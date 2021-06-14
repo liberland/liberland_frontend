@@ -1,23 +1,79 @@
-import logo from './logo.svg';
-import './App.css';
+// LIBS
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from 'react-router-dom';
+import MoonLoader from 'react-spinners/MoonLoader';
+import { css } from '@emotion/core';
+
+// ROUTER
+import routes from './router';
+
+// COMPONENTS
+import SignIn from './components/AuthComponents/SignIn';
+import SignUp from './components/AuthComponents/SingUp';
+import Home from './components/Home';
+import Loader from './components/Loader';
+
+// REDUX
+import { userSelectors } from './redux/selectors';
+import {
+  authActions,
+} from './redux/actions';
+
+const override = css`
+  display: block;
+  margin: 0 auto;
+`;
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+  const dispatch = useDispatch();
+  const isSessionVerified = useSelector(userSelectors.selectIsSessionVerified);
+  const user = useSelector(userSelectors.selectUser);
+
+  useEffect(() => {
+    dispatch(authActions.verifySession.call());
+  }, [dispatch]);
+
+  const loggedOutRoutes = (
+    <Router>
+      <Switch>
+        <Route path={routes.signIn} component={SignIn} />
+        <Route path={routes.signUp} component={SignUp} />
+        <Route path="*" render={() => <Redirect to={routes.signIn} />} />
+      </Switch>
+    </Router>
+  );
+
+  const loggedInRoutes = (
+    <Router>
+      <Switch>
+        <Route path={routes.home.index} component={Home} />
+        <Route path="*" render={() => <Redirect to={routes.home.index} />} />
+      </Switch>
+    </Router>
+  );
+
+  const appRouter = user ? loggedInRoutes : loggedOutRoutes;
+
+  return isSessionVerified ? (
+    <Loader>
+      {appRouter}
+    </Loader>
+  ) : (
+    <div
+      style={{
+        display: 'flex',
+        height: '100vh',
+        alignItems: 'center',
+        background: 'rgb(170,170,170,0.1)',
+      }}
+    >
+      <MoonLoader loading css={override} size={150} color="#F1C823" />
     </div>
   );
 }

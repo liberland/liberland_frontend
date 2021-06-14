@@ -1,0 +1,30 @@
+@import '../../assets/variables';
+@import '../../assets/fonts/fonts';
+
+.button {
+  background: $bg3;
+  border-radius: 15px;
+  width: 100%;
+  height: 58px;
+  border: none;
+  font-family: $medium;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  & > svg {
+    margin-right: 10px;
+  }
+  &.large{
+    width: 540px;
+  }
+  &.medium{
+    width: 222px;
+  }
+  color: $text4;
+  cursor: pointer;
+  &.primary {
+    background: $primary;
+    color: white;
+  }
+}
