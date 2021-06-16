@@ -1,0 +1,31 @@
+@import '../../../assets/variables';
+@import '../../../assets/fonts/fonts';
+
+.logoHeaderWrapper {
+  padding: 30px 35px;
+  border-right: 1px solid $bg2;
+  max-width: 179px;
+  width: 100%;
+}
+
+.homeHeaderWrapper {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.homeHeaderAccountWrapper{
+  display: flex;
+  align-items: center;
+  height: 42px;
+  justify-content: space-between;
+  width: 100%;
+  padding: 30px 35px;
+
+  & > p {
+    margin: 0;
+    font-family: $regular;
+    font-weight: bold;
+    font-size: 24px;
+  }
+}

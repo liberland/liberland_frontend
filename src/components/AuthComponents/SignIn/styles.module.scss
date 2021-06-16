@@ -1,6 +1,12 @@
 @import '../../../assets/variables';
 @import '../../../assets/fonts/fonts';
 
+.headerWrapper {
+  display: flex;
+  justify-content: space-between;
+  margin: 30px 78px;
+}
+
 .signInWrapper {
   max-width: 540px;
   width: 100%;
