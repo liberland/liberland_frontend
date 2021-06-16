@@ -1,0 +1,54 @@
+@import '../../../assets/variables';
+@import '../../../assets/fonts/fonts';
+
+.navigationLink {
+  width: 100%;
+  font-family: $medium;
+  font-size: 14px;
+  line-height: 29px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & .activeBg {
+    background: $secondary3;
+  }
+
+  & a {
+    padding: 11px 13px;
+    align-items: center;
+    display: flex;
+    text-decoration: none;
+    width: 80%;
+    border-radius: 15px;
+    position: relative;
+
+    &>img {
+      margin-right: 10px;
+    }
+
+
+    &>img.activeIcon {
+      display: none;
+    }
+
+    &>span {
+      color: $text3;
+    }
+
+    &.activeBg {
+      &>img {
+        display: none;
+      }
+
+      &>img.activeIcon {
+        display: initial;
+      }
+
+      &>span {
+        color: $primary;
+      }
+    }
+  }
+}

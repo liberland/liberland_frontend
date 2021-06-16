@@ -58,7 +58,9 @@ const SignIn = () => {
 
   return (
     <div>
-      <Header />
+      <div className={styles.headerWrapper}>
+        <Header />
+      </div>
       <div className={styles.signInWrapper}>
         <h3>Sign In to Liberland</h3>
         <p>Welcome back, you’ve been missed!</p>
