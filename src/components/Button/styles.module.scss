@@ -21,10 +21,20 @@
   &.medium{
     width: 222px;
   }
+  &.small{
+    width: 139px;
+    height: 48px;
+    font-size: 14px;
+    font-weight: 600;
+  }
   color: $text4;
   cursor: pointer;
   &.primary {
     background: $primary;
     color: white;
+  }
+  &.secondary {
+    background: $secondary3;
+    color: $primary;
   }
 }

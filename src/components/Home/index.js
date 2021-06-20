@@ -4,6 +4,7 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import router from '../../router';
 import HomeHeader from './HomeHeader';
 import HomeNavigation from './HomeNavigation';
+import Wallet from '../Wallet';
 import RoleHOC from '../../hocs/RoleHOC';
 
 import styles from './styles.module.scss';
@@ -17,7 +18,7 @@ const Home = () => (
         <Route path={router.home.profile} component={() => <div>Profile</div>} />
         <Route path={router.home.feed} component={() => <div>Feed</div>} />
         <Route path={router.home.documents} component={() => <div>documents</div>} />
-        <Route path={router.home.wallet} component={() => <div>wallet</div>} />
+        <Route path={router.home.wallet} component={Wallet} />
         <Route path={router.home.voting} component={() => <div>voting</div>} />
         <Route path={router.home.constitution} component={() => <div>Feed</div>} />
 
