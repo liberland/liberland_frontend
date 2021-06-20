@@ -1,0 +1,78 @@
+@import '../../../assets/variables';
+@import '../../../assets/fonts/fonts';
+
+.cardWrapper{
+  margin-top: 32px;
+}
+
+.transactionHistoryCard{
+  padding: 28px;
+  border-radius: 20px;
+  background-color: #fff;
+  margin-top: 35px;
+}
+
+.transactionHistoryCardHeader{
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  border-radius: 15px;
+  background-color: $bg3;
+  font-size: 14px;
+  font-weight: 600;
+
+  & > :first-child{
+    width: 300px;
+  }
+  & > * {
+    flex: 0 0 auto;
+  }
+}
+
+.transactionHistoryCardMain{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 32px 0;
+  padding-right: 20px;
+  & > :first-child{
+    width: 350px;
+  }
+  & > * {
+    flex: 0 0 auto;
+  }
+  & .paymentNumber{ 
+    display: flex;
+    align-items: center;
+    
+    & .paymentNumberIcon{
+      margin-right: 21px;
+      display: flex;
+      align-items: center;
+    }
+
+    & .paymentFrom {
+      & > p {
+        font-weight: 600;
+        color: $text2;
+        line-height: 29px;
+        font-size: 14px;
+
+        & > span {
+          color: $primary;
+        }
+      }
+      & > .paymentFromDate{
+        color: $text4;
+        font-weight: 500;
+        
+      }
+    }
+  }
+}
+
+.transactionHistoryAmount{
+  color: $text2;
+  font-size: 14px;
+  font-weight: 600;
+}

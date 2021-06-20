@@ -1,0 +1,20 @@
+@import '../../assets/variables';
+@import '../../assets/fonts/fonts';
+
+.status {
+  text-transform: capitalize;
+  border-radius: 15px;
+  padding: 7px 11px;
+  font-size: 12px;
+  font-weight: 500;
+  
+  &.completed {
+    color: $primary2;
+    background-color: $secondary2;
+  }
+
+  &.declined {
+    color: $primary4;
+    background-color: $secondary4;
+  }
+}

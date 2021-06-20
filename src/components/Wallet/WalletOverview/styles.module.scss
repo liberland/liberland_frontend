@@ -1,0 +1,66 @@
+@import '../../../assets/variables';
+@import '../../../assets/fonts/fonts';
+
+.overviewWrapper {
+  margin-top: 21px;
+}
+
+.overViewCard {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 39px;
+}
+
+.cardInfo{
+  width: 199px;
+  background: #fff;
+  border-radius: 15px;
+  padding: 21px 25px;
+  cursor: pointer;
+
+  &:hover{
+    box-shadow: 0px 23px 44px rgba(176, 183, 195, 0.14);
+  }
+}
+
+.cardInfoAmountWrapper{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  
+
+  & > p {
+    line-height: 29px;
+    margin-bottom: 0;
+    font-weight: 600;
+  }
+}
+
+.cardInfoAmount {
+  color: $text2;
+  font-size: 24px;
+  margin-top: 20px;
+  
+
+  & > span {
+    font-size: 12px;
+  }
+}
+
+.cardInfoAmountDiff {
+  font-size: 12px;
+  &.cardInfoAmountDiffGreen{
+    color: $primary2,
+  }
+  &.cardInfoAmountDiffRed{
+    color: $errorText,
+  }
+}
+
+.cardInfoTitle {
+  line-height: 29px;
+  margin: 0;
+  font-weight: 600;
+  color: $text4;
+  font-weight: 500;
+}

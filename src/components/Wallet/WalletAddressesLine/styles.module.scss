@@ -1,0 +1,50 @@
+@import '../../../assets/variables';
+@import '../../../assets/fonts/fonts';
+
+.walletAddressLineWrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.addressesWrapper {
+  display: flex;
+  margin-right: 60px;
+}
+
+.addressTitle {
+  font-size: 14px;
+  color: $text4;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 5px;
+  line-height: 29px;
+}
+
+.address {
+  font-size: 22px;
+  color: $text1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  margin: 0;
+}
+
+.singleAddressWrapper {
+  width: 213px;
+  margin-right: 60px;
+}
+
+.buttonsWrapper {
+  display: flex;
+  align-items: center;
+
+  &>button {
+    margin-left: 20px;
+  }
+}
+
+.copyIcon {
+  cursor: pointer;
+}
