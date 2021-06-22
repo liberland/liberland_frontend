@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import { authActions } from '../../../redux/actions';
 import router from '../../../router';
-import Header from '../../AuthComponents/Header';
 
 import styles from './styles.module.scss';
 
@@ -26,9 +25,6 @@ const HomeHeader = () => {
 
   return (
     <div className={styles.homeHeaderWrapper}>
-      <div className={styles.logoHeaderWrapper}>
-        <Header />
-      </div>
       <div className={styles.homeHeaderAccountWrapper}>
         <p>{titles[location.pathname]}</p>
         <button onClick={handleLogout}>Logout</button>

@@ -1,0 +1,36 @@
+@import '../../assets/variables';
+@import '../../assets/fonts/fonts';
+
+
+.getCitizenshipModal {
+  padding: 33px 35px 40px 35px;
+  width: 525px;
+
+  & .h3{
+    color: $text1;
+    font-weight: 600;
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+
+  & .description {
+    font-size: 16px;
+    color: $text4;
+    font-weight: 500;
+  }
+
+  & .title {
+    font-size: 14px;
+    font-weight: 600;
+    color: $text4;
+    margin: 30px 0 5px 0;
+    line-height: 29px;
+  }
+
+  & .buttonWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 40px;
+  }
+}
