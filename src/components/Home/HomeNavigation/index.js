@@ -17,6 +17,8 @@ import VotingIcon from '../../../assets/icons/voting.svg';
 import VotingIconActive from '../../../assets/icons/active-voting.svg';
 import ConstitutionIcon from '../../../assets/icons/constitution.svg';
 import ConstitutionIconActive from '../../../assets/icons/active-constitution.svg';
+import Header from '../../AuthComponents/Header';
+import GetCitizenshipCard from '../GetCitizenshipCard';
 
 const navigationList = [
   {
@@ -61,6 +63,9 @@ const HomeNavigation = () => {
 
   return (
     <div className={styles.navigationWrapper}>
+      <div className={styles.logoHeaderWrapper}>
+        <Header />
+      </div>
       {
         navigationList.map(({
           route,
@@ -80,6 +85,7 @@ const HomeNavigation = () => {
           </RoleHOC>
         ))
       }
+      <GetCitizenshipCard />
     </div>
 
   );

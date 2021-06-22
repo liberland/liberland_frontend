@@ -51,7 +51,7 @@ const WalletOverview = () => {
             const isDiffPositive = cardInfo.diff > 0;
 
             return (
-              <div className={styles.cardInfo}>
+              <div className={styles.cardInfo} key={cardInfo.title}>
                 <div className={styles.cardInfoIcon}>{cardInfo.getIcon()}</div>
                 <div className={styles.cardInfoAmountWrapper}>
                   <p className={styles.cardInfoAmount}>
