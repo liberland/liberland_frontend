@@ -12,6 +12,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 600;
   & > svg {
     margin-right: 10px;
   }
@@ -25,7 +26,6 @@
     width: 139px;
     height: 48px;
     font-size: 14px;
-    font-weight: 600;
   }
   color: $text4;
   cursor: pointer;

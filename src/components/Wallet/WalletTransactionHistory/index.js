@@ -19,7 +19,7 @@ const WalletTransactionHistory = () => {
     {
       status: 'completed',
       amount: 0.532,
-      number: '#23433',
+      number: '#23432',
       date: 'Today, 11:54 AM',
       paymentType: 'complete',
     },
@@ -33,7 +33,7 @@ const WalletTransactionHistory = () => {
     {
       status: 'declined',
       amount: -0.532,
-      number: '#23433',
+      number: '#23434',
       date: 'Today, 11:54 AM',
       paymentType: 'failed',
     },
@@ -51,7 +51,7 @@ const WalletTransactionHistory = () => {
         {transactionHistory.map((transactionHistoryInfo) => {
           const isAmountPositive = transactionHistoryInfo.amount > 0;
           return (
-            <div className={styles.transactionHistoryCardMain}>
+            <div className={styles.transactionHistoryCardMain} key={transactionHistoryInfo.number}>
               <div className={styles.paymentNumber}>
                 <div className={styles.paymentNumberIcon}>
                   {paymentTypeIcons[transactionHistoryInfo.paymentType]()}
