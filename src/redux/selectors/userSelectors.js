@@ -30,7 +30,55 @@ const selectUserId = createSelector(
     return user.id;
   },
 );
-
+const selectUserName = createSelector(
+  selectUser,
+  (user) => {
+    if (!user) return null;
+    return user.name;
+  },
+);
+const selectUserLastName = createSelector(
+  selectUser,
+  (user) => {
+    if (!user) return null;
+    return user.lastName;
+  },
+);
+const selectUserOrigin = createSelector(
+  selectUser,
+  (user) => {
+    if (!user) return null;
+    return user.origin;
+  },
+);
+const selectUserAbout = createSelector(
+  selectUser,
+  (user) => {
+    if (!user) return null;
+    return user.about;
+  },
+);
+const selectUserOccupation = createSelector(
+  selectUser,
+  (user) => {
+    if (!user) return null;
+    return user.occupation;
+  },
+);
+const selectUserGender = createSelector(
+  selectUser,
+  (user) => {
+    if (!user) return null;
+    return user.gender;
+  },
+);
+const selectUserLanguages = createSelector(
+  selectUser,
+  (user) => {
+    if (!user) return null;
+    return user.languages;
+  },
+);
 const selectIsSessionVerified = createSelector(
   userReducer,
   (reducer) => reducer.isSessionVerified,
@@ -48,4 +96,11 @@ export {
   selectUserEmail,
   selectUserId,
   selectIsSignInFetching,
+  selectUserAbout,
+  selectUserName,
+  selectUserLastName,
+  selectUserOrigin,
+  selectUserOccupation,
+  selectUserGender,
+  selectUserLanguages,
 };
