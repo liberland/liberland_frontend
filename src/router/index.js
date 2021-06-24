@@ -10,4 +10,10 @@ export default {
     profile: '/home/profile',
     constitution: '/home/constitution',
   },
+  documents: {
+    myAccount: '/home/documents/my-account',
+    citizenshipHistory: '/home/documents/citizenship-history',
+    landOwnership: '/home/documents/land-ownership',
+    courtCases: '/home/documents/court-cases',
+  },
 };

@@ -1,0 +1,23 @@
+@import '../../assets/variables';
+@import '../../assets/fonts/fonts';
+
+.tabsWrapper {
+  display: flex;
+  margin-bottom: 40px;
+  align-items: center;
+}
+
+.link {
+  margin-right: 40px;
+  font-size: 14px;
+  font-weight: 600;
+  color: $text4;
+  padding-bottom: 14px;
+  line-height: 29px;
+  text-decoration: none;
+}
+
+.activeLink {
+  color: $primary;
+  border-bottom: 1px solid $primary;
+}

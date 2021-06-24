@@ -1,9 +1,14 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import Avatar from 'react-avatar';
 
+// COMPONENTS
 import NavigationLink from '../NavigationLink';
 import RoleHOC from '../../../hocs/RoleHOC';
 import router from '../../../router';
+import Header from '../../AuthComponents/Header';
+import GetCitizenshipCard from '../GetCitizenshipCard';
 
 // ASSETS
 import styles from './styles.module.scss';
@@ -17,49 +22,58 @@ import VotingIcon from '../../../assets/icons/voting.svg';
 import VotingIconActive from '../../../assets/icons/active-voting.svg';
 import ConstitutionIcon from '../../../assets/icons/constitution.svg';
 import ConstitutionIconActive from '../../../assets/icons/active-constitution.svg';
-import Header from '../../AuthComponents/Header';
-import GetCitizenshipCard from '../GetCitizenshipCard';
 
-const navigationList = [
-  {
-    route: router.home.profile,
-    title: 'Profile',
-    // access: 'citizen',
-  },
-  {
-    route: router.home.feed,
-    title: 'Feed',
-    icon: FeedIcon,
-    activeIcon: FeedIconActive,
-  },
-  {
-    route: router.home.documents,
-    title: 'Documents',
-    icon: DocumentsIcon,
-    activeIcon: DocumentsIconActive,
-  },
-  {
-    route: router.home.wallet,
-    title: 'Wallet',
-    icon: WalletIcon,
-    activeIcon: WalletIconActive,
-  },
-  {
-    route: router.home.voting,
-    title: 'Voting',
-    icon: VotingIcon,
-    activeIcon: VotingIconActive,
-  },
-  {
-    route: router.home.constitution,
-    title: 'Constitution',
-    icon: ConstitutionIcon,
-    activeIcon: ConstitutionIconActive,
-  },
-];
+// REDUX
+import { userSelectors } from '../../../redux/selectors';
+
+// CONSTANTS
+import roleEnums from '../../../constants/roleEnums';
 
 const HomeNavigation = () => {
   const location = useLocation();
+  const role = useSelector(userSelectors.selectUserRole);
+  const name = useSelector(userSelectors.selectUserName);
+  const lastName = useSelector(userSelectors.selectUserLastName);
+
+  const navigationList = [
+    {
+      route: router.home.profile,
+      title: `${name} ${lastName}`,
+      // access: 'citizen',
+      icon: () => <Avatar name={`${name} ${lastName}`} round size="41px" />,
+      description: '100.000 LLM',
+    },
+    {
+      route: router.home.feed,
+      title: 'Feed',
+      icon: FeedIcon,
+      activeIcon: FeedIconActive,
+    },
+    {
+      route: router.home.documents,
+      title: 'Documents',
+      icon: DocumentsIcon,
+      activeIcon: DocumentsIconActive,
+    },
+    {
+      route: router.home.wallet,
+      title: 'Wallet',
+      icon: WalletIcon,
+      activeIcon: WalletIconActive,
+    },
+    {
+      route: router.home.voting,
+      title: 'Voting',
+      icon: VotingIcon,
+      activeIcon: VotingIconActive,
+    },
+    {
+      route: router.home.constitution,
+      title: 'Constitution',
+      icon: ConstitutionIcon,
+      activeIcon: ConstitutionIconActive,
+    },
+  ];
 
   return (
     <div className={styles.navigationWrapper}>
@@ -73,6 +87,7 @@ const HomeNavigation = () => {
           activeIcon,
           title,
           access,
+          description,
         }) => (
           <RoleHOC key={route} access={access}>
             <NavigationLink
@@ -81,11 +96,12 @@ const HomeNavigation = () => {
               icon={icon}
               activeIcon={activeIcon}
               path={location.pathname}
+              description={description}
             />
           </RoleHOC>
         ))
       }
-      <GetCitizenshipCard />
+      {role === roleEnums.E_RESIDENT && <GetCitizenshipCard />}
     </div>
 
   );

@@ -1,16 +1,25 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import Avatar from 'react-avatar';
 import { useHistory, useLocation } from 'react-router-dom';
+import useDropdown from '../../../hooks/useDropdown';
 import { authActions } from '../../../redux/actions';
+import { userSelectors } from '../../../redux/selectors';
 import router from '../../../router';
 
 import styles from './styles.module.scss';
 
 const HomeHeader = () => {
+  const name = useSelector(userSelectors.selectUserName);
+  const lastName = useSelector(userSelectors.selectUserLastName);
   const titles = {
     [router.home.profile]: 'My profile',
     [router.home.documents]: 'My documents',
-    [router.home.feed]: 'Hi, {Username}!',
+    [router.documents.myAccount]: 'My documents',
+    [router.documents.citizenshipHistory]: 'My documents',
+    [router.documents.courtCases]: 'My documents',
+    [router.documents.landOwnership]: 'My documents',
+    [router.home.feed]: `Hi, ${name} ${lastName}!`,
     [router.home.constitution]: 'Constitution',
     [router.home.voting]: 'Voting',
     [router.home.wallet]: 'Wallet',
@@ -18,6 +27,9 @@ const HomeHeader = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const location = useLocation();
+  const [
+    isOpen, toggleDropdown, dropdown, trigger,
+  ] = useDropdown();
 
   const handleLogout = () => {
     dispatch(authActions.signOut.call(history));
@@ -27,7 +39,16 @@ const HomeHeader = () => {
     <div className={styles.homeHeaderWrapper}>
       <div className={styles.homeHeaderAccountWrapper}>
         <p>{titles[location.pathname]}</p>
-        <button onClick={handleLogout}>Logout</button>
+        <div className={styles.avatarWrapper}>
+          <div ref={trigger} className={styles.avatar}>
+            <Avatar name={`${name} ${lastName}`} round onClick={toggleDropdown} size="47px" />
+          </div>
+          {isOpen && (
+            <div className={styles.dropdown} ref={dropdown}>
+              <button onClick={handleLogout}>Logout</button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

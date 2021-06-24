@@ -22,3 +22,14 @@
     font-size: 24px;
   }
 }
+
+.avatarWrapper{
+  position: relative;
+}
+
+.dropdown {
+  display: flex;
+  padding: 10px 0 10px 20px;
+  background: $text4;
+  position: absolute;
+};
