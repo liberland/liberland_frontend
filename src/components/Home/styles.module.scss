@@ -1,7 +1,16 @@
+@import '../../assets/variables';
+@import '../../assets/fonts/fonts';
+
 .homeContentWrapper {
   display: flex;
 }
 
 .homeMain {
   width: 100%;
+}
+
+.switchContentWrapper {
+  display: flex;
+  padding: 30px;
+  background-color: $bg3;
 }
