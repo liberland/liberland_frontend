@@ -1,0 +1,24 @@
+@import '../assets/variables';
+@import '../assets/fonts/fonts';
+
+.btn {
+  font-family: $bold;
+  font-size: 14px;
+  border: none;
+  border-radius: 15px;
+  padding: 13px 30px;
+  margin-top: 15px;
+}
+
+.btnGrey {
+  @extend .btn;
+  background-color: $bg3;
+  color: $text4;
+  text-transform: capitalize;
+}
+
+.btnYellow {
+  @extend .btn;
+  background-color: $primary;
+  color: $bg4;
+}

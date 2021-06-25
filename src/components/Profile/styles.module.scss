@@ -1,0 +1,139 @@
+@import '../../assets/variables';
+@import '../../assets/fonts/fonts';
+@import '../../assets/buttuns';
+
+.profile {
+  display: flex;
+  justify-content: center;
+  width: 835px;
+  font-family: $medium;
+  font-size: 14px;
+  color: $text4;
+
+  h3 {
+    font-family: $bold;
+    font-size: 16px;
+    color: $text2;
+  }
+
+  .wrapperBlock {
+    background-color: $bg4;
+    border-radius: 15px;
+    margin: 10px;
+    padding: 20px;
+  }
+
+  .avatar {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    span {
+      color: $primary;
+    }
+  }
+
+  .liberlandId {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .userNameBalance {
+    display: flex;
+    flex-direction: column;
+
+    .userNameRole {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h3 {
+        font-size: 20px;
+        margin-bottom: 13px;
+      }
+
+      span {
+        text-transform: capitalize;
+      }
+    }
+
+    .balance {
+      text-transform: capitalize;
+      font-family: $medium;
+      font-weight: 500;
+      font-size: 12px;
+
+      span {
+        font-family: $bold;
+        font-weight: 700;
+      }
+
+      .walletAddress {
+        color: $primary;
+        font-weight: 500;
+        margin-left: 7px;
+      }
+    }
+  }
+
+  .aboutUser {
+    h3 {
+      margin-bottom: 23px;
+    }
+
+    span {
+      line-height: 28px;
+      font-size: 14px;
+    }
+
+    .aboutUserFooter {
+      margin-top: 64px;
+    }
+
+    .itemFooterAbout {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      margin-bottom: 18px;
+
+      img {
+        margin-right: 17px;
+      }
+    }
+    .valueOfItem{
+      margin-left: 3px;
+      font-weight: 600;
+    }
+  }
+
+  .startOfKyc {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    img {
+      max-width: 70px;
+      max-height: 70px;
+      margin-bottom: 17px;
+    }
+
+    h3 {
+      line-height: 23px;
+      margin: 0;
+      font-size: 16px;
+    }
+
+    span {
+      font-size: 12px;
+      line-height: 24px;
+      text-align: center;
+      margin: 10px 0 25px 0;
+    }
+
+    .btnYellow {
+      align-self: normal;
+      margin: 0;
+    }
+  }
+}
+
