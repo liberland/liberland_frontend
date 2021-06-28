@@ -14,6 +14,7 @@ import languagesImage from '../../assets/icons/languages.svg';
 import occupationImage from '../../assets/icons/occuoation.svg';
 import genderImage from '../../assets/icons/gender.svg';
 import startOfKyc from '../../assets/icons/startOfKyc.svg';
+import Card from '../Card';
 
 const Profile = () => {
   const userName = useSelector(userSelectors.selectUserName);
@@ -28,11 +29,13 @@ const Profile = () => {
   const gender = useSelector(userSelectors.selectUserGender);
 
   return (
-    <div className={styles.profile}>
+    <Card className={styles.profile}>
       <div className="left-column">
         <div className={styles.wrapperBlock}>
           <div className={styles.avatar}>
-            <Avatar name={`${userName} ${lastName}`} round size="251" color="#FDF4E0" />
+            <div className={styles.avatarImage}>
+              <Avatar name={`${userName} ${lastName}`} round size="251" color="#FDF4E0" />
+            </div>
             <Button medium>Edit Your Profile</Button>
           </div>
         </div>
@@ -41,7 +44,9 @@ const Profile = () => {
             <div className={styles.wrapperBlock}>
               <div className={styles.liberlandId}>
                 <h3>Your Liberland ID</h3>
-                <img src={eCardImage} alt="" />
+                <div className={styles.avatarImage}>
+                  <img src={eCardImage} alt="" />
+                </div>
                 <Button medium primary>Show QR code</Button>
               </div>
             </div>
@@ -117,7 +122,7 @@ const Profile = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
