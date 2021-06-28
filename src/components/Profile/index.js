@@ -2,6 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import Avatar from 'react-avatar';
 
+import Button from '../Button/Button';
 import { userSelectors } from '../../redux/selectors';
 
 import styles from './styles.module.scss';
@@ -32,7 +33,7 @@ const Profile = () => {
         <div className={styles.wrapperBlock}>
           <div className={styles.avatar}>
             <Avatar name={`${userName} ${lastName}`} round size="251" color="#FDF4E0" />
-            <button className={styles.btnGrey}>edit your profile</button>
+            <Button medium>Edit Your Profile</Button>
           </div>
         </div>
         {(userRole !== 'non-citizen')
@@ -41,7 +42,7 @@ const Profile = () => {
               <div className={styles.liberlandId}>
                 <h3>Your Liberland ID</h3>
                 <img src={eCardImage} alt="" />
-                <button className={styles.btnYellow}>Show QR code</button>
+                <Button medium primary>Show QR code</Button>
               </div>
             </div>
           )
@@ -54,7 +55,7 @@ const Profile = () => {
                 <span>
                   We need to know more information about you to provide e-residency status.
                 </span>
-                <button className={styles.btnYellow}>Start KYC</button>
+                <Button medium primary>Start KYC</Button>
               </div>
             </div>
           )}

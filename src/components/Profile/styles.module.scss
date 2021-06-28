@@ -1,6 +1,5 @@
 @import '../../assets/variables';
 @import '../../assets/fonts/fonts';
-@import '../../assets/buttuns';
 
 .profile {
   display: flex;
@@ -128,11 +127,6 @@
       line-height: 24px;
       text-align: center;
       margin: 10px 0 25px 0;
-    }
-
-    .btnYellow {
-      align-self: normal;
-      margin: 0;
     }
   }
 }
