@@ -15,9 +15,19 @@
   padding-bottom: 14px;
   line-height: 29px;
   text-decoration: none;
+
+  &:hover {
+    border-bottom: 1px solid $text4;
+    padding-bottom: 13px;
+  }
 }
 
 .activeLink {
   color: $primary;
   border-bottom: 1px solid $primary;
+  padding-bottom: 13px;
+
+  &:hover{
+    border-bottom: 1px solid $primary;
+  }
 }

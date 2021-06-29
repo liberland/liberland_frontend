@@ -1,0 +1,18 @@
+.votingWrapper {
+  padding: 8px 30px;
+}
+
+.navWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+
+  & > div {
+    margin: 0;
+  }
+
+  & > .upcomingVotings {
+    width: 189px;
+  }
+}

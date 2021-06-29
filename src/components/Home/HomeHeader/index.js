@@ -22,6 +22,9 @@ const HomeHeader = () => {
     [router.home.feed]: `Hi, ${name} ${lastName}!`,
     [router.home.constitution]: 'Constitution',
     [router.home.voting]: 'Voting',
+    [router.voting.voteHistory]: 'Voting',
+    [router.voting.congressionalAssemble]: 'Voting',
+    [router.voting.vetoVotes]: 'Voting',
     [router.home.wallet]: 'Wallet',
   };
   const dispatch = useDispatch();
@@ -41,7 +44,7 @@ const HomeHeader = () => {
         <p>{titles[location.pathname]}</p>
         <div className={styles.avatarWrapper}>
           <div ref={trigger} className={styles.avatar}>
-            <Avatar name={`${name} ${lastName}`} round onClick={toggleDropdown} size="47px" />
+            <Avatar name={`${name} ${lastName}`} round onClick={toggleDropdown} size="47px" fgColor="#F1C823" color="#FDF4E0" />
           </div>
           {isOpen && (
             <div className={styles.dropdown} ref={dropdown}>
