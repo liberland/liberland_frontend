@@ -6,6 +6,7 @@ import HomeHeader from './HomeHeader';
 import HomeNavigation from './HomeNavigation';
 import Wallet from '../Wallet';
 import RoleHOC from '../../hocs/RoleHOC';
+import Profile from '../Profile';
 
 import styles from './styles.module.scss';
 import Documents from '../Documents';
@@ -17,7 +18,7 @@ const Home = () => (
       <div className={styles.homeMain}>
         <HomeHeader />
         <Switch>
-          <Route path={router.home.profile} component={() => <div>Profile</div>} />
+          <Route path={router.home.profile} component={Profile} />
           <Route path={router.home.feed} component={() => <div>Feed</div>} />
           <Route path={router.home.documents} component={Documents} />
           <Route path={router.home.wallet} component={Wallet} />
@@ -35,7 +36,6 @@ const Home = () => (
           />
         </Switch>
       </div>
-
     </div>
   </div>
 );
