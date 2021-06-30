@@ -40,7 +40,7 @@ const HomeNavigation = () => {
       route: router.home.profile,
       title: `${name} ${lastName}`,
       // access: 'citizen',
-      icon: () => <Avatar name={`${name} ${lastName}`} round size="41px" />,
+      icon: () => <Avatar name={`${name} ${lastName}`} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
       description: '100.000 LLM',
     },
     {
