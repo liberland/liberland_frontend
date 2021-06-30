@@ -1,0 +1,90 @@
+@import '../../assets/variables';
+@import '../../assets/fonts/fonts';
+
+.constitution {
+  margin-left: 30px;
+  display: flex;
+
+  h3 {
+    margin-bottom: 34px;
+  }
+}
+
+.article {
+  display: flex;
+  flex-direction: column;
+}
+
+.singleArticle {
+  display: flex;
+  padding: 27px;
+  background-color: $bg4;
+  border-radius: 15px;
+  margin-bottom: 18px;
+  width: 783px;
+
+  h3 {
+    font-size: 22px;
+    color: $text2;
+    margin: 0 0 20px;
+  }
+
+  span {
+    font-size: 14px;
+    color: $text4;
+  }
+}
+
+.round {
+  background-color: $transparent1;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 30px;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.categoryNavigation {
+ display: flex;
+  flex-direction: column;
+  margin: 0 30px;
+
+  h3 {
+    margin-bottom: 25px;
+  }
+}
+
+.categoryItem{
+  display: flex;
+  align-items: center;
+  padding: 17px 0;
+  background-color: $transparent1;
+  border-radius: 15px;
+  margin-bottom: 13px;
+  width: 240px;
+
+  img {
+    margin: 0 7px 0 23px;
+    width: 30px;
+    height: 30px;
+  }
+
+  h4 {
+    color: $text2;
+    margin: 0 0 7px;
+  }
+
+  span {
+
+    font-size: 12px;
+    color: $text4;
+  }
+}
+
