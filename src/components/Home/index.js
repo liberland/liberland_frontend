@@ -7,6 +7,7 @@ import HomeNavigation from './HomeNavigation';
 import Wallet from '../Wallet';
 import RoleHOC from '../../hocs/RoleHOC';
 import Profile from '../Profile';
+import Constitution from '../Constitution';
 
 import styles from './styles.module.scss';
 import Documents from '../Documents';
@@ -23,7 +24,7 @@ const Home = () => (
           <Route path={router.home.documents} component={Documents} />
           <Route path={router.home.wallet} component={Wallet} />
           <Route path={router.home.voting} component={() => <div>voting</div>} />
-          <Route path={router.home.constitution} component={() => <div>Feed</div>} />
+          <Route path={router.home.constitution} component={Constitution} />
 
           <Route
             exact
