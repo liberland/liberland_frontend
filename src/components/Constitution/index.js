@@ -87,7 +87,7 @@ const Constitution = () => {
     <div className={styles.constitution}>
       <Card title="Main Articles" className={styles.article}>
         {articles.map((article) => (
-          <Article key={article.id} image={blueSquareImage} article />
+          <Article key={article.id} image={blueSquareImage} article={article} />
         ))}
       </Card>
       <div className={styles.categoryNavigation}>
