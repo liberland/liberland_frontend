@@ -13,6 +13,7 @@ const Article = ({ article, image }) => (
       </h3>
       <span>
         Last update
+        {' '}
         {article.lastUpdate}
       </span>
     </div>
