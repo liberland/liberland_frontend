@@ -1,5 +1,4 @@
 import React from 'react';
-import { v4 as uuidv4 } from 'uuid';
 
 import Card from '../Card';
 import Article from './Article';
@@ -8,30 +7,34 @@ import NavigationCategory from './NavigationCategory';
 import styles from './styles.module.scss';
 import blueSquareImage from '../../assets/icons/blue-square.svg';
 
-const article = [
+const articles = [
   {
+    id: 234,
     title: 'Article 1',
     lastUpdate: '13.04.2021',
 
   },
   {
+    id: 235,
     title: 'Article 2',
     lastUpdate: '13.04.2021',
 
   },
   {
+    id: 236,
     title: 'Article 3',
     lastUpdate: '13.04.2021',
 
   },
   {
+    id: 237,
     title: 'Article 4',
     lastUpdate: '13.04.2021',
 
   },
 ];
 
-const category = [
+const categories = [
   {
     id: 123,
     title: 'Category 1',
@@ -83,16 +86,16 @@ const Constitution = () => {
   return (
     <div className={styles.constitution}>
       <Card title="Main Articles" className={styles.article}>
-        {article.map((el) => (
-          <Article key={uuidv4()} image={blueSquareImage} article={el} />
+        {articles.map((article) => (
+          <Article key={article.id} image={blueSquareImage} article />
         ))}
       </Card>
       <div className={styles.categoryNavigation}>
         <h3>Navigation</h3>
-        { category.map((el) => (
+        { categories.map((category) => (
           <NavigationCategory
-            key={uuidv4()}
-            category={el}
+            key={category.id}
+            category={category}
             setCategory={setCategory}
             image={blueSquareImage}
           />
