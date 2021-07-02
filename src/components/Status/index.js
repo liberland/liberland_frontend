@@ -3,10 +3,12 @@ import cx from 'classnames';
 
 import styles from './styles.module.scss';
 
-const Status = ({ status }) => (
+const Status = ({
+  status, completed, declined, pending, className,
+}) => (
   <span
-    className={cx(styles.status,
-      { [styles.completed]: status === 'completed', [styles.declined]: status === 'declined' })}
+    className={cx(styles.status, className,
+      { [styles.completed]: completed, [styles.declined]: declined, [styles.pending]: pending })}
   >
     {status}
   </span>
