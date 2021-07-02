@@ -16,4 +16,9 @@ export default {
     landOwnership: '/home/documents/land-ownership',
     courtCases: '/home/documents/court-cases',
   },
+  voting: {
+    congressionalAssemble: '/home/voting/congressional-assemble',
+    vetoVotes: '/home/voting/veto-votes',
+    voteHistory: '/home/voting/vote-history',
+  },
 };

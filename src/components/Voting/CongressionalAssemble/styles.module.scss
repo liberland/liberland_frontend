@@ -1,0 +1,32 @@
+@import '../../../assets/variables';
+@import '../../../assets/fonts/fonts';
+
+
+.congressionalAssembleWrapper {
+  background-color: $bg4;
+  padding: 36px 30px;
+  border-radius: 15px;
+};
+
+.headerWrapper{
+  display: flex;
+  justify-content: space-between;
+
+  & > h3 {
+    margin: 0;
+    color: $text1;
+    font-weight: 600;
+    font-size: 18px;
+  }
+}
+
+.buttonWrapper {
+  width: 63px;
+  height: 43px;
+  & > button {
+    height: 100%;
+    & > svg {
+      margin: auto
+    }
+  }
+}

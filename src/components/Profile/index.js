@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Avatar from 'react-avatar';
+import cx from 'classnames';
 
 import Button from '../Button/Button';
 import { userSelectors } from '../../redux/selectors';
@@ -16,7 +17,7 @@ import genderImage from '../../assets/icons/gender.svg';
 import startOfKyc from '../../assets/icons/startOfKyc.svg';
 import Card from '../Card';
 
-const Profile = () => {
+const Profile = ({ className }) => {
   const userName = useSelector(userSelectors.selectUserName);
   const lastName = useSelector(userSelectors.selectUserLastName);
   const userBalance = '100.000';
@@ -29,7 +30,7 @@ const Profile = () => {
   const gender = useSelector(userSelectors.selectUserGender);
 
   return (
-    <Card className={styles.profile}>
+    <Card className={cx(styles.profile, className)}>
       <div className="left-column">
         <div className={styles.wrapperBlock}>
           <div className={styles.avatar}>

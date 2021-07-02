@@ -2,6 +2,7 @@ import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import RoleHOC from '../../hocs/RoleHOC';
 import router from '../../router';
+import Profile from '../Profile';
 import Tabs from '../Tabs';
 
 import styles from './styles.module.scss';
@@ -34,7 +35,7 @@ const Documents = () => (
       <Switch>
         <Route
           path={router.documents.myAccount}
-          component={() => <div>My account</div>}
+          component={() => <Profile className={styles.withoutMargin} />}
         />
         <Route
           path={router.documents.citizenshipHistory}

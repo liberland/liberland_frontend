@@ -13,6 +13,7 @@ const Button = ({
   small,
   className,
   secondary,
+  green,
 }) => (
   <button
     onClick={onClick}
@@ -24,6 +25,7 @@ const Button = ({
         [styles.medium]: medium,
         [styles.large]: large,
         [styles.small]: small,
+        [styles.green]: green,
       })
     }
   >
