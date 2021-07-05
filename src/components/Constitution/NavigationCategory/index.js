@@ -2,10 +2,10 @@ import React from 'react';
 
 import styles from '../styles.module.scss';
 
-const NavigationCategory = ({ category, setCategory, image }) => (
-  <div onClick={() => (setCategory(category.id))} className={styles.categoryItem}>
+const NavigationCategory = ({ category, setCategory, itemColorObject }) => (
+  <div onClick={() => (setCategory(category.id))} className={styles[`${itemColorObject.color}CategoryItem`]}>
     <div>
-      <img src={image} alt="Blue Square" />
+      <img src={itemColorObject.srcImage} alt={`${itemColorObject.color} square`} />
     </div>
     <div>
       <h4>

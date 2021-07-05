@@ -6,6 +6,9 @@ import NavigationCategory from './NavigationCategory';
 
 import styles from './styles.module.scss';
 import blueSquareImage from '../../assets/icons/blue-square.svg';
+import greenSquareImage from '../../assets/icons/green-square.svg';
+import yellowSquareImage from '../../assets/icons/yellow-square.svg';
+import redSquareImage from '../../assets/icons/red-square.svg';
 
 const articles = [
   {
@@ -83,6 +86,25 @@ const Constitution = () => {
     console.log('SET id', id)
   );
 
+  const colorsObject = {
+    0: {
+      color: 'blue',
+      srcImage: blueSquareImage,
+    },
+    1: {
+      color: 'green',
+      srcImage: greenSquareImage,
+    },
+    2: {
+      color: 'yellow',
+      srcImage: yellowSquareImage,
+    },
+    3: {
+      color: 'red',
+      srcImage: redSquareImage,
+    },
+  };
+
   return (
     <div className={styles.constitution}>
       <Card title="Main Articles" className={styles.article}>
@@ -92,12 +114,12 @@ const Constitution = () => {
       </Card>
       <div className={styles.categoryNavigation}>
         <h3>Navigation</h3>
-        { categories.map((category) => (
+        { categories.map((category, index) => (
           <NavigationCategory
             key={category.id}
             category={category}
             setCategory={setCategory}
-            image={blueSquareImage}
+            itemColorObject={colorsObject[index % 4]}
           />
         ))}
       </div>

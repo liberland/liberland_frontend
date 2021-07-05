@@ -88,3 +88,23 @@
   }
 }
 
+.blueCategoryItem{
+  @extend .categoryItem;
+  background-color: $transparent1;
+}
+
+.greenCategoryItem{
+  @extend .categoryItem;
+  background-color: $transparent2;
+}
+
+.yellowCategoryItem{
+  @extend .categoryItem;
+  background-color: $transparent3;
+}
+
+.redCategoryItem{
+  @extend .categoryItem;
+  background-color: $transparent4;
+}
+
