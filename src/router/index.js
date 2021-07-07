@@ -20,5 +20,6 @@ export default {
     congressionalAssemble: '/home/voting/congressional-assemble',
     vetoVotes: '/home/voting/veto-votes',
     voteHistory: '/home/voting/vote-history',
+    congressional: '/home/voting/congressional',
   },
 };

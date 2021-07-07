@@ -1,3 +1,6 @@
+@import '../../assets/variables';
+@import '../../assets/fonts/fonts';
+
 .votingWrapper {
   padding: 8px 30px;
 }
@@ -15,4 +18,39 @@
   & > .upcomingVotings {
     width: 189px;
   }
+}
+
+.congressionalWrapper {
+  @extend .navWrapper;
+  align-items: flex-end;
+  margin-bottom: 0;
+}
+
+.headCongressional {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.headCongressionalFirstItem {
+  display: flex;
+  margin-bottom: 6px;
+
+  svg {
+    margin-right: 10px;
+  }
+
+  h3 {
+    font-size: 22px;
+    margin: 0;
+    color: $text1;
+  }
+}
+
+.headCongressionalSecondItem {
+  display: flex;
+  align-self: flex-start;
+  font-size: 14px;
+  color: $text4;
+  margin-bottom: 40px;
 }
