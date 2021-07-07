@@ -1,23 +1,34 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import cx from 'classnames';
 
-import styles from '../styles.module.scss';
+import { ReactComponent as Icon } from '../../../assets/icons/blue-square.svg';
+import styles from './styles.module.scss';
 
-const Article = ({ article, image }) => (
-  <div className={styles.singleArticle}>
+const Article = ({ article: { title, lastUpdate }, type }) => (
+  <div className={cx(styles.singleArticle, styles[type])}>
     <div className={styles.round}>
-      <img src={image} alt="Blue Square" />
+      <Icon />
     </div>
     <div>
       <h3>
-        {article.title}
+        {title}
       </h3>
       <span>
         Last update
         {' '}
-        {article.lastUpdate}
+        {lastUpdate}
       </span>
     </div>
   </div>
 );
+
+Article.propTypes = {
+  article: PropTypes.shape({
+    title: PropTypes.string.isRequired,
+    lastUpdate: PropTypes.string.isRequired,
+  }).isRequired,
+  type: PropTypes.string.isRequired,
+};
 
 export default Article;

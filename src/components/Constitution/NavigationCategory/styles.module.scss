@@ -1,0 +1,54 @@
+@import '../../../assets/variables';
+@import '../../../assets/fonts/fonts';
+
+.categoryItem {
+  display: flex;
+  align-items: center;
+  padding: 17px 0 17px 22px;
+  background-color: $transparent1;
+  border-radius: 15px;
+  margin-bottom: 13px;
+  width: 240px;
+  cursor: pointer;
+
+  &>svg {
+    margin-right: 17px;
+  }
+
+  h4 {
+    color: $text2;
+    margin: 0;
+  }
+
+  span {
+    font-size: 12px;
+    color: $text4;
+  }
+
+
+  &.blue {
+    background-color: $transparent1;
+    
+  }
+
+  &.green {
+    background-color: $transparent2;
+    & > svg > path {
+      fill: $primary2;
+    }
+  }
+
+  &.yellow {
+    background-color: $transparent3;
+    & > svg > path {
+      fill: $primary;
+    }
+  }
+
+  &.red {
+    background-color: $transparent4;
+    & > svg > path {
+      fill: $primary4;
+    }
+  }
+}

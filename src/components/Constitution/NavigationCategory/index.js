@@ -1,23 +1,41 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import cx from 'classnames';
 
-import styles from '../styles.module.scss';
+import { ReactComponent as Icon } from '../../../assets/icons/blue-square.svg';
+import styles from './styles.module.scss';
 
-const NavigationCategory = ({ category, setCategory, image }) => (
-  <div onClick={() => (setCategory(category.id))} className={styles.categoryItem}>
-    <div>
-      <img src={image} alt="Blue Square" />
-    </div>
+const NavigationCategory = ({
+  category: {
+    id, title, type, amountArticle,
+  }, setCategory,
+}) => (
+  <div
+    onClick={() => (setCategory(id))}
+    className={cx(styles.categoryItem, styles[type])}
+  >
+    <Icon />
     <div>
       <h4>
-        {category.title}
+        {title}
       </h4>
       <span>
-        {category.amountArticle}
+        {amountArticle}
         {' '}
         Articles
       </span>
     </div>
   </div>
 );
+
+NavigationCategory.propTypes = {
+  category: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    amountArticle: PropTypes.number.isRequired,
+  }).isRequired,
+  setCategory: PropTypes.func.isRequired,
+};
 
 export default NavigationCategory;

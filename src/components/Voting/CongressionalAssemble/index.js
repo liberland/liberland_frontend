@@ -9,7 +9,7 @@ import { ReactComponent as SearchIcon } from '../../../assets/icons/search.svg';
 import { ReactComponent as CancelIcon } from '../../../assets/icons/cancel.svg';
 import styles from './styles.module.scss';
 
-const CongressionalAssemble = () => {
+const CongressionalAssemble = ({ title }) => {
   const data = useMemo(
     () => [
       {
@@ -96,7 +96,7 @@ const CongressionalAssemble = () => {
       <div className={styles.congressionalAssembleWrapper}>
         <div className={styles.headerWrapper}>
           <h3>
-            Congressional assembly
+            {title}
           </h3>
           <div className={styles.buttonWrapper}>
             <Button><SearchIcon /></Button>

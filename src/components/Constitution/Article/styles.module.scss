@@ -1,0 +1,73 @@
+@import '../../../assets/variables';
+@import '../../../assets/fonts/fonts';
+
+
+
+
+.round {
+  background-color: $transparent1;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 30px;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.singleArticle {
+  display: flex;
+  padding: 27px;
+  background-color: $bg4;
+  border-radius: 15px;
+  margin-bottom: 18px;
+
+  h3 {
+    font-size: 22px;
+    color: $text2;
+    margin: 0 0 20px;
+  }
+
+  span {
+    font-size: 14px;
+    color: $text4;
+  }
+
+  &.blue {
+    .round {
+      background-color: $transparent1;
+    }
+  }
+
+  &.green {
+    .round {
+      background-color: $transparent2;
+      & > svg > path {
+        fill: $primary2;
+      }
+    }
+  }
+
+  &.yellow {
+    .round {
+      background-color: $transparent3;
+      & > svg > path {
+        fill: $primary;
+      }
+    }
+  }
+
+  &.red {
+    .round {
+      background-color: $transparent4;
+      & > svg > path {
+        fill: $primary4;
+      }
+    }
+  }
+}

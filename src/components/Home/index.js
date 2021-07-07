@@ -11,7 +11,6 @@ import Constitution from '../Constitution';
 import Documents from '../Documents';
 import Voting from '../Voting';
 import Feed from '../Feed';
-
 import styles from './styles.module.scss';
 
 const Home = () => (
