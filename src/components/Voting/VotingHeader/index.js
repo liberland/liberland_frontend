@@ -1,9 +1,10 @@
 import React from 'react';
-import styles from '../styles.module.scss';
 import Tabs from '../../Tabs';
 import Button from '../../Button/Button';
-import { ReactComponent as CalendarIcon } from '../../../assets/icons/calendar.svg';
 import router from '../../../router';
+
+import { ReactComponent as CalendarIcon } from '../../../assets/icons/calendar.svg';
+import styles from './styles.module.scss';
 
 const navigationList = [
   {
@@ -21,15 +22,15 @@ const navigationList = [
   },
 ];
 const VotingHeader = () => (
-  <div className={styles.navWrapper}>
+  <>
     <Tabs navigationList={navigationList} />
-    <Button primary small className={styles.upcomingVotings}>
+    <Button primary className={styles.upcomingVotings}>
       <CalendarIcon />
       {' '}
       Upcoming votings
       {' '}
     </Button>
-  </div>
+  </>
 );
 
 export default VotingHeader;

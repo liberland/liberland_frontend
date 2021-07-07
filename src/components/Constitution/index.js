@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 
 import Card from '../Card';
@@ -6,12 +5,6 @@ import Article from './Article';
 import NavigationCategory from './NavigationCategory';
 
 import styles from './styles.module.scss';
-import blueSquareImage from '../../assets/icons/blue-square.svg';
-
-import greenSquareImage from '../../assets/icons/green-square.svg';
-import yellowSquareImage from '../../assets/icons/yellow-square.svg';
-import redSquareImage from '../../assets/icons/red-square.svg';
-
 
 const articles = [
   {
@@ -19,50 +12,46 @@ const articles = [
     title: 'Article 1',
     lastUpdate: '13.04.2021',
     categoryId: 123,
-
-
   },
   {
     id: 235,
     title: 'Article 2',
     lastUpdate: '13.04.2021',
     categoryId: 124,
-
-
   },
   {
     id: 236,
     title: 'Article 3',
     lastUpdate: '13.04.2021',
-    categoryId: 125,
+    categoryId: 124,
 
   },
   {
     id: 237,
     title: 'Article 4',
     lastUpdate: '13.04.2021',
-    categoryId: 126,
+    categoryId: 125,
 
   },
   {
     id: 238,
     title: 'Article 5',
     lastUpdate: '13.04.2021',
-    categoryId: 127,
+    categoryId: 125,
 
   },
   {
     id: 239,
     title: 'Article 6',
     lastUpdate: '13.04.2021',
-    categoryId: 128,
+    categoryId: 126,
 
   },
   {
     id: 240,
     title: 'Article 7',
     lastUpdate: '13.04.2021',
-    categoryId: 129,
+    categoryId: 127,
 
   },
   {
@@ -74,95 +63,74 @@ const articles = [
   },
 ];
 
-let categories = [
+const categories = [
   {
     id: 123,
     title: 'Category 1',
     amountArticle: 123,
+    type: 'blue',
   },
   {
     id: 124,
     title: 'Category 2',
     amountArticle: 233,
+    type: 'green',
   },
   {
     id: 125,
     title: 'Category 3',
     amountArticle: 123,
+    type: 'yellow',
   },
   {
     id: 126,
     title: 'Category 4',
     amountArticle: 20,
+    type: 'red',
   },
   {
     id: 127,
     title: 'Category 5',
     amountArticle: 42,
+    type: 'blue',
   },
   {
     id: 128,
     title: 'Category 6',
     amountArticle: 453,
+    type: 'green',
   },
   {
     id: 129,
     title: 'Category 7',
     amountArticle: 14,
+    type: 'yellow',
   },
   {
     id: 130,
     title: 'Category 8',
     amountArticle: 15,
+    type: 'red',
   },
 ];
 
 const Constitution = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
 
-  const setCategory = (id) => (
-    setSelectedCategory(id)
-  );
+  const getCategoryType = (categoryId) => categories
+    .find((category) => category.id === categoryId).type;
 
-  const colorsObject = {
-    0: {
-      color: 'blue',
-      srcImage: blueSquareImage,
-    },
-    1: {
-      color: 'green',
-      srcImage: greenSquareImage,
-    },
-    2: {
-      color: 'yellow',
-      srcImage: yellowSquareImage,
-    },
-    3: {
-      color: 'red',
-      srcImage: redSquareImage,
-    },
-  };
-
-  categories = categories.map((category, index) => {
-    // eslint-disable-next-line no-param-reassign
-    category.color = colorsObject[index % 4];
-    return (category);
-  });
+  const getArticles = () => (selectedCategory
+    ? articles.filter((article) => article.categoryId === selectedCategory)
+    : articles);
 
   return (
     <div className={styles.constitution}>
       <Card title="Main Articles" className={styles.article}>
-        {articles.map((article) => (
+        {getArticles().map((article) => (
           <Article
             key={article.id}
-            image={selectedCategory
-              ? (categories.filter((category) => selectedCategory === category.id))
-              : ([{
-                color: {
-                  srcImage: blueSquareImage,
-                  color: 'blue',
-                },
-              }])}
+            type={getCategoryType(article.categoryId)}
             article={article}
           />
         ))}
@@ -173,8 +141,7 @@ const Constitution = () => {
           <NavigationCategory
             key={category.id}
             category={category}
-            setCategory={setCategory}
-            itemColorObject={category.color}
+            setCategory={setSelectedCategory}
           />
         ))}
       </div>

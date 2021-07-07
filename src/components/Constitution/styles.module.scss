@@ -13,128 +13,16 @@
 .article {
   display: flex;
   flex-direction: column;
-}
-
-.singleArticle {
-  display: flex;
-  padding: 27px;
-  background-color: $bg4;
-  border-radius: 15px;
-  margin-bottom: 18px;
-  width: 750px;
-
-
-  h3 {
-    font-size: 22px;
-    color: $text2;
-    margin: 0 0 20px;
-  }
-
-  span {
-    font-size: 14px;
-    color: $text4;
-  }
-}
-
-.round {
-  background-color: $transparent1;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 30px;
-
-  img {
-    width: 24px;
-    height: 24px;
-  }
+  max-width: 800px;
+  width: 100%;
 }
 
 .categoryNavigation {
- display: flex;
+  display: flex;
   flex-direction: column;
   margin: 0 30px;
 
   h3 {
     margin-bottom: 25px;
   }
-}
-
-.categoryItem{
-  display: flex;
-  align-items: center;
-  padding: 17px 0;
-  background-color: $transparent1;
-  border-radius: 15px;
-  margin-bottom: 13px;
-  width: 240px;
-
-  img {
-    margin: 0 7px 0 23px;
-    width: 30px;
-    height: 30px;
-  }
-
-  h4 {
-    color: $text2;
-    margin: 0 0 7px;
-  }
-
-  span {
-
-    font-size: 12px;
-    color: $text4;
-  }
-}
-
-.blueCategoryItem{
-  @extend .categoryItem;
-  background-color: $transparent1;
-}
-
-.greenCategoryItem{
-  @extend .categoryItem;
-  background-color: $transparent2;
-}
-
-.yellowCategoryItem{
-  @extend .categoryItem;
-  background-color: $transparent3;
-}
-
-.redCategoryItem{
-  @extend .categoryItem;
-  background-color: $transparent4;
-}
-
-.blueSingleArticle{
-  @extend .singleArticle;
-  .round {
-    background-color: $transparent1;
-  }
-
-}
-
-.greenSingleArticle{
-  @extend .singleArticle;
-  .round {
-    background-color: $transparent2;
-  }
-}
-
-.yellowSingleArticle{
-  @extend .singleArticle;
-  .round {
-    background-color: $transparent3;
-  }
-}
-
-.redSingleArticle{
-  @extend .singleArticle;
-  .round {
-    background-color: $transparent4;
-  }
-
 }
