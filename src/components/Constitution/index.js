@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 
 import Card from '../Card';
@@ -6,9 +7,11 @@ import NavigationCategory from './NavigationCategory';
 
 import styles from './styles.module.scss';
 import blueSquareImage from '../../assets/icons/blue-square.svg';
+
 import greenSquareImage from '../../assets/icons/green-square.svg';
 import yellowSquareImage from '../../assets/icons/yellow-square.svg';
 import redSquareImage from '../../assets/icons/red-square.svg';
+
 
 const articles = [
   {
@@ -17,12 +20,14 @@ const articles = [
     lastUpdate: '13.04.2021',
     categoryId: 123,
 
+
   },
   {
     id: 235,
     title: 'Article 2',
     lastUpdate: '13.04.2021',
     categoryId: 124,
+
 
   },
   {
@@ -143,6 +148,7 @@ const Constitution = () => {
     category.color = colorsObject[index % 4];
     return (category);
   });
+
   return (
     <div className={styles.constitution}>
       <Card title="Main Articles" className={styles.article}>

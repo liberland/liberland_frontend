@@ -17,4 +17,8 @@
     color: $primary4;
     background-color: $secondary4;
   }
+  &.pending {
+    color: $primary;
+    background-color: $secondary3;
+  }
 }

@@ -2,6 +2,7 @@ import React from 'react';
 
 import styles from '../styles.module.scss';
 
+
 const NavigationCategory = ({ category, setCategory, itemColorObject }) => (
   <div onClick={() => (setCategory(category.id))} className={styles[`${itemColorObject.color}CategoryItem`]}>
     <div>

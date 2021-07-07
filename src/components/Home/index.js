@@ -10,8 +10,7 @@ import Profile from '../Profile';
 import Constitution from '../Constitution';
 import Documents from '../Documents';
 import Voting from '../Voting';
-
-
+import Feed from '../Feed';
 import styles from './styles.module.scss';
 
 const Home = () => (
@@ -22,7 +21,7 @@ const Home = () => (
         <HomeHeader />
         <Switch>
           <Route path={router.home.profile} component={Profile} />
-          <Route path={router.home.feed} component={() => <div>Feed</div>} />
+          <Route path={router.home.feed} component={Feed} />
           <Route path={router.home.documents} component={Documents} />
           <Route path={router.home.wallet} component={Wallet} />
           <Route path={router.home.voting} component={Voting} />

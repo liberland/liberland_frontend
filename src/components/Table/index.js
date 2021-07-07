@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useTable } from 'react-table';
 
 import styles from './styles.module.scss';
@@ -55,6 +56,16 @@ const Table = ({ columns, data }) => {
       </tbody>
     </table>
   );
+};
+
+Table.defaultProps = {
+  columns: [],
+  data: [],
+};
+
+Table.propTypes = {
+  columns: PropTypes.arrayOf(PropTypes.shape({})),
+  data: PropTypes.arrayOf(PropTypes.shape({})),
 };
 
 export default Table;

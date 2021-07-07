@@ -72,7 +72,13 @@ const WalletTransactionHistory = () => {
                 {' '}
                 LLM
               </div>
-              <div><Status status={transactionHistoryInfo.status} /></div>
+              <div>
+                <Status
+                  status={transactionHistoryInfo.status}
+                  completed={transactionHistoryInfo.status === 'completed'}
+                  declined={transactionHistoryInfo.status === 'declined'}
+                />
+              </div>
             </div>
           );
         })}
