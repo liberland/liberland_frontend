@@ -108,3 +108,33 @@
   background-color: $transparent4;
 }
 
+.blueSingleArticle{
+  @extend .singleArticle;
+  .round {
+    background-color: $transparent1;
+  }
+
+}
+
+.greenSingleArticle{
+  @extend .singleArticle;
+  .round {
+    background-color: $transparent2;
+  }
+}
+
+.yellowSingleArticle{
+  @extend .singleArticle;
+  .round {
+    background-color: $transparent3;
+  }
+}
+
+.redSingleArticle{
+  @extend .singleArticle;
+  .round {
+    background-color: $transparent4;
+  }
+
+}
+

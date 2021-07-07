@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import Card from '../Card';
 import Article from './Article';
@@ -15,29 +15,61 @@ const articles = [
     id: 234,
     title: 'Article 1',
     lastUpdate: '13.04.2021',
+    categoryId: 123,
 
   },
   {
     id: 235,
     title: 'Article 2',
     lastUpdate: '13.04.2021',
+    categoryId: 124,
 
   },
   {
     id: 236,
     title: 'Article 3',
     lastUpdate: '13.04.2021',
+    categoryId: 125,
 
   },
   {
     id: 237,
     title: 'Article 4',
     lastUpdate: '13.04.2021',
+    categoryId: 126,
+
+  },
+  {
+    id: 238,
+    title: 'Article 5',
+    lastUpdate: '13.04.2021',
+    categoryId: 127,
+
+  },
+  {
+    id: 239,
+    title: 'Article 6',
+    lastUpdate: '13.04.2021',
+    categoryId: 128,
+
+  },
+  {
+    id: 240,
+    title: 'Article 7',
+    lastUpdate: '13.04.2021',
+    categoryId: 129,
+
+  },
+  {
+    id: 241,
+    title: 'Article 8',
+    lastUpdate: '13.04.2021',
+    categoryId: 130,
 
   },
 ];
 
-const categories = [
+let categories = [
   {
     id: 123,
     title: 'Category 1',
@@ -81,9 +113,10 @@ const categories = [
 ];
 
 const Constitution = () => {
+  const [selectedCategory, setSelectedCategory] = useState('');
+
   const setCategory = (id) => (
-    // eslint-disable-next-line no-console
-    console.log('SET id', id)
+    setSelectedCategory(id)
   );
 
   const colorsObject = {
@@ -105,21 +138,37 @@ const Constitution = () => {
     },
   };
 
+  categories = categories.map((category, index) => {
+    // eslint-disable-next-line no-param-reassign
+    category.color = colorsObject[index % 4];
+    return (category);
+  });
   return (
     <div className={styles.constitution}>
       <Card title="Main Articles" className={styles.article}>
         {articles.map((article) => (
-          <Article key={article.id} image={blueSquareImage} article={article} />
+          <Article
+            key={article.id}
+            image={selectedCategory
+              ? (categories.filter((category) => selectedCategory === category.id))
+              : ([{
+                color: {
+                  srcImage: blueSquareImage,
+                  color: 'blue',
+                },
+              }])}
+            article={article}
+          />
         ))}
       </Card>
       <div className={styles.categoryNavigation}>
         <h3>Navigation</h3>
-        { categories.map((category, index) => (
+        { categories.map((category) => (
           <NavigationCategory
             key={category.id}
             category={category}
             setCategory={setCategory}
-            itemColorObject={colorsObject[index % 4]}
+            itemColorObject={category.color}
           />
         ))}
       </div>
