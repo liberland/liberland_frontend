@@ -1,5 +1,6 @@
 // LIBS
 import React from 'react';
+import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
 import cx from 'classnames';
 
@@ -41,5 +42,14 @@ const NavigationLink = ({
     </NavLink>
   </div>
 );
+
+NavigationLink.propTypes = {
+  route: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  icon: PropTypes.string.isRequired,
+  activeIcon: PropTypes.string.isRequired,
+  path: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+};
 
 export default NavigationLink;

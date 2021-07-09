@@ -21,5 +21,6 @@ export default {
     vetoVotes: '/home/voting/veto-votes',
     voteHistory: '/home/voting/vote-history',
     congressional: '/home/voting/congressional',
+    currentCongressional: '/home/voting/congressional/:id',
   },
 };

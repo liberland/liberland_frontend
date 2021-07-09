@@ -8,7 +8,7 @@ import NavigationLink from '../NavigationLink';
 import RoleHOC from '../../../hocs/RoleHOC';
 import router from '../../../router';
 import Header from '../../AuthComponents/Header';
-import GetCitizenshipCard from '../GetCitizenshipCard';
+import { GetCitizenshipCard, NextAssemblyCard } from '../Cards';
 
 // ASSETS
 import styles from './styles.module.scss';
@@ -102,6 +102,7 @@ const HomeNavigation = () => {
         ))
       }
       {role === roleEnums.E_RESIDENT && <GetCitizenshipCard />}
+      <NextAssemblyCard />
     </div>
 
   );

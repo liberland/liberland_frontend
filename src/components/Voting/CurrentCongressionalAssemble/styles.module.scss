@@ -1,0 +1,15 @@
+@import '../../../assets/variables';
+@import '../../../assets/fonts/fonts';
+
+.currentAssemble {
+  display: flex;
+  justify-content: space-between;
+  & > div {
+    flex-basis: 43%;
+
+    &:last-child > div{
+      padding-top: 78px;
+    }
+  }
+  
+}

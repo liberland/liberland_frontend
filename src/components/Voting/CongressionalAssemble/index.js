@@ -1,15 +1,12 @@
 /* eslint-disable react/prop-types */
 import React, { useMemo } from 'react';
 
-import Card from '../../Card';
 import Button from '../../Button/Button';
-import Table from '../../Table';
+import TableComponent from '../TableComponent';
 
-import { ReactComponent as SearchIcon } from '../../../assets/icons/search.svg';
 import { ReactComponent as CancelIcon } from '../../../assets/icons/cancel.svg';
-import styles from './styles.module.scss';
 
-const CongressionalAssemble = ({ title }) => {
+const CongressionalAssemble = () => {
   const data = useMemo(
     () => [
       {
@@ -91,21 +88,7 @@ const CongressionalAssemble = ({ title }) => {
     [],
   );
 
-  return (
-    <Card>
-      <div className={styles.congressionalAssembleWrapper}>
-        <div className={styles.headerWrapper}>
-          <h3>
-            {title}
-          </h3>
-          <div className={styles.buttonWrapper}>
-            <Button><SearchIcon /></Button>
-          </div>
-        </div>
-        <Table data={data} columns={columns} />
-      </div>
-    </Card>
-  );
+  return <TableComponent title="Current assembly" data={data} columns={columns} />;
 };
 
 export default CongressionalAssemble;
