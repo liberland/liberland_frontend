@@ -11,9 +11,10 @@ import { ReactComponent as CopyIcon } from '../../../assets/icons/copy.svg';
 import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
 
-const WalletAddressesLine = () => {
+// eslint-disable-next-line react/prop-types
+const WalletAddressesLine = ({ walletAddress }) => {
   const addresses = {
-    walletAddress: '0x0A1B23Be38A1dbc2A833D051780698CBbd9911FA',
+    walletAddress,
     validatorAddress: '0x0A1B23Be38A1dbc2A833D051780698CBbd9911FB',
   };
 
@@ -28,7 +29,7 @@ const WalletAddressesLine = () => {
           <p className={styles.addressTitle}>Wallet address:</p>
           <p className={styles.address}>
             <WalletActiveIcon />
-            {truncate(addresses.walletAddress, 13)}
+            {addresses.walletAddress ? truncate(addresses.walletAddress, 13) : ''}
             <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={handleCopyClick} />
           </p>
         </div>
