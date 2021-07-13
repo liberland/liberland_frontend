@@ -6,10 +6,11 @@ import Button from '../../Button/Button';
 import Table from '../../Table';
 
 import { ReactComponent as SearchIcon } from '../../../assets/icons/search.svg';
-// import { ReactComponent as CancelIcon } from '../../../assets/icons/cancel.svg';
 import styles from './styles.module.scss';
 
-const TableComponent = ({ title, data, columns }) => (
+const TableComponent = ({
+  title, data, columns, ...rest
+}) => (
   <Card>
     <div className={styles.congressionalAssembleWrapper}>
       {title && (
@@ -22,7 +23,7 @@ const TableComponent = ({ title, data, columns }) => (
           </div>
         </div>
       )}
-      <Table data={data} columns={columns} />
+      <Table data={data} columns={columns} {...rest} />
     </div>
   </Card>
 );

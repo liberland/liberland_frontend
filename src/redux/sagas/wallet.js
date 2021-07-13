@@ -9,11 +9,11 @@ import { walletActions } from '../actions';
 function* getWalletWorker() {
   try {
     const extensions = yield web3Enable('Liberland dapp');
-    if (extensions.length === 0) {
-      yield put(walletActions.getWallet.failure());
+    if (extensions.length) {
+      const [accounts] = yield web3Accounts();
+      yield put(walletActions.getWallet.success(accounts));
     } else {
-      const allAccounts = yield web3Accounts();
-      yield put(walletActions.getWallet.success(allAccounts[0]));
+      yield put(walletActions.getWallet.failure());
     }
   } catch (e) {
     yield put(walletActions.getWallet.failure(e));

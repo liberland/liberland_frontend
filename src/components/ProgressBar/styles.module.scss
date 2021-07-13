@@ -1,0 +1,26 @@
+@import '../../assets/variables';
+@import '../../assets/fonts/fonts';
+
+.container {
+  width: 100px;
+  background: $secondary;
+  height: 4px;
+  border-radius: 15px;
+}
+
+.progress{
+  height: 100%;
+  background: $primary2;
+  border-radius: 15px;
+}
+
+.wrapper{
+  display: flex;
+  align-items: center;
+  color: $primary2;
+
+  p {
+    margin-left: 7px;
+    font-size: 14px;
+  }
+}

@@ -3,7 +3,7 @@
 
 .table {
   width: 100%;
-  border-collapse: collapse;
+  border-spacing: 0;
   margin-top: 30px;
 
   .thead {
@@ -12,27 +12,16 @@
     color: $text2;
     font-size: 12px;
 
-
-
-    &>tr>th {
+    th {
       font-weight: 600;
       line-height: 29px;
       padding: 14px 0;
       text-align: left;
-
-      &:first-child {
-        border-radius: 15px 0 0 15px;
-        padding-left: 22px;
-      }
-
-      &:last-child {
-        border-radius: 0 15px 15px 0;
-      }
     }
   }
 
   .tbody {
-    &>tr>td{
+    td{
       height: 90px;
       font-size: 14px;
       font-weight: 600;
@@ -47,9 +36,16 @@
         font-weight: 500;
         font-size: 12px;
       }
-      &:first-child {
-        padding-left: 22px;
-      }
     }
+  }
+  td:first-child,
+  th:first-child {
+    border-radius: 15px 0 0 15px;
+    padding-left: 22px;
+  }
+
+  th:last-child,
+  td:last-child {
+    border-radius: 0 15px 15px 0;
   }
 }

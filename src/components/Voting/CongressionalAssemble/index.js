@@ -1,45 +1,43 @@
 /* eslint-disable react/prop-types */
 import React, { useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { selectUserId } from '../../../redux/selectors/userSelectors';
 
-import Button from '../../Button/Button';
 import TableComponent from '../TableComponent';
-
-import { ReactComponent as CancelIcon } from '../../../assets/icons/cancel.svg';
+import Status from '../../Status';
+import ProgressBar from '../../ProgressBar';
 
 const CongressionalAssemble = () => {
+  const userId = useSelector(selectUserId);
   const data = useMemo(
     () => [
       {
-        id: '1',
+        id: '4',
         place: '#1',
         deputies: 'John Wayne',
-        totalStaked: '10.000 LLM',
-        youStaked: '',
-        action: 'Stake',
+        supported: '10.000 LLM',
+        power: '100',
       },
       {
         id: '2',
         place: '#2',
         deputies: 'Latisha Peacock',
-        totalStaked: '9.000 LLM',
-        youStaked: '6.000 LLM',
-        action: 'Stake',
+        supported: '9.000 LLM',
+        power: '70',
       },
       {
-        id: '3',
+        id: '1',
         place: '#3',
         deputies: 'Vernon Leonard',
-        totalStaked: '8.000 LLM',
-        youStaked: '4.000 LLM',
-        action: 'Stake',
+        supported: '8.000 LLM',
+        power: '40',
       },
       {
         id: '4',
         place: '#4',
         deputies: 'Guto Callaghan',
-        totalStaked: '7.000 LLM',
-        youStaked: '2.000 LLM',
-        action: 'Stake',
+        supported: '7.000 LLM',
+        power: '20',
       },
     ],
     [],
@@ -54,41 +52,44 @@ const CongressionalAssemble = () => {
       {
         Header: 'DEPUTIES',
         accessor: 'deputies',
+        Cell: ({ cell }) => (cell.row.original.id === `${userId}`
+          ? (
+            <>
+              {' '}
+              {cell.row.original.deputies}
+              {' '}
+              <Status status="Your candidate" pending />
+              {' '}
+            </>
+          )
+          : cell.row.original.deputies),
       },
       {
-        Header: 'TOTAL STAKED',
-        accessor: 'totalStaked',
+        Header: 'SUPPORTED',
+        accessor: 'supported',
       },
       {
-        Header: 'YOU STAKED',
-        accessor: 'youStaked',
-        Cell: ({ cell }) => {
-          if (cell.row.values.youStaked) {
-            return (
-              <>
-                {cell.row.values.youStaked}
-                {' '}
-                <CancelIcon />
-              </>
-            );
-          }
-          return '—';
-        },
-      },
-      {
-        Header: 'ACTIONS',
-        accessor: 'action',
+        Header: 'POWER',
+        accessor: 'power',
         Cell: ({ cell }) => (
-          <Button green value={cell.row.original.id} onClick={() => { }}>
-            {cell.row.original.action}
-          </Button>
+          <ProgressBar percent={cell.row.original.power} />
         ),
       },
     ],
-    [],
+    [userId],
   );
 
-  return <TableComponent title="Current assembly" data={data} columns={columns} />;
+  const rowProps = (row) => {
+    if (row.original.id === `${userId}`) {
+      return {
+        style: {
+          boxShadow: '0 0 0 1px #F1C823',
+        },
+      };
+    }
+    return {};
+  };
+  return <TableComponent title="Current assembly" data={data} columns={columns} rowProps={rowProps} />;
 };
 
 export default CongressionalAssemble;
