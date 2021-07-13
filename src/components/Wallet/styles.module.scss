@@ -1,3 +1,15 @@
+@import '../../assets/variables';
+
 .walletWrapper {
   padding: 8px 30px;
+}
+
+.haveNotExtension {
+  display: flex;
+  height: 100vh;
+  background-color: $bg4;
+  font-size: 18px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
 }
