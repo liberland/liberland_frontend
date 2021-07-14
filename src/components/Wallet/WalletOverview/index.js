@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
+import PropTypes from 'prop-types';
 
 import { ReactComponent as ArrowYellowUpIcon } from '../../../assets/icons/arrow-yellow-up.svg';
 import { ReactComponent as ArrowYellowDownIcon } from '../../../assets/icons/arrow-yellow-down.svg';
@@ -11,7 +12,7 @@ import Card from '../../Card';
 
 import styles from './styles.module.scss';
 
-const WalletOverview = () => {
+const WalletOverview = ({ freeBalance }) => {
   const overviewInfo = [
     {
       amount: '20.0k',
@@ -35,7 +36,7 @@ const WalletOverview = () => {
       getIcon: () => (-0.4 > 0 ? <ArrowBlueUpIcon /> : <ArrowBlueDownIcon />),
     },
     {
-      amount: '100.0k',
+      amount: `${freeBalance}k`,
       title: 'Total',
       diff: -0.6,
       // eslint-disable-next-line no-constant-condition
@@ -83,6 +84,9 @@ const WalletOverview = () => {
       </div>
     </Card>
   );
+};
+WalletOverview.propTypes = {
+  freeBalance: PropTypes.string.isRequired,
 };
 
 export default WalletOverview;

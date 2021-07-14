@@ -13,6 +13,7 @@ import Card from '../Card';
 const Wallet = () => {
   const dispatch = useDispatch();
   const walletInfo = useSelector(walletSelectors.selectorWalletInfo);
+  const freeAmountBalance = useSelector(walletSelectors.selectorFreeBalance);
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
   }, [dispatch]);
@@ -22,7 +23,7 @@ const Wallet = () => {
       { (walletInfo !== undefined) ? (
         <div className={styles.walletWrapper}>
           <WalletAddressesLine walletAddress={walletInfo.address} />
-          <WalletOverview />
+          <WalletOverview freeBalance={freeAmountBalance} />
           <WalletTransactionHistory />
         </div>
       ) : (
