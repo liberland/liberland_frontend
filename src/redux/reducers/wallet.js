@@ -2,7 +2,14 @@ import { handleActions, combineActions } from 'redux-actions';
 import { walletActions } from '../actions';
 
 const initialState = {
-  walletInfo: '',
+  walletInfo: {
+    balance: {
+      free: {
+        amount: 0,
+        nonce: 0,
+      },
+    },
+  },
   gettingWalletInfo: false,
 };
 

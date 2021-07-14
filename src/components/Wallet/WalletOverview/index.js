@@ -11,7 +11,8 @@ import Card from '../../Card';
 
 import styles from './styles.module.scss';
 
-const WalletOverview = () => {
+// eslint-disable-next-line react/prop-types
+const WalletOverview = ({ freeBalance }) => {
   const overviewInfo = [
     {
       amount: '20.0k',
@@ -35,7 +36,7 @@ const WalletOverview = () => {
       getIcon: () => (-0.4 > 0 ? <ArrowBlueUpIcon /> : <ArrowBlueDownIcon />),
     },
     {
-      amount: '100.0k',
+      amount: `${freeBalance}k`,
       title: 'Total',
       diff: -0.6,
       // eslint-disable-next-line no-constant-condition
