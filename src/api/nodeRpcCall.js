@@ -9,8 +9,12 @@ const getBalanceByAddress = async (address) => {
       data: { free: previousFree },
       nonce: previousNonce,
     } = await api.query.system.account(address);
-    // eslint-disable-next-line max-len
-    return ({ free: { amount: previousFree.toString(), nonce: previousNonce.toString() } });
+    return ({
+      free: {
+        amount: previousFree.toString(),
+        nonce: previousNonce.toString(),
+      },
+    });
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);

@@ -1,4 +1,4 @@
-import { put, takeLatest } from 'redux-saga/effects';
+import { put, takeLatest, call } from 'redux-saga/effects';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import { getBalanceByAddress } from '../../api/nodeRpcCall';
 
@@ -9,8 +9,8 @@ function* getWalletWorker() {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       const [accounts] = yield web3Accounts();
-      accounts.balance = yield getBalanceByAddress(accounts.address);
-      yield put(walletActions.getWallet.success(accounts));
+      const balance = yield call(getBalanceByAddress, accounts.address);
+      yield put(walletActions.getWallet.success({ ...accounts, balance }));
     } else {
       yield put(walletActions.getWallet.failure());
     }

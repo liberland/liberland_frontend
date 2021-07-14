@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
+import PropTypes from 'prop-types';
 
 import { ReactComponent as ArrowYellowUpIcon } from '../../../assets/icons/arrow-yellow-up.svg';
 import { ReactComponent as ArrowYellowDownIcon } from '../../../assets/icons/arrow-yellow-down.svg';
@@ -11,7 +12,6 @@ import Card from '../../Card';
 
 import styles from './styles.module.scss';
 
-// eslint-disable-next-line react/prop-types
 const WalletOverview = ({ freeBalance }) => {
   const overviewInfo = [
     {
@@ -84,6 +84,9 @@ const WalletOverview = ({ freeBalance }) => {
       </div>
     </Card>
   );
+};
+WalletOverview.propTypes = {
+  freeBalance: PropTypes.string.isRequired,
 };
 
 export default WalletOverview;

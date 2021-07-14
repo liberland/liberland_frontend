@@ -13,10 +13,10 @@ const selectorGettingWalletInfo = createSelector(
 );
 
 const selectorFreeBalance = createSelector(
-  walletReducer,
+  selectorWalletInfo,
   (reducer) => (
     // eslint-disable-next-line no-restricted-properties
-    (reducer.walletInfo.balance.free.amount.toString()) * Math.pow(10, -10) * Math.pow(10, -2)
+    (reducer.balance.free.amount.toString()) * Math.pow(10, -10) * Math.pow(10, -2)
   ),
 );
 
