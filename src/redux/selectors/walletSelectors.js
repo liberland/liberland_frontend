@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import matchPowHelper from '../../utils/matchPowHelper';
 
 const walletReducer = (state) => state.wallet;
 
@@ -14,9 +15,36 @@ const selectorGettingWalletInfo = createSelector(
 
 const selectorFreeBalance = createSelector(
   selectorWalletInfo,
-  (reducer) => (
-    // eslint-disable-next-line no-restricted-properties
-    (reducer.balance.free.amount.toString()) * Math.pow(10, -10) * Math.pow(10, -2)
+  (reducer) => matchPowHelper(reducer.balance.free.amount),
+);
+
+const selectorWalletAddress = createSelector(
+  selectorWalletInfo,
+  (reducer) => reducer.address,
+);
+
+const selectorLiberstakeBalance = createSelector(
+  selectorWalletInfo,
+  (reducer) => matchPowHelper(reducer.balance.liberstake.amount),
+);
+
+const selectorPolkastakeBalance = createSelector(
+  selectorWalletInfo,
+  (reducer) => matchPowHelper(reducer.balance.polkastake.amount),
+);
+
+const selectorLiquidMeritsBalance = createSelector(
+  selectorWalletInfo,
+  (reducer) => matchPowHelper(reducer.balance.liquidMerits.amount),
+);
+
+const selectorTotalBalance = createSelector(
+  selectorFreeBalance,
+  selectorLiberstakeBalance,
+  selectorPolkastakeBalance,
+  selectorLiquidMeritsBalance,
+  (free, liberstake, polkastake, liquidMerits) => (
+    matchPowHelper(free + liberstake + polkastake + liquidMerits)
   ),
 );
 
@@ -24,4 +52,9 @@ export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
   selectorFreeBalance,
+  selectorWalletAddress,
+  selectorLiberstakeBalance,
+  selectorPolkastakeBalance,
+  selectorLiquidMeritsBalance,
+  selectorTotalBalance,
 };

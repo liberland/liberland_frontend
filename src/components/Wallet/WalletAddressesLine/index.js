@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import cx from 'classnames';
 import Button from '../../Button/Button';
 
@@ -11,7 +12,6 @@ import { ReactComponent as CopyIcon } from '../../../assets/icons/copy.svg';
 import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
 
-// eslint-disable-next-line react/prop-types
 const WalletAddressesLine = ({ walletAddress }) => {
   const addresses = {
     walletAddress,
@@ -54,6 +54,9 @@ const WalletAddressesLine = ({ walletAddress }) => {
       </div>
     </div>
   );
+};
+WalletAddressesLine.propTypes = {
+  walletAddress: PropTypes.string.isRequired,
 };
 
 export default WalletAddressesLine;

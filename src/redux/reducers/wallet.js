@@ -8,6 +8,15 @@ const initialState = {
         amount: 0,
         nonce: 0,
       },
+      liberstake: {
+        amount: 0,
+      },
+      polkastake: {
+        amount: 0,
+      },
+      liquidMerits: {
+        amount: 0,
+      },
     },
   },
   gettingWalletInfo: false,

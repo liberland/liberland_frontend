@@ -5,7 +5,9 @@ import Avatar from 'react-avatar';
 import cx from 'classnames';
 
 import Button from '../Button/Button';
-import { userSelectors } from '../../redux/selectors';
+import { userSelectors, walletSelectors } from '../../redux/selectors';
+
+import truncate from '../../utils/truncate';
 
 import styles from './styles.module.scss';
 
@@ -21,8 +23,8 @@ import Card from '../Card';
 const Profile = ({ className }) => {
   const userName = useSelector(userSelectors.selectUserName);
   const lastName = useSelector(userSelectors.selectUserLastName);
-  const userBalance = '100.000';
-  const walletAddress = '0x495f...7b5e';
+  const userBalance = useSelector(walletSelectors.selectorFreeBalance);
+  const walletAddress = useSelector(walletSelectors.selectorWalletAddress);
   const userRole = useSelector(userSelectors.selectUserRole);
   const aboutUser = useSelector(userSelectors.selectUserAbout);
   const originFrom = useSelector(userSelectors.selectUserOrigin);
@@ -89,7 +91,7 @@ const Profile = ({ className }) => {
                   {`${userBalance} LLM`}
                 </span>
                 <span className={styles.walletAddress}>
-                  {walletAddress}
+                  {walletAddress ? truncate(walletAddress, 13) : ''}
                 </span>
               </div>
             </div>

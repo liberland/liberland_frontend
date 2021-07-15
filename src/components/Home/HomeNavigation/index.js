@@ -24,7 +24,7 @@ import ConstitutionIcon from '../../../assets/icons/constitution.svg';
 import ConstitutionIconActive from '../../../assets/icons/active-constitution.svg';
 
 // REDUX
-import { userSelectors } from '../../../redux/selectors';
+import { userSelectors, walletSelectors } from '../../../redux/selectors';
 
 // CONSTANTS
 import roleEnums from '../../../constants/roleEnums';
@@ -34,6 +34,7 @@ const HomeNavigation = () => {
   const role = useSelector(userSelectors.selectUserRole);
   const name = useSelector(userSelectors.selectUserName);
   const lastName = useSelector(userSelectors.selectUserLastName);
+  const freeAmountBalance = useSelector(walletSelectors.selectorFreeBalance);
 
   const navigationList = [
     {
@@ -41,7 +42,7 @@ const HomeNavigation = () => {
       title: `${name} ${lastName}`,
       // access: 'citizen',
       icon: () => <Avatar name={`${name} ${lastName}`} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
-      description: '100.000 LLM',
+      description: `${freeAmountBalance} LLM`,
     },
     {
       route: router.home.feed,
