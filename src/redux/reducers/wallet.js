@@ -3,10 +3,15 @@ import { walletActions } from '../actions';
 
 const initialState = {
   walletInfo: {
-    balance: {
-      free: {
+    balances: {
+      liberstake: {
         amount: 0,
-        nonce: 0,
+      },
+      polkastake: {
+        amount: 0,
+      },
+      liquidMerits: {
+        amount: 0,
       },
     },
   },

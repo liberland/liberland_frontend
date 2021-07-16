@@ -2,6 +2,8 @@ import React from 'react';
 import cx from 'classnames';
 import PropTypes from 'prop-types';
 
+import prettyNumber from '../../../utils/prettyNumber';
+
 import { ReactComponent as ArrowYellowUpIcon } from '../../../assets/icons/arrow-yellow-up.svg';
 import { ReactComponent as ArrowYellowDownIcon } from '../../../assets/icons/arrow-yellow-down.svg';
 import { ReactComponent as ArrowRedDownIcon } from '../../../assets/icons/arrow-red-down.svg';
@@ -12,32 +14,34 @@ import Card from '../../Card';
 
 import styles from './styles.module.scss';
 
-const WalletOverview = ({ freeBalance }) => {
+const WalletOverview = ({
+  totalBalance, balances,
+}) => {
   const overviewInfo = [
     {
-      amount: '20.0k',
-      title: 'Political stake',
+      amount: prettyNumber(balances.liberstake.amount),
+      title: 'Liberstake',
       diff: 2.4,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (2.4 > 0 ? <ArrowYellowUpIcon /> : <ArrowYellowDownIcon />),
     },
     {
-      amount: '10.0k',
-      title: 'Validator stake',
+      amount: prettyNumber(balances.polkastake.amount),
+      title: 'Polkastake',
       diff: 2.4,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (2.4 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
     },
     {
-      amount: '70.0k',
-      title: 'Available stake',
+      amount: prettyNumber(balances.liquidMerits.amount),
+      title: 'Liquid Merits',
       diff: -0.4,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (-0.4 > 0 ? <ArrowBlueUpIcon /> : <ArrowBlueDownIcon />),
     },
     {
-      amount: `${freeBalance}k`,
-      title: 'Total',
+      amount: prettyNumber(totalBalance),
+      title: 'Total merits',
       diff: -0.6,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (-0.6 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
@@ -85,8 +89,27 @@ const WalletOverview = ({ freeBalance }) => {
     </Card>
   );
 };
+WalletOverview.defaultProps = {
+  totalBalance: 0,
+  balances: {},
+};
+
 WalletOverview.propTypes = {
-  freeBalance: PropTypes.string.isRequired,
+  totalBalance: PropTypes.number,
+  balances: PropTypes.shape({
+    free: PropTypes.shape({
+      amount: PropTypes.number,
+    }),
+    liberstake: PropTypes.shape({
+      amount: PropTypes.number,
+    }),
+    polkastake: PropTypes.shape({
+      amount: PropTypes.number,
+    }),
+    liquidMerits: PropTypes.shape({
+      amount: PropTypes.number,
+    }),
+  }),
 };
 
 export default WalletOverview;
