@@ -10,9 +10,6 @@ const getBalanceByAddress = async (address) => {
       data: { free: previousFree },
     } = await api.query.system.account(address);
     return ({
-      free: {
-        amount: parseInt(previousFree.toString(), 10),
-      },
       liberstake: {
         amount: 20000000000000000,
       },
@@ -20,7 +17,7 @@ const getBalanceByAddress = async (address) => {
         amount: 10000000000000000,
       },
       liquidMerits: {
-        amount: 70000000000000000,
+        amount: parseInt(previousFree.toString(), 10),
       },
     });
   } catch (e) {

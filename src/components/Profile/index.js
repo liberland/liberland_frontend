@@ -23,7 +23,7 @@ import Card from '../Card';
 const Profile = ({ className }) => {
   const userName = useSelector(userSelectors.selectUserName);
   const lastName = useSelector(userSelectors.selectUserLastName);
-  const userBalance = useSelector(walletSelectors.selectorFreeBalance);
+  const userBalance = useSelector(walletSelectors.selectorLiquidMeritsBalance);
   const walletAddress = useSelector(walletSelectors.selectorWalletAddress);
   const userRole = useSelector(userSelectors.selectUserRole);
   const aboutUser = useSelector(userSelectors.selectUserAbout);

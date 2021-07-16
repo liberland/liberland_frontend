@@ -4,10 +4,6 @@ import { walletActions } from '../actions';
 const initialState = {
   walletInfo: {
     balances: {
-      free: {
-        amount: 0,
-        nonce: 0,
-      },
       liberstake: {
         amount: 0,
       },

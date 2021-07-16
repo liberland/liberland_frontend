@@ -22,23 +22,22 @@ const selectorBalances = createSelector(
   (reducer) => reducer.balances,
 );
 
-const selectorFreeBalance = createSelector(
+const selectorLiquidMeritsBalance = createSelector(
   selectorBalances,
-  (reducer) => matchPowHelper(reducer.free.amount),
+  (reducer) => matchPowHelper(reducer.liquidMerits.amount),
 );
 
 const selectorTotalBalance = createSelector(
   selectorBalances,
-  selectorFreeBalance,
-  (reducer, free) => (
-    reducer.free.amount + reducer.liberstake.amount + reducer.polkastake.amount + free
+  (reducer) => (
+    reducer.liberstake.amount + reducer.polkastake.amount + reducer.liquidMerits.amount
   ),
 );
 
 export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
-  selectorFreeBalance,
+  selectorLiquidMeritsBalance,
   selectorBalances,
   selectorTotalBalance,
   selectorWalletAddress,
