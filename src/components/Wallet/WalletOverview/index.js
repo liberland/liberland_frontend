@@ -15,25 +15,25 @@ import Card from '../../Card';
 import styles from './styles.module.scss';
 
 const WalletOverview = ({
-  totalBalance, liberstake, polkastake, liquidMerits,
+  totalBalance, balances,
 }) => {
   const overviewInfo = [
     {
-      amount: prettyNumber(liberstake),
+      amount: prettyNumber(balances.liberstake.amount),
       title: 'Liberstake',
       diff: 2.4,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (2.4 > 0 ? <ArrowYellowUpIcon /> : <ArrowYellowDownIcon />),
     },
     {
-      amount: prettyNumber(polkastake),
+      amount: prettyNumber(balances.polkastake.amount),
       title: 'Polkastake',
       diff: 2.4,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (2.4 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
     },
     {
-      amount: prettyNumber(liquidMerits),
+      amount: prettyNumber(balances.liquidMerits.amount),
       title: 'Liquid Merits',
       diff: -0.4,
       // eslint-disable-next-line no-constant-condition
@@ -41,7 +41,7 @@ const WalletOverview = ({
     },
     {
       amount: prettyNumber(totalBalance),
-      title: 'Total',
+      title: 'Total merits',
       diff: -0.6,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (-0.6 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
@@ -91,16 +91,25 @@ const WalletOverview = ({
 };
 WalletOverview.defaultProps = {
   totalBalance: 0,
-  liberstake: 0,
-  polkastake: 0,
-  liquidMerits: 0,
+  balances: {},
 };
 
 WalletOverview.propTypes = {
   totalBalance: PropTypes.number,
-  liberstake: PropTypes.number,
-  polkastake: PropTypes.number,
-  liquidMerits: PropTypes.number,
+  balances: PropTypes.shape({
+    free: PropTypes.shape({
+      amount: PropTypes.number,
+    }),
+    liberstake: PropTypes.shape({
+      amount: PropTypes.number,
+    }),
+    polkastake: PropTypes.shape({
+      amount: PropTypes.number,
+    }),
+    liquidMerits: PropTypes.shape({
+      amount: PropTypes.number,
+    }),
+  }),
 };
 
 export default WalletOverview;

@@ -11,9 +11,7 @@ import Card from '../Card';
 
 const Wallet = () => {
   const walletInfo = useSelector(walletSelectors.selectorWalletInfo);
-  const liquidMeritsBalance = useSelector(walletSelectors.selectorLiberstakeBalance);
-  const polkastakeBalance = useSelector(walletSelectors.selectorPolkastakeBalance);
-  const liberstakeBalance = useSelector(walletSelectors.selectorLiquidMeritsBalance);
+  const balances = useSelector(walletSelectors.selectorBalances);
   const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
 
   return (
@@ -23,9 +21,7 @@ const Wallet = () => {
           <WalletAddressesLine walletAddress={walletInfo.address} />
           <WalletOverview
             totalBalance={totalBalance}
-            liberstakeBalance={liberstakeBalance}
-            polkastakeBalance={polkastakeBalance}
-            liquidMeritsBalance={liquidMeritsBalance}
+            balances={balances}
           />
           <WalletTransactionHistory />
         </div>

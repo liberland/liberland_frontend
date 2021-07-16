@@ -3,7 +3,7 @@ import { walletActions } from '../actions';
 
 const initialState = {
   walletInfo: {
-    balance: {
+    balances: {
       free: {
         amount: 0,
         nonce: 0,

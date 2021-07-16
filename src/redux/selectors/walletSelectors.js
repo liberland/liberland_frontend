@@ -12,39 +12,26 @@ const selectorGettingWalletInfo = createSelector(
   walletReducer,
   (reducer) => reducer.gettingWalletInfo,
 );
-
-const selectorFreeBalance = createSelector(
-  selectorWalletInfo,
-  (reducer) => matchPowHelper(reducer.balance.free.amount),
-);
-
 const selectorWalletAddress = createSelector(
   selectorWalletInfo,
   (reducer) => reducer.address,
 );
 
-const selectorLiberstakeBalance = createSelector(
+const selectorBalances = createSelector(
   selectorWalletInfo,
-  (reducer) => matchPowHelper(reducer.balance.liberstake.amount),
+  (reducer) => reducer.balances,
 );
 
-const selectorPolkastakeBalance = createSelector(
-  selectorWalletInfo,
-  (reducer) => matchPowHelper(reducer.balance.polkastake.amount),
-);
-
-const selectorLiquidMeritsBalance = createSelector(
-  selectorWalletInfo,
-  (reducer) => matchPowHelper(reducer.balance.liquidMerits.amount),
+const selectorFreeBalance = createSelector(
+  selectorBalances,
+  (reducer) => matchPowHelper(reducer.free.amount),
 );
 
 const selectorTotalBalance = createSelector(
+  selectorBalances,
   selectorFreeBalance,
-  selectorLiberstakeBalance,
-  selectorPolkastakeBalance,
-  selectorLiquidMeritsBalance,
-  (free, liberstake, polkastake, liquidMerits) => (
-    matchPowHelper(free + liberstake + polkastake + liquidMerits)
+  (reducer, free) => (
+    reducer.free.amount + reducer.liberstake.amount + reducer.polkastake.amount + free
   ),
 );
 
@@ -52,9 +39,7 @@ export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
   selectorFreeBalance,
-  selectorWalletAddress,
-  selectorLiberstakeBalance,
-  selectorPolkastakeBalance,
-  selectorLiquidMeritsBalance,
+  selectorBalances,
   selectorTotalBalance,
+  selectorWalletAddress,
 };

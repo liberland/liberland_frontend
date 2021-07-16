@@ -8,18 +8,16 @@ const getBalanceByAddress = async (address) => {
     const api = await ApiPromise.create({ provider });
     const {
       data: { free: previousFree },
-      nonce: previousNonce,
     } = await api.query.system.account(address);
     return ({
       free: {
-        amount: previousFree.toString(),
-        nonce: previousNonce.toString(),
+        amount: parseInt(previousFree.toString(), 10),
       },
       liberstake: {
         amount: 20000000000000000,
       },
       polkastake: {
-        amount: 1000000000000000,
+        amount: 10000000000000000,
       },
       liquidMerits: {
         amount: 70000000000000000,

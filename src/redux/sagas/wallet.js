@@ -9,8 +9,8 @@ function* getWalletWorker() {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       const [accounts] = yield web3Accounts();
-      const balance = yield call(getBalanceByAddress, accounts.address);
-      yield put(walletActions.getWallet.success({ ...accounts, balance }));
+      const balances = yield call(getBalanceByAddress, accounts.address);
+      yield put(walletActions.getWallet.success({ ...accounts, balances }));
     } else {
       yield put(walletActions.getWallet.failure());
     }

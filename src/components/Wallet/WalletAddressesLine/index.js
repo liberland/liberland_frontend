@@ -55,8 +55,13 @@ const WalletAddressesLine = ({ walletAddress }) => {
     </div>
   );
 };
+
+WalletAddressesLine.defaultProps = {
+  walletAddress: '',
+};
+
 WalletAddressesLine.propTypes = {
-  walletAddress: PropTypes.string.isRequired,
+  walletAddress: PropTypes.string,
 };
 
 export default WalletAddressesLine;
