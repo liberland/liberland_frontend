@@ -11,5 +11,6 @@ export default function* rootSaga() {
 
     // WALLET
     walletSagas.getWalletWatcher(),
+    walletSagas.sendTransferWatcher(),
   ]);
 }
