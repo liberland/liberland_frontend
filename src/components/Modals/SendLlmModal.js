@@ -38,6 +38,7 @@ const SendLlmModal = ({
         register={register}
         name="account_from"
         placeholder="Send from account"
+        required
       />
 
       <div className={styles.title}>Send to address</div>
@@ -45,6 +46,7 @@ const SendLlmModal = ({
         register={register}
         name="account_to"
         placeholder="Send to address"
+        required
       />
 
       <div className={styles.title}>Amount LLM</div>
@@ -52,6 +54,7 @@ const SendLlmModal = ({
         register={register}
         name="amount"
         placeholder="Amount LLM"
+        required
       />
 
       <div className={styles.buttonWrapper}>
