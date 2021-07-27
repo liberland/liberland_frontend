@@ -8,7 +8,7 @@ export default {
     wallet: '/home/wallet',
     voting: '/home/voting',
     profile: '/home/profile',
-    constitution: '/home/constitution',
+    constitution: '/home/law',
   },
   documents: {
     myAccount: '/home/documents/my-account',

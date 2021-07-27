@@ -70,7 +70,7 @@ const HomeNavigation = () => {
     },
     {
       route: router.home.constitution,
-      title: 'Constitution',
+      title: 'Law',
       icon: ConstitutionIcon,
       activeIcon: ConstitutionIconActive,
     },
