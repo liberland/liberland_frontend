@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 import Button from '../../Button/Button';
+
+import { walletActions } from '../../../redux/actions';
+
+import { SendLlmModal } from '../../Modals';
 
 import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
@@ -13,6 +18,8 @@ import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
 
 const WalletAddressesLine = ({ walletAddress }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const dispatch = useDispatch();
   const addresses = {
     walletAddress,
     validatorAddress: '0x0A1B23Be38A1dbc2A833D051780698CBbd9911FB',
@@ -20,6 +27,12 @@ const WalletAddressesLine = ({ walletAddress }) => {
 
   const handleCopyClick = (event) => {
     navigator.clipboard.writeText(addresses[event.currentTarget.getAttribute('name')]);
+  };
+
+  const handleModalOpen = () => setIsModalOpen(!isModalOpen);
+  const handleSubmit = (values) => {
+    dispatch(walletActions.sendTransfer.call(values));
+    handleModalOpen();
   };
 
   return (
@@ -47,11 +60,18 @@ const WalletAddressesLine = ({ walletAddress }) => {
           <GraphIcon />
           Stake LLM
         </Button>
-        <Button small primary>
+        <Button small primary onClick={handleModalOpen}>
           <UploadIcon />
           Send LLM
         </Button>
       </div>
+      {isModalOpen && (
+      <SendLlmModal
+        onSubmit={handleSubmit}
+        closeModal={handleModalOpen}
+        addressFrom={walletAddress}
+      />
+      )}
     </div>
   );
 };
