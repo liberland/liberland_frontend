@@ -4,6 +4,7 @@ import {
 } from 'react-router-dom';
 
 import AssemblyHeader from './AssemblyHeader';
+import MyDrafts from './MyDrafts';
 
 import styles from './styles.module.scss';
 import router from '../../router';
@@ -17,7 +18,7 @@ const Assembly = () => (
         <Route
           exact
           path={router.assembly.myDrafts}
-          component={() => <div>My drafts</div>}
+          component={MyDrafts}
         />
         <Route
           path={router.assembly.legislationVotes}
