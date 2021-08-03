@@ -11,10 +11,13 @@ const Button = ({
   onClick = () => { },
   medium,
   large,
+  little,
   small,
+  nano,
   className,
   secondary,
   green,
+  grey,
 }) => (
   <button
     onClick={onClick}
@@ -25,8 +28,11 @@ const Button = ({
         [styles.secondary]: secondary,
         [styles.medium]: medium,
         [styles.large]: large,
+        [styles.little]: little,
         [styles.small]: small,
+        [styles.nano]: nano,
         [styles.green]: green,
+        [styles.grey]: grey,
       })
     }
   >
@@ -40,10 +46,13 @@ Button.defaultProps = {
   onClick: () => {},
   medium: false,
   large: false,
+  little: false,
   small: false,
+  nano: false,
   className: '',
   secondary: false,
   green: false,
+  grey: false,
 };
 
 Button.propTypes = {
@@ -53,10 +62,13 @@ Button.propTypes = {
   onClick: PropTypes.func,
   medium: PropTypes.bool,
   large: PropTypes.bool,
+  little: PropTypes.bool,
   small: PropTypes.bool,
+  nano: PropTypes.bool,
   className: PropTypes.string,
   secondary: PropTypes.bool,
   green: PropTypes.bool,
+  grey: PropTypes.bool,
 };
 
 export default Button;

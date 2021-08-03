@@ -22,10 +22,20 @@
   &.medium{
     width: 222px;
   }
+  &.little{
+    width: 190px;
+    height: 43px;
+    font-size: 14px;
+  }
   &.small{
     width: 139px;
     height: 48px;
     font-size: 14px;
+  }
+  &.nano{
+    width: 60px;
+    height: 25px;
+    font-size: 12px;
   }
   color: $text4;
   cursor: pointer;
@@ -40,5 +50,9 @@
   &.green{
     background: $secondary;
     color: $primary2;
+  }
+  &.grey{
+    background: $bg2;
+    color: $text4;
   }
 }
