@@ -15,11 +15,16 @@
   width: 100%;
   padding: 30px 35px;
 
-  & > p {
+  .headerTitle {
     margin: 0;
     font-family: $regular;
     font-weight: bold;
     font-size: 24px;
+  }
+
+  .titleWrapper {
+    display: flex;
+    align-items: center;
   }
 }
 

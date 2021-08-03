@@ -1,0 +1,44 @@
+@import '../../../assets/variables';
+@import '../../../assets/fonts/fonts';
+
+.assemblyInfoWrapper {
+  display: flex;
+  font-family: $medium;
+  margin-left: 20px;
+}
+
+.infoBox {
+  display: flex;
+  margin-left: 20px;
+
+  svg {
+    margin-left: 5px;
+    align-self: center;
+  }
+}
+
+.rightSideInfobox {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  justify-content: center;
+
+  p {
+    font-size: 14px;
+    color: $text4;
+    margin-bottom: 5px;
+  }
+
+  span {
+    font-family: $medium;
+    font-size: 20px;
+  }
+}
+
+.greenGrow {
+  color: $primary2;
+}
+
+.redGrow {
+  color: $primary4;
+}
