@@ -24,3 +24,40 @@
     font-size: 14px;
   }
 }
+
+.containerDraft {
+  width: 186px;
+  background: $bg2;
+  height: 4px;
+  border-radius: 15px;
+}
+
+.wrapperDraft {
+  width: 186px;
+  background: $bg2;
+  height: 5px;
+  border-radius: 15px;
+  margin-bottom: 31px;
+}
+
+.progressDraft{
+  height: 100%;
+  background: $primary;
+  border-radius: 15px;
+}
+.progressDraftGreen {
+  height: 100%;
+  background: $primary2;
+  border-radius: 15px;
+}
+
+.wrapperDraft{
+  display: flex;
+  align-items: center;
+  color: $bg2;
+
+  p {
+    margin-left: 7px;
+    font-size: 14px;
+  }
+}
