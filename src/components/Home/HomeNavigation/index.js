@@ -22,6 +22,7 @@ import VotingIcon from '../../../assets/icons/voting.svg';
 import VotingIconActive from '../../../assets/icons/active-voting.svg';
 import ConstitutionIcon from '../../../assets/icons/constitution.svg';
 import ConstitutionIconActive from '../../../assets/icons/active-constitution.svg';
+import AssemblyIcon from '../../../assets/icons/assembly.svg';
 import AssemblyIconActive from '../../../assets/icons/active-assembly.svg';
 
 // REDUX
@@ -72,7 +73,7 @@ const HomeNavigation = () => {
     {
       route: router.home.assembly,
       title: 'Assembly',
-      icon: ConstitutionIcon,
+      icon: AssemblyIcon,
       activeIcon: AssemblyIconActive,
     },
     {

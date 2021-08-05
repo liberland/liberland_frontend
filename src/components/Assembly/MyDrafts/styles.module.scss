@@ -5,6 +5,23 @@
   font-family: $medium;
   font-size: 18px;
   margin-bottom: 35px;
+  display: flex;
+  justify-content: space-between;
+
+  .buttonWrapper {
+    .searchButton {
+      background-color: $bg2;
+    }
+    width: 63px;
+    height: 43px;
+    & > button {
+      height: 100%;
+
+      & > svg {
+        margin: auto
+      }
+    }
+  }
 }
 
 .draftWrapper {
@@ -13,11 +30,10 @@
   padding: 30px;
   border-radius: 15px;
   max-width: 1058px;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
 
   .singleDraft {
-    padding: 31px 23px;
+    padding: 31px 22px;
     background-color: $bg3;
     border-radius: 15px;
     width: 234px;
@@ -55,6 +71,7 @@
         align-self: center;
         margin: 19px 0 30px 0;
         text-transform: capitalize;
+        width: 180px;
       }
     }
 
@@ -67,11 +84,17 @@
         text-transform: uppercase;
         font-size: 12px;
         margin-left: 4px;
+        align-self: center;
       }
 
       .detailsButton {
         text-transform: capitalize;
       }
+    }
+
+    .imageAndStatus {
+      display: flex;
+      align-items: center;
     }
   }
 
@@ -93,5 +116,22 @@
 
   .draftDeclined {
     color: $text2;
+  }
+
+  .addNewDraft {
+    @extend .singleDraft;
+    background-color: $bg4;
+    border: dashed 2.5px $bg2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 31px 19px;
+  }
+
+  .addNewDraft:hover {
+    background-color: $bg3;
+    cursor: pointer;
   }
 }

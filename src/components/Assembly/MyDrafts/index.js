@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Card from '../../Card';
 import Button from '../../Button/Button';
 
@@ -8,8 +8,18 @@ import styles from './styles.module.scss';
 import { ReactComponent as PassedImage } from '../../../assets/icons/passed.svg';
 import { ReactComponent as VetoedImage } from '../../../assets/icons/vetoed.svg';
 import { ReactComponent as DeclinedImage } from '../../../assets/icons/declined.svg';
+import { ReactComponent as AddNewDraftImage } from '../../../assets/icons/add-new-draft.svg';
+import { ReactComponent as SearchIcon } from '../../../assets/icons/search.svg';
+import { AddNewDraftModal } from '../../Modals';
 
 const MyDrafts = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleModalOpen = () => setIsModalOpen(!isModalOpen);
+  const handleSubmit = (values) => {
+    // eslint-disable-next-line no-console
+    console.log(values);
+    handleModalOpen();
+  };
   const draftStatuses = ['draft', 'voting', 'passed', 'vetoed', 'declined'];
   const drafts = [
     {
@@ -65,7 +75,7 @@ const MyDrafts = () => {
       case 0: return <span className={styles.draftNew}>{draftStatuses[statusDraft]}</span>;
       case 1: return <span className={styles.draftVoting}>{`${draftStatuses[statusDraft]} (${votingHourLeft}h left)`}</span>;
       case 2: return (
-        <div>
+        <div className={styles.imageAndStatus}>
           <PassedImage />
           <span className={styles.draftPassed}>
             {draftStatuses[statusDraft]}
@@ -73,7 +83,7 @@ const MyDrafts = () => {
         </div>
       );
       case 3: return (
-        <div>
+        <div className={styles.imageAndStatus}>
           <VetoedImage />
           <span className={styles.draftVetoed}>
             {draftStatuses[statusDraft]}
@@ -81,7 +91,7 @@ const MyDrafts = () => {
         </div>
       );
       case 4: return (
-        <div>
+        <div className={styles.imageAndStatus}>
           <DeclinedImage />
           <span className={styles.draftDeclined}>
             {draftStatuses[statusDraft]}
@@ -99,8 +109,22 @@ const MyDrafts = () => {
           My drafts
           {`(${drafts.length})`}
         </span>
+
+        <div className={styles.buttonWrapper}>
+          <Button className={styles.searchButton}><SearchIcon /></Button>
+        </div>
       </div>
       <div className={styles.draftWrapper}>
+        <div className={styles.addNewDraft} onClick={() => handleModalOpen()}>
+          <AddNewDraftImage />
+          <h3>
+            Add New Draft
+          </h3>
+          <span>
+            Create new lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            Ipsum pharetra sagittis.
+          </span>
+        </div>
         {drafts.map((draft) => (
           <div className={styles.singleDraft} key={draft.id}>
             <h3>
@@ -137,6 +161,12 @@ const MyDrafts = () => {
           </div>
         ))}
       </div>
+      {isModalOpen && (
+        <AddNewDraftModal
+          onSubmit={handleSubmit}
+          closeModal={handleModalOpen}
+        />
+      )}
     </Card>
   );
 };
