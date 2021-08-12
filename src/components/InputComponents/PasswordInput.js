@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from 'react';
 import cx from 'classnames';
 
@@ -30,7 +31,7 @@ const PasswordInput = ({
         type={show ? 'text' : 'password'}
         name={name}
         placeholder={placeholder}
-        ref={register({
+        {...register(name, {
           pattern,
           validate,
           required: required && 'This field is required',

@@ -6,6 +6,7 @@ import {
 import AssemblyHeader from './AssemblyHeader';
 import MyDrafts from './MyDrafts';
 import LegislationVotes from './LegislationVotes';
+import VoteHistory from './VoteHistory';
 import styles from './styles.module.scss';
 import router from '../../router';
 import RoleHOC from '../../hocs/RoleHOC';
@@ -29,7 +30,7 @@ const Assembly = () => (
       />
       <Route
         path={router.assembly.voteHistory}
-        component={() => <div>Vote history</div>}
+        component={VoteHistory}
       />
       <Route
         path={router.assembly.pmElection}

@@ -18,7 +18,7 @@ const MyDrafts = () => {
   const handleSubmit = (values) => {
     // eslint-disable-next-line no-console
     console.log(values);
-    handleModalOpen();
+    // handleModalOpen();
   };
   const draftStatuses = ['draft', 'voting', 'passed', 'vetoed', 'declined'];
   const drafts = [

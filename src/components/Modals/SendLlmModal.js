@@ -1,6 +1,6 @@
 // LIBS
 import React from 'react';
-import useForm from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';

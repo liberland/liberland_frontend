@@ -1,6 +1,7 @@
 // LIBS
-import React from 'react';
-import useForm from 'react-hook-form';
+import React, { useCallback, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { useDropzone } from 'react-dropzone';
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';
@@ -10,6 +11,7 @@ import Button from '../Button/Button';
 // STYLES
 import styles from './styles.module.scss';
 import { ReactComponent as DragAndDropImage } from '../../assets/icons/drag-and-drop.svg';
+// import File from '../../utils/file';
 
 const AddNewDraftModal = ({
   // eslint-disable-next-line react/prop-types
@@ -18,14 +20,32 @@ const AddNewDraftModal = ({
   const {
     handleSubmit,
     register,
+    control,
+    setValue,
   } = useForm({
     defaultValues: {
       amount: '10',
       account_from: '5FLSigC9HGRKVhB9FiEo4Ydsdgsdg',
       // Default address to send is CHARLIE
       account_to: '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y',
+      file: '',
     },
   });
+
+  const [isFileSelected, setIsFileSelected] = useState(false);
+
+  const onDrop = useCallback(async (acceptedFiles) => {
+    acceptedFiles.forEach(async (file) => {
+      // const base64 = await File.toBase64(file);
+      setValue('file', file);
+      setIsFileSelected(true);
+    });
+  }, []);
+
+  const {
+    getRootProps,
+    getInputProps,
+  } = useDropzone({ onDrop, maxFiles: 1 });
 
   return (
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
@@ -51,10 +71,47 @@ const AddNewDraftModal = ({
         placeholder="https://"
       />
       <div className={styles.dragAndDrop}>
-        <DragAndDropImage />
-        <span>
-          Or drag and drop/browse to upload
-        </span>
+        {
+          isFileSelected ? (
+            <Controller
+              render={({ field }) => (
+                <div onClick={() => {
+                  field.onChange('');
+                  setIsFileSelected(false);
+                }}
+                >
+                  {field.value.name}
+                </div>
+              )}
+              name="file"
+              control={control}
+            />
+          ) : (
+            <>
+              <DragAndDropImage />
+              <span>
+                Or drag and drop/browse to upload
+              </span>
+              <Controller
+                render={({ field }) => (
+                  <div {...getRootProps()} className={styles.dropZone}>
+                    <input {...getInputProps({
+                      onChange: async (e) => {
+                        // const base64 = await File.toBase64(e.target.files[0]);
+                        field.onChange(e.target.files[0]);
+                        setIsFileSelected(true);
+                      },
+                    })}
+                    />
+                  </div>
+                )}
+                name="file"
+                control={control}
+              />
+            </>
+          )
+        }
+
       </div>
       <div className={styles.title}>Thread link</div>
       <TextInput

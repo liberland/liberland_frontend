@@ -13,9 +13,12 @@ import { ReactComponent as GroupChat } from '../../assets/icons/group-chat.svg';
 import styles from './styles.module.scss';
 
 const ProposalDetailsModal = ({
-  closeModal, proposalId
+  // eslint-disable-next-line react/prop-types
+  closeModal, proposalId,
 }) => {
   // Here you need to fetch data for chosen proposal using proposalRow
+  // eslint-disable-next-line no-console
+  console.log(proposalId);
   return (
     <div className={styles.getCitizenshipModal}>
       <div className={styles.h3}>Proposal details</div>

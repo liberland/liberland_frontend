@@ -1,0 +1,66 @@
+@import '../../../assets/base/variables';
+@import '../../../assets/base/fonts';
+
+.supportedProgress {
+  margin-bottom: 6px;
+  color: $text4;
+  font-size: 12px;
+}
+
+.supportedWrapper {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: -31px;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+
+  &.red {
+    color: $primary4;
+  }
+
+  &.green {
+    color: $primary2;
+  }
+
+  svg {
+    margin-right: 7px;
+  }
+}
+
+.actionButtonsWrapper {
+  display: flex;
+}
+
+.actionButton {
+  height: 43px;
+  width: 63px;
+  border-radius: 15px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  cursor: pointer;
+  &.actionButtonRed{
+    background: $secondary4;
+  }
+  &.actionButtonGreen{
+    background: $secondary2;
+  }
+
+  & > svg {
+    opacity: 1;
+  }
+}
+
+.proposalWrapper {
+  display: flex;
+  align-items: center;
+
+  span {
+    margin-right: 10px;
+  }
+}

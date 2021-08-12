@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from 'react';
 import cx from 'classnames';
 
@@ -20,7 +21,7 @@ const CheckboxInput = ({
         className={cx(styles.hiddenInput)}
         checked={isChecked}
         type="checkbox"
-        ref={register({ required: required && `${errorTitle} is required` })}
+        {...register(name, { required: required && `${errorTitle} is required` })}
         name={name}
         readOnly
       />

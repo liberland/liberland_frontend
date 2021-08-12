@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import cx from 'classnames';
 
@@ -24,7 +25,7 @@ const TextInput = ({
       placeholder={placeholder}
       width={width}
       error={error}
-      ref={register({
+      {...register(name, {
         validate,
         pattern,
         required: required && `${errorTitle} is required`,
