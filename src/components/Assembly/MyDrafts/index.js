@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import Card from '../../Card';
 import Button from '../../Button/Button';
 
 import ProgressBar from '../../ProgressBar';
+
+import { assemblyActions } from '../../../redux/actions';
 
 import styles from './styles.module.scss';
 import { ReactComponent as PassedImage } from '../../../assets/icons/passed.svg';
@@ -14,10 +17,15 @@ import { AddNewDraftModal } from '../../Modals';
 
 const MyDrafts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const dispatch = useDispatch();
+
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
   const handleSubmit = (values) => {
     // eslint-disable-next-line no-console
     console.log(values);
+    dispatch(assemblyActions.addMyDraft.call({
+      pdfFile: values.pdf_file[0],
+    }));
     // handleModalOpen();
   };
   const draftStatuses = ['draft', 'voting', 'passed', 'vetoed', 'declined'];
