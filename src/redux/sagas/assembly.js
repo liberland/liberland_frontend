@@ -1,21 +1,27 @@
-import { put, takeLatest, call } from 'redux-saga/effects';
+import {
+  put, takeLatest, call, select,
+} from 'redux-saga/effects';
+import { web3Accounts } from '@polkadot/extension-dapp';
 
 import { assemblyActions } from '../actions';
+
+import { userSelectors } from '../selectors';
 
 import api from '../../api';
 
 // WORKERS
 function* addMyDraftWorker(action) {
   try {
-    const { pdfFile } = action.payload;
-    // eslint-disable-next-line no-console
-    console.log('pdfFile', pdfFile);
-    const sendsData = new FormData();
-    yield sendsData.append('pdffile', pdfFile);
-    const { data: { textFromPdf } } = yield call(api.post, 'assembly/add_new_draft', sendsData, { headers: { 'Content-Type': 'multipart/form-data' } });
-    yield put(assemblyActions.addMyDraft.success);
-    // eslint-disable-next-line no-console
-    console.log('textFromPdf', textFromPdf);
+    const { data } = action.payload;
+    const [accounts] = yield web3Accounts();
+    const createdAt = Date.now();
+    const userId = yield select(userSelectors.selectUserId);
+    data.fileName = accounts.address + createdAt;
+    data.createdDate = createdAt;
+    data.userId = userId;
+
+    yield call(api.post, 'assembly/add_new_draft', data);
+    yield put(assemblyActions.addMyDraft.success());
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('e', e);
@@ -35,5 +41,4 @@ function* addMyDraftWatcher() {
 
 export {
   addMyDraftWatcher,
-  addMyDraftWorker,
 };

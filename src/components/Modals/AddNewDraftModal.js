@@ -34,12 +34,18 @@ const AddNewDraftModal = ({
 
   const [isFileSelected, setIsFileSelected] = useState(false);
 
+  // const toBase64 = (file) => new Promise((resolve, reject) => {
+  //   const reader = new FileReader();
+  //   reader.readAsDataURL(file);
+  //   reader.onload = () => resolve(reader.result);
+  //   reader.onerror = (error) => reject(error);
+  // });
+
   const onDrop = useCallback(async (acceptedFiles) => {
-    acceptedFiles.forEach(async (file) => {
-      // const base64 = await File.toBase64(file);
+    for (const file of acceptedFiles) {
       setValue('file', file);
       setIsFileSelected(true);
-    });
+    }
   }, []);
 
   const {

@@ -20,12 +20,30 @@ const MyDrafts = () => {
   const dispatch = useDispatch();
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
-  const handleSubmit = (values) => {
-    // eslint-disable-next-line no-console
-    console.log(values);
-    dispatch(assemblyActions.addMyDraft.call({
-      pdfFile: values.pdf_file[0],
-    }));
+
+  const toBase64 = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+
+  const handleSubmit = async (values) => {
+    const {
+      file,
+      link_to_Google_document,
+      proposal_name,
+      short_description,
+      thread_link,
+    } = values;
+    const data = {
+      file: await toBase64(file),
+      linkToGoogleDocument: link_to_Google_document,
+      proposalName: proposal_name,
+      shortDescription: short_description,
+      threadLink: thread_link,
+    };
+    dispatch(assemblyActions.addMyDraft.call({ data }));
     // handleModalOpen();
   };
   const draftStatuses = ['draft', 'voting', 'passed', 'vetoed', 'declined'];
