@@ -16,5 +16,6 @@ export default function* rootSaga() {
 
     // ASSEMBLY
     assemblySagas.addMyDraftWatcher(),
+    assemblySagas.getMyProposalsWatcher(),
   ]);
 }

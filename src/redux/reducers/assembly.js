@@ -5,15 +5,24 @@ const initialState = {
   assembly: {
     isDraftSend: false,
   },
+  proposals: [],
 };
 
 const assemblyReducer = handleActions(
   {
-    [assemblyActions.addMyDraft.call]: (state) => ({
+    [combineActions(
+      assemblyActions.addMyDraft.call,
+      assemblyActions.getMyProposals.call,
+    )]: (state) => ({
       ...state,
       isDraftSend: true,
     }),
+    [assemblyActions.getMyProposals.success]: (state, action) => ({
+      ...state,
+      proposals: action.payload,
+    }),
     [combineActions(
+      assemblyActions.getMyProposals.failure,
       assemblyActions.addMyDraft.success,
       assemblyActions.addMyDraft.failure,
     )]: (state) => ({

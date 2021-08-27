@@ -29,6 +29,16 @@ function* addMyDraftWorker(action) {
   }
 }
 
+function* getMyProposalsWorker() {
+  try {
+    const userId = yield select(userSelectors.selectUserId);
+    const { data } = yield api.post('/assembly/get_my_proposals', { userId });
+    yield put(assemblyActions.getMyProposals.success(data));
+  } catch (e) {
+    yield put(assemblyActions.getMyProposals.failure(e));
+  }
+}
+
 // WATCHERS
 
 function* addMyDraftWatcher() {
@@ -39,6 +49,15 @@ function* addMyDraftWatcher() {
   }
 }
 
+function* getMyProposalsWatcher() {
+  try {
+    yield takeLatest(assemblyActions.getMyProposals.call, getMyProposalsWorker);
+  } catch (e) {
+    yield put(assemblyActions.getMyProposals.failure(e));
+  }
+}
+
 export {
   addMyDraftWatcher,
+  getMyProposalsWatcher,
 };

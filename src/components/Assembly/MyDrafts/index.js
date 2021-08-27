@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import Card from '../../Card';
 import Button from '../../Button/Button';
@@ -127,6 +127,8 @@ const MyDrafts = () => {
       default: return (<span> status error</span>);
     }
   };
+
+  useEffect(() => dispatch(assemblyActions.getMyProposals.call()), [dispatch]);
 
   return (
     <Card>
