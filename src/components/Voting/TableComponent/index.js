@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
-import { web3Accounts } from '@polkadot/extension-dapp';
+import { web3Accounts, web3FromAddress } from '@polkadot/extension-dapp';
 
 import cx from 'classnames';
 
@@ -13,36 +13,37 @@ import styles from './styles.module.scss';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
-const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
-
 const applyMyCandidate = async () => {
   try {
+    const provider = await new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
     const api = await ApiPromise.create({ provider });
+
     const allAccounts = await web3Accounts();
-    const account = allAccounts[0];
+    const accountAddress = allAccounts[0].address;
+    // TODO: Move this method to sage
+    // const candidatesList = await api.query.assemblyPallet.candidatesList();
+    // console.log('candidatesList', candidatesList);
 
-    const response = await new Promise((resovle) => {
-      setTimeout(async () => {
-        if (account.address) {
-          const signer = account.address;
-          try {
-            const txHash = await api.tx.cosmosAbci
-              .add_condidate(signer)
-              .signAndSend(signer);
-            resovle(txHash.toString());
-          } catch (err) {
-            resovle(err);
+    if (accountAddress) {
+      const injector = await web3FromAddress(accountAddress);
+      await api.tx.assemblyPallet
+        .addCondidate()
+        .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+          if (status.isInBlock) {
+            // eslint-disable-next-line no-console
+            console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+          } else {
+            // eslint-disable-next-line no-console
+            console.log(`Current status: ${status.type}`);
           }
-        }
-        // Set 5s delay between txs.
-      }, 5000);
-    });
-
-    // eslint-disable-next-line no-console
-    console.log(response);
+        }).catch((error) => {
+          // eslint-disable-next-line no-console
+          console.log(':( transaction failed', error);
+        });
+    }
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log(e);
+    console.log('error', e);
   }
 };
 
