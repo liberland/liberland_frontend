@@ -42,6 +42,9 @@ const MyDrafts = () => {
       proposalName: proposal_name,
       shortDescription: short_description,
       threadLink: thread_link,
+      requiredAmountLlm: null,
+      currentLlm: null,
+      votingHourLeft: null,
     };
     dispatch(assemblyActions.addMyDraft.call({ data }));
     // handleModalOpen();
