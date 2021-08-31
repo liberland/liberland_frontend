@@ -16,13 +16,24 @@ const { ApiPromise, WsProvider } = require('@polkadot/api');
 const applyMyCandidate = async () => {
   try {
     const provider = await new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
-    const api = await ApiPromise.create({ provider });
 
     const allAccounts = await web3Accounts();
     const accountAddress = allAccounts[0].address;
-    // TODO: Move this method to sage
+
+    const api = await ApiPromise.create({ provider });
+    // TODO: Move this method to sage request candidate list
+    // const api = await ApiPromise.create({
+    //   provider,
+    //   types: {
+    //     Candidate: {
+    //       pasportId: 'Vec<u8>',
+    //     },
+    //   },
+    // });
+    //
+    //
     // const candidatesList = await api.query.assemblyPallet.candidatesList();
-    // console.log('candidatesList', candidatesList);
+    // console.log('candidatesList', candidatesList.toString());
 
     if (accountAddress) {
       const injector = await web3FromAddress(accountAddress);
