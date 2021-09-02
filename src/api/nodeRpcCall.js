@@ -11,29 +11,6 @@ const getBalanceByAddress = async (address) => {
     const {
       data: { free: previousFree },
     } = await api.query.system.account(address);
-    const api2 = await ApiPromise.create({
-      provider,
-      types: {
-        UnlockChunk: {
-          stakingId: '[u8; 8]',
-          value: 'Balance',
-          era: 'EraIndex',
-        },
-        StakingLedger: {
-          stash: 'AccountId',
-          total: 'Balance',
-          active: 'Balance',
-          unlocking: 'Vec<UnlockChunk>',
-          claimedRewards: 'Vec<u32>',
-          polkaAmount: 'Balance',
-          liberAmount: 'Balance',
-        },
-      },
-    });
-    const balanceWallet = await api2.query.stakingPallet.ledger(address);
-    // eslint-disable-next-line no-console
-    console.log('test', balanceWallet);
-
     return ({
       liberstake: {
         amount: 20000000000000000,
