@@ -25,16 +25,20 @@ const getBalanceByAddress = async (address) => {
         },
       },
     });
-    const stash = await api2.query.stakingPallet.ledger(address);
-    // const {data: {stash}} = await api2.query.stakingPallet.ledger(address);
-    // eslint-disable-next-line no-console
-    console.log('stash', JSON.parse(stash.toString()));
+    const ledger = await api2.query.stakingPallet.ledger(address);
+    let polkaAmount = 0;
+    let liberAmount = 0;
+    if (ledger.toString() !== '') {
+      const ledgerObj = JSON.parse(ledger.toString());
+      polkaAmount = ledgerObj.polkaAmount;
+      liberAmount = ledgerObj.liberAmount;
+    }
     return ({
       liberstake: {
-        amount: 20000000000000000,
+        amount: liberAmount,
       },
       polkastake: {
-        amount: 10000000000000000,
+        amount: polkaAmount,
       },
       liquidMerits: {
         amount: parseInt(previousFree.toString(), 10),
