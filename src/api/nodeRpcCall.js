@@ -11,28 +11,24 @@ const getBalanceByAddress = async (address) => {
     const {
       data: { free: previousFree },
     } = await api.query.system.account(address);
-    // const api2 = await ApiPromise.create({
-    //   provider,
-    //   types: {
-    //     UnlockChunk: {
-    //       stakingId: '[u8; 8]',
-    //       value: 'Balance',
-    //       era: 'EraIndex',
-    //     },
-    //     StakingLedger: {
-    //       stash: 'AccountId',
-    //       total: 'Balance',
-    //       active: 'Balance',
-    //       unlocking: 'Vec<UnlockChunk>',
-    //       claimedRewards: 'Vec<u32>',
-    //       polkaAmount: 'Balance',
-    //       liberAmount: 'Balance',
-    //     },
-    //   },
-    // });
-    // const balanceWallet = await api2.query.stakingPallet.ledger(address);
-    // // eslint-disable-next-line no-console
-    // console.log('test', balanceWallet);
+    const api2 = await ApiPromise.create({
+      provider,
+      types: {
+        StakingLedger: {
+          stash: 'AccountId',
+          total: 'Compact<Balance>',
+          active: 'Compact<Balance>',
+          unlocking: 'Vec<UnlockChunk>',
+          claimedRewards: 'Vec<EraIndex>',
+          polkaAmount: 'Compact<Balance>',
+          liberAmount: 'Compact<Balance>',
+        },
+      },
+    });
+    const stash = await api2.query.stakingPallet.ledger(address);
+    // const {data: {stash}} = await api2.query.stakingPallet.ledger(address);
+    // eslint-disable-next-line no-console
+    console.log('stash', JSON.parse(stash.toString()));
     return ({
       liberstake: {
         amount: 20000000000000000,
