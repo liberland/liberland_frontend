@@ -34,6 +34,14 @@ const selectorTotalBalance = createSelector(
   ),
 );
 
+const selectorIsUserHaveStake = createSelector(
+  selectorBalances,
+  (reducer) => {
+    if ((reducer.liberstake.amount === 0) && (reducer.polkastake.amount === 0)) return false;
+    return true;
+  },
+);
+
 export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
@@ -41,4 +49,5 @@ export {
   selectorBalances,
   selectorTotalBalance,
   selectorWalletAddress,
+  selectorIsUserHaveStake,
 };

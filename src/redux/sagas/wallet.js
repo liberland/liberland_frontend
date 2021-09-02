@@ -1,6 +1,6 @@
 import { put, takeLatest, call } from 'redux-saga/effects';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
-import { getBalanceByAddress, sendTransfer } from '../../api/nodeRpcCall';
+import { getBalanceByAddress, sendTransfer, stakeToPolkaBondExtra } from '../../api/nodeRpcCall';
 
 import { walletActions } from '../actions';
 
@@ -16,6 +16,18 @@ function* getWalletWorker() {
     }
   } catch (e) {
     yield put(walletActions.getWallet.failure(e));
+  }
+}
+
+function* stakeToPolkaWorker(action) {
+  try {
+    const extensions = yield web3Enable('Liberland dapp');
+    if (extensions.length) {
+      yield call(stakeToPolkaBondExtra, action.payload);
+      yield put(walletActions.stakeToPolka.success());
+    }
+  } catch (e) {
+    yield put(walletActions.stakeToPolka.failure(e));
   }
 }
 
@@ -45,7 +57,16 @@ function* sendTransferWatcher() {
   }
 }
 
+function* stakeToPolkaWatcher() {
+  try {
+    yield takeLatest(walletActions.stakeToPolka.call, stakeToPolkaWorker);
+  } catch (e) {
+    yield put(walletActions.stakeToPolka.failure(e));
+  }
+}
+
 export {
   getWalletWatcher,
   sendTransferWatcher,
+  stakeToPolkaWatcher,
 };

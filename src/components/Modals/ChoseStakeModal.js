@@ -1,40 +1,110 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 // COMPONENTS
-// import ModalRoot from './ModalRoot';
-// import { TextInput } from '../InputComponents';
+import ModalRoot from './ModalRoot';
+import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
+import styles from './styles.module.scss';
 
-// eslint-disable-next-line react/prop-types
-const ChoseStakeModal = ({ closeModal }) => {
-  const [modalShown, setModalShown] = useState(0);
+const ChoseStakeModal = ({
+  // eslint-disable-next-line react/prop-types
+  closeModal, handleSubmit, register, modalShown, setModalShown, handleSubmitStakePolka,
+}) => (
+  <>
+    { modalShown === 0 && (
+      <form className={styles.getCitizenshipModal}>
+        <div className={styles.buttonWrapper}>
+          <Button
+            primary
+            medium
+            onClick={() => setModalShown(1)}
+          >
+            Polka Stake
+          </Button>
+          <Button
+            primary
+            medium
+            onClick={() => setModalShown(2)}
+          >
+            Liberland Stake
+          </Button>
 
-  const ChoseStake = () => (
-    <div>
-      <Button
-        medium
-        onClick={() => setModalShown(1)}
-      >
-        Polka Stake LLM
-      </Button>
-      <Button
-        medium
-        onClick={() => setModalShown(2)}
-      >
-        Liberland Stake LLM
-      </Button>
+          <Button
+            medium
+            onClick={closeModal}
+          >
+            Cancel
+          </Button>
+        </div>
+      </form>
+    )}
+    { modalShown === 1
+   && (
+   <form
+     className={styles.getCitizenshipModal}
+     onSubmit={handleSubmit(handleSubmitStakePolka)}
+   >
+     <div className={styles.h3}>Polka stake</div>
+     <div className={styles.title}>Amount LLM</div>
+     <TextInput
+       register={register}
+       name="amount"
+       placeholder="Amount LLM"
+     />
+
+     <div className={styles.buttonWrapper}>
+       <Button
+         medium
+         onClick={closeModal}
+       >
+         Cancel
+       </Button>
+       <Button
+         primary
+         medium
+         type="submit"
+       >
+         Stake
+       </Button>
+     </div>
+   </form>
+   ) }
+
+    { modalShown === 2
+  && (
+  <form className={styles.getCitizenshipModal}>
+    <div className={styles.h3}>Liberland stake</div>
+    <div className={styles.title}>Amount LLM</div>
+    <TextInput
+      register={register}
+      name="amount"
+      placeholder="Amount LLM"
+    />
+
+    <div className={styles.buttonWrapper}>
       <Button
         medium
         onClick={closeModal}
       >
         Cancel
       </Button>
+      <Button
+        primary
+        medium
+        type="submit"
+      >
+        Stake
+      </Button>
     </div>
-  );
+  </form>
+  )}
+  </>
+);
 
-  if (modalShown) return ChoseStake;
+const ChoseStakeModalWrapper = (props) => (
+  <ModalRoot>
+    <ChoseStakeModal {...props} />
+  </ModalRoot>
+);
 
-  return null;
-};
-
-export default ChoseStakeModal;
+export default ChoseStakeModalWrapper;
