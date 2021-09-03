@@ -31,6 +31,9 @@ import { userSelectors, walletSelectors } from '../../../redux/selectors';
 // CONSTANTS
 import roleEnums from '../../../constants/roleEnums';
 
+// UTILS
+import prettyNumber from '../../../utils/prettyNumber';
+
 const HomeNavigation = () => {
   const location = useLocation();
   const role = useSelector(userSelectors.selectUserRole);
@@ -44,7 +47,7 @@ const HomeNavigation = () => {
       title: `${name} ${lastName}`,
       // access: 'citizen',
       icon: () => <Avatar name={`${name} ${lastName}`} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
-      description: `${liquidMeritsBalance} LLM`,
+      description: `${prettyNumber(liquidMeritsBalance)} LLM`,
     },
     {
       route: router.home.feed,

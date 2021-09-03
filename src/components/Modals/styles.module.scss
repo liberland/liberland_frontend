@@ -42,6 +42,11 @@
   }
 }
 
+.ChoseStakeModal {
+  @extend .getCitizenshipModal;
+  width: 730px;
+}
+
 .dragAndDrop {
   overflow: scroll;
   display: flex;

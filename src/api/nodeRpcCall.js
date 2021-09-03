@@ -11,15 +11,42 @@ const getBalanceByAddress = async (address) => {
     const {
       data: { free: previousFree },
     } = await api.query.system.account(address);
+    const api2 = await ApiPromise.create({
+      provider,
+      types: {
+        StakingLedger: {
+          stash: 'AccountId',
+          total: 'Compact<Balance>',
+          active: 'Compact<Balance>',
+          unlocking: 'Vec<UnlockChunk>',
+          claimedRewards: 'Vec<EraIndex>',
+          polkaAmount: 'Compact<Balance>',
+          liberAmount: 'Compact<Balance>',
+        },
+      },
+    });
+    const ledger = await api2.query.stakingPallet.ledger(address);
+    let polkaAmount = 0;
+    let liberAmount = 0;
+    let totalAmount = 0;
+    if (ledger.toString() !== '') {
+      const ledgerObj = JSON.parse(ledger.toString());
+      polkaAmount = ledgerObj.polkaAmount;
+      liberAmount = ledgerObj.liberAmount;
+      totalAmount = ledgerObj.total;
+    }
     return ({
       liberstake: {
-        amount: 20000000000000000,
+        amount: liberAmount,
       },
       polkastake: {
-        amount: 10000000000000000,
+        amount: polkaAmount,
       },
       liquidMerits: {
         amount: parseInt(previousFree.toString(), 10),
+      },
+      totalAmount: {
+        amount: totalAmount,
       },
     });
   } catch (e) {
@@ -51,7 +78,71 @@ const sendTransfer = async (payload) => {
   });
 };
 
+const stakeToPolkaBondAndExtra = async (...payload) => {
+  try {
+    const { values: { amount }, isUserHaveStake } = payload[0];
+    const api = await ApiPromise.create({ provider });
+    const allAccounts = await web3Accounts();
+    const account = allAccounts[0];
+
+    const transferExtrinsic = isUserHaveStake
+      ? await api.tx.stakingPallet.bondExtra(amount * (10 ** 12))
+      : await api.tx.stakingPallet.bond(account.address, (amount * (10 ** 12)), 'Staked');
+
+    const injector = await web3FromSource(account.meta.source);
+    // eslint-disable-next-line max-len
+    await transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
+      if (status.isInBlock) {
+        // eslint-disable-next-line no-console
+        console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(`Current status: ${status.type}`);
+      }
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.log(':( transaction failed', error);
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+  }
+};
+
+const stakeToLiberlandBondAndExtra = async (...payload) => {
+  try {
+    const { values: { amount }, isUserHaveStake } = payload[0];
+    const api = await ApiPromise.create({ provider });
+    const allAccounts = await web3Accounts();
+    const account = allAccounts[0];
+
+    const transferExtrinsic = isUserHaveStake
+      ? await api.tx.stakingPallet.liberlandBondExtra(amount * (10 ** 12))
+      : await api.tx.stakingPallet.liberlandBond(account.address, (amount * (10 ** 12)), 'Staked');
+
+    const injector = await web3FromSource(account.meta.source);
+    // eslint-disable-next-line max-len
+    await transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
+      if (status.isInBlock) {
+        // eslint-disable-next-line no-console
+        console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+      } else {
+        // eslint-disable-next-line no-console
+        console.log(`Current status: ${status.type}`);
+      }
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.log(':( transaction failed', error);
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+  }
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
+  stakeToPolkaBondAndExtra,
+  stakeToLiberlandBondAndExtra,
 };
