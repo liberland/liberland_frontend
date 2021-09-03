@@ -14,13 +14,20 @@ import { ReactComponent as VetoedImage } from '../../../assets/icons/vetoed.svg'
 import { ReactComponent as DeclinedImage } from '../../../assets/icons/declined.svg';
 import { ReactComponent as AddNewDraftImage } from '../../../assets/icons/add-new-draft.svg';
 import { ReactComponent as SearchIcon } from '../../../assets/icons/search.svg';
-import { AddNewDraftModal } from '../../Modals';
+import { AddNewDraftModal, EditDraftModal } from '../../Modals';
 
 const MyDrafts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedDraft, setSelectedDraft] = useState({});
   const dispatch = useDispatch();
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
+
+  const handleEditModalOpen = (draft) => {
+    setIsEditModalOpen(!isEditModalOpen);
+    setSelectedDraft(draft);
+  };
 
   const toBase64 = (file) => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -48,8 +55,20 @@ const MyDrafts = () => {
       votingHourLeft: null,
     };
     dispatch(assemblyActions.addMyDraft.call({ data }));
-    // handleModalOpen();
+    handleModalOpen();
   };
+
+  const handleEdit = () => {
+    // const {
+    //   file,
+    //   link_to_Google_document,
+    //   proposal_name,
+    //   short_description,
+    //   thread_link,
+    // } = draft;
+
+  };
+
   const draftStatuses = ['draft', 'voting', 'passed', 'vetoed', 'declined'];
   const drafts = useSelector(assemblySelectors.proposalsSelector);
   const viewStatus = (draft) => {
@@ -122,7 +141,14 @@ const MyDrafts = () => {
               <div className={styles.draftButtons}>
                 <Button primary little className={styles.submitButton}>submit</Button>
                 <div className={styles.editButtonStatus}>
-                  <Button nano grey className={styles.editDraftButton}>edit</Button>
+                  <Button
+                    nano
+                    grey
+                    className={styles.editDraftButton}
+                    onClick={() => handleEditModalOpen(draft)}
+                  >
+                    edit
+                  </Button>
                   {viewStatus(draft)}
                 </div>
               </div>
@@ -150,6 +176,13 @@ const MyDrafts = () => {
         <AddNewDraftModal
           onSubmit={handleSubmit}
           closeModal={handleModalOpen}
+        />
+      )}
+      {isEditModalOpen && (
+        <EditDraftModal
+          onSubmit={handleEdit}
+          closeModal={handleEditModalOpen}
+          draft={selectedDraft}
         />
       )}
     </Card>
