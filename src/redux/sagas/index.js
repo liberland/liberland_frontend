@@ -12,5 +12,7 @@ export default function* rootSaga() {
     // WALLET
     walletSagas.getWalletWatcher(),
     walletSagas.sendTransferWatcher(),
+    walletSagas.stakeToPolkaWatcher(),
+    walletSagas.stakeToLiberlandWatcher(),
   ]);
 }
