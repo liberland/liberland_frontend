@@ -24,22 +24,28 @@ const AddNewDraftModal = ({
     setValue,
   } = useForm({
     defaultValues: {
-      amount: '10',
-      account_from: '5FLSigC9HGRKVhB9FiEo4Ydsdgsdg',
-      // Default address to send is CHARLIE
-      account_to: '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y',
+      proposal_name: 'SOME proposal name',
+      short_description: 'SOME short description',
+      link_to_Google_document: 'http://link_to_Google_document',
+      thread_link: 'http://thread_link',
       file: '',
     },
   });
 
   const [isFileSelected, setIsFileSelected] = useState(false);
 
+  // const toBase64 = (file) => new Promise((resolve, reject) => {
+  //   const reader = new FileReader();
+  //   reader.readAsDataURL(file);
+  //   reader.onload = () => resolve(reader.result);
+  //   reader.onerror = (error) => reject(error);
+  // });
+
   const onDrop = useCallback(async (acceptedFiles) => {
-    acceptedFiles.forEach(async (file) => {
-      // const base64 = await File.toBase64(file);
+    for (const file of acceptedFiles) {
       setValue('file', file);
       setIsFileSelected(true);
-    });
+    }
   }, []);
 
   const {
