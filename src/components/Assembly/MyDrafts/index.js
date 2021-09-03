@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Card from '../../Card';
 import Button from '../../Button/Button';
 
 import ProgressBar from '../../ProgressBar';
 
 import { assemblyActions } from '../../../redux/actions';
+import { assemblySelectors } from '../../../redux/selectors';
 
 import styles from './styles.module.scss';
 import { ReactComponent as PassedImage } from '../../../assets/icons/passed.svg';
@@ -50,53 +51,7 @@ const MyDrafts = () => {
     // handleModalOpen();
   };
   const draftStatuses = ['draft', 'voting', 'passed', 'vetoed', 'declined'];
-  const drafts = [
-    {
-      id: 1,
-      title: 'Create lorem ipsum dolor sit consectetur',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ipsum pharetra sagittis.',
-      statusDraft: 0,
-      requiredAmountLlm: 21430,
-      currentLlm: 2430,
-      votingHourLeft: null,
-    },
-    {
-      id: 2,
-      title: 'Change lorem ipsum dolor sit consectetur',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ipsum pharetra sagittis.',
-      statusDraft: 1,
-      requiredAmountLlm: 21430,
-      currentLlm: 3470,
-      votingHourLeft: 72,
-    },
-    {
-      id: 3,
-      title: 'Change lorem ipsum dolor sit consectetur',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ipsum pharetra sagittis.',
-      statusDraft: 2,
-      requiredAmountLlm: 21430,
-      currentLlm: 21430,
-      votingHourLeft: null,
-    },
-    {
-      id: 4,
-      title: 'Create lorem ipsum dolor sit consectetur',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ipsum pharetra sagittis.',
-      statusDraft: 3,
-      requiredAmountLlm: 21430,
-      currentLlm: 4430,
-      votingHourLeft: null,
-    },
-    {
-      id: 5,
-      title: 'Create lorem ipsum dolor sit consectetur',
-      content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ipsum pharetra sagittis.',
-      statusDraft: 4,
-      requiredAmountLlm: 21430,
-      currentLlm: 7430,
-      votingHourLeft: null,
-    },
-  ];
+  const drafts = useSelector(assemblySelectors.proposalsSelector);
 
   const viewStatus = (draft) => {
     const { statusDraft, votingHourLeft } = draft;
@@ -138,7 +93,7 @@ const MyDrafts = () => {
       <div className={styles.draftHeader}>
         <span>
           My drafts
-          {`(${drafts.length})`}
+          {`(${drafts && drafts.length})`}
         </span>
 
         <div className={styles.buttonWrapper}>
@@ -156,7 +111,7 @@ const MyDrafts = () => {
             Ipsum pharetra sagittis.
           </span>
         </div>
-        {drafts.map((draft) => (
+        { drafts && drafts.map((draft) => (
           <div className={styles.singleDraft} key={draft.id}>
             <h3>
               {draft.title}

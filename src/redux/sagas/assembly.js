@@ -22,6 +22,7 @@ function* addMyDraftWorker(action) {
 
     yield call(api.post, 'assembly/add_new_draft', data);
     yield put(assemblyActions.addMyDraft.success());
+    yield put(assemblyActions.getMyProposals.call());
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('e', e);
