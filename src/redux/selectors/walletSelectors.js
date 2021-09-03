@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import matchPowHelper from '../../utils/matchPowHelper';
 
 const walletReducer = (state) => state.wallet;
 
@@ -24,14 +23,22 @@ const selectorBalances = createSelector(
 
 const selectorLiquidMeritsBalance = createSelector(
   selectorBalances,
-  (reducer) => matchPowHelper(reducer.liquidMerits.amount),
+  (reducer) => (reducer.liquidMerits.amount - reducer.totalAmount.amount),
 );
 
 const selectorTotalBalance = createSelector(
   selectorBalances,
   (reducer) => (
-    reducer.liberstake.amount + reducer.polkastake.amount + reducer.liquidMerits.amount
+    reducer.totalAmount.amount
   ),
+);
+
+const selectorIsUserHaveStake = createSelector(
+  selectorBalances,
+  (reducer) => {
+    if ((reducer.liberstake.amount === 0) && (reducer.polkastake.amount === 0)) return false;
+    return true;
+  },
 );
 
 export {
@@ -41,4 +48,5 @@ export {
   selectorBalances,
   selectorTotalBalance,
   selectorWalletAddress,
+  selectorIsUserHaveStake,
 };

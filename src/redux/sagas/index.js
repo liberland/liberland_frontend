@@ -13,9 +13,10 @@ export default function* rootSaga() {
     // WALLET
     walletSagas.getWalletWatcher(),
     walletSagas.sendTransferWatcher(),
-
     // ASSEMBLY
     assemblySagas.addMyDraftWatcher(),
     assemblySagas.getMyProposalsWatcher(),
+    walletSagas.stakeToPolkaWatcher(),
+    walletSagas.stakeToLiberlandWatcher(),
   ]);
 }

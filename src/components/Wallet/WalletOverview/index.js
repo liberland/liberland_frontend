@@ -15,7 +15,7 @@ import Card from '../../Card';
 import styles from './styles.module.scss';
 
 const WalletOverview = ({
-  totalBalance, balances,
+  totalBalance, balances, liquidMerits,
 }) => {
   const overviewInfo = [
     {
@@ -33,7 +33,7 @@ const WalletOverview = ({
       getIcon: () => (2.4 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
     },
     {
-      amount: prettyNumber(balances.liquidMerits.amount),
+      amount: prettyNumber(liquidMerits),
       title: 'Liquid Merits',
       diff: -0.4,
       // eslint-disable-next-line no-constant-condition
@@ -92,6 +92,7 @@ const WalletOverview = ({
 WalletOverview.defaultProps = {
   totalBalance: 0,
   balances: {},
+  liquidMerits: 0,
 };
 
 WalletOverview.propTypes = {
@@ -110,6 +111,7 @@ WalletOverview.propTypes = {
       amount: PropTypes.number,
     }),
   }),
+  liquidMerits: PropTypes.number,
 };
 
 export default WalletOverview;

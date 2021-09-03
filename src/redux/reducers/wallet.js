@@ -13,6 +13,9 @@ const initialState = {
       liquidMerits: {
         amount: 0,
       },
+      totalAmount: {
+        amount: 0,
+      },
     },
   },
   gettingWalletInfo: false,
@@ -20,7 +23,11 @@ const initialState = {
 
 const walletReducer = handleActions(
   {
-    [walletActions.getWallet.call]: (state) => ({
+    [combineActions(
+      walletActions.getWallet.call,
+      walletActions.stakeToPolka.call,
+      walletActions.stakeToLiberland.call,
+    )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
     }),
@@ -31,6 +38,10 @@ const walletReducer = handleActions(
     [combineActions(
       walletActions.getWallet.success,
       walletActions.getWallet.failure,
+      walletActions.stakeToPolka.success,
+      walletActions.stakeToLiberland.success,
+      walletActions.stakeToPolka.failure,
+      walletActions.stakeToLiberland.failure,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,
