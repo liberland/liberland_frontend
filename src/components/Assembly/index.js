@@ -7,6 +7,7 @@ import AssemblyHeader from './AssemblyHeader';
 import MyDrafts from './MyDrafts';
 import LegislationVotes from './LegislationVotes';
 import VoteHistory from './VoteHistory';
+import PMElection from './PMElection';
 import styles from './styles.module.scss';
 import router from '../../router';
 import RoleHOC from '../../hocs/RoleHOC';
@@ -34,7 +35,7 @@ const Assembly = () => (
       />
       <Route
         path={router.assembly.pmElection}
-        component={() => <div>PM Election</div>}
+        component={PMElection}
       />
       <Route
         exact
