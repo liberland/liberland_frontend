@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import Tabs from '../../Tabs';
 import Button from '../../Button/Button';
 import router from '../../../router';
@@ -21,16 +22,20 @@ const navigationList = [
     title: 'Vote history',
   },
 ];
-const VotingHeader = () => (
-  <>
-    <Tabs navigationList={navigationList} />
-    <Button primary className={styles.upcomingVotings}>
-      <CalendarIcon />
-      {' '}
-      Upcoming votings
-      {' '}
-    </Button>
-  </>
-);
+const VotingHeader = () => {
+  const history = useHistory();
+  const handleClick = () => history.push(router.voting.currentCongressional.replace(':id', '1'));
+  return (
+    <>
+      <Tabs navigationList={navigationList} />
+      <Button primary className={styles.upcomingVotings} onClick={handleClick}>
+        <CalendarIcon />
+        {' '}
+        Upcoming votings
+        {' '}
+      </Button>
+    </>
+  );
+};
 
 export default VotingHeader;

@@ -1,4 +1,4 @@
-import { web3Accounts, web3FromSource } from '@polkadot/extension-dapp';
+import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -140,9 +140,61 @@ const stakeToLiberlandBondAndExtra = async (...payload) => {
   }
 };
 
+const applyMyCandidacy = async () => {
+  try {
+    const allAccounts = await web3Accounts();
+    const accountAddress = allAccounts[0].address;
+
+    const api = await ApiPromise.create({ provider });
+    if (accountAddress) {
+      const injector = await web3FromAddress(accountAddress);
+      await api.tx.assemblyPallet
+        .addCandidate()
+        .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+          if (status.isInBlock) {
+            // eslint-disable-next-line no-console
+            console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+          } else {
+            // eslint-disable-next-line no-console
+            console.log(`Current status: ${status.type}`);
+          }
+        }).catch((error) => {
+          // eslint-disable-next-line no-console
+          console.log(':( transaction failed', error);
+        });
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error', e);
+  }
+};
+
+const getCandidacyListRpc = async () => {
+  try {
+    const api = await ApiPromise.create({
+      provider,
+      types: {
+        Candidate: {
+          pasportId: 'Vec<u8>',
+        },
+      },
+    });
+    const candidatesList = await api.query.assemblyPallet.candidatesList();
+    // eslint-disable-next-line no-console
+    console.log('candidatesList', candidatesList.toString());
+    return JSON.parse(candidatesList.toString());
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error', e);
+  }
+  return null;
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
   stakeToPolkaBondAndExtra,
   stakeToLiberlandBondAndExtra,
+  applyMyCandidacy,
+  getCandidacyListRpc,
 };
