@@ -52,17 +52,16 @@ const MyDrafts = () => {
   };
   const draftStatuses = ['draft', 'voting', 'passed', 'vetoed', 'declined'];
   const drafts = useSelector(assemblySelectors.proposalsSelector);
-
   const viewStatus = (draft) => {
-    const { statusDraft, votingHourLeft } = draft;
-    switch (statusDraft) {
-      case 0: return <span className={styles.draftNew}>{draftStatuses[statusDraft]}</span>;
-      case 1: return <span className={styles.draftVoting}>{`${draftStatuses[statusDraft]} (${votingHourLeft}h left)`}</span>;
+    const { proposalStatus, votingHourLeft } = draft;
+    switch (proposalStatus) {
+      case 0: return <span className={styles.draftNew}>{draftStatuses[proposalStatus]}</span>;
+      case 1: return <span className={styles.draftVoting}>{`${draftStatuses[proposalStatus]} (${votingHourLeft}h left)`}</span>;
       case 2: return (
         <div className={styles.imageAndStatus}>
           <PassedImage />
           <span className={styles.draftPassed}>
-            {draftStatuses[statusDraft]}
+            {draftStatuses[proposalStatus]}
           </span>
         </div>
       );
@@ -70,7 +69,7 @@ const MyDrafts = () => {
         <div className={styles.imageAndStatus}>
           <VetoedImage />
           <span className={styles.draftVetoed}>
-            {draftStatuses[statusDraft]}
+            {draftStatuses[proposalStatus]}
           </span>
         </div>
       );
@@ -78,7 +77,7 @@ const MyDrafts = () => {
         <div className={styles.imageAndStatus}>
           <DeclinedImage />
           <span className={styles.draftDeclined}>
-            {draftStatuses[statusDraft]}
+            {draftStatuses[proposalStatus]}
           </span>
         </div>
       );
@@ -114,12 +113,12 @@ const MyDrafts = () => {
         { drafts && drafts.map((draft) => (
           <div className={styles.singleDraft} key={draft.id}>
             <h3>
-              {draft.title}
+              {draft.proposalName}
             </h3>
             <span>
-              {draft.content}
+              {draft.shortDescription}
             </span>
-            {draft.statusDraft === 0 && (
+            {draft.proposalStatus === 0 && (
               <div className={styles.draftButtons}>
                 <Button primary little className={styles.submitButton}>submit</Button>
                 <div className={styles.editButtonStatus}>
@@ -128,7 +127,7 @@ const MyDrafts = () => {
                 </div>
               </div>
             )}
-            {draft.statusDraft > 0 && (
+            {draft.proposalStatus > 0 && (
               <>
                 <p>
                   {`${draft.currentLlm}/${draft.requiredAmountLlm} llm`}

@@ -9,7 +9,7 @@ import {
   stakeToLiberlandBondAndExtra,
 } from '../../api/nodeRpcCall';
 
-import { walletActions } from '../actions';
+import { walletActions, assemblyActions } from '../actions';
 
 // WORKERS
 
@@ -20,6 +20,7 @@ function* getWalletWorker() {
       const [accounts] = yield web3Accounts();
       const balances = yield call(getBalanceByAddress, accounts.address);
       yield put(walletActions.getWallet.success({ ...accounts, balances }));
+      yield put(assemblyActions.getMyProposals.call());
     } else {
       yield put(walletActions.getWallet.failure());
     }

@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-const assemblyReducer = (state) => state.user;
+const assemblyReducer = (state) => state.assembly;
 
 const proposalsSelector = createSelector(
   assemblyReducer,

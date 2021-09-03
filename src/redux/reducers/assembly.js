@@ -2,9 +2,7 @@ import { combineActions, handleActions } from 'redux-actions';
 import { assemblyActions } from '../actions';
 
 const initialState = {
-  assembly: {
-    isDraftSend: false,
-  },
+  isDraftSend: false,
   proposals: [],
 };
 
