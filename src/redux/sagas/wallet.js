@@ -1,4 +1,6 @@
-import { put, takeLatest, call } from 'redux-saga/effects';
+import {
+  put, takeLatest, call, delay,
+} from 'redux-saga/effects';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import {
   getBalanceByAddress,
@@ -31,7 +33,9 @@ function* stakeToPolkaWorker(action) {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       yield call(stakeToPolkaBondAndExtra, action.payload);
+      yield delay(15000);
       yield put(walletActions.stakeToPolka.success());
+      yield put(walletActions.getWallet.call());
     }
   } catch (e) {
     yield put(walletActions.stakeToPolka.failure(e));
@@ -43,13 +47,15 @@ function* stakeToLiberlandWorker(action) {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       yield call(stakeToLiberlandBondAndExtra, action.payload);
+      yield delay(15000);
       yield put(walletActions.stakeToPolka.success());
+      yield put(walletActions.getWallet.call());
     }
-  } catch (e) {
-    yield put(walletActions.stakeToPolka.failure(e));
+  } catch
+  (e) {
+    yield put(walletActions.stakeToLiberland.failure(e));
   }
 }
-
 function* sendTransferWorker(action) {
   try {
     yield sendTransfer(action.payload);

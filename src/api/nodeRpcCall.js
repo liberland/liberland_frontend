@@ -28,10 +28,12 @@ const getBalanceByAddress = async (address) => {
     const ledger = await api2.query.stakingPallet.ledger(address);
     let polkaAmount = 0;
     let liberAmount = 0;
+    let totalAmount = 0;
     if (ledger.toString() !== '') {
       const ledgerObj = JSON.parse(ledger.toString());
       polkaAmount = ledgerObj.polkaAmount;
       liberAmount = ledgerObj.liberAmount;
+      totalAmount = ledgerObj.total;
     }
     return ({
       liberstake: {
@@ -42,6 +44,9 @@ const getBalanceByAddress = async (address) => {
       },
       liquidMerits: {
         amount: parseInt(previousFree.toString(), 10),
+      },
+      totalAmount: {
+        amount: totalAmount,
       },
     });
   } catch (e) {

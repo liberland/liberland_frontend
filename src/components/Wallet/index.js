@@ -13,6 +13,7 @@ const Wallet = () => {
   const walletInfo = useSelector(walletSelectors.selectorWalletInfo);
   const balances = useSelector(walletSelectors.selectorBalances);
   const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
+  const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
 
   return (
     <>
@@ -22,6 +23,7 @@ const Wallet = () => {
           <WalletOverview
             totalBalance={totalBalance}
             balances={balances}
+            liquidMerits={liquidMerits}
           />
           <WalletTransactionHistory />
         </div>

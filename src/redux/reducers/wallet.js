@@ -13,6 +13,9 @@ const initialState = {
       liquidMerits: {
         amount: 0,
       },
+      totalAmount: {
+        amount: 0,
+      },
     },
   },
   gettingWalletInfo: false,
