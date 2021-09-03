@@ -38,7 +38,7 @@ const applyMyCandidate = async () => {
     if (accountAddress) {
       const injector = await web3FromAddress(accountAddress);
       await api.tx.assemblyPallet
-        .addCondidate()
+        .addCandidate()
         .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
           if (status.isInBlock) {
             // eslint-disable-next-line no-console
