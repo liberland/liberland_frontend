@@ -49,6 +49,10 @@ const WalletAddressesLine = ({ walletAddress }) => {
     dispatch(walletActions.stakeToPolka.call({ values, isUserHaveStake }));
     handleModalOpenStake();
   };
+  const handleSubmitStakeLiberland = (values) => {
+    dispatch(walletActions.stakeToLiberland.call({ values, isUserHaveStake }));
+    handleModalOpenStake();
+  };
 
   return (
     <div className={styles.walletAddressLineWrapper}>
@@ -95,6 +99,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
         modalShown={modalShown}
         setModalShown={setModalShown}
         handleSubmitStakePolka={handleSubmitStakePolka}
+        handleSubmitStakeLiberland={handleSubmitStakeLiberland}
       />
       )}
     </div>

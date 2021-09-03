@@ -1,8 +1,15 @@
 import { put, takeLatest, call } from 'redux-saga/effects';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
-import { getBalanceByAddress, sendTransfer, stakeToPolkaBondExtra } from '../../api/nodeRpcCall';
+import {
+  getBalanceByAddress,
+  sendTransfer,
+  stakeToPolkaBondAndExtra,
+  stakeToLiberlandBondAndExtra,
+} from '../../api/nodeRpcCall';
 
 import { walletActions } from '../actions';
+
+// WORKERS
 
 function* getWalletWorker() {
   try {
@@ -23,7 +30,19 @@ function* stakeToPolkaWorker(action) {
   try {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
-      yield call(stakeToPolkaBondExtra, action.payload);
+      yield call(stakeToPolkaBondAndExtra, action.payload);
+      yield put(walletActions.stakeToPolka.success());
+    }
+  } catch (e) {
+    yield put(walletActions.stakeToPolka.failure(e));
+  }
+}
+
+function* stakeToLiberlandWorker(action) {
+  try {
+    const extensions = yield web3Enable('Liberland dapp');
+    if (extensions.length) {
+      yield call(stakeToLiberlandBondAndExtra, action.payload);
       yield put(walletActions.stakeToPolka.success());
     }
   } catch (e) {
@@ -40,6 +59,8 @@ function* sendTransferWorker(action) {
     yield put(walletActions.sendTransfer.failure(e));
   }
 }
+
+// WATCHERS
 
 function* getWalletWatcher() {
   try {
@@ -65,8 +86,17 @@ function* stakeToPolkaWatcher() {
   }
 }
 
+function* stakeToLiberlandWatcher() {
+  try {
+    yield takeLatest(walletActions.stakeToLiberland.call, stakeToLiberlandWorker);
+  } catch (e) {
+    yield put(walletActions.stakeToLiberland.failure(e));
+  }
+}
+
 export {
   getWalletWatcher,
   sendTransferWatcher,
   stakeToPolkaWatcher,
+  stakeToLiberlandWatcher,
 };

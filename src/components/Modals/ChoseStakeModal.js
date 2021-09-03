@@ -7,12 +7,12 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
 const ChoseStakeModal = ({
-  // eslint-disable-next-line react/prop-types
-  closeModal, handleSubmit, register, modalShown, setModalShown, handleSubmitStakePolka,
+  // eslint-disable-next-line react/prop-types,max-len
+  closeModal, handleSubmit, register, modalShown, setModalShown, handleSubmitStakePolka, handleSubmitStakeLiberland,
 }) => (
   <>
     { modalShown === 0 && (
-      <form className={styles.getCitizenshipModal}>
+      <form className={styles.ChoseStakeModal}>
         <div className={styles.buttonWrapper}>
           <Button
             primary
@@ -72,7 +72,10 @@ const ChoseStakeModal = ({
 
     { modalShown === 2
   && (
-  <form className={styles.getCitizenshipModal}>
+  <form
+    className={styles.getCitizenshipModal}
+    onSubmit={handleSubmit(handleSubmitStakeLiberland)}
+  >
     <div className={styles.h3}>Liberland stake</div>
     <div className={styles.title}>Amount LLM</div>
     <TextInput
