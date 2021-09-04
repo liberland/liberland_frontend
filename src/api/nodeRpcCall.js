@@ -140,32 +140,26 @@ const stakeToLiberlandBondAndExtra = async (...payload) => {
   }
 };
 
-const applyMyCandidacy = async () => {
-  try {
-    const allAccounts = await web3Accounts();
-    const accountAddress = allAccounts[0].address;
+const applyMyCandidacy = async (callback) => {
+  const allAccounts = await web3Accounts();
+  const accountAddress = allAccounts[0].address;
 
-    const api = await ApiPromise.create({ provider });
-    if (accountAddress) {
-      const injector = await web3FromAddress(accountAddress);
-      await api.tx.assemblyPallet
-        .addCandidate()
-        .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
-          if (status.isInBlock) {
-            // eslint-disable-next-line no-console
-            console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-          } else {
-            // eslint-disable-next-line no-console
-            console.log(`Current status: ${status.type}`);
-          }
-        }).catch((error) => {
+  const api = await ApiPromise.create({ provider });
+  if (accountAddress) {
+    const injector = await web3FromAddress(accountAddress);
+    await api.tx.assemblyPallet
+      .addCandidate()
+      .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+        if (status.isInBlock) {
           // eslint-disable-next-line no-console
-          console.log(':( transaction failed', error);
-        });
-    }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('error', e);
+          console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+          callback(null, 'done');
+        }
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(':( transaction failed', error);
+        callback(error);
+      });
   }
 };
 

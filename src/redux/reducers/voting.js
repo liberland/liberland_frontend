@@ -18,13 +18,15 @@ const votingReducer = handleActions(
     [votingActions.getListOfCandidacy.success]: (state, action) => ({
       ...state,
       candidateList: action.payload,
+      isVotingRequested: false,
     }),
     [combineActions(
       votingActions.addMyCandidacy.failure,
+      votingActions.addMyCandidacy.success,
       votingActions.getListOfCandidacy.failure,
     )]: (state) => ({
       ...state,
-      isVotingRequested: false,
+      isVotingRequested: initialState.isVotingRequested,
     }),
   }, initialState,
 );

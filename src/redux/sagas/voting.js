@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, call,
+  put, takeLatest, call, cps,
 } from 'redux-saga/effects';
 import { web3Enable } from '@polkadot/extension-dapp';
 
@@ -16,7 +16,7 @@ function* addMyCandidacyWorker() {
   try {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
-      yield call(applyMyCandidacy);
+      yield cps(applyMyCandidacy);
       yield put(votingActions.addMyCandidacy.success());
       yield put(votingActions.getListOfCandidacy.call());
     }
