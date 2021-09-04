@@ -1,5 +1,10 @@
 /* eslint-disable react/prop-types */
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback, useEffect, useMemo, useState,
+} from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+
+import { votingSelectors } from '../../../redux/selectors';
 
 import TableComponent from '../TableComponent';
 import Button from '../../Button/Button';
@@ -8,37 +13,11 @@ import { ReactComponent as CancelIcon } from '../../../assets/icons/cancel.svg';
 import styles from './styles.module.scss';
 
 const CurrentCongressionalAssemble = () => {
-  const [allCandidatesData, setAllCandidatesData] = useState([
-    {
-      id: '1',
-      deputies: 'John Wayne',
-      supported: '10.000 LLM',
-      action: 'Vote',
-      place: '',
-    },
-    {
-      id: '2',
-      deputies: 'Latisha Peacock',
-      supported: '9.000 LLM',
-      action: 'Vote',
-      place: '',
-    },
-    {
-      id: '3',
-      deputies: 'Vernon Leonard',
-      supported: '8.000 LLM',
-      action: 'Vote',
-      place: '',
-    },
-    {
-      id: '4',
-      deputies: 'Guto Callaghan',
-      supported: '6.000 LLM',
-      action: 'Vote',
-      place: '',
-    },
-  ]);
+  const listCandidats = useSelector(votingSelectors.selectorCandidateList);
+  const [allCandidatesData, setAllCandidatesData] = useState([]);
   const [selectedCandidatesData, setSelectedCandidatesData] = useState([]);
+
+  const dispatch = useDispatch();
 
   const handleVote = useCallback((id) => {
     setAllCandidatesData(allCandidatesData.filter((candidate) => candidate.id !== id));
@@ -102,10 +81,18 @@ const CurrentCongressionalAssemble = () => {
     },
   ], [handleCancel]);
 
+  useEffect(() => {
+    setAllCandidatesData(listCandidats);
+  }, [dispatch, listCandidats]);
+
   return (
     <div className={styles.currentAssemble}>
       <TableComponent title="All candidates" data={allCandidatesData} columns={allCandidatesColumns} />
-      <TableComponent data={selectedCandidatesData} columns={selectedCandidatesColumns} />
+      <TableComponent
+        title="electoral_sheet"
+        data={selectedCandidatesData}
+        columns={selectedCandidatesColumns}
+      />
     </div>
   );
 };

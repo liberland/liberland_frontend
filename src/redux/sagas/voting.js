@@ -10,6 +10,8 @@ import {
   getCandidacyListRpc,
 } from '../../api/nodeRpcCall';
 
+import truncate from '../../utils/truncate';
+
 // WORKERS
 
 function* addMyCandidacyWorker() {
@@ -29,7 +31,16 @@ function* getListOFCandidacyWorker() {
   try {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
-      const listOfCandidacy = yield call(getCandidacyListRpc);
+      let listOfCandidacy = yield call(getCandidacyListRpc);
+      listOfCandidacy = yield listOfCandidacy.map((el) => (
+        {
+          id: el.pasportId,
+          deputies: truncate(el.pasportId, 10),
+          supported: '10.000 LLM',
+          action: 'Vote',
+          place: '',
+        }
+      ));
       yield put(votingActions.getListOfCandidacy.success(listOfCandidacy));
     }
   } catch (e) {
@@ -54,7 +65,7 @@ function* getListOFCandidacyWatcher() {
     yield takeLatest(votingActions.getListOfCandidacy.call, getListOFCandidacyWorker);
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('getListOFCandidacy getListOFCandidacy getListOFCandidacy getListOFCandidacy getListOFCandidacy', e);
+    console.log(e);
     yield put(votingActions.getListOfCandidacy.failure(e));
   }
 }

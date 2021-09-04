@@ -13,6 +13,7 @@ import styles from './styles.module.scss';
 const buttons = {
   search: <Button><SearchIcon /></Button>,
   apply: <Button primary>Apply my candidate</Button>,
+  electoral_sheet: <Button primary> Cast Vote</Button>,
 };
 
 const TableComponent = ({
@@ -24,7 +25,7 @@ const TableComponent = ({
 }) => (
   <Card>
     <div className={styles.congressionalAssembleWrapper}>
-      {title && (
+      {title === 'All candidates' && (
         <div className={styles.headerWrapper}>
           <h3>
             {title}
@@ -34,7 +35,20 @@ const TableComponent = ({
           </div>
         </div>
       )}
-      <Table data={data} columns={columns} {...rest} />
+      { title === 'electoral_sheet' ? (
+        <>
+          <Table data={data} columns={columns} {...rest} />
+          { (data.length > 0)
+            ? (
+              <div className={cx(styles.buttonWrapper, styles.buttonWrapperBig)}>
+                {buttons[title]}
+              </div>
+            )
+            : null}
+        </>
+      ) : (
+        <Table data={data} columns={columns} {...rest} />
+      )}
     </div>
   </Card>
 );

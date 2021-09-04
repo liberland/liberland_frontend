@@ -4,6 +4,7 @@ import { votingActions } from '../actions';
 const initialState = {
   isVotingRequested: false,
   candidateList: [],
+  electoral_sheet: [],
 };
 
 const votingReducer = handleActions(

@@ -12,7 +12,7 @@ import {
 const Loader = ({ children }) => {
   const isSignInFetching = useSelector(userSelectors.selectIsSignInFetching);
   const isGettingWalletInfo = useSelector(walletSelectors.selectorGettingWalletInfo);
-  const isVotingRequested = useSelector(votingSelectors.isVotingRequested);
+  const isVotingRequested = useSelector(votingSelectors.selectorIsVotingRequested);
 
   const isLoading = [
     isSignInFetching,
