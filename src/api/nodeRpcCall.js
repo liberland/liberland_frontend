@@ -43,10 +43,10 @@ const getBalanceByAddress = async (address) => {
         amount: polkaAmount,
       },
       liquidMerits: {
-        amount: parseInt(previousFree.toString(), 10),
+        amount: parseInt(previousFree.toString(), 10) - totalAmount,
       },
       totalAmount: {
-        amount: totalAmount,
+        amount: parseInt(previousFree.toString(), 10),
       },
     });
   } catch (e) {
