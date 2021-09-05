@@ -78,9 +78,9 @@ const sendTransfer = async (payload) => {
   });
 };
 
-const stakeToPolkaBondAndExtra = async (...payload) => {
+const stakeToPolkaBondAndExtra = async (payload, callback) => {
   try {
-    const { values: { amount }, isUserHaveStake } = payload[0];
+    const { values: { amount }, isUserHaveStake } = payload;
     const api = await ApiPromise.create({ provider });
     const allAccounts = await web3Accounts();
     const account = allAccounts[0];
@@ -92,26 +92,26 @@ const stakeToPolkaBondAndExtra = async (...payload) => {
     const injector = await web3FromSource(account.meta.source);
     // eslint-disable-next-line max-len
     await transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
-      if (status.isInBlock) {
+      if (status.isFinalized) {
         // eslint-disable-next-line no-console
-        console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      } else {
-        // eslint-disable-next-line no-console
-        console.log(`Current status: ${status.type}`);
+        console.log(`isFinalized at block hash #${status.asFinalized.toString()}`);
+        callback(null, 'done');
       }
     }).catch((error) => {
       // eslint-disable-next-line no-console
       console.log(':( transaction failed', error);
+      callback(error);
     });
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    callback(e);
   }
 };
 
-const stakeToLiberlandBondAndExtra = async (...payload) => {
+const stakeToLiberlandBondAndExtra = async (payload, callback) => {
   try {
-    const { values: { amount }, isUserHaveStake } = payload[0];
+    const { values: { amount }, isUserHaveStake } = payload;
     const api = await ApiPromise.create({ provider });
     const allAccounts = await web3Accounts();
     const account = allAccounts[0];
@@ -123,20 +123,20 @@ const stakeToLiberlandBondAndExtra = async (...payload) => {
     const injector = await web3FromSource(account.meta.source);
     // eslint-disable-next-line max-len
     await transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
-      if (status.isInBlock) {
+      if (status.isFinalized) {
         // eslint-disable-next-line no-console
-        console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      } else {
-        // eslint-disable-next-line no-console
-        console.log(`Current status: ${status.type}`);
+        console.log(`Finalized at block hash #${status.asFinalized.toString()}`);
+        callback(null, 'done');
       }
     }).catch((error) => {
       // eslint-disable-next-line no-console
       console.log(':( transaction failed', error);
+      callback(error);
     });
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
+    callback(e);
   }
 };
 
