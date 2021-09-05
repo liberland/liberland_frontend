@@ -40,7 +40,10 @@ const TableComponent = ({
           <Table data={data} columns={columns} {...rest} />
           { (data.length > 0)
             ? (
-              <div className={cx(styles.buttonWrapper, styles.buttonWrapperBig)}>
+              <div
+                onClick={rest.handlerOnClickCastVoting}
+                className={cx(styles.buttonWrapper, styles.buttonWrapperBig)}
+              >
                 {buttons[title]}
               </div>
             )

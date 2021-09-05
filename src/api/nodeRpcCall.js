@@ -150,9 +150,9 @@ const applyMyCandidacy = async (callback) => {
     await api.tx.assemblyPallet
       .addCandidate()
       .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
-        if (status.isInBlock) {
+        if (status.isFinalized) {
           // eslint-disable-next-line no-console
-          console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+          console.log(`Finalized at block hash #${status.asFinalized.toString()}`);
           callback(null, 'done');
         }
       }).catch((error) => {
@@ -174,14 +174,43 @@ const getCandidacyListRpc = async () => {
       },
     });
     const candidatesList = await api.query.assemblyPallet.candidatesList();
-    // eslint-disable-next-line no-console
-    console.log('candidatesList', candidatesList.toString());
     return JSON.parse(candidatesList.toString());
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
   }
   return null;
+};
+
+const sendElectoralSheetRpc = async (electoralSheet, callback) => {
+  const allAccounts = await web3Accounts();
+  const accountAddress = allAccounts[0].address;
+  const dataForNode = await electoralSheet.map((el) => ({ pasportId: el.id }));
+  const api = await ApiPromise.create({
+    provider,
+    types: {
+      Candidate: {
+        pasportId: 'Vec<u8>',
+      },
+      AltVote: 'VecDeque<Candidate>',
+    },
+  });
+  if (accountAddress) {
+    const injector = await web3FromAddress(accountAddress);
+    await api.tx.assemblyPallet
+      .vote(dataForNode)
+      .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+        if (status.isFinalized) {
+          // eslint-disable-next-line no-console
+          console.log(`Finalized at block hash #${status.asFinalized.toString()}`);
+          callback(null, 'done');
+        }
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(':( transaction failed', error);
+        callback(error);
+      });
+  }
 };
 
 export {
@@ -191,4 +220,5 @@ export {
   stakeToLiberlandBondAndExtra,
   applyMyCandidacy,
   getCandidacyListRpc,
+  sendElectoralSheetRpc,
 };

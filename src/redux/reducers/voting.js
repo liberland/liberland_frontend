@@ -4,7 +4,7 @@ import { votingActions } from '../actions';
 const initialState = {
   isVotingRequested: false,
   candidateList: [],
-  electoral_sheet: [],
+  electoralSheet: [],
 };
 
 const votingReducer = handleActions(
@@ -12,6 +12,7 @@ const votingReducer = handleActions(
     [combineActions(
       votingActions.addMyCandidacy.call,
       votingActions.getListOfCandidacy.call,
+      votingActions.sendElectoralSheet.call,
     )]: (state) => ({
       ...state,
       isVotingRequested: true,
@@ -21,10 +22,16 @@ const votingReducer = handleActions(
       candidateList: action.payload,
       isVotingRequested: false,
     }),
+    [votingActions.addCandidacyToElectoralSheet.success]: (state, action) => ({
+      ...state,
+      electoralSheet: action.payload,
+    }),
     [combineActions(
       votingActions.addMyCandidacy.failure,
       votingActions.addMyCandidacy.success,
       votingActions.getListOfCandidacy.failure,
+      votingActions.sendElectoralSheet.success,
+      votingActions.sendElectoralSheet.failure,
     )]: (state) => ({
       ...state,
       isVotingRequested: initialState.isVotingRequested,

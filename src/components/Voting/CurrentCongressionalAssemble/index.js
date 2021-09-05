@@ -5,6 +5,7 @@ import React, {
 import { useSelector, useDispatch } from 'react-redux';
 
 import { votingSelectors } from '../../../redux/selectors';
+import { votingActions } from '../../../redux/actions';
 
 import TableComponent from '../TableComponent';
 import Button from '../../Button/Button';
@@ -27,7 +28,11 @@ const CurrentCongressionalAssemble = () => {
         allCandidatesData.find((candidate) => candidate.id === id),
       ],
     );
-  }, [selectedCandidatesData, allCandidatesData]);
+    dispatch(votingActions.addCandidacyToElectoralSheet.success([
+      ...selectedCandidatesData,
+      allCandidatesData.find((candidate) => candidate.id === id),
+    ]));
+  }, [selectedCandidatesData, allCandidatesData, dispatch]);
 
   const handleCancel = useCallback((id) => {
     setSelectedCandidatesData(selectedCandidatesData.filter((candidate) => candidate.id !== id));
@@ -37,7 +42,11 @@ const CurrentCongressionalAssemble = () => {
         selectedCandidatesData.find((candidate) => candidate.id === id),
       ],
     );
-  }, [allCandidatesData, selectedCandidatesData]);
+    dispatch(votingActions.addCandidacyToElectoralSheet.success([
+      ...allCandidatesData,
+      selectedCandidatesData.find((candidate) => candidate.id === id),
+    ]));
+  }, [allCandidatesData, selectedCandidatesData, dispatch]);
 
   const allCandidatesColumns = useMemo(() => [
     {
@@ -81,6 +90,10 @@ const CurrentCongressionalAssemble = () => {
     },
   ], [handleCancel]);
 
+  const handlerOnClickCastVoting = () => {
+    dispatch(votingActions.sendElectoralSheet.call());
+  };
+
   useEffect(() => {
     setAllCandidatesData(listCandidats);
   }, [dispatch, listCandidats]);
@@ -92,6 +105,7 @@ const CurrentCongressionalAssemble = () => {
         title="electoral_sheet"
         data={selectedCandidatesData}
         columns={selectedCandidatesColumns}
+        handlerOnClickCastVoting={handlerOnClickCastVoting}
       />
     </div>
   );

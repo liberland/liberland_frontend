@@ -24,5 +24,6 @@ export default function* rootSaga() {
     // VOTING
     votingSagas.addMyCandidacyWatcher(),
     votingSagas.getListOFCandidacyWatcher(),
+    votingSagas.sendElectoralSheetWatcher(),
   ]);
 }

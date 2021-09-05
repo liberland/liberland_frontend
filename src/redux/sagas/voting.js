@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, call, cps,
+  put, takeLatest, call, cps, select,
 } from 'redux-saga/effects';
 import { web3Enable } from '@polkadot/extension-dapp';
 
@@ -8,9 +8,11 @@ import { votingActions } from '../actions';
 import {
   applyMyCandidacy,
   getCandidacyListRpc,
+  sendElectoralSheetRpc,
 } from '../../api/nodeRpcCall';
 
 import truncate from '../../utils/truncate';
+import { votingSelectors } from '../selectors';
 
 // WORKERS
 
@@ -48,6 +50,19 @@ function* getListOFCandidacyWorker() {
   }
 }
 
+function* sendElectoralSheetWorker() {
+  try {
+    const extensions = yield web3Enable('Liberland dapp');
+    const electoralSheet = yield select(votingSelectors.selectorElectoralSheet);
+    if (extensions.length) {
+      yield cps(sendElectoralSheetRpc, electoralSheet);
+      yield put(votingActions.sendElectoralSheet.success());
+    }
+  } catch (e) {
+    yield put(votingActions.sendElectoralSheet.failure(e));
+  }
+}
+
 // WATCHERS
 
 function* addMyCandidacyWatcher() {
@@ -70,7 +85,18 @@ function* getListOFCandidacyWatcher() {
   }
 }
 
+function* sendElectoralSheetWatcher() {
+  try {
+    yield takeLatest(votingActions.sendElectoralSheet.call, sendElectoralSheetWorker);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    yield put(votingActions.sendElectoralSheet.failure(e));
+  }
+}
+
 export {
   addMyCandidacyWatcher,
   getListOFCandidacyWatcher,
+  sendElectoralSheetWatcher,
 };

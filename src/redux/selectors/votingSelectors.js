@@ -12,7 +12,13 @@ const selectorCandidateList = createSelector(
   (reducer) => reducer.candidateList,
 );
 
+const selectorElectoralSheet = createSelector(
+  votingReducer,
+  (reducer) => reducer.electoralSheet,
+);
+
 export {
   selectorIsVotingRequested,
   selectorCandidateList,
+  selectorElectoralSheet,
 };
