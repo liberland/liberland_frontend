@@ -44,6 +44,7 @@ const MyDrafts = () => {
       short_description,
       thread_link,
     } = values;
+
     const data = {
       file: await toBase64(file),
       linkToGoogleDocument: link_to_Google_document,
@@ -54,19 +55,33 @@ const MyDrafts = () => {
       currentLlm: null,
       votingHourLeft: null,
     };
+
     dispatch(assemblyActions.addMyDraft.call({ data }));
     handleModalOpen();
   };
 
-  const handleEdit = () => {
-    // const {
-    //   file,
-    //   link_to_Google_document,
-    //   proposal_name,
-    //   short_description,
-    //   thread_link,
-    // } = draft;
+  const handleEdit = async (draft, file) => {
+    const {
+      link_to_Google_document,
+      proposal_name,
+      short_description,
+      thread_link,
+    } = draft;
+    if (!file) {
+      // TODO add error handling, when no file is present
+      return;
+    }
+    const data = {
+      id: draft.id,
+      file: await toBase64(file),
+      linkToGoogleDocument: link_to_Google_document,
+      proposalName: proposal_name,
+      shortDescription: short_description,
+      threadLink: thread_link,
+    };
 
+    dispatch(assemblyActions.editDraft.call(data));
+    handleEditModalOpen();
   };
 
   const draftStatuses = ['draft', 'voting', 'passed', 'vetoed', 'declined'];
@@ -183,6 +198,7 @@ const MyDrafts = () => {
           onSubmit={handleEdit}
           closeModal={handleEditModalOpen}
           draft={selectedDraft}
+          closeEditModal={handleEditModalOpen}
         />
       )}
     </Card>

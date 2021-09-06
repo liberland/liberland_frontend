@@ -2,6 +2,7 @@
 import React, { useCallback, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useDropzone } from 'react-dropzone';
+import { useDispatch } from 'react-redux';
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';
@@ -11,17 +12,20 @@ import Button from '../Button/Button';
 // STYLES
 import styles from './styles.module.scss';
 import { ReactComponent as DragAndDropImage } from '../../assets/icons/drag-and-drop.svg';
+import { assemblyActions } from '../../redux/actions';
 // import File from '../../utils/file';
 
 const EditDraftModal = ({
   // eslint-disable-next-line react/prop-types
-  onSubmit, closeModal, draft,
+  onSubmit, closeModal, draft, closeEditModal,
 }) => {
+  const [file, setFile] = useState('');
   const {
-    handleSubmit,
+    // handleSubmit,
     register,
     control,
     setValue,
+    getValues,
   } = useForm({
     defaultValues: {
       // eslint-disable-next-line react/prop-types
@@ -35,6 +39,8 @@ const EditDraftModal = ({
     },
   });
 
+  const dispatch = useDispatch();
+
   const [isFileSelected, setIsFileSelected] = useState(false);
 
   // const toBase64 = (file) => new Promise((resolve, reject) => {
@@ -45,9 +51,10 @@ const EditDraftModal = ({
   // });
 
   const onDrop = useCallback(async (acceptedFiles) => {
-    for (const file of acceptedFiles) {
-      setValue('file', file);
+    for (const afile of acceptedFiles) {
+      setValue('file', afile);
       setIsFileSelected(true);
+      setFile(afile);
     }
   }, []);
 
@@ -56,8 +63,14 @@ const EditDraftModal = ({
     getInputProps,
   } = useDropzone({ onDrop, maxFiles: 1 });
 
+  const handleDelete = () => {
+    // eslint-disable-next-line react/prop-types
+    dispatch(assemblyActions.deleteProposal.call(draft.id));
+    closeEditModal();
+  };
+
   return (
-    <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
+    <form className={styles.getCitizenshipModal}>
       <div className={styles.h3}>Edit Draft</div>
       <div className={styles.title}>Proposal name</div>
       <TextInput
@@ -132,9 +145,11 @@ const EditDraftModal = ({
         <Button
           primary
           large
-          type="submit"
+          // type="submit"
+          // eslint-disable-next-line react/prop-types
+          onClick={() => onSubmit({ id: draft.id, ...getValues() }, file)}
         >
-          Save draft
+          Save edited draft
         </Button>
       </div>
       <div className={styles.buttonWrapper}>
@@ -146,7 +161,8 @@ const EditDraftModal = ({
         </Button>
         <Button
           medium
-          type="submit"
+          // eslint-disable-next-line react/prop-types
+          onClick={() => handleDelete()}
         >
           Delete
         </Button>
