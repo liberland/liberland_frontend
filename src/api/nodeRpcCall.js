@@ -1,4 +1,4 @@
-import { web3Accounts, web3FromSource } from '@polkadot/extension-dapp';
+import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -140,9 +140,85 @@ const stakeToLiberlandBondAndExtra = async (payload, callback) => {
   }
 };
 
+const applyMyCandidacy = async (callback) => {
+  const allAccounts = await web3Accounts();
+  const accountAddress = allAccounts[0].address;
+
+  const api = await ApiPromise.create({ provider });
+  if (accountAddress) {
+    const injector = await web3FromAddress(accountAddress);
+    await api.tx.assemblyPallet
+      .addCandidate()
+      .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+        if (status.isFinalized) {
+          // eslint-disable-next-line no-console
+          console.log(`Finalized at block hash #${status.asFinalized.toString()}`);
+          callback(null, 'done');
+        }
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(':( transaction failed', error);
+        callback(error);
+      });
+  }
+};
+
+const getCandidacyListRpc = async () => {
+  try {
+    const api = await ApiPromise.create({
+      provider,
+      types: {
+        Candidate: {
+          pasportId: 'Vec<u8>',
+        },
+      },
+    });
+    const candidatesList = await api.query.assemblyPallet.candidatesList();
+    return JSON.parse(candidatesList.toString());
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error', e);
+  }
+  return null;
+};
+
+const sendElectoralSheetRpc = async (electoralSheet, callback) => {
+  const allAccounts = await web3Accounts();
+  const accountAddress = allAccounts[0].address;
+  const dataForNode = await electoralSheet.map((el) => ({ pasportId: el.id }));
+  const api = await ApiPromise.create({
+    provider,
+    types: {
+      Candidate: {
+        pasportId: 'Vec<u8>',
+      },
+      AltVote: 'VecDeque<Candidate>',
+    },
+  });
+  if (accountAddress) {
+    const injector = await web3FromAddress(accountAddress);
+    await api.tx.assemblyPallet
+      .vote(dataForNode)
+      .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+        if (status.isFinalized) {
+          // eslint-disable-next-line no-console
+          console.log(`Finalized at block hash #${status.asFinalized.toString()}`);
+          callback(null, 'done');
+        }
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(':( transaction failed', error);
+        callback(error);
+      });
+  }
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
   stakeToPolkaBondAndExtra,
   stakeToLiberlandBondAndExtra,
+  applyMyCandidacy,
+  getCandidacyListRpc,
+  sendElectoralSheetRpc,
 };

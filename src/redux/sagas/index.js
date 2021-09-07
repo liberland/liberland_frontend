@@ -2,6 +2,7 @@ import { all } from 'redux-saga/effects';
 import * as authSagas from './auth';
 import * as walletSagas from './wallet';
 import * as assemblySagas from './assembly';
+import * as votingSagas from './voting';
 
 export default function* rootSaga() {
   yield all([
@@ -13,12 +14,18 @@ export default function* rootSaga() {
     // WALLET
     walletSagas.getWalletWatcher(),
     walletSagas.sendTransferWatcher(),
+    walletSagas.stakeToPolkaWatcher(),
+    walletSagas.stakeToLiberlandWatcher(),
+
     // ASSEMBLY
     assemblySagas.addMyDraftWatcher(),
     assemblySagas.getMyProposalsWatcher(),
     assemblySagas.deleteProposalWatcher(),
     assemblySagas.editDraftWatcher(),
-    walletSagas.stakeToPolkaWatcher(),
-    walletSagas.stakeToLiberlandWatcher(),
+
+    // VOTING
+    votingSagas.addMyCandidacyWatcher(),
+    votingSagas.getListOFCandidacyWatcher(),
+    votingSagas.sendElectoralSheetWatcher(),
   ]);
 }
