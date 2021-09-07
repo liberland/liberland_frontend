@@ -1,8 +1,5 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-
-import { votingActions } from '../../../redux/actions';
 
 import Card from '../../Card';
 import Button from '../../Button/Button';
@@ -13,12 +10,8 @@ import router from '../../../router';
 
 const NextAssemblyCard = () => {
   const history = useHistory();
-  const dispatch = useDispatch();
 
-  const handleClick = () => {
-    dispatch(votingActions.getListOfCandidacy.call());
-    history.push(router.voting.currentCongressional.replace(':id', '1'));
-  };
+  const handleClick = () => history.push(router.voting.currentCongressional.replace(':id', '1'));
 
   return (
     <>
