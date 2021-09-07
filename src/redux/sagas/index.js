@@ -16,10 +16,12 @@ export default function* rootSaga() {
     walletSagas.sendTransferWatcher(),
     walletSagas.stakeToPolkaWatcher(),
     walletSagas.stakeToLiberlandWatcher(),
-    // ASSEMBLY
 
+    // ASSEMBLY
     assemblySagas.addMyDraftWatcher(),
     assemblySagas.getMyProposalsWatcher(),
+    assemblySagas.deleteProposalWatcher(),
+    assemblySagas.editDraftWatcher(),
 
     // VOTING
     votingSagas.addMyCandidacyWatcher(),
