@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, call, delay,
+  put, takeLatest, call, cps,
 } from 'redux-saga/effects';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import {
@@ -33,8 +33,7 @@ function* stakeToPolkaWorker(action) {
   try {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
-      yield call(stakeToPolkaBondAndExtra, action.payload);
-      yield delay(15000);
+      yield cps(stakeToPolkaBondAndExtra, action.payload);
       yield put(walletActions.stakeToPolka.success());
       yield put(walletActions.getWallet.call());
     }
@@ -47,8 +46,7 @@ function* stakeToLiberlandWorker(action) {
   try {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
-      yield call(stakeToLiberlandBondAndExtra, action.payload);
-      yield delay(15000);
+      yield cps(stakeToLiberlandBondAndExtra, action.payload);
       yield put(walletActions.stakeToPolka.success());
       yield put(walletActions.getWallet.call());
     }

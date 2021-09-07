@@ -39,7 +39,7 @@ const HomeNavigation = () => {
   const role = useSelector(userSelectors.selectUserRole);
   const name = useSelector(userSelectors.selectUserName);
   const lastName = useSelector(userSelectors.selectUserLastName);
-  const liquidMeritsBalance = useSelector(walletSelectors.selectorLiquidMeritsBalance);
+  const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
 
   const navigationList = [
     {
@@ -47,7 +47,7 @@ const HomeNavigation = () => {
       title: `${name} ${lastName}`,
       // access: 'citizen',
       icon: () => <Avatar name={`${name} ${lastName}`} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
-      description: `${prettyNumber(liquidMeritsBalance)} LLM`,
+      description: `${prettyNumber(totalBalance)} LLM`,
     },
     {
       route: router.home.feed,
