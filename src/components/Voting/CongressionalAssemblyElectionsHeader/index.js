@@ -6,7 +6,8 @@ import { ReactComponent as UserCongressional } from '../../../assets/icons/user-
 
 import styles from './styles.module.scss';
 
-const CongressionalAssemblyElectionsHeader = () => (
+// eslint-disable-next-line react/prop-types
+const CongressionalAssemblyElectionsHeader = ({ handlerOnClickApplyMyCandidacy }) => (
   <>
     <div className={styles.headCongressional}>
       <div className={styles.headCongressionalFirstItem}>
@@ -19,7 +20,7 @@ const CongressionalAssemblyElectionsHeader = () => (
         Election finishes 12th of July 2021
       </span>
     </div>
-    <Button primary className={styles.upcomingVotings}>
+    <Button primary className={styles.upcomingVotings} onClick={handlerOnClickApplyMyCandidacy}>
       <UserCandidacyWhite />
       {' '}
       Apply my candidacy

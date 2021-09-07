@@ -2,6 +2,9 @@ import React from 'react';
 import {
   Switch, Route, Redirect, useLocation,
 } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+
+import { votingActions } from '../../redux/actions';
 
 import VotingHeader from './VotingHeader';
 import RoleHOC from '../../hocs/RoleHOC';
@@ -16,12 +19,22 @@ const Voting = () => {
   const location = useLocation();
   const param = location.pathname.split('/').pop();
 
+  const dispath = useDispatch();
+
+  const handlerOnClickApplyMyCandidacy = () => {
+    dispath(votingActions.addMyCandidacy.call());
+  };
+
   return (
     <div className={styles.votingWrapper}>
       <div className={styles.navWrapper}>
         {
           Number(param)
-            ? <CongressionalAssemblyElectionsHeader />
+            ? (
+              <CongressionalAssemblyElectionsHeader
+                handlerOnClickApplyMyCandidacy={handlerOnClickApplyMyCandidacy}
+              />
+            )
             : <VotingHeader />
         }
       </div>
