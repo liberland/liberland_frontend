@@ -16,6 +16,8 @@ export default function* rootSaga() {
     // ASSEMBLY
     assemblySagas.addMyDraftWatcher(),
     assemblySagas.getMyProposalsWatcher(),
+    assemblySagas.deleteProposalWatcher(),
+    assemblySagas.editDraftWatcher(),
     walletSagas.stakeToPolkaWatcher(),
     walletSagas.stakeToLiberlandWatcher(),
   ]);

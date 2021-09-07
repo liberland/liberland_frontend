@@ -40,11 +40,49 @@ function* getMyProposalsWorker() {
   }
 }
 
+function* deleteProposalWorker(action) {
+  try {
+    const { id } = action.payload;
+    const response = yield api.delete(`/assembly/delete_draft/${id}`);
+    yield put(assemblyActions.deleteProposal.success(response.data));
+    yield put(assemblyActions.getMyProposals.call());
+  } catch (e) {
+    yield put(assemblyActions.deleteProposal.failure(e));
+  }
+}
+
+function* editDraftWorker(action) {
+  try {
+    const { data } = action.payload;
+    const [accounts] = yield web3Accounts();
+    const createdAt = Date.now();
+    const userId = yield select(userSelectors.selectUserId);
+    data.fileName = accounts.address + createdAt;
+    // data.createdDate = createdAt;
+    data.userId = userId;
+    yield call(api.patch, `assembly/edit_draft/${data.id}`, data);
+    yield put(assemblyActions.addMyDraft.success());
+    yield put(assemblyActions.getMyProposals.call());
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('e', e);
+    yield put(assemblyActions.addMyDraft.failure(e));
+  }
+}
+
 // WATCHERS
 
 function* addMyDraftWatcher() {
   try {
     yield takeLatest(assemblyActions.addMyDraft.call, addMyDraftWorker);
+  } catch (e) {
+    yield put(assemblyActions.addMyDraft.failure(e));
+  }
+}
+
+function* editDraftWatcher() {
+  try {
+    yield takeLatest(assemblyActions.editDraft.call, editDraftWorker);
   } catch (e) {
     yield put(assemblyActions.addMyDraft.failure(e));
   }
@@ -58,7 +96,17 @@ function* getMyProposalsWatcher() {
   }
 }
 
+function* deleteProposalWatcher() {
+  try {
+    yield takeLatest(assemblyActions.deleteProposal.call, deleteProposalWorker);
+  } catch (e) {
+    yield put(assemblyActions.deleteProposal.failure(e));
+  }
+}
+
 export {
   addMyDraftWatcher,
   getMyProposalsWatcher,
+  deleteProposalWatcher,
+  editDraftWatcher,
 };
