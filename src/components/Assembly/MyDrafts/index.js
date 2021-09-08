@@ -84,6 +84,10 @@ const MyDrafts = () => {
     handleEditModalOpen();
   };
 
+  const handleSubmitProposal = async (id) => {
+    dispatch(assemblyActions.submitProposal.call(id));
+  };
+
   const draftStatuses = ['draft', 'voting', 'passed', 'vetoed', 'declined'];
   const drafts = useSelector(assemblySelectors.proposalsSelector);
   const viewStatus = (draft) => {
@@ -154,7 +158,7 @@ const MyDrafts = () => {
             </span>
             {draft.proposalStatus === 0 && (
               <div className={styles.draftButtons}>
-                <Button primary little className={styles.submitButton}>submit</Button>
+                <Button onClick={() => handleSubmitProposal(draft.id)} primary little className={styles.submitButton}>submit</Button>
                 <div className={styles.editButtonStatus}>
                   <Button
                     nano

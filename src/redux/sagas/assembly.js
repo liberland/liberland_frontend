@@ -8,6 +8,7 @@ import { assemblyActions } from '../actions';
 import { userSelectors } from '../selectors';
 
 import api from '../../api';
+import { sendLawProposal } from '../../api/nodeRpcCall';
 
 // WORKERS
 function* addMyDraftWorker(action) {
@@ -30,6 +31,18 @@ function* addMyDraftWorker(action) {
   }
 }
 
+function* submitProposalWorker(action) {
+  try {
+    const { data } = yield api.get(`/assembly/calc_hash/${action.payload.id}`);
+    console.log('hash', data);
+
+    yield sendLawProposal(data);
+    yield put(assemblyActions.submitProposal.success(data));
+  } catch (e) {
+    yield put(assemblyActions.submitProposal.failure(e));
+  }
+}
+
 function* getMyProposalsWorker() {
   try {
     const userId = yield select(userSelectors.selectUserId);
@@ -37,6 +50,18 @@ function* getMyProposalsWorker() {
     yield put(assemblyActions.getMyProposals.success(data));
   } catch (e) {
     yield put(assemblyActions.getMyProposals.failure(e));
+  }
+}
+
+function* getByHashesWorker() {
+  try {
+    // TODO add fetching hashes from blockchain
+    const hashes = ['6333a3849db1edbccf7cc872840355bb7d18c339b275651e21a5a85cbc4bdc81', '293949cb8465220bb1f2f6ca8647597975c9de62e8ccdb4b1fa5f38f044ab7ad'];
+    const { data } = yield api.post('/assembly/proposals_hashes', { hashes });
+    console.log(data);
+    yield put(assemblyActions.getByHashes.success(data));
+  } catch (e) {
+    yield put(assemblyActions.getByHashes.failure(e));
   }
 }
 
@@ -80,6 +105,22 @@ function* addMyDraftWatcher() {
   }
 }
 
+function* submitProposalWatcher() {
+  try {
+    yield takeLatest(assemblyActions.submitProposal.call, submitProposalWorker);
+  } catch (e) {
+    yield put(assemblyActions.submitProposal.failure(e));
+  }
+}
+
+function* getByHashesWatcher() {
+  try {
+    yield takeLatest(assemblyActions.getByHashes.call, getByHashesWorker);
+  } catch (e) {
+    yield put(assemblyActions.getByHashes.failure(e));
+  }
+}
+
 function* editDraftWatcher() {
   try {
     yield takeLatest(assemblyActions.editDraft.call, editDraftWorker);
@@ -109,4 +150,6 @@ export {
   getMyProposalsWatcher,
   deleteProposalWatcher,
   editDraftWatcher,
+  submitProposalWatcher,
+  getByHashesWatcher,
 };
