@@ -9,6 +9,7 @@ import {
   applyMyCandidacy,
   getCandidacyListRpc,
   sendElectoralSheetRpc,
+  setIsVotingInProgressRpc,
 } from '../../api/nodeRpcCall';
 
 import truncate from '../../utils/truncate';
@@ -63,6 +64,15 @@ function* sendElectoralSheetWorker() {
   }
 }
 
+function* setIsVotingInProgressWorker() {
+  try {
+    const result = yield call(setIsVotingInProgressRpc);
+    yield put(votingActions.setIsVotingInProgress.success(result));
+  } catch (e) {
+    yield put(votingActions.setIsVotingInProgress.failure(e));
+  }
+}
+
 // WATCHERS
 
 function* addMyCandidacyWatcher() {
@@ -95,8 +105,19 @@ function* sendElectoralSheetWatcher() {
   }
 }
 
+function* setIsVotingInProgressWatcher() {
+  try {
+    yield takeLatest(votingActions.setIsVotingInProgress.call, setIsVotingInProgressWorker);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    yield put(votingActions.sendElectoralSheet.failure(e));
+  }
+}
+
 export {
   addMyCandidacyWatcher,
   getListOFCandidacyWatcher,
   sendElectoralSheetWatcher,
+  setIsVotingInProgressWatcher,
 };

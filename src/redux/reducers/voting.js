@@ -5,6 +5,7 @@ const initialState = {
   isVotingRequested: false,
   candidateList: [],
   electoralSheet: [],
+  isVotingInProgress: false,
 };
 
 const votingReducer = handleActions(
@@ -25,6 +26,14 @@ const votingReducer = handleActions(
     [votingActions.addCandidacyToElectoralSheet.success]: (state, action) => ({
       ...state,
       electoralSheet: action.payload,
+    }),
+    [votingActions.setIsVotingInProgress.success]: (state, action) => ({
+      ...state,
+      isVotingInProgress: action.payload,
+    }),
+    [votingActions.setIsVotingInProgress.failure]: (state) => ({
+      ...state,
+      isVotingInProgress: initialState.isVotingRequested,
     }),
     [combineActions(
       votingActions.addMyCandidacy.failure,

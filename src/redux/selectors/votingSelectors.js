@@ -17,8 +17,14 @@ const selectorElectoralSheet = createSelector(
   (reducer) => reducer.electoralSheet,
 );
 
+const selectorIsVotingInProgress = createSelector(
+  votingReducer,
+  (reducer) => reducer.isVotingInProgress,
+);
+
 export {
   selectorIsVotingRequested,
   selectorCandidateList,
   selectorElectoralSheet,
+  selectorIsVotingInProgress,
 };

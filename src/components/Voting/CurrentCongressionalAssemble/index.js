@@ -17,6 +17,7 @@ const CurrentCongressionalAssemble = () => {
   const listCandidats = useSelector(votingSelectors.selectorCandidateList);
   const [allCandidatesData, setAllCandidatesData] = useState([]);
   const [selectedCandidatesData, setSelectedCandidatesData] = useState([]);
+  const isVotingInProgress = useSelector(votingSelectors.selectorIsVotingInProgress);
 
   const dispatch = useDispatch();
 
@@ -96,7 +97,14 @@ const CurrentCongressionalAssemble = () => {
 
   useEffect(() => {
     setAllCandidatesData(listCandidats);
-  }, [dispatch, listCandidats]);
+  }, [listCandidats]);
+
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      dispatch(votingActions.setIsVotingInProgress.call());
+    }, 6000);
+    return (() => { clearInterval(timerId); });
+  }, [dispatch, isVotingInProgress]);
 
   return (
     <div className={styles.currentAssemble}>
@@ -106,6 +114,7 @@ const CurrentCongressionalAssemble = () => {
         data={selectedCandidatesData}
         columns={selectedCandidatesColumns}
         handlerOnClickCastVoting={handlerOnClickCastVoting}
+        isVotingInProgress={isVotingInProgress}
       />
     </div>
   );

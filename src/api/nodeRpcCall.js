@@ -213,6 +213,39 @@ const sendElectoralSheetRpc = async (electoralSheet, callback) => {
   }
 };
 
+const setIsVotingInProgressRpc = async () => {
+  try {
+    const api = await ApiPromise.create({ provider });
+    const isVotingInProgress = await api.query.assemblyPallet.votingState();
+    // eslint-disable-next-line no-console
+    console.log('isVotingInProgress', isVotingInProgress.toString());
+    return (isVotingInProgress.toString());
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error', e);
+  }
+  return null;
+};
+
+const getMinistersRpc = async () => {
+  try {
+    const api = await ApiPromise.create({
+      provider,
+      types: {
+        Candidate: {
+          pasportId: 'Vec<u64>',
+        },
+      },
+    });
+    const ministersList = await api.query.assemblyPallet.ministersList();
+    return JSON.parse(ministersList.toString());
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error', e);
+  }
+  return null;
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -221,4 +254,6 @@ export {
   applyMyCandidacy,
   getCandidacyListRpc,
   sendElectoralSheetRpc,
+  setIsVotingInProgressRpc,
+  getMinistersRpc,
 };
