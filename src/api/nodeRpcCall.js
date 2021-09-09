@@ -239,10 +239,18 @@ const getMinistersRpc = async () => {
         Minister: 'BTreeMap<Candidate>, <votingPower>',
       },
     });
-    const ministersList = await api.query.assemblyPallet.currentMinistersList();
-    // eslint-disable-next-line no-console
-    console.log('ministersList', ministersList.toString());
-    return JSON.parse(ministersList);
+    const ministersList = JSON.parse(await api.query.assemblyPallet.currentMinistersList());
+
+    let finaleObject = [];
+    for (const prop in ministersList) {
+      if (Object.prototype.hasOwnProperty.call(ministersList, prop)) {
+        finaleObject = [...finaleObject, {
+          votingPower: ministersList[prop],
+          pasportId: JSON.parse(prop).pasportId,
+        }];
+      }
+    }
+    return finaleObject;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
