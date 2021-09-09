@@ -1,4 +1,7 @@
 import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
+import prettyNumber from '../utils/prettyNumber';
+import matchPowHelper from '../utils/matchPowHelper';
+import truncate from '../utils/truncate';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -242,12 +245,17 @@ const getMinistersRpc = async () => {
     const ministersList = JSON.parse(await api.query.assemblyPallet.currentMinistersList());
 
     let finaleObject = [];
+    let i = 1;
     for (const prop in ministersList) {
       if (Object.prototype.hasOwnProperty.call(ministersList, prop)) {
         finaleObject = [...finaleObject, {
-          votingPower: ministersList[prop],
-          pasportId: JSON.parse(prop).pasportId,
+          id: i,
+          place: i,
+          deputies: truncate(JSON.parse(prop).pasportId, 10),
+          supported: `${prettyNumber(matchPowHelper(ministersList[prop]))} LLM`,
+          power: ministersList[prop],
         }];
+        i += 1;
       }
     }
     return finaleObject;

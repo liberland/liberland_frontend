@@ -22,9 +22,15 @@ const selectorIsVotingInProgress = createSelector(
   (reducer) => reducer.isVotingInProgress,
 );
 
+const selectorMinistersList = createSelector(
+  votingReducer,
+  (reducer) => reducer.ministersList,
+);
+
 export {
   selectorIsVotingRequested,
   selectorCandidateList,
   selectorElectoralSheet,
   selectorIsVotingInProgress,
+  selectorMinistersList,
 };
