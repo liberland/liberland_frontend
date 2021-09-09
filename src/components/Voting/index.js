@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Switch, Route, Redirect, useLocation,
 } from 'react-router-dom';
@@ -24,6 +24,10 @@ const Voting = () => {
   const handlerOnClickApplyMyCandidacy = () => {
     dispath(votingActions.addMyCandidacy.call());
   };
+
+  useEffect(() => {
+    dispath(votingActions.getMinistersList.call());
+  }, [dispath]);
 
   return (
     <div className={styles.votingWrapper}>

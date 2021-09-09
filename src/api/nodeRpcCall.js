@@ -233,12 +233,16 @@ const getMinistersRpc = async () => {
       provider,
       types: {
         Candidate: {
-          pasportId: 'Vec<u64>',
+          pasportId: 'Vec<u8>',
         },
+        votingPower: '<U64>',
+        Minister: 'BTreeMap<Candidate>, <votingPower>',
       },
     });
-    const ministersList = await api.query.assemblyPallet.ministersList();
-    return JSON.parse(ministersList.toString());
+    const ministersList = await api.query.assemblyPallet.currentMinistersList();
+    // eslint-disable-next-line no-console
+    console.log('ministersList', ministersList.toString());
+    return JSON.parse(ministersList);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
