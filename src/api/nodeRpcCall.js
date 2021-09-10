@@ -263,10 +263,50 @@ const getMinistersRpc = async () => {
     // eslint-disable-next-line no-console
     console.log('error', e);
   }
+  return [];
+};
+
+const sendLawProposal = async (hash) => {
+  const allAccounts = await web3Accounts();
+  const accountAddress = allAccounts[0].address;
+
+  const api = await ApiPromise.create({
+    provider,
+    types: {
+      law_hash: 'Hash',
+    },
+  });
+
+  if (accountAddress) {
+    const injector = await web3FromAddress(accountAddress);
+    await api.tx.assemblyPallet
+      .proposeLaw(hash)
+      .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+        if (status.isFinalized) {
+          // eslint-disable-next-line no-console
+          console.log(`Finalized at block hash #${status.asFinalized.toString()}`);
+        }
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(':( transaction failed', error);
+      });
+  }
+};
+
+const getLawHashes = async () => {
+  try {
+    const api = await ApiPromise.create({ provider });
+    const laws = await api.query.assemblyPallet.laws();
+
+    return JSON.parse(laws.toString());
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error', e);
+  }
   return null;
 };
 
-const getUserRoleRpc = async () => ('assemblyMember');
+const getUserRoleRpc = () => ('assemblyMember');
 // {
 // try {
 //   const allAccounts = await web3Accounts();
@@ -313,4 +353,6 @@ export {
   setIsVotingInProgressRpc,
   getMinistersRpc,
   getUserRoleRpc,
+  sendLawProposal,
+  getLawHashes,
 };
