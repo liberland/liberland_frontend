@@ -7,6 +7,8 @@ const initialState = {
   electoralSheet: [],
   isVotingInProgress: false,
   ministersList: [],
+  assemblyElectionPeriod: 0,
+  assemblyVotingDuration: 0,
 };
 
 const votingReducer = handleActions(
@@ -40,6 +42,14 @@ const votingReducer = handleActions(
     [votingActions.getMinistersList.success]: (state, action) => ({
       ...state,
       ministersList: action.payload,
+    }),
+    [votingActions.setAssemblyElectionPeriod.success]: (state, action) => ({
+      ...state,
+      assemblyElectionPeriod: action.payload,
+    }),
+    [votingActions.setAssemblyVotingDuration.success]: (state, action) => ({
+      ...state,
+      assemblyVotingDuration: action.payload,
     }),
     [combineActions(
       votingActions.addMyCandidacy.failure,

@@ -243,7 +243,8 @@ const getMinistersRpc = async () => {
       },
     });
     const ministersList = JSON.parse(await api.query.assemblyPallet.currentMinistersList());
-
+    // eslint-disable-next-line no-console
+    console.log('ministersList', ministersList);
     let finaleObject = [];
     let i = 1;
     for (const prop in ministersList) {
@@ -329,8 +330,13 @@ const getUserRoleRpc = async () => {
     const ministersList = JSON.stringify(await api.query.assemblyPallet.currentMinistersList());
     const passportId = await api2.query.identityPallet.passportIds(accountAddress);
 
-    if (ministersList.includes(passportId.toString())) return 'assemblyMember';
-    return 'citizen';
+    if (ministersList.includes(passportId.toString())) {
+      return {
+        assemblyMember: 'assemblyMember',
+        citizen: 'citizen',
+      };
+    }
+    return { citizen: 'citizen' };
   } catch (e) {
   // eslint-disable-next-line no-console
     console.log('error', e);
