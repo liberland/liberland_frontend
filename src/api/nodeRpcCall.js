@@ -266,7 +266,7 @@ const getMinistersRpc = async () => {
   return [];
 };
 
-const sendLawProposal = async (hash) => {
+const sendLawProposal = async (hash, callback) => {
   const allAccounts = await web3Accounts();
   const accountAddress = allAccounts[0].address;
 
@@ -285,10 +285,12 @@ const sendLawProposal = async (hash) => {
         if (status.isFinalized) {
           // eslint-disable-next-line no-console
           console.log(`Finalized at block hash #${status.asFinalized.toString()}`);
+          callback(null, 'done');
         }
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.log(':( transaction failed', error);
+        callback(error);
       });
   }
 };

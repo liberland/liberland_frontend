@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, call, select,
+  put, takeLatest, call, select, cps,
 } from 'redux-saga/effects';
 import { web3Accounts } from '@polkadot/extension-dapp';
 
@@ -37,7 +37,7 @@ function* submitProposalWorker(action) {
     // eslint-disable-next-line no-console
     console.log('hash', data);
 
-    yield sendLawProposal(data);
+    yield cps(sendLawProposal, data);
     yield put(assemblyActions.submitProposal.success(data));
   } catch (e) {
     yield put(assemblyActions.submitProposal.failure(e));

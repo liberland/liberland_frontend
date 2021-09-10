@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 
 // REDUX
 import {
-  userSelectors, walletSelectors, votingSelectors,
+  userSelectors, walletSelectors, votingSelectors, assemblySelectors,
 } from '../../redux/selectors';
 
 // eslint-disable-next-line react/prop-types
@@ -13,11 +13,13 @@ const Loader = ({ children }) => {
   const isSignInFetching = useSelector(userSelectors.selectIsSignInFetching);
   const isGettingWalletInfo = useSelector(walletSelectors.selectorGettingWalletInfo);
   const isVotingRequested = useSelector(votingSelectors.selectorIsVotingRequested);
+  const isisDraftSend = useSelector(assemblySelectors.isDraftSendSelector);
 
   const isLoading = [
     isSignInFetching,
     isGettingWalletInfo,
     isVotingRequested,
+    isisDraftSend,
   ].some((isFetching) => isFetching);
 
   return (
