@@ -4,6 +4,8 @@ import {
   call,
 } from 'redux-saga/effects';
 
+import { getUserRoleRpc } from '../../api/nodeRpcCall';
+
 import { authActions } from '../actions';
 import routes from '../../router';
 import api from '../../api';
@@ -12,6 +14,7 @@ function* signInWorker(action) {
   try {
     const { credentials, history } = action.payload;
     const { data: user } = yield call(api.post, '/users/signin', credentials);
+    user.role = yield call(getUserRoleRpc);
     yield put(authActions.signIn.success(user));
     yield call(history.push, routes.home.index);
   } catch (error) {

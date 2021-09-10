@@ -266,6 +266,42 @@ const getMinistersRpc = async () => {
   return null;
 };
 
+const getUserRoleRpc = async () => ('assemblyMember');
+// {
+// try {
+//   const allAccounts = await web3Accounts();
+//   const accountAddress = allAccounts[0].address;
+//   const api = await ApiPromise.create({
+//     provider,
+//     types: {
+//       Candidate: {
+//         pasportId: 'Vec<u8>',
+//       },
+//     },
+//   });
+//   const api2 = await ApiPromise.create({
+//     provider,
+//     types: {
+//       PassportId: {
+//         pasportId: '<u8>',
+//       },
+//     },
+//   });
+//   const ministersList = JSON.parse(await api.query.assemblyPallet.currentMinistersList());
+//   const passportId = await api2.query.identityPallet.passportIds(accountAddress);
+//
+//   // eslint-disable-next-line no-console
+//   console.log('ministersList', ministersList);
+//   // eslint-disable-next-line no-console
+//   console.log('passportId', passportId.toString());
+//   return ('assemblyMember');
+// } catch (e) {
+//   // eslint-disable-next-line no-console
+//   console.log('error', e);
+// }
+//   return null;
+// };
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -276,4 +312,5 @@ export {
   sendElectoralSheetRpc,
   setIsVotingInProgressRpc,
   getMinistersRpc,
+  getUserRoleRpc,
 };
