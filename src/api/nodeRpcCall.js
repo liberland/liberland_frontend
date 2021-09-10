@@ -308,41 +308,35 @@ const getLawHashes = async () => {
   return null;
 };
 
-const getUserRoleRpc = () => ('assemblyMember');
-// {
-// try {
-//   const allAccounts = await web3Accounts();
-//   const accountAddress = allAccounts[0].address;
-//   const api = await ApiPromise.create({
-//     provider,
-//     types: {
-//       Candidate: {
-//         pasportId: 'Vec<u8>',
-//       },
-//     },
-//   });
-//   const api2 = await ApiPromise.create({
-//     provider,
-//     types: {
-//       PassportId: {
-//         pasportId: '<u8>',
-//       },
-//     },
-//   });
-//   const ministersList = JSON.parse(await api.query.assemblyPallet.currentMinistersList());
-//   const passportId = await api2.query.identityPallet.passportIds(accountAddress);
-//
-//   // eslint-disable-next-line no-console
-//   console.log('ministersList', ministersList);
-//   // eslint-disable-next-line no-console
-//   console.log('passportId', passportId.toString());
-//   return ('assemblyMember');
-// } catch (e) {
-//   // eslint-disable-next-line no-console
-//   console.log('error', e);
-// }
-//   return null;
-// };
+const getUserRoleRpc = async () => {
+  try {
+    const allAccounts = await web3Accounts();
+    const accountAddress = allAccounts[0].address;
+    const api = await ApiPromise.create({
+      provider,
+      types: {
+        Candidate: {
+          pasportId: 'Vec<u8>',
+        },
+      },
+    });
+    const api2 = await ApiPromise.create({
+      provider,
+      types: {
+        PassportId: '[u8; 32]',
+      },
+    });
+    const ministersList = JSON.stringify(await api.query.assemblyPallet.currentMinistersList());
+    const passportId = await api2.query.identityPallet.passportIds(accountAddress);
+
+    if (ministersList.includes(passportId.toString())) return 'assemblyMember';
+    return 'citizen';
+  } catch (e) {
+  // eslint-disable-next-line no-console
+    console.log('error', e);
+  }
+  return null;
+};
 
 export {
   getBalanceByAddress,
