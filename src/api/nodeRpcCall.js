@@ -344,6 +344,25 @@ const getUserRoleRpc = async () => {
   return null;
 };
 
+const getPeriodAndVotingDurationRpc = async () => {
+  try {
+    const api = await ApiPromise.create({ provider });
+    const assemblyElectionPeriod = api.consts.assemblyPallet.assemblyElectionPeriod.toNumber();
+    // eslint-disable-next-line no-console
+    console.log('AssemblyElectionPeriod', assemblyElectionPeriod);
+
+    const assemblyVotingDuration = api.consts.assemblyPallet.assemblyVotingDuration.toNumber();
+    // eslint-disable-next-line no-console
+    console.log('assemblyVotingDuration', assemblyVotingDuration);
+
+    return { assemblyVotingDuration, assemblyElectionPeriod };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error', e);
+  }
+  return null;
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -357,4 +376,5 @@ export {
   getUserRoleRpc,
   sendLawProposal,
   getLawHashes,
+  getPeriodAndVotingDurationRpc,
 };

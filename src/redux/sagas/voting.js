@@ -11,6 +11,7 @@ import {
   sendElectoralSheetRpc,
   setIsVotingInProgressRpc,
   getMinistersRpc,
+  getPeriodAndVotingDurationRpc,
 } from '../../api/nodeRpcCall';
 
 import truncate from '../../utils/truncate';
@@ -73,12 +74,21 @@ function* setIsVotingInProgressWorker() {
     yield put(votingActions.setIsVotingInProgress.failure(e));
   }
 }
+
 function* getMinistersListWorker() {
   try {
     const result = yield call(getMinistersRpc);
     yield put(votingActions.getMinistersList.success(result));
   } catch (e) {
     yield put(votingActions.getMinistersList.failure(e));
+  }
+}
+function* getPeriodAndVotingDurationWorker() {
+  try {
+    const result = yield call(getPeriodAndVotingDurationRpc);
+    yield put(votingActions.getPeriodAndVotingDuration.success(result));
+  } catch (e) {
+    yield put(votingActions.getPeriodAndVotingDuration.failure(e));
   }
 }
 
@@ -123,6 +133,7 @@ function* setIsVotingInProgressWatcher() {
     yield put(votingActions.sendElectoralSheet.failure(e));
   }
 }
+
 function* getMinistersListWatcher() {
   try {
     yield takeLatest(votingActions.getMinistersList.call, getMinistersListWorker);
@@ -133,10 +144,22 @@ function* getMinistersListWatcher() {
   }
 }
 
+function* getPeriodAndVotingDurationWatcher() {
+  try {
+    // eslint-disable-next-line max-len
+    yield takeLatest(votingActions.getPeriodAndVotingDuration.call, getPeriodAndVotingDurationWorker);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    yield put(votingActions.getPeriodAndVotingDuration.failure(e));
+  }
+}
+
 export {
   addMyCandidacyWatcher,
   getListOFCandidacyWatcher,
   sendElectoralSheetWatcher,
   setIsVotingInProgressWatcher,
   getMinistersListWatcher,
+  getPeriodAndVotingDurationWatcher,
 };

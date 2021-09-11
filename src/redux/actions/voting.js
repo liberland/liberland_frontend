@@ -7,8 +7,7 @@ export const {
   sendElectoralSheet,
   setIsVotingInProgress,
   getMinistersList,
-  setAssemblyElectionPeriod,
-  setAssemblyVotingDuration,
+  getPeriodAndVotingDuration,
 } = createActions({
   ADD_MY_CANDIDACY: {
     call: undefined,
@@ -40,12 +39,7 @@ export const {
     success: undefined,
     failure: undefined,
   },
-  SET_ASSEMBLY_ELECTION_PERIOD: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  SET_ASSEMBLY_VOTING_DURATION: {
+  GET_PERIOD_AND_VOTING_DURATION: {
     call: undefined,
     success: undefined,
     failure: undefined,
