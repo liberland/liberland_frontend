@@ -238,7 +238,7 @@ const getMinistersRpc = async () => {
         Candidate: {
           pasportId: 'Vec<u8>',
         },
-        votingPower: '<U64>',
+        votingPower: '<u64>',
         Minister: 'BTreeMap<Candidate>, <votingPower>',
       },
     });
@@ -363,6 +363,24 @@ const getPeriodAndVotingDurationRpc = async () => {
   return null;
 };
 
+const getStatusProposalRpc = async (hash, callback) => {
+  try {
+    const api = await ApiPromise.create({
+      provider,
+      lawHash: 'Hash',
+      LawState: '<std>',
+    });
+    const proposalStatus = await api.query.assemblyPallet.laws(hash);
+    // eslint-disable-next-line no-console
+    console.log('proposalStatus', proposalStatus);
+    callback(null, proposalStatus);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error', e);
+  }
+  return null;
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -377,4 +395,5 @@ export {
   sendLawProposal,
   getLawHashes,
   getPeriodAndVotingDurationRpc,
+  getStatusProposalRpc,
 };

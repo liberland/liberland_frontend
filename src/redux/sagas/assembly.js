@@ -8,7 +8,7 @@ import { assemblyActions } from '../actions';
 import { userSelectors } from '../selectors';
 
 import api from '../../api';
-import { sendLawProposal } from '../../api/nodeRpcCall';
+import { sendLawProposal, getStatusProposalRpc } from '../../api/nodeRpcCall';
 
 // WORKERS
 function* addMyDraftWorker(action) {
@@ -39,6 +39,7 @@ function* submitProposalWorker(action) {
 
     yield cps(sendLawProposal, data);
     yield put(assemblyActions.submitProposal.success(data));
+    yield cps(getStatusProposalRpc, data);
   } catch (e) {
     yield put(assemblyActions.submitProposal.failure(e));
   }
