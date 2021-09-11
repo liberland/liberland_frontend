@@ -103,7 +103,9 @@ const CurrentCongressionalAssemble = () => {
     const timerId = setInterval(() => {
       dispatch(votingActions.setIsVotingInProgress.call());
     }, 6000);
-    return (() => { clearInterval(timerId); });
+    return (() => {
+      clearInterval(timerId);
+    });
   }, [dispatch, isVotingInProgress]);
 
   return (

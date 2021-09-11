@@ -8,6 +8,7 @@ const initialState = {
   isVotingInProgress: false,
   ministersList: [],
   periodAndVotingDuration: {},
+  currentBlockNumber: 0,
 };
 
 const votingReducer = handleActions(
@@ -45,6 +46,10 @@ const votingReducer = handleActions(
     [votingActions.getPeriodAndVotingDuration.success]: (state, action) => ({
       ...state,
       periodAndVotingDuration: action.payload,
+    }),
+    [votingActions.setCurrentBlockNumber.success]: (state, action) => ({
+      ...state,
+      currentBlockNumber: action.payload,
     }),
     [combineActions(
       votingActions.addMyCandidacy.failure,

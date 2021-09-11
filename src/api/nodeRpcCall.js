@@ -381,6 +381,20 @@ const getStatusProposalRpc = async (hash, callback) => {
   return null;
 };
 
+// const getCurrentBlockNumberRpc = async () => {
+//   try {
+//     const api = await ApiPromise.create({ provider });
+//     return await api.rpc.chain.subscribeNewHeads((header) => {
+//       // eslint-disable-next-line no-console
+//       console.log(`Chain is at block: #${header.number}`);
+//     });
+//   } catch (e) {
+//     // eslint-disable-next-line no-console
+//     console.log('error', e);
+//   }
+//   return null;
+// };
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -396,4 +410,5 @@ export {
   getLawHashes,
   getPeriodAndVotingDurationRpc,
   getStatusProposalRpc,
+  // getCurrentBlockNumberRpc,
 };

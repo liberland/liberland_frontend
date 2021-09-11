@@ -8,6 +8,7 @@ export const {
   setIsVotingInProgress,
   getMinistersList,
   getPeriodAndVotingDuration,
+  setCurrentBlockNumber,
 } = createActions({
   ADD_MY_CANDIDACY: {
     call: undefined,
@@ -40,6 +41,11 @@ export const {
     failure: undefined,
   },
   GET_PERIOD_AND_VOTING_DURATION: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SET_CURRENT_BLOCK_NUMBER: {
     call: undefined,
     success: undefined,
     failure: undefined,
