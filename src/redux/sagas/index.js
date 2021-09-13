@@ -32,5 +32,7 @@ export default function* rootSaga() {
     votingSagas.setIsVotingInProgressWatcher(),
     votingSagas.getMinistersListWatcher(),
     votingSagas.getPeriodAndVotingDurationWatcher(),
+    votingSagas.getCurrentBlockNumberWatcher(),
+    votingSagas.getLiberStakeAmountWatcher(),
   ]);
 }

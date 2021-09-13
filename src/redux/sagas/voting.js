@@ -12,6 +12,8 @@ import {
   setIsVotingInProgressRpc,
   getMinistersRpc,
   getPeriodAndVotingDurationRpc,
+  getCurrentBlockNumberRpc,
+  getLiberStakeAmountRpc,
 } from '../../api/nodeRpcCall';
 
 import truncate from '../../utils/truncate';
@@ -83,12 +85,31 @@ function* getMinistersListWorker() {
     yield put(votingActions.getMinistersList.failure(e));
   }
 }
+
 function* getPeriodAndVotingDurationWorker() {
   try {
     const result = yield call(getPeriodAndVotingDurationRpc);
     yield put(votingActions.getPeriodAndVotingDuration.success(result));
   } catch (e) {
     yield put(votingActions.getPeriodAndVotingDuration.failure(e));
+  }
+}
+
+function* getCurrentBlockNumberWorker() {
+  try {
+    const result = yield call(getCurrentBlockNumberRpc);
+    yield put(votingActions.getCurrentBlockNumber.success(result));
+  } catch (e) {
+    yield put(votingActions.getCurrentBlockNumber.failure(e));
+  }
+}
+
+function* getLiberStakeAmountWorker() {
+  try {
+    const result = yield call(getLiberStakeAmountRpc);
+    yield put(votingActions.getLiberStakeAmount.success(result));
+  } catch (e) {
+    yield put(votingActions.getLiberStakeAmount.failure(e));
   }
 }
 
@@ -155,6 +176,26 @@ function* getPeriodAndVotingDurationWatcher() {
   }
 }
 
+function* getCurrentBlockNumberWatcher() {
+  try {
+    yield takeLatest(votingActions.getCurrentBlockNumber.call, getCurrentBlockNumberWorker);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    yield put(votingActions.getCurrentBlockNumber.failure(e));
+  }
+}
+
+function* getLiberStakeAmountWatcher() {
+  try {
+    yield takeLatest(votingActions.getLiberStakeAmount.call, getLiberStakeAmountWorker);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    yield put(votingActions.getLiberStakeAmount.failure(e));
+  }
+}
+
 export {
   addMyCandidacyWatcher,
   getListOFCandidacyWatcher,
@@ -162,4 +203,6 @@ export {
   setIsVotingInProgressWatcher,
   getMinistersListWatcher,
   getPeriodAndVotingDurationWatcher,
+  getCurrentBlockNumberWatcher,
+  getLiberStakeAmountWatcher,
 };

@@ -247,6 +247,12 @@ const getMinistersRpc = async () => {
     const ministersList = JSON.parse(await api.query.assemblyPallet.currentMinistersList());
     // eslint-disable-next-line no-console
     console.log('ministersList', ministersList);
+
+    const api3 = await ApiPromise.create({ provider });
+    const liberStakeAmount = await api3.query.assemblyPallet.liberStakeAmount();
+    // eslint-disable-next-line no-console
+    console.log('liberStakeAmount', liberStakeAmount.toString());
+
     let finaleObject = [];
     let i = 1;
     for (const prop in ministersList) {
@@ -256,7 +262,8 @@ const getMinistersRpc = async () => {
           place: i,
           deputies: truncate(JSON.parse(prop).pasportId, 10),
           supported: `${prettyNumber(ministersList[prop])}`,
-          power: matchPowHelper(ministersList[prop]),
+          // eslint-disable-next-line max-len
+          power: ((matchPowHelper(ministersList[prop]) * 100) / matchPowHelper(liberStakeAmount)).toFixed(2),
         }];
         i += 1;
       }
@@ -372,15 +379,15 @@ const getStatusProposalRpc = async (hash, callback) => {
   try {
     const api = await ApiPromise.create({
       provider,
-      lawHash: 'Hash',
-      LawState: {
-        _enum: '[Approved, InProgress, Declined,]',
+      types: {
+        lawHash: 'Hash',
+        LawState: {
+          _enum: ['Approved', 'InProgress', 'Declined'],
+        },
       },
     });
     const proposalStatus = await api.query.assemblyPallet.laws(hash);
-    // eslint-disable-next-line no-console
-    console.log('proposalStatus', proposalStatus);
-    callback(null, proposalStatus);
+    callback(null, proposalStatus.toString());
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
@@ -388,19 +395,31 @@ const getStatusProposalRpc = async (hash, callback) => {
   return null;
 };
 
-// const getCurrentBlockNumberRpc = async () => {
-//   try {
-//     const api = await ApiPromise.create({ provider });
-//     return await api.rpc.chain.subscribeNewHeads((header) => {
-//       // eslint-disable-next-line no-console
-//       console.log(`Chain is at block: #${header.number}`);
-//     });
-//   } catch (e) {
-//     // eslint-disable-next-line no-console
-//     console.log('error', e);
-//   }
-//   return null;
-// };
+const getCurrentBlockNumberRpc = async () => {
+  try {
+    const api = await ApiPromise.create({ provider });
+    const bestNumber = await api.derive.chain.bestNumber();
+    return (bestNumber.toNumber());
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error', e);
+  }
+  return null;
+};
+
+const getLiberStakeAmountRpc = async () => {
+  try {
+    const api = await ApiPromise.create({ provider });
+    const liberStakeAmount = await api.query.assemblyPallet.liberStakeAmount();
+    // eslint-disable-next-line no-console
+    console.log('liberStakeAmount', liberStakeAmount.toString());
+    return (liberStakeAmount);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('error', e);
+  }
+  return null;
+};
 
 export {
   getBalanceByAddress,
@@ -417,5 +436,6 @@ export {
   getLawHashes,
   getPeriodAndVotingDurationRpc,
   getStatusProposalRpc,
-  // getCurrentBlockNumberRpc,
+  getCurrentBlockNumberRpc,
+  getLiberStakeAmountRpc,
 };

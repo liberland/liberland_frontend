@@ -99,15 +99,6 @@ const CurrentCongressionalAssemble = () => {
     setAllCandidatesData(listCandidats);
   }, [listCandidats]);
 
-  useEffect(() => {
-    const timerId = setInterval(() => {
-      dispatch(votingActions.setIsVotingInProgress.call());
-    }, 6000);
-    return (() => {
-      clearInterval(timerId);
-    });
-  }, [dispatch, isVotingInProgress]);
-
   return (
     <div className={styles.currentAssemble}>
       <TableComponent title="All candidates" data={allCandidatesData} columns={allCandidatesColumns} />
