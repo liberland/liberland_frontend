@@ -177,6 +177,8 @@ const getCandidacyListRpc = async () => {
       },
     });
     const candidatesList = await api.query.assemblyPallet.candidatesList();
+    // eslint-disable-next-line no-console
+    console.log('candidatesList', JSON.parse(candidatesList.toString()));
     return JSON.parse(candidatesList.toString());
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -238,7 +240,7 @@ const getMinistersRpc = async () => {
         Candidate: {
           pasportId: 'Vec<u8>',
         },
-        votingPower: '<u64>',
+        votingPower: 'u64',
         Minister: 'BTreeMap<Candidate>, <votingPower>',
       },
     });
@@ -253,8 +255,8 @@ const getMinistersRpc = async () => {
           id: i,
           place: i,
           deputies: truncate(JSON.parse(prop).pasportId, 10),
-          supported: `${prettyNumber(matchPowHelper(ministersList[prop]))} LLM`,
-          power: ministersList[prop],
+          supported: `${prettyNumber(ministersList[prop])}`,
+          power: matchPowHelper(ministersList[prop]),
         }];
         i += 1;
       }
@@ -330,6 +332,9 @@ const getUserRoleRpc = async () => {
     const ministersList = JSON.stringify(await api.query.assemblyPallet.currentMinistersList());
     const passportId = await api2.query.identityPallet.passportIds(accountAddress);
 
+    // eslint-disable-next-line no-console
+    console.log('ministersList', ministersList);
+
     if (ministersList.includes(passportId.toString())) {
       return {
         assemblyMember: 'assemblyMember',
@@ -368,7 +373,9 @@ const getStatusProposalRpc = async (hash, callback) => {
     const api = await ApiPromise.create({
       provider,
       lawHash: 'Hash',
-      LawState: '<std>',
+      LawState: {
+        _enum: '[Approved, InProgress, Declined,]',
+      },
     });
     const proposalStatus = await api.query.assemblyPallet.laws(hash);
     // eslint-disable-next-line no-console
