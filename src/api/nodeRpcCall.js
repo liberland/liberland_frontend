@@ -253,6 +253,10 @@ const getMinistersRpc = async () => {
     // eslint-disable-next-line no-console
     console.log('liberStakeAmount', liberStakeAmount.toString());
 
+    const assemblyStakeAmount = await api.query.assemblyPallet.assemblyStakeAmount();
+    // eslint-disable-next-line no-console
+    console.log('assemblysStakeAmount assemblysStakeAmount', assemblyStakeAmount.toString());
+
     let finaleObject = [];
     let i = 1;
     for (const prop in ministersList) {
