@@ -3,6 +3,8 @@ import prettyNumber from '../utils/prettyNumber';
 import matchPowHelper from '../utils/matchPowHelper';
 import truncate from '../utils/truncate';
 
+import citizenAddressList from '../constants/citizenAdressList';
+
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
@@ -326,6 +328,9 @@ const getUserRoleRpc = async () => {
   try {
     const allAccounts = await web3Accounts();
     const accountAddress = allAccounts[0].address;
+
+    if (!citizenAddressList.includes(accountAddress)) return { non_citizen: 'non_citizen' };
+
     const api = await ApiPromise.create({
       provider,
       types: {
