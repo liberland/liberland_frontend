@@ -178,7 +178,7 @@ const getCandidacyListRpc = async () => {
     });
     const candidatesList = await api.query.assemblyPallet.candidatesList();
     // eslint-disable-next-line no-console
-    console.log('candidatesList', JSON.parse(candidatesList.toString()));
+    // console.log('candidatesList', JSON.parse(candidatesList.toString()));
     return JSON.parse(candidatesList.toString());
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -246,12 +246,12 @@ const getMinistersRpc = async () => {
     });
     const ministersList = JSON.parse(await api.query.assemblyPallet.currentMinistersList());
     // eslint-disable-next-line no-console
-    console.log('ministersList', ministersList);
+    // console.log('ministersList', ministersList);
 
     const api3 = await ApiPromise.create({ provider });
     const liberStakeAmount = await api3.query.assemblyPallet.liberStakeAmount();
     // eslint-disable-next-line no-console
-    console.log('liberStakeAmount', liberStakeAmount.toString());
+    // console.log('liberStakeAmount', liberStakeAmount.toString());
 
     const assemblyStakeAmount = await api.query.assemblyPallet.assemblyStakeAmount();
     // eslint-disable-next-line no-console
