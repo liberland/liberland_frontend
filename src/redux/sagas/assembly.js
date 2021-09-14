@@ -5,7 +5,9 @@ import { web3Accounts } from '@polkadot/extension-dapp';
 
 import { assemblyActions } from '../actions';
 
-import { userSelectors } from '../selectors';
+import {
+  userSelectors, votingSelectors,
+} from '../selectors';
 
 import api from '../../api';
 import { sendLawProposal, getStatusProposalRpc } from '../../api/nodeRpcCall';
@@ -39,7 +41,20 @@ function* submitProposalWorker(action) {
 
     yield cps(sendLawProposal, data);
     yield put(assemblyActions.submitProposal.success(data));
-    yield cps(getStatusProposalRpc, data);
+    const propouselStatus = yield cps(getStatusProposalRpc, data);
+    const requiredAmountLlm = yield select(votingSelectors.selectorLiberStakeAmount);
+
+    const result = yield api.patch('/assembly/update_status_proposal',
+      {
+        hash: data,
+        status: propouselStatus,
+        requiredAmountLlm,
+        currentLlm: 0,
+        votingHourLeft: 72,
+      });
+    // eslint-disable-next-line no-console
+    console.log('/assembly/update_status_proposal', result);
+    yield put(assemblyActions.getMyProposals.call);
   } catch (e) {
     yield put(assemblyActions.submitProposal.failure(e));
   }

@@ -386,6 +386,11 @@ const getPeriodAndVotingDurationRpc = async () => {
 
 const getStatusProposalRpc = async (hash, callback) => {
   try {
+    const proposalSatuses = {
+      InProgress: 1,
+      Approved: 2,
+      Declined: 3,
+    };
     const api = await ApiPromise.create({
       provider,
       types: {
@@ -396,7 +401,7 @@ const getStatusProposalRpc = async (hash, callback) => {
       },
     });
     const proposalStatus = await api.query.assemblyPallet.laws(hash);
-    callback(null, proposalStatus.toString());
+    callback(null, proposalSatuses[proposalStatus.toString()]);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
@@ -422,7 +427,7 @@ const getLiberStakeAmountRpc = async () => {
     const liberStakeAmount = await api.query.assemblyPallet.liberStakeAmount();
     // eslint-disable-next-line no-console
     console.log('liberStakeAmount', liberStakeAmount.toString());
-    return (liberStakeAmount);
+    return (matchPowHelper(liberStakeAmount.toString()));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
