@@ -45,14 +45,14 @@ const HomeNavigation = () => {
     {
       route: router.home.profile,
       title: `${name} ${lastName}`,
-      access: ['citizen', 'assemblyMember'],
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: () => <Avatar name={`${name} ${lastName}`} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
       description: `${prettyNumber(totalBalance)} LLM`,
     },
     {
       route: router.home.feed,
       title: 'Feed',
-      access: ['citizen', 'assemblyMember'],
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: FeedIcon,
       activeIcon: FeedIconActive,
     },
@@ -66,7 +66,7 @@ const HomeNavigation = () => {
     {
       route: router.home.wallet,
       title: 'Wallet',
-      access: ['citizen', 'assemblyMember'],
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: WalletIcon,
       activeIcon: WalletIconActive,
     },
@@ -87,7 +87,7 @@ const HomeNavigation = () => {
     {
       route: router.home.constitution,
       title: 'Law',
-      access: ['citizen', 'assemblyMember'],
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
       activeIcon: ConstitutionIconActive,
     },
@@ -119,8 +119,8 @@ const HomeNavigation = () => {
           </RoleHOC>
         ))
       }
-      {roles['e-resident'] ?? <GetCitizenshipCard />}
-      <NextAssemblyCard />
+      {roles['e-resident'] === 'e-resident' ? <GetCitizenshipCard /> : ''}
+      {roles.citizen === 'citizen' ? <NextAssemblyCard /> : ''}
     </div>
 
   );
