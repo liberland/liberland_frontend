@@ -1,7 +1,8 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { walletSelectors } from '../../redux/selectors';
+import { walletActions } from '../../redux/actions';
 
 import WalletAddressesLine from './WalletAddressesLine';
 import styles from './styles.module.scss';
@@ -14,6 +15,12 @@ const Wallet = () => {
   const balances = useSelector(walletSelectors.selectorBalances);
   const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(walletActions.getWallet.call());
+  }, [dispatch]);
 
   return (
     <>
