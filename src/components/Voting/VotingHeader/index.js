@@ -13,7 +13,7 @@ import styles from './styles.module.scss';
 const navigationList = [
   {
     route: router.voting.congressionalAssemble,
-    title: 'Congressional Assemble',
+    title: 'Congressional Assembly',
   },
   {
     route: router.voting.vetoVotes,

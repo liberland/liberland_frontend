@@ -1,47 +1,15 @@
 /* eslint-disable react/prop-types */
 import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { selectUserId } from '../../../redux/selectors/userSelectors';
+import { userSelectors, votingSelectors } from '../../../redux/selectors';
 
 import TableComponent from '../TableComponent';
 import Status from '../../Status';
 import ProgressBar from '../../ProgressBar';
 
 const CongressionalAssemble = () => {
-  const userId = useSelector(selectUserId);
-  const data = useMemo(
-    () => [
-      {
-        id: '4',
-        place: '#1',
-        deputies: 'John Wayne',
-        supported: '10.000 LLM',
-        power: '100',
-      },
-      {
-        id: '2',
-        place: '#2',
-        deputies: 'Latisha Peacock',
-        supported: '9.000 LLM',
-        power: '70',
-      },
-      {
-        id: '1',
-        place: '#3',
-        deputies: 'Vernon Leonard',
-        supported: '8.000 LLM',
-        power: '40',
-      },
-      {
-        id: '4',
-        place: '#4',
-        deputies: 'Guto Callaghan',
-        supported: '7.000 LLM',
-        power: '20',
-      },
-    ],
-    [],
-  );
+  const userId = useSelector(userSelectors.selectUserId);
+  const data = useSelector(votingSelectors.selectorMinistersList);
 
   const columns = useMemo(
     () => [

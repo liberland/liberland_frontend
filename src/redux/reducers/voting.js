@@ -5,13 +5,17 @@ const initialState = {
   isVotingRequested: false,
   candidateList: [],
   electoralSheet: [],
+  isVotingInProgress: false,
+  ministersList: [],
+  periodAndVotingDuration: {},
+  currentBlockNumber: 0,
+  liberStakeAmount: 0,
 };
 
 const votingReducer = handleActions(
   {
     [combineActions(
       votingActions.addMyCandidacy.call,
-      votingActions.getListOfCandidacy.call,
       votingActions.sendElectoralSheet.call,
     )]: (state) => ({
       ...state,
@@ -20,11 +24,34 @@ const votingReducer = handleActions(
     [votingActions.getListOfCandidacy.success]: (state, action) => ({
       ...state,
       candidateList: action.payload,
-      isVotingRequested: false,
     }),
     [votingActions.addCandidacyToElectoralSheet.success]: (state, action) => ({
       ...state,
       electoralSheet: action.payload,
+    }),
+    [votingActions.setIsVotingInProgress.success]: (state, action) => ({
+      ...state,
+      isVotingInProgress: action.payload,
+    }),
+    [votingActions.setIsVotingInProgress.failure]: (state) => ({
+      ...state,
+      isVotingInProgress: initialState.isVotingRequested,
+    }),
+    [votingActions.getMinistersList.success]: (state, action) => ({
+      ...state,
+      ministersList: action.payload,
+    }),
+    [votingActions.getPeriodAndVotingDuration.success]: (state, action) => ({
+      ...state,
+      periodAndVotingDuration: action.payload,
+    }),
+    [votingActions.getCurrentBlockNumber.success]: (state, action) => ({
+      ...state,
+      currentBlockNumber: action.payload,
+    }),
+    [votingActions.getLiberStakeAmount.success]: (state, action) => ({
+      ...state,
+      liberStakeAmount: action.payload,
     }),
     [combineActions(
       votingActions.addMyCandidacy.failure,

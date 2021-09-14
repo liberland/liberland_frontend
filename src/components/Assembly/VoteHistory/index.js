@@ -114,7 +114,7 @@ const VoteHistory = () => {
         },
       },
     ],
-    [userId, data],
+    [userId, data, handleModalOpen],
   );
 
   const rowProps = (row) => {

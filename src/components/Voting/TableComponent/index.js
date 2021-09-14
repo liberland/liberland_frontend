@@ -38,7 +38,7 @@ const TableComponent = ({
       { title === 'electoral_sheet' ? (
         <>
           <Table data={data} columns={columns} {...rest} />
-          { (data.length > 0)
+          { (data.length > 0 && rest.isVotingInProgress === 'true')
             ? (
               <div
                 onClick={rest.handlerOnClickCastVoting}

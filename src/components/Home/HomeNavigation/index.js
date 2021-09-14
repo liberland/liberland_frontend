@@ -29,14 +29,14 @@ import AssemblyIconActive from '../../../assets/icons/active-assembly.svg';
 import { userSelectors, walletSelectors } from '../../../redux/selectors';
 
 // CONSTANTS
-import roleEnums from '../../../constants/roleEnums';
+// import roleEnums from '../../../constants/roleEnums';
 
 // UTILS
 import prettyNumber from '../../../utils/prettyNumber';
 
 const HomeNavigation = () => {
   const location = useLocation();
-  const role = useSelector(userSelectors.selectUserRole);
+  const roles = useSelector(userSelectors.selectUserRole);
   const name = useSelector(userSelectors.selectUserName);
   const lastName = useSelector(userSelectors.selectUserLastName);
   const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
@@ -45,43 +45,49 @@ const HomeNavigation = () => {
     {
       route: router.home.profile,
       title: `${name} ${lastName}`,
-      // access: 'citizen',
+      access: ['citizen', 'assemblyMember'],
       icon: () => <Avatar name={`${name} ${lastName}`} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
       description: `${prettyNumber(totalBalance)} LLM`,
     },
     {
       route: router.home.feed,
       title: 'Feed',
+      access: ['citizen', 'assemblyMember'],
       icon: FeedIcon,
       activeIcon: FeedIconActive,
     },
     {
       route: router.home.documents,
       title: 'Documents',
+      access: ['citizen', 'assemblyMember'],
       icon: DocumentsIcon,
       activeIcon: DocumentsIconActive,
     },
     {
       route: router.home.wallet,
       title: 'Wallet',
+      access: ['citizen', 'assemblyMember'],
       icon: WalletIcon,
       activeIcon: WalletIconActive,
     },
     {
       route: router.home.voting,
       title: 'Voting',
+      access: ['citizen', 'assemblyMember'],
       icon: VotingIcon,
       activeIcon: VotingIconActive,
     },
     {
       route: router.home.assembly,
       title: 'Assembly',
+      access: ['assemblyMember'],
       icon: AssemblyIcon,
       activeIcon: AssemblyIconActive,
     },
     {
       route: router.home.constitution,
       title: 'Law',
+      access: ['citizen', 'assemblyMember'],
       icon: ConstitutionIcon,
       activeIcon: ConstitutionIconActive,
     },
@@ -101,7 +107,7 @@ const HomeNavigation = () => {
           access,
           description,
         }) => (
-          <RoleHOC key={route} access={access}>
+          <RoleHOC key={route} roles={roles} access={access}>
             <NavigationLink
               route={route}
               title={title}
@@ -113,7 +119,7 @@ const HomeNavigation = () => {
           </RoleHOC>
         ))
       }
-      {role === roleEnums.E_RESIDENT && <GetCitizenshipCard />}
+      {roles['e-resident'] ?? <GetCitizenshipCard />}
       <NextAssemblyCard />
     </div>
 

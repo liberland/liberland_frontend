@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import React, { useState, useMemo } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import cx from 'classnames';
 import { selectUserId } from '../../../redux/selectors/userSelectors';
 import ProgressBar from '../../ProgressBar';
@@ -12,11 +12,17 @@ import { ReactComponent as RedLike } from '../../../assets/icons/like-red.svg';
 
 import styles from './styles.module.scss';
 import ProposalDetailsModal from '../../Modals/ProposalDetailsModal';
+import { assemblyActions } from '../../../redux/actions';
 
 const LegislationVotes = () => {
+  const dispatch = useDispatch();
   const userId = useSelector(selectUserId);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rowId, setRowId] = useState(null);
+
+  useEffect(() => {
+    dispatch(assemblyActions.getByHashes.call());
+  });
 
   const handleModalOpen = (id) => {
     setIsModalOpen(!isModalOpen);

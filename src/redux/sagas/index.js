@@ -19,6 +19,8 @@ export default function* rootSaga() {
 
     // ASSEMBLY
     assemblySagas.addMyDraftWatcher(),
+    assemblySagas.submitProposalWatcher(),
+    assemblySagas.getByHashesWatcher(),
     assemblySagas.getMyProposalsWatcher(),
     assemblySagas.deleteProposalWatcher(),
     assemblySagas.editDraftWatcher(),
@@ -27,5 +29,10 @@ export default function* rootSaga() {
     votingSagas.addMyCandidacyWatcher(),
     votingSagas.getListOFCandidacyWatcher(),
     votingSagas.sendElectoralSheetWatcher(),
+    votingSagas.setIsVotingInProgressWatcher(),
+    votingSagas.getMinistersListWatcher(),
+    votingSagas.getPeriodAndVotingDurationWatcher(),
+    votingSagas.getCurrentBlockNumberWatcher(),
+    votingSagas.getLiberStakeAmountWatcher(),
   ]);
 }

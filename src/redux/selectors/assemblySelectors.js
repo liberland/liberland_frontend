@@ -7,6 +7,12 @@ const proposalsSelector = createSelector(
   (reducer) => reducer.proposals,
 );
 
+const isDraftSendSelector = createSelector(
+  assemblyReducer,
+  (reducer) => reducer.isDraftSend,
+);
+
 export {
+  isDraftSendSelector,
   proposalsSelector,
 };

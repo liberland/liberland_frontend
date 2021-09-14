@@ -2,12 +2,24 @@ import { createActions } from 'redux-actions';
 
 export const {
   addMyDraft,
+  submitProposal,
+  getByHashes,
   getMyProposals,
   editDraft,
   deleteProposal,
 } = createActions({
   ADD_MY_DRAFT: {
     call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SUBMIT_PROPOSAL: {
+    call: (id) => ({ id }),
+    success: undefined,
+    failure: undefined,
+  },
+  GET_BY_HASHES: {
+    call: (hashes) => ({ hashes }),
     success: undefined,
     failure: undefined,
   },

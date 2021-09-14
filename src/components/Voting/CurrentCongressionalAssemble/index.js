@@ -3,6 +3,7 @@ import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { votingSelectors } from '../../../redux/selectors';
 import { votingActions } from '../../../redux/actions';
@@ -17,6 +18,8 @@ const CurrentCongressionalAssemble = () => {
   const listCandidats = useSelector(votingSelectors.selectorCandidateList);
   const [allCandidatesData, setAllCandidatesData] = useState([]);
   const [selectedCandidatesData, setSelectedCandidatesData] = useState([]);
+  const isVotingInProgress = useSelector(votingSelectors.selectorIsVotingInProgress);
+  const history = useHistory();
 
   const dispatch = useDispatch();
 
@@ -90,13 +93,13 @@ const CurrentCongressionalAssemble = () => {
     },
   ], [handleCancel]);
 
-  const handlerOnClickCastVoting = () => {
-    dispatch(votingActions.sendElectoralSheet.call());
-  };
+  const handlerOnClickCastVoting = useCallback(() => {
+    dispatch(votingActions.sendElectoralSheet.call({ history }));
+  }, [history]);
 
   useEffect(() => {
     setAllCandidatesData(listCandidats);
-  }, [dispatch, listCandidats]);
+  }, [listCandidats]);
 
   return (
     <div className={styles.currentAssemble}>
@@ -106,6 +109,7 @@ const CurrentCongressionalAssemble = () => {
         data={selectedCandidatesData}
         columns={selectedCandidatesColumns}
         handlerOnClickCastVoting={handlerOnClickCastVoting}
+        isVotingInProgress={isVotingInProgress}
       />
     </div>
   );

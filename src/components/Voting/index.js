@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Switch, Route, Redirect, useLocation,
 } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { votingActions } from '../../redux/actions';
 
@@ -14,6 +14,7 @@ import CongressionalAssemble from './CongressionalAssemble';
 import styles from './styles.module.scss';
 import CongressionalAssemblyElectionsHeader from './CongressionalAssemblyElectionsHeader';
 import CurrentCongressionalAssemble from './CurrentCongressionalAssemble';
+import { votingSelectors } from '../../redux/selectors';
 
 const Voting = () => {
   const location = useLocation();
@@ -24,6 +25,20 @@ const Voting = () => {
   const handlerOnClickApplyMyCandidacy = () => {
     dispath(votingActions.addMyCandidacy.call());
   };
+  const isVotingInProgress = useSelector(votingSelectors.selectorIsVotingInProgress);
+
+  useEffect(() => {
+    dispath(votingActions.getPeriodAndVotingDuration.call());
+  }, [dispath]);
+
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      dispath(votingActions.getMinistersList.call());
+    }, 6000);
+    return (() => {
+      clearInterval(timerId);
+    });
+  }, [dispath, isVotingInProgress]);
 
   return (
     <div className={styles.votingWrapper}>

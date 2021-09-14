@@ -5,6 +5,11 @@ export const {
   getListOfCandidacy,
   addCandidacyToElectoralSheet,
   sendElectoralSheet,
+  setIsVotingInProgress,
+  getMinistersList,
+  getPeriodAndVotingDuration,
+  getCurrentBlockNumber,
+  getLiberStakeAmount,
 } = createActions({
   ADD_MY_CANDIDACY: {
     call: undefined,
@@ -22,6 +27,31 @@ export const {
     failure: undefined,
   },
   SEND_ELECTORAL_SHEET: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SET_IS_VOTING_IN_PROGRESS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_MINISTERS_LIST: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_PERIOD_AND_VOTING_DURATION: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_CURRENT_BLOCK_NUMBER: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_LIBER_STAKE_AMOUNT: {
     call: undefined,
     success: undefined,
     failure: undefined,
