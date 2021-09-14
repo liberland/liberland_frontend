@@ -16,6 +16,8 @@ import {
   getLiberStakeAmountRpc,
 } from '../../api/nodeRpcCall';
 
+import route from '../../router';
+
 import truncate from '../../utils/truncate';
 import { votingSelectors } from '../selectors';
 
@@ -55,13 +57,15 @@ function* getListOFCandidacyWorker() {
   }
 }
 
-function* sendElectoralSheetWorker() {
+function* sendElectoralSheetWorker(action) {
   try {
+    const { history } = action.payload;
     const extensions = yield web3Enable('Liberland dapp');
     const electoralSheet = yield select(votingSelectors.selectorElectoralSheet);
     if (extensions.length) {
       yield cps(sendElectoralSheetRpc, electoralSheet);
       yield put(votingActions.sendElectoralSheet.success());
+      yield call(history.push, route.voting.congressionalAssemble);
     }
   } catch (e) {
     yield put(votingActions.sendElectoralSheet.failure(e));
