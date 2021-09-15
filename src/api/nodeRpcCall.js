@@ -97,9 +97,9 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
     const injector = await web3FromSource(account.meta.source);
     // eslint-disable-next-line max-len
     await transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
-      if (status.isFinalized) {
+      if (status.isInBlock) {
         // eslint-disable-next-line no-console
-        console.log(`isFinalized at block hash #${status.asFinalized.toString()}`);
+        console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
         callback(null, 'done');
       }
     }).catch((error) => {
@@ -128,9 +128,9 @@ const stakeToLiberlandBondAndExtra = async (payload, callback) => {
     const injector = await web3FromSource(account.meta.source);
     // eslint-disable-next-line max-len
     await transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
-      if (status.isFinalized) {
+      if (status.isInBlock) {
         // eslint-disable-next-line no-console
-        console.log(`Finalized at block hash #${status.asFinalized.toString()}`);
+        console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
         callback(null, 'done');
       }
     }).catch((error) => {
@@ -155,9 +155,9 @@ const applyMyCandidacy = async (callback) => {
     await api.tx.assemblyPallet
       .addCandidate()
       .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
-        if (status.isFinalized) {
+        if (status.isInBlock) {
           // eslint-disable-next-line no-console
-          console.log(`Finalized at block hash #${status.asFinalized.toString()}`);
+          console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
           callback(null, 'done');
         }
       }).catch((error) => {
@@ -207,9 +207,9 @@ const sendElectoralSheetRpc = async (electoralSheet, callback) => {
     await api.tx.assemblyPallet
       .vote(dataForNode)
       .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
-        if (status.isFinalized) {
+        if (status.isInBlock) {
           // eslint-disable-next-line no-console
-          console.log(`Finalized at block hash #${status.asFinalized.toString()}`);
+          console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
           callback(null, 'done');
         }
       }).catch((error) => {
@@ -301,9 +301,9 @@ const sendLawProposal = async (hash, callback) => {
     await api.tx.assemblyPallet
       .proposeLaw(hash, 'ConstitutionalChange')
       .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
-        if (status.isFinalized) {
+        if (status.isInBlock) {
           // eslint-disable-next-line no-console
-          console.log(`Finalized at block hash #${status.asFinalized.toString()}`);
+          console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
           callback(null, 'done');
         }
       }).catch((error) => {
