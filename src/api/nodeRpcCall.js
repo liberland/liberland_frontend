@@ -290,13 +290,16 @@ const sendLawProposal = async (hash, callback) => {
     provider,
     types: {
       law_hash: 'Hash',
+      LawType: {
+        _enum: ['ConstitutionalChange', 'Edict'],
+      },
     },
   });
 
   if (accountAddress) {
     const injector = await web3FromAddress(accountAddress);
     await api.tx.assemblyPallet
-      .proposeLaw(hash)
+      .proposeLaw(hash, 'ConstitutionalChange')
       .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
         if (status.isFinalized) {
           // eslint-disable-next-line no-console
@@ -397,6 +400,13 @@ const getStatusProposalRpc = async (hash, callback) => {
         lawHash: 'Hash',
         LawState: {
           _enum: ['Approved', 'InProgress', 'Declined'],
+        },
+        LawType: {
+          _enum: ['ConstitutionalChange', 'Edict'],
+        },
+        Law: {
+          state: 'LawState',
+          law_type: 'LawType',
         },
       },
     });
