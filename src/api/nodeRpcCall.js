@@ -406,12 +406,12 @@ const getStatusProposalRpc = async (hash, callback) => {
         },
         Law: {
           state: 'LawState',
-          law_type: 'LawType',
+          lawType: 'LawType',
         },
       },
     });
     const proposalStatus = await api.query.assemblyPallet.laws(hash);
-    callback(null, proposalSatuses[proposalStatus.toString()]);
+    callback(null, proposalSatuses[JSON.parse(proposalStatus).state]);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
