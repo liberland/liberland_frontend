@@ -41,13 +41,13 @@ function* submitProposalWorker(action) {
 
     yield cps(sendLawProposal, data);
     yield put(assemblyActions.submitProposal.success(data));
-    const propouselStatus = yield cps(getStatusProposalRpc, data);
+    const proposalStatus = yield cps(getStatusProposalRpc, data);
     const requiredAmountLlm = yield select(votingSelectors.selectorLiberStakeAmount);
 
     const result = yield api.patch('/assembly/update_status_proposal',
       {
         hash: data,
-        status: propouselStatus,
+        status: proposalStatus,
         requiredAmountLlm,
         currentLlm: 0,
         votingHourLeft: 72,

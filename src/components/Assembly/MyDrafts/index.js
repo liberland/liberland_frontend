@@ -43,6 +43,7 @@ const MyDrafts = () => {
       proposal_name,
       short_description,
       thread_link,
+      draft_type,
     } = values;
 
     const data = {
@@ -54,6 +55,7 @@ const MyDrafts = () => {
       requiredAmountLlm: null,
       currentLlm: null,
       votingHourLeft: null,
+      draftType: draft_type,
     };
 
     dispatch(assemblyActions.addMyDraft.call({ data }));
