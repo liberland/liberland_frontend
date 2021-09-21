@@ -29,6 +29,7 @@ const AddNewDraftModal = ({
       link_to_Google_document: 'http://link_to_Google_document',
       thread_link: 'http://thread_link',
       file: '',
+      draft_type: '',
     },
   });
 
@@ -56,6 +57,11 @@ const AddNewDraftModal = ({
   return (
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.h3}>Add New Draft</div>
+      <div className={styles.title}>Select type of Draft</div>
+      <select {...register('draft_type')} required>
+        <option value="ConstitutionalChange">Constitutional Change</option>
+        <option value="Edict">Edict</option>
+      </select>
       <div className={styles.title}>Proposal name</div>
       <TextInput
         register={register}

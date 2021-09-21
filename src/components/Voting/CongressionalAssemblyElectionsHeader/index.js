@@ -34,7 +34,7 @@ const CongressionalAssemblyElectionsHeader = ({ handlerOnClickApplyMyCandidacy }
         <div className={styles.headCongressionalFirstItem}>
           <UserCongressional />
           <h3>
-            {currentNumVoting}
+            {currentNumVoting.toFixed(2)}
             {' '}
             Congressional Assembly Elections
           </h3>

@@ -5,10 +5,12 @@ import { web3Accounts } from '@polkadot/extension-dapp';
 
 import { assemblyActions } from '../actions';
 
-import { userSelectors } from '../selectors';
+import {
+  userSelectors, votingSelectors,
+} from '../selectors';
 
 import api from '../../api';
-import { sendLawProposal, getStatusProposalRpc } from '../../api/nodeRpcCall';
+import { sendLawProposal, voteByProposalRpc, getProposalHashesRpc } from '../../api/nodeRpcCall';
 
 // WORKERS
 function* addMyDraftWorker(action) {
@@ -20,6 +22,7 @@ function* addMyDraftWorker(action) {
     data.fileName = accounts.address + createdAt;
     data.createdDate = createdAt;
     data.userId = userId;
+    data.proposalStatus = 'Draft';
 
     yield call(api.post, 'assembly/add_new_draft', data);
     yield put(assemblyActions.addMyDraft.success());
@@ -35,12 +38,31 @@ function* submitProposalWorker(action) {
   try {
     const { data } = yield api.get(`/assembly/calc_hash/${action.payload.id}`);
     // eslint-disable-next-line no-console
-    console.log('hash', data);
+    console.log('hash', data.hash);
+    const resultSendNode = yield cps(sendLawProposal, data);
 
-    yield cps(sendLawProposal, data);
-    yield put(assemblyActions.submitProposal.success(data));
-    yield cps(getStatusProposalRpc, data);
+    if (resultSendNode !== 'done') {
+      yield put(assemblyActions.submitProposal.failure(resultSendNode));
+      return;
+    }
+    const requiredAmountLlm = yield select(votingSelectors.selectorLiberStakeAmount);
+
+    const result = yield api.patch('/assembly/update_status_proposal',
+      {
+        hash: data.hash,
+        status: 'InProgress',
+        requiredAmountLlm,
+        currentLlm: 0,
+        votingHourLeft: 72,
+        nodeIdProposel: 'NoNeed',
+      });
+    yield put(assemblyActions.submitProposal.success());
+    // eslint-disable-next-line no-console
+    console.log('/assembly/update_status_proposal', result);
+    yield put(assemblyActions.getMyProposals.call());
   } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
     yield put(assemblyActions.submitProposal.failure(e));
   }
 }
@@ -76,6 +98,35 @@ function* deleteProposalWorker(action) {
     yield put(assemblyActions.getMyProposals.call());
   } catch (e) {
     yield put(assemblyActions.deleteProposal.failure(e));
+  }
+}
+
+function* updateAllProposalsWorker() {
+  try {
+    // Get all proposal in status !Draft
+    const { data: { hashesNotDraft } } = yield api.get('/assembly/get_hashes_proposals_not_draft/');
+    // GET from node new statuses by hash
+    const hashesAllProposals = yield cps(getProposalHashesRpc, hashesNotDraft);
+    // UPDATE in back all proposals and get it
+    const {
+      data: {
+        proposals,
+      },
+    } = yield api.post('/assembly/update_all_proposals', { hashesAllProposals });
+    yield put(assemblyActions.updateAllProposals.success(proposals));
+    yield put(assemblyActions.getMyProposals.call());
+  } catch (e) {
+    yield put(assemblyActions.updateAllProposals.failure(e));
+  }
+}
+
+function* voteByProposalWorker(action) {
+  try {
+    const { docHash } = action.payload;
+    yield cps(voteByProposalRpc, docHash);
+    yield put(assemblyActions.updateAllProposals.success());
+  } catch (e) {
+    yield put(assemblyActions.updateAllProposals.failure(e));
   }
 }
 
@@ -148,6 +199,22 @@ function* deleteProposalWatcher() {
   }
 }
 
+function* updateAllProposalsWatcher() {
+  try {
+    yield takeLatest(assemblyActions.updateAllProposals.call, updateAllProposalsWorker);
+  } catch (e) {
+    yield put(assemblyActions.updateAllProposals.failure(e));
+  }
+}
+
+function* voteByProposalWatcher() {
+  try {
+    yield takeLatest(assemblyActions.voteByProposal.call, voteByProposalWorker);
+  } catch (e) {
+    yield put(assemblyActions.voteByProposal.failure(e));
+  }
+}
+
 export {
   addMyDraftWatcher,
   getMyProposalsWatcher,
@@ -155,4 +222,6 @@ export {
   editDraftWatcher,
   submitProposalWatcher,
   getByHashesWatcher,
+  updateAllProposalsWatcher,
+  voteByProposalWatcher,
 };
