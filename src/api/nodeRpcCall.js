@@ -248,10 +248,11 @@ const getMinistersRpc = async () => {
     });
     const ministersList = JSON.parse(await api.query.assemblyPallet.currentMinistersList());
     // eslint-disable-next-line no-console
-    // console.log('ministersList', ministersList);
+    console.log('ministersList', ministersList);
 
-    const api3 = await ApiPromise.create({ provider });
-    const liberStakeAmount = await api3.query.assemblyPallet.liberStakeAmount();
+    // const api3 = await ApiPromise.create({ provider });
+    // const liberStakeAmount = await api3.query.assemblyPallet.liberStakeAmount();
+    const liberStakeAmount = 0;
     // eslint-disable-next-line no-console
     // console.log('liberStakeAmount', liberStakeAmount.toString());
 
@@ -282,7 +283,8 @@ const getMinistersRpc = async () => {
   return [];
 };
 
-const sendLawProposal = async (hash, callback) => {
+const sendLawProposal = async (data, callback) => {
+  const { hash, proposalType } = data;
   const allAccounts = await web3Accounts();
   const accountAddress = allAccounts[0].address;
 
@@ -299,7 +301,7 @@ const sendLawProposal = async (hash, callback) => {
   if (accountAddress) {
     const injector = await web3FromAddress(accountAddress);
     await api.tx.assemblyPallet
-      .proposeLaw(hash, 'ConstitutionalChange')
+      .proposeLaw(hash, proposalType)
       .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
         if (status.isInBlock) {
           // eslint-disable-next-line no-console
@@ -314,15 +316,37 @@ const sendLawProposal = async (hash, callback) => {
   }
 };
 
-const getLawHashes = async () => {
+const getProposalHashesRpc = async (hashesNotDraft, callback) => {
   try {
-    const api = await ApiPromise.create({ provider });
-    const laws = await api.query.assemblyPallet.laws();
-
-    return JSON.parse(laws.toString());
+    const api = await ApiPromise.create({
+      provider,
+      types: {
+        law_hash: 'Hash',
+        LawState: {
+          _enum: ['Approved', 'InProgress', 'Declined'],
+        },
+        LawType: {
+          _enum: ['ConstitutionalChange', 'Edict'],
+        },
+        Law: {
+          state: 'LawState',
+          law_type: 'LawType',
+        },
+      },
+    });
+    const newStatuses = await hashesNotDraft.map(async (el) => {
+      const state = await api.query.assemblyPallet.laws(el.docHash)
+        .then((value) => value.toString().split(',')[0].split('":"')[1].split('"')[0]);
+      return ({
+        docHash: el.docHash,
+        state,
+      });
+    });
+    Promise.all(newStatuses).then((value) => callback(null, value)).catch((e) => callback(e));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
+    callback(e);
   }
   return null;
 };
@@ -389,11 +413,6 @@ const getPeriodAndVotingDurationRpc = async () => {
 
 const getStatusProposalRpc = async (hash, callback) => {
   try {
-    const proposalSatuses = {
-      InProgress: 1,
-      Approved: 2,
-      Declined: 3,
-    };
     const api = await ApiPromise.create({
       provider,
       types: {
@@ -411,7 +430,7 @@ const getStatusProposalRpc = async (hash, callback) => {
       },
     });
     const proposalStatus = await api.query.assemblyPallet.laws(hash);
-    callback(null, proposalSatuses[JSON.parse(proposalStatus).state]);
+    callback(null, JSON.parse(proposalStatus.toString()));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
@@ -433,8 +452,9 @@ const getCurrentBlockNumberRpc = async () => {
 
 const getLiberStakeAmountRpc = async () => {
   try {
-    const api = await ApiPromise.create({ provider });
-    const liberStakeAmount = await api.query.assemblyPallet.liberStakeAmount();
+    // const api = await ApiPromise.create({ provider });
+    // const liberStakeAmount = await api.query.assemblyPallet.liberStakeAmount();
+    const liberStakeAmount = 0;
     // eslint-disable-next-line no-console
     console.log('liberStakeAmount', liberStakeAmount.toString());
     return (matchPowHelper(liberStakeAmount.toString()));
@@ -443,6 +463,32 @@ const getLiberStakeAmountRpc = async () => {
     console.log('error', e);
   }
   return null;
+};
+
+const voteByProposalRpc = async (docHash, callback) => {
+  const allAccounts = await web3Accounts();
+  const accountAddress = allAccounts[0].address;
+  const injector = await web3FromAddress(accountAddress);
+  const api = await ApiPromise.create({
+    provider,
+    types: {
+      law_hash: 'Sha256',
+    },
+  });
+
+  await api.tx.assemblyPallet
+    .voteToLaw(docHash)
+    .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+      if (status.isInBlock) {
+        // eslint-disable-next-line no-console
+        console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
+        callback(null, 'done');
+      }
+    }).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.log(':( transaction failed', error);
+      callback(error);
+    });
 };
 
 export {
@@ -457,9 +503,10 @@ export {
   getMinistersRpc,
   getUserRoleRpc,
   sendLawProposal,
-  getLawHashes,
   getPeriodAndVotingDurationRpc,
   getStatusProposalRpc,
   getCurrentBlockNumberRpc,
   getLiberStakeAmountRpc,
+  getProposalHashesRpc,
+  voteByProposalRpc,
 };

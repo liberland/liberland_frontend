@@ -90,34 +90,34 @@ const MyDrafts = () => {
     dispatch(assemblyActions.submitProposal.call(id));
   };
 
-  const draftStatuses = ['draft', 'voting', 'passed', 'vetoed', 'declined'];
   const drafts = useSelector(assemblySelectors.proposalsSelector);
+
   const viewStatus = (draft) => {
     const { proposalStatus, votingHourLeft } = draft;
     switch (proposalStatus) {
-      case 0: return <span className={styles.draftNew}>{draftStatuses[proposalStatus]}</span>;
-      case 1: return <span className={styles.draftVoting}>{`${draftStatuses[proposalStatus]} (${votingHourLeft}h left)`}</span>;
-      case 2: return (
+      case 'Draft': return <span className={styles.draftNew}>{proposalStatus}</span>;
+      case 'InProgress': return <span className={styles.draftVoting}>{`${proposalStatus} (${votingHourLeft}h left)`}</span>;
+      case 'Approved': return (
         <div className={styles.imageAndStatus}>
           <PassedImage />
           <span className={styles.draftPassed}>
-            {draftStatuses[proposalStatus]}
+            {proposalStatus}
           </span>
         </div>
       );
-      case 3: return (
+      case 'Vetoed': return (
         <div className={styles.imageAndStatus}>
           <VetoedImage />
           <span className={styles.draftVetoed}>
-            {draftStatuses[proposalStatus]}
+            {proposalStatus}
           </span>
         </div>
       );
-      case 4: return (
+      case 'Declined': return (
         <div className={styles.imageAndStatus}>
           <DeclinedImage />
           <span className={styles.draftDeclined}>
-            {draftStatuses[proposalStatus]}
+            {proposalStatus}
           </span>
         </div>
       );
@@ -161,7 +161,7 @@ const MyDrafts = () => {
             <span>
               {draft.shortDescription}
             </span>
-            {draft.proposalStatus === 0 && (
+            {draft.proposalStatus === 'Draft' && (
               <div className={styles.draftButtons}>
                 <Button
                   onClick={() => handleSubmitProposal(draft.id)}
@@ -184,7 +184,7 @@ const MyDrafts = () => {
                 </div>
               </div>
             )}
-            {draft.proposalStatus > 0 && (
+            {draft.proposalStatus !== 'Draft' && (
               <>
                 <p>
                   {`${draft.currentLlm}/${draft.requiredAmountLlm} llm`}

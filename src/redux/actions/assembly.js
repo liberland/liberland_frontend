@@ -7,6 +7,9 @@ export const {
   getMyProposals,
   editDraft,
   deleteProposal,
+  updateAllProposals,
+  getAllSendProposals,
+  voteByProposal,
 } = createActions({
   ADD_MY_DRAFT: {
     call: undefined,
@@ -35,6 +38,21 @@ export const {
   },
   DELETE_PROPOSAL: {
     call: (id) => ({ id }),
+    success: undefined,
+    failure: undefined,
+  },
+  UPDATE_ALL_PROPOSALS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_ALL_SEND_PROPOSALS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  VOTE_BY_PROPOSAL: {
+    call: undefined,
     success: undefined,
     failure: undefined,
   },

@@ -13,59 +13,63 @@ import { ReactComponent as RedLike } from '../../../assets/icons/like-red.svg';
 import styles from './styles.module.scss';
 import ProposalDetailsModal from '../../Modals/ProposalDetailsModal';
 import { assemblyActions } from '../../../redux/actions';
+import { assemblySelectors } from '../../../redux/selectors';
 
 const LegislationVotes = () => {
   const dispatch = useDispatch();
   const userId = useSelector(selectUserId);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rowId, setRowId] = useState(null);
+  const allSendProposals = useSelector(assemblySelectors.allSendProposalsSelector);
 
   useEffect(() => {
-    dispatch(assemblyActions.getByHashes.call());
-  });
+    dispatch(assemblyActions.updateAllProposals.call());
+  }, [dispatch]);
 
   const handleModalOpen = (id) => {
     setIsModalOpen(!isModalOpen);
     setRowId(id);
   };
 
-  const [data, setData] = useState([
-    {
-      id: '4',
-      proposal: 'Create lorem ipsum dolor sit consectet...',
-      supported: 430,
-      timeLeft: '72h 52m 48s',
-      status: 'pending',
-    },
-    {
-      id: '2',
-      proposal: 'Create lorem ipsum dolor sit consectet...',
-      supported: 21430,
-      timeLeft: '72h 52m 48s',
-      status: 'supported',
-    },
-    {
-      id: '1',
-      proposal: 'Create lorem ipsum dolor sit consectet...',
-      supported: 15000,
-      timeLeft: '72h 52m 48s',
-      status: 'declined',
-    },
-    {
-      id: '3',
-      proposal: 'Create lorem ipsum dolor sit consectet...',
-      supported: 9000,
-      timeLeft: '72h 52m 48s',
-      status: 'pending',
-    },
-  ]);
+  const [data, setData] = useState(allSendProposals);
+
+  //   {
+  //     id: '4',
+  //     proposal: 'Create lorem ipsum dolor sit consectet...',
+  //     supported: 430,
+  //     timeLeft: '72h 52m 48s',
+  //     status: 'pending',
+  //   },
+  //   {
+  //     id: '2',
+  //     proposal: 'Create lorem ipsum dolor sit consectet...',
+  //     supported: 21430,
+  //     timeLeft: '72h 52m 48s',
+  //     status: 'supported',
+  //   },
+  //   {
+  //     id: '1',
+  //     proposal: 'Create lorem ipsum dolor sit consectet...',
+  //     supported: 15000,
+  //     timeLeft: '72h 52m 48s',
+  //     status: 'declined',
+  //   },
+  //   {
+  //     id: '3',
+  //     proposal: 'Create lorem ipsum dolor sit consectet...',
+  //     supported: 9000,
+  //     timeLeft: '72h 52m 48s',
+  //     status: 'pending',
+  //   },
+  // ]);
 
   const onDecline = (id) => {
     setData(data.map((el) => (el.id === id ? { ...el, status: 'declined' } : el)));
   };
 
-  const onSupport = (id) => {
+  const onSupport = (id, docHash) => {
     setData(data.map((el) => (el.id === id ? { ...el, status: 'supported' } : el)));
+    dispatch(assemblyActions.voteByProposal.call({ docHash }));
   };
 
   const columns = useMemo(
@@ -76,7 +80,7 @@ const LegislationVotes = () => {
         Cell: ({ cell }) => (
           <div className={styles.proposalWrapper}>
             <span>
-              {cell.row.original.proposal}
+              {cell.row.original.proposalName}
             </span>
             <Button grey nano onClick={() => handleModalOpen(cell.row.original.id)}>Details</Button>
           </div>
@@ -88,7 +92,7 @@ const LegislationVotes = () => {
         Cell: ({ cell }) => (
           <div className={styles.supportedWrapper}>
             <span className={styles.supportedProgress}>
-              {cell.row.original.supported}
+              {cell.row.original.currentLlm}
               /21430 LLM
             </span>
             <ProgressBar currentValue={cell.row.original.supported} maxValue={21430} />
@@ -134,7 +138,7 @@ const LegislationVotes = () => {
                 aria-label="Support"
                 type="button"
                 className={cx(styles.actionButton, styles.actionButtonGreen)}
-                onClick={() => onSupport(cell.row.original.id)}
+                onClick={() => onSupport(cell.row.original.id, cell.row.original.docHash)}
               >
                 <GreenLike />
               </button>
