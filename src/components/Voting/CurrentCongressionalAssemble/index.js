@@ -24,27 +24,23 @@ const CurrentCongressionalAssemble = () => {
   const dispatch = useDispatch();
 
   const handleVote = useCallback((id) => {
-    setAllCandidatesData(allCandidatesData.filter((candidate) => candidate.id !== id));
-    setSelectedCandidatesData(
-      [
+    // setAllCandidatesData(allCandidatesData.filter((candidate) => candidate.id !== id));
+    if (!selectedCandidatesData.find((candidate) => candidate.id === id)) {
+      setSelectedCandidatesData(
+        [
+          ...selectedCandidatesData,
+          allCandidatesData.find((candidate) => candidate.id === id),
+        ],
+      );
+      dispatch(votingActions.addCandidacyToElectoralSheet.success([
         ...selectedCandidatesData,
         allCandidatesData.find((candidate) => candidate.id === id),
-      ],
-    );
-    dispatch(votingActions.addCandidacyToElectoralSheet.success([
-      ...selectedCandidatesData,
-      allCandidatesData.find((candidate) => candidate.id === id),
-    ]));
+      ]));
+    }
   }, [selectedCandidatesData, allCandidatesData, dispatch]);
 
   const handleCancel = useCallback((id) => {
     setSelectedCandidatesData(selectedCandidatesData.filter((candidate) => candidate.id !== id));
-    setAllCandidatesData(
-      [
-        ...allCandidatesData,
-        selectedCandidatesData.find((candidate) => candidate.id === id),
-      ],
-    );
     dispatch(votingActions.addCandidacyToElectoralSheet.success([
       ...allCandidatesData,
       selectedCandidatesData.find((candidate) => candidate.id === id),
@@ -103,7 +99,12 @@ const CurrentCongressionalAssemble = () => {
 
   return (
     <div className={styles.currentAssemble}>
-      <TableComponent title="All candidates" data={allCandidatesData} columns={allCandidatesColumns} />
+      <TableComponent
+        title="All candidates"
+        data={allCandidatesData}
+        columns={allCandidatesColumns}
+        isVotingInProgress={isVotingInProgress}
+      />
       <TableComponent
         title="electoral_sheet"
         data={selectedCandidatesData}
