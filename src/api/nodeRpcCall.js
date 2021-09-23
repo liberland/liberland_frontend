@@ -250,15 +250,8 @@ const getMinistersRpc = async () => {
     // eslint-disable-next-line no-console
     console.log('ministersList', ministersList);
 
-    // const api3 = await ApiPromise.create({ provider });
-    // const liberStakeAmount = await api3.query.assemblyPallet.liberStakeAmount();
-    const liberStakeAmount = 0;
-    // eslint-disable-next-line no-console
-    // console.log('liberStakeAmount', liberStakeAmount.toString());
-
-    const assemblyStakeAmount = await api.query.assemblyPallet.assemblyStakeAmount();
-    // eslint-disable-next-line no-console
-    console.log('assemblysStakeAmount assemblysStakeAmount', assemblyStakeAmount.toString());
+    const liberStakeAmount = Object.values(ministersList)
+      .reduce((acum, curVal) => acum + matchPowHelper(curVal));
 
     let finaleObject = [];
     let i = 1;
@@ -270,11 +263,13 @@ const getMinistersRpc = async () => {
           deputies: truncate(JSON.parse(prop).pasportId, 10),
           supported: `${prettyNumber(ministersList[prop])}`,
           // eslint-disable-next-line max-len
-          power: ((matchPowHelper(ministersList[prop]) * 100) / matchPowHelper(liberStakeAmount)).toFixed(2),
+          power: ((matchPowHelper(ministersList[prop]) * 100) / liberStakeAmount).toFixed(2),
         }];
         i += 1;
       }
     }
+    finaleObject.sort((a, b) => (a.power < b.power ? 1 : -1));
+
     return finaleObject;
   } catch (e) {
     // eslint-disable-next-line no-console
