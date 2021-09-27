@@ -93,9 +93,14 @@ const LegislationVotes = () => {
           <div className={styles.supportedWrapper}>
             <span className={styles.supportedProgress}>
               {cell.row.original.currentLlm}
-              /21430 LLM
+              /
+              {cell.row.original.requiredAmountLlm}
+              LLM
             </span>
-            <ProgressBar currentValue={cell.row.original.supported} maxValue={21430} />
+            <ProgressBar
+              currentValue={cell.row.original.currentLlm}
+              maxValue={cell.row.original.requiredAmountLlm}
+            />
           </div>
         ),
       },

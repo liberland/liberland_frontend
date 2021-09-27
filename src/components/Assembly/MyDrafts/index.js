@@ -6,7 +6,7 @@ import Button from '../../Button/Button';
 import ProgressBar from '../../ProgressBar';
 
 import { assemblyActions, votingActions } from '../../../redux/actions';
-import { assemblySelectors } from '../../../redux/selectors';
+import { assemblySelectors, votingSelectors } from '../../../redux/selectors';
 
 import styles from './styles.module.scss';
 import { ReactComponent as PassedImage } from '../../../assets/icons/passed.svg';
@@ -21,6 +21,7 @@ const MyDrafts = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedDraft, setSelectedDraft] = useState({});
   const dispatch = useDispatch();
+  const liberStakeAmount = useSelector(votingSelectors.selectorLiberStakeAmount);
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
 
@@ -52,7 +53,7 @@ const MyDrafts = () => {
         proposalName: proposal_name,
         shortDescription: short_description,
         threadLink: thread_link,
-        requiredAmountLlm: null,
+        requiredAmountLlm: liberStakeAmount,
         currentLlm: null,
         votingHourLeft: null,
         draftType: draft_type,
@@ -81,6 +82,7 @@ const MyDrafts = () => {
       proposalName: proposal_name,
       shortDescription: short_description,
       threadLink: thread_link,
+      requiredAmountLlm: liberStakeAmount,
     };
 
     dispatch(assemblyActions.editDraft.call(data));
