@@ -10,6 +10,7 @@ export default function* rootSaga() {
     authSagas.signInWatcher(),
     authSagas.verifySessionWatcher(),
     authSagas.signOutWatcher(),
+    authSagas.initGetDataFromNodeWatcher(),
 
     // WALLET
     walletSagas.getWalletWatcher(),

@@ -24,6 +24,7 @@ const LegislationVotes = () => {
 
   useEffect(() => {
     dispatch(assemblyActions.updateAllProposals.call());
+    dispatch(assemblyActions.getAllSendProposals.call());
   }, [dispatch]);
 
   const handleModalOpen = (id) => {

@@ -28,10 +28,6 @@ const Voting = () => {
   const isVotingInProgress = useSelector(votingSelectors.selectorIsVotingInProgress);
 
   useEffect(() => {
-    dispatch(votingActions.getPeriodAndVotingDuration.call());
-  }, [dispatch]);
-
-  useEffect(() => {
     const timerId = setInterval(() => {
       dispatch(votingActions.getMinistersList.call());
     }, 6000);

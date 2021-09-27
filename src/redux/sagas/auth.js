@@ -6,7 +6,7 @@ import {
 import { web3Enable } from '@polkadot/extension-dapp';
 
 import { getUserRoleRpc } from '../../api/nodeRpcCall';
-import { authActions } from '../actions';
+import { authActions, votingActions, walletActions } from '../actions';
 import routes from '../../router';
 import api from '../../api';
 
@@ -47,6 +47,12 @@ function* signOutWorker() {
   }
 }
 
+function* initGetDataFromNodeWorker() {
+  yield put(walletActions.getWallet.call());
+  yield put(votingActions.getPeriodAndVotingDuration.call());
+  yield put(votingActions.getMinistersList.call());
+}
+
 function* signInWatcher() {
   yield takeLatest(authActions.signIn.call, signInWorker);
 }
@@ -59,8 +65,16 @@ function* signOutWatcher() {
   yield takeLatest(authActions.signOut.call, signOutWorker);
 }
 
+function* initGetDataFromNodeWatcher() {
+  yield takeLatest([
+    authActions.signIn.success,
+    authActions.verifySession.success,
+  ], initGetDataFromNodeWorker);
+}
+
 export {
   signInWatcher,
   verifySessionWatcher,
   signOutWatcher,
+  initGetDataFromNodeWatcher,
 };

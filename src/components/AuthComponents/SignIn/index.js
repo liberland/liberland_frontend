@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 
 // REDUX
-import { authActions, votingActions } from '../../../redux/actions';
+import { authActions } from '../../../redux/actions';
 import { errorsSelectors } from '../../../redux/selectors';
 
 // STYLES
@@ -33,7 +33,6 @@ const SignIn = () => {
   const apiError = useSelector(errorsSelectors.selectSignIn);
 
   useEffect(() => {
-    dispatch(votingActions.getPeriodAndVotingDuration.call());
     if (apiError) {
       setError([
         {

@@ -5,7 +5,7 @@ import Button from '../../Button/Button';
 
 import ProgressBar from '../../ProgressBar';
 
-import { assemblyActions, votingActions } from '../../../redux/actions';
+import { assemblyActions } from '../../../redux/actions';
 import { assemblySelectors, votingSelectors } from '../../../redux/selectors';
 
 import styles from './styles.module.scss';
@@ -130,7 +130,6 @@ const MyDrafts = () => {
 
   useEffect(() => {
     dispatch(assemblyActions.getMyProposals.call());
-    dispatch(votingActions.getLiberStakeAmount.call());
   }, [dispatch]);
 
   return (
