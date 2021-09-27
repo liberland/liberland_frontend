@@ -2,6 +2,7 @@ import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extensi
 import prettyNumber from '../utils/prettyNumber';
 import matchPowHelper from '../utils/matchPowHelper';
 import truncate from '../utils/truncate';
+import roughScale from '../utils/roughScale';
 
 import citizenAddressList from '../constants/citizenAdressList';
 
@@ -248,10 +249,12 @@ const getMinistersRpc = async () => {
     });
     const ministersList = JSON.parse(await api.query.assemblyPallet.currentMinistersList());
     // eslint-disable-next-line no-console
-    console.log('ministersList', ministersList);
+    console.log('getMinistersRpc', ministersList);
+
+    if (Object.keys(ministersList).length === 0) return { finaleObject: [], liberStakeAmount: 0 };
 
     const liberStakeAmount = Object.values(ministersList)
-      .reduce((acum, curVal) => acum + matchPowHelper(curVal));
+      .reduce((acum, curVal) => (acum + matchPowHelper(roughScale(curVal, 16))), 0);
 
     let finaleObject = [];
     let i = 1;
@@ -263,14 +266,16 @@ const getMinistersRpc = async () => {
           deputies: truncate(JSON.parse(prop).pasportId, 10),
           supported: `${prettyNumber(ministersList[prop])}`,
           // eslint-disable-next-line max-len
-          power: ((matchPowHelper(ministersList[prop]) * 100) / liberStakeAmount).toFixed(2),
+          power: liberStakeAmount !== 0
+            ? ((matchPowHelper(ministersList[prop]) * 100) / liberStakeAmount)
+              .toFixed(2)
+            : 100,
         }];
         i += 1;
       }
     }
     finaleObject.sort((a, b) => (a.power < b.power ? 1 : -1));
-
-    return finaleObject;
+    return { finaleObject, liberStakeAmount };
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
@@ -370,9 +375,6 @@ const getUserRoleRpc = async () => {
     const ministersList = JSON.stringify(await api.query.assemblyPallet.currentMinistersList());
     const passportId = await api2.query.identityPallet.passportIds(accountAddress);
 
-    // eslint-disable-next-line no-console
-    console.log('ministersList', ministersList);
-
     if (ministersList.includes(passportId.toString())) {
       return {
         assemblyMember: 'assemblyMember',
@@ -445,21 +447,6 @@ const getCurrentBlockNumberRpc = async () => {
   return null;
 };
 
-const getLiberStakeAmountRpc = async () => {
-  try {
-    // const api = await ApiPromise.create({ provider });
-    // const liberStakeAmount = await api.query.assemblyPallet.liberStakeAmount();
-    const liberStakeAmount = 0;
-    // eslint-disable-next-line no-console
-    console.log('liberStakeAmount', liberStakeAmount.toString());
-    return (matchPowHelper(liberStakeAmount.toString()));
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('error', e);
-  }
-  return null;
-};
-
 const voteByProposalRpc = async (docHash, callback) => {
   const allAccounts = await web3Accounts();
   const accountAddress = allAccounts[0].address;
@@ -501,7 +488,6 @@ export {
   getPeriodAndVotingDurationRpc,
   getStatusProposalRpc,
   getCurrentBlockNumberRpc,
-  getLiberStakeAmountRpc,
   getProposalHashesRpc,
   voteByProposalRpc,
 };
