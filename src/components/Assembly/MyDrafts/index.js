@@ -45,21 +45,22 @@ const MyDrafts = () => {
       thread_link,
       draft_type,
     } = values;
+    if (file) {
+      const data = {
+        file: await toBase64(file),
+        linkToGoogleDocument: link_to_Google_document,
+        proposalName: proposal_name,
+        shortDescription: short_description,
+        threadLink: thread_link,
+        requiredAmountLlm: null,
+        currentLlm: null,
+        votingHourLeft: null,
+        draftType: draft_type,
+      };
 
-    const data = {
-      file: await toBase64(file),
-      linkToGoogleDocument: link_to_Google_document,
-      proposalName: proposal_name,
-      shortDescription: short_description,
-      threadLink: thread_link,
-      requiredAmountLlm: null,
-      currentLlm: null,
-      votingHourLeft: null,
-      draftType: draft_type,
-    };
-
-    dispatch(assemblyActions.addMyDraft.call({ data }));
-    handleModalOpen();
+      dispatch(assemblyActions.addMyDraft.call({ data }));
+      handleModalOpen();
+    }
   };
 
   const handleEdit = async (draft, file) => {

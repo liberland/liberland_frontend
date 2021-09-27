@@ -293,7 +293,7 @@ const sendLawProposal = async (data, callback) => {
     types: {
       law_hash: 'Hash',
       LawType: {
-        _enum: ['ConstitutionalChange', 'Edict'],
+        _enum: ['ConstitutionalChange', 'Legislation', 'Decision'],
       },
     },
   });
@@ -326,7 +326,7 @@ const getProposalHashesRpc = async (hashesNotDraft, callback) => {
           _enum: ['Approved', 'InProgress', 'Declined'],
         },
         LawType: {
-          _enum: ['ConstitutionalChange', 'Edict'],
+          _enum: ['ConstitutionalChange', 'Legislation', 'Decision'],
         },
         Law: {
           state: 'LawState',
@@ -418,7 +418,7 @@ const getStatusProposalRpc = async (hash, callback) => {
           _enum: ['Approved', 'InProgress', 'Declined'],
         },
         LawType: {
-          _enum: ['ConstitutionalChange', 'Edict'],
+          _enum: ['ConstitutionalChange', 'Legislation', 'Decision'],
         },
         Law: {
           state: 'LawState',
