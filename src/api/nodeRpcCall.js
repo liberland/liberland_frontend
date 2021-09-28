@@ -92,8 +92,8 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
     const account = allAccounts[0];
 
     const transferExtrinsic = isUserHaveStake
-      ? await api.tx.stakingPallet.bondExtra(amount * (10 ** 12))
-      : await api.tx.stakingPallet.bond(account.address, (amount * (10 ** 12)), 'Staked');
+      ? await api.tx.stakingPallet.bondExtra(`${amount}000000000000`)
+      : await api.tx.stakingPallet.bond(account.address, `${amount}000000000000`);
 
     const injector = await web3FromSource(account.meta.source);
     // eslint-disable-next-line max-len
@@ -123,8 +123,8 @@ const stakeToLiberlandBondAndExtra = async (payload, callback) => {
     const account = allAccounts[0];
 
     const transferExtrinsic = isUserHaveStake
-      ? await api.tx.stakingPallet.liberlandBondExtra(amount * (10 ** 12))
-      : await api.tx.stakingPallet.liberlandBond(account.address, (amount * (10 ** 12)), 'Staked');
+      ? await api.tx.stakingPallet.liberlandBondExtra(`${amount}000000000000`)
+      : await api.tx.stakingPallet.liberlandBond(account.address, (`${amount}000000000000`), 'Staked');
 
     const injector = await web3FromSource(account.meta.source);
     // eslint-disable-next-line max-len
