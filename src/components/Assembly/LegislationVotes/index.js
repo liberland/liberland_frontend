@@ -20,11 +20,10 @@ const LegislationVotes = () => {
   const userId = useSelector(selectUserId);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rowId, setRowId] = useState(null);
-  const allSendProposals = useSelector(assemblySelectors.allSendProposalsSelector);
+  const allSendProposals = useSelector(assemblySelectors.allProposalsInProgressSelector);
 
   useEffect(() => {
     dispatch(assemblyActions.updateAllProposals.call());
-    dispatch(assemblyActions.getAllSendProposals.call());
   }, [dispatch]);
 
   const handleModalOpen = (id) => {
@@ -153,7 +152,7 @@ const LegislationVotes = () => {
         },
       },
     ],
-    [userId, data],
+    [userId, data, allSendProposals],
   );
 
   const rowProps = (row) => {

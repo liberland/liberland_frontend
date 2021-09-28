@@ -336,7 +336,11 @@ const getProposalHashesRpc = async (hashesNotDraft, callback) => {
     });
     const newStatuses = await hashesNotDraft.map(async (el) => {
       const state = await api.query.assemblyPallet.laws(el.docHash)
-        .then((value) => value.toString().split(',')[0].split('":"')[1].split('"')[0]);
+        .then((value) => {
+          // eslint-disable-next-line no-console
+          console.log('api.query.assemblyPallet.laws', value.toString());
+          return value.toString().split(',')[0].split('":"')[1].split('"')[0];
+        });
       return ({
         docHash: el.docHash,
         state,
