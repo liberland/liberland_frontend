@@ -23,7 +23,6 @@ import Loader from './components/Loader';
 import { userSelectors } from './redux/selectors';
 import {
   authActions,
-  walletActions,
 } from './redux/actions';
 
 const override = css`
@@ -38,7 +37,6 @@ function App() {
 
   useEffect(() => {
     dispatch(authActions.verifySession.call());
-    dispatch(walletActions.getWallet.call());
   }, [dispatch]);
 
   const loggedOutRoutes = (

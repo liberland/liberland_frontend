@@ -5,6 +5,7 @@ export const {
   signIn,
   signUp,
   verifySession,
+  initGetDataFromNode,
 } = createActions({
   SIGN_OUT: {
     call: undefined,
@@ -22,6 +23,11 @@ export const {
     failure: undefined,
   },
   VERIFY_SESSION: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  INIT_GET_DATA_FROM_NODE: {
     call: undefined,
     success: undefined,
     failure: undefined,

@@ -17,8 +17,14 @@ const allSendProposalsSelector = createSelector(
   (reducer) => reducer.allSendProposals,
 );
 
+const allProposalsInProgressSelector = createSelector(
+  allSendProposalsSelector,
+  (reducer) => (reducer.filter((proposal) => proposal.proposalStatus === 'InProgress')),
+);
+
 export {
   isDraftSendSelector,
   proposalsSelector,
   allSendProposalsSelector,
+  allProposalsInProgressSelector,
 };

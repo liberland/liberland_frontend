@@ -20,25 +20,21 @@ const Voting = () => {
   const location = useLocation();
   const param = location.pathname.split('/').pop();
 
-  const dispath = useDispatch();
+  const dispatch = useDispatch();
 
   const handlerOnClickApplyMyCandidacy = () => {
-    dispath(votingActions.addMyCandidacy.call());
+    dispatch(votingActions.addMyCandidacy.call());
   };
   const isVotingInProgress = useSelector(votingSelectors.selectorIsVotingInProgress);
 
   useEffect(() => {
-    dispath(votingActions.getPeriodAndVotingDuration.call());
-  }, [dispath]);
-
-  useEffect(() => {
     const timerId = setInterval(() => {
-      dispath(votingActions.getMinistersList.call());
+      dispatch(votingActions.getMinistersList.call());
     }, 6000);
     return (() => {
       clearInterval(timerId);
     });
-  }, [dispath, isVotingInProgress]);
+  }, [dispatch, isVotingInProgress]);
 
   return (
     <div className={styles.votingWrapper}>

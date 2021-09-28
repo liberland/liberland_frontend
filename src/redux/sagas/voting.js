@@ -13,7 +13,6 @@ import {
   getMinistersRpc,
   getPeriodAndVotingDurationRpc,
   getCurrentBlockNumberRpc,
-  getLiberStakeAmountRpc,
 } from '../../api/nodeRpcCall';
 
 import route from '../../router';
@@ -84,8 +83,11 @@ function* setIsVotingInProgressWorker() {
 function* getMinistersListWorker() {
   try {
     const result = yield call(getMinistersRpc);
-    yield put(votingActions.getMinistersList.success(result));
+    yield put(votingActions.getMinistersList.success(result.finaleObject));
+    yield put(votingActions.getLiberStakeAmount.success(result.liberStakeAmount));
   } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
     yield put(votingActions.getMinistersList.failure(e));
   }
 }
@@ -105,15 +107,6 @@ function* getCurrentBlockNumberWorker() {
     yield put(votingActions.getCurrentBlockNumber.success(result));
   } catch (e) {
     yield put(votingActions.getCurrentBlockNumber.failure(e));
-  }
-}
-
-function* getLiberStakeAmountWorker() {
-  try {
-    const result = yield call(getLiberStakeAmountRpc);
-    yield put(votingActions.getLiberStakeAmount.success(result));
-  } catch (e) {
-    yield put(votingActions.getLiberStakeAmount.failure(e));
   }
 }
 
@@ -190,16 +183,6 @@ function* getCurrentBlockNumberWatcher() {
   }
 }
 
-function* getLiberStakeAmountWatcher() {
-  try {
-    yield takeLatest(votingActions.getLiberStakeAmount.call, getLiberStakeAmountWorker);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e);
-    yield put(votingActions.getLiberStakeAmount.failure(e));
-  }
-}
-
 export {
   addMyCandidacyWatcher,
   getListOFCandidacyWatcher,
@@ -208,5 +191,4 @@ export {
   getMinistersListWatcher,
   getPeriodAndVotingDurationWatcher,
   getCurrentBlockNumberWatcher,
-  getLiberStakeAmountWatcher,
 };

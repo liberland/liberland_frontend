@@ -2,6 +2,7 @@ import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extensi
 import prettyNumber from '../utils/prettyNumber';
 import matchPowHelper from '../utils/matchPowHelper';
 import truncate from '../utils/truncate';
+import roughScale from '../utils/roughScale';
 
 import citizenAddressList from '../constants/citizenAdressList';
 
@@ -91,8 +92,8 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
     const account = allAccounts[0];
 
     const transferExtrinsic = isUserHaveStake
-      ? await api.tx.stakingPallet.bondExtra(amount * (10 ** 12))
-      : await api.tx.stakingPallet.bond(account.address, (amount * (10 ** 12)), 'Staked');
+      ? await api.tx.stakingPallet.bondExtra(`${amount}000000000000`)
+      : await api.tx.stakingPallet.bond(account.address, `${amount}000000000000`);
 
     const injector = await web3FromSource(account.meta.source);
     // eslint-disable-next-line max-len
@@ -122,8 +123,8 @@ const stakeToLiberlandBondAndExtra = async (payload, callback) => {
     const account = allAccounts[0];
 
     const transferExtrinsic = isUserHaveStake
-      ? await api.tx.stakingPallet.liberlandBondExtra(amount * (10 ** 12))
-      : await api.tx.stakingPallet.liberlandBond(account.address, (amount * (10 ** 12)), 'Staked');
+      ? await api.tx.stakingPallet.liberlandBondExtra(`${amount}000000000000`)
+      : await api.tx.stakingPallet.liberlandBond(account.address, (`${amount}000000000000`), 'Staked');
 
     const injector = await web3FromSource(account.meta.source);
     // eslint-disable-next-line max-len
@@ -248,10 +249,12 @@ const getMinistersRpc = async () => {
     });
     const ministersList = JSON.parse(await api.query.assemblyPallet.currentMinistersList());
     // eslint-disable-next-line no-console
-    console.log('ministersList', ministersList);
+    console.log('getMinistersRpc', ministersList);
+
+    if (Object.keys(ministersList).length === 0) return { finaleObject: [], liberStakeAmount: 0 };
 
     const liberStakeAmount = Object.values(ministersList)
-      .reduce((acum, curVal) => acum + matchPowHelper(curVal));
+      .reduce((acum, curVal) => (acum + matchPowHelper(roughScale(curVal, 16))), 0);
 
     let finaleObject = [];
     let i = 1;
@@ -263,14 +266,16 @@ const getMinistersRpc = async () => {
           deputies: truncate(JSON.parse(prop).pasportId, 10),
           supported: `${prettyNumber(ministersList[prop])}`,
           // eslint-disable-next-line max-len
-          power: ((matchPowHelper(ministersList[prop]) * 100) / liberStakeAmount).toFixed(2),
+          power: liberStakeAmount !== 0
+            ? ((matchPowHelper(ministersList[prop]) * 100) / liberStakeAmount)
+              .toFixed(2)
+            : 100,
         }];
         i += 1;
       }
     }
     finaleObject.sort((a, b) => (a.power < b.power ? 1 : -1));
-
-    return finaleObject;
+    return { finaleObject, liberStakeAmount };
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
@@ -288,7 +293,7 @@ const sendLawProposal = async (data, callback) => {
     types: {
       law_hash: 'Hash',
       LawType: {
-        _enum: ['ConstitutionalChange', 'Edict'],
+        _enum: ['ConstitutionalChange', 'Legislation', 'Decision'],
       },
     },
   });
@@ -321,7 +326,7 @@ const getProposalHashesRpc = async (hashesNotDraft, callback) => {
           _enum: ['Approved', 'InProgress', 'Declined'],
         },
         LawType: {
-          _enum: ['ConstitutionalChange', 'Edict'],
+          _enum: ['ConstitutionalChange', 'Legislation', 'Decision'],
         },
         Law: {
           state: 'LawState',
@@ -331,7 +336,11 @@ const getProposalHashesRpc = async (hashesNotDraft, callback) => {
     });
     const newStatuses = await hashesNotDraft.map(async (el) => {
       const state = await api.query.assemblyPallet.laws(el.docHash)
-        .then((value) => value.toString().split(',')[0].split('":"')[1].split('"')[0]);
+        .then((value) => {
+          // eslint-disable-next-line no-console
+          console.log('api.query.assemblyPallet.laws', value.toString());
+          return value.toString().split(',')[0].split('":"')[1].split('"')[0];
+        });
       return ({
         docHash: el.docHash,
         state,
@@ -369,9 +378,6 @@ const getUserRoleRpc = async () => {
     });
     const ministersList = JSON.stringify(await api.query.assemblyPallet.currentMinistersList());
     const passportId = await api2.query.identityPallet.passportIds(accountAddress);
-
-    // eslint-disable-next-line no-console
-    console.log('ministersList', ministersList);
 
     if (ministersList.includes(passportId.toString())) {
       return {
@@ -416,7 +422,7 @@ const getStatusProposalRpc = async (hash, callback) => {
           _enum: ['Approved', 'InProgress', 'Declined'],
         },
         LawType: {
-          _enum: ['ConstitutionalChange', 'Edict'],
+          _enum: ['ConstitutionalChange', 'Legislation', 'Decision'],
         },
         Law: {
           state: 'LawState',
@@ -438,21 +444,6 @@ const getCurrentBlockNumberRpc = async () => {
     const api = await ApiPromise.create({ provider });
     const bestNumber = await api.derive.chain.bestNumber();
     return (bestNumber.toNumber());
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('error', e);
-  }
-  return null;
-};
-
-const getLiberStakeAmountRpc = async () => {
-  try {
-    // const api = await ApiPromise.create({ provider });
-    // const liberStakeAmount = await api.query.assemblyPallet.liberStakeAmount();
-    const liberStakeAmount = 0;
-    // eslint-disable-next-line no-console
-    console.log('liberStakeAmount', liberStakeAmount.toString());
-    return (matchPowHelper(liberStakeAmount.toString()));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
@@ -501,7 +492,6 @@ export {
   getPeriodAndVotingDurationRpc,
   getStatusProposalRpc,
   getCurrentBlockNumberRpc,
-  getLiberStakeAmountRpc,
   getProposalHashesRpc,
   voteByProposalRpc,
 };

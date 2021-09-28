@@ -58,9 +58,10 @@ const AddNewDraftModal = ({
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.h3}>Add New Draft</div>
       <div className={styles.title}>Select type of Draft</div>
-      <select {...register('draft_type')} required>
+      <select className={styles.draftTypes} {...register('draft_type')} required>
         <option value="ConstitutionalChange">Constitutional Change</option>
-        <option value="Edict">Edict</option>
+        <option value="Legislation">Legislation</option>
+        <option value="Decision">Decision</option>
       </select>
       <div className={styles.title}>Proposal name</div>
       <TextInput
@@ -107,18 +108,20 @@ const AddNewDraftModal = ({
               <Controller
                 render={({ field }) => (
                   <div {...getRootProps()} className={styles.dropZone}>
-                    <input {...getInputProps({
-                      onChange: async (e) => {
-                        // const base64 = await File.toBase64(e.target.files[0]);
-                        field.onChange(e.target.files[0]);
-                        setIsFileSelected(true);
-                      },
-                    })}
+                    <input
+                      {...getInputProps({
+                        onChange: async (e) => {
+                          // const base64 = await File.toBase64(e.target.files[0]);
+                          field.onChange(e.target.files[0]);
+                          setIsFileSelected(true);
+                        },
+                      })}
                     />
                   </div>
                 )}
                 name="file"
                 control={control}
+                required
               />
             </>
           )

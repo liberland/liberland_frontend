@@ -115,6 +115,7 @@ function* updateAllProposalsWorker() {
     } = yield api.post('/assembly/update_all_proposals', { hashesAllProposals });
     yield put(assemblyActions.updateAllProposals.success(proposals));
     yield put(assemblyActions.getMyProposals.call());
+    yield put(assemblyActions.getAllSendProposals.call());
   } catch (e) {
     yield put(assemblyActions.updateAllProposals.failure(e));
   }

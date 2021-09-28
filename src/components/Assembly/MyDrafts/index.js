@@ -5,8 +5,8 @@ import Button from '../../Button/Button';
 
 import ProgressBar from '../../ProgressBar';
 
-import { assemblyActions, votingActions } from '../../../redux/actions';
-import { assemblySelectors } from '../../../redux/selectors';
+import { assemblyActions } from '../../../redux/actions';
+import { assemblySelectors, votingSelectors } from '../../../redux/selectors';
 
 import styles from './styles.module.scss';
 import { ReactComponent as PassedImage } from '../../../assets/icons/passed.svg';
@@ -21,6 +21,7 @@ const MyDrafts = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedDraft, setSelectedDraft] = useState({});
   const dispatch = useDispatch();
+  const liberStakeAmount = useSelector(votingSelectors.selectorLiberStakeAmount);
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
 
@@ -45,21 +46,22 @@ const MyDrafts = () => {
       thread_link,
       draft_type,
     } = values;
+    if (file) {
+      const data = {
+        file: await toBase64(file),
+        linkToGoogleDocument: link_to_Google_document,
+        proposalName: proposal_name,
+        shortDescription: short_description,
+        threadLink: thread_link,
+        requiredAmountLlm: liberStakeAmount,
+        currentLlm: null,
+        votingHourLeft: null,
+        draftType: draft_type,
+      };
 
-    const data = {
-      file: await toBase64(file),
-      linkToGoogleDocument: link_to_Google_document,
-      proposalName: proposal_name,
-      shortDescription: short_description,
-      threadLink: thread_link,
-      requiredAmountLlm: null,
-      currentLlm: null,
-      votingHourLeft: null,
-      draftType: draft_type,
-    };
-
-    dispatch(assemblyActions.addMyDraft.call({ data }));
-    handleModalOpen();
+      dispatch(assemblyActions.addMyDraft.call({ data }));
+      handleModalOpen();
+    }
   };
 
   const handleEdit = async (draft, file) => {
@@ -80,6 +82,7 @@ const MyDrafts = () => {
       proposalName: proposal_name,
       shortDescription: short_description,
       threadLink: thread_link,
+      requiredAmountLlm: liberStakeAmount,
     };
 
     dispatch(assemblyActions.editDraft.call(data));
@@ -127,7 +130,6 @@ const MyDrafts = () => {
 
   useEffect(() => {
     dispatch(assemblyActions.getMyProposals.call());
-    dispatch(votingActions.getLiberStakeAmount.call());
   }, [dispatch]);
 
   return (

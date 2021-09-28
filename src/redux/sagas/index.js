@@ -10,6 +10,7 @@ export default function* rootSaga() {
     authSagas.signInWatcher(),
     authSagas.verifySessionWatcher(),
     authSagas.signOutWatcher(),
+    authSagas.initGetDataFromNodeWatcher(),
 
     // WALLET
     walletSagas.getWalletWatcher(),
@@ -35,6 +36,5 @@ export default function* rootSaga() {
     votingSagas.getMinistersListWatcher(),
     votingSagas.getPeriodAndVotingDurationWatcher(),
     votingSagas.getCurrentBlockNumberWatcher(),
-    votingSagas.getLiberStakeAmountWatcher(),
   ]);
 }
