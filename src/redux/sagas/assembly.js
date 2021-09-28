@@ -125,9 +125,9 @@ function* voteByProposalWorker(action) {
   try {
     const { docHash } = action.payload;
     yield cps(voteByProposalRpc, docHash);
-    yield put(assemblyActions.updateAllProposals.success());
+    yield put(assemblyActions.voteByProposal.success());
   } catch (e) {
-    yield put(assemblyActions.updateAllProposals.failure(e));
+    yield put(assemblyActions.voteByProposal.failure(e));
   }
 }
 
