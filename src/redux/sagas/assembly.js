@@ -10,7 +10,13 @@ import {
 } from '../selectors';
 
 import api from '../../api';
-import { sendLawProposal, voteByProposalRpc, getProposalHashesRpc } from '../../api/nodeRpcCall';
+import {
+  sendLawProposal,
+  voteByProposalRpc,
+  getProposalHashesRpc,
+  getCurrentPowerProposalRpc,
+  getStatusProposalRpc,
+} from '../../api/nodeRpcCall';
 
 // WORKERS
 function* addMyDraftWorker(action) {
@@ -46,15 +52,17 @@ function* submitProposalWorker(action) {
       return;
     }
     const requiredAmountLlm = yield select(votingSelectors.selectorLiberStakeAmount);
+    const proposalStatus = yield cps(getStatusProposalRpc, data.hash);
 
     const result = yield api.patch('/assembly/update_status_proposal',
       {
         hash: data.hash,
-        status: 'InProgress',
+        status: proposalStatus.state,
         requiredAmountLlm,
         currentLlm: 0,
         votingHourLeft: 72,
         nodeIdProposel: 'NoNeed',
+        draftType: proposalStatus.lawType,
       });
     yield put(assemblyActions.submitProposal.success());
     // eslint-disable-next-line no-console
@@ -124,8 +132,13 @@ function* updateAllProposalsWorker() {
 function* voteByProposalWorker(action) {
   try {
     const { docHash } = action.payload;
-    yield cps(voteByProposalRpc, docHash);
-    yield put(assemblyActions.voteByProposal.success());
+    const result = yield cps(voteByProposalRpc, action.payload);
+    if (result === 'done') {
+      const votePower = yield cps(getCurrentPowerProposalRpc, docHash);
+      yield api.patch('/assembly/update_power_proposal', { docHash, votePower });
+      yield put(assemblyActions.voteByProposal.success());
+    }
+    yield put(assemblyActions.voteByProposal.failure());
   } catch (e) {
     yield put(assemblyActions.voteByProposal.failure(e));
   }
