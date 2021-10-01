@@ -3,6 +3,7 @@ import * as authSagas from './auth';
 import * as walletSagas from './wallet';
 import * as assemblySagas from './assembly';
 import * as votingSagas from './voting';
+import * as lawSagas from './law';
 
 export default function* rootSaga() {
   yield all([
@@ -36,5 +37,6 @@ export default function* rootSaga() {
     votingSagas.getMinistersListWatcher(),
     votingSagas.getPeriodAndVotingDurationWatcher(),
     votingSagas.getCurrentBlockNumberWatcher(),
+    lawSagas.getCurrentLawsWatcher(),
   ]);
 }
