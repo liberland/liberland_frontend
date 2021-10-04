@@ -34,18 +34,8 @@ const SignIn = () => {
 
   useEffect(() => {
     if (apiError) {
-      setError([
-        {
-          type: '',
-          name: 'email',
-          message: apiError.data.error,
-        },
-        {
-          type: '',
-          name: 'password',
-          message: '',
-        },
-      ]);
+      setError('email',
+        apiError.data.error);
     }
   }, [apiError, setError, dispatch]);
 
