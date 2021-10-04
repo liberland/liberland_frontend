@@ -336,11 +336,7 @@ const getProposalHashesRpc = async (hashesNotDraft, callback) => {
     });
     const newStatuses = await hashesNotDraft.map(async (el) => {
       const state = await api.query.assemblyPallet.laws(el.docHash)
-        .then((value) => {
-          // eslint-disable-next-line no-console
-          console.log('api.query.assemblyPallet.laws', value.toString());
-          return value.toString().split(',')[0].split('":"')[1].split('"')[0];
-        });
+        .then((value) => value.toString().split(',')[0].split('":"')[1].split('"')[0]);
       return ({
         docHash: el.docHash,
         state,
@@ -451,7 +447,8 @@ const getCurrentBlockNumberRpc = async () => {
   return null;
 };
 
-const voteByProposalRpc = async (docHash, callback) => {
+const voteByProposalRpc = async (data, callback) => {
+  const { docHash, decision } = data;
   const allAccounts = await web3Accounts();
   const accountAddress = allAccounts[0].address;
   const injector = await web3FromAddress(accountAddress);
@@ -459,11 +456,13 @@ const voteByProposalRpc = async (docHash, callback) => {
     provider,
     types: {
       law_hash: 'Sha256',
+      Decision: {
+        _enum: ['Accept', 'Decline'],
+      },
     },
   });
-
   await api.tx.assemblyPallet
-    .voteToLaw(docHash)
+    .voteToLaw(docHash, decision)
     .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
       if (status.isInBlock) {
         // eslint-disable-next-line no-console
@@ -475,6 +474,24 @@ const voteByProposalRpc = async (docHash, callback) => {
       console.log(':( transaction failed', error);
       callback(error);
     });
+};
+
+const getCurrentPowerProposalRpc = async (docHash, callback) => {
+  const api = await ApiPromise.create({
+    provider,
+    types: {
+      law_hash: 'Sha256',
+      VotingSettings: {
+        result: 'u64',
+        voting_duration: 'BlockNumber',
+        submitted_height: 'BlockNumber',
+      },
+    },
+  });
+
+  let power = await api.query.votingPallet.activeVotings(docHash);
+  power = matchPowHelper(JSON.parse(power).result * 1);
+  callback(null, power);
 };
 
 export {
@@ -494,4 +511,5 @@ export {
   getCurrentBlockNumberRpc,
   getProposalHashesRpc,
   voteByProposalRpc,
+  getCurrentPowerProposalRpc,
 };

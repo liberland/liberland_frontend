@@ -63,13 +63,16 @@ const LegislationVotes = () => {
   //   },
   // ]);
 
-  const onDecline = (id) => {
+  const onDecline = (id, docHash) => {
     setData(data.map((el) => (el.id === id ? { ...el, status: 'declined' } : el)));
+    const decision = 'Decline';
+    dispatch(assemblyActions.voteByProposal.call({ docHash, decision }));
   };
 
   const onSupport = (id, docHash) => {
     setData(data.map((el) => (el.id === id ? { ...el, status: 'supported' } : el)));
-    dispatch(assemblyActions.voteByProposal.call({ docHash }));
+    const decision = 'Accept';
+    dispatch(assemblyActions.voteByProposal.call({ docHash, decision }));
   };
 
   const columns = useMemo(
