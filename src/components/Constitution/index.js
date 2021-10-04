@@ -11,12 +11,21 @@ import { lawSelectors } from '../../redux/selectors';
 
 const Constitution = () => {
   // eslint-disable-next-line no-unused-vars
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const articles = useSelector(lawSelectors.currentLawsSelector);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const allArticles = useSelector(lawSelectors.currentLawsSelector);
   const constitutionalChange = useSelector(lawSelectors.constitutionalChangeSelector);
   const legislation = useSelector(lawSelectors.legislationSelector);
   const decision = useSelector(lawSelectors.decisionSelector);
   const dispatch = useDispatch();
+
+  const selectedArticles = (selected) => {
+    switch (selected) {
+      case 'ConstitutionalChange': return constitutionalChange;
+      case 'Legislation': return legislation;
+      case 'Decision': return decision;
+      default: return allArticles;
+    }
+  };
 
   const categories = [
     {
@@ -24,28 +33,26 @@ const Constitution = () => {
       title: 'Constitutional change',
       amountArticle: constitutionalChange.length,
       type: 'blue',
-      articles: constitutionalChange,
     },
     {
       id: 'Legislation',
       title: 'Legislation',
       amountArticle: legislation.length,
       type: 'green',
-      articles: legislation,
     },
     {
       id: 'Decision',
       title: 'Decision',
       amountArticle: decision.length,
       type: 'yellow',
-      articles: decision,
     },
   ];
 
-  // eslint-disable-next-line no-console
-  const getCategoryType = (categoryId) => (console.log('categoryId', categoryId));
-
-  const getArticles = () => articles;
+  const articlesColor = {
+    ConstitutionalChange: 'blue',
+    Legislation: 'green',
+    Decision: 'yellow',
+  };
 
   useEffect(() => {
     dispatch(lawsActions.getCurrentLaws.call());
@@ -54,10 +61,10 @@ const Constitution = () => {
   return (
     <div className={styles.constitution}>
       <Card title="Main Articles" className={styles.article}>
-        { articles && (getArticles().map((article) => (
+        { selectedArticles() && (selectedArticles(selectedCategory).map((article) => (
           <Article
             key={article.id}
-            type={getCategoryType(article.categoryId)}
+            type={articlesColor[article.draftType]}
             article={article}
           />
         )))}
