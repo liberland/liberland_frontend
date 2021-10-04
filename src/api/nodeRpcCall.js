@@ -1,7 +1,6 @@
 import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
 import prettyNumber from '../utils/prettyNumber';
 import matchPowHelper from '../utils/matchPowHelper';
-import truncate from '../utils/truncate';
 import roughScale from '../utils/roughScale';
 
 import citizenAddressList from '../constants/citizenAdressList';
@@ -263,7 +262,7 @@ const getMinistersRpc = async () => {
         finaleObject = [...finaleObject, {
           id: i,
           place: i,
-          deputies: truncate(JSON.parse(prop).pasportId, 10),
+          deputies: JSON.parse(prop).pasportId,
           supported: `${prettyNumber(ministersList[prop])}`,
           // eslint-disable-next-line max-len
           power: liberStakeAmount !== 0
@@ -494,6 +493,18 @@ const getCurrentPowerProposalRpc = async (docHash, callback) => {
   callback(null, power);
 };
 
+const getUserPassportId = async () => {
+  const allAccounts = await web3Accounts();
+  const accountAddress = allAccounts[0].address;
+  const api = await ApiPromise.create({
+    provider,
+    types: {
+      PassportId: '[u8; 32]',
+    },
+  });
+  return api.query.identityPallet.passportIds(accountAddress);
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -512,4 +523,5 @@ export {
   getProposalHashesRpc,
   voteByProposalRpc,
   getCurrentPowerProposalRpc,
+  getUserPassportId,
 };
