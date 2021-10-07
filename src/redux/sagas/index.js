@@ -4,6 +4,7 @@ import * as walletSagas from './wallet';
 import * as assemblySagas from './assembly';
 import * as votingSagas from './voting';
 import * as lawSagas from './law';
+import * as blockchainSagas from './blockchain';
 
 export default function* rootSaga() {
   yield all([
@@ -12,6 +13,10 @@ export default function* rootSaga() {
     authSagas.verifySessionWatcher(),
     authSagas.signOutWatcher(),
     authSagas.initGetDataFromNodeWatcher(),
+
+    // // BLOCKCHAIN
+    blockchainSagas.fetchBlockNumberWatcher(),
+    blockchainSagas.getPeriodAndVotingDurationWatcher(),
 
     // WALLET
     walletSagas.getWalletWatcher(),
@@ -35,8 +40,6 @@ export default function* rootSaga() {
     votingSagas.sendElectoralSheetWatcher(),
     votingSagas.setIsVotingInProgressWatcher(),
     votingSagas.getMinistersListWatcher(),
-    votingSagas.getPeriodAndVotingDurationWatcher(),
-    votingSagas.getCurrentBlockNumberWatcher(),
     lawSagas.getCurrentLawsWatcher(),
   ]);
 }

@@ -7,12 +7,17 @@ import { ReactComponent as UserCongressional } from '../../../assets/icons/user-
 
 import styles from './styles.module.scss';
 import { votingActions } from '../../../redux/actions';
-import { votingSelectors } from '../../../redux/selectors';
+import { votingSelectors, blockchainSelectors } from '../../../redux/selectors';
 
 // eslint-disable-next-line react/prop-types
 const CongressionalAssemblyElectionsHeader = ({ handlerOnClickApplyMyCandidacy }) => {
   const isVotingInProgress = useSelector(votingSelectors.selectorIsVotingInProgress);
-  const currentNumVoting = useSelector(votingSelectors.selectorNumberCongressionalAssemble);
+  const currentNumVoting = useSelector(blockchainSelectors.eraOfElectionSelector);
+  const endOfElection = useSelector(blockchainSelectors.endElectionsAssemblySelector);
+
+  const options = {
+    year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
+  };
 
   const dispatch = useDispatch();
 
@@ -40,7 +45,9 @@ const CongressionalAssemblyElectionsHeader = ({ handlerOnClickApplyMyCandidacy }
           </h3>
         </div>
         <span className={styles.headCongressionalSecondItem}>
-          Election finishes 12th of July 2021
+          Election finishes
+          {' '}
+          {new Intl.DateTimeFormat('en-US', options).format(endOfElection)}
         </span>
       </div>
       <Button primary className={styles.upcomingVotings} onClick={handlerOnClickApplyMyCandidacy}>

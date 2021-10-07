@@ -3,6 +3,7 @@ import * as walletActions from './wallet';
 import * as assemblyActions from './assembly';
 import * as votingActions from './voting';
 import * as lawsActions from './law';
+import * as blockchainActions from './blockchain';
 
 export {
   authActions,
@@ -10,4 +11,5 @@ export {
   assemblyActions,
   votingActions,
   lawsActions,
+  blockchainActions,
 };

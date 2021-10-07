@@ -7,7 +7,6 @@ export const {
   sendElectoralSheet,
   setIsVotingInProgress,
   getMinistersList,
-  getPeriodAndVotingDuration,
   getCurrentBlockNumber,
   getLiberStakeAmount,
 } = createActions({
@@ -37,11 +36,6 @@ export const {
     failure: undefined,
   },
   GET_MINISTERS_LIST: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  GET_PERIOD_AND_VOTING_DURATION: {
     call: undefined,
     success: undefined,
     failure: undefined,

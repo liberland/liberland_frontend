@@ -7,8 +7,6 @@ const initialState = {
   electoralSheet: [],
   isVotingInProgress: false,
   ministersList: [],
-  periodAndVotingDuration: {},
-  currentBlockNumber: 0,
   liberStakeAmount: 0,
 };
 
@@ -40,10 +38,6 @@ const votingReducer = handleActions(
     [votingActions.getMinistersList.success]: (state, action) => ({
       ...state,
       ministersList: action.payload,
-    }),
-    [votingActions.getPeriodAndVotingDuration.success]: (state, action) => ({
-      ...state,
-      periodAndVotingDuration: action.payload,
     }),
     [votingActions.getCurrentBlockNumber.success]: (state, action) => ({
       ...state,

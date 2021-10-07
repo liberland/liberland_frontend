@@ -6,7 +6,9 @@ import {
 import { web3Enable } from '@polkadot/extension-dapp';
 
 import { getUserRoleRpc, getUserPassportId } from '../../api/nodeRpcCall';
-import { authActions, votingActions, walletActions } from '../actions';
+import {
+  authActions, votingActions, walletActions, blockchainActions,
+} from '../actions';
 import routes from '../../router';
 import api from '../../api';
 
@@ -19,6 +21,7 @@ function* signInWorker(action) {
       user.role = yield call(getUserRoleRpc);
       user.passportId = yield call(getUserPassportId);
       yield put(authActions.signIn.success(user));
+      yield put(blockchainActions.getCurrentBlockNumber.call());
       yield call(history.push, routes.home.index);
     } else {
       yield put(authActions.signIn.failure());
@@ -38,6 +41,7 @@ function* verifySessionWorker() {
     }
     if (success) {
       yield put(authActions.verifySession.success(user));
+      yield put(blockchainActions.getCurrentBlockNumber.call());
     } else {
       throw new Error();
     }
@@ -57,7 +61,7 @@ function* signOutWorker() {
 
 function* initGetDataFromNodeWorker() {
   yield put(walletActions.getWallet.call());
-  yield put(votingActions.getPeriodAndVotingDuration.call());
+  yield put(blockchainActions.getPeriodAndVotingDuration.call());
   yield put(votingActions.getMinistersList.call());
 }
 

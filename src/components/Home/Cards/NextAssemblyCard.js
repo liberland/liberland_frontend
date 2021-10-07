@@ -1,9 +1,10 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { votingActions } from '../../../redux/actions';
 
+import { blockchainSelectors } from '../../../redux/selectors';
 import Card from '../../Card';
 import Button from '../../Button/Button';
 
@@ -20,11 +21,15 @@ const NextAssemblyCard = () => {
     history.push(router.voting.currentCongressional.replace(':id', '1'));
   };
 
+  const dateOfElections = new Date(useSelector(blockchainSelectors.startElectionsAssemblySelector));
+  const options = {
+    year: 'numeric', month: 'long', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
+  };
   return (
     <>
       <Card className={styles.getCitizenshipCard}>
         <img src={Matte} alt="speaker" />
-        <h3>24th June 2021</h3>
+        <h3>{new Intl.DateTimeFormat('en-US', options).format(dateOfElections)}</h3>
         <p>Next Congressional assembly date coming soon</p>
         <Button primary small onClick={handleClick}>View</Button>
       </Card>

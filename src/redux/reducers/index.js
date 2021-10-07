@@ -5,6 +5,7 @@ import walletReducer from './wallet';
 import assemblyReducer from './assembly';
 import votingReducer from './voting';
 import lawReducer from './law';
+import blockchainReducer from './blockchain';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   assembly: assemblyReducer,
   voting: votingReducer,
   law: lawReducer,
+  blockchain: blockchainReducer,
 });
 
 export default rootReducer;
