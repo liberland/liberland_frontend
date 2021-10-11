@@ -39,10 +39,6 @@ const votingReducer = handleActions(
       ...state,
       ministersList: action.payload,
     }),
-    [votingActions.getCurrentBlockNumber.success]: (state, action) => ({
-      ...state,
-      currentBlockNumber: action.payload,
-    }),
     [votingActions.getLiberStakeAmount.success]: (state, action) => ({
       ...state,
       liberStakeAmount: action.payload,

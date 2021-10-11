@@ -7,7 +7,6 @@ export const {
   sendElectoralSheet,
   setIsVotingInProgress,
   getMinistersList,
-  getCurrentBlockNumber,
   getLiberStakeAmount,
 } = createActions({
   ADD_MY_CANDIDACY: {
@@ -36,11 +35,6 @@ export const {
     failure: undefined,
   },
   GET_MINISTERS_LIST: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  GET_CURRENT_BLOCK_NUMBER: {
     call: undefined,
     success: undefined,
     failure: undefined,

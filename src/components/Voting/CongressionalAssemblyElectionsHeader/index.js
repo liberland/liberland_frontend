@@ -24,7 +24,6 @@ const CongressionalAssemblyElectionsHeader = ({ handlerOnClickApplyMyCandidacy }
   useEffect(() => {
     const timerId = setInterval(() => {
       dispatch(votingActions.setIsVotingInProgress.call());
-      dispatch(votingActions.getCurrentBlockNumber.call());
       dispatch(votingActions.getListOfCandidacy.call());
       dispatch(votingActions.getLiberStakeAmount.call());
     }, 6000);

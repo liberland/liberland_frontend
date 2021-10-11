@@ -7,6 +7,7 @@ const initialState = {
     assemblyVotingDuration: 0,
     assemblyVotingPeriod: 0,
   },
+  electionsBlock: 0,
 };
 
 const blockchainReducer = handleActions({
@@ -21,6 +22,10 @@ const blockchainReducer = handleActions({
   [blockchainActions.getCurrentBlockNumber.failure]: (state, action) => ({
     ...state,
     currentBlockNumber: action.payload,
+  }),
+  [blockchainActions.setElectionsBlock.success]: (state, action) => ({
+    ...state,
+    electionsBlock: action.payload,
   }),
 }, initialState);
 
