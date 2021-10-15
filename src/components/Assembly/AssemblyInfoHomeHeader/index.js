@@ -33,7 +33,7 @@ const AssemblyInfoHomeHeader = () => {
       <div className={styles.infoBox}>
         <AssemblyStakedOnYou />
         <div className={styles.rightSideInfobox}>
-          <p>Staked on you</p>
+          <p>Your support</p>
           <div>
             <span>{`${currentMinister?.supported} LLM`}</span>
             <ArrowGrowDownRed />
