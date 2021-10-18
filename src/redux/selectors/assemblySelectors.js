@@ -22,9 +22,27 @@ const allProposalsInProgressSelector = createSelector(
   (reducer) => (reducer.filter((proposal) => proposal.proposalStatus === 'InProgress')),
 );
 
+const constitutionalChangeSelector = createSelector(
+  assemblyReducer,
+  (reducer) => reducer.constitutionalChange,
+);
+
+const legislationSelector = createSelector(
+  assemblyReducer,
+  (reducer) => reducer.legislation,
+);
+
+const decisionSelector = createSelector(
+  assemblyReducer,
+  (reducer) => reducer.decision,
+);
+
 export {
   isDraftSendSelector,
   proposalsSelector,
   allSendProposalsSelector,
   allProposalsInProgressSelector,
+  constitutionalChangeSelector,
+  legislationSelector,
+  decisionSelector,
 };

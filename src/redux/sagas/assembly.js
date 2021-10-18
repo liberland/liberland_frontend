@@ -163,6 +163,22 @@ function* editDraftWorker(action) {
   }
 }
 
+function* getProposalsInProgressByTypeWorker(action) {
+  try {
+    const { data: { proposals } } = yield call(api.get, 'assembly/get_in_progress_proposals/', { params: { draftType: action.payload } });
+    switch (action.payload) {
+      case 'ConstitutionalChange': yield put(assemblyActions.getConstitutionalChange.success(proposals)); break;
+      case 'Legislation': yield put(assemblyActions.getLegislation.success(proposals)); break;
+      case 'Decision': yield put(assemblyActions.getDecision.success(proposals)); break;
+      default: yield put(assemblyActions.setGotSomeError.failure(`Unknown type of proposal ${action.payload}`));
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('e', e);
+    yield put(assemblyActions.setGotSomeError.failure(e));
+  }
+}
+
 // WATCHERS
 
 function* addMyDraftWatcher() {
@@ -229,6 +245,33 @@ function* voteByProposalWatcher() {
   }
 }
 
+function* getConstitutionalChangeWatcher() {
+  try {
+    yield takeLatest(
+      assemblyActions.getConstitutionalChange.call,
+      getProposalsInProgressByTypeWorker,
+    );
+  } catch (e) {
+    yield put(assemblyActions.getConstitutionalChange.failure(e));
+  }
+}
+
+function* getLegislationWatcher() {
+  try {
+    yield takeLatest(assemblyActions.getLegislation.call, getProposalsInProgressByTypeWorker);
+  } catch (e) {
+    yield put(assemblyActions.getLegislation.failure(e));
+  }
+}
+
+function* getDecisionWatcher() {
+  try {
+    yield takeLatest(assemblyActions.getDecision.call, getProposalsInProgressByTypeWorker);
+  } catch (e) {
+    yield put(assemblyActions.getDecision.failure(e));
+  }
+}
+
 export {
   addMyDraftWatcher,
   getMyProposalsWatcher,
@@ -238,4 +281,7 @@ export {
   getByHashesWatcher,
   updateAllProposalsWatcher,
   voteByProposalWatcher,
+  getConstitutionalChangeWatcher,
+  getLegislationWatcher,
+  getDecisionWatcher,
 };

@@ -6,19 +6,19 @@ import ProposalsVoteTable from '../ProposalsVoteTable';
 import { assemblySelectors } from '../../../redux/selectors';
 import { assemblyActions } from '../../../redux/actions';
 
-const Legislation = () => {
+const ConstitutionalChange = () => {
   const dispatch = useDispatch();
-  const legislationProposals = useSelector(assemblySelectors.legislationSelector);
+  const constitutionalChangeProposals = useSelector(assemblySelectors.constitutionalChangeSelector);
 
   useEffect(() => {
-    dispatch(assemblyActions.getLegislation.call('Legislation'));
+    dispatch(assemblyActions.getConstitutionalChange.call('ConstitutionalChange'));
   }, [dispatch]);
 
   return (
     <div>
-      <ProposalsVoteTable currentProposals={legislationProposals} />
+      <ProposalsVoteTable currentProposals={constitutionalChangeProposals} />
     </div>
   );
 };
 
-export default Legislation;
+export default ConstitutionalChange;

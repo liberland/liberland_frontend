@@ -9,6 +9,11 @@ const navigationList = [
     title: 'My drafts',
   },
   {
+    route: router.assembly.constitutionalChangeVotes,
+    title: 'Constitutional Change Votes',
+
+  },
+  {
     route: router.assembly.legislationVotes,
     title: 'Legislation votes',
 
