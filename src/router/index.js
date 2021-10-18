@@ -26,6 +26,7 @@ export default {
   },
   assembly: {
     myDrafts: '/home/assembly/my-drafts',
+    constitutionalChangeVotes: '/home/assembly/constitutional-change-votes',
     legislationVotes: '/home/assembly/legislation-votes',
     decisionVotes: '/home/assembly/decision-votes',
     voteHistory: '/home/assembly/vote-history',

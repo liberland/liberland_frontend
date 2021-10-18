@@ -36,6 +36,9 @@ export default function* rootSaga() {
     assemblySagas.editDraftWatcher(),
     assemblySagas.updateAllProposalsWatcher(),
     assemblySagas.voteByProposalWatcher(),
+    assemblySagas.getConstitutionalChangeWatcher(),
+    assemblySagas.getLegislationWatcher(),
+    assemblySagas.getDecisionWatcher(),
 
     // VOTING
     votingSagas.addMyCandidacyWatcher(),

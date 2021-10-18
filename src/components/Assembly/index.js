@@ -5,7 +5,9 @@ import {
 
 import AssemblyHeader from './AssemblyHeader';
 import MyDrafts from './MyDrafts';
-import LegislationVotes from './LegislationVotes';
+import ConstitutionalChange from './ConstitutionalChange';
+import Legislation from './LegislationVotes';
+import Decision from './Decision';
 import VoteHistory from './VoteHistory';
 import PMElection from './PMElection';
 import styles from './styles.module.scss';
@@ -23,11 +25,15 @@ const Assembly = () => (
       />
       <Route
         path={router.assembly.legislationVotes}
-        component={LegislationVotes}
+        component={Legislation}
+      />
+      <Route
+        path={router.assembly.constitutionalChangeVotes}
+        component={ConstitutionalChange}
       />
       <Route
         path={router.assembly.decisionVotes}
-        component={() => <div>Decision votes</div>}
+        component={Decision}
       />
       <Route
         path={router.assembly.voteHistory}

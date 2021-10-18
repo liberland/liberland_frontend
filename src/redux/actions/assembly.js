@@ -10,6 +10,10 @@ export const {
   updateAllProposals,
   getAllSendProposals,
   voteByProposal,
+  getConstitutionalChange,
+  getLegislation,
+  getDecision,
+  setGotSomeError,
 } = createActions({
   ADD_MY_DRAFT: {
     call: undefined,
@@ -54,6 +58,24 @@ export const {
   VOTE_BY_PROPOSAL: {
     call: undefined,
     success: undefined,
+    failure: undefined,
+  },
+  GET_CONSTITUTIONAL_CHANGE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_LEGISLATION: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_DECISION: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SET_GOT_SOME_ERROR: {
     failure: undefined,
   },
 });
