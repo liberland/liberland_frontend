@@ -1,16 +1,16 @@
 body {
   margin: 0;
-  font-family: 'Inter';
+  font-family: "Inter";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-p{
+p {
   margin: 0;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
@@ -18,8 +18,8 @@ code {
   position: fixed;
   left: 0;
   top: 0;
-  overflow-y:scroll;
-  overflow-x:scroll;
+  overflow-y: scroll;
+  overflow-x: scroll;
 
   &.active {
     width: 100%;

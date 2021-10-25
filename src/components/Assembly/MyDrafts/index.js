@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Card from '../../Card';
 import Button from '../../Button/Button';
-
+import ProposalDetailsModal from '../../Modals/ProposalDetailsModal';
 import ProgressBar from '../../ProgressBar';
 
 import { assemblyActions } from '../../../redux/actions';
@@ -19,11 +19,30 @@ import { AddNewDraftModal, EditDraftModal } from '../../Modals';
 const MyDrafts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [selectedDraft, setSelectedDraft] = useState({});
+  const [proposalModalProps, setproposalModalProps] = useState({});
   const dispatch = useDispatch();
   const liberStakeAmount = useSelector(votingSelectors.selectorLiberStakeAmount);
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
+
+  const handleProposalModalOpen = ({
+    proposalName,
+    proposalStatus,
+    shortDescription,
+    threadLink,
+    id,
+  }) => {
+    setIsProposalModalOpen(!isProposalModalOpen);
+    setproposalModalProps({
+      proposalName,
+      proposalStatus,
+      shortDescription,
+      threadLink,
+      id,
+    });
+  };
 
   const handleEditModalOpen = (draft) => {
     setIsEditModalOpen(!isEditModalOpen);
@@ -197,7 +216,14 @@ const MyDrafts = () => {
                   currentValue={draft.currentLlm}
                 />
                 <div className={styles.editButtonStatus}>
-                  <Button nano grey className={styles.detailsButton}>details</Button>
+                  <Button
+                    nano
+                    grey
+                    className={styles.detailsButton}
+                    onClick={() => handleProposalModalOpen(draft)}
+                  >
+                    details
+                  </Button>
                   {viewStatus(draft)}
                 </div>
               </>
@@ -217,6 +243,16 @@ const MyDrafts = () => {
           closeModal={handleEditModalOpen}
           draft={selectedDraft}
           closeEditModal={handleEditModalOpen}
+        />
+      )}
+      {isProposalModalOpen && (
+        <ProposalDetailsModal
+          closeModal={handleProposalModalOpen}
+          proposalName={proposalModalProps.proposalName}
+          proposalStatus={proposalModalProps.proposalStatus}
+          shortDescription={proposalModalProps.shortDescription}
+          threadLink={proposalModalProps.threadLink}
+          proposalId={proposalModalProps.id}
         />
       )}
     </Card>
