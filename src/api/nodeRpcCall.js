@@ -505,6 +505,8 @@ const getUserPassportId = async () => {
   return api.query.identityPallet.passportIds(accountAddress);
 };
 
+const getAllWalletsRpc = async () => web3Accounts();
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -524,4 +526,5 @@ export {
   voteByProposalRpc,
   getCurrentPowerProposalRpc,
   getUserPassportId,
+  getAllWalletsRpc,
 };

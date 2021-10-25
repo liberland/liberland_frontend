@@ -16,6 +16,7 @@ function* signInWorker(action) {
   try {
     const { credentials, history } = action.payload;
     const { data: user } = yield call(api.post, '/users/signin', credentials);
+    yield put(blockchainActions.setUserWallet.success(credentials.wallet_address));
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc);

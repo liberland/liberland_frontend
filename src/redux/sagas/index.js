@@ -20,6 +20,7 @@ export default function* rootSaga() {
     blockchainSagas.setElectionsBlockWatcher(),
     blockchainSagas.runSetElectionsBlockWorker(),
     blockchainSagas.updateDateElectionsWatcher(),
+    blockchainSagas.getAllWalletsWatcher(),
 
     // WALLET
     walletSagas.getWalletWatcher(),
