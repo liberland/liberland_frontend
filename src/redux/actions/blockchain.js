@@ -5,6 +5,8 @@ export const {
   getPeriodAndVotingDuration,
   setElectionsBlock,
   updateDateElections,
+  getAllWallets,
+  setUserWallet,
 } = createActions({
   GET_CURRENT_BLOCK_NUMBER: {
     call: undefined,
@@ -22,6 +24,16 @@ export const {
     failure: undefined,
   },
   UPDATE_DATE_ELECTIONS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_All_WALLETS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SET_USER_WALLET: {
     call: undefined,
     success: undefined,
     failure: undefined,

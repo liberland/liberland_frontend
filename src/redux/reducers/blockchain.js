@@ -8,6 +8,8 @@ const initialState = {
     assemblyVotingPeriod: 0,
   },
   electionsBlock: 0,
+  allWallets: [],
+  userWalletAddress: '',
 };
 
 const blockchainReducer = handleActions({
@@ -26,6 +28,14 @@ const blockchainReducer = handleActions({
   [blockchainActions.setElectionsBlock.success]: (state, action) => ({
     ...state,
     electionsBlock: action.payload,
+  }),
+  [blockchainActions.getAllWallets.success]: (state, action) => ({
+    ...state,
+    allWallets: action.payload,
+  }),
+  [blockchainActions.setUserWallet.success]: (state, action) => ({
+    ...state,
+    userWalletAddress: action.payload,
   }),
 }, initialState);
 

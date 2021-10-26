@@ -16,7 +16,7 @@ import {
 import route from '../../router';
 
 import truncate from '../../utils/truncate';
-import { votingSelectors } from '../selectors';
+import { blockchainSelectors, votingSelectors } from '../selectors';
 
 // WORKERS
 
@@ -24,7 +24,8 @@ function* addMyCandidacyWorker() {
   try {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
-      yield cps(applyMyCandidacy);
+      const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+      yield cps(applyMyCandidacy, walletAddress);
       yield put(votingActions.addMyCandidacy.success());
       yield put(votingActions.getListOfCandidacy.call());
     }
@@ -56,11 +57,12 @@ function* getListOFCandidacyWorker() {
 
 function* sendElectoralSheetWorker(action) {
   try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     const { history } = action.payload;
-    const extensions = yield web3Enable('Liberland dapp');
     const electoralSheet = yield select(votingSelectors.selectorElectoralSheet);
-    if (extensions.length) {
-      yield cps(sendElectoralSheetRpc, electoralSheet);
+    const args = [electoralSheet, walletAddress];
+    if (walletAddress) {
+      yield cps(sendElectoralSheetRpc, args);
       yield put(votingActions.sendElectoralSheet.success());
       yield call(history.push, route.voting.congressionalAssemble);
     }

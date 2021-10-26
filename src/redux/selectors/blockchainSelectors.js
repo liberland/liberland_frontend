@@ -76,6 +76,15 @@ const nextElectionsTimeStampSelector = createSelector(
   (era, period, duration, genesis) => (((period + duration) * (era + 2)) * 6000) + genesis || 0,
 );
 
+const allWalletsSelector = createSelector(
+  blockchainReducer,
+  (reducer) => reducer.allWallets,
+);
+const userWalletAddressSelector = createSelector(
+  blockchainReducer,
+  (reducer) => reducer.userWalletAddress,
+);
+
 export {
   startFromGenesisElectionsAssemblySelector,
   eraOfElectionSelector,
@@ -86,4 +95,6 @@ export {
   electionsBlockSelector,
   nextElectionsBlockSelector,
   nextElectionsTimeStampSelector,
+  allWalletsSelector,
+  userWalletAddressSelector,
 };

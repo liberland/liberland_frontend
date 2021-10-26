@@ -61,42 +61,36 @@ const getBalanceByAddress = async (address) => {
   }
 };
 
-const sendTransfer = async (payload) => {
-  const { account_to, amount } = payload;
+const sendTransfer = async (payload, callback) => {
+  const { account_to, amount, account_from } = payload;
   const api = await ApiPromise.create({ provider });
-  const allAccounts = await web3Accounts();
-  const account = allAccounts[0];
 
   const transferExtrinsic = api.tx.balances.transfer(account_to, (amount * (10 ** 12)));
-  const injector = await web3FromSource(account.meta.source);
-  transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
+  const injector = await web3FromSource('polkadot-js');
+  transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status }) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-    } else {
-      // eslint-disable-next-line no-console
-      console.log(`Current status: ${status.type}`);
+      callback(null, 'done');
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.log(':( transaction failed', error);
+    callback(error);
   });
 };
 
 const stakeToPolkaBondAndExtra = async (payload, callback) => {
   try {
-    const { values: { amount }, isUserHaveStake } = payload;
+    const { values: { amount }, isUserHaveStake, walletAddress } = payload;
     const api = await ApiPromise.create({ provider });
-    const allAccounts = await web3Accounts();
-    const account = allAccounts[0];
-
     const transferExtrinsic = isUserHaveStake
       ? await api.tx.stakingPallet.bondExtra(`${amount}000000000000`)
-      : await api.tx.stakingPallet.bond(account.address, `${amount}000000000000`);
+      : await api.tx.stakingPallet.bond(walletAddress, `${amount}000000000000`);
 
-    const injector = await web3FromSource(account.meta.source);
+    const injector = await web3FromSource('polkadot-js');
     // eslint-disable-next-line max-len
-    await transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
+    await transferExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
       if (status.isInBlock) {
         // eslint-disable-next-line no-console
         console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -116,18 +110,16 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
 
 const stakeToLiberlandBondAndExtra = async (payload, callback) => {
   try {
-    const { values: { amount }, isUserHaveStake } = payload;
+    const { values: { amount }, isUserHaveStake, walletAddress } = payload;
     const api = await ApiPromise.create({ provider });
-    const allAccounts = await web3Accounts();
-    const account = allAccounts[0];
 
     const transferExtrinsic = isUserHaveStake
       ? await api.tx.stakingPallet.liberlandBondExtra(`${amount}000000000000`)
-      : await api.tx.stakingPallet.liberlandBond(account.address, (`${amount}000000000000`), 'Staked');
+      : await api.tx.stakingPallet.liberlandBond(walletAddress, (`${amount}000000000000`), 'Staked');
 
-    const injector = await web3FromSource(account.meta.source);
+    const injector = await web3FromSource('polkadot-js');
     // eslint-disable-next-line max-len
-    await transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
+    await transferExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
       if (status.isInBlock) {
         // eslint-disable-next-line no-console
         console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -145,16 +137,13 @@ const stakeToLiberlandBondAndExtra = async (payload, callback) => {
   }
 };
 
-const applyMyCandidacy = async (callback) => {
-  const allAccounts = await web3Accounts();
-  const accountAddress = allAccounts[0].address;
-
+const applyMyCandidacy = async (walletAddress, callback) => {
   const api = await ApiPromise.create({ provider });
-  if (accountAddress) {
-    const injector = await web3FromAddress(accountAddress);
+  if (walletAddress) {
+    const injector = await web3FromAddress(walletAddress);
     await api.tx.assemblyPallet
       .addCandidate()
-      .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+      .signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
         if (status.isInBlock) {
           // eslint-disable-next-line no-console
           console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -189,9 +178,9 @@ const getCandidacyListRpc = async () => {
   return null;
 };
 
-const sendElectoralSheetRpc = async (electoralSheet, callback) => {
-  const allAccounts = await web3Accounts();
-  const accountAddress = allAccounts[0].address;
+const sendElectoralSheetRpc = async (args, callback) => {
+  const electoralSheet = args[0];
+  const walletAddress = args[1];
   const dataForNode = await electoralSheet.map((el) => ({ pasportId: el.id }));
   const api = await ApiPromise.create({
     provider,
@@ -202,11 +191,11 @@ const sendElectoralSheetRpc = async (electoralSheet, callback) => {
       AltVote: 'VecDeque<Candidate>',
     },
   });
-  if (accountAddress) {
-    const injector = await web3FromAddress(accountAddress);
+  if (walletAddress) {
+    const injector = await web3FromAddress(walletAddress);
     await api.tx.assemblyPallet
       .vote(dataForNode)
-      .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+      .signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
         if (status.isInBlock) {
           // eslint-disable-next-line no-console
           console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -282,10 +271,10 @@ const getMinistersRpc = async () => {
   return [];
 };
 
-const sendLawProposal = async (data, callback) => {
+const sendLawProposal = async (args, callback) => {
+  const data = args[0];
+  const walletAddress = args[1];
   const { hash, proposalType } = data;
-  const allAccounts = await web3Accounts();
-  const accountAddress = allAccounts[0].address;
 
   const api = await ApiPromise.create({
     provider,
@@ -297,11 +286,11 @@ const sendLawProposal = async (data, callback) => {
     },
   });
 
-  if (accountAddress) {
-    const injector = await web3FromAddress(accountAddress);
+  if (walletAddress) {
+    const injector = await web3FromAddress(walletAddress);
     await api.tx.assemblyPallet
       .proposeLaw(hash, proposalType)
-      .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+      .signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
         if (status.isInBlock) {
           // eslint-disable-next-line no-console
           console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -350,12 +339,9 @@ const getProposalHashesRpc = async (hashesNotDraft, callback) => {
   return null;
 };
 
-const getUserRoleRpc = async () => {
+const getUserRoleRpc = async (walletAddress) => {
   try {
-    const allAccounts = await web3Accounts();
-    const accountAddress = allAccounts[0].address;
-
-    if (!citizenAddressList.includes(accountAddress)) return { non_citizen: 'non_citizen' };
+    if (!citizenAddressList.includes(walletAddress)) return { non_citizen: 'non_citizen' };
 
     const api = await ApiPromise.create({
       provider,
@@ -372,7 +358,7 @@ const getUserRoleRpc = async () => {
       },
     });
     const ministersList = JSON.stringify(await api.query.assemblyPallet.currentMinistersList());
-    const passportId = await api2.query.identityPallet.passportIds(accountAddress);
+    const passportId = await api2.query.identityPallet.passportIds(walletAddress);
 
     if (ministersList.includes(passportId.toString())) {
       return {
@@ -446,11 +432,11 @@ const getCurrentBlockNumberRpc = async () => {
   return null;
 };
 
-const voteByProposalRpc = async (data, callback) => {
+const voteByProposalRpc = async (args, callback) => {
+  const data = args[0];
+  const walletAddress = args[1];
   const { docHash, decision } = data;
-  const allAccounts = await web3Accounts();
-  const accountAddress = allAccounts[0].address;
-  const injector = await web3FromAddress(accountAddress);
+  const injector = await web3FromAddress(walletAddress);
   const api = await ApiPromise.create({
     provider,
     types: {
@@ -462,7 +448,7 @@ const voteByProposalRpc = async (data, callback) => {
   });
   await api.tx.assemblyPallet
     .voteToLaw(docHash, decision)
-    .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+    .signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
       if (status.isInBlock) {
         // eslint-disable-next-line no-console
         console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -489,21 +475,21 @@ const getCurrentPowerProposalRpc = async (docHash, callback) => {
   });
 
   let power = await api.query.votingPallet.activeVotings(docHash);
-  power = matchPowHelper(JSON.parse(power).result * 1);
+  power = (JSON.parse(power).result === 0) ? 0 : matchPowHelper(JSON.parse(power).result * 1);
   callback(null, power);
 };
 
-const getUserPassportId = async () => {
-  const allAccounts = await web3Accounts();
-  const accountAddress = allAccounts[0].address;
+const getUserPassportId = async (walletAddress) => {
   const api = await ApiPromise.create({
     provider,
     types: {
       PassportId: '[u8; 32]',
     },
   });
-  return api.query.identityPallet.passportIds(accountAddress);
+  return api.query.identityPallet.passportIds(walletAddress);
 };
+
+const getAllWalletsRpc = async () => web3Accounts();
 
 export {
   getBalanceByAddress,
@@ -524,4 +510,5 @@ export {
   voteByProposalRpc,
   getCurrentPowerProposalRpc,
   getUserPassportId,
+  getAllWalletsRpc,
 };
