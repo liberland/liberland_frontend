@@ -1,7 +1,7 @@
 import {
   takeLatest,
   put,
-  call, select,
+  call,
 } from 'redux-saga/effects';
 import { web3Enable } from '@polkadot/extension-dapp';
 
@@ -9,20 +9,19 @@ import { getUserRoleRpc, getUserPassportId } from '../../api/nodeRpcCall';
 import {
   authActions, votingActions, walletActions, blockchainActions,
 } from '../actions';
-import { blockchainSelectors } from '../selectors';
 import routes from '../../router';
 import api from '../../api';
 
 function* signInWorker(action) {
   try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     const { credentials, history } = action.payload;
     const { data: user } = yield call(api.post, '/users/signin', credentials);
     yield put(blockchainActions.setUserWallet.success(credentials.wallet_address));
+    yield sessionStorage.setItem('userWalletAddress', credentials.wallet_address);
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
-      user.role = yield call(getUserRoleRpc);
-      user.passportId = yield call(getUserPassportId, walletAddress);
+      user.role = yield call(getUserRoleRpc, credentials.wallet_address);
+      user.passportId = yield call(getUserPassportId, credentials.wallet_address);
       yield put(authActions.signIn.success(user));
       yield put(blockchainActions.getCurrentBlockNumber.call());
       yield call(history.push, routes.home.index);
@@ -36,11 +35,12 @@ function* signInWorker(action) {
 
 function* verifySessionWorker() {
   try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const walletAddress = yield sessionStorage.getItem('userWalletAddress');
     const { data: { user, success } } = yield call(api.get, '/users/check_session');
     const extensions = yield web3Enable('Liberland dapp');
+    yield put(blockchainActions.setUserWallet.success(walletAddress));
     if (extensions.length) {
-      user.role = yield call(getUserRoleRpc);
+      user.role = yield call(getUserRoleRpc, walletAddress);
       user.passportId = yield call(getUserPassportId, walletAddress);
     }
     if (success) {
@@ -58,6 +58,8 @@ function* signOutWorker() {
   try {
     yield call(api.post, '/users/logout');
     yield put(authActions.signOut.success());
+    yield put(blockchainActions.setUserWallet.success(''));
+    yield sessionStorage.clear();
   } catch (error) {
     yield put(authActions.signOut.failure);
   }

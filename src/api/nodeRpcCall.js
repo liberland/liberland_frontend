@@ -137,16 +137,13 @@ const stakeToLiberlandBondAndExtra = async (payload, callback) => {
   }
 };
 
-const applyMyCandidacy = async (callback) => {
-  const allAccounts = await web3Accounts();
-  const accountAddress = allAccounts[0].address;
-
+const applyMyCandidacy = async (walletAddress, callback) => {
   const api = await ApiPromise.create({ provider });
-  if (accountAddress) {
-    const injector = await web3FromAddress(accountAddress);
+  if (walletAddress) {
+    const injector = await web3FromAddress(walletAddress);
     await api.tx.assemblyPallet
       .addCandidate()
-      .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+      .signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
         if (status.isInBlock) {
           // eslint-disable-next-line no-console
           console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -181,9 +178,9 @@ const getCandidacyListRpc = async () => {
   return null;
 };
 
-const sendElectoralSheetRpc = async (electoralSheet, callback) => {
-  const allAccounts = await web3Accounts();
-  const accountAddress = allAccounts[0].address;
+const sendElectoralSheetRpc = async (args, callback) => {
+  const electoralSheet = args[0];
+  const walletAddress = args[1];
   const dataForNode = await electoralSheet.map((el) => ({ pasportId: el.id }));
   const api = await ApiPromise.create({
     provider,
@@ -194,11 +191,11 @@ const sendElectoralSheetRpc = async (electoralSheet, callback) => {
       AltVote: 'VecDeque<Candidate>',
     },
   });
-  if (accountAddress) {
-    const injector = await web3FromAddress(accountAddress);
+  if (walletAddress) {
+    const injector = await web3FromAddress(walletAddress);
     await api.tx.assemblyPallet
       .vote(dataForNode)
-      .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+      .signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
         if (status.isInBlock) {
           // eslint-disable-next-line no-console
           console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -274,10 +271,10 @@ const getMinistersRpc = async () => {
   return [];
 };
 
-const sendLawProposal = async (data, callback) => {
+const sendLawProposal = async (args, callback) => {
+  const data = args[0];
+  const walletAddress = args[1];
   const { hash, proposalType } = data;
-  const allAccounts = await web3Accounts();
-  const accountAddress = allAccounts[0].address;
 
   const api = await ApiPromise.create({
     provider,
@@ -289,11 +286,11 @@ const sendLawProposal = async (data, callback) => {
     },
   });
 
-  if (accountAddress) {
-    const injector = await web3FromAddress(accountAddress);
+  if (walletAddress) {
+    const injector = await web3FromAddress(walletAddress);
     await api.tx.assemblyPallet
       .proposeLaw(hash, proposalType)
-      .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+      .signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
         if (status.isInBlock) {
           // eslint-disable-next-line no-console
           console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -342,12 +339,9 @@ const getProposalHashesRpc = async (hashesNotDraft, callback) => {
   return null;
 };
 
-const getUserRoleRpc = async () => {
+const getUserRoleRpc = async (walletAddress) => {
   try {
-    const allAccounts = await web3Accounts();
-    const accountAddress = allAccounts[0].address;
-
-    if (!citizenAddressList.includes(accountAddress)) return { non_citizen: 'non_citizen' };
+    if (!citizenAddressList.includes(walletAddress)) return { non_citizen: 'non_citizen' };
 
     const api = await ApiPromise.create({
       provider,
@@ -364,7 +358,7 @@ const getUserRoleRpc = async () => {
       },
     });
     const ministersList = JSON.stringify(await api.query.assemblyPallet.currentMinistersList());
-    const passportId = await api2.query.identityPallet.passportIds(accountAddress);
+    const passportId = await api2.query.identityPallet.passportIds(walletAddress);
 
     if (ministersList.includes(passportId.toString())) {
       return {
@@ -438,11 +432,11 @@ const getCurrentBlockNumberRpc = async () => {
   return null;
 };
 
-const voteByProposalRpc = async (data, callback) => {
+const voteByProposalRpc = async (args, callback) => {
+  const data = args[0];
+  const walletAddress = args[1];
   const { docHash, decision } = data;
-  const allAccounts = await web3Accounts();
-  const accountAddress = allAccounts[0].address;
-  const injector = await web3FromAddress(accountAddress);
+  const injector = await web3FromAddress(walletAddress);
   const api = await ApiPromise.create({
     provider,
     types: {
@@ -454,7 +448,7 @@ const voteByProposalRpc = async (data, callback) => {
   });
   await api.tx.assemblyPallet
     .voteToLaw(docHash, decision)
-    .signAndSend(accountAddress, { signer: injector.signer }, ({ status }) => {
+    .signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
       if (status.isInBlock) {
         // eslint-disable-next-line no-console
         console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -481,13 +475,11 @@ const getCurrentPowerProposalRpc = async (docHash, callback) => {
   });
 
   let power = await api.query.votingPallet.activeVotings(docHash);
-  power = matchPowHelper(JSON.parse(power).result * 1);
+  power = (JSON.parse(power).result === 0) ? 0 : matchPowHelper(JSON.parse(power).result * 1);
   callback(null, power);
 };
 
 const getUserPassportId = async (walletAddress) => {
-  // const allAccounts = await web3Accounts();
-  // const accountAddress = allAccounts[0].address;
   const api = await ApiPromise.create({
     provider,
     types: {
