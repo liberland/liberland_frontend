@@ -61,42 +61,36 @@ const getBalanceByAddress = async (address) => {
   }
 };
 
-const sendTransfer = async (payload) => {
-  const { account_to, amount } = payload;
+const sendTransfer = async (payload, callback) => {
+  const { account_to, amount, account_from } = payload;
   const api = await ApiPromise.create({ provider });
-  const allAccounts = await web3Accounts();
-  const account = allAccounts[0];
 
   const transferExtrinsic = api.tx.balances.transfer(account_to, (amount * (10 ** 12)));
-  const injector = await web3FromSource(account.meta.source);
-  transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
+  const injector = await web3FromSource('polkadot-js');
+  transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status }) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-    } else {
-      // eslint-disable-next-line no-console
-      console.log(`Current status: ${status.type}`);
+      callback(null, 'done');
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.log(':( transaction failed', error);
+    callback(error);
   });
 };
 
 const stakeToPolkaBondAndExtra = async (payload, callback) => {
   try {
-    const { values: { amount }, isUserHaveStake } = payload;
+    const { values: { amount }, isUserHaveStake, walletAddress } = payload;
     const api = await ApiPromise.create({ provider });
-    const allAccounts = await web3Accounts();
-    const account = allAccounts[0];
-
     const transferExtrinsic = isUserHaveStake
       ? await api.tx.stakingPallet.bondExtra(`${amount}000000000000`)
-      : await api.tx.stakingPallet.bond(account.address, `${amount}000000000000`);
+      : await api.tx.stakingPallet.bond(walletAddress, `${amount}000000000000`);
 
-    const injector = await web3FromSource(account.meta.source);
+    const injector = await web3FromSource('polkadot-js');
     // eslint-disable-next-line max-len
-    await transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
+    await transferExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
       if (status.isInBlock) {
         // eslint-disable-next-line no-console
         console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -116,18 +110,16 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
 
 const stakeToLiberlandBondAndExtra = async (payload, callback) => {
   try {
-    const { values: { amount }, isUserHaveStake } = payload;
+    const { values: { amount }, isUserHaveStake, walletAddress } = payload;
     const api = await ApiPromise.create({ provider });
-    const allAccounts = await web3Accounts();
-    const account = allAccounts[0];
 
     const transferExtrinsic = isUserHaveStake
       ? await api.tx.stakingPallet.liberlandBondExtra(`${amount}000000000000`)
-      : await api.tx.stakingPallet.liberlandBond(account.address, (`${amount}000000000000`), 'Staked');
+      : await api.tx.stakingPallet.liberlandBond(walletAddress, (`${amount}000000000000`), 'Staked');
 
-    const injector = await web3FromSource(account.meta.source);
+    const injector = await web3FromSource('polkadot-js');
     // eslint-disable-next-line max-len
-    await transferExtrinsic.signAndSend(account.address, { signer: injector.signer }, ({ status }) => {
+    await transferExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
       if (status.isInBlock) {
         // eslint-disable-next-line no-console
         console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
@@ -493,16 +485,16 @@ const getCurrentPowerProposalRpc = async (docHash, callback) => {
   callback(null, power);
 };
 
-const getUserPassportId = async () => {
-  const allAccounts = await web3Accounts();
-  const accountAddress = allAccounts[0].address;
+const getUserPassportId = async (walletAddress) => {
+  // const allAccounts = await web3Accounts();
+  // const accountAddress = allAccounts[0].address;
   const api = await ApiPromise.create({
     provider,
     types: {
       PassportId: '[u8; 32]',
     },
   });
-  return api.query.identityPallet.passportIds(accountAddress);
+  return api.query.identityPallet.passportIds(walletAddress);
 };
 
 const getAllWalletsRpc = async () => web3Accounts();

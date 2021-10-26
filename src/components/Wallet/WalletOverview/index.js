@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { walletActions } from '../../../redux/actions';
-import { walletSelectors } from '../../../redux/selectors';
+import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 
 import prettyNumber from '../../../utils/prettyNumber';
 
@@ -41,13 +41,14 @@ const WalletOverview = ({
   };
 
   const isUserHaveStake = useSelector(walletSelectors.selectorIsUserHaveStake);
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   const handleSubmitStakePolka = (values) => {
-    dispatch(walletActions.stakeToPolka.call({ values, isUserHaveStake }));
+    dispatch(walletActions.stakeToPolka.call({ values, isUserHaveStake, walletAddress }));
     handleModalOpenStake();
   };
   const handleSubmitStakeLiberland = (values) => {
-    dispatch(walletActions.stakeToLiberland.call({ values, isUserHaveStake }));
+    dispatch(walletActions.stakeToLiberland.call({ values, isUserHaveStake, walletAddress }));
     handleModalOpenStake();
   };
 

@@ -1,7 +1,7 @@
 import {
   takeLatest,
   put,
-  call,
+  call, select,
 } from 'redux-saga/effects';
 import { web3Enable } from '@polkadot/extension-dapp';
 
@@ -9,18 +9,20 @@ import { getUserRoleRpc, getUserPassportId } from '../../api/nodeRpcCall';
 import {
   authActions, votingActions, walletActions, blockchainActions,
 } from '../actions';
+import { blockchainSelectors } from '../selectors';
 import routes from '../../router';
 import api from '../../api';
 
 function* signInWorker(action) {
   try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     const { credentials, history } = action.payload;
     const { data: user } = yield call(api.post, '/users/signin', credentials);
     yield put(blockchainActions.setUserWallet.success(credentials.wallet_address));
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc);
-      user.passportId = yield call(getUserPassportId);
+      user.passportId = yield call(getUserPassportId, walletAddress);
       yield put(authActions.signIn.success(user));
       yield put(blockchainActions.getCurrentBlockNumber.call());
       yield call(history.push, routes.home.index);
@@ -34,11 +36,12 @@ function* signInWorker(action) {
 
 function* verifySessionWorker() {
   try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     const { data: { user, success } } = yield call(api.get, '/users/check_session');
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc);
-      user.passportId = yield call(getUserPassportId);
+      user.passportId = yield call(getUserPassportId, walletAddress);
     }
     if (success) {
       yield put(authActions.verifySession.success(user));

@@ -80,6 +80,10 @@ const allWalletsSelector = createSelector(
   blockchainReducer,
   (reducer) => reducer.allWallets,
 );
+const userWalletAddressSelector = createSelector(
+  blockchainReducer,
+  (reducer) => reducer.userWalletAddress,
+);
 
 export {
   startFromGenesisElectionsAssemblySelector,
@@ -92,4 +96,5 @@ export {
   nextElectionsBlockSelector,
   nextElectionsTimeStampSelector,
   allWalletsSelector,
+  userWalletAddressSelector,
 };

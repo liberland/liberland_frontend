@@ -17,16 +17,16 @@ const ChoseStakeModal = ({
           <Button
             primary
             medium
-            onClick={() => setModalShown(1)}
+            onClick={() => setModalShown(2)}
           >
-            Polka Stake
+            Liberland Stake
           </Button>
           <Button
             primary
             medium
-            onClick={() => setModalShown(2)}
+            onClick={() => setModalShown(1)}
           >
-            Liberland Stake
+            Polka Stake
           </Button>
 
           <Button
