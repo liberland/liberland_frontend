@@ -89,6 +89,7 @@ const MyDrafts = () => {
       proposal_name,
       short_description,
       thread_link,
+      draft_type,
     } = draft;
     if (!file) {
       // TODO add error handling, when no file is present
@@ -102,6 +103,7 @@ const MyDrafts = () => {
       shortDescription: short_description,
       threadLink: thread_link,
       requiredAmountLlm: liberStakeAmount,
+      draftType: draft_type,
     };
 
     dispatch(assemblyActions.editDraft.call(data));
@@ -181,6 +183,10 @@ const MyDrafts = () => {
             </h3>
             <span>
               {draft.shortDescription}
+            </span>
+            <br />
+            <span>
+              {draft.draftType === 'ConstitutionalChange' ? 'Constitutional change' : draft.draftType}
             </span>
             {draft.proposalStatus === 'Draft' && (
               <div className={styles.draftButtons}>
