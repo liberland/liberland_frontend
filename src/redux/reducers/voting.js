@@ -35,7 +35,7 @@ const votingReducer = handleActions(
       ...state,
       isVotingInProgress: initialState.isVotingRequested,
     }),
-    [votingActions.getMinistersList.success]: (state, action) => ({
+    [votingActions.getAssembliesList.success]: (state, action) => ({
       ...state,
       ministersList: action.payload,
     }),

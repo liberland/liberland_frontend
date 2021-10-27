@@ -29,7 +29,7 @@ const Voting = () => {
 
   useEffect(() => {
     const timerId = setInterval(() => {
-      dispatch(votingActions.getMinistersList.call());
+      dispatch(votingActions.getAssembliesList.call());
     }, 6000);
     return (() => {
       clearInterval(timerId);
