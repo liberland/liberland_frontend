@@ -68,7 +68,7 @@ function* signOutWorker() {
 function* initGetDataFromNodeWorker() {
   yield put(walletActions.getWallet.call());
   yield put(blockchainActions.getPeriodAndVotingDuration.call());
-  yield put(votingActions.getMinistersList.call());
+  yield put(votingActions.getAssembliesList.call());
 }
 
 function* signInWatcher() {

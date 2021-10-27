@@ -235,27 +235,27 @@ const getMinistersRpc = async () => {
         Minister: 'BTreeMap<Candidate>, <votingPower>',
       },
     });
-    const ministersList = JSON.parse(await api.query.assemblyPallet.currentMinistersList());
+    const assembliesList = JSON.parse(await api.query.assemblyPallet.currentAssembliesList());
     // eslint-disable-next-line no-console
-    console.log('getMinistersRpc', ministersList);
+    console.log('getAssembliesRpc', assembliesList);
 
-    if (Object.keys(ministersList).length === 0) return { finaleObject: [], liberStakeAmount: 0 };
+    if (Object.keys(assembliesList).length === 0) return { finaleObject: [], liberStakeAmount: 0 };
 
-    const liberStakeAmount = Object.values(ministersList)
+    const liberStakeAmount = Object.values(assembliesList)
       .reduce((acum, curVal) => (acum + matchPowHelper(roughScale(curVal, 16))), 0);
 
     let finaleObject = [];
     let i = 1;
-    for (const prop in ministersList) {
-      if (Object.prototype.hasOwnProperty.call(ministersList, prop)) {
+    for (const prop in assembliesList) {
+      if (Object.prototype.hasOwnProperty.call(assembliesList, prop)) {
         finaleObject = [...finaleObject, {
           id: i,
           place: i,
           deputies: JSON.parse(prop).pasportId,
-          supported: `${prettyNumber(ministersList[prop])}`,
+          supported: `${prettyNumber(assembliesList[prop])}`,
           // eslint-disable-next-line max-len
           power: liberStakeAmount !== 0
-            ? ((matchPowHelper(ministersList[prop]) * 100) / liberStakeAmount)
+            ? ((matchPowHelper(assembliesList[prop]) * 100) / liberStakeAmount)
               .toFixed(2)
             : 100,
         }];
@@ -357,10 +357,10 @@ const getUserRoleRpc = async (walletAddress) => {
         PassportId: '[u8; 32]',
       },
     });
-    const ministersList = JSON.stringify(await api.query.assemblyPallet.currentMinistersList());
+    const assembliesList = JSON.stringify(await api.query.assemblyPallet.currentAssembliesList());
     const passportId = await api2.query.identityPallet.passportIds(walletAddress);
 
-    if (ministersList.includes(passportId.toString())) {
+    if (assembliesList.includes(passportId.toString())) {
       return {
         assemblyMember: 'assemblyMember',
         citizen: 'citizen',

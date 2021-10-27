@@ -46,7 +46,7 @@ export default function* rootSaga() {
     votingSagas.getListOFCandidacyWatcher(),
     votingSagas.sendElectoralSheetWatcher(),
     votingSagas.setIsVotingInProgressWatcher(),
-    votingSagas.getMinistersListWatcher(),
+    votingSagas.getAssembliesListWatcher(),
     lawSagas.getCurrentLawsWatcher(),
   ]);
 }
