@@ -46,11 +46,11 @@ const WalletAddressesLine = ({ walletAddress }) => {
     handleModalOpen();
   };
   const handleSubmitStakePolka = (values) => {
-    dispatch(walletActions.stakeToPolka.call({ values, isUserHaveStake }));
+    dispatch(walletActions.stakeToPolka.call({ values, isUserHaveStake, walletAddress }));
     handleModalOpenStake();
   };
   const handleSubmitStakeLiberland = (values) => {
-    dispatch(walletActions.stakeToLiberland.call({ values, isUserHaveStake }));
+    dispatch(walletActions.stakeToLiberland.call({ values, isUserHaveStake, walletAddress }));
     handleModalOpenStake();
   };
 

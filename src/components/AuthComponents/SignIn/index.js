@@ -6,11 +6,11 @@ import { Link, useHistory } from 'react-router-dom';
 
 // REDUX
 import { authActions } from '../../../redux/actions';
-import { errorsSelectors } from '../../../redux/selectors';
+
+import { errorsSelectors, blockchainSelectors } from '../../../redux/selectors';
 
 // STYLES
 import styles from './styles.module.scss';
-
 // COMPONENTS
 import { ReactComponent as Divider } from '../../../assets/icons/divider.svg';
 import { ReactComponent as Lock } from '../../../assets/icons/lock.svg';
@@ -31,6 +31,7 @@ const SignIn = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const apiError = useSelector(errorsSelectors.selectSignIn);
+  const allAccounts = useSelector(blockchainSelectors.allWalletsSelector);
 
   useEffect(() => {
     if (apiError) {
@@ -65,6 +66,13 @@ const SignIn = () => {
           <Divider />
         </p>
         <form className={styles.signInForm} onSubmit={handleSubmit(onSubmit)}>
+          <div className={styles.inputWrapper}>
+            <select className={styles.addressSwitcher} {...register('wallet_address')} required>
+              { allAccounts.map((el) => (
+                <option value={el.address}>{el.address}</option>
+              ))}
+            </select>
+          </div>
           <div className={styles.inputWrapper}>
             <TextInput
               register={register}

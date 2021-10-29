@@ -1,11 +1,12 @@
 import {
   put, call, takeLatest, select, take, all,
 } from 'redux-saga/effects';
+import { web3Enable } from '@polkadot/extension-dapp';
 import { blockchainActions } from '../actions';
 
 import { blockchainSelectors } from '../selectors';
 
-import { getCurrentBlockNumberRpc, getPeriodAndVotingDurationRpc } from '../../api/nodeRpcCall';
+import { getCurrentBlockNumberRpc, getPeriodAndVotingDurationRpc, getAllWalletsRpc } from '../../api/nodeRpcCall';
 
 // WORKERS
 
@@ -49,6 +50,22 @@ function* updateDateElectionsWorker() {
     // eslint-disable-next-line no-console
     console.log(e);
     yield put(blockchainActions.updateDateElections.failure(e));
+  }
+}
+
+function* getAllWalletsWorker() {
+  try {
+    const extensions = yield web3Enable('Liberland dapp');
+    if (extensions.length) {
+      const allWallets = yield call(getAllWalletsRpc);
+      yield put(blockchainActions.getAllWallets.success(allWallets));
+    } else {
+      yield put(blockchainActions.getAllWallets.failure('No enable Extensione'));
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    yield put(blockchainActions.getAllWallets.failure(e));
   }
 }
 
@@ -96,6 +113,15 @@ function* updateDateElectionsWatcher() {
     yield put(blockchainActions.updateDateElections.failure(e));
   }
 }
+function* getAllWalletsWatcher() {
+  try {
+    yield takeLatest(blockchainActions.getAllWallets.call, getAllWalletsWorker);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    yield put(blockchainActions.updateDateElections.failure(e));
+  }
+}
 
 export {
   fetchBlockNumberWatcher,
@@ -103,4 +129,5 @@ export {
   setElectionsBlockWatcher,
   runSetElectionsBlockWorker,
   updateDateElectionsWatcher,
+  getAllWalletsWatcher,
 };

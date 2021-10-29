@@ -1,7 +1,7 @@
 import {
-  put, takeLatest, call, cps,
+  put, takeLatest, call, cps, select,
 } from 'redux-saga/effects';
-import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
+
 import {
   getBalanceByAddress,
   sendTransfer,
@@ -10,19 +10,15 @@ import {
 } from '../../api/nodeRpcCall';
 
 import { walletActions } from '../actions';
+import { blockchainSelectors } from '../selectors';
 
 // WORKERS
 
 function* getWalletWorker() {
   try {
-    const extensions = yield web3Enable('Liberland dapp');
-    if (extensions.length) {
-      const [accounts] = yield web3Accounts();
-      const balances = yield call(getBalanceByAddress, accounts.address);
-      yield put(walletActions.getWallet.success({ ...accounts, balances }));
-    } else {
-      yield put(walletActions.getWallet.failure());
-    }
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const balances = yield call(getBalanceByAddress, walletAddress);
+    yield put(walletActions.getWallet.success({ ...walletAddress, balances }));
   } catch (e) {
     yield put(walletActions.getWallet.failure(e));
   }
@@ -30,12 +26,9 @@ function* getWalletWorker() {
 
 function* stakeToPolkaWorker(action) {
   try {
-    const extensions = yield web3Enable('Liberland dapp');
-    if (extensions.length) {
-      yield cps(stakeToPolkaBondAndExtra, action.payload);
-      yield put(walletActions.stakeToPolka.success());
-      yield put(walletActions.getWallet.call());
-    }
+    yield cps(stakeToPolkaBondAndExtra, action.payload);
+    yield put(walletActions.stakeToPolka.success());
+    yield put(walletActions.getWallet.call());
   } catch (e) {
     yield put(walletActions.stakeToPolka.failure(e));
   }
@@ -43,12 +36,9 @@ function* stakeToPolkaWorker(action) {
 
 function* stakeToLiberlandWorker(action) {
   try {
-    const extensions = yield web3Enable('Liberland dapp');
-    if (extensions.length) {
-      yield cps(stakeToLiberlandBondAndExtra, action.payload);
-      yield put(walletActions.stakeToPolka.success());
-      yield put(walletActions.getWallet.call());
-    }
+    yield cps(stakeToLiberlandBondAndExtra, action.payload);
+    yield put(walletActions.stakeToPolka.success());
+    yield put(walletActions.getWallet.call());
   } catch
   (e) {
     yield put(walletActions.stakeToLiberland.failure(e));
@@ -56,7 +46,7 @@ function* stakeToLiberlandWorker(action) {
 }
 function* sendTransferWorker(action) {
   try {
-    yield sendTransfer(action.payload);
+    yield cps(sendTransfer, action.payload);
     yield put(walletActions.sendTransfer.success);
     yield put(walletActions.getWallet.call);
   } catch (e) {

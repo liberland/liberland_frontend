@@ -20,6 +20,7 @@ export default function* rootSaga() {
     blockchainSagas.setElectionsBlockWatcher(),
     blockchainSagas.runSetElectionsBlockWorker(),
     blockchainSagas.updateDateElectionsWatcher(),
+    blockchainSagas.getAllWalletsWatcher(),
 
     // WALLET
     walletSagas.getWalletWatcher(),
@@ -45,7 +46,7 @@ export default function* rootSaga() {
     votingSagas.getListOFCandidacyWatcher(),
     votingSagas.sendElectoralSheetWatcher(),
     votingSagas.setIsVotingInProgressWatcher(),
-    votingSagas.getMinistersListWatcher(),
+    votingSagas.getAssembliesListWatcher(),
     lawSagas.getCurrentLawsWatcher(),
   ]);
 }
