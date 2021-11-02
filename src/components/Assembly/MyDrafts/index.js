@@ -28,15 +28,15 @@ const MyDrafts = () => {
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
 
-  const handleWorkerCall = (id) => {
-    dispatch(assemblyActions.getTextPdf.call(id));
-    setproposalModalProps({ ...proposalModalProps, proposalModalShown: 1 });
-  };
-
   const handleProposalModalOpen = (proposal) => {
     setIsProposalModalOpen(!isProposalModalOpen);
     setproposalModalProps({ ...proposal, proposalModalShown: 0 });
     dispatch(assemblyActions.getTextPdf.call(proposal.id));
+  };
+
+  const handleWorkerCall = (id) => {
+    dispatch(assemblyActions.getTextPdf.call(id));
+    setproposalModalProps({ ...proposalModalProps, proposalModalShown: 1 });
   };
 
   const handleEditModalOpen = (draft) => {
