@@ -36,6 +36,8 @@ const EditDraftModal = ({
       // eslint-disable-next-line react/prop-types
       thread_link: draft.threadLink,
       file: '',
+      // eslint-disable-next-line react/prop-types
+      draft_type: draft.draftType,
     },
   });
 
@@ -72,6 +74,12 @@ const EditDraftModal = ({
   return (
     <form className={styles.getCitizenshipModal}>
       <div className={styles.h3}>Edit Draft</div>
+      <div className={styles.title}>Select type of Draft</div>
+      <select className={styles.draftTypes} {...register('draft_type')} required>
+        <option value="ConstitutionalChange">Constitutional Change</option>
+        <option value="Legislation">Legislation</option>
+        <option value="Decision">Decision</option>
+      </select>
       <div className={styles.title}>Proposal name</div>
       <TextInput
         register={register}

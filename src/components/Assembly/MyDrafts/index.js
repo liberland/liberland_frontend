@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Card from '../../Card';
 import Button from '../../Button/Button';
-
+import ProposalDetailsModal from '../../Modals/ProposalDetailsModal';
 import ProgressBar from '../../ProgressBar';
 
 import { assemblyActions } from '../../../redux/actions';
@@ -19,11 +19,25 @@ import { AddNewDraftModal, EditDraftModal } from '../../Modals';
 const MyDrafts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [selectedDraft, setSelectedDraft] = useState({});
+  const [proposalModalProps, setproposalModalProps] = useState({});
   const dispatch = useDispatch();
+  const texFromPdf = useSelector(assemblySelectors.textPdfSelector);
   const liberStakeAmount = useSelector(votingSelectors.selectorLiberStakeAmount);
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
+
+  const handleWorkerCall = (id) => {
+    dispatch(assemblyActions.getTextPdf.call(id));
+    setproposalModalProps({ ...proposalModalProps, proposalModalShown: 1 });
+  };
+
+  const handleProposalModalOpen = (proposal) => {
+    setIsProposalModalOpen(!isProposalModalOpen);
+    setproposalModalProps({ ...proposal, proposalModalShown: 0 });
+    dispatch(assemblyActions.getTextPdf.call(proposal.id));
+  };
 
   const handleEditModalOpen = (draft) => {
     setIsEditModalOpen(!isEditModalOpen);
@@ -70,6 +84,7 @@ const MyDrafts = () => {
       proposal_name,
       short_description,
       thread_link,
+      draft_type,
     } = draft;
     if (!file) {
       // TODO add error handling, when no file is present
@@ -83,6 +98,7 @@ const MyDrafts = () => {
       shortDescription: short_description,
       threadLink: thread_link,
       requiredAmountLlm: liberStakeAmount,
+      draftType: draft_type,
     };
 
     dispatch(assemblyActions.editDraft.call(data));
@@ -163,6 +179,10 @@ const MyDrafts = () => {
             <span>
               {draft.shortDescription}
             </span>
+            <br />
+            <span>
+              {draft.draftType === 'ConstitutionalChange' ? 'Constitutional change' : draft.draftType}
+            </span>
             {draft.proposalStatus === 'Draft' && (
               <div className={styles.draftButtons}>
                 <Button
@@ -197,7 +217,14 @@ const MyDrafts = () => {
                   currentValue={draft.currentLlm}
                 />
                 <div className={styles.editButtonStatus}>
-                  <Button nano grey className={styles.detailsButton}>details</Button>
+                  <Button
+                    nano
+                    grey
+                    className={styles.detailsButton}
+                    onClick={() => handleProposalModalOpen(draft)}
+                  >
+                    details
+                  </Button>
                   {viewStatus(draft)}
                 </div>
               </>
@@ -217,6 +244,14 @@ const MyDrafts = () => {
           closeModal={handleEditModalOpen}
           draft={selectedDraft}
           closeEditModal={handleEditModalOpen}
+        />
+      )}
+      {isProposalModalOpen && (
+        <ProposalDetailsModal
+          proposal={proposalModalProps}
+          closeModal={handleProposalModalOpen}
+          goToProposal={handleWorkerCall}
+          texFromPdf={texFromPdf}
         />
       )}
     </Card>

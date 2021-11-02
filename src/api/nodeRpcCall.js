@@ -416,6 +416,7 @@ const getStatusProposalRpc = async (hash, callback) => {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
+    callback(e);
   }
   return null;
 };

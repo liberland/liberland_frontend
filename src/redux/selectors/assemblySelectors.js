@@ -37,6 +37,11 @@ const decisionSelector = createSelector(
   (reducer) => reducer.decision,
 );
 
+const textPdfSelector = createSelector(
+  assemblyReducer,
+  (reducer) => reducer.textPdf.text,
+);
+
 export {
   isDraftSendSelector,
   proposalsSelector,
@@ -45,4 +50,5 @@ export {
   constitutionalChangeSelector,
   legislationSelector,
   decisionSelector,
+  textPdfSelector,
 };

@@ -1,12 +1,11 @@
-@import '../../assets/base/variables';
-@import '../../assets/base/fonts';
-
+@import "../../assets/base/variables";
+@import "../../assets/base/fonts";
 
 .getCitizenshipModal {
   padding: 33px 35px 40px 35px;
   width: 525px;
 
-  & .h3{
+  & .h3 {
     color: $text1;
     font-weight: 600;
     font-size: 32px;
@@ -40,6 +39,10 @@
     justify-content: space-between;
     margin-top: 40px;
   }
+
+  & .lawText {
+    border: 1px solid red;
+  }
 }
 
 .ChoseStakeModal {
@@ -60,7 +63,7 @@
   padding: 17px;
   position: relative;
 
-  .dropZone{
+  .dropZone {
     top: 0;
     bottom: 0;
     position: absolute;
@@ -95,12 +98,12 @@
     margin-right: 17px;
   }
 }
-.valueOfItem{
+.valueOfItem {
   margin-left: 3px;
   font-weight: 600;
   color: $text1;
 
-  &.yellow{
+  &.yellow {
     color: $primary;
   }
 }
@@ -110,10 +113,10 @@
   background: white;
   width: calc(100% - 22px);
   height: 56px;
-  border: 1px solid #F3F3F3;
+  border: 1px solid #f3f3f3;
   font-size: 16px;
   padding-left: 20px;
   position: relative;
   font-weight: 500;
-  color: #4E5D78;
+  color: #4e5d78;
 }

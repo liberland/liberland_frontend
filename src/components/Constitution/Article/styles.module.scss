@@ -1,8 +1,5 @@
-@import '../../../assets/base/variables';
-@import '../../../assets/base/fonts';
-
-
-
+@import "../../../assets/base/variables";
+@import "../../../assets/base/fonts";
 
 .round {
   background-color: $transparent1;
@@ -22,10 +19,15 @@
   border-radius: 15px;
   margin-bottom: 18px;
 
+  .titleWrapper {
+    display: flex;
+    align-items: flex-start;
+  }
+
   h3 {
     font-size: 22px;
     color: $text2;
-    margin: 0 0 20px!important;
+    margin: 0 20px 20px 0 !important;
   }
 
   span {

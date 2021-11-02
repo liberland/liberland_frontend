@@ -18,15 +18,27 @@ const ProposalsVoteTable = ({ currentProposals }) => {
   const dispatch = useDispatch();
   const userId = useSelector(selectUserId);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [rowId, setRowId] = useState(null);
+  const [proposalModalProps, setproposalModalProps] = useState({});
 
   useEffect(() => {
     dispatch(assemblyActions.updateAllProposals.call());
   }, [dispatch]);
 
-  const handleModalOpen = (id) => {
+  const handleModalOpen = ({
+    proposalName,
+    proposalStatus,
+    shortDescription,
+    threadLink,
+    id,
+  }) => {
     setIsModalOpen(!isModalOpen);
-    setRowId(id);
+    setproposalModalProps({
+      proposalName,
+      proposalStatus,
+      shortDescription,
+      threadLink,
+      id,
+    });
   };
 
   //   {
@@ -79,7 +91,7 @@ const ProposalsVoteTable = ({ currentProposals }) => {
             <span>
               {cell.row.original.proposalName}
             </span>
-            <Button grey nano onClick={() => handleModalOpen(cell.row.original.id)}>Details</Button>
+            <Button grey nano onClick={() => handleModalOpen(cell.row.original)}>Details</Button>
           </div>
         ),
       },
@@ -165,7 +177,16 @@ const ProposalsVoteTable = ({ currentProposals }) => {
   return (
     <>
       <TableComponent title={`Legislation votes (${currentProposals.length})`} data={currentProposals} columns={columns} rowProps={rowProps} />
-      {isModalOpen && <ProposalDetailsModal proposalId={rowId} closeModal={handleModalOpen} />}
+      {isModalOpen && (
+        <ProposalDetailsModal
+          closeModal={handleModalOpen}
+          proposalName={proposalModalProps.proposalName}
+          proposalStatus={proposalModalProps.proposalStatus}
+          shortDescription={proposalModalProps.shortDescription}
+          threadLink={proposalModalProps.threadLink}
+          proposalId={proposalModalProps.id}
+        />
+      )}
     </>
   );
 };
