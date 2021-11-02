@@ -32,9 +32,9 @@ const ProposalsVoteTable = ({ currentProposals }) => {
     dispatch(assemblyActions.getTextPdf.call(proposal.id));
   };
 
-  const handleWorkerCall = (id) => {
-    dispatch(assemblyActions.getTextPdf.call(id));
+  const handleWorkerCall = () => {
     setproposalModalProps({ ...proposalModalProps, proposalModalShown: 1 });
+    dispatch(assemblyActions.getTextPdf.call(proposalModalProps.id));
   };
 
   //   {

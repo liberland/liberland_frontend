@@ -21,7 +21,6 @@ const ProposalDetailsModal = ({
     shortDescription,
     threadLink,
     proposalSubmiter,
-    proposalId,
     proposalModalShown,
   },
   goToProposal,
@@ -63,7 +62,7 @@ const ProposalDetailsModal = ({
           <Button
             primary
             medium
-            onClick={() => goToProposal(proposalId)}
+            onClick={goToProposal}
           >
             Go to proposal
           </Button>
@@ -99,7 +98,6 @@ ProposalDetailsModal.propTypes = {
     shortDescription: PropTypes.string,
     threadLink: PropTypes.string,
     proposalSubmiter: PropTypes.string,
-    proposalId: PropTypes.number,
     proposalModalShown: PropTypes.number,
   }),
   goToProposal: PropTypes.func,
@@ -114,7 +112,6 @@ ProposalDetailsModal.defaultProps = {
     shortDescription: 'PROPOSAL DESCRIPTION',
     threadLink: 'THERE IS NO THREAD',
     proposalSubmiter: 'PROPOSAL SUBMITER',
-    proposalId: 0,
     proposalModalShown: 0,
   }),
   goToProposal: () => null,
