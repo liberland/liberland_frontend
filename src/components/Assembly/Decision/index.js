@@ -1,24 +1,23 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import ProposalsVoteTable from '../ProposalsVoteTable';
-
 import { assemblySelectors } from '../../../redux/selectors';
 import { assemblyActions } from '../../../redux/actions';
+import ProposalsVoteTable from '../ProposalsVoteTable';
 
-const Legislation = () => {
+const Decision = () => {
   const dispatch = useDispatch();
-  const legislationProposals = useSelector(assemblySelectors.legislationSelector);
+  const decisionProposals = useSelector(assemblySelectors.decisionSelector);
 
   useEffect(() => {
-    dispatch(assemblyActions.getLegislation.call('Legislation'));
+    dispatch(assemblyActions.getDecision.call('Decision'));
   }, [dispatch]);
 
   return (
     <div>
-      <ProposalsVoteTable currentProposals={legislationProposals} />
+      <ProposalsVoteTable currentProposals={decisionProposals} />
     </div>
   );
 };
 
-export default Legislation;
+export default Decision;

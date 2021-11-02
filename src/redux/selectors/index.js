@@ -4,6 +4,7 @@ import * as walletSelectors from './walletSelectors';
 import * as assemblySelectors from './assemblySelectors';
 import * as votingSelectors from './votingSelectors';
 import * as lawSelectors from './lawSelectors';
+import * as blockchainSelectors from './blockchainSelectors';
 
 export {
   errorsSelectors,
@@ -12,4 +13,5 @@ export {
   assemblySelectors,
   votingSelectors,
   lawSelectors,
+  blockchainSelectors,
 };

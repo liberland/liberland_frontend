@@ -1,45 +1,39 @@
 import { createActions } from 'redux-actions';
 
 export const {
-  addMyCandidacy,
-  getListOfCandidacy,
-  addCandidacyToElectoralSheet,
-  sendElectoralSheet,
-  setIsVotingInProgress,
-  getAssembliesList,
-  getLiberStakeAmount,
+  getCurrentBlockNumber,
+  getPeriodAndVotingDuration,
+  setElectionsBlock,
+  updateDateElections,
+  getAllWallets,
+  setUserWallet,
 } = createActions({
-  ADD_MY_CANDIDACY: {
+  GET_CURRENT_BLOCK_NUMBER: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  GET_LIST_OF_CANDIDACY: {
+  GET_PERIOD_AND_VOTING_DURATION: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  ADD_CANDIDACY_TO_ELECTORAL_SHEET: {
+  SET_ELECTIONS_BLOCK: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  SEND_ELECTORAL_SHEET: {
+  UPDATE_DATE_ELECTIONS: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  SET_IS_VOTING_IN_PROGRESS: {
+  GET_All_WALLETS: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  GET_ASSEMBLIES_LIST: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  GET_LIBER_STAKE_AMOUNT: {
+  SET_USER_WALLET: {
     call: undefined,
     success: undefined,
     failure: undefined,

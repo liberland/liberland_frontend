@@ -30,7 +30,7 @@ const NavigationCategory = ({
 
 NavigationCategory.propTypes = {
   category: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
     amountArticle: PropTypes.number.isRequired,

@@ -22,7 +22,7 @@ const SendLlmModal = ({
       amount: '10',
       account_from: addressFrom,
       // Default address to send is CHARLIE
-      account_to: '5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y',
+      account_to: '',
     },
   });
 

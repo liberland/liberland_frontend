@@ -1,7 +1,6 @@
 import {
   put, takeLatest, call, cps, select,
 } from 'redux-saga/effects';
-import { web3Enable } from '@polkadot/extension-dapp';
 
 import { votingActions } from '../actions';
 
@@ -11,25 +10,21 @@ import {
   sendElectoralSheetRpc,
   setIsVotingInProgressRpc,
   getMinistersRpc,
-  getPeriodAndVotingDurationRpc,
-  getCurrentBlockNumberRpc,
 } from '../../api/nodeRpcCall';
 
 import route from '../../router';
 
 import truncate from '../../utils/truncate';
-import { votingSelectors } from '../selectors';
+import { blockchainSelectors, votingSelectors } from '../selectors';
 
 // WORKERS
 
 function* addMyCandidacyWorker() {
   try {
-    const extensions = yield web3Enable('Liberland dapp');
-    if (extensions.length) {
-      yield cps(applyMyCandidacy);
-      yield put(votingActions.addMyCandidacy.success());
-      yield put(votingActions.getListOfCandidacy.call());
-    }
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    yield cps(applyMyCandidacy, walletAddress);
+    yield put(votingActions.addMyCandidacy.success());
+    yield put(votingActions.getListOfCandidacy.call());
   } catch (e) {
     yield put(votingActions.addMyCandidacy.failure(e));
   }
@@ -37,20 +32,17 @@ function* addMyCandidacyWorker() {
 
 function* getListOFCandidacyWorker() {
   try {
-    const extensions = yield web3Enable('Liberland dapp');
-    if (extensions.length) {
-      let listOfCandidacy = yield call(getCandidacyListRpc);
-      listOfCandidacy = yield listOfCandidacy.map((el) => (
-        {
-          id: el.pasportId,
-          deputies: truncate(el.pasportId, 10),
-          supported: '10.000 LLM',
-          action: 'Vote',
-          place: '',
-        }
-      ));
-      yield put(votingActions.getListOfCandidacy.success(listOfCandidacy));
-    }
+    let listOfCandidacy = yield call(getCandidacyListRpc);
+    listOfCandidacy = yield listOfCandidacy.map((el) => (
+      {
+        id: el.pasportId,
+        deputies: truncate(el.pasportId, 10),
+        supported: '10.000 LLM',
+        action: 'Vote',
+        place: '',
+      }
+    ));
+    yield put(votingActions.getListOfCandidacy.success(listOfCandidacy));
   } catch (e) {
     yield put(votingActions.getListOfCandidacy.failure(e));
   }
@@ -58,11 +50,12 @@ function* getListOFCandidacyWorker() {
 
 function* sendElectoralSheetWorker(action) {
   try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     const { history } = action.payload;
-    const extensions = yield web3Enable('Liberland dapp');
     const electoralSheet = yield select(votingSelectors.selectorElectoralSheet);
-    if (extensions.length) {
-      yield cps(sendElectoralSheetRpc, electoralSheet);
+    const args = [electoralSheet, walletAddress];
+    if (walletAddress) {
+      yield cps(sendElectoralSheetRpc, args);
       yield put(votingActions.sendElectoralSheet.success());
       yield call(history.push, route.voting.congressionalAssemble);
     }
@@ -80,33 +73,15 @@ function* setIsVotingInProgressWorker() {
   }
 }
 
-function* getMinistersListWorker() {
+function* getAssembliesListWorker() {
   try {
     const result = yield call(getMinistersRpc);
-    yield put(votingActions.getMinistersList.success(result.finaleObject));
+    yield put(votingActions.getAssembliesList.success(result.finaleObject));
     yield put(votingActions.getLiberStakeAmount.success(result.liberStakeAmount));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
-    yield put(votingActions.getMinistersList.failure(e));
-  }
-}
-
-function* getPeriodAndVotingDurationWorker() {
-  try {
-    const result = yield call(getPeriodAndVotingDurationRpc);
-    yield put(votingActions.getPeriodAndVotingDuration.success(result));
-  } catch (e) {
-    yield put(votingActions.getPeriodAndVotingDuration.failure(e));
-  }
-}
-
-function* getCurrentBlockNumberWorker() {
-  try {
-    const result = yield call(getCurrentBlockNumberRpc);
-    yield put(votingActions.getCurrentBlockNumber.success(result));
-  } catch (e) {
-    yield put(votingActions.getCurrentBlockNumber.failure(e));
+    yield put(votingActions.getAssembliesList.failure(e));
   }
 }
 
@@ -152,34 +127,13 @@ function* setIsVotingInProgressWatcher() {
   }
 }
 
-function* getMinistersListWatcher() {
+function* getAssembliesListWatcher() {
   try {
-    yield takeLatest(votingActions.getMinistersList.call, getMinistersListWorker);
+    yield takeLatest(votingActions.getAssembliesList.call, getAssembliesListWorker);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
-    yield put(votingActions.getMinistersList.failure(e));
-  }
-}
-
-function* getPeriodAndVotingDurationWatcher() {
-  try {
-    // eslint-disable-next-line max-len
-    yield takeLatest(votingActions.getPeriodAndVotingDuration.call, getPeriodAndVotingDurationWorker);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e);
-    yield put(votingActions.getPeriodAndVotingDuration.failure(e));
-  }
-}
-
-function* getCurrentBlockNumberWatcher() {
-  try {
-    yield takeLatest(votingActions.getCurrentBlockNumber.call, getCurrentBlockNumberWorker);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e);
-    yield put(votingActions.getCurrentBlockNumber.failure(e));
+    yield put(votingActions.getAssembliesList.failure(e));
   }
 }
 
@@ -188,7 +142,5 @@ export {
   getListOFCandidacyWatcher,
   sendElectoralSheetWatcher,
   setIsVotingInProgressWatcher,
-  getMinistersListWatcher,
-  getPeriodAndVotingDurationWatcher,
-  getCurrentBlockNumberWatcher,
+  getAssembliesListWatcher,
 };

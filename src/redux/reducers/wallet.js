@@ -27,6 +27,7 @@ const walletReducer = handleActions(
       walletActions.getWallet.call,
       walletActions.stakeToPolka.call,
       walletActions.stakeToLiberland.call,
+      walletActions.sendTransfer.call,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
@@ -42,6 +43,8 @@ const walletReducer = handleActions(
       walletActions.stakeToLiberland.success,
       walletActions.stakeToPolka.failure,
       walletActions.stakeToLiberland.failure,
+      walletActions.sendTransfer.success,
+      walletActions.sendTransfer.failure,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,

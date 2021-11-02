@@ -1,6 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import cx from 'classnames';
 import PropTypes from 'prop-types';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { walletActions } from '../../../redux/actions';
+import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 
 import prettyNumber from '../../../utils/prettyNumber';
 
@@ -10,6 +15,7 @@ import { ReactComponent as ArrowRedDownIcon } from '../../../assets/icons/arrow-
 import { ReactComponent as ArrowRedUpIcon } from '../../../assets/icons/arrow-red-up.svg';
 import { ReactComponent as ArrowBlueDownIcon } from '../../../assets/icons/arrow-blue-down.svg';
 import { ReactComponent as ArrowBlueUpIcon } from '../../../assets/icons/arrow-blue-up.svg';
+import { ChoseStakeModal } from '../../Modals';
 import Card from '../../Card';
 
 import styles from './styles.module.scss';
@@ -17,6 +23,35 @@ import styles from './styles.module.scss';
 const WalletOverview = ({
   totalBalance, balances, liquidMerits,
 }) => {
+  const [isModalOpenStake, setIsModalOpenStake] = useState(false);
+  const [modalShown, setModalShown] = useState(1);
+  const { handleSubmit, register } = useForm();
+  const dispatch = useDispatch();
+
+  const handleModalOpenStake = (title) => {
+    setIsModalOpenStake(!isModalOpenStake);
+
+    if (title === 'Liberstake') {
+      setModalShown(2);
+    } else if (title === 'Polkastake') {
+      setModalShown(1);
+    } else {
+      setIsModalOpenStake(false);
+    }
+  };
+
+  const isUserHaveStake = useSelector(walletSelectors.selectorIsUserHaveStake);
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+
+  const handleSubmitStakePolka = (values) => {
+    dispatch(walletActions.stakeToPolka.call({ values, isUserHaveStake, walletAddress }));
+    handleModalOpenStake();
+  };
+  const handleSubmitStakeLiberland = (values) => {
+    dispatch(walletActions.stakeToLiberland.call({ values, isUserHaveStake, walletAddress }));
+    handleModalOpenStake();
+  };
+
   const overviewInfo = [
     {
       amount: prettyNumber(balances.liberstake.amount),
@@ -42,6 +77,7 @@ const WalletOverview = ({
     {
       amount: prettyNumber(totalBalance),
       title: 'Total merits',
+
       diff: -0.6,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (-0.6 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
@@ -56,7 +92,11 @@ const WalletOverview = ({
             const isDiffPositive = cardInfo.diff > 0;
 
             return (
-              <div className={styles.cardInfo} key={cardInfo.title}>
+              <div
+                className={styles.cardInfo}
+                key={cardInfo.title}
+                onClick={() => handleModalOpenStake(cardInfo.title)}
+              >
                 <div className={styles.cardInfoIcon}>{cardInfo.getIcon()}</div>
                 <div className={styles.cardInfoAmountWrapper}>
                   <p className={styles.cardInfoAmount}>
@@ -86,6 +126,17 @@ const WalletOverview = ({
           })
         }
       </div>
+      {isModalOpenStake && (
+        <ChoseStakeModal
+          closeModal={handleModalOpenStake}
+          handleSubmit={handleSubmit}
+          register={register}
+          modalShown={modalShown}
+          setModalShown={setModalShown}
+          handleSubmitStakePolka={handleSubmitStakePolka}
+          handleSubmitStakeLiberland={handleSubmitStakeLiberland}
+        />
+      )}
     </Card>
   );
 };

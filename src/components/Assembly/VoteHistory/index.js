@@ -16,11 +16,23 @@ import ProposalDetailsModal from '../../Modals/ProposalDetailsModal';
 const VoteHistory = () => {
   const userId = useSelector(selectUserId);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [rowId, setRowId] = useState(null);
+  const [proposalModalProps, setproposalModalProps] = useState({});
 
-  const handleModalOpen = (id) => {
+  const handleModalOpen = ({
+    proposalName,
+    proposalStatus,
+    shortDescription,
+    threadLink,
+    id,
+  }) => {
     setIsModalOpen(!isModalOpen);
-    setRowId(id);
+    setproposalModalProps({
+      proposalName,
+      proposalStatus,
+      shortDescription,
+      threadLink,
+      id,
+    });
   };
 
   const data = useMemo(() => [
@@ -68,7 +80,7 @@ const VoteHistory = () => {
             <span>
               {cell.row.original.proposal}
             </span>
-            <Button grey nano onClick={() => handleModalOpen(cell.row.original.id)}>Details</Button>
+            <Button grey nano onClick={() => handleModalOpen(cell.row.original)}>Details</Button>
           </div>
         ),
       },
@@ -130,7 +142,16 @@ const VoteHistory = () => {
   return (
     <>
       <TableComponent title={`Votes history (${data.length})`} data={data} columns={columns} rowProps={rowProps} />
-      {isModalOpen && <ProposalDetailsModal proposalId={rowId} closeModal={handleModalOpen} />}
+      {isModalOpen && (
+        <ProposalDetailsModal
+          closeModal={handleModalOpen}
+          proposalName={proposalModalProps.proposalName}
+          proposalStatus={proposalModalProps.proposalStatus}
+          shortDescription={proposalModalProps.shortDescription}
+          threadLink={proposalModalProps.threadLink}
+          proposalId={proposalModalProps.id}
+        />
+      )}
     </>
   );
 };

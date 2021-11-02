@@ -5,6 +5,10 @@ const initialState = {
   isDraftSend: false,
   proposals: [],
   allSendProposals: [],
+  constitutionalChange: [],
+  legislation: [],
+  decision: [],
+  textPdf: [],
 };
 
 const assemblyReducer = handleActions(
@@ -16,6 +20,10 @@ const assemblyReducer = handleActions(
       assemblyActions.updateAllProposals.call,
       assemblyActions.getAllSendProposals.call,
       assemblyActions.voteByProposal.call,
+      assemblyActions.getConstitutionalChange.call,
+      assemblyActions.getLegislation.call,
+      assemblyActions.getDecision.call,
+      assemblyActions.getTextPdf.call,
     )]: (state) => ({
       ...state,
       isDraftSend: true,
@@ -30,6 +38,26 @@ const assemblyReducer = handleActions(
       allSendProposals: action.payload,
       isDraftSend: false,
     }),
+    [assemblyActions.getConstitutionalChange.success]: (state, action) => ({
+      ...state,
+      constitutionalChange: action.payload,
+      isDraftSend: false,
+    }),
+    [assemblyActions.getLegislation.success]: (state, action) => ({
+      ...state,
+      legislation: action.payload,
+      isDraftSend: false,
+    }),
+    [assemblyActions.getDecision.success]: (state, action) => ({
+      ...state,
+      decision: action.payload,
+      isDraftSend: false,
+    }),
+    [assemblyActions.getTextPdf.success]: (state, action) => ({
+      ...state,
+      textPdf: action.payload,
+      isDraftSend: false,
+    }),
     [combineActions(
       assemblyActions.getMyProposals.failure,
       assemblyActions.addMyDraft.success,
@@ -39,6 +67,10 @@ const assemblyReducer = handleActions(
       assemblyActions.updateAllProposals.failure,
       assemblyActions.voteByProposal.success,
       assemblyActions.voteByProposal.failure,
+      assemblyActions.getConstitutionalChange.failure,
+      assemblyActions.getLegislation.failure,
+      assemblyActions.getDecision.failure,
+      assemblyActions.getTextPdf.failure,
     )]: (state) => ({
       ...state,
       isDraftSend: false,

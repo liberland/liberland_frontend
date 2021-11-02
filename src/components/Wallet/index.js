@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { walletSelectors } from '../../redux/selectors';
+import { walletSelectors, blockchainSelectors } from '../../redux/selectors';
 import { walletActions } from '../../redux/actions';
 
 import WalletAddressesLine from './WalletAddressesLine';
@@ -11,7 +11,7 @@ import WalletTransactionHistory from './WalletTransactionHistory';
 import Card from '../Card';
 
 const Wallet = () => {
-  const walletInfo = useSelector(walletSelectors.selectorWalletInfo);
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const balances = useSelector(walletSelectors.selectorBalances);
   const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
@@ -24,9 +24,9 @@ const Wallet = () => {
 
   return (
     <>
-      { (walletInfo !== undefined) ? (
+      { (userWalletAddress !== undefined) ? (
         <div className={styles.walletWrapper}>
-          <WalletAddressesLine walletAddress={walletInfo.address} />
+          <WalletAddressesLine walletAddress={userWalletAddress} />
           <WalletOverview
             totalBalance={totalBalance}
             balances={balances}

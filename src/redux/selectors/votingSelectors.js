@@ -27,31 +27,9 @@ const selectorMinistersList = createSelector(
   (reducer) => reducer.ministersList,
 );
 
-const selectorAssemblyVotingDuration = createSelector(
-  votingReducer,
-  (reducer) => reducer.periodAndVotingDuration.assemblyVotingDuration,
-);
-
-const selectorAssemblyElectionPeriod = createSelector(
-  votingReducer,
-  (reducer) => reducer.periodAndVotingDuration.assemblyElectionPeriod,
-);
-
-const selectorCurrentBlockNumber = createSelector(
-  votingReducer,
-  (reducer) => reducer.currentBlockNumber,
-);
-
 const selectorLiberStakeAmount = createSelector(
   votingReducer,
   (reducer) => reducer.liberStakeAmount,
-);
-
-const selectorNumberCongressionalAssemble = createSelector(
-  selectorCurrentBlockNumber,
-  selectorAssemblyVotingDuration,
-  selectorAssemblyElectionPeriod,
-  (block, duration, Period) => block / (duration + Period),
 );
 
 export {
@@ -60,6 +38,5 @@ export {
   selectorElectoralSheet,
   selectorIsVotingInProgress,
   selectorMinistersList,
-  selectorNumberCongressionalAssemble,
   selectorLiberStakeAmount,
 };

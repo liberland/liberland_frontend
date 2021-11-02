@@ -6,6 +6,7 @@ import { web3Accounts } from '@polkadot/extension-dapp';
 import { assemblyActions } from '../actions';
 
 import {
+  blockchainSelectors,
   userSelectors, votingSelectors,
 } from '../selectors';
 
@@ -42,10 +43,12 @@ function* addMyDraftWorker(action) {
 
 function* submitProposalWorker(action) {
   try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     const { data } = yield api.get(`/assembly/calc_hash/${action.payload.id}`);
     // eslint-disable-next-line no-console
     console.log('hash', data.hash);
-    const resultSendNode = yield cps(sendLawProposal, data);
+    const args = [data, walletAddress];
+    const resultSendNode = yield cps(sendLawProposal, args);
 
     if (resultSendNode !== 'done') {
       yield put(assemblyActions.submitProposal.failure(resultSendNode));
@@ -123,7 +126,7 @@ function* updateAllProposalsWorker() {
     } = yield api.post('/assembly/update_all_proposals', { hashesAllProposals });
     yield put(assemblyActions.updateAllProposals.success(proposals));
     yield put(assemblyActions.getMyProposals.call());
-    yield put(assemblyActions.getAllSendProposals.call());
+    // yield put(assemblyActions.getAllSendProposals.call());
   } catch (e) {
     yield put(assemblyActions.updateAllProposals.failure(e));
   }
@@ -131,15 +134,21 @@ function* updateAllProposalsWorker() {
 
 function* voteByProposalWorker(action) {
   try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     const { docHash } = action.payload;
-    const result = yield cps(voteByProposalRpc, action.payload);
+    const args = [action.payload, walletAddress];
+    const result = yield cps(voteByProposalRpc, args);
     if (result === 'done') {
       const votePower = yield cps(getCurrentPowerProposalRpc, docHash);
       yield api.patch('/assembly/update_power_proposal', { docHash, votePower });
       yield put(assemblyActions.voteByProposal.success());
+      yield put(assemblyActions.updateAllProposals.call());
+    } else {
+      yield put(assemblyActions.voteByProposal.failure());
     }
-    yield put(assemblyActions.voteByProposal.failure());
   } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
     yield put(assemblyActions.voteByProposal.failure(e));
   }
 }
@@ -160,6 +169,33 @@ function* editDraftWorker(action) {
     // eslint-disable-next-line no-console
     console.log('e', e);
     yield put(assemblyActions.addMyDraft.failure(e));
+  }
+}
+
+function* getProposalsInProgressByTypeWorker(action) {
+  try {
+    const { data: { proposals } } = yield call(api.get, 'assembly/get_in_progress_proposals/', { params: { draftType: action.payload } });
+    switch (action.payload) {
+      case 'ConstitutionalChange': yield put(assemblyActions.getConstitutionalChange.success(proposals)); break;
+      case 'Legislation': yield put(assemblyActions.getLegislation.success(proposals)); break;
+      case 'Decision': yield put(assemblyActions.getDecision.success(proposals)); break;
+      default: yield put(assemblyActions.setGotSomeError.failure(`Unknown type of proposal ${action.payload}`));
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('e', e);
+    yield put(assemblyActions.setGotSomeError.failure(e));
+  }
+}
+
+function* getTextPdfWorker(action) {
+  try {
+    const { data } = yield call(api.get, `/assembly/get_text_pdf/${action.payload}`);
+    yield put(assemblyActions.getTextPdf.success(data));
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('e', e);
+    yield put(assemblyActions.getTextPdf.failure(e));
   }
 }
 
@@ -229,6 +265,41 @@ function* voteByProposalWatcher() {
   }
 }
 
+function* getConstitutionalChangeWatcher() {
+  try {
+    yield takeLatest(
+      assemblyActions.getConstitutionalChange.call,
+      getProposalsInProgressByTypeWorker,
+    );
+  } catch (e) {
+    yield put(assemblyActions.getConstitutionalChange.failure(e));
+  }
+}
+
+function* getLegislationWatcher() {
+  try {
+    yield takeLatest(assemblyActions.getLegislation.call, getProposalsInProgressByTypeWorker);
+  } catch (e) {
+    yield put(assemblyActions.getLegislation.failure(e));
+  }
+}
+
+function* getDecisionWatcher() {
+  try {
+    yield takeLatest(assemblyActions.getDecision.call, getProposalsInProgressByTypeWorker);
+  } catch (e) {
+    yield put(assemblyActions.getDecision.failure(e));
+  }
+}
+
+function* getTextPdfWatcher() {
+  try {
+    yield takeLatest(assemblyActions.getTextPdf.call, getTextPdfWorker);
+  } catch (e) {
+    yield put(assemblyActions.getTextPdf.failure(e));
+  }
+}
+
 export {
   addMyDraftWatcher,
   getMyProposalsWatcher,
@@ -238,4 +309,8 @@ export {
   getByHashesWatcher,
   updateAllProposalsWatcher,
   voteByProposalWatcher,
+  getConstitutionalChangeWatcher,
+  getLegislationWatcher,
+  getDecisionWatcher,
+  getTextPdfWatcher,
 };

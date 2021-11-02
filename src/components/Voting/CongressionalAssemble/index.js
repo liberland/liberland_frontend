@@ -7,6 +7,8 @@ import TableComponent from '../TableComponent';
 import Status from '../../Status';
 import ProgressBar from '../../ProgressBar';
 
+import truncate from '../../../utils/truncate';
+
 const CongressionalAssemble = () => {
   const userId = useSelector(userSelectors.selectUserId);
   const data = useSelector(votingSelectors.selectorMinistersList);
@@ -30,7 +32,7 @@ const CongressionalAssemble = () => {
               {' '}
             </>
           )
-          : cell.row.original.deputies),
+          : truncate(cell.row.original.deputies, 10)),
       },
       {
         Header: 'SUPPORTED',

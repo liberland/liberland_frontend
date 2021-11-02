@@ -89,6 +89,11 @@ const selectIsSignInFetching = createSelector(
   (reducer) => reducer.isSignInFetching,
 );
 
+const selectUserPassportId = createSelector(
+  selectUser,
+  (reducer) => reducer.passportId.toString(),
+);
+
 export {
   selectUser,
   selectIsSessionVerified,
@@ -103,4 +108,5 @@ export {
   selectUserOccupation,
   selectUserGender,
   selectUserLanguages,
+  selectUserPassportId,
 };
