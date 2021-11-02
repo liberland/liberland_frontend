@@ -13,32 +13,28 @@ import { ReactComponent as RedLike } from '../../../assets/icons/like-red.svg';
 import styles from './styles.module.scss';
 import ProposalDetailsModal from '../../Modals/ProposalDetailsModal';
 import { assemblyActions } from '../../../redux/actions';
+import { assemblySelectors } from '../../../redux/selectors';
 
 const ProposalsVoteTable = ({ currentProposals }) => {
   const dispatch = useDispatch();
   const userId = useSelector(selectUserId);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [proposalModalProps, setproposalModalProps] = useState({});
+  const texFromPdf = useSelector(assemblySelectors.textPdfSelector);
 
   useEffect(() => {
     dispatch(assemblyActions.updateAllProposals.call());
   }, [dispatch]);
 
-  const handleModalOpen = ({
-    proposalName,
-    proposalStatus,
-    shortDescription,
-    threadLink,
-    id,
-  }) => {
-    setIsModalOpen(!isModalOpen);
-    setproposalModalProps({
-      proposalName,
-      proposalStatus,
-      shortDescription,
-      threadLink,
-      id,
-    });
+  const handleProposalModalOpen = (proposal) => {
+    setIsProposalModalOpen(!isProposalModalOpen);
+    setproposalModalProps({ ...proposal, proposalModalShown: 0 });
+    dispatch(assemblyActions.getTextPdf.call(proposal.id));
+  };
+
+  const handleWorkerCall = (id) => {
+    dispatch(assemblyActions.getTextPdf.call(id));
+    setproposalModalProps({ ...proposalModalProps, proposalModalShown: 1 });
   };
 
   //   {
@@ -91,7 +87,13 @@ const ProposalsVoteTable = ({ currentProposals }) => {
             <span>
               {cell.row.original.proposalName}
             </span>
-            <Button grey nano onClick={() => handleModalOpen(cell.row.original)}>Details</Button>
+            <Button
+              grey
+              nano
+              onClick={() => handleProposalModalOpen(cell.row.original)}
+            >
+              Details
+            </Button>
           </div>
         ),
       },
@@ -177,14 +179,12 @@ const ProposalsVoteTable = ({ currentProposals }) => {
   return (
     <>
       <TableComponent title={`Legislation votes (${currentProposals.length})`} data={currentProposals} columns={columns} rowProps={rowProps} />
-      {isModalOpen && (
+      {isProposalModalOpen && (
         <ProposalDetailsModal
-          closeModal={handleModalOpen}
-          proposalName={proposalModalProps.proposalName}
-          proposalStatus={proposalModalProps.proposalStatus}
-          shortDescription={proposalModalProps.shortDescription}
-          threadLink={proposalModalProps.threadLink}
-          proposalId={proposalModalProps.id}
+          proposal={proposalModalProps}
+          closeModal={handleProposalModalOpen}
+          goToProposal={handleWorkerCall}
+          texFromPdf={texFromPdf}
         />
       )}
     </>
