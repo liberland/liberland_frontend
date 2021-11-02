@@ -19,13 +19,14 @@ code {
   left: 0;
   top: 0;
   overflow-y: scroll;
-  overflow-x: scroll;
+  opacity: 0;
 
   &.active {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.7);
     z-index: 999999;
+    opacity: 1;
   }
 
   & > .modal-wrapper {
@@ -35,5 +36,10 @@ code {
     transform: translate(-50%, -50%);
     background: #fff;
     border-radius: 20px;
+  }
+
+  & > .modal-text-wrapper {
+    top: 5%;
+    transform: translate(-50%, 0%);
   }
 }

@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 import Button from '../../Button/Button';
 import ProposalDetailsModal from '../../Modals/ProposalDetailsModal';
+
+import { assemblyActions } from '../../../redux/actions';
+import { assemblySelectors } from '../../../redux/selectors';
 
 import { ReactComponent as Icon } from '../../../assets/icons/blue-square.svg';
 import styles from './styles.module.scss';
@@ -10,22 +14,18 @@ import styles from './styles.module.scss';
 const Article = ({ article, type }) => {
   const [isProposalModalOpen, setIsProposalModalOpen] = useState(false);
   const [proposalModalProps, setproposalModalProps] = useState({});
+  const dispatch = useDispatch();
+  const texFromPdf = useSelector(assemblySelectors.textPdfSelector);
 
-  const handleProposalModalOpen = ({
-    proposalName,
-    proposalStatus,
-    shortDescription,
-    threadLink,
-    id,
-  }) => {
+  const handleWorkerCall = (id) => {
+    dispatch(assemblyActions.getTextPdf.call(id));
+    setproposalModalProps({ ...proposalModalProps, proposalModalShown: 1 });
+  };
+
+  const handleProposalModalOpen = (proposal) => {
     setIsProposalModalOpen(!isProposalModalOpen);
-    setproposalModalProps({
-      proposalName,
-      proposalStatus,
-      shortDescription,
-      threadLink,
-      id,
-    });
+    setproposalModalProps({ ...proposal, proposalModalShown: 0 });
+    dispatch(assemblyActions.getTextPdf.call(proposal.id));
   };
 
   return (
@@ -61,12 +61,10 @@ const Article = ({ article, type }) => {
       </div>
       {isProposalModalOpen && (
         <ProposalDetailsModal
+          proposal={proposalModalProps}
           closeModal={handleProposalModalOpen}
-          proposalName={proposalModalProps.proposalName}
-          proposalStatus={proposalModalProps.proposalStatus}
-          shortDescription={proposalModalProps.shortDescription}
-          threadLink={proposalModalProps.threadLink}
-          proposalId={proposalModalProps.id}
+          goToProposal={handleWorkerCall}
+          texFromPdf={texFromPdf}
         />
       )}
     </div>

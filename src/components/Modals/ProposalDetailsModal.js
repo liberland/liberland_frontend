@@ -15,51 +15,75 @@ import styles from './styles.module.scss';
 
 const ProposalDetailsModal = ({
   // eslint-disable-next-line react/prop-types
+  proposal: {
+    proposalName,
+    proposalStatus,
+    shortDescription,
+    threadLink,
+    proposalSubmiter,
+    proposalId,
+    proposalModalShown,
+  },
+  goToProposal,
+  texFromPdf,
   closeModal,
-  proposalName,
-  proposalStatus,
-  shortDescription,
-  threadLink,
-  proposalSubmiter,
 }) => (
   // Here you need to fetch data for chosen proposal using proposalRow
   // eslint-disable-next-line no-console
-  <div className={styles.getCitizenshipModal}>
-    <div className={styles.h3}>Proposal details</div>
-    <div className={styles.h4}>{proposalName}</div>
-    <div className={styles.description}>{shortDescription}</div>
-    <div className={styles.infoSection}>
-      <div className={styles.infoItem}>
-        <OccupationImage />
-        <span>Submitted by</span>
-        <span className={styles.valueOfItem}>{proposalSubmiter}</span>
+  <>
+    {proposalModalShown === 0 && (
+      <div className={styles.getCitizenshipModal}>
+        <div className={styles.h3}>Proposal details</div>
+        <div className={styles.h4}>{proposalName}</div>
+        <div className={styles.description}>{shortDescription}</div>
+        <div className={styles.infoSection}>
+          <div className={styles.infoItem}>
+            <OccupationImage />
+            <span>Submitted by</span>
+            <span className={styles.valueOfItem}>{proposalSubmiter}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <LikeGrey />
+            <span>Current status</span>
+            <span className={styles.valueOfItem}>{proposalStatus}</span>
+          </div>
+          <div className={styles.infoItem}>
+            <GroupChat />
+            <span>Discussion thread</span>
+            <span className={cx(styles.valueOfItem, styles.yellow)}>{threadLink}</span>
+          </div>
+        </div>
+        <div className={styles.buttonWrapper}>
+          <Button
+            medium
+            onClick={closeModal}
+          >
+            Cancel
+          </Button>
+          <Button
+            primary
+            medium
+            onClick={() => goToProposal(proposalId)}
+          >
+            Go to proposal
+          </Button>
+        </div>
       </div>
-      <div className={styles.infoItem}>
-        <LikeGrey />
-        <span>Current status</span>
-        <span className={styles.valueOfItem}>{proposalStatus}</span>
+    )}
+    {proposalModalShown === 1 && (
+      <div className={styles.getCitizenshipModal}>
+        <p>{texFromPdf}</p>
+        <div className={styles.buttonWrapper}>
+          <Button
+            medium
+            onClick={closeModal}
+          >
+            Close
+          </Button>
+        </div>
       </div>
-      <div className={styles.infoItem}>
-        <GroupChat />
-        <span>Discussion thread</span>
-        <span className={cx(styles.valueOfItem, styles.yellow)}>{threadLink}</span>
-      </div>
-    </div>
-    <div className={styles.buttonWrapper}>
-      <Button
-        medium
-        onClick={closeModal}
-      >
-        Cancel
-      </Button>
-      <Button
-        primary
-        medium
-      >
-        Go to proposal
-      </Button>
-    </div>
-  </div>
+    )}
+  </>
 );
 
 const ProposalDetailsModalWrapper = (props) => (
@@ -69,20 +93,32 @@ const ProposalDetailsModalWrapper = (props) => (
 );
 
 ProposalDetailsModal.propTypes = {
+  proposal: PropTypes.shape({
+    proposalName: PropTypes.string,
+    proposalStatus: PropTypes.string,
+    shortDescription: PropTypes.string,
+    threadLink: PropTypes.string,
+    proposalSubmiter: PropTypes.string,
+    proposalId: PropTypes.number,
+    proposalModalShown: PropTypes.number,
+  }),
+  goToProposal: PropTypes.func,
+  texFromPdf: PropTypes.string,
   closeModal: PropTypes.func.isRequired,
-  proposalName: PropTypes.string,
-  proposalStatus: PropTypes.string,
-  shortDescription: PropTypes.string,
-  threadLink: PropTypes.string,
-  proposalSubmiter: PropTypes.string,
 };
 
 ProposalDetailsModal.defaultProps = {
-  proposalName: 'PROPOSAL NAME',
-  proposalStatus: 'PROPOSAL STATUS',
-  shortDescription: 'PROPOSAL DESCRIPTION',
-  threadLink: 'THERE IS NO THREAD',
-  proposalSubmiter: 'PROPOSAL SUBMITER',
+  proposal: ({
+    proposalName: 'PROPOSAL NAME',
+    proposalStatus: 'PROPOSAL STATUS',
+    shortDescription: 'PROPOSAL DESCRIPTION',
+    threadLink: 'THERE IS NO THREAD',
+    proposalSubmiter: 'PROPOSAL SUBMITER',
+    proposalId: 0,
+    proposalModalShown: 0,
+  }),
+  goToProposal: () => null,
+  texFromPdf: '',
 };
 
 export default ProposalDetailsModalWrapper;

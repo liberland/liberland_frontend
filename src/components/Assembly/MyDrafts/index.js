@@ -23,25 +23,20 @@ const MyDrafts = () => {
   const [selectedDraft, setSelectedDraft] = useState({});
   const [proposalModalProps, setproposalModalProps] = useState({});
   const dispatch = useDispatch();
+  const texFromPdf = useSelector(assemblySelectors.textPdfSelector);
   const liberStakeAmount = useSelector(votingSelectors.selectorLiberStakeAmount);
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
 
-  const handleProposalModalOpen = ({
-    proposalName,
-    proposalStatus,
-    shortDescription,
-    threadLink,
-    id,
-  }) => {
+  const handleWorkerCall = (id) => {
+    dispatch(assemblyActions.getTextPdf.call(id));
+    setproposalModalProps({ ...proposalModalProps, proposalModalShown: 1 });
+  };
+
+  const handleProposalModalOpen = (proposal) => {
     setIsProposalModalOpen(!isProposalModalOpen);
-    setproposalModalProps({
-      proposalName,
-      proposalStatus,
-      shortDescription,
-      threadLink,
-      id,
-    });
+    setproposalModalProps({ ...proposal, proposalModalShown: 0 });
+    dispatch(assemblyActions.getTextPdf.call(proposal.id));
   };
 
   const handleEditModalOpen = (draft) => {
@@ -253,12 +248,10 @@ const MyDrafts = () => {
       )}
       {isProposalModalOpen && (
         <ProposalDetailsModal
+          proposal={proposalModalProps}
           closeModal={handleProposalModalOpen}
-          proposalName={proposalModalProps.proposalName}
-          proposalStatus={proposalModalProps.proposalStatus}
-          shortDescription={proposalModalProps.shortDescription}
-          threadLink={proposalModalProps.threadLink}
-          proposalId={proposalModalProps.id}
+          goToProposal={handleWorkerCall}
+          texFromPdf={texFromPdf}
         />
       )}
     </Card>

@@ -188,6 +188,17 @@ function* getProposalsInProgressByTypeWorker(action) {
   }
 }
 
+function* getTextPdfWorker(action) {
+  try {
+    const { data } = yield call(api.get, `/assembly/get_text_pdf/${action.payload}`);
+    yield put(assemblyActions.getTextPdf.success(data));
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('e', e);
+    yield put(assemblyActions.getTextPdf.failure(e));
+  }
+}
+
 // WATCHERS
 
 function* addMyDraftWatcher() {
@@ -281,6 +292,14 @@ function* getDecisionWatcher() {
   }
 }
 
+function* getTextPdfWatcher() {
+  try {
+    yield takeLatest(assemblyActions.getTextPdf.call, getTextPdfWorker);
+  } catch (e) {
+    yield put(assemblyActions.getTextPdf.failure(e));
+  }
+}
+
 export {
   addMyDraftWatcher,
   getMyProposalsWatcher,
@@ -293,4 +312,5 @@ export {
   getConstitutionalChangeWatcher,
   getLegislationWatcher,
   getDecisionWatcher,
+  getTextPdfWatcher,
 };

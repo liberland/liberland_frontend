@@ -14,6 +14,7 @@ export const {
   getLegislation,
   getDecision,
   setGotSomeError,
+  getTextPdf,
 } = createActions({
   ADD_MY_DRAFT: {
     call: undefined,
@@ -76,6 +77,11 @@ export const {
     failure: undefined,
   },
   SET_GOT_SOME_ERROR: {
+    failure: undefined,
+  },
+  GET_TEXT_PDF: {
+    call: undefined,
+    success: undefined,
     failure: undefined,
   },
 });

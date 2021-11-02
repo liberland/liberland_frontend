@@ -40,6 +40,7 @@ export default function* rootSaga() {
     assemblySagas.getConstitutionalChangeWatcher(),
     assemblySagas.getLegislationWatcher(),
     assemblySagas.getDecisionWatcher(),
+    assemblySagas.getTextPdfWatcher(),
 
     // VOTING
     votingSagas.addMyCandidacyWatcher(),
