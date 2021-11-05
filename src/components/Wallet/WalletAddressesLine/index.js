@@ -19,6 +19,8 @@ import { ReactComponent as CopyIcon } from '../../../assets/icons/copy.svg';
 import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
 
+import { getEventsInBlockRpc } from '../../../api/nodeRpcCall';
+
 const WalletAddressesLine = ({ walletAddress }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenStake, setIsModalOpenStake] = useState(false);
@@ -40,6 +42,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
   const handleModalOpenStake = () => {
     setIsModalOpenStake(!isModalOpenStake);
     setModalShown(0);
+    getEventsInBlockRpc();
   };
   const handleSubmitForm = (values) => {
     dispatch(walletActions.sendTransfer.call(values));
