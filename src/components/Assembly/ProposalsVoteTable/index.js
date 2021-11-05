@@ -29,7 +29,6 @@ const ProposalsVoteTable = ({ currentProposals }) => {
   const handleProposalModalOpen = (proposal) => {
     setIsProposalModalOpen(!isProposalModalOpen);
     setproposalModalProps({ ...proposal, proposalModalShown: 0 });
-    dispatch(assemblyActions.getTextPdf.call(proposal.id));
   };
 
   const handleWorkerCall = () => {
