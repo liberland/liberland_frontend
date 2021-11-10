@@ -12,7 +12,7 @@ import styles from './styles.module.scss';
 
 const SendLlmModal = ({
   // eslint-disable-next-line react/prop-types
-  onSubmit, closeModal, addressFrom,
+  onSubmit, closeModal, addressFrom, setSendAddress,
 }) => {
   const {
     handleSubmit,
@@ -46,6 +46,7 @@ const SendLlmModal = ({
         register={register}
         name="account_to"
         placeholder="Send to address"
+        setSendAddress={setSendAddress}
         required
       />
 

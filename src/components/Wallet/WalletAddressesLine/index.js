@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
+import { decodeAddress, encodeAddress } from '@polkadot/keyring';
+import { hexToU8a, isHex } from '@polkadot/util';
 import cx from 'classnames';
 import Button from '../../Button/Button';
 import NotificationPortal from '../../NotificationPortal';
@@ -24,6 +26,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenStake, setIsModalOpenStake] = useState(false);
   const [modalShown, setModalShown] = useState(0);
+  const [sendAddress, setSendAddress] = useState('');
   const { handleSubmit, register } = useForm();
   const dispatch = useDispatch();
   const notificationRef = useRef();
@@ -36,7 +39,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
 
   const handleCopyClick = (event, mode) => {
     navigator.clipboard.writeText(addresses[event.currentTarget.getAttribute('name')]);
-    notificationRef.current.addMessage({ mode, text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit.' });
+    notificationRef.current.addMessage({ mode, text: 'Address was copied' });
   };
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
@@ -44,9 +47,27 @@ const WalletAddressesLine = ({ walletAddress }) => {
     setIsModalOpenStake(!isModalOpenStake);
     setModalShown(0);
   };
+  const isValidAddressPolkadotAddress = (address) => {
+    try {
+      encodeAddress(
+        isHex(address)
+          ? hexToU8a(address)
+          : decodeAddress(address),
+      );
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
   const handleSubmitForm = (values) => {
-    dispatch(walletActions.sendTransfer.call(values));
-    handleModalOpen();
+    const isAddressValid = isValidAddressPolkadotAddress(sendAddress);
+
+    if (isAddressValid) {
+      dispatch(walletActions.sendTransfer.call(values));
+      handleModalOpen();
+    } else {
+      notificationRef.current.addMessage({ mode: 'error', text: 'Invalid address.' });
+    }
   };
   const handleSubmitStakePolka = (values) => {
     dispatch(walletActions.stakeToPolka.call({ values, isUserHaveStake, walletAddress }));
@@ -94,6 +115,8 @@ const WalletAddressesLine = ({ walletAddress }) => {
           onSubmit={handleSubmitForm}
           closeModal={handleModalOpen}
           addressFrom={walletAddress}
+          setSendAddress={setSendAddress}
+          sendAddress={sendAddress}
         />
         )}
         {isModalOpenStake && (
