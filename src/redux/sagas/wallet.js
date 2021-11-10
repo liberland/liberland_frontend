@@ -7,7 +7,9 @@ import {
   sendTransfer,
   stakeToPolkaBondAndExtra,
   stakeToLiberlandBondAndExtra,
+  getResultByHashRpc,
 } from '../../api/nodeRpcCall';
+import api from '../../api';
 
 import { walletActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
@@ -44,13 +46,43 @@ function* stakeToLiberlandWorker(action) {
     yield put(walletActions.stakeToLiberland.failure(e));
   }
 }
+
+function* sendTxToDb(tx) {
+  try {
+    const { data: { result } } = yield call(api.post, '/wallet/insert_tx', tx);
+    return result;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log('Error in sendTxToDb', e);
+    return 'failure';
+  }
+}
+
 function* sendTransferWorker(action) {
   try {
-    yield cps(sendTransfer, action.payload);
-    yield put(walletActions.sendTransfer.success);
-    yield put(walletActions.getWallet.call);
+    const blockHash = yield cps(sendTransfer, action.payload);
+    const status = yield call(getResultByHashRpc, blockHash);
+    const tx = { ...action.payload, status };
+    const result = yield call(sendTxToDb, tx);
+    if (result === 'success') {
+      yield put(walletActions.sendTransfer.success());
+      yield put(walletActions.getWallet.call());
+    } else {
+      yield put(walletActions.sendTransfer.failure());
+    }
   } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
     yield put(walletActions.sendTransfer.failure(e));
+  }
+}
+
+function* getThreeTxWorker() {
+  try {
+    const { data: { threeTx } } = yield call(api.get, 'wallet/get_tree_tx');
+    yield put(walletActions.getThreeTx.success(threeTx));
+  } catch (e) {
+    yield put(walletActions.getThreeTx.failure(e));
   }
 }
 
@@ -88,9 +120,18 @@ function* stakeToLiberlandWatcher() {
   }
 }
 
+function* getThreeTxWatcher() {
+  try {
+    yield takeLatest(walletActions.getThreeTx.call, getThreeTxWorker);
+  } catch (e) {
+    yield put(walletActions.getThreeTx.failure(e));
+  }
+}
+
 export {
   getWalletWatcher,
   sendTransferWatcher,
   stakeToPolkaWatcher,
   stakeToLiberlandWatcher,
+  getThreeTxWatcher,
 };

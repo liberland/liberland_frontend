@@ -71,7 +71,7 @@ const sendTransfer = async (payload, callback) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, 'done');
+      callback(null, status.asInBlock.toString());
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
@@ -492,18 +492,9 @@ const getUserPassportId = async (walletAddress) => {
 
 const getAllWalletsRpc = async () => web3Accounts();
 
-const getEventsInBlockRpc = async () => {
-  // fail balance tx 0x5c3adce7771c9bd8b18f15a08fef7a06a0ff971e490840dbe471788c06678c1a
-  // normal balance tx 0x140d3487352f6a736a083f9770d8a8d680f405919eca6704913aae1cdcbf737f
-  // eslint-disable-next-line max-len
-  // fail apply my candidance tx 0x30f8ca85b9b3793378be9a34a0d65b33bc9496e6fe6e1e522657ae4debb08ef7 non citizen
-  // eslint-disable-next-line max-len
-  // fail apply my candidance tx 0x25aa65f0fb5e7c4567b2856ce478a3a204f64c57e0cde5d03dfc68a13b2ebd92  citizen
-  // eslint-disable-next-line max-len
-  // normal apply my candidance tx 0x60f2d526792dea914c989aa17d1fc556b1776985e52282f29dac3bdd4c652b7a  citizen
-
+const getResultByHashRpc = async (blockHash) => {
   const api = await ApiPromise.create({ provider });
-  const signedBlock = await api.rpc.chain.getBlock('0x5c3adce7771c9bd8b18f15a08fef7a06a0ff971e490840dbe471788c06678c1a');
+  const signedBlock = await api.rpc.chain.getBlock(blockHash);
   const allRecords = await api.query.system.events.at(signedBlock.block.header.hash);
 
   // map between the extrinsics and events
@@ -514,12 +505,11 @@ const getEventsInBlockRpc = async () => {
       .filter(({ phase }) => phase.isApplyExtrinsic
             && phase.asApplyExtrinsic.eq(index))
     // test the events against the specific types we are looking for
+    // eslint-disable-next-line consistent-return
       .forEach(({ event }) => {
         if (api.events.system.ExtrinsicSuccess.is(event)) {
           // extract the data for this event
           // (In TS, because of the guard above, these will be typed)
-          // eslint-disable-next-line no-console
-          console.log('event ', event.toHuman());
           const [dispatchInfo] = event.data;
 
           // eslint-disable-next-line no-console
@@ -545,9 +535,11 @@ const getEventsInBlockRpc = async () => {
           }
           // eslint-disable-next-line no-console
           console.log(`${section}.${method}:: ExtrinsicFailed:: ${errorInfo}`);
+          return ('failure');
         }
       });
   });
+  return ('success');
 };
 
 export {
@@ -570,5 +562,5 @@ export {
   getCurrentPowerProposalRpc,
   getUserPassportId,
   getAllWalletsRpc,
-  getEventsInBlockRpc,
+  getResultByHashRpc,
 };

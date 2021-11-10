@@ -27,6 +27,7 @@ export default function* rootSaga() {
     walletSagas.sendTransferWatcher(),
     walletSagas.stakeToPolkaWatcher(),
     walletSagas.stakeToLiberlandWatcher(),
+    walletSagas.getThreeTxWatcher(),
 
     // ASSEMBLY
     assemblySagas.addMyDraftWatcher(),
