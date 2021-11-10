@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react';
 import cx from 'classnames';
+import PropTypes from 'prop-types';
 
 import styles from './styles.module.scss';
 
@@ -16,6 +17,7 @@ const TextInput = ({
   errorTitle,
   withIcon = false,
   Icon,
+  setSendAddress,
 }) => (
   <div className={styles.inputWrapper}>
     {Icon && <Icon className={styles.inputIcon} />}
@@ -25,6 +27,7 @@ const TextInput = ({
       placeholder={placeholder}
       width={width}
       error={error}
+      onInput={(e) => setSendAddress(e.target.value)}
       {...register(name, {
         validate,
         pattern,
@@ -34,5 +37,13 @@ const TextInput = ({
     <div />
   </div>
 );
+
+TextInput.propTypes = {
+  setSendAddress: PropTypes.func,
+};
+
+TextInput.defaultProps = {
+  setSendAddress: () => null,
+};
 
 export default TextInput;
