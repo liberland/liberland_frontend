@@ -67,6 +67,7 @@ function* sendTransferWorker(action) {
     if (result === 'success') {
       yield put(walletActions.sendTransfer.success());
       yield put(walletActions.getWallet.call());
+      yield put(walletActions.getThreeTx.call());
     } else {
       yield put(walletActions.sendTransfer.failure());
     }
@@ -79,7 +80,13 @@ function* sendTransferWorker(action) {
 
 function* getThreeTxWorker() {
   try {
-    const { data: { threeTx } } = yield call(api.get, 'wallet/get_tree_tx');
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const { data: { threeTx } } = yield call(api.post, 'wallet/get_tree_tx', { walletAddress });
+    // eslint-disable-next-line array-callback-return
+    yield threeTx.map((oneTx) => {
+      // eslint-disable-next-line no-param-reassign
+      if (oneTx.account_from === walletAddress) oneTx.amount *= (-1);
+    });
     yield put(walletActions.getThreeTx.success(threeTx));
   } catch (e) {
     yield put(walletActions.getThreeTx.failure(e));
