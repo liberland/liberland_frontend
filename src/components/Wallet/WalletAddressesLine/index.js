@@ -37,9 +37,9 @@ const WalletAddressesLine = ({ walletAddress }) => {
 
   const isUserHaveStake = useSelector(walletSelectors.selectorIsUserHaveStake);
 
-  const handleCopyClick = (event, mode) => {
+  const handleCopyClick = (event) => {
     navigator.clipboard.writeText(addresses[event.currentTarget.getAttribute('name')]);
-    notificationRef.current.addMessage({ mode, text: 'Address was copied' });
+    notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
@@ -66,7 +66,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
       dispatch(walletActions.sendTransfer.call(values));
       handleModalOpen();
     } else {
-      notificationRef.current.addMessage({ mode: 'error', text: 'Invalid address.' });
+      notificationRef.current.addError({ text: 'Invalid address.' });
     }
   };
   const handleSubmitStakePolka = (values) => {
@@ -88,7 +88,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
             <p className={styles.address}>
               <WalletActiveIcon />
               {addresses.walletAddress ? truncate(addresses.walletAddress, 13) : ''}
-              <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={(e) => handleCopyClick(e, 'success')} />
+              <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={(e) => handleCopyClick(e)} />
             </p>
           </div>
           <div className={styles.singleAddressWrapper}>
@@ -96,7 +96,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
             <p className={styles.address}>
               <ValidatorIcon />
               {truncate(addresses.validatorAddress, 13)}
-              <CopyIcon className={styles.copyIcon} name="validatorAddress" onClick={(e) => handleCopyClick(e, 'success')} />
+              <CopyIcon className={styles.copyIcon} name="validatorAddress" onClick={(e) => handleCopyClick(e)} />
             </p>
           </div>
         </div>
