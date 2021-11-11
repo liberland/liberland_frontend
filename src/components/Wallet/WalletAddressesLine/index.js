@@ -9,7 +9,7 @@ import Button from '../../Button/Button';
 import NotificationPortal from '../../NotificationPortal';
 
 import { walletActions } from '../../../redux/actions';
-import { walletSelectors } from '../../../redux/selectors';
+import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
 
 import { ChoseStakeModal, SendLlmModal } from '../../Modals';
 
@@ -36,10 +36,11 @@ const WalletAddressesLine = ({ walletAddress }) => {
   };
 
   const isUserHaveStake = useSelector(walletSelectors.selectorIsUserHaveStake);
+  const userWalletAddressSelector = useSelector(blockchainSelectors.userWalletAddressSelector);
 
-  const handleCopyClick = (event, mode) => {
-    navigator.clipboard.writeText(addresses[event.currentTarget.getAttribute('name')]);
-    notificationRef.current.addMessage({ mode, text: 'Address was copied' });
+  const handleCopyClick = () => {
+    navigator.clipboard.writeText(userWalletAddressSelector);
+    notificationRef.current.addMessage({ mode: 'success', text: 'Address was copied' });
   };
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
@@ -88,7 +89,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
             <p className={styles.address}>
               <WalletActiveIcon />
               {addresses.walletAddress ? truncate(addresses.walletAddress, 13) : ''}
-              <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={(e) => handleCopyClick(e, 'success')} />
+              <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={handleCopyClick} />
             </p>
           </div>
           <div className={styles.singleAddressWrapper}>
@@ -96,7 +97,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
             <p className={styles.address}>
               <ValidatorIcon />
               {truncate(addresses.validatorAddress, 13)}
-              <CopyIcon className={styles.copyIcon} name="validatorAddress" onClick={(e) => handleCopyClick(e, 'success')} />
+              <CopyIcon className={styles.copyIcon} name="validatorAddress" onClick={handleCopyClick} />
             </p>
           </div>
         </div>
