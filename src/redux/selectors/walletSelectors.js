@@ -41,6 +41,11 @@ const selectorIsUserHaveStake = createSelector(
   },
 );
 
+const selectorHistoryTx = createSelector(
+  walletReducer,
+  (reducer) => reducer.historyTx,
+);
+
 export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
@@ -49,4 +54,5 @@ export {
   selectorTotalBalance,
   selectorWalletAddress,
   selectorIsUserHaveStake,
+  selectorHistoryTx,
 };

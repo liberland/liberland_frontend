@@ -19,6 +19,7 @@ const initialState = {
     },
   },
   gettingWalletInfo: false,
+  historyTx: [{}],
 };
 
 const walletReducer = handleActions(
@@ -28,6 +29,7 @@ const walletReducer = handleActions(
       walletActions.stakeToPolka.call,
       walletActions.stakeToLiberland.call,
       walletActions.sendTransfer.call,
+      walletActions.getThreeTx.call,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
@@ -35,6 +37,11 @@ const walletReducer = handleActions(
     [walletActions.getWallet.success]: (state, action) => ({
       ...state,
       walletInfo: action.payload,
+    }),
+    [walletActions.getThreeTx.success]: (state, action) => ({
+      ...state,
+      historyTx: action.payload,
+      gettingWalletInfo: initialState.gettingWalletInfo,
     }),
     [combineActions(
       walletActions.getWallet.success,
