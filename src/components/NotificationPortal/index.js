@@ -12,12 +12,6 @@ import Notification from '../Notification';
 
 import styles from './styles.module.scss';
 
-const NotificationMessage = {
-  success: 'success',
-  warning: 'warning',
-  error: 'error',
-};
-
 const NotificationPortal = forwardRef(({ closingTime }, ref) => {
   const [notifications, setNotifications] = useState([]);
   const [removing, setRemoving] = useState('');
@@ -43,14 +37,36 @@ const NotificationPortal = forwardRef(({ closingTime }, ref) => {
   }, [notifications]);
 
   useImperativeHandle(ref, () => ({
-    addMessage(notification) {
+    addSuccess(notification) {
       setNotifications([
         ...notifications,
         {
+          mode: 'success',
+          heading: 'Success',
           text: notification.text,
-          mode: notification.mode,
           id: new Date().valueOf() * Math.random(),
-          heading: NotificationMessage[notification.mode],
+        },
+      ]);
+    },
+    addError(notification) {
+      setNotifications([
+        ...notifications,
+        {
+          mode: 'error',
+          heading: 'Error',
+          text: notification.text,
+          id: new Date().valueOf() * Math.random(),
+        },
+      ]);
+    },
+    addWarning(notification) {
+      setNotifications([
+        ...notifications,
+        {
+          mode: 'warning',
+          heading: 'Warning',
+          text: notification.text,
+          id: new Date().valueOf() * Math.random(),
         },
       ]);
     },
