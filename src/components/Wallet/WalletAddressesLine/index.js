@@ -9,7 +9,7 @@ import Button from '../../Button/Button';
 import NotificationPortal from '../../NotificationPortal';
 
 import { walletActions } from '../../../redux/actions';
-import { walletSelectors } from '../../../redux/selectors';
+import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
 
 import { ChoseStakeModal, SendLlmModal } from '../../Modals';
 
@@ -36,9 +36,10 @@ const WalletAddressesLine = ({ walletAddress }) => {
   };
 
   const isUserHaveStake = useSelector(walletSelectors.selectorIsUserHaveStake);
+  const userWalletAddressSelector = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   const handleCopyClick = (event) => {
-    navigator.clipboard.writeText(addresses[event.currentTarget.getAttribute('name')]);
+    navigator.clipboard.writeText(userWalletAddressSelector);
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
 
