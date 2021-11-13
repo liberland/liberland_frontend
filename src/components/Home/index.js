@@ -12,6 +12,7 @@ import Documents from '../Documents';
 import Voting from '../Voting';
 import Feed from '../Feed';
 import Assembly from '../Assembly';
+import AllTransactions from '../Wallet/AllTransactions';
 import styles from './styles.module.scss';
 
 const Home = () => (
@@ -24,10 +25,11 @@ const Home = () => (
           <Route path={router.home.profile} component={Profile} />
           <Route path={router.home.feed} component={Feed} />
           <Route path={router.home.documents} component={Documents} />
-          <Route path={router.home.wallet} component={Wallet} />
+          <Route exact path={router.home.wallet} component={Wallet} />
           <Route path={router.home.voting} component={Voting} />
           <Route path={router.home.assembly} component={Assembly} />
           <Route path={router.home.constitution} component={Constitution} />
+          <Route path={router.wallet.allTransactions} component={AllTransactions} />
 
           <Route
             exact
