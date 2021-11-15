@@ -40,7 +40,7 @@ const WalletTransactionHistory = ({ transactionHistory, textForBtn, bottomButton
                           Payment from
                           {' '}
                           <span>
-                            {transactionHistoryInfo.account_to}
+                            {transactionHistoryInfo.account_from}
                           </span>
                         </p>
                       )
