@@ -32,4 +32,7 @@ export default {
     voteHistory: '/home/assembly/vote-history',
     pmElection: '/home/assembly/pm-election',
   },
+  wallet: {
+    allTransactions: '/home/wallet/all-transactions',
+  },
 };

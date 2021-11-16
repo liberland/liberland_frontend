@@ -12,7 +12,7 @@ import {
 import api from '../../api';
 
 import { walletActions } from '../actions';
-import { blockchainSelectors } from '../selectors';
+import { blockchainSelectors, walletSelectors } from '../selectors';
 
 // WORKERS
 
@@ -83,13 +83,40 @@ function* getThreeTxWorker() {
     const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     const { data: { threeTx } } = yield call(api.post, 'wallet/get_tree_tx', { walletAddress });
     // eslint-disable-next-line array-callback-return
-    yield threeTx.map((oneTx) => {
+    yield threeTx.rows.map((oneTx) => {
       // eslint-disable-next-line no-param-reassign
       if (oneTx.account_from === walletAddress) oneTx.amount *= (-1);
     });
     yield put(walletActions.getThreeTx.success(threeTx));
   } catch (e) {
     yield put(walletActions.getThreeTx.failure(e));
+  }
+}
+
+function* getMoreTxWorker() {
+  try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const currentPage = yield select(walletSelectors.selectorCurrentPageNumber);
+    const countAllRows = yield select(walletSelectors.selectorCountAllRows);
+    const allTx = yield select(walletSelectors.selectorAllHistoryTx);
+    const offset = 7 * currentPage;
+    if (countAllRows > offset) {
+      const { data: { historyTx } } = yield call(api.post, 'wallet/get_more_tx', { walletAddress, offset });
+      const updatedData = yield historyTx.map((oneRow) => {
+        // eslint-disable-next-line no-param-reassign
+        if (oneRow.account_from === walletAddress) oneRow.amount *= (-1);
+        return oneRow;
+      });
+      const oldAndNew = [...updatedData, ...allTx];
+      yield put(walletActions.getMoreTx.success(oldAndNew));
+      yield put(walletActions.setCurrentPageNumber.success(currentPage + 1));
+    } else {
+      yield put(walletActions.getMoreTx.failure);
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    yield put(walletActions.getMoreTx.failure(e));
   }
 }
 
@@ -135,10 +162,19 @@ function* getThreeTxWatcher() {
   }
 }
 
+function* getMoreTxWatcher() {
+  try {
+    yield takeLatest(walletActions.getMoreTx.call, getMoreTxWorker);
+  } catch (e) {
+    yield put(walletActions.getMoreTx.failure(e));
+  }
+}
+
 export {
   getWalletWatcher,
   sendTransferWatcher,
   stakeToPolkaWatcher,
   stakeToLiberlandWatcher,
   getThreeTxWatcher,
+  getMoreTxWatcher,
 };

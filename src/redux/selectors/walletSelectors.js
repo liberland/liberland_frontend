@@ -46,6 +46,21 @@ const selectorHistoryTx = createSelector(
   (reducer) => reducer.historyTx,
 );
 
+const selectorCountAllRows = createSelector(
+  walletReducer,
+  (reducer) => reducer.countAllRows,
+);
+
+const selectorCurrentPageNumber = createSelector(
+  walletReducer,
+  (reducer) => reducer.currentPageNumber,
+);
+
+const selectorAllHistoryTx = createSelector(
+  walletReducer,
+  (reducer) => reducer.allHistoryTx,
+);
+
 export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
@@ -55,4 +70,7 @@ export {
   selectorWalletAddress,
   selectorIsUserHaveStake,
   selectorHistoryTx,
+  selectorCountAllRows,
+  selectorCurrentPageNumber,
+  selectorAllHistoryTx,
 };

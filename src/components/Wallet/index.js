@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import routes from '../../router';
 
 import { walletSelectors, blockchainSelectors } from '../../redux/selectors';
 import { walletActions } from '../../redux/actions';
@@ -15,8 +17,14 @@ const Wallet = () => {
   const balances = useSelector(walletSelectors.selectorBalances);
   const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
+  const transactionHistory = useSelector(walletSelectors.selectorHistoryTx);
 
   const dispatch = useDispatch();
+  const history = useHistory();
+
+  const redirectToViewAllTx = () => {
+    history.push(routes.wallet.allTransactions);
+  };
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
@@ -33,7 +41,11 @@ const Wallet = () => {
             balances={balances}
             liquidMerits={liquidMerits}
           />
-          <WalletTransactionHistory />
+          <WalletTransactionHistory
+            transactionHistory={transactionHistory}
+            textForBtn="View All Transactions"
+            bottomButtonOnclick={redirectToViewAllTx}
+          />
         </div>
       ) : (
         <Card>

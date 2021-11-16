@@ -6,6 +6,8 @@ export const {
   stakeToPolka,
   stakeToLiberland,
   getThreeTx,
+  getMoreTx,
+  setCurrentPageNumber,
 } = createActions({
   GET_WALLET: {
     call: undefined,
@@ -28,6 +30,16 @@ export const {
     failure: undefined,
   },
   GET_THREE_TX: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_MORE_TX: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SET_CURRENT_PAGE_NUMBER: {
     call: undefined,
     success: undefined,
     failure: undefined,
