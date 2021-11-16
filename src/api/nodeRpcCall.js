@@ -496,6 +496,7 @@ const getResultByHashRpc = async (blockHash) => {
   const api = await ApiPromise.create({ provider });
   const signedBlock = await api.rpc.chain.getBlock(blockHash);
   const allRecords = await api.query.system.events.at(signedBlock.block.header.hash);
+  let result = '';
 
   // map between the extrinsics and events
   signedBlock.block.extrinsics.forEach(({ method: { method, section } }, index) => {
@@ -514,6 +515,7 @@ const getResultByHashRpc = async (blockHash) => {
 
           // eslint-disable-next-line no-console
           console.log(`${section}.${method}:: ExtrinsicSuccess:: ${dispatchInfo.toString()}`);
+          result = 'success';
         } else if (api.events.system.ExtrinsicFailed.is(event)) {
           // extract the data for this event
           const [dispatchError] = event.data;
@@ -535,11 +537,11 @@ const getResultByHashRpc = async (blockHash) => {
           }
           // eslint-disable-next-line no-console
           console.log(`${section}.${method}:: ExtrinsicFailed:: ${errorInfo}`);
-          return ('failure');
+          result = 'failure';
         }
       });
   });
-  return ('success');
+  return result;
 };
 
 export {

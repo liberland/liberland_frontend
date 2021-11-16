@@ -10,9 +10,9 @@ import styles from './styles.module.scss';
 import Status from '../../Status';
 
 const paymentTypeIcons = {
-  failed: () => <FailedIcon />,
-  success: () => <CheckIcon />,
-  refund: () => <RefundIcon />,
+  failure: <FailedIcon />,
+  success: <CheckIcon />,
+  refund: <RefundIcon />,
 };
 
 const WalletTransactionHistory = ({ transactionHistory, textForBtn, bottomButtonOnclick }) => (
@@ -30,7 +30,7 @@ const WalletTransactionHistory = ({ transactionHistory, textForBtn, bottomButton
           <div className={styles.transactionHistoryCardMain} key={transactionHistoryInfo.id}>
             <div className={styles.paymentNumber}>
               <div className={styles.paymentNumberIcon}>
-                {paymentTypeIcons.success()}
+                {paymentTypeIcons[transactionHistoryInfo.status]}
               </div>
               <div className={styles.paymentFrom}>
                 {
@@ -67,7 +67,7 @@ const WalletTransactionHistory = ({ transactionHistory, textForBtn, bottomButton
               <Status
                 status={transactionHistoryInfo.status}
                 completed={transactionHistoryInfo.status === 'success'}
-                declined={transactionHistoryInfo.status === 'declined'}
+                declined={transactionHistoryInfo.status === 'failure'}
               />
             </div>
           </div>
