@@ -7,23 +7,12 @@ import citizenAddressList from '../constants/citizenAdressList';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
-//const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
-//const provider = new WsProvider('ws://localhost:9944');
-const provider = new WsProvider('ws://159.65.203.73:9945');
-/*const api = ApiPromise.create({ provider }).then((res)=>{
-  console.log('api')
-  console.log(res)
-  console.log('api.genesisHash');
-  console.log(api.genesisHash);
-});*/
-
+const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 
 // TODO: Need refactor when blockchain node update
 const getBalanceByAddress = async (address) => {
   try {
     const api = await ApiPromise.create({ provider });
-    console.log('api')
-    console.log(api)
     const {
       data: { free: previousFree },
     } = await api.query.system.account(address);
