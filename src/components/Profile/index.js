@@ -19,6 +19,7 @@ import occupationImage from '../../assets/icons/occuoation.svg';
 import genderImage from '../../assets/icons/gender.svg';
 import startOfKyc from '../../assets/icons/startOfKyc.svg';
 import Card from '../Card';
+import userRolesHelper from '../../utils/userRolesHelper';
 
 const Profile = ({ className }) => {
   const userName = useSelector(userSelectors.selectUserName);
@@ -79,9 +80,9 @@ const Profile = ({ className }) => {
               <div>
                 <img src={liberlandEmblemImage} alt="" />
                 <span>
-                  {` ${userRole} `}
+                  {` ${userRolesHelper.getUserRolesString(userRole)} `}
                 </span>
-                {(userRole !== 'non-citizen') ? 'of Liberland' : ''}
+                {(userRolesHelper.getUserRolesString(userRole) !== 'Non citizen') ? 'of Liberland' : ''}
               </div>
             </div>
             <div className="bottom-block">
