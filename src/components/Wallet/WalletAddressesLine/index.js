@@ -38,7 +38,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
   const isUserHaveStake = useSelector(walletSelectors.selectorIsUserHaveStake);
   const userWalletAddressSelector = useSelector(blockchainSelectors.userWalletAddressSelector);
 
-  const handleCopyClick = (event) => {
+  const handleCopyClick = () => {
     navigator.clipboard.writeText(userWalletAddressSelector);
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };

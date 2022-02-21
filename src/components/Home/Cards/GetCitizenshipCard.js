@@ -12,6 +12,7 @@ const GetCitizenshipCard = () => {
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
 
+  // eslint-disable-next-line no-console
   const handleSubmit = (values) => console.log('values', values);
 
   return (

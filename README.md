@@ -6,6 +6,9 @@
 - Install polkadotjs browser extension https://polkadot.js.org/extension/ and add non citizen, citizen, and assemblyMember accounts from seeds
 - for local development, run yarn start and Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
+### Linting
+To autolint, run
+yarn run eslint --fix
 
 ## Build for production
 

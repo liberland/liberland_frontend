@@ -1,5 +1,6 @@
 import React from 'react';
 import cx from 'classnames';
+import PropTypes from 'prop-types';
 
 import styles from './styles.module.scss';
 
@@ -10,4 +11,13 @@ const Card = ({ title, children, className }) => (
   </div>
 );
 
+Card.propTypes = {
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node,
+  className: PropTypes.string,
+};
+Card.defaultProps = {
+  children: [],
+  className: '',
+};
 export default Card;

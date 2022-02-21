@@ -11,6 +11,7 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
 const GetCitizenshipModal = ({
+  // eslint-disable-next-line react/prop-types
   onSubmit, closeModal,
 }) => {
   const {
