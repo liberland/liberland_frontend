@@ -11,3 +11,8 @@
 
  - run yarn build
  
+## Default wallets
+You can add the following to the polkadotjs browser extension to use them
+Citizen1
+exercise museum credit crystal various nature defy human cable any split help
+5G3uZjEpvNAQ6U2eUjnMb66B8g6d8wyB68x6CfkRPNcno8eR
