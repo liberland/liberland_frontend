@@ -1,4 +1,4 @@
 {
-  "plugins": ["emotion"],
+  "plugins": ["emotion", "@babel/plugin-proposal-private-methods"],
   "presets": ["@babel/preset-react", "@babel/preset-env"],
 }

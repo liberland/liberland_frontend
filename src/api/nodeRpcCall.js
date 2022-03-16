@@ -543,6 +543,16 @@ const getResultByHashRpc = async (blockHash) => {
   return result;
 };
 
+const testIdentity = async () => {
+  console.log('awaiting apipromisecreate')
+  const api = await ApiPromise.create({ provider });
+  console.log('any moment now')
+  //api.query.identity.identityOf('5HGZfBpqUUqGY7uRCYA6aRwnRHJVhrikn8to31GcfNcifkym').then((r) => console.log(r));
+  return null
+};
+console.log('testing identitu')
+testIdentity()
+
 export {
   getBalanceByAddress,
   sendTransfer,
