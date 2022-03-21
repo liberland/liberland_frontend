@@ -6,7 +6,6 @@ import roughScale from '../utils/roughScale';
 import citizenAddressList from '../constants/citizenAdressList';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
-
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 
 // TODO: Need refactor when blockchain node update
