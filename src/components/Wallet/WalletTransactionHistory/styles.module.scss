@@ -1,5 +1,6 @@
 @import '../../../assets/base/variables';
 @import '../../../assets/base/fonts';
+//@import '../../../assets/base/fonts';
 
 .cardWrapper{
   margin-top: 32px;
@@ -41,10 +42,10 @@
   & > * {
     flex: 0 0 auto;
   }
-  & .paymentNumber{ 
+  & .paymentNumber{
     display: flex;
     align-items: center;
-    
+
     & .paymentNumberIcon{
       margin-right: 21px;
       display: flex;
@@ -65,7 +66,7 @@
       & > .paymentFromDate{
         color: $text4;
         font-weight: 500;
-        
+
       }
     }
   }
