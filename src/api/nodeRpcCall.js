@@ -4,13 +4,28 @@ import matchPowHelper from '../utils/matchPowHelper';
 import roughScale from '../utils/roughScale';
 
 import citizenAddressList from '../constants/citizenAdressList';
+import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
+
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 
 // TODO: Need refactor when blockchain node update
-const getBalanceByAddress = async (address) => {
-  try {
+const getBalanceByAddress = async (address) => ({
+  liberstake: {
+    amount: 1234,
+  },
+  polkastake: {
+    amount: 1234,
+  },
+  liquidMerits: {
+    amount: 123,
+  },
+  totalAmount: {
+    amount: 123,
+  },
+})
+/* try {
     const api = await ApiPromise.create({ provider });
     const {
       data: { free: previousFree },
@@ -57,8 +72,8 @@ const getBalanceByAddress = async (address) => {
     // eslint-disable-next-line no-console
     console.log(e);
     return {};
-  }
-};
+  } */
+;
 
 const sendTransfer = async (payload, callback) => {
   const { account_to, amount, account_from } = payload;
@@ -156,8 +171,8 @@ const applyMyCandidacy = async (walletAddress, callback) => {
   }
 };
 
-const getCandidacyListRpc = async () => {
-  try {
+const getCandidacyListRpc = async () => []
+/* try {
     const api = await ApiPromise.create({
       provider,
       types: {
@@ -174,8 +189,8 @@ const getCandidacyListRpc = async () => {
     // eslint-disable-next-line no-console
     console.log('error', e);
   }
-  return null;
-};
+  return null; */
+;
 
 const sendElectoralSheetRpc = async (args, callback) => {
   const electoralSheet = args[0];
@@ -208,8 +223,8 @@ const sendElectoralSheetRpc = async (args, callback) => {
   }
 };
 
-const setIsVotingInProgressRpc = async () => {
-  try {
+const setIsVotingInProgressRpc = async () => false
+/* try {
     const api = await ApiPromise.create({ provider });
     const isVotingInProgress = await api.query.assemblyPallet.votingState();
     // eslint-disable-next-line no-console
@@ -219,11 +234,11 @@ const setIsVotingInProgressRpc = async () => {
     // eslint-disable-next-line no-console
     console.log('error', e);
   }
-  return null;
-};
+  return null; */
+;
 
-const getMinistersRpc = async () => {
-  try {
+const getMinistersRpc = async () => []
+/* try {
     const api = await ApiPromise.create({
       provider,
       types: {
@@ -267,8 +282,8 @@ const getMinistersRpc = async () => {
     // eslint-disable-next-line no-console
     console.log('error', e);
   }
-  return [];
-};
+  return []; */
+;
 
 const sendLawProposal = async (args, callback) => {
   const data = args[0];
@@ -304,7 +319,7 @@ const sendLawProposal = async (args, callback) => {
 };
 
 const getProposalHashesRpc = async (hashesNotDraft, callback) => {
-  try {
+  /* try {
     const api = await ApiPromise.create({
       provider,
       types: {
@@ -334,37 +349,18 @@ const getProposalHashesRpc = async (hashesNotDraft, callback) => {
     // eslint-disable-next-line no-console
     console.log('error', e);
     callback(e);
-  }
+  } */
   return null;
 };
-
 const getUserRoleRpc = async (walletAddress) => {
   try {
-    if (!citizenAddressList.includes(walletAddress)) return { non_citizen: 'non_citizen' };
-
-    const api = await ApiPromise.create({
-      provider,
-      types: {
-        Candidate: {
-          pasportId: 'Vec<u8>',
-        },
-      },
-    });
-    const api2 = await ApiPromise.create({
-      provider,
-      types: {
-        PassportId: '[u8; 32]',
-      },
-    });
-    const assembliesList = JSON.stringify(await api.query.assemblyPallet.currentAssembliesList());
-    const passportId = await api2.query.identityPallet.passportIds(walletAddress);
-    if (assembliesList.includes(passportId.toString())) {
-      return {
-        assemblyMember: 'assemblyMember',
-        citizen: 'citizen',
-      };
+    const api = await ApiPromise.create({ provider });
+    const identityResult = await api.query.identity.identityOf(walletAddress);
+    const userRoleObject = identityResult?.toHuman().info.additional[0];
+    if (USER_ROLES.includes(userRoleObject[0]?.Raw) && userRoleObject[1]?.Raw === '1') {
+      return userRolesHelper.assignJsIdentity(userRoleObject[0].Raw);
     }
-    return { citizen: 'citizen' };
+    return { non_citizen: 'non_citizen' };
   } catch (e) {
   // eslint-disable-next-line no-console
     console.log('error', e);
@@ -372,8 +368,8 @@ const getUserRoleRpc = async (walletAddress) => {
   return null;
 };
 
-const getPeriodAndVotingDurationRpc = async () => {
-  try {
+const getPeriodAndVotingDurationRpc = async () =>
+  /* try {
     const api = await ApiPromise.create({ provider });
     const assemblyElectionPeriod = api.consts.assemblyPallet.assemblyElectionPeriod.toNumber();
     // eslint-disable-next-line no-console
@@ -387,12 +383,10 @@ const getPeriodAndVotingDurationRpc = async () => {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('error', e);
-  }
-  return null;
-};
-
+  } */
+  null;
 const getStatusProposalRpc = async (hash, callback) => {
-  try {
+  /* try {
     const api = await ApiPromise.create({
       provider,
       types: {
@@ -415,10 +409,9 @@ const getStatusProposalRpc = async (hash, callback) => {
     // eslint-disable-next-line no-console
     console.log('error', e);
     callback(e);
-  }
+  } */
   return null;
 };
-
 const getCurrentBlockNumberRpc = async () => {
   try {
     const api = await ApiPromise.create({ provider });
@@ -479,15 +472,16 @@ const getCurrentPowerProposalRpc = async (docHash, callback) => {
 };
 
 const getUserPassportId = async (walletAddress) => {
-  const api = await ApiPromise.create({
+// TODO remove passports logic as its not required on new chain
+  /* const api = await ApiPromise.create({
     provider,
     types: {
       PassportId: '[u8; 32]',
     },
   });
-  return api.query.identityPallet.passportIds(walletAddress);
+  return api.query.identityPallet.passportIds(walletAddress); */
+  return 12345;
 };
-
 const getAllWalletsRpc = async () => web3Accounts();
 
 const getResultByHashRpc = async (blockHash) => {
@@ -541,16 +535,6 @@ const getResultByHashRpc = async (blockHash) => {
   });
   return result;
 };
-
-const testIdentity = async () => {
-  console.log('awaiting apipromisecreate')
-  const api = await ApiPromise.create({ provider });
-  console.log('any moment now')
-  //api.query.identity.identityOf('5HGZfBpqUUqGY7uRCYA6aRwnRHJVhrikn8to31GcfNcifkym').then((r) => console.log(r));
-  return null
-};
-console.log('testing identitu')
-testIdentity()
 
 export {
   getBalanceByAddress,

@@ -19,7 +19,7 @@ import occupationImage from '../../assets/icons/occuoation.svg';
 import genderImage from '../../assets/icons/gender.svg';
 import startOfKyc from '../../assets/icons/startOfKyc.svg';
 import Card from '../Card';
-import userRolesHelper from '../../utils/userRolesHelper';
+import { userRolesHelper } from '../../utils/userRolesHelper';
 
 const Profile = ({ className }) => {
   const userName = useSelector(userSelectors.selectUserName);

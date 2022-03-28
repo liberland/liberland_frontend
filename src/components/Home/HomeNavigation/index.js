@@ -8,7 +8,6 @@ import NavigationLink from '../NavigationLink';
 import RoleHOC from '../../../hocs/RoleHOC';
 import router from '../../../router';
 import Header from '../../AuthComponents/Header';
-import { GetCitizenshipCard, NextAssemblyCard } from '../Cards';
 
 // ASSETS
 import styles from './styles.module.scss';
@@ -120,7 +119,7 @@ const HomeNavigation = () => {
         ))
       }
       {roles['e-resident'] === 'e-resident' ? <GetCitizenshipCard /> : ''}
-      {roles.citizen === 'citizen' ? <NextAssemblyCard /> : ''}
+      {/* roles.citizen === 'citizen' ? <NextAssemblyCard /> : '' */}
     </div>
 
   );
