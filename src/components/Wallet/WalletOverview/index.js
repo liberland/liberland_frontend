@@ -19,6 +19,7 @@ import { ChoseStakeModal } from '../../Modals';
 import Card from '../../Card';
 
 import styles from './styles.module.scss';
+import {formatMerits} from "../../../utils/walletHelpers";
 
 const WalletOverview = ({
   totalBalance, balances, liquidMerits,
@@ -68,7 +69,7 @@ const WalletOverview = ({
       getIcon: () => (2.4 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
     },
     {
-      amount: prettyNumber(liquidMerits),
+      amount: formatMerits(liquidMerits),
       title: 'Liquid Merits',
       diff: -0.4,
       // eslint-disable-next-line no-constant-condition

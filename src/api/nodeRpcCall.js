@@ -11,20 +11,32 @@ const { ApiPromise, WsProvider } = require('@polkadot/api');
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 
 // TODO: Need refactor when blockchain node update
-const getBalanceByAddress = async (address) => ({
-  liberstake: {
-    amount: 1234,
-  },
-  polkastake: {
-    amount: 1234,
-  },
-  liquidMerits: {
-    amount: 123,
-  },
-  totalAmount: {
-    amount: 123,
-  },
-})
+const getBalanceByAddress = async (address) => {
+  console.log('getting balance by address');
+  try {
+    const api = await ApiPromise.create({ provider });
+    const data = await api.query.system.account(address);
+    const walletData = data.toJSON();
+    return {
+      liberstake: {
+        amount: 12345,
+      },
+      polkastake: {
+        amount: 1234,
+      },
+      liquidMerits: {
+        amount: walletData.data.free,
+      },
+      totalAmount: {
+        amount: 123,
+      },
+    };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    return {};
+  }
+}
 /* try {
     const api = await ApiPromise.create({ provider });
     const {
@@ -79,7 +91,7 @@ const sendTransfer = async (payload, callback) => {
   const { account_to, amount, account_from } = payload;
   const api = await ApiPromise.create({ provider });
 
-  const transferExtrinsic = api.tx.balances.transfer(account_to, (amount * (10 ** 12)));
+  const transferExtrinsic = api.tx.balances.transfer(account_to, (amount));
   const injector = await web3FromSource('polkadot-js');
   transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status }) => {
     if (status.isInBlock) {
@@ -318,7 +330,7 @@ const sendLawProposal = async (args, callback) => {
   }
 };
 
-const getProposalHashesRpc = async (hashesNotDraft, callback) => {
+const getProposalHashesRpc = async (hashesNotDraft, callback) =>
   /* try {
     const api = await ApiPromise.create({
       provider,
@@ -350,14 +362,13 @@ const getProposalHashesRpc = async (hashesNotDraft, callback) => {
     console.log('error', e);
     callback(e);
   } */
-  return null;
-};
+  null;
 const getUserRoleRpc = async (walletAddress) => {
   try {
     const api = await ApiPromise.create({ provider });
     const identityResult = await api.query.identity.identityOf(walletAddress);
-    const userRoleObject = identityResult?.toHuman().info.additional[0];
-    if (USER_ROLES.includes(userRoleObject[0]?.Raw) && userRoleObject[1]?.Raw === '1') {
+    const userRoleObject = identityResult?.toHuman()?.info.additional[0];
+    if (userRoleObject && (USER_ROLES.includes(userRoleObject[0]?.Raw) && userRoleObject[1]?.Raw === '1')) {
       return userRolesHelper.assignJsIdentity(userRoleObject[0].Raw);
     }
     return { non_citizen: 'non_citizen' };
@@ -385,7 +396,7 @@ const getPeriodAndVotingDurationRpc = async () =>
     console.log('error', e);
   } */
   null;
-const getStatusProposalRpc = async (hash, callback) => {
+const getStatusProposalRpc = async (hash, callback) =>
   /* try {
     const api = await ApiPromise.create({
       provider,
@@ -410,8 +421,7 @@ const getStatusProposalRpc = async (hash, callback) => {
     console.log('error', e);
     callback(e);
   } */
-  return null;
-};
+  null;
 const getCurrentBlockNumberRpc = async () => {
   try {
     const api = await ApiPromise.create({ provider });
@@ -471,7 +481,7 @@ const getCurrentPowerProposalRpc = async (docHash, callback) => {
   callback(null, power);
 };
 
-const getUserPassportId = async (walletAddress) => {
+const getUserPassportId = async (walletAddress) =>
 // TODO remove passports logic as its not required on new chain
   /* const api = await ApiPromise.create({
     provider,
@@ -480,8 +490,7 @@ const getUserPassportId = async (walletAddress) => {
     },
   });
   return api.query.identityPallet.passportIds(walletAddress); */
-  return 12345;
-};
+  12345;
 const getAllWalletsRpc = async () => web3Accounts();
 
 const getResultByHashRpc = async (blockHash) => {

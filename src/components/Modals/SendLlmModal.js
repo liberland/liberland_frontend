@@ -50,11 +50,11 @@ const SendLlmModal = ({
         required
       />
 
-      <div className={styles.title}>Amount LLM</div>
+      <div className={styles.title}>Amount picoLLM</div>
       <TextInput
         register={register}
         name="amount"
-        placeholder="Amount LLM"
+        placeholder="Amount picoLLM"
         required
       />
 
