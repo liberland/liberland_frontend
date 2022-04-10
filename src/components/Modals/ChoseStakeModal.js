@@ -19,14 +19,14 @@ const ChoseStakeModal = ({
             medium
             onClick={() => setModalShown(2)}
           >
-            Liberland Stake
+            PolitiPool
           </Button>
           <Button
             primary
             medium
             onClick={() => setModalShown(1)}
           >
-            Polka Stake
+            Validator Stake
           </Button>
 
           <Button
@@ -44,7 +44,7 @@ const ChoseStakeModal = ({
      className={styles.getCitizenshipModal}
      onSubmit={handleSubmit(handleSubmitStakePolka)}
    >
-     <div className={styles.h3}>Polka stake</div>
+     <div className={styles.h3}>Validator Stake</div>
      <div className={styles.title}>Amount LLM</div>
      <TextInput
        register={register}
@@ -76,7 +76,7 @@ const ChoseStakeModal = ({
     className={styles.getCitizenshipModal}
     onSubmit={handleSubmit(handleSubmitStakeLiberland)}
   >
-    <div className={styles.h3}>Liberland stake</div>
+    <div className={styles.h3}>PolitiPool</div>
     <div className={styles.title}>Amount LLM</div>
     <TextInput
       register={register}

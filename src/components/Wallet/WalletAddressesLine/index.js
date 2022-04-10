@@ -21,6 +21,8 @@ import { ReactComponent as CopyIcon } from '../../../assets/icons/copy.svg';
 
 import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
+import router from "../../../router";
+import Tabs from "../../Tabs";
 
 const WalletAddressesLine = ({ walletAddress }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -79,10 +81,22 @@ const WalletAddressesLine = ({ walletAddress }) => {
     handleModalOpenStake();
   };
 
+  const navigationList = [
+    {
+      route: router.wallet.overView,
+      title: 'Wallet',
+    },
+    {
+      route: router.wallet.validatorsStaking,
+      title: 'Validator staking',
+    },
+  ];
+
   return (
     <>
       <NotificationPortal ref={notificationRef} />
       <div className={styles.walletAddressLineWrapper}>
+        <Tabs navigationList={navigationList} />
         <div className={styles.addressesWrapper}>
           <div className={styles.singleAddressWrapper}>
             <p className={styles.addressTitle}>Wallet address:</p>

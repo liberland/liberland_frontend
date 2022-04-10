@@ -68,6 +68,9 @@ function* signOutWorker() {
 function* initGetDataFromNodeWorker() {
   yield put(walletActions.getWallet.call());
   yield put(walletActions.getThreeTx.call());
+  yield put(walletActions.getValidators.call());
+  const walletAddress = yield sessionStorage.getItem('userWalletAddress');
+  yield put(walletActions.getNominatorTargets.call(walletAddress));
   yield put(blockchainActions.getPeriodAndVotingDuration.call());
   yield put(votingActions.getAssembliesList.call());
 }

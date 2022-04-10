@@ -34,6 +34,7 @@ const HomeHeader = () => {
     [router.assembly.decisionVotes]: 'Assembly',
     [router.assembly.voteHistory]: 'Assembly',
     [router.assembly.pmElection]: 'Assembly',
+    [router.wallet.validatorsStaking]: 'Validator Staking',
   };
   const dispatch = useDispatch();
   const history = useHistory();

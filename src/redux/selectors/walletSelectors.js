@@ -61,6 +61,16 @@ const selectorAllHistoryTx = createSelector(
   (reducer) => reducer.allHistoryTx,
 );
 
+const selectorValidators = createSelector(
+  walletReducer,
+  (reducer) => reducer.validators,
+);
+
+const selectorNominatorTargets = createSelector(
+  walletReducer,
+  (reducer) => reducer.nominatorTargets,
+);
+
 export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
@@ -73,4 +83,6 @@ export {
   selectorCountAllRows,
   selectorCurrentPageNumber,
   selectorAllHistoryTx,
+  selectorValidators,
+  selectorNominatorTargets,
 };

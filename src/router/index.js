@@ -23,6 +23,7 @@ export default {
     voteHistory: '/home/voting/vote-history',
     congressional: '/home/voting/congressional',
     currentCongressional: '/home/voting/congressional/:id',
+    test: '/home/voting/test',
   },
   assembly: {
     myDrafts: '/home/assembly/my-drafts',
@@ -34,5 +35,7 @@ export default {
   },
   wallet: {
     allTransactions: '/home/wallet/all-transactions',
+    validatorsStaking: '/home/wallet/validators-staking',
+    overView: '/home/wallet/overview',
   },
 };

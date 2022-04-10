@@ -8,6 +8,8 @@ export const {
   getThreeTx,
   getMoreTx,
   setCurrentPageNumber,
+  getValidators,
+  getNominatorTargets,
 } = createActions({
   GET_WALLET: {
     call: undefined,
@@ -40,6 +42,16 @@ export const {
     failure: undefined,
   },
   SET_CURRENT_PAGE_NUMBER: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_VALIDATORS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_NOMINATOR_TARGETS: {
     call: undefined,
     success: undefined,
     failure: undefined,

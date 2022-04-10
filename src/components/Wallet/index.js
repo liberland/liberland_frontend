@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import {
+  Redirect, Route, Switch, useHistory,
+} from 'react-router-dom';
 import routes from '../../router';
 
 import { walletSelectors, blockchainSelectors } from '../../redux/selectors';
@@ -11,6 +13,11 @@ import styles from './styles.module.scss';
 import WalletOverview from './WalletOverview';
 import WalletTransactionHistory from './WalletTransactionHistory';
 import Card from '../Card';
+import Nominator from './Nominator';
+import router from '../../router';
+import CongressionalAssemble from '../Voting/CongressionalAssemble';
+import CurrentCongressionalAssemble from '../Voting/CurrentCongressionalAssemble';
+import RoleHOC from '../../hocs/RoleHOC';
 
 const Wallet = () => {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -29,6 +36,8 @@ const Wallet = () => {
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
     dispatch(walletActions.getThreeTx.call());
+    dispatch(walletActions.getValidators.call());
+    dispatch(walletActions.getNominatorTargets.call());
   }, [dispatch]);
 
   return (
@@ -36,16 +45,45 @@ const Wallet = () => {
       { (userWalletAddress !== undefined) ? (
         <div className={styles.walletWrapper}>
           <WalletAddressesLine walletAddress={userWalletAddress} />
-          <WalletOverview
-            totalBalance={totalBalance}
-            balances={balances}
-            liquidMerits={liquidMerits}
-          />
-          <WalletTransactionHistory
-            transactionHistory={transactionHistory}
-            textForBtn="View All Transactions"
-            bottomButtonOnclick={redirectToViewAllTx}
-          />
+          <div>
+            <Switch>
+              <Route
+                path={router.wallet.validatorsStaking}
+                component={() => (
+                  <Nominator />
+                )}
+              />
+              <Route
+                path={router.wallet.overView}
+                component={() => {
+                  return (
+                    <div>
+                      <WalletOverview
+                        totalBalance={totalBalance}
+                        balances={balances}
+                        liquidMerits={liquidMerits}
+                      />
+
+                      <WalletTransactionHistory
+                        transactionHistory={transactionHistory}
+                        textForBtn="View All Transactions"
+                        bottomButtonOnclick={redirectToViewAllTx}
+                      />
+                    </div>
+                  );
+                }}
+              />
+              <Route
+                exact
+                path={router.home.wallet}
+                render={() => (
+                  <RoleHOC>
+                    <Redirect to={router.wallet.overView} />
+                  </RoleHOC>
+                )}
+              />
+            </Switch>
+          </div>
         </div>
       ) : (
         <Card>

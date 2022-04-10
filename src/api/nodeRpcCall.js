@@ -12,23 +12,23 @@ const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 
 // TODO: Need refactor when blockchain node update
 const getBalanceByAddress = async (address) => {
-  console.log('getting balance by address');
   try {
     const api = await ApiPromise.create({ provider });
     const data = await api.query.system.account(address);
     const walletData = data.toJSON();
+    let totalAmount = parseInt(walletData.data.miscFrozen) + parseInt(walletData.data.free)
     return {
       liberstake: {
         amount: 12345,
       },
       polkastake: {
-        amount: 1234,
+        amount: walletData.data.miscFrozen,
       },
       liquidMerits: {
         amount: walletData.data.free,
       },
       totalAmount: {
-        amount: 123,
+        amount: totalAmount,
       },
     };
   } catch (e) {
@@ -111,8 +111,8 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
     const { values: { amount }, isUserHaveStake, walletAddress } = payload;
     const api = await ApiPromise.create({ provider });
     const transferExtrinsic = isUserHaveStake
-      ? await api.tx.stakingPallet.bondExtra(`${amount}000000000000`)
-      : await api.tx.stakingPallet.bond(walletAddress, `${amount}000000000000`);
+      ? await api.tx.staking.bondExtra(`${amount}000000000000`)
+      : await api.tx.staking.bond(walletAddress, `${amount}000000000000`, walletAddress);
 
     const injector = await web3FromSource('polkadot-js');
     // eslint-disable-next-line max-len
@@ -545,6 +545,62 @@ const getResultByHashRpc = async (blockHash) => {
   return result;
 };
 
+const getValidators = async () => {
+  const api = await ApiPromise.create({ provider });
+  const validators = [];
+  const validatorsKeys = await api.query.staking.validators.keys();
+  const validatorQueries = [];
+  const validatorIdentityQueries = [];
+  validatorsKeys.forEach((validatorKey, index) => {
+    const address = validatorKey.toHuman().pop();
+    validatorQueries.push([api.query.staking.validators, address]);
+    validatorIdentityQueries.push([api.query.identity.identityOf, address]);
+    validators[index] = { address };
+  });
+  const numOfValidators = validatorsKeys.length;
+  const validatorsData = await api.queryMulti([
+    ...validatorQueries,
+    ...validatorIdentityQueries,
+  ]);
+  validatorsData.forEach((validatorData, index) => {
+    const validatorHumanData = validatorData.toHuman();
+    const dataToAdd = {
+      ...((validatorHumanData?.commission !== undefined) && { commission: validatorHumanData.commission }),
+      ...((validatorHumanData?.blocked !== undefined) && { blocked: validatorHumanData.blocked }),
+      ...((validatorHumanData?.info?.display?.Raw !== undefined) && { displayName: validatorHumanData?.info?.display?.Raw }),
+    };
+    validators[index % numOfValidators] = {
+      ...validators[index % numOfValidators],
+      ...dataToAdd,
+    };
+  });
+  return validators;
+};
+
+const getNominatorTargets = async (walletId) => {
+  const api = await ApiPromise.create({ provider });
+  const nominations = await api.query.staking.nominators(walletId);
+
+  return nominations?.toHuman()?.targets ? nominations?.toHuman()?.targets : [];
+};
+
+const setNewNominatorTargets = async (newNominatorTargets, walletAddress) => {
+  const injector = await web3FromAddress(walletAddress);
+  const api = await ApiPromise.create({ provider });
+  const setNewTargets = await api.tx.staking.nominate(newNominatorTargets);
+  await setNewTargets.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
+      callback(null, 'done');
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.log(':( transaction failed', error);
+    callback(error);
+  });
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -566,4 +622,7 @@ export {
   getUserPassportId,
   getAllWalletsRpc,
   getResultByHashRpc,
+  getValidators,
+  getNominatorTargets,
+  setNewNominatorTargets,
 };

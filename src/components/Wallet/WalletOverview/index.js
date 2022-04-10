@@ -56,14 +56,14 @@ const WalletOverview = ({
   const overviewInfo = [
     {
       amount: prettyNumber(balances.liberstake.amount),
-      title: 'Liberstake',
+      title: 'PolitiPooled',
       diff: 2.4,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (2.4 > 0 ? <ArrowYellowUpIcon /> : <ArrowYellowDownIcon />),
     },
     {
-      amount: prettyNumber(balances.polkastake.amount),
-      title: 'Polkastake',
+      amount: formatMerits(balances.polkastake.amount),
+      title: 'Validator Staked',
       diff: 2.4,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (2.4 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
@@ -76,7 +76,7 @@ const WalletOverview = ({
       getIcon: () => (-0.4 > 0 ? <ArrowBlueUpIcon /> : <ArrowBlueDownIcon />),
     },
     {
-      amount: prettyNumber(totalBalance),
+      amount: formatMerits(totalBalance),
       title: 'Total merits',
 
       diff: -0.6,
@@ -98,13 +98,13 @@ const WalletOverview = ({
                 key={cardInfo.title}
                 onClick={() => handleModalOpenStake(cardInfo.title)}
               >
-                <div className={styles.cardInfoIcon}>{cardInfo.getIcon()}</div>
+                {/*<div className={styles.cardInfoIcon}>{cardInfo.getIcon()}</div>*/}
                 <div className={styles.cardInfoAmountWrapper}>
                   <p className={styles.cardInfoAmount}>
                     {cardInfo.amount}
                     <span> LLM</span>
                   </p>
-                  <p className={cx(styles.cardInfoAmountDiff, {
+                  {/*<p className={cx(styles.cardInfoAmountDiff, {
                     [styles.cardInfoAmountDiffRed]: !isDiffPositive,
                     [styles.cardInfoAmountDiffGreen]: isDiffPositive,
                   })}
@@ -119,7 +119,7 @@ const WalletOverview = ({
                         <path d="M10 6L5.5 11L1 6M5.5 1L5.5 10.2857" stroke="#FF5630" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     )}
-                  </p>
+                  </p>*/}
                 </div>
                 <p className={styles.cardInfoTitle}>{cardInfo.title}</p>
               </div>
