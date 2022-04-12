@@ -62,7 +62,6 @@ const WalletTransactionHistory = ({ transactionHistory, textForBtn, bottomButton
               </div>
             </div>
             <div className={styles.transactionHistoryAmount}>
-              {isAmountPositive ? '+' : ''}
               {formatMeritTransaction(transactionHistoryInfo.amount)}
             </div>
             <div>
