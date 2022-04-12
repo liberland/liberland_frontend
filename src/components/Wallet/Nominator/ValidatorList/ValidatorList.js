@@ -14,26 +14,25 @@ const ValidatorList = ({
   selectingValidatorsDisabled,
   toggleSelectedValidator,
 }) => {
-  const test = '';
 
   return (
     <div>
       <div className={styles.validatorsListHeader}>
         <div className={styles.listItemName}>
           Name &nbsp;
-          <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" />
+          {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
         </div>
         <div className={styles.listItem}>
           Commission &nbsp;
-          <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" />
+          {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
         </div>
         <div className={styles.listItem}>
           Allowed &nbsp;
-          <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" />
+          {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
         </div>
         <div className={styles.listItem}>
           Nominated by me &nbsp;
-          <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" />
+          {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
         </div>
       </div>
       {

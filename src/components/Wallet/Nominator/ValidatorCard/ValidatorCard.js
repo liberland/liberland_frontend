@@ -23,10 +23,10 @@ const ValidatorCard = ({
         <div className={styles.avatarName}>{name}</div>
       </div>
       <div className={styles.listItem}>{commission}</div>
-      <div className={styles.listItem}>{blocked ? '❌' : '✅' }</div>
+      <div className={styles.listItem}><div className={blocked ? styles.blocked : styles.available}>{blocked ? 'Blocked' : 'Available' }</div></div>
       <div className={styles.listItem} onClick={() => toggleSelectedValidator(validatorAddress)}>
         <div className={styles.checkBox}>
-          <div>{nominatedByMe ? '✅' : selectingValidatorsDisabled ? 'MAX' : '❌' }</div>
+          <div>{nominatedByMe ? '✅' : selectingValidatorsDisabled ? 'MAX' : '' }</div>
         </div>
       </div>
 

@@ -1,15 +1,15 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
-import {blockchainSelectors, walletSelectors} from '../../../redux/selectors';
-import SearchBar from "../../SearchBar";
-import ValidatorCard from "./ValidatorCard/ValidatorCard";
-import ValidatorList from "./ValidatorList/ValidatorList";
-import {ReactComponent as GraphIcon} from "../../../assets/icons/graph.svg";
-import Button from "../../Button/Button";
-import {setNewNominatorTargets} from "../../../api/nodeRpcCall";
+import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
+import SearchBar from '../../SearchBar';
+import ValidatorCard from './ValidatorCard/ValidatorCard';
+import ValidatorList from './ValidatorList/ValidatorList';
+import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
+import Button from '../../Button/Button';
+import { setNewNominatorTargets } from '../../../api/nodeRpcCall';
 
 const Nominator = ({
   testProp,
@@ -19,7 +19,7 @@ const Nominator = ({
   const validators = useSelector(walletSelectors.selectorValidators);
   const nominatorTargets = useSelector(walletSelectors.selectorNominatorTargets);
   const [selectedValidatorsAsTargets, setSelectedValidatorsAsTargets] = useState(nominatorTargets);
-  const isMaxNumValidatorsSelected = (selectedValidators) => selectedValidators.length > 2;
+  const isMaxNumValidatorsSelected = (selectedValidators) => selectedValidators.length > 15;
   const toggleSelectedValidator = (validatorAddress) => {
     console.log('toggling selected validator');
     let currentlySelectedValidators = selectedValidatorsAsTargets;
@@ -36,18 +36,18 @@ const Nominator = ({
     setSelectedValidatorsAsTargets([...currentlySelectedValidators]);
   };
 
-  const [searchTerm, setSearchTerm] = useState(null)
+  const [searchTerm, setSearchTerm] = useState(null);
 
   const updateNominations = (newNominations) => {
-    console.log('updating nominations')
-    console.log(newNominations)
-    setNewNominatorTargets(newNominations, userWalletAddress)
-  }
+    console.log('updating nominations');
+    console.log(newNominations);
+    setNewNominatorTargets(newNominations, userWalletAddress);
+  };
 
   const goToAdvancedPage = () => {
-    const stakingLink = 'https://polkadot.js.org/apps/?rpc=' + process.env.REACT_APP_NODE_ADDRESS + '#/staking'
-    window.open(stakingLink)
-  }
+    const stakingLink = `https://polkadot.js.org/apps/?rpc=${process.env.REACT_APP_NODE_ADDRESS}#/staking`;
+    window.open(stakingLink);
+  };
   /*
   * TODO mynominations#/maxnominations
   * TODO validator oversubscribed or not
@@ -57,9 +57,9 @@ const Nominator = ({
   return (
     <div className={styles.nominatorWrapper}>
       <div className={styles.nominatorsList}>
-        <SearchBar
+        {/*<SearchBar
           setSearchTerm={setSearchTerm}
-        />
+        />*/}
         <ValidatorList
           validators={validators}
           selectedValidatorsAsTargets={selectedValidatorsAsTargets}
