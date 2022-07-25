@@ -45,11 +45,11 @@ const ChoseStakeModal = ({
      onSubmit={handleSubmit(handleSubmitStakePolka)}
    >
      <div className={styles.h3}>Validator Stake</div>
-     <div className={styles.title}>Amount LLM</div>
+     <div className={styles.title}>Amount LLD</div>
      <TextInput
        register={register}
        name="amount"
-       placeholder="Amount LLM"
+       placeholder="Amount LLD"
      />
 
      <div className={styles.buttonWrapper}>

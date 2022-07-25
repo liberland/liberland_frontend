@@ -21,8 +21,8 @@ import { ReactComponent as CopyIcon } from '../../../assets/icons/copy.svg';
 
 import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
-import router from "../../../router";
-import Tabs from "../../Tabs";
+import router from '../../../router';
+import Tabs from '../../Tabs';
 
 const WalletAddressesLine = ({ walletAddress }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -118,11 +118,11 @@ const WalletAddressesLine = ({ walletAddress }) => {
         <div className={cx(styles.buttonsWrapper)}>
           <Button small secondary onClick={handleModalOpenStake}>
             <GraphIcon />
-            Stake LLM
+            Staking
           </Button>
           <Button small primary onClick={handleModalOpen}>
             <UploadIcon />
-            Send LLM
+            Send
           </Button>
         </div>
         {isModalOpen && (

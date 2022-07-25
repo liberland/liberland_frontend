@@ -14,21 +14,26 @@ const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 const getBalanceByAddress = async (address) => {
   try {
     const api = await ApiPromise.create({ provider });
-    const data = await api.query.system.account(address);
-    const walletData = data.toJSON();
-    let totalAmount = parseInt(walletData.data.miscFrozen) + parseInt(walletData.data.free)
+    // TODO get this in one transaction?
+    const LLDData = await api.query.system.account(address);
+    const LLMData = await api.query.llm.llmBalance(address);
+    const LLDWalletData = LLDData.toJSON();
+    const LLDTotalAmount = parseInt(LLDWalletData.data.miscFrozen) + parseInt(LLDWalletData.data.free);
+    const LLMWalletData = LLMData.toJSON();
+    console.log('LLMWalletData');
+    console.log(LLMWalletData);
     return {
       liberstake: {
-        amount: 12345,
+        amount: 0,
       },
       polkastake: {
-        amount: walletData.data.miscFrozen,
+        amount: LLDWalletData.data.miscFrozen,
       },
       liquidMerits: {
-        amount: walletData.data.free,
+        amount: LLMWalletData,
       },
       totalAmount: {
-        amount: totalAmount,
+        amount: LLDTotalAmount,
       },
     };
   } catch (e) {

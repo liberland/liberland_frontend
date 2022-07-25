@@ -19,7 +19,7 @@ import { ChoseStakeModal } from '../../Modals';
 import Card from '../../Card';
 
 import styles from './styles.module.scss';
-import {formatMerits} from "../../../utils/walletHelpers";
+import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 
 const WalletOverview = ({
   totalBalance, balances, liquidMerits,
@@ -60,13 +60,15 @@ const WalletOverview = ({
       diff: 2.4,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (2.4 > 0 ? <ArrowYellowUpIcon /> : <ArrowYellowDownIcon />),
+      currency: 'LLM',
     },
     {
-      amount: formatMerits(balances.polkastake.amount),
+      amount: formatDollars(balances.polkastake.amount),
       title: 'Validator Staked',
       diff: 2.4,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (2.4 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
+      currency: 'LLD',
     },
     {
       amount: formatMerits(liquidMerits),
@@ -74,14 +76,15 @@ const WalletOverview = ({
       diff: -0.4,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (-0.4 > 0 ? <ArrowBlueUpIcon /> : <ArrowBlueDownIcon />),
+      currency: 'LLM',
     },
     {
-      amount: formatMerits(totalBalance),
-      title: 'Total merits',
-
+      amount: formatDollars(totalBalance),
+      title: 'Liquid LLD',
       diff: -0.6,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (-0.6 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
+      currency: 'LLD',
     },
   ];
 
@@ -98,13 +101,16 @@ const WalletOverview = ({
                 key={cardInfo.title}
                 onClick={() => handleModalOpenStake(cardInfo.title)}
               >
-                {/*<div className={styles.cardInfoIcon}>{cardInfo.getIcon()}</div>*/}
+                {/* <div className={styles.cardInfoIcon}>{cardInfo.getIcon()}</div> */}
                 <div className={styles.cardInfoAmountWrapper}>
                   <p className={styles.cardInfoAmount}>
                     {cardInfo.amount}
-                    <span> LLM</span>
+                    <span>
+                      {' '}
+                      {cardInfo.currency}
+                    </span>
                   </p>
-                  {/*<p className={cx(styles.cardInfoAmountDiff, {
+                  {/* <p className={cx(styles.cardInfoAmountDiff, {
                     [styles.cardInfoAmountDiffRed]: !isDiffPositive,
                     [styles.cardInfoAmountDiffGreen]: isDiffPositive,
                   })}
@@ -119,7 +125,7 @@ const WalletOverview = ({
                         <path d="M10 6L5.5 11L1 6M5.5 1L5.5 10.2857" stroke="#FF5630" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     )}
-                  </p>*/}
+                  </p> */}
                 </div>
                 <p className={styles.cardInfoTitle}>{cardInfo.title}</p>
               </div>
