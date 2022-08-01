@@ -72,7 +72,7 @@ const HomeNavigation = () => {
     {
       route: router.home.voting,
       title: 'Voting',
-      access: ['citizen', 'assemblyMember'],
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: VotingIcon,
       activeIcon: VotingIconActive,
     },

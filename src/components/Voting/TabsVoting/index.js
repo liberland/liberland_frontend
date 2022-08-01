@@ -20,6 +20,14 @@ const TabsVoting = () => (
         component={() => <div>Vote history</div>}
       />
       <Route
+        path={router.voting.referendum}
+        component={() => <div>Referendum</div>}
+      />
+      <Route
+        path={router.voting.election}
+        component={() => <div>Election</div>}
+      />
+      <Route
         exact
         path={router.home.voting}
         render={() => (

@@ -8,7 +8,7 @@ import { ReactComponent as RefundIcon } from '../../../assets/icons/refund.svg';
 import { ReactComponent as FailedIcon } from '../../../assets/icons/failed.svg';
 import styles from './styles.module.scss';
 import Status from '../../Status';
-import {formatMeritTransaction} from "../../../utils/walletHelpers";
+import { formatMeritTransaction } from '../../../utils/walletHelpers';
 
 const paymentTypeIcons = {
   failure: <FailedIcon />,
@@ -16,9 +16,7 @@ const paymentTypeIcons = {
   refund: <RefundIcon />,
 };
 
-const WalletTransactionHistory = ({ transactionHistory, textForBtn, bottomButtonOnclick }) => {
-
-  return (
+const WalletTransactionHistory = ({ transactionHistory, textForBtn, bottomButtonOnclick }) => (
   <Card title="Transaction History" className={styles.cardWrapper}>
     <div className={styles.transactionHistoryCard}>
       <div className={styles.transactionHistoryCardHeader}>
@@ -82,5 +80,5 @@ const WalletTransactionHistory = ({ transactionHistory, textForBtn, bottomButton
       </Button>
     </div>
   </Card>
-)};
+);
 export default WalletTransactionHistory;

@@ -26,6 +26,8 @@ const HomeHeader = () => {
     [router.home.voting]: 'Voting',
     [router.voting.voteHistory]: 'Voting',
     [router.voting.congressionalAssemble]: 'Voting',
+    [router.voting.referendum]: 'Voting',
+    [router.voting.election]: 'Voting',
     [router.voting.vetoVotes]: 'Voting',
     [router.home.wallet]: 'Wallet',
     [router.home.assembly]: 'Assembly',

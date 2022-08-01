@@ -24,6 +24,8 @@ export default {
     congressional: '/home/voting/congressional',
     currentCongressional: '/home/voting/congressional/:id',
     test: '/home/voting/test',
+    referendum: '/home/voting/referendum',
+    election: '/home/voting/election',
   },
   assembly: {
     myDrafts: '/home/assembly/my-drafts',

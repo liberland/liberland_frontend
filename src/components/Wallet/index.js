@@ -55,23 +55,21 @@ const Wallet = () => {
               />
               <Route
                 path={router.wallet.overView}
-                component={() => {
-                  return (
-                    <div>
-                      <WalletOverview
-                        totalBalance={totalBalance}
-                        balances={balances}
-                        liquidMerits={liquidMerits}
-                      />
+                component={() => (
+                  <div>
+                    <WalletOverview
+                      totalBalance={totalBalance}
+                      balances={balances}
+                      liquidMerits={liquidMerits}
+                    />
 
-                      <WalletTransactionHistory
-                        transactionHistory={transactionHistory}
-                        textForBtn="View All Transactions"
-                        bottomButtonOnclick={redirectToViewAllTx}
-                      />
-                    </div>
-                  );
-                }}
+                    <WalletTransactionHistory
+                      transactionHistory={transactionHistory}
+                      textForBtn="View All Transactions"
+                      bottomButtonOnclick={redirectToViewAllTx}
+                    />
+                  </div>
+                )}
               />
               <Route
                 exact

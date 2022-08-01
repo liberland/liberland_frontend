@@ -124,7 +124,7 @@ function* getValidatorsWorker() {
   try {
     const validators = yield call(getValidators);
     yield put(walletActions.getValidators.success(validators));
-    console.log('i have put getvalidators success')
+    console.log('i have put getvalidators success');
   } catch (e) {
     console.log(e);
     yield put(walletActions.getValidators.failure(e));
@@ -136,7 +136,7 @@ function* getNominatorTargetsWorker() {
     const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     const nominatorTargets = yield call(getNominatorTargets, walletAddress);
     yield put(walletActions.getNominatorTargets.success(nominatorTargets));
-    console.log('i have put getnominatortargets')
+    console.log('i have put getnominatortargets');
   } catch (e) {
     console.log(e);
     yield put(walletActions.getNominatorTargets.failure(e));
@@ -195,19 +195,19 @@ function* getMoreTxWatcher() {
 
 function* getValidatorsWatcher() {
   try {
-    yield takeLatest(walletActions.getValidators.call, getValidatorsWorker)
+    yield takeLatest(walletActions.getValidators.call, getValidatorsWorker);
   } catch (e) {
     console.log(e);
-    yield put(walletActions.getValidators.failure(e))
+    yield put(walletActions.getValidators.failure(e));
   }
 }
 
 function* getNominatorTargetsWatcher() {
   try {
-    yield takeLatest(walletActions.getNominatorTargets.call, getNominatorTargetsWorker)
+    yield takeLatest(walletActions.getNominatorTargets.call, getNominatorTargetsWorker);
   } catch (e) {
     console.log(e);
-    yield put(walletActions.getNominatorTargets.failure(e))
+    yield put(walletActions.getNominatorTargets.failure(e));
   }
 }
 

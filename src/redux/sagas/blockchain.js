@@ -8,7 +8,6 @@ import { blockchainSelectors } from '../selectors';
 
 import { getCurrentBlockNumberRpc, getPeriodAndVotingDurationRpc, getAllWalletsRpc } from '../../api/nodeRpcCall';
 
-
 const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
 // WORKERS
@@ -64,7 +63,7 @@ function* getAllWalletsWorker() {
       // Hack, is caused by web3Enable needing a fully loaded page to work,
       // but i am not sure how to do it other way without larger refactor
       while (retryCounter < 30 && extensions.length === 0) {
-        ++retryCounter
+        ++retryCounter;
         yield call(delay, 1000);
         extensions = yield call(web3Enable, 'Liberland dapp');
       }
@@ -73,7 +72,7 @@ function* getAllWalletsWorker() {
       const allWallets = yield call(getAllWalletsRpc);
       yield put(blockchainActions.getAllWallets.success(allWallets));
     } else {
-      alert('You need a wallet manager like polkadot{js} browser extension to use this page')
+      alert('You need a wallet manager like polkadot{js} browser extension to use this page');
       yield put(blockchainActions.getAllWallets.failure('No enable Extensione'));
     }
   } catch (e) {

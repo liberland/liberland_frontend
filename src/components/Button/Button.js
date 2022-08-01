@@ -18,6 +18,7 @@ const Button = ({
   secondary,
   green,
   grey,
+  red,
 }) => (
   <button
     onClick={onClick}
@@ -33,6 +34,7 @@ const Button = ({
         [styles.nano]: nano,
         [styles.green]: green,
         [styles.grey]: grey,
+        [styles.red]: red,
       })
     }
   >
@@ -53,6 +55,7 @@ Button.defaultProps = {
   secondary: false,
   green: false,
   grey: false,
+  red: false,
 };
 
 Button.propTypes = {
@@ -69,6 +72,7 @@ Button.propTypes = {
   secondary: PropTypes.bool,
   green: PropTypes.bool,
   grey: PropTypes.bool,
+  red: PropTypes.bool,
 };
 
 export default Button;

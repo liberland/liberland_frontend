@@ -24,6 +24,14 @@ const navigationList = [
     route: router.voting.voteHistory,
     title: 'Vote history',
   },
+  {
+    route: router.voting.referendum,
+    title: 'Referendum',
+  },
+  {
+    route: router.voting.election,
+    title: 'Election',
+  },
 ];
 const VotingHeader = () => {
   const history = useHistory();

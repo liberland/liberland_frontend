@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useForm } from 'react-hook-form';
 import styles from './styles.module.scss';
-import {useForm} from "react-hook-form";
-import {ReactComponent as SearchIcon} from "../../assets/icons/search.svg";
-import {TextInput} from "../InputComponents";
+import { ReactComponent as SearchIcon } from '../../assets/icons/search.svg';
+import { TextInput } from '../InputComponents';
 
 const SearchBar = ({
   setSearchTerm,

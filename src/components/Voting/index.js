@@ -15,6 +15,7 @@ import styles from './styles.module.scss';
 import CongressionalAssemblyElectionsHeader from './CongressionalAssemblyElectionsHeader';
 import CurrentCongressionalAssemble from './CurrentCongressionalAssemble';
 import { votingSelectors } from '../../redux/selectors';
+import Referendum from './Referendum';
 
 const Voting = () => {
   const location = useLocation();
@@ -64,6 +65,14 @@ const Voting = () => {
           <Route
             path={router.voting.voteHistory}
             component={() => <div>Vote history</div>}
+          />
+          <Route
+            path={router.voting.referendum}
+            component={Referendum}
+          />
+          <Route
+            path={router.voting.election}
+            component={() => <div>Election</div>}
           />
 
           <Route

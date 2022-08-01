@@ -57,9 +57,9 @@ const Nominator = ({
   return (
     <div className={styles.nominatorWrapper}>
       <div className={styles.nominatorsList}>
-        {/*<SearchBar
+        {/* <SearchBar
           setSearchTerm={setSearchTerm}
-        />*/}
+        /> */}
         <ValidatorList
           validators={validators}
           selectedValidatorsAsTargets={selectedValidatorsAsTargets}
