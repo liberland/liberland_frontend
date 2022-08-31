@@ -7,7 +7,7 @@ import { web3Enable } from '@polkadot/extension-dapp';
 
 import { getUserRoleRpc, getUserPassportId } from '../../api/nodeRpcCall';
 import {
-  authActions, votingActions, walletActions, blockchainActions,
+  authActions, votingActions, walletActions, blockchainActions, democracyActions,
 } from '../actions';
 import routes from '../../router';
 import api from '../../api';
@@ -73,6 +73,7 @@ function* initGetDataFromNodeWorker() {
   yield put(walletActions.getNominatorTargets.call(walletAddress));
   yield put(blockchainActions.getPeriodAndVotingDuration.call());
   yield put(votingActions.getAssembliesList.call());
+  yield put(democracyActions.getDemocracy.call(walletAddress));
 }
 
 function* signInWatcher() {

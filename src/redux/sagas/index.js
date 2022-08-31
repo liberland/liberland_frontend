@@ -5,6 +5,7 @@ import * as assemblySagas from './assembly';
 import * as votingSagas from './voting';
 import * as lawSagas from './law';
 import * as blockchainSagas from './blockchain';
+import * as democracySagas from './democracy';
 
 export default function* rootSaga() {
   yield all([
@@ -53,5 +54,9 @@ export default function* rootSaga() {
     votingSagas.setIsVotingInProgressWatcher(),
     votingSagas.getAssembliesListWatcher(),
     lawSagas.getCurrentLawsWatcher(),
+
+    // DEMOCRACY
+    democracySagas.getDemocracyWatcher(),
+    democracySagas.secondProposalWatcher(),
   ]);
 }

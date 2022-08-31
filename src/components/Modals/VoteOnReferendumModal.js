@@ -7,7 +7,7 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
 const renderVoteButton = (vote) => {
-  return vote === 'Yay' ? <Button green medium type="submit">Vote Yay</Button> : <Button red medium type="submit">Vote Nay</Button>;
+  return vote === 'Aye' ? <Button green medium type="submit">Vote Aye</Button> : <Button red medium type="submit">Vote Nay</Button>;
 }
 
 const VoteOnReferendumModal = ({
@@ -21,11 +21,12 @@ const VoteOnReferendumModal = ({
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className={styles.h3}>{referendumInfo.name}</div>
-      <div className={styles.title}>Amount LLM</div>
+      <div className={styles.title}>Referendum Index</div>
       <TextInput
         register={register}
-        name="amount"
-        placeholder="Amount LLM"
+        name="referendumIndex"
+        placeholder="referendumIndex"
+        value={referendumInfo.referendumIndex}
       />
 
       <div className={styles.buttonWrapper}>
@@ -45,11 +46,12 @@ const VoteOnReferendumModal = ({
         onSubmit={handleSubmit(onSubmit)}
       >
         <div className={styles.h3}>{referendumInfo.name}</div>
-        <div className={styles.title}>Amount LLD</div>
+        <div className={styles.title}>Index of the proposal</div>
         <TextInput
           register={register}
-          name="amount"
-          placeholder="Amount LLD"
+          name="proposalIndex"
+          placeholder={referendumInfo.proposalIndex}
+          value={referendumInfo.proposalIndex}
         />
 
         <div className={styles.buttonWrapper}>

@@ -5,12 +5,12 @@ import Button from '../../../../Button/Button';
 
 const voteButtons = (buttonVoteCallback, referendumInfo) => (
   <div className={styles.buttonContainer}>
-    <Button small primary green className={styles.yayButton} onClick={() => { buttonVoteCallback('Yay', referendumInfo); }}>Vote Yay</Button>
+    <Button small primary green className={styles.yayButton} onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}>Vote Aye</Button>
     <Button small primary red className={styles.nayButton} onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}>Vote Nay</Button>
   </div>
 );
 
-const alreadyVotedButton = (alreadyVoted) => (alreadyVoted === 'Yay'
+const alreadyVotedButton = (alreadyVoted) => (alreadyVoted === 'Aye'
   ? (
     <Button medium green>
       You voted: &nbsp;
@@ -25,9 +25,9 @@ const alreadyVotedButton = (alreadyVoted) => (alreadyVoted === 'Yay'
   ));
 
 const ReferendumItem = ({
-  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, alreadyVoted, buttonVoteCallback, votingTimeLeft
+  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, alreadyVoted, buttonVoteCallback, votingTimeLeft, referendumIndex
 }) => {
-  const progressBarRatio = yayVotes > 0 ? `${((yayVotes) / (yayVotes + nayVotes)) * 100}%` : '0%';
+  const progressBarRatio = yayVotes > 0 ? `${((parseInt(yayVotes)) / (parseInt(yayVotes) + parseInt(nayVotes))) * 100}%` : '0%';
   return (
     <Card
       title={name}
@@ -78,7 +78,7 @@ const ReferendumItem = ({
           {
             alreadyVoted
               ? alreadyVotedButton(alreadyVoted)
-              : voteButtons(buttonVoteCallback, { name })
+              : voteButtons(buttonVoteCallback, { name, referendumIndex })
 
           }
         </div>

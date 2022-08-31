@@ -4,18 +4,18 @@ import Card from "../../../../Card";
 import Button from '../../../../Button/Button';
 
 const endorseButton = (buttonEndorseCallback, userDidEndorse, referendumInfo) => (userDidEndorse ? (
-    <Button medium primary onClick={() => { buttonEndorseCallback(referendumInfo); }}>
-      Endorse
+    <Button medium gray>
+      Already endorsed
     </Button>
   )
   : (
-    <Button medium gray>
-      Already endorsed
+    <Button medium primary onClick={() => { buttonEndorseCallback(referendumInfo); }}>
+      Endorse
     </Button>
   ));
 
 const ProposalItem = ({
-  name, createdBy, currentEndorsement, externalLink, description, userDidEndorse, hash, buttonEndorseCallback
+  name, createdBy, currentEndorsement, externalLink, description, userDidEndorse, hash, buttonEndorseCallback, proposalIndex
  }) => {
   return (
     <Card
@@ -47,7 +47,7 @@ const ProposalItem = ({
           <p>{description}</p>
         </div>
         <div className={styles.buttonContainer}>
-          {endorseButton(buttonEndorseCallback, userDidEndorse, { name })}
+          {endorseButton(buttonEndorseCallback, userDidEndorse, { name, proposalIndex })}
         </div>
       </div>
     </Card>

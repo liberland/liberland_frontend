@@ -5,6 +5,7 @@ import roughScale from '../utils/roughScale';
 
 import citizenAddressList from '../constants/citizenAdressList';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
+import user from '../redux/reducers/user';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -606,6 +607,73 @@ const setNewNominatorTargets = async (newNominatorTargets, walletAddress) => {
   });
 };
 
+const getDemocracyReferendums = async (address) => {
+  try {
+    console.log('called with address');
+    console.log(address);
+    const api = await ApiPromise.create({ provider });
+    const proposals = await api.query.democracy.publicProps();
+    const referendumInfoOf = await api.query.democracy.referendumInfoOf(['0x767a116c005fc82e2604b07e70872c4e25ccd1d57a62c5cdabdf0d4e7ab76e29']);
+    const apideriveReferendums = await api.derive.democracy.referendums();
+    const apideriveReferendumsActive = await api.derive.democracy.referendumsActive();
+    const dispatch = await api.derive.democracy.dispatchQueue();
+    const userVotes = await api.query.democracy.votingOf(address);
+    const proposalsDerive = await api.derive.democracy.proposals();
+    console.log('proposalsDerive');
+    console.log(proposalsDerive);
+    const proposalData = [];
+    proposals.toHuman().forEach((proposalItem) => {
+      proposalData.push({
+        index: proposalItem[0],
+        preimageHash: proposalItem[1],
+        proposer: proposalItem[2],
+      });
+    });
+
+    // const referendums = api.query.democracy.publicProps();
+    return {
+      proposalData,
+      apideriveReferendums,
+      apideriveReferendumsActive,
+      userVotes: userVotes.toHuman(),
+      proposalsDerive,
+    };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    return {};
+  }
+};
+
+const secondProposal = async (walletAddress, proposal) => {
+  const api = await ApiPromise.create({ provider });
+  const injector = await web3FromAddress(walletAddress);
+  const secondExtrinsic = api.tx.democracy.second(proposal, 2000);
+  secondExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.log(':( transaction failed', error);
+  });
+};
+
+const voteOnReferendum = async (walletAddress, referendumIndex) => {
+  const api = await ApiPromise.create({ provider });
+  const injector = await web3FromAddress(walletAddress);
+  const voteExtrinsic = api.tx.democracy.vote(referendumIndex, {
+    asStandard: {
+      vote: {
+        aye: true,
+        get isAye() { return true; },
+      },
+      balance: 10,
+    },
+  });
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -630,4 +698,6 @@ export {
   getValidators,
   getNominatorTargets,
   setNewNominatorTargets,
+  getDemocracyReferendums,
+  secondProposal,
 };

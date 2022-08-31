@@ -1,13 +1,15 @@
-import React, {useMemo, useState} from 'react';
-import { useSelector } from 'react-redux';
-import { userSelectors } from '../../../redux/selectors';
-import ProposalItem from "./Items/ProposalItem";
-import Card from "../../Card";
+import React, { useMemo, useState } from 'react';
+import {useDispatch, useSelector} from 'react-redux';
+import { useForm } from 'react-hook-form';
+import {blockchainSelectors, democracySelectors, userSelectors} from '../../../redux/selectors';
+import ProposalItem from './Items/ProposalItem';
+import Card from '../../Card';
 import styles from './styles.module.scss';
-import ReferendumItem from "./Items/ReferendumItem";
-import {VoteOnReferendumModal} from "../../Modals";
-import {useForm} from "react-hook-form";
-import DispatchItem from "./Items/DispatchItem";
+import ReferendumItem from './Items/ReferendumItem';
+import { VoteOnReferendumModal } from '../../Modals';
+import DispatchItem from './Items/DispatchItem';
+import {formatDemocracyMerits, formatMerits} from "../../../utils/walletHelpers";
+import {democracyActions, walletActions} from "../../../redux/actions";
 
 const Referendum = () => {
   const userId = useSelector(userSelectors.selectUserId);
@@ -16,6 +18,14 @@ const Referendum = () => {
   const [selectedReferendumInfo, setSelectedReferendumInfo] = useState({ name: 'Referendum' });
   const [selectedVoteType, setSelectedVoteType] = useState('Nay');
   const { handleSubmit, register } = useForm();
+  const dispatch = useDispatch();
+  const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  console.log('democracy')
+  console.log(democracy)
+  console.log('userWalletAddress')
+  console.log(userWalletAddress)
+
   const handleModalOpenVote = (voteType, referendumInfo) => {
     setIsModalOpenVote(!isModalOpenVote);
     setSelectedReferendumInfo(referendumInfo);
@@ -27,6 +37,10 @@ const Referendum = () => {
     setSelectedReferendumInfo(referendumInfo);
     setModalShown(2);
   };
+  const handleSubmitForm = (values) => {
+    console.log(values)
+    dispatch(democracyActions.secondProposal.call(values));
+  }
   return (
     <div>
       <div className={styles.referendumsSection}>
@@ -44,6 +58,7 @@ const Referendum = () => {
               alreadyVoted={false}
               buttonVoteCallback={handleModalOpenVote}
               votingTimeLeft="2d 3h 47m"
+              referendumIndex={1}
             />
             <ReferendumItem
               name="Kill puppies act"
@@ -58,7 +73,41 @@ const Referendum = () => {
               alreadyVoted="Nay"
               buttonVoteCallback={handleModalOpenVote}
               votingTimeLeft="14d 21h 02m"
+              referendumIndex={2}
             />
+            {
+              democracy.democracy?.apideriveReferendums.map((referendum) => (
+                <ReferendumItem
+                  name="Onchain referendum"
+                  createdBy="There is no createdBy unless thru database"
+                  currentEndorsement="??"
+                  externalLink="https://forum.liberland.org/"
+                  description="OnchainReferendum"
+                  yayVotes={formatDemocracyMerits(parseInt(referendum.votedAye))}
+                  nayVotes={formatDemocracyMerits(parseInt(referendum.votedNay))}
+                  hash={referendum.imageHash}
+                  alreadyVoted={
+                    (referendum.allAye.reduce((previousValue, currentValue) => {
+                      if(currentValue.accountId == userWalletAddress){
+                        return previousValue + 1;
+                      }
+                      else return previousValue;
+                    }, 0)  > 0 ) ? 'Aye'
+                      : (referendum.allNay.reduce((previousValue, currentValue) => {
+                      if(currentValue.accountId == userWalletAddress){
+                        return previousValue + 1;
+                      }
+                      else return previousValue;
+                    }, 0)  > 0 ) ? 'Nay' : false
+                  }
+                  /*alreadyVoted={referendum.allAye.includes(userWalletAddress) ? 'Aye'
+                    : referendum.allNay.includes(userWalletAddress) ? 'Nay' : false}*/
+                  buttonVoteCallback={handleModalOpenVote}
+                  votingTimeLeft="Query system or something for this"
+                  referendumIndex={parseInt(referendum.index)}
+                />
+              ))
+            }
           </div>
         </Card>
       </div>
@@ -71,9 +120,10 @@ const Referendum = () => {
               currentEndorsement="137.5k LLD"
               externalLink="https://forum.liberland.org/"
               description="Lobsters psychologically are very similar to humans therefore they should be allowed to experience Liberland when we reintroduce them to the Danube "
-              userDidEndorse={true}
+              userDidEndorse
               hash="0x5G3uZjEpvNAQ6U2eUjnMb66B8g6d8wyB68x6CfkRPNcno8eR"
               buttonEndorseCallback={handleModalOpenEndorse}
+              proposalIndex={1}
             />
             <ProposalItem
               name="Bomb Syria"
@@ -84,7 +134,28 @@ const Referendum = () => {
               userDidEndorse={false}
               hash="0x5G3uZjEpvNAQ6U2eUjnMb66B8g6d8wyB68x6CfkRPNcno8eR"
               buttonEndorseCallback={handleModalOpenEndorse}
+              proposalIndex={2}
             />
+            {
+              democracy.democracy?.proposalsDerive.map((proposal) => {
+                console.log("proposal.seconds.includes(userWalletAddress)")
+                console.log(proposal.seconds.includes(userWalletAddress))
+                console.log(proposal.seconds)
+                console.log(proposal.proposer)
+                console.log(userWalletAddress)
+                return (<ProposalItem
+                  name="Onchain proposal"
+                  createdBy={proposal.proposer}
+                  currentEndorsement={`${proposal.seconds.length} Citizens supported`}
+                  externalLink="https://forum.liberland.org/"
+                  description="OnChain proposal"
+                  userDidEndorse={(proposal.seconds.includes(userWalletAddress) || proposal.proposer === userWalletAddress)}
+                  hash={proposal.imageHash}
+                  buttonEndorseCallback={handleModalOpenEndorse}
+                  proposalIndex={proposal.index}
+                />)
+              })
+            }
           </div>
         </Card>
       </div>
@@ -121,12 +192,12 @@ const Referendum = () => {
               setModalShown={setModalShown}
               referendumInfo={selectedReferendumInfo}
               voteType={selectedVoteType}
-              onSubmit={() => {}}
+              onSubmit={handleSubmitForm}
             />
           )}
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 export default Referendum;
