@@ -58,5 +58,6 @@ export default function* rootSaga() {
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),
     democracySagas.secondProposalWatcher(),
+    democracySagas.voteOnReferendumWatcher(),
   ]);
 }

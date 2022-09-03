@@ -19,6 +19,7 @@ const TextInput = ({
   Icon,
   setSendAddress,
   value,
+  disabled = false,
 }) => (
   <div className={styles.inputWrapper}>
     {Icon && <Icon className={styles.inputIcon} />}
@@ -30,6 +31,7 @@ const TextInput = ({
       error={error}
       value={value}
       onInput={(e) => setSendAddress(e.target.value)}
+      disabled={disabled}
       {...register(name, {
         validate,
         pattern,

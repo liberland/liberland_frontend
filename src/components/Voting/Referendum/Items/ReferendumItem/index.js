@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react';
+import { formatBalance } from '@polkadot/util';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
+import {formatPolkadotBalance, grainsInMeritDecimals} from "../../../../../utils/walletHelpers";
 
 const voteButtons = (buttonVoteCallback, referendumInfo) => (
   <div className={styles.buttonContainer}>
@@ -27,7 +29,8 @@ const alreadyVotedButton = (alreadyVoted) => (alreadyVoted === 'Aye'
 const ReferendumItem = ({
   name, createdBy, externalLink, description, yayVotes, nayVotes, hash, alreadyVoted, buttonVoteCallback, votingTimeLeft, referendumIndex
 }) => {
-  const progressBarRatio = yayVotes > 0 ? `${((parseInt(yayVotes)) / (parseInt(yayVotes) + parseInt(nayVotes))) * 100}%` : '0%';
+
+  const progressBarRatio = yayVotes > 0 ? `${(formatPolkadotBalance(yayVotes)) / (formatPolkadotBalance(yayVotes) + formatPolkadotBalance(nayVotes)) * 100}%` : '0%';
   return (
     <Card
       title={name}
@@ -53,9 +56,9 @@ const ReferendumItem = ({
                 <span className={styles.nayText}>Nay</span>
               </div>
               <div>
-                <span className={styles.yayText}>{yayVotes}</span>
+                <span className={styles.yayText}>{formatPolkadotBalance(yayVotes)}</span>
                 /
-                <span className={styles.nayText}>{nayVotes}</span>
+                <span className={styles.nayText}>{formatPolkadotBalance(nayVotes)}</span>
               </div>
             </div>
             <div className={styles.progressBar}>

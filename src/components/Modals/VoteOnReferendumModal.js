@@ -12,13 +12,13 @@ const renderVoteButton = (vote) => {
 
 const VoteOnReferendumModal = ({
   // eslint-disable-next-line react/prop-types,max-len
-  closeModal, handleSubmit, register, modalShown, setModalShown, onSubmit, voteType, referendumInfo
+  closeModal, handleSubmit, register, modalShown, setModalShown, onSubmitSecond, onSubmitVote, voteType, referendumInfo
 }) => (
   <>
     { modalShown === 1 && (
     <form
       className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmitVote)}
     >
       <div className={styles.h3}>{referendumInfo.name}</div>
       <div className={styles.title}>Referendum Index</div>
@@ -43,7 +43,7 @@ const VoteOnReferendumModal = ({
     { modalShown === 2 && (
       <form
         className={styles.getCitizenshipModal}
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmitSecond)}
       >
         <div className={styles.h3}>{referendumInfo.name}</div>
         <div className={styles.title}>Index of the proposal</div>

@@ -660,18 +660,37 @@ const secondProposal = async (walletAddress, proposal) => {
   });
 };
 
-const voteOnReferendum = async (walletAddress, referendumIndex) => {
+const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
   const api = await ApiPromise.create({ provider });
   const injector = await web3FromAddress(walletAddress);
+  //TODO BALANCE ALWAYS VOTE MAX when chain ready
   const voteExtrinsic = api.tx.democracy.vote(referendumIndex, {
-    asStandard: {
+    Standard: {
       vote: {
-        aye: true,
-        get isAye() { return true; },
+        aye: voteType === 'Aye',
+        conviction: 1,
       },
-      balance: 10,
+      balance: 1000000000000000,
     },
   });
+
+  voteExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed VOTE at block hash #${status.asInBlock.toString()}`);
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.log(':( transaction VOTE failed', error);
+  });
+  /*
+  params={
+                isCurrentVote
+                  ? [referendumId, { Standard: { balance, vote: { aye: true, conviction } } }]
+                  : [referendumId, { aye: true, conviction }]
+              }
+              tx={api.tx.democracy.vote}
+   */
 };
 
 export {
@@ -700,4 +719,5 @@ export {
   setNewNominatorTargets,
   getDemocracyReferendums,
   secondProposal,
+  voteOnReferendum,
 };

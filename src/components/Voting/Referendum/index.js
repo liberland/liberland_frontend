@@ -37,9 +37,12 @@ const Referendum = () => {
     setSelectedReferendumInfo(referendumInfo);
     setModalShown(2);
   };
-  const handleSubmitForm = (values) => {
+  const handleSubmitSecondForm = (values) => {
     console.log(values)
     dispatch(democracyActions.secondProposal.call(values));
+  }
+  const handleSubmitVoteForm = (values) => {
+    dispatch(democracyActions.voteOnReferendum.call({...values, voteType: selectedVoteType}));
   }
   return (
     <div>
@@ -83,8 +86,9 @@ const Referendum = () => {
                   currentEndorsement="??"
                   externalLink="https://forum.liberland.org/"
                   description="OnchainReferendum"
-                  yayVotes={formatDemocracyMerits(parseInt(referendum.votedAye))}
-                  nayVotes={formatDemocracyMerits(parseInt(referendum.votedNay))}
+                  yayVotes={referendum.votedAye}
+                  nayVotes={referendum.votedNay}
+                  //nayVotes={formatDemocracyMerits(parseInt(referendum.votedNay.words[0]))}
                   hash={referendum.imageHash}
                   alreadyVoted={
                     (referendum.allAye.reduce((previousValue, currentValue) => {
@@ -192,7 +196,8 @@ const Referendum = () => {
               setModalShown={setModalShown}
               referendumInfo={selectedReferendumInfo}
               voteType={selectedVoteType}
-              onSubmit={handleSubmitForm}
+              onSubmitSecond={handleSubmitSecondForm}
+              onSubmitVote={handleSubmitVoteForm}
             />
           )}
         </Card>
