@@ -4,6 +4,7 @@ import AddNewDraftModal from './AddNewDraftModal';
 import ChoseStakeModal from './ChoseStakeModal';
 import VoteOnReferendumModal from './VoteOnReferendumModal';
 import EditDraftModal from './EditDraftModal';
+import ProposeReferendumModal from './ProposeReferendumModal';
 
 export {
   GetCitizenshipModal,
@@ -12,4 +13,5 @@ export {
   ChoseStakeModal,
   EditDraftModal,
   VoteOnReferendumModal,
+  ProposeReferendumModal,
 };

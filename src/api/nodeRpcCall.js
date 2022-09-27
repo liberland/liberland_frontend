@@ -2,10 +2,13 @@ import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extensi
 import prettyNumber from '../utils/prettyNumber';
 import matchPowHelper from '../utils/matchPowHelper';
 import roughScale from '../utils/roughScale';
+import { BN, BN_ZERO } from '@polkadot/util';
+import { blake2AsHex } from '@polkadot/util-crypto';
 
 import citizenAddressList from '../constants/citizenAdressList';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import user from '../redux/reducers/user';
+import axios from "axios";
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -630,13 +633,56 @@ const getDemocracyReferendums = async (address) => {
       });
     });
 
+    //TODO REFACTOR
+    let centralizedReferendumsData = []
+    let api2 = axios.create({
+      baseURL: 'http://localhost:8010',
+      withCredentials: true,
+    });
+    api2.defaults.headers.common["x-auth-token"] = '7VpLfCKnCdc5BDyzECsr57EFCHOJPaXziGNKbBAvxgFcc0wfB3fIE1LEXOARxkWJ';
+
+    await api2.get('/referendums').then((result) => {
+      centralizedReferendumsData = result.data;
+    })
+
+    let crossReferencedReferendumsData = [];
+    apideriveReferendums.forEach(referendum => {
+      console.log('human index');
+      console.log(referendum.index.toHuman());
+      const referendumIndex = referendum.index.toHuman();
+      let centralizedBackendItem = {}
+      centralizedReferendumsData.forEach(centralizedData => {
+        if(parseInt(centralizedData.chainIndex) === parseInt(referendumIndex)){
+          centralizedBackendItem = centralizedData;
+        }
+      })
+      referendum.centralizedData = centralizedBackendItem;
+      crossReferencedReferendumsData.push(referendum);
+    })
+
+    let crossReferencedProposalsData = [];
+    proposalsDerive.forEach(proposal => {
+      const proposalIndex = proposal.index
+      let centralizedBackendItem = {}
+      centralizedReferendumsData.forEach(centralizedData => {
+        if(parseInt(centralizedData.chainIndex) === parseInt(proposalIndex)){
+          centralizedBackendItem = centralizedData;
+        }
+      })
+      proposal.centralizedData = centralizedBackendItem;
+      crossReferencedProposalsData.push(proposal);
+    })
+
     // const referendums = api.query.democracy.publicProps();
     return {
       proposalData,
       apideriveReferendums,
+      crossReferencedReferendumsData,
+      crossReferencedProposalsData,
       apideriveReferendumsActive,
       userVotes: userVotes.toHuman(),
       proposalsDerive,
+      centralizedReferendumsData,
     };
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -683,15 +729,64 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
     // eslint-disable-next-line no-console
     console.log(':( transaction VOTE failed', error);
   });
-  /*
-  params={
-                isCurrentVote
-                  ? [referendumId, { Standard: { balance, vote: { aye: true, conviction } } }]
-                  : [referendumId, { aye: true, conviction }]
-              }
-              tx={api.tx.democracy.vote}
-   */
 };
+
+const getProposalHash = async (values, legislationIndex) => {
+  console.log('GETTING PROPOSAL HASH')
+  const api = await ApiPromise.create({ provider });
+  //const extrinsicEncoded = api.tx.system.remark(values.legislationTier + values.legislationName + values.forumLink, values.legislationContent).method.toHex();
+  const extrinsicEncoded = api.tx.liberlandLegislation.addLaw(
+    parseInt(values.legislationTier), legislationIndex, values.legislationContent
+  ).method.toHex();
+  const storageFee = api.consts.democracy.preimageByteDeposit.mul(new BN((extrinsicEncoded.length - 2) / 2));
+  let hash = { encodedHash: blake2AsHex(extrinsicEncoded), extrinsicEncoded, storageFee };
+  return hash;
+}
+
+const submitProposal = async (walletAddress, values) => {
+  const api = await ApiPromise.create({ provider });
+  const injector = await web3FromAddress(walletAddress);
+  const nextChainIndexQuery = await api.query.democracy.referendumCount();
+  const nextChainIndex = nextChainIndexQuery.toHuman();
+  //TODO REFACTOR
+  let api2 = axios.create({
+    baseURL: 'http://localhost:8010',
+    withCredentials: true,
+  });
+  api2.defaults.headers.common["X-Token"] = '7VpLfCKnCdc5BDyzECsr57EFCHOJPaXziGNKbBAvxgFcc0wfB3fIE1LEXOARxkWJ';
+
+  let centralizedMetadata = await api2.post('/referendums', {
+    username: 'username',
+    link: values.forumLink,
+    personId: 10,
+    chainIndex: nextChainIndex,
+    description: values.legislationContent,
+    hash: 'hash not needed',
+    additionalMetadata: {}
+  })
+  const legislationIndex = centralizedMetadata.data.id;
+  let hash = await getProposalHash(values, legislationIndex);
+  const notePreimageTx = api.tx.democracy.notePreimage(hash.extrinsicEncoded)
+  const proposeTx = api.tx.democracy.propose(hash.encodedHash, hash.storageFee)
+  notePreimageTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed NOTEPREIMAGE at block hash #${status.asInBlock.toString()}`);
+      proposeTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+        if (status.isInBlock) {
+          // eslint-disable-next-line no-console
+          console.log(`Completed PROPOSE at block hash #${status.asInBlock.toString()}`);
+        }
+      }).catch((error) => {
+        // eslint-disable-next-line no-console
+        console.log(':( transaction PROPOSE failed', error);
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.log(':( transaction NOTEPREIMAGE failed', error);
+  });
+}
 
 export {
   getBalanceByAddress,
@@ -720,4 +815,5 @@ export {
   getDemocracyReferendums,
   secondProposal,
   voteOnReferendum,
+  submitProposal,
 };

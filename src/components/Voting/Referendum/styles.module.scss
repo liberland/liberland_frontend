@@ -6,3 +6,11 @@
 .referendumsCard {
   //background-color: $transparent1;
 }
+
+.proposeReferendumLine {
+  display: grid;
+  flex: 1;
+  height: 3rem;
+  align-items: flex-end;
+  justify-items: flex-end;
+}
