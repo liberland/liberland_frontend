@@ -7,6 +7,8 @@ const initialState = {
     apideriveReferendums: [],
     apideriveReferendumsActive: [],
     userVotes: [],
+    candidates: [],
+    currentCongressMembers: [],
   },
   gettingDemocracyInfo: false,
 };

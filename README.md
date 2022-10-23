@@ -19,3 +19,20 @@ You can add the following to the polkadotjs browser extension to use them
 Steve (citizen)
 bargain album current caught tragic slab identify squirrel embark black drip imitate
 5HGZfBpqUUqGY7uRCYA6aRwnRHJVhrikn8to31GcfNcifkym
+
+
+##Local development
+Local dev - start api and auth servers, both with nvm use 10.21.0
+api- PORT=8010 npm run start
+sso- npm run development
+web old - npm run start
+cdn - PORT=8020 npm run start
+
+blockchain cargo run --release -- --dev
+
+nvm use 14.19.3 
+liberland-backend yarn run dev
+liberland-frontend yarn run dev
+
+https://polkadot.js.org/apps/#/explorer?rpc=ws://localhost:9944
+http://localhost:8080

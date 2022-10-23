@@ -1,65 +1,100 @@
 /* eslint-disable react/prop-types */
-import React, { useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { userSelectors, votingSelectors } from '../../../redux/selectors';
+import { useForm } from 'react-hook-form';
+import { democracySelectors } from '../../../redux/selectors';
+import styles from './styles.module.scss';
 
-import TableComponent from '../TableComponent';
-import Status from '../../Status';
-import ProgressBar from '../../ProgressBar';
-
-import truncate from '../../../utils/truncate';
+import CurrentAssemble from './CurrentAssemble';
+import CandidateVoting from './CandidateVoting';
 
 const CongressionalAssemble = () => {
-  const userId = useSelector(userSelectors.selectUserId);
-  const data = useSelector(votingSelectors.selectorMinistersList);
+  const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
+  const [selectedCandidates, setSelectedCandidates] = useState([]);
+  const [eligibleUnselectedCandidates, setEligibleUnselectedCandidates] = useState([]);
+  const [didChangeSelectedCandidates, setDidChangeSelectedCandidates] = useState(false);
+  console.log('democracycngrs ass');
+  console.log(democracy);
 
-  const columns = useMemo(
-    () => [
-      {
-        Header: 'PLACE',
-        accessor: 'place',
-      },
-      {
-        Header: 'DEPUTIES',
-        accessor: 'deputies',
-        Cell: ({ cell }) => (cell.row.original.id === `${userId}`
-          ? (
-            <>
-              {' '}
-              {cell.row.original.deputies}
-              {' '}
-              <Status status="Your candidate" pending />
-              {' '}
-            </>
-          )
-          : truncate(cell.row.original.deputies, 10)),
-      },
-      {
-        Header: 'SUPPORTED',
-        accessor: 'supported',
-      },
-      {
-        Header: 'POWER',
-        accessor: 'power',
-        Cell: ({ cell }) => (
-          <ProgressBar percent={cell.row.original.power} />
-        ),
-      },
-    ],
-    [userId],
-  );
-
-  const rowProps = (row) => {
-    if (row.original.id === `${userId}`) {
-      return {
-        style: {
-          boxShadow: '0 0 0 1px #F1C823',
-        },
-      };
-    }
-    return {};
+  const selectCandidate = (politician) => {
+    const newSelectedCandidates = selectedCandidates;
+    newSelectedCandidates.push(politician);
+    setSelectedCandidates(newSelectedCandidates);
+    let newEligibleUnselectedCandidates = eligibleUnselectedCandidates;
+    newEligibleUnselectedCandidates = newEligibleUnselectedCandidates.filter((candidate) => {
+      if (candidate.rawIdentity === politician.rawIdentity) { return false; }
+      return true;
+    });
+    setEligibleUnselectedCandidates(newEligibleUnselectedCandidates);
+    setDidChangeSelectedCandidates(true);
   };
-  return <TableComponent title="Current assembly" data={data} columns={columns} rowProps={rowProps} />;
+
+  const unselectCandidate = (politician) => {
+    const newEligibleUnselectedCandidates = eligibleUnselectedCandidates;
+    newEligibleUnselectedCandidates.push(politician);
+    setEligibleUnselectedCandidates(newEligibleUnselectedCandidates);
+    let newSelectedCandidates = selectedCandidates;
+    newSelectedCandidates = newSelectedCandidates.filter((candidate) => {
+      if (candidate.rawIdentity === politician.rawIdentity) { return false; }
+      return true;
+    });
+    setSelectedCandidates(newSelectedCandidates);
+    setDidChangeSelectedCandidates(true);
+  };
+
+  const moveSelectedCandidate = (politician, direction) => {
+    const newSelectedCandidates = selectedCandidates.slice();
+    let selectedPoliticianArrayIndex = findPoliticianIndex(selectedCandidates, politician);
+    let swapPlaceWithIndex = direction==='up'? selectedPoliticianArrayIndex - 1 : selectedPoliticianArrayIndex + 1;
+    if(swapPlaceWithIndex < 0 || swapPlaceWithIndex > (newSelectedCandidates.length - 1)) {
+      return false
+    }
+    let swapWithPolitician = newSelectedCandidates[swapPlaceWithIndex];
+    newSelectedCandidates[swapPlaceWithIndex] = politician;
+    newSelectedCandidates[selectedPoliticianArrayIndex] = swapWithPolitician;
+    setSelectedCandidates(newSelectedCandidates);
+    setDidChangeSelectedCandidates(true);
+  };
+
+  const findPoliticianIndex = (ar, el) => {
+    let indexOfPolitician = false;
+    for (let i = 0; i < ar.length; i++) {
+      if (ar[i].rawIdentity === el.rawIdentity) { indexOfPolitician = i; }
+    }
+    return indexOfPolitician;
+  };
+
+  useEffect(() => {
+    setSelectedCandidates(democracy?.democracy?.currentCandidateVotesByUser);
+    let filteredEligibleUnselectedCandidates = democracy?.democracy?.currentCongressMembers?.concat(democracy?.democracy?.candidates);
+    filteredEligibleUnselectedCandidates = filteredEligibleUnselectedCandidates?.filter((candidate) => {
+      let shouldKeep = true;
+      democracy?.democracy?.currentCandidateVotesByUser?.forEach((votedForCandidate) => {
+        if (votedForCandidate.rawIdentity === candidate.rawIdentity) {
+          shouldKeep = false;
+        }
+      });
+      return shouldKeep;
+    });
+    setEligibleUnselectedCandidates(filteredEligibleUnselectedCandidates);
+  }, [democracy]);
+
+  const onSubmitVote = () => {};
+  return (
+    <div>
+      <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />
+      <div style={{height:'15px'}}></div>
+      <CandidateVoting
+        eligibleUnselectedCandidates={eligibleUnselectedCandidates}
+        selectedCandidates={selectedCandidates}
+        selectCandidate={selectCandidate}
+        unselectCandidate={unselectCandidate}
+        moveSelectedCandidate={moveSelectedCandidate}
+        didChangeSelectedCandidates={didChangeSelectedCandidates}
+      />
+
+    </div>
+  );
 };
 
 export default CongressionalAssemble;

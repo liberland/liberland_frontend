@@ -1,14 +1,14 @@
 import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
+import { BN, BN_ZERO } from '@polkadot/util';
+import { blake2AsHex } from '@polkadot/util-crypto';
+import axios from 'axios';
 import prettyNumber from '../utils/prettyNumber';
 import matchPowHelper from '../utils/matchPowHelper';
 import roughScale from '../utils/roughScale';
-import { BN, BN_ZERO } from '@polkadot/util';
-import { blake2AsHex } from '@polkadot/util-crypto';
 
 import citizenAddressList from '../constants/citizenAdressList';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import user from '../redux/reducers/user';
-import axios from "axios";
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -633,45 +633,45 @@ const getDemocracyReferendums = async (address) => {
       });
     });
 
-    //TODO REFACTOR
-    let centralizedReferendumsData = []
-    let api2 = axios.create({
+    // TODO REFACTOR
+    let centralizedReferendumsData = [];
+    const api2 = axios.create({
       baseURL: 'http://localhost:8010',
       withCredentials: true,
     });
-    api2.defaults.headers.common["x-auth-token"] = '7VpLfCKnCdc5BDyzECsr57EFCHOJPaXziGNKbBAvxgFcc0wfB3fIE1LEXOARxkWJ';
+    api2.defaults.headers.common['x-auth-token'] = '7VpLfCKnCdc5BDyzECsr57EFCHOJPaXziGNKbBAvxgFcc0wfB3fIE1LEXOARxkWJ';
 
     await api2.get('/referendums').then((result) => {
       centralizedReferendumsData = result.data;
-    })
+    });
 
-    let crossReferencedReferendumsData = [];
-    apideriveReferendums.forEach(referendum => {
+    const crossReferencedReferendumsData = [];
+    apideriveReferendums.forEach((referendum) => {
       console.log('human index');
       console.log(referendum.index.toHuman());
       const referendumIndex = referendum.index.toHuman();
-      let centralizedBackendItem = {}
-      centralizedReferendumsData.forEach(centralizedData => {
-        if(parseInt(centralizedData.chainIndex) === parseInt(referendumIndex)){
+      let centralizedBackendItem = {};
+      centralizedReferendumsData.forEach((centralizedData) => {
+        if (parseInt(centralizedData.chainIndex) === parseInt(referendumIndex)) {
           centralizedBackendItem = centralizedData;
         }
-      })
+      });
       referendum.centralizedData = centralizedBackendItem;
       crossReferencedReferendumsData.push(referendum);
-    })
+    });
 
-    let crossReferencedProposalsData = [];
-    proposalsDerive.forEach(proposal => {
-      const proposalIndex = proposal.index
-      let centralizedBackendItem = {}
-      centralizedReferendumsData.forEach(centralizedData => {
-        if(parseInt(centralizedData.chainIndex) === parseInt(proposalIndex)){
+    const crossReferencedProposalsData = [];
+    proposalsDerive.forEach((proposal) => {
+      const proposalIndex = proposal.index;
+      let centralizedBackendItem = {};
+      centralizedReferendumsData.forEach((centralizedData) => {
+        if (parseInt(centralizedData.chainIndex) === parseInt(proposalIndex)) {
           centralizedBackendItem = centralizedData;
         }
-      })
+      });
       proposal.centralizedData = centralizedBackendItem;
       crossReferencedProposalsData.push(proposal);
-    })
+    });
 
     // const referendums = api.query.democracy.publicProps();
     return {
@@ -709,7 +709,7 @@ const secondProposal = async (walletAddress, proposal) => {
 const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
   const api = await ApiPromise.create({ provider });
   const injector = await web3FromAddress(walletAddress);
-  //TODO BALANCE ALWAYS VOTE MAX when chain ready
+  // TODO BALANCE ALWAYS VOTE MAX when chain ready
   const voteExtrinsic = api.tx.democracy.vote(referendumIndex, {
     Standard: {
       vote: {
@@ -732,42 +732,42 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
 };
 
 const getProposalHash = async (values, legislationIndex) => {
-  console.log('GETTING PROPOSAL HASH')
+  console.log('GETTING PROPOSAL HASH');
   const api = await ApiPromise.create({ provider });
-  //const extrinsicEncoded = api.tx.system.remark(values.legislationTier + values.legislationName + values.forumLink, values.legislationContent).method.toHex();
+  // const extrinsicEncoded = api.tx.system.remark(values.legislationTier + values.legislationName + values.forumLink, values.legislationContent).method.toHex();
   const extrinsicEncoded = api.tx.liberlandLegislation.addLaw(
-    parseInt(values.legislationTier), legislationIndex, values.legislationContent
+    parseInt(values.legislationTier), legislationIndex, values.legislationContent,
   ).method.toHex();
   const storageFee = api.consts.democracy.preimageByteDeposit.mul(new BN((extrinsicEncoded.length - 2) / 2));
-  let hash = { encodedHash: blake2AsHex(extrinsicEncoded), extrinsicEncoded, storageFee };
+  const hash = { encodedHash: blake2AsHex(extrinsicEncoded), extrinsicEncoded, storageFee };
   return hash;
-}
+};
 
 const submitProposal = async (walletAddress, values) => {
   const api = await ApiPromise.create({ provider });
   const injector = await web3FromAddress(walletAddress);
   const nextChainIndexQuery = await api.query.democracy.referendumCount();
   const nextChainIndex = nextChainIndexQuery.toHuman();
-  //TODO REFACTOR
-  let api2 = axios.create({
+  // TODO REFACTOR
+  const api2 = axios.create({
     baseURL: 'http://localhost:8010',
     withCredentials: true,
   });
-  api2.defaults.headers.common["X-Token"] = '7VpLfCKnCdc5BDyzECsr57EFCHOJPaXziGNKbBAvxgFcc0wfB3fIE1LEXOARxkWJ';
+  api2.defaults.headers.common['X-Token'] = '7VpLfCKnCdc5BDyzECsr57EFCHOJPaXziGNKbBAvxgFcc0wfB3fIE1LEXOARxkWJ';
 
-  let centralizedMetadata = await api2.post('/referendums', {
+  const centralizedMetadata = await api2.post('/referendums', {
     username: 'username',
     link: values.forumLink,
     personId: 10,
     chainIndex: nextChainIndex,
     description: values.legislationContent,
     hash: 'hash not needed',
-    additionalMetadata: {}
-  })
+    additionalMetadata: {},
+  });
   const legislationIndex = centralizedMetadata.data.id;
-  let hash = await getProposalHash(values, legislationIndex);
-  const notePreimageTx = api.tx.democracy.notePreimage(hash.extrinsicEncoded)
-  const proposeTx = api.tx.democracy.propose(hash.encodedHash, hash.storageFee)
+  const hash = await getProposalHash(values, legislationIndex);
+  const notePreimageTx = api.tx.democracy.notePreimage(hash.extrinsicEncoded);
+  const proposeTx = api.tx.democracy.propose(hash.encodedHash, hash.storageFee);
   notePreimageTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
@@ -785,6 +785,117 @@ const submitProposal = async (walletAddress, values) => {
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.log(':( transaction NOTEPREIMAGE failed', error);
+  });
+};
+
+const getCongressMembersWithIdentity = async (walletAddress) => {
+  const api = await ApiPromise.create({ provider });
+  let councilMembers = await api.query.council.members();
+  councilMembers = councilMembers.toHuman();
+  const councilMembersIdentityQueries = [];
+  councilMembers.forEach((councilMember) => {
+    councilMembersIdentityQueries.push([api.query.identity.identityOf, councilMember]);
+  });
+
+  const councilMemberIdentities = await api.queryMulti([
+    ...councilMembersIdentityQueries,
+  ]);
+
+  const crossReferencedCouncilMemberIdentities = [];
+  councilMemberIdentities.forEach((councilMemberIdentity) => {
+    const toHumanIdentity = councilMemberIdentity.toHuman();
+    // address use councilmembers.shift as its same ordering as councilmemberidentities
+    let rawIdentity = councilMembers.shift();
+    rawIdentity = typeof rawIdentity === "string" ? rawIdentity : rawIdentity[0]
+    crossReferencedCouncilMemberIdentities.push({
+      name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
+      identityData: toHumanIdentity,
+      rawIdentity: rawIdentity,
+    });
+  });
+
+  let candidates = await api.query.elections.candidates();
+  candidates = candidates.toHuman();
+  // TODO isolate in function ?
+  const candidatesIdentityQueries = [];
+  candidates.forEach((candidate) => {
+    candidatesIdentityQueries.push([api.query.identity.identityOf, candidate[0]]);
+  });
+
+  const candidateIdentities = await api.queryMulti([
+    ...candidatesIdentityQueries,
+  ]);
+
+  const crossReferencedCandidateIdentities = [];
+  candidateIdentities.forEach((candidateIdentity) => {
+    const toHumanIdentity = candidateIdentity.toHuman();
+    // address use councilmembers.shift as its same ordering as councilmemberidentities
+    let rawIdentity = candidates.shift();
+    rawIdentity = typeof rawIdentity === "string" ? rawIdentity : rawIdentity[0]
+    crossReferencedCandidateIdentities.push({
+      name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
+      identityData: toHumanIdentity,
+      rawIdentity: rawIdentity,
+    });
+  });
+
+  const currentCandidateVotesByUserQuery = await api.query.elections.voting(walletAddress);
+  const currentCandidateVotesByUser = currentCandidateVotesByUserQuery.toHuman().votes;
+
+  const currentCandidateVotesByUserIdentityQueries = [];
+  currentCandidateVotesByUser.forEach((currentCandidateVote) => {
+    currentCandidateVotesByUserIdentityQueries.push([api.query.identity.identityOf, currentCandidateVote]);
+  });
+
+  const currentCandidateVotesByUserIdentities = await api.queryMulti(
+    [
+      ...currentCandidateVotesByUserIdentityQueries,
+    ],
+  );
+
+  const crossReferencedCurrentCandidateVotesByUser = [];
+  currentCandidateVotesByUserIdentities.forEach(currentCandidateVoteIdentity => {
+    const toHumanIdentity = currentCandidateVoteIdentity.toHuman();
+    // address use councilmembers.shift as its same ordering as councilmemberidentities
+    let rawIdentity = currentCandidateVotesByUser.shift();
+    rawIdentity = typeof rawIdentity === "string" ? rawIdentity : rawIdentity[0]
+    console.log('rawIdentity')
+    console.log(rawIdentity)
+    crossReferencedCurrentCandidateVotesByUser.push({
+      name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
+      identityData: toHumanIdentity,
+      rawIdentity: rawIdentity,
+    });
+  });
+  // TODO add runnersup
+
+  /*
+   const electionsInfo = useCall<DeriveElectionsInfo>(api.derive.elections.info);
+   const allVotes = useCall<Record<string, AccountId[]>>(api.derive.council.votes, undefined, transformVotes);
+   */
+
+  return { currentCongressMembers: crossReferencedCouncilMemberIdentities, candidates: crossReferencedCandidateIdentities, currentCandidateVotesByUser: crossReferencedCurrentCandidateVotesByUser };
+};
+
+const voteForCongress = async (listofVotes, walletAddress) => {
+  console.log('voting for cuntgress')
+  console.log(listofVotes)
+  const api = await ApiPromise.create({ provider });
+  const injector = await web3FromAddress(walletAddress);
+  let votes = listofVotes.map(vote => {return vote.rawIdentity})
+  console.log('votes')
+  console.log(votes)
+
+  const voteExtrinsic = api.tx.elections.vote(votes, 100000000);
+
+  voteExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed VOTE at block hash #${status.asInBlock.toString()}`);
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.log(':( transaction VOTE failed', error);
   });
 }
 
@@ -816,4 +927,6 @@ export {
   secondProposal,
   voteOnReferendum,
   submitProposal,
+  getCongressMembersWithIdentity,
+  voteForCongress
 };

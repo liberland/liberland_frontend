@@ -1,0 +1,37 @@
+@import "../../../../assets/base/variables";
+.candidateVotingContainer {
+  display: flex;
+  flex-direction: row;
+  //width: 100%;
+  border-color: $primary;
+  border-style: solid;
+  background-color: $secondary3;
+  margin-top: 15px;
+}
+.eligibleCandidatesContainer {
+  flex: 1;
+}
+.selectedCandidatesContainer {
+  flex: 1;
+}
+.candidateVotingHeader {
+  font-weight: bolder;
+  font-size: 1.75rem;
+}
+.candidatesHeader{
+  font-size: 1.5rem;
+  font-weight: bolder;
+  align-items: center;
+  justify-items: center;
+  display: grid;
+  margin: 15px;
+  margin-bottom: 5px;
+}
+.candidatesSubtext{
+  font-size: 1.25rem;
+  align-items: center;
+  justify-items: center;
+  display: grid;
+  margin: 7px;
+  height: 55px;
+}

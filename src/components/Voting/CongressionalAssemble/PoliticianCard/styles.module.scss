@@ -1,0 +1,70 @@
+@import "../../../../assets/base/variables";
+.politicianCardContainer {
+  flex-direction: row;
+  display: flex;
+  height: 3rem;
+  align-items: center;
+  justify-items: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border-width: 2px;
+  border-color: $primary;
+  border-style: solid;
+  background-color: $secondary3;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  //justify-content: center;
+}
+.politicianData {
+  display: flex;
+  flex: 3;
+  align-items: center;
+  justify-items: center;
+}
+.politicianVotingPower {
+  display: grid;
+  flex: 1;
+  align-items: flex-end;
+  justify-items: flex-end;
+  flex-direction: row;
+}
+.politicianVotingPowerItems {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-items: center;
+}
+.politicianVotingPowerNumber {
+  font-weight: bolder;
+  font-size: 1.25rem;
+}
+.politicianImageContainer{
+  margin-right: 10px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  height:3rem;
+}
+.politicianPartyImageContainer{
+  margin-right: 10px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  height:3rem;
+}
+.politicianVotingPowerImageContainer{
+  margin-right: 10px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  height:3rem;
+}
+.politicianDisplayName{
+  font-weight: bolder;
+  font-size: 1.25rem;
+  color: $text2;
+}
+

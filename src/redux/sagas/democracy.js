@@ -2,7 +2,12 @@ import {
   put, takeLatest, call, cps, select,
 } from 'redux-saga/effects';
 
-import {getDemocracyReferendums, secondProposal, voteOnReferendum} from '../../api/nodeRpcCall';
+import {
+  getCongressMembersWithIdentity,
+  getDemocracyReferendums,
+  secondProposal,
+  voteOnReferendum
+} from '../../api/nodeRpcCall';
 
 import api from '../../api';
 
@@ -17,7 +22,9 @@ function* getDemocracyWorker() {
     let walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     //TODO use user wallet address once chain is in good state
     //walletAddress = '5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo';
-    const democracy = yield call(getDemocracyReferendums, walletAddress);
+    const directDemocracyInfo = yield call(getDemocracyReferendums, walletAddress);
+    const currentCongressMembers = yield call(getCongressMembersWithIdentity, walletAddress);
+    const democracy = {...directDemocracyInfo, ...currentCongressMembers}
     console.log('democracy')
     console.log(democracy)
     yield put(democracyActions.getDemocracy.success({democracy}))
