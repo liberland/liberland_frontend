@@ -91,11 +91,7 @@ const HomeNavigation = () => {
       activeIcon: ConstitutionIconActive,
     },
   ];
-
-  console.log('navigationList')
-  console.log(navigationList)
-  console.log('roles')
-  console.log(roles)
+  
   return (
     <div className={styles.navigationWrapper}>
       <div className={styles.logoHeaderWrapper}>
@@ -124,7 +120,6 @@ const HomeNavigation = () => {
       }
       {roles['e-resident'] === 'e-resident' ? <GetCitizenshipCard /> : ''}
       {/* roles.citizen === 'citizen' ? <NextAssemblyCard /> : '' */}
-      <div>After nav</div>
     </div>
 
   );

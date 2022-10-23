@@ -12,6 +12,8 @@ import {
 import routes from '../../router';
 import api from '../../api';
 
+const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
+
 function* signInWorker(action) {
   try {
     const { credentials, history } = action.payload;
@@ -37,8 +39,18 @@ function* verifySessionWorker() {
   try {
     const walletAddress = yield sessionStorage.getItem('userWalletAddress');
     const { data: { user, success } } = yield call(api.get, '/users/check_session');
-    const extensions = yield web3Enable('Liberland dapp');
+    let extensions = yield web3Enable('Liberland dapp');
     yield put(blockchainActions.setUserWallet.success(walletAddress));
+    if (extensions.length === 0) {
+      let retryCounter = 0;
+      // Hack, is caused by web3Enable needing a fully loaded page to work,
+      // but i am not sure how to do it other way without larger refactor
+      while (retryCounter < 30 && extensions.length === 0) {
+        ++retryCounter;
+        yield call(delay, 1000);
+        extensions = yield call(web3Enable, 'Liberland dapp');
+      }
+    }
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc, walletAddress);
       user.passportId = yield call(getUserPassportId, walletAddress);
