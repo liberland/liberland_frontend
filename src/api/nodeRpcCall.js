@@ -388,49 +388,6 @@ const getUserRoleRpc = async (walletAddress) => {
   return null;
 };
 
-const getPeriodAndVotingDurationRpc = async () =>
-  /* try {
-    const api = await ApiPromise.create({ provider });
-    const assemblyElectionPeriod = api.consts.assemblyPallet.assemblyElectionPeriod.toNumber();
-    // eslint-disable-next-line no-console
-    console.log('AssemblyElectionPeriod', assemblyElectionPeriod);
-
-    const assemblyVotingDuration = api.consts.assemblyPallet.assemblyVotingDuration.toNumber();
-    // eslint-disable-next-line no-console
-    console.log('assemblyVotingDuration', assemblyVotingDuration);
-
-    return { assemblyVotingDuration, assemblyElectionPeriod };
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('error', e);
-  } */
-  null;
-const getStatusProposalRpc = async (hash, callback) =>
-  /* try {
-    const api = await ApiPromise.create({
-      provider,
-      types: {
-        lawHash: 'Hash',
-        LawState: {
-          _enum: ['Approved', 'InProgress', 'Declined'],
-        },
-        LawType: {
-          _enum: ['ConstitutionalChange', 'Legislation', 'Decision'],
-        },
-        Law: {
-          state: 'LawState',
-          lawType: 'LawType',
-        },
-      },
-    });
-    const proposalStatus = await api.query.assemblyPallet.laws(hash);
-    callback(null, JSON.parse(proposalStatus.toString()));
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('error', e);
-    callback(e);
-  } */
-  null;
 const getCurrentBlockNumberRpc = async () => {
   try {
     const api = await ApiPromise.create({ provider });
@@ -911,8 +868,6 @@ export {
   getMinistersRpc,
   getUserRoleRpc,
   sendLawProposal,
-  getPeriodAndVotingDurationRpc,
-  getStatusProposalRpc,
   getCurrentBlockNumberRpc,
   getProposalHashesRpc,
   voteByProposalRpc,

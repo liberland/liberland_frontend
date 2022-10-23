@@ -7,8 +7,6 @@ import { authActions } from '../../../redux/actions';
 import { userSelectors } from '../../../redux/selectors';
 import router from '../../../router';
 
-import AssemblyInfoHomeHeader from '../../Assembly/AssemblyInfoHomeHeader';
-
 import styles from './styles.module.scss';
 
 const HomeHeader = () => {
@@ -49,14 +47,11 @@ const HomeHeader = () => {
     dispatch(authActions.signOut.call(history));
   };
 
-  const isAssembly = () => ((location.pathname.indexOf(router.home.assembly.split('/').pop())) !== -1);
-
   return (
     <div className={styles.homeHeaderWrapper}>
       <div className={styles.homeHeaderAccountWrapper}>
         <div className={styles.titleWrapper}>
           <span className={styles.headerTitle}>{titles[location.pathname]}</span>
-          { isAssembly() && <AssemblyInfoHomeHeader /> }
         </div>
         <div className={styles.avatarWrapper}>
           <div ref={trigger} className={styles.avatar}>

@@ -41,43 +41,6 @@ function* addMyDraftWorker(action) {
   }
 }
 
-function* submitProposalWorker(action) {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { data } = yield api.get(`/assembly/calc_hash/${action.payload.id}`);
-    // eslint-disable-next-line no-console
-    console.log('hash', data.hash);
-    const args = [data, walletAddress];
-    const resultSendNode = yield cps(sendLawProposal, args);
-
-    if (resultSendNode !== 'done') {
-      yield put(assemblyActions.submitProposal.failure(resultSendNode));
-      return;
-    }
-    const requiredAmountLlm = yield select(votingSelectors.selectorLiberStakeAmount);
-    const proposalStatus = yield cps(getStatusProposalRpc, data.hash);
-
-    const result = yield api.patch('/assembly/update_status_proposal',
-      {
-        hash: data.hash,
-        status: proposalStatus.state,
-        requiredAmountLlm,
-        currentLlm: 0,
-        votingHourLeft: 72,
-        nodeIdProposel: 'NoNeed',
-        draftType: proposalStatus.lawType,
-      });
-    yield put(assemblyActions.submitProposal.success());
-    // eslint-disable-next-line no-console
-    console.log('/assembly/update_status_proposal', result);
-    yield put(assemblyActions.getMyProposals.call());
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e);
-    yield put(assemblyActions.submitProposal.failure(e));
-  }
-}
-
 function* getMyProposalsWorker() {
   try {
     const userId = yield select(userSelectors.selectUserId);
@@ -209,14 +172,6 @@ function* addMyDraftWatcher() {
   }
 }
 
-function* submitProposalWatcher() {
-  try {
-    yield takeLatest(assemblyActions.submitProposal.call, submitProposalWorker);
-  } catch (e) {
-    yield put(assemblyActions.submitProposal.failure(e));
-  }
-}
-
 function* getByHashesWatcher() {
   try {
     yield takeLatest(assemblyActions.getByHashes.call, getByHashesWorker);
@@ -305,7 +260,6 @@ export {
   getMyProposalsWatcher,
   deleteProposalWatcher,
   editDraftWatcher,
-  submitProposalWatcher,
   getByHashesWatcher,
   updateAllProposalsWatcher,
   voteByProposalWatcher,

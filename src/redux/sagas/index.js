@@ -17,10 +17,6 @@ export default function* rootSaga() {
 
     // // BLOCKCHAIN
     blockchainSagas.fetchBlockNumberWatcher(),
-    blockchainSagas.getPeriodAndVotingDurationWatcher(),
-    blockchainSagas.setElectionsBlockWatcher(),
-    blockchainSagas.runSetElectionsBlockWorker(),
-    blockchainSagas.updateDateElectionsWatcher(),
     blockchainSagas.getAllWalletsWatcher(),
 
     // WALLET
@@ -35,7 +31,6 @@ export default function* rootSaga() {
 
     // ASSEMBLY
     assemblySagas.addMyDraftWatcher(),
-    assemblySagas.submitProposalWatcher(),
     assemblySagas.getByHashesWatcher(),
     assemblySagas.getMyProposalsWatcher(),
     assemblySagas.deleteProposalWatcher(),

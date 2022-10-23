@@ -46,10 +46,13 @@ const NavigationLink = ({
 NavigationLink.propTypes = {
   route: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired,
-  activeIcon: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  icon: PropTypes.any.isRequired,
+  // eslint-disable-next-line react/require-default-props
+  activeIcon: PropTypes.string,
   path: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+  // eslint-disable-next-line react/require-default-props
+  description: PropTypes.string,
 };
 
 export default NavigationLink;

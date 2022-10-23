@@ -4,7 +4,6 @@ import {
 } from 'react-router-dom';
 
 import AssemblyHeader from './AssemblyHeader';
-import MyDrafts from './MyDrafts';
 import ConstitutionalChange from './ConstitutionalChange';
 import Legislation from './LegislationVotes';
 import Decision from './Decision';
@@ -18,11 +17,6 @@ const Assembly = () => (
   <div className={styles.assemblyWrapper}>
     <AssemblyHeader />
     <Switch>
-      <Route
-        exact
-        path={router.assembly.myDrafts}
-        component={MyDrafts}
-      />
       <Route
         path={router.assembly.legislationVotes}
         component={Legislation}

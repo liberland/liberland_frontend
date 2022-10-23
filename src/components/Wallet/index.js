@@ -15,8 +15,6 @@ import WalletTransactionHistory from './WalletTransactionHistory';
 import Card from '../Card';
 import Nominator from './Nominator';
 import router from '../../router';
-import CongressionalAssemble from '../Voting/CongressionalAssemble';
-import CurrentCongressionalAssemble from '../Voting/CurrentCongressionalAssemble';
 import RoleHOC from '../../hocs/RoleHOC';
 
 const Wallet = () => {

@@ -12,21 +12,13 @@ import router from '../../router';
 
 import CongressionalAssemble from './CongressionalAssemble';
 import styles from './styles.module.scss';
-import CongressionalAssemblyElectionsHeader from './CongressionalAssemblyElectionsHeader';
-import CurrentCongressionalAssemble from './CurrentCongressionalAssemble';
 import { votingSelectors } from '../../redux/selectors';
 import Referendum from './Referendum';
 
 const Voting = () => {
   const location = useLocation();
-  const param = location.pathname.split('/').pop();
 
   const dispatch = useDispatch();
-
-  const handlerOnClickApplyMyCandidacy = () => {
-    dispatch(votingActions.addMyCandidacy.call());
-  };
-  const isVotingInProgress = useSelector(votingSelectors.selectorIsVotingInProgress);
 
   useEffect(() => {
     const timerId = setInterval(() => {
@@ -35,20 +27,12 @@ const Voting = () => {
     return (() => {
       clearInterval(timerId);
     });
-  }, [dispatch, isVotingInProgress]);
+  }, [dispatch]);
 
   return (
     <div className={styles.votingWrapper}>
       <div className={styles.navWrapper}>
-        {
-          Number(param)
-            ? (
-              <CongressionalAssemblyElectionsHeader
-                handlerOnClickApplyMyCandidacy={handlerOnClickApplyMyCandidacy}
-              />
-            )
-            : <VotingHeader />
-        }
+        <VotingHeader />
       </div>
 
       <div>
@@ -73,11 +57,6 @@ const Voting = () => {
           <Route
             path={router.voting.election}
             component={() => <div>Election</div>}
-          />
-
-          <Route
-            path={router.voting.currentCongressional}
-            component={CurrentCongressionalAssemble}
           />
           <Route
             exact
