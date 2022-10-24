@@ -14,7 +14,7 @@ const CandidateVoting = ({
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   return (
     <div>
-      <Card>
+      <Card title="">
         <div className={styles.candidateVotingHeader}>Voting</div>
         <div className={styles.candidateVotingContainer}>
           <div className={styles.eligibleCandidatesContainer}>
@@ -26,7 +26,7 @@ const CandidateVoting = ({
             </div>
             <div className={styles.candidatesList}>
               {
-                eligibleUnselectedCandidates?.map((currentCongressMember) => <CandidateCard politician={currentCongressMember} selectCandidate={selectCandidate} />)
+                eligibleUnselectedCandidates?.map((eligibleUnselectedCandidate) => <CandidateCard politician={eligibleUnselectedCandidate} selectCandidate={selectCandidate} key={`candidate-${  eligibleUnselectedCandidate.name}`} />)
               }
             </div>
           </div>

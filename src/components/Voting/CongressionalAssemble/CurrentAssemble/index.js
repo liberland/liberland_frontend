@@ -9,13 +9,13 @@ const CurrentAssemble = (
   },
 ) => (
   <div>
-    <Card>
+    <Card title="">
       <div className={styles.currentAssembleHeader}>
         Acting Congressional Assembly
       </div>
       <div className={styles.congressMembersList}>
         {
-            currentCongressMembers?.map((currentCongressMember) => <PoliticanCard politician={currentCongressMember} />)
+            currentCongressMembers?.map((currentCongressMember) => <PoliticanCard politician={currentCongressMember} key={`current-congress-member${ currentCongressMember.name }`} />)
           }
       </div>
     </Card>
