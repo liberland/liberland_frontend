@@ -12,20 +12,8 @@ const TabsVoting = () => (
         component={() => <CongressionalAssemble title="Congressional assembly" />}
       />
       <Route
-        path={router.voting.vetoVotes}
-        component={() => <div>Veto votes</div>}
-      />
-      <Route
-        path={router.voting.voteHistory}
-        component={() => <div>Vote history</div>}
-      />
-      <Route
         path={router.voting.referendum}
         component={() => <div>Referendum</div>}
-      />
-      <Route
-        path={router.voting.election}
-        component={() => <div>Election</div>}
       />
       <Route
         exact

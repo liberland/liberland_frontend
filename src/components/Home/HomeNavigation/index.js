@@ -91,7 +91,7 @@ const HomeNavigation = () => {
       activeIcon: ConstitutionIconActive,
     },
   ];
-  
+
   return (
     <div className={styles.navigationWrapper}>
       <div className={styles.logoHeaderWrapper}>

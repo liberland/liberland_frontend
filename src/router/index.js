@@ -9,7 +9,6 @@ export default {
     voting: '/home/voting',
     profile: '/home/profile',
     constitution: '/home/law',
-    assembly: '/home/assembly',
   },
   documents: {
     myAccount: '/home/documents/my-account',
@@ -19,21 +18,7 @@ export default {
   },
   voting: {
     congressionalAssemble: '/home/voting/congressional-assemble',
-    vetoVotes: '/home/voting/veto-votes',
-    voteHistory: '/home/voting/vote-history',
-    congressional: '/home/voting/congressional',
-    currentCongressional: '/home/voting/congressional/:id',
-    test: '/home/voting/test',
     referendum: '/home/voting/referendum',
-    election: '/home/voting/election',
-  },
-  assembly: {
-    myDrafts: '/home/assembly/my-drafts',
-    constitutionalChangeVotes: '/home/assembly/constitutional-change-votes',
-    legislationVotes: '/home/assembly/legislation-votes',
-    decisionVotes: '/home/assembly/decision-votes',
-    voteHistory: '/home/assembly/vote-history',
-    pmElection: '/home/assembly/pm-election',
   },
   wallet: {
     allTransactions: '/home/wallet/all-transactions',

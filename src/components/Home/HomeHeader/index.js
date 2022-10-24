@@ -22,18 +22,9 @@ const HomeHeader = () => {
     [router.home.feed]: `Hi, ${name} ${lastName}!`,
     [router.home.constitution]: 'Law',
     [router.home.voting]: 'Voting',
-    [router.voting.voteHistory]: 'Voting',
     [router.voting.congressionalAssemble]: 'Voting',
     [router.voting.referendum]: 'Voting',
-    [router.voting.election]: 'Voting',
-    [router.voting.vetoVotes]: 'Voting',
     [router.home.wallet]: 'Wallet',
-    [router.home.assembly]: 'Assembly',
-    [router.assembly.myDrafts]: 'Assembly',
-    [router.assembly.legislationVotes]: 'Assembly',
-    [router.assembly.decisionVotes]: 'Assembly',
-    [router.assembly.voteHistory]: 'Assembly',
-    [router.assembly.pmElection]: 'Assembly',
     [router.wallet.validatorsStaking]: 'Validator Staking',
   };
   const dispatch = useDispatch();

@@ -16,21 +16,8 @@ const navigationList = [
     title: 'Congressional Assembly',
   },
   {
-    route: router.voting.vetoVotes,
-    title: 'Veto votes',
-
-  },
-  {
-    route: router.voting.voteHistory,
-    title: 'Vote history',
-  },
-  {
     route: router.voting.referendum,
     title: 'Referendum',
-  },
-  {
-    route: router.voting.election,
-    title: 'Election',
   },
 ];
 const VotingHeader = () => {

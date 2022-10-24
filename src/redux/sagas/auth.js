@@ -5,7 +5,7 @@ import {
 } from 'redux-saga/effects';
 import { web3Enable } from '@polkadot/extension-dapp';
 
-import { getUserRoleRpc, getUserPassportId } from '../../api/nodeRpcCall';
+import { getUserRoleRpc } from '../../api/nodeRpcCall';
 import {
   authActions, votingActions, walletActions, blockchainActions, democracyActions,
 } from '../actions';
@@ -23,7 +23,6 @@ function* signInWorker(action) {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc, credentials.wallet_address);
-      user.passportId = yield call(getUserPassportId, credentials.wallet_address);
       yield put(authActions.signIn.success(user));
       yield put(blockchainActions.getCurrentBlockNumber.call());
       yield call(history.push, routes.home.index);
@@ -53,7 +52,6 @@ function* verifySessionWorker() {
     }
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc, walletAddress);
-      user.passportId = yield call(getUserPassportId, walletAddress);
     }
     if (success) {
       yield put(authActions.verifySession.success(user));
