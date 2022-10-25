@@ -16,6 +16,9 @@ const initialState = {
       totalAmount: {
         amount: 0,
       },
+      meritsTotalAmount: {
+        amount: 0,
+      },
     },
   },
   gettingWalletInfo: false,
@@ -34,6 +37,7 @@ const walletReducer = handleActions(
       walletActions.stakeToPolka.call,
       walletActions.stakeToLiberland.call,
       walletActions.sendTransfer.call,
+      walletActions.sendTransferLLM.call,
       walletActions.getThreeTx.call,
       walletActions.getMoreTx.call,
       walletActions.getValidators.call,
@@ -76,7 +80,9 @@ const walletReducer = handleActions(
       walletActions.stakeToPolka.failure,
       walletActions.stakeToLiberland.failure,
       walletActions.sendTransfer.success,
+      walletActions.sendTransferLLM.success,
       walletActions.sendTransfer.failure,
+      walletActions.sendTransferLLM.failure,
       walletActions.getMoreTx.success,
       walletActions.getMoreTx.failure,
       walletActions.getValidators.success,

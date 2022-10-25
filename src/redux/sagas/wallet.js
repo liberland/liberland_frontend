@@ -5,6 +5,7 @@ import {
 import {
   getBalanceByAddress,
   sendTransfer,
+  sendTransferLLM,
   stakeToPolkaBondAndExtra,
   stakeToLiberlandBondAndExtra,
   getResultByHashRpc, getValidators, getNominatorTargets,
@@ -75,6 +76,26 @@ function* sendTransferWorker(action) {
     // eslint-disable-next-line no-console
     console.log(e);
     yield put(walletActions.sendTransfer.failure(e));
+  }
+}
+
+function* sendTransferLLMWorker(action) {
+  try {
+    const blockHash = yield cps(sendTransferLLM, action.payload);
+    const status = yield call(getResultByHashRpc, blockHash);
+    const tx = { ...action.payload, status };
+    const result = yield call(sendTxToDb, tx);
+    if (result === 'success') {
+      yield put(walletActions.sendTransferLLM.success());
+      yield put(walletActions.getWallet.call());
+      yield put(walletActions.getThreeTx.call());
+    } else {
+      yield put(walletActions.sendTransferLLM.failure());
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    yield put(walletActions.sendTransferLLM.failure(e));
   }
 }
 
@@ -161,6 +182,14 @@ function* sendTransferWatcher() {
   }
 }
 
+function* sendTransferLLMWatcher() {
+  try {
+    yield takeLatest(walletActions.sendTransferLLM.call, sendTransferLLMWorker);
+  } catch (e) {
+    yield put(walletActions.sendTransferLLM.failure(e));
+  }
+}
+
 function* stakeToPolkaWatcher() {
   try {
     yield takeLatest(walletActions.stakeToPolka.call, stakeToPolkaWorker);
@@ -214,6 +243,7 @@ function* getNominatorTargetsWatcher() {
 export {
   getWalletWatcher,
   sendTransferWatcher,
+  sendTransferLLMWatcher,
   stakeToPolkaWatcher,
   stakeToLiberlandWatcher,
   getThreeTxWatcher,

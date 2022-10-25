@@ -10,7 +10,7 @@ import Button from '../Button/Button';
 // STYLES
 import styles from './styles.module.scss';
 
-const SendLlmModal = ({
+const SendLLDModal = ({
   // eslint-disable-next-line react/prop-types
   onSubmit, closeModal, addressFrom, setSendAddress,
 }) => {
@@ -21,14 +21,13 @@ const SendLlmModal = ({
     defaultValues: {
       amount: '10',
       account_from: addressFrom,
-      // Default address to send is CHARLIE
       account_to: '',
     },
   });
 
   return (
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
-      <div className={styles.h3}>Send LLM</div>
+      <div className={styles.h3}>Send LLD</div>
       <div className={styles.description}>
         You are going to send tokens from your wallet
       </div>
@@ -50,11 +49,11 @@ const SendLlmModal = ({
         required
       />
 
-      <div className={styles.title}>Amount picoLLM</div>
+      <div className={styles.title}>Amount LLD</div>
       <TextInput
         register={register}
         name="amount"
-        placeholder="Amount picoLLM"
+        placeholder="Amount LLD"
         required
       />
 
@@ -77,10 +76,10 @@ const SendLlmModal = ({
   );
 };
 
-const SendLlmModalWrapper = (props) => (
+const SendLLDModalWrapper = (props) => (
   <ModalRoot>
-    <SendLlmModal {...props} />
+    <SendLLDModal {...props} />
   </ModalRoot>
 );
 
-export default SendLlmModalWrapper;
+export default SendLLDModalWrapper;

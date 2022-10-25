@@ -33,6 +33,13 @@ const selectorTotalBalance = createSelector(
   ),
 );
 
+const selectorTotalLLM = createSelector(
+  selectorBalances,
+  (reducer) => (
+    reducer.meritsTotalAmount.amount
+  ),
+);
+
 const selectorIsUserHaveStake = createSelector(
   selectorBalances,
   (reducer) => {
@@ -77,6 +84,7 @@ export {
   selectorLiquidMeritsBalance,
   selectorBalances,
   selectorTotalBalance,
+  selectorTotalLLM,
   selectorWalletAddress,
   selectorIsUserHaveStake,
   selectorHistoryTx,

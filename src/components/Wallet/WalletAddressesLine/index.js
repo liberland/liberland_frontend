@@ -11,7 +11,7 @@ import NotificationPortal from '../../NotificationPortal';
 import { walletActions } from '../../../redux/actions';
 import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
 
-import { ChoseStakeModal, SendLlmModal } from '../../Modals';
+import {ChoseStakeModal, SendLLDModal, SendLLMModal } from '../../Modals';
 
 import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
@@ -23,10 +23,12 @@ import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
 import router from '../../../router';
 import Tabs from '../../Tabs';
+import {dollarsToGrains, meritsToGrains} from '../../../utils/walletHelpers';
 
 const WalletAddressesLine = ({ walletAddress }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenStake, setIsModalOpenStake] = useState(false);
+  const [isModalOpenLLM, setIsModalOpenLLM] = useState(false);
   const [modalShown, setModalShown] = useState(0);
   const [sendAddress, setSendAddress] = useState('');
   const { handleSubmit, register } = useForm();
@@ -46,6 +48,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
   };
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
+  const handleModalLLMOpen = () => setIsModalOpenLLM(!isModalOpenLLM);
   const handleModalOpenStake = () => {
     setIsModalOpenStake(!isModalOpenStake);
     setModalShown(0);
@@ -65,13 +68,28 @@ const WalletAddressesLine = ({ walletAddress }) => {
   const handleSubmitForm = (values) => {
     const isAddressValid = isValidAddressPolkadotAddress(sendAddress);
 
+    const preparedValues = values;
+    preparedValues.amount = dollarsToGrains(preparedValues.amount);
+
     if (isAddressValid) {
-      dispatch(walletActions.sendTransfer.call(values));
+      dispatch(walletActions.sendTransfer.call(preparedValues));
       handleModalOpen();
     } else {
       notificationRef.current.addError({ text: 'Invalid address.' });
     }
   };
+
+  const handleSubmitFormLLM = (values) => {
+    const isAddressValid = isValidAddressPolkadotAddress(sendAddress);
+
+    if (isAddressValid) {
+      dispatch(walletActions.sendTransferLLM.call(values));
+      handleModalOpen();
+    } else {
+      notificationRef.current.addError({ text: 'Invalid address.' });
+    }
+  };
+
   const handleSubmitStakePolka = (values) => {
     dispatch(walletActions.stakeToPolka.call({ values, isUserHaveStake, walletAddress }));
     handleModalOpenStake();
@@ -120,19 +138,32 @@ const WalletAddressesLine = ({ walletAddress }) => {
             <GraphIcon />
             Staking
           </Button>
+          <Button small primary onClick={handleModalLLMOpen}>
+            <UploadIcon />
+            Send LLM
+          </Button>
           <Button small primary onClick={handleModalOpen}>
             <UploadIcon />
-            Send
+            Send LLD
           </Button>
         </div>
         {isModalOpen && (
-        <SendLlmModal
+        <SendLLDModal
           onSubmit={handleSubmitForm}
           closeModal={handleModalOpen}
           addressFrom={walletAddress}
           setSendAddress={setSendAddress}
           sendAddress={sendAddress}
         />
+        )}
+        {isModalOpenLLM && (
+          <SendLLMModal
+            onSubmit={handleSubmitFormLLM}
+            closeModal={handleModalLLMOpen}
+            addressFrom={walletAddress}
+            setSendAddress={setSendAddress}
+            sendAddress={sendAddress}
+          />
         )}
         {isModalOpenStake && (
         <ChoseStakeModal

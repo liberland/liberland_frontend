@@ -33,6 +33,9 @@ const getBalanceByAddress = async (address) => {
       totalAmount: {
         amount: LLDTotalAmount,
       },
+      meritsTotalAmount: {
+        amount: LLMWalletData,
+      },
     };
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -44,7 +47,6 @@ const getBalanceByAddress = async (address) => {
 const sendTransfer = async (payload, callback) => {
   const { account_to, amount, account_from } = payload;
   const api = await ApiPromise.create({ provider });
-
   const transferExtrinsic = api.tx.balances.transfer(account_to, (amount));
   const injector = await web3FromSource('polkadot-js');
   transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status }) => {
@@ -58,6 +60,26 @@ const sendTransfer = async (payload, callback) => {
     console.log(':( transaction failed', error);
     callback(error);
   });
+};
+
+const sendTransferLLM = async (payload, callback) => {
+  const { account_to, amount, account_from } = payload;
+  const api = await ApiPromise.create({ provider });
+  const transferExtrinsic = api.tx.llm.sendLlm(account_to, (amount));
+
+  const injector = await web3FromSource('polkadot-js');
+  transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status }) => {
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+      callback(null, status.asInBlock.toString());
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.log(':( transaction failed', error);
+    callback(error);
+  });
+
 };
 
 const stakeToPolkaBondAndExtra = async (payload, callback) => {
@@ -547,6 +569,7 @@ const voteForCongress = async (listofVotes, walletAddress) => {
 export {
   getBalanceByAddress,
   sendTransfer,
+  sendTransferLLM,
   stakeToPolkaBondAndExtra,
   stakeToLiberlandBondAndExtra,
   getUserRoleRpc,

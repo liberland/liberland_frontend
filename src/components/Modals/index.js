@@ -1,12 +1,14 @@
 import GetCitizenshipModal from './GetCitizenshipModal';
-import SendLlmModal from './SendLlmModal';
+import SendLLDModal from './SendLLDModal';
+import SendLLMModal from './SendLLMModal';
 import ChoseStakeModal from './ChoseStakeModal';
 import VoteOnReferendumModal from './VoteOnReferendumModal';
 import ProposeReferendumModal from './ProposeReferendumModal';
 
 export {
   GetCitizenshipModal,
-  SendLlmModal,
+  SendLLDModal,
+  SendLLMModal,
   ChoseStakeModal,
   VoteOnReferendumModal,
   ProposeReferendumModal,

@@ -3,6 +3,7 @@ import { createActions } from 'redux-actions';
 export const {
   getWallet,
   sendTransfer,
+  sendTransferLLM,
   stakeToPolka,
   stakeToLiberland,
   getThreeTx,
@@ -17,6 +18,11 @@ export const {
     failure: undefined,
   },
   SEND_TRANSFER: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SEND_TRANSFER_L_L_M: {
     call: undefined,
     success: undefined,
     failure: undefined,

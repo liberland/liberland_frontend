@@ -1,4 +1,4 @@
-import {formatBalance} from "@polkadot/util";
+import { formatBalance } from '@polkadot/util';
 
 export const grainsInMerit = 1;
 export const grainsInDollar = 1000000000000;
@@ -21,4 +21,8 @@ export const formatMeritTransaction = (merits) => {
 export const formatPolkadotBalance = (polkadotBalance) => {
   const polkadotFormattedBalance = formatBalance(polkadotBalance, { withSi: false, withUnit: false, decimals: 0 });
   return parseInt(polkadotFormattedBalance.replace('.', ''));
-}
+};
+
+export const dollarsToGrains = (dollars) => parseInt(dollars) * grainsInDollar;
+
+export const meritsToGrains = (merits) => parseInt(merits) * grainsInDemocracyMerit;
