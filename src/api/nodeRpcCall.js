@@ -88,7 +88,7 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
     const api = await ApiPromise.create({ provider });
     const transferExtrinsic = isUserHaveStake
       ? await api.tx.staking.bondExtra(`${amount}000000000000`)
-      : await api.tx.staking.bond(walletAddress, `${amount}000000000000`, walletAddress);
+      : await api.tx.staking.bond(walletAddress, `${amount}000000000000`, 'Staked');
 
     const injector = await web3FromSource('polkadot-js');
     // eslint-disable-next-line max-len
