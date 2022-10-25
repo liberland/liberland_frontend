@@ -95,7 +95,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
     handleModalOpenStake();
   };
   const handleSubmitStakeLiberland = (values) => {
-    dispatch(walletActions.stakeToLiberland.call({ values, isUserHaveStake, walletAddress }));
+    dispatch(walletActions.stakeToLiberland.call({ values, walletAddress }));
     handleModalOpenStake();
   };
 

@@ -55,7 +55,7 @@ const WalletOverview = ({
 
   const overviewInfo = [
     {
-      amount: prettyNumber(balances.liberstake.amount),
+      amount: prettyNumber(balances.liberstake.amount, false),
       title: 'PolitiPooled',
       diff: 2.4,
       // eslint-disable-next-line no-constant-condition

@@ -7,7 +7,7 @@ import {
   sendTransfer,
   sendTransferLLM,
   stakeToPolkaBondAndExtra,
-  stakeToLiberlandBondAndExtra,
+  politiPool,
   getResultByHashRpc, getValidators, getNominatorTargets,
 } from '../../api/nodeRpcCall';
 import api from '../../api';
@@ -39,7 +39,7 @@ function* stakeToPolkaWorker(action) {
 
 function* stakeToLiberlandWorker(action) {
   try {
-    yield cps(stakeToLiberlandBondAndExtra, action.payload);
+    yield cps(politiPool, action.payload);
     yield put(walletActions.stakeToPolka.success());
     yield put(walletActions.getWallet.call());
   } catch

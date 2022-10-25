@@ -15,14 +15,14 @@ const getBalanceByAddress = async (address) => {
     // TODO get this in one transaction?
     const LLDData = await api.query.system.account(address);
     const LLMData = await api.query.llm.llmBalance(address);
+    const LLMPolitiPool = await api.query.llm.llmPolitics(address);
+    const LLMPolitiPoolData = LLMPolitiPool.toHuman();
     const LLDWalletData = LLDData.toJSON();
     const LLDTotalAmount = parseInt(LLDWalletData.data.miscFrozen) + parseInt(LLDWalletData.data.free);
     const LLMWalletData = LLMData.toJSON();
-    console.log('LLMWalletData');
-    console.log(LLMWalletData);
     return {
       liberstake: {
-        amount: 0,
+        amount: parseInt(LLMPolitiPoolData),
       },
       polkastake: {
         amount: LLDWalletData.data.miscFrozen,
@@ -34,7 +34,7 @@ const getBalanceByAddress = async (address) => {
         amount: LLDTotalAmount,
       },
       meritsTotalAmount: {
-        amount: LLMWalletData,
+        amount: parseInt(LLMWalletData) + parseInt(LLMPolitiPoolData),
       },
     };
   } catch (e) {
@@ -79,7 +79,6 @@ const sendTransferLLM = async (payload, callback) => {
     console.log(':( transaction failed', error);
     callback(error);
   });
-
 };
 
 const stakeToPolkaBondAndExtra = async (payload, callback) => {
@@ -110,33 +109,23 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
   }
 };
 
-const stakeToLiberlandBondAndExtra = async (payload, callback) => {
-  try {
-    const { values: { amount }, isUserHaveStake, walletAddress } = payload;
-    const api = await ApiPromise.create({ provider });
+const politiPool = async (payload) => {
+  const { values: { amount }, walletAddress } = payload;
+  const api = await ApiPromise.create({ provider });
+  const politiPoolExtrinsic = api.tx.llm.politicsLock(amount);
 
-    const transferExtrinsic = isUserHaveStake
-      ? await api.tx.stakingPallet.liberlandBondExtra(`${amount}000000000000`)
-      : await api.tx.stakingPallet.liberlandBond(walletAddress, (`${amount}000000000000`), 'Staked');
-
-    const injector = await web3FromSource('polkadot-js');
-    // eslint-disable-next-line max-len
-    await transferExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
-      if (status.isInBlock) {
-        // eslint-disable-next-line no-console
-        console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
-        callback(null, 'done');
-      }
-    }).catch((error) => {
+  const injector = await web3FromSource('polkadot-js');
+  politiPoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+    if (status.isInBlock) {
       // eslint-disable-next-line no-console
-      console.log(':( transaction failed', error);
-      callback(error);
-    });
-  } catch (e) {
+      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+      // callback(null, status.asInBlock.toString());
+    }
+  }).catch((error) => {
     // eslint-disable-next-line no-console
-    console.log(e);
-    callback(e);
-  }
+    console.log(':( transaction failed', error);
+    // callback(error);
+  });
 };
 
 const getUserRoleRpc = async (walletAddress) => {
@@ -473,11 +462,11 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     const toHumanIdentity = councilMemberIdentity.toHuman();
     // address use councilmembers.shift as its same ordering as councilmemberidentities
     let rawIdentity = councilMembers.shift();
-    rawIdentity = typeof rawIdentity === "string" ? rawIdentity : rawIdentity[0]
+    rawIdentity = typeof rawIdentity === 'string' ? rawIdentity : rawIdentity[0];
     crossReferencedCouncilMemberIdentities.push({
       name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
       identityData: toHumanIdentity,
-      rawIdentity: rawIdentity,
+      rawIdentity,
     });
   });
 
@@ -498,11 +487,11 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     const toHumanIdentity = candidateIdentity.toHuman();
     // address use councilmembers.shift as its same ordering as councilmemberidentities
     let rawIdentity = candidates.shift();
-    rawIdentity = typeof rawIdentity === "string" ? rawIdentity : rawIdentity[0]
+    rawIdentity = typeof rawIdentity === 'string' ? rawIdentity : rawIdentity[0];
     crossReferencedCandidateIdentities.push({
       name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
       identityData: toHumanIdentity,
-      rawIdentity: rawIdentity,
+      rawIdentity,
     });
   });
 
@@ -521,17 +510,17 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
   );
 
   const crossReferencedCurrentCandidateVotesByUser = [];
-  currentCandidateVotesByUserIdentities.forEach(currentCandidateVoteIdentity => {
+  currentCandidateVotesByUserIdentities.forEach((currentCandidateVoteIdentity) => {
     const toHumanIdentity = currentCandidateVoteIdentity.toHuman();
     // address use councilmembers.shift as its same ordering as councilmemberidentities
     let rawIdentity = currentCandidateVotesByUser.shift();
-    rawIdentity = typeof rawIdentity === "string" ? rawIdentity : rawIdentity[0]
-    console.log('rawIdentity')
-    console.log(rawIdentity)
+    rawIdentity = typeof rawIdentity === 'string' ? rawIdentity : rawIdentity[0];
+    console.log('rawIdentity');
+    console.log(rawIdentity);
     crossReferencedCurrentCandidateVotesByUser.push({
       name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
       identityData: toHumanIdentity,
-      rawIdentity: rawIdentity,
+      rawIdentity,
     });
   });
   // TODO add runnersup
@@ -545,13 +534,13 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
 };
 
 const voteForCongress = async (listofVotes, walletAddress) => {
-  console.log('voting for cuntgress')
-  console.log(listofVotes)
+  console.log('voting for cuntgress');
+  console.log(listofVotes);
   const api = await ApiPromise.create({ provider });
   const injector = await web3FromAddress(walletAddress);
-  let votes = listofVotes.map(vote => {return vote.rawIdentity})
-  console.log('votes')
-  console.log(votes)
+  const votes = listofVotes.map((vote) => vote.rawIdentity);
+  console.log('votes');
+  console.log(votes);
 
   const voteExtrinsic = api.tx.elections.vote(votes, 100000000);
 
@@ -564,14 +553,14 @@ const voteForCongress = async (listofVotes, walletAddress) => {
     // eslint-disable-next-line no-console
     console.log(':( transaction VOTE failed', error);
   });
-}
+};
 
 export {
   getBalanceByAddress,
   sendTransfer,
   sendTransferLLM,
   stakeToPolkaBondAndExtra,
-  stakeToLiberlandBondAndExtra,
+  politiPool,
   getUserRoleRpc,
   getCurrentBlockNumberRpc,
   getAllWalletsRpc,
@@ -584,5 +573,5 @@ export {
   voteOnReferendum,
   submitProposal,
   getCongressMembersWithIdentity,
-  voteForCongress
+  voteForCongress,
 };
