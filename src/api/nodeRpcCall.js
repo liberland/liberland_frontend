@@ -292,7 +292,7 @@ const getDemocracyReferendums = async (address) => {
     // TODO REFACTOR
     let centralizedReferendumsData = [];
     const api2 = axios.create({
-      baseURL: 'http://localhost:8010',
+      baseURL: process.env.REACT_APP_API2,
       withCredentials: true,
     });
     api2.defaults.headers.common['x-auth-token'] = '7VpLfCKnCdc5BDyzECsr57EFCHOJPaXziGNKbBAvxgFcc0wfB3fIE1LEXOARxkWJ';
@@ -406,7 +406,7 @@ const submitProposal = async (walletAddress, values) => {
   const nextChainIndex = nextChainIndexQuery.toHuman();
   // TODO REFACTOR
   const api2 = axios.create({
-    baseURL: 'http://localhost:8010',
+    baseURL: process.env.REACT_APP_API2,
     withCredentials: true,
   });
   api2.defaults.headers.common['X-Token'] = '7VpLfCKnCdc5BDyzECsr57EFCHOJPaXziGNKbBAvxgFcc0wfB3fIE1LEXOARxkWJ';
