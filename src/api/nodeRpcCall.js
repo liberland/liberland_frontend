@@ -295,7 +295,7 @@ const getDemocracyReferendums = async (address) => {
       baseURL: process.env.REACT_APP_API2,
       withCredentials: true,
     });
-    api2.defaults.headers.common['x-auth-token'] = '7VpLfCKnCdc5BDyzECsr57EFCHOJPaXziGNKbBAvxgFcc0wfB3fIE1LEXOARxkWJ';
+    api2.defaults.headers.common['x-auth-token'] = process.env.REACT_APP_API2_TEST_XTOKEN;
 
     await api2.get('/referendums').then((result) => {
       centralizedReferendumsData = result.data;
@@ -409,7 +409,7 @@ const submitProposal = async (walletAddress, values) => {
     baseURL: process.env.REACT_APP_API2,
     withCredentials: true,
   });
-  api2.defaults.headers.common['X-Token'] = '7VpLfCKnCdc5BDyzECsr57EFCHOJPaXziGNKbBAvxgFcc0wfB3fIE1LEXOARxkWJ';
+  api2.defaults.headers.common['X-Token'] = process.env.REACT_APP_API2_TEST_XTOKEN;
 
   const centralizedMetadata = await api2.post('/referendums', {
     username: 'username',
