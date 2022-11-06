@@ -22,7 +22,7 @@ const getBalanceByAddress = async (address) => {
     const LLMWalletData = LLMData.toJSON();
     return {
       liberstake: {
-        amount: parseInt(LLMPolitiPoolData),
+        amount: LLMPolitiPoolData,
       },
       polkastake: {
         amount: LLDWalletData.data.miscFrozen,
@@ -34,7 +34,7 @@ const getBalanceByAddress = async (address) => {
         amount: LLDTotalAmount,
       },
       meritsTotalAmount: {
-        amount: parseInt(LLMWalletData) + parseInt(LLMPolitiPoolData),
+        amount: LLMWalletData,
       },
     };
   } catch (e) {
