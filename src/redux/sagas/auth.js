@@ -16,10 +16,12 @@ const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
 function* signInWorker(action) {
   try {
-    const { credentials, history } = action.payload;
+    const { credentials, history, ssoAccessTokenHash } = action.payload;
     const { data: user } = yield call(api.post, '/users/signin', credentials);
+    user.ssoAccessTokenHash = ssoAccessTokenHash;
     yield put(blockchainActions.setUserWallet.success(credentials.wallet_address));
     yield sessionStorage.setItem('userWalletAddress', credentials.wallet_address);
+    yield sessionStorage.setItem('ssoAccessTokenHash', ssoAccessTokenHash);
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc, credentials.wallet_address);

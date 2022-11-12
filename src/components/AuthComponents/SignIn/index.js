@@ -32,6 +32,14 @@ const SignIn = () => {
   const history = useHistory();
   const apiError = useSelector(errorsSelectors.selectSignIn);
   const allAccounts = useSelector(blockchainSelectors.allWalletsSelector);
+  const queryString = window.location.hash;
+  // TODO REFACTOR
+  const beginToken = queryString.indexOf('=');
+  const endToken = queryString.indexOf('&');
+  const ssoAccessTokenHash = queryString.substring(beginToken + 1, endToken);
+  if(!ssoAccessTokenHash) {
+    alert(`Due to stupid but temporary reasons, you should get here through this link, otherwise bugs will happen ${process.env.REACT_APP_SSO_API_IMPLICIT_LINK}`)
+  }
 
   useEffect(() => {
     if (apiError) {
@@ -44,6 +52,7 @@ const SignIn = () => {
     dispatch(authActions.signIn.call({
       credentials: values,
       history,
+      ssoAccessTokenHash,
     }));
   };
 

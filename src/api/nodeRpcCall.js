@@ -270,6 +270,9 @@ const getDemocracyReferendums = async (address) => {
   try {
     console.log('called with address');
     console.log(address);
+    let ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
+    console.log('ssoAccessTokenHashSEXSION STORAGE')
+    console.log(ssoAccessTokenHash)
     const api = await ApiPromise.create({ provider });
     const proposals = await api.query.democracy.publicProps();
     const referendumInfoOf = await api.query.democracy.referendumInfoOf(['0x767a116c005fc82e2604b07e70872c4e25ccd1d57a62c5cdabdf0d4e7ab76e29']);
@@ -295,7 +298,7 @@ const getDemocracyReferendums = async (address) => {
       baseURL: process.env.REACT_APP_API2,
       withCredentials: true,
     });
-    api2.defaults.headers.common['x-auth-token'] = process.env.REACT_APP_API2_TEST_XTOKEN;
+    api2.defaults.headers.common['x-auth-token'] = ssoAccessTokenHash;
 
     await api2.get('/referendums').then((result) => {
       centralizedReferendumsData = result.data;
@@ -404,12 +407,13 @@ const submitProposal = async (walletAddress, values) => {
   const injector = await web3FromAddress(walletAddress);
   const nextChainIndexQuery = await api.query.democracy.referendumCount();
   const nextChainIndex = nextChainIndexQuery.toHuman();
+  let ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
   // TODO REFACTOR
   const api2 = axios.create({
     baseURL: process.env.REACT_APP_API2,
     withCredentials: true,
   });
-  api2.defaults.headers.common['X-Token'] = process.env.REACT_APP_API2_TEST_XTOKEN;
+  api2.defaults.headers.common['X-Token'] = ssoAccessTokenHash;
 
   const centralizedMetadata = await api2.post('/referendums', {
     username: 'username',
