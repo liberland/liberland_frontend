@@ -300,7 +300,7 @@ const getDemocracyReferendums = async (address) => {
     });
     api2.defaults.headers.common['x-auth-token'] = ssoAccessTokenHash;
 
-    await api2.get('/referendums').then((result) => {
+    await api2.get('/referenda').then((result) => {
       centralizedReferendumsData = result.data;
     });
 
@@ -415,14 +415,16 @@ const submitProposal = async (walletAddress, values) => {
   });
   api2.defaults.headers.common['X-Token'] = ssoAccessTokenHash;
 
-  const centralizedMetadata = await api2.post('/referendums', {
-    username: 'username',
+  const centralizedMetadata = await api2.post('/referenda', {
+    //username: 'username',
     link: values.forumLink,
-    personId: 10,
+    //personId: 10,
     chainIndex: nextChainIndex,
+    name: 'Hardcoded server name',
     description: values.legislationContent,
     hash: 'hash not needed',
     additionalMetadata: {},
+    proposerAddress: walletAddress,
   });
   const legislationIndex = centralizedMetadata.data.id;
   const hash = await getProposalHash(values, legislationIndex);
