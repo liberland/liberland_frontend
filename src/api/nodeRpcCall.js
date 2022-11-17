@@ -3,6 +3,7 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import axios from 'axios';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
+import {meritsToGrains} from "../utils/walletHelpers";
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -16,9 +17,8 @@ const getBalanceByAddress = async (address) => {
     const LLDData = await api.query.system.account(address);
     const LLMData = await api.query.llm.llmBalance(address);
     const LLMPolitiPool = await api.query.llm.llmPolitics(address);
-    const LLMPolitiPoolData = LLMPolitiPool.toHuman();
+    const LLMPolitiPoolData = LLMPolitiPool.toJSON();
     const LLDWalletData = LLDData.toJSON();
-    const LLDTotalAmount = parseInt(LLDWalletData.data.miscFrozen) + parseInt(LLDWalletData.data.free);
     const LLMWalletData = LLMData.toJSON();
     return {
       liberstake: {
@@ -31,7 +31,7 @@ const getBalanceByAddress = async (address) => {
         amount: LLMWalletData,
       },
       totalAmount: {
-        amount: LLDTotalAmount,
+        amount: LLDWalletData.data.free,
       },
       meritsTotalAmount: {
         amount: LLMWalletData,
@@ -65,7 +65,7 @@ const sendTransfer = async (payload, callback) => {
 const sendTransferLLM = async (payload, callback) => {
   const { account_to, amount, account_from } = payload;
   const api = await ApiPromise.create({ provider });
-  const transferExtrinsic = api.tx.llm.sendLlm(account_to, (amount));
+  const transferExtrinsic = api.tx.llm.sendLlm(account_to, (meritsToGrains(amount)));
 
   const injector = await web3FromSource('polkadot-js');
   transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status }) => {
@@ -112,7 +112,7 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
 const politiPool = async (payload) => {
   const { values: { amount }, walletAddress } = payload;
   const api = await ApiPromise.create({ provider });
-  const politiPoolExtrinsic = api.tx.llm.politicsLock(amount);
+  const politiPoolExtrinsic = api.tx.llm.politicsLock(meritsToGrains(amount));
 
   const injector = await web3FromSource('polkadot-js');
   politiPoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
@@ -368,14 +368,15 @@ const secondProposal = async (walletAddress, proposal) => {
 const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
   const api = await ApiPromise.create({ provider });
   const injector = await web3FromAddress(walletAddress);
-  // TODO BALANCE ALWAYS VOTE MAX when chain ready
+  const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
+  const LLMPolitiPoolData = LLMPolitiPool.toJSON();
   const voteExtrinsic = api.tx.democracy.vote(referendumIndex, {
     Standard: {
       vote: {
         aye: voteType === 'Aye',
         conviction: 1,
       },
-      balance: 1000000000000000,
+      balance: LLMPolitiPoolData,
     },
   });
 
@@ -548,7 +549,10 @@ const voteForCongress = async (listofVotes, walletAddress) => {
   console.log('votes');
   console.log(votes);
 
-  const voteExtrinsic = api.tx.elections.vote(votes, 100000000);
+  const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
+  const LLMPolitiPoolData = LLMPolitiPool.toJSON();
+
+  const voteExtrinsic = api.tx.elections.vote(votes, LLMPolitiPoolData);
 
   voteExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
     if (status.isInBlock) {

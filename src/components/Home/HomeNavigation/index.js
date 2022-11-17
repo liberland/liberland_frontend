@@ -32,6 +32,7 @@ import { userSelectors, walletSelectors } from '../../../redux/selectors';
 
 // UTILS
 import prettyNumber from '../../../utils/prettyNumber';
+import {formatMerits} from "../../../utils/walletHelpers";
 
 const HomeNavigation = () => {
   const location = useLocation();
@@ -46,7 +47,7 @@ const HomeNavigation = () => {
       title: `${name} ${lastName}`,
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: () => <Avatar name={`${name} ${lastName}`} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
-      description: `${prettyNumber(totalBalance, false)} LLM`,
+      description: `${formatMerits(totalBalance)} LLM`,
     },
     {
       route: router.home.feed,

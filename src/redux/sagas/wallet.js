@@ -21,6 +21,8 @@ function* getWalletWorker() {
   try {
     const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     const balances = yield call(getBalanceByAddress, walletAddress);
+    console.log('balances')
+    console.log(balances)
     yield put(walletActions.getWallet.success({ ...walletAddress, balances }));
   } catch (e) {
     yield put(walletActions.getWallet.failure(e));

@@ -55,7 +55,7 @@ const WalletOverview = ({
 
   const overviewInfo = [
     {
-      amount: balances.liberstake.amount,
+      amount: formatMerits(balances.liberstake.amount),
       title: 'PolitiPooled',
       diff: 2.4,
       // eslint-disable-next-line no-constant-condition

@@ -1,8 +1,8 @@
 import { formatBalance } from '@polkadot/util';
 
-export const grainsInMerit = 1;
+export const grainsInMerit = 1000000000000;
 export const grainsInDollar = 1000000000000;
-export const grainsInDemocracyMerit = 100000000000;
+export const grainsInDemocracyMerit = 1000000000000;
 export const grainsInMeritDecimals = 11;
 
 export const formatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
@@ -20,7 +20,7 @@ export const formatMeritTransaction = (merits) => {
 };
 export const formatPolkadotBalance = (polkadotBalance) => {
   const polkadotFormattedBalance = formatBalance(polkadotBalance, { withSi: false, withUnit: false, decimals: 0 });
-  return parseInt(polkadotFormattedBalance.replace('.', ''));
+  return parseInt(polkadotFormattedBalance.replace('.', '')) / 10;
 };
 
 export const dollarsToGrains = (dollars) => parseInt(dollars) * grainsInDollar;
