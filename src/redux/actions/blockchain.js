@@ -7,6 +7,8 @@ export const {
   updateDateElections,
   getAllWallets,
   setUserWallet,
+  setErrorExistsAndUnacknowledgedByUser,
+  getErrorExistsAndUnacknowledgedByUser,
 } = createActions({
   GET_CURRENT_BLOCK_NUMBER: {
     call: undefined,
@@ -34,6 +36,16 @@ export const {
     failure: undefined,
   },
   SET_USER_WALLET: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SET_ERROR_EXISTS_AND_UNACKNOWLEDGED_BY_USER: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_ERROR_EXISTS_AND_UNACKNOWLEDGED_BY_USER: {
     call: undefined,
     success: undefined,
     failure: undefined,

@@ -12,8 +12,9 @@ import {
 } from '../../api/nodeRpcCall';
 import api from '../../api';
 
-import { walletActions } from '../actions';
+import {blockchainActions, walletActions} from '../actions';
 import { blockchainSelectors, walletSelectors } from '../selectors';
+import {setErrorExistsAndUnacknowledgedByUser} from "../actions/blockchain";
 
 // WORKERS
 
@@ -51,6 +52,8 @@ function* stakeToLiberlandWorker(action) {
 }
 
 function* sendTxToDb(tx) {
+  console.log('tx')
+  console.log(tx)
   try {
     const { data: { result } } = yield call(api.post, '/wallet/insert_tx', tx);
     return result;
@@ -85,8 +88,16 @@ function* sendTransferLLMWorker(action) {
   try {
     const blockHash = yield cps(sendTransferLLM, action.payload);
     const status = yield call(getResultByHashRpc, blockHash);
-    const tx = { ...action.payload, status };
+    console.log('status')
+    console.log(status)
+    if(status.result === 'failure'){
+      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true))
+    }
+    // TODO use block explorer for this
+    const tx = { ...action.payload, status: status.result };
     const result = yield call(sendTxToDb, tx);
+    console.log('result')
+    console.log(result)
     if (result === 'success') {
       yield put(walletActions.sendTransferLLM.success());
       yield put(walletActions.getWallet.call());

@@ -10,6 +10,7 @@ const initialState = {
   electionsBlock: 0,
   allWallets: [],
   userWalletAddress: '',
+  errorExistsAndUnacknowledgedByUser: false,
 };
 
 const blockchainReducer = handleActions({
@@ -36,6 +37,10 @@ const blockchainReducer = handleActions({
   [blockchainActions.setUserWallet.success]: (state, action) => ({
     ...state,
     userWalletAddress: action.payload,
+  }),
+  [blockchainActions.setErrorExistsAndUnacknowledgedByUser.success]: (state, action) => ({
+    ...state,
+    errorExistsAndUnacknowledgedByUser: action.payload,
   }),
 }, initialState);
 

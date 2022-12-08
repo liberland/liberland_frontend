@@ -15,6 +15,7 @@ export default function* rootSaga() {
     // // BLOCKCHAIN
     blockchainSagas.fetchBlockNumberWatcher(),
     blockchainSagas.getAllWalletsWatcher(),
+    blockchainSagas.clearErrorsWatcher(),
 
     // WALLET
     walletSagas.getWalletWatcher(),

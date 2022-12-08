@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import {
   userSelectors, walletSelectors,
 } from '../../redux/selectors';
+import ErrorModal from "../ErrorModal";
 
 // eslint-disable-next-line react/prop-types
 const Loader = ({ children }) => {
@@ -49,7 +50,9 @@ const Loader = ({ children }) => {
             />
           </div>
         )}
-      { children }
+      <ErrorModal>
+        { children }
+      </ErrorModal>
     </div>
   );
 };

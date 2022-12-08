@@ -3,7 +3,7 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import axios from 'axios';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
-import {meritsToGrains} from "../utils/walletHelpers";
+import { meritsToGrains } from '../utils/walletHelpers';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -63,6 +63,8 @@ const sendTransfer = async (payload, callback) => {
 };
 
 const sendTransferLLM = async (payload, callback) => {
+  console.log('callback');
+  console.log(callback);
   const { account_to, amount, account_from } = payload;
   const api = await ApiPromise.create({ provider });
   const transferExtrinsic = api.tx.llm.sendLlm(account_to, (meritsToGrains(amount)));
@@ -163,6 +165,10 @@ const getResultByHashRpc = async (blockHash) => {
   const signedBlock = await api.rpc.chain.getBlock(blockHash);
   const allRecords = await api.query.system.events.at(signedBlock.block.header.hash);
   let result = '';
+  const error = {
+    error: false,
+    details: '',
+  };
 
   // map between the extrinsics and events
   signedBlock.block.extrinsics.forEach(({ method: { method, section } }, index) => {
@@ -196,18 +202,19 @@ const getResultByHashRpc = async (blockHash) => {
             // eslint-disable-next-line no-console
             console.log('decoded  ', decoded);
 
-            errorInfo = `${decoded.documentation}`;
+            errorInfo = `${decoded.docs}`;
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
             errorInfo = dispatchError.toString();
           }
+          error.details = errorInfo;
           // eslint-disable-next-line no-console
           console.log(`${section}.${method}:: ExtrinsicFailed:: ${errorInfo}`);
           result = 'failure';
         }
       });
   });
-  return result;
+  return { result, error };
 };
 
 const getValidators = async () => {
@@ -270,9 +277,9 @@ const getDemocracyReferendums = async (address) => {
   try {
     console.log('called with address');
     console.log(address);
-    let ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
-    console.log('ssoAccessTokenHashSEXSION STORAGE')
-    console.log(ssoAccessTokenHash)
+    const ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
+    console.log('ssoAccessTokenHashSEXSION STORAGE');
+    console.log(ssoAccessTokenHash);
     const api = await ApiPromise.create({ provider });
     const proposals = await api.query.democracy.publicProps();
     const referendumInfoOf = await api.query.democracy.referendumInfoOf(['0x767a116c005fc82e2604b07e70872c4e25ccd1d57a62c5cdabdf0d4e7ab76e29']);
@@ -408,7 +415,7 @@ const submitProposal = async (walletAddress, values) => {
   const injector = await web3FromAddress(walletAddress);
   const nextChainIndexQuery = await api.query.democracy.referendumCount();
   const nextChainIndex = nextChainIndexQuery.toHuman();
-  let ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
+  const ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
   // TODO REFACTOR
   const api2 = axios.create({
     baseURL: process.env.REACT_APP_API2,
@@ -417,9 +424,9 @@ const submitProposal = async (walletAddress, values) => {
   api2.defaults.headers.common['X-Token'] = ssoAccessTokenHash;
 
   const centralizedMetadata = await api2.post('/referenda', {
-    //username: 'username',
+    // username: 'username',
     link: values.forumLink,
-    //personId: 10,
+    // personId: 10,
     chainIndex: nextChainIndex,
     name: 'Hardcoded server name',
     description: values.legislationContent,

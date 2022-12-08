@@ -10,8 +10,13 @@ const userWalletAddressSelector = createSelector(
   blockchainReducer,
   (reducer) => reducer.userWalletAddress,
 );
+const errorExistsAndUnacknowledgedByUser = createSelector(
+  blockchainReducer,
+  (reducer) => reducer.errorExistsAndUnacknowledgedByUser,
+);
 
 export {
   allWalletsSelector,
   userWalletAddressSelector,
+  errorExistsAndUnacknowledgedByUser,
 };
