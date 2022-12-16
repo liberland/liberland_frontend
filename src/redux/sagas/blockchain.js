@@ -52,6 +52,7 @@ function* clearErrorsWorker(action) {
   console.log('action')
   console.log(action)
   yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(action.payload))
+  yield put(blockchainActions.setError.success(''))
 }
 
 // WATCHERS

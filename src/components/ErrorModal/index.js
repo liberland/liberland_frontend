@@ -6,6 +6,7 @@ import {blockchainActions} from "../../redux/actions";
 
 const ErrorModal = ({ children }) => {
   const errorExistsAndUnacknowledged = useSelector(blockchainSelectors.errorExistsAndUnacknowledgedByUser);
+  const blockchainError = useSelector(blockchainSelectors.blockchainError);
   const dispatch = useDispatch();
 
   return (
@@ -35,10 +36,15 @@ const ErrorModal = ({ children }) => {
             alignItems: 'center',
             justifyContent: 'center',
             flexDirection: 'column',
-            borderRadius: 5,
+            borderRadius: 10,
+            padding: '25px',
+            paddingBottom: '10px'
           }}
         >
-          <p>ERROR</p>
+          <p style={{
+            fontWeight: '1.5rem',
+            marginBottom: '2.5rem'
+          }}>{blockchainError?.details}</p>
           <br />
           <Button primary onClick={() => {
             console.log('clicked button')

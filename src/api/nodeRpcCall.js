@@ -45,11 +45,21 @@ const getBalanceByAddress = async (address) => {
 };
 
 const sendTransfer = async (payload, callback) => {
+  console.log('payload')
+  console.log(payload)
   const { account_to, amount, account_from } = payload;
   const api = await ApiPromise.create({ provider });
   const transferExtrinsic = api.tx.balances.transfer(account_to, (amount));
   const injector = await web3FromSource('polkadot-js');
-  transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status }) => {
+  transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    console.log('dispatchError')
+    console.log(dispatchError)
+    console.log('events')
+    console.log(events)
+    events.forEach(event => {
+      console.log('event.method')
+      console.log(event.method)
+    })
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
@@ -111,22 +121,25 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
   }
 };
 
-const politiPool = async (payload) => {
+const politiPool = async (payload, callback) => {
   const { values: { amount }, walletAddress } = payload;
   const api = await ApiPromise.create({ provider });
   const politiPoolExtrinsic = api.tx.llm.politicsLock(meritsToGrains(amount));
 
   const injector = await web3FromSource('polkadot-js');
-  politiPoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+  politiPoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    console.log('dispatchError')
+    console.log(dispatchError?.toString())
+
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      // callback(null, status.asInBlock.toString());
+      callback(null, status.asInBlock.toString());
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.log(':( transaction failed', error);
-    // callback(error);
+    callback(error);
   });
 };
 
@@ -548,7 +561,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
 };
 
 const voteForCongress = async (listofVotes, walletAddress) => {
-  console.log('voting for cuntgress');
+  console.log('voting for congress');
   console.log(listofVotes);
   const api = await ApiPromise.create({ provider });
   const injector = await web3FromAddress(walletAddress);

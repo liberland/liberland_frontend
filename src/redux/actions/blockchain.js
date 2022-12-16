@@ -9,6 +9,7 @@ export const {
   setUserWallet,
   setErrorExistsAndUnacknowledgedByUser,
   getErrorExistsAndUnacknowledgedByUser,
+  setError,
 } = createActions({
   GET_CURRENT_BLOCK_NUMBER: {
     call: undefined,
@@ -46,6 +47,11 @@ export const {
     failure: undefined,
   },
   GET_ERROR_EXISTS_AND_UNACKNOWLEDGED_BY_USER: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SET_ERROR: {
     call: undefined,
     success: undefined,
     failure: undefined,

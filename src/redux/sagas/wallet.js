@@ -42,7 +42,11 @@ function* stakeToPolkaWorker(action) {
 
 function* stakeToLiberlandWorker(action) {
   try {
-    yield cps(politiPool, action.payload);
+    const blockHash = yield cps(politiPool, action.payload);
+    const status = yield call(getResultByHashRpc, blockHash);
+    console.log('status')
+    console.log(status)
+
     yield put(walletActions.stakeToPolka.success());
     yield put(walletActions.getWallet.call());
   } catch
@@ -68,7 +72,14 @@ function* sendTransferWorker(action) {
   try {
     const blockHash = yield cps(sendTransfer, action.payload);
     const status = yield call(getResultByHashRpc, blockHash);
-    const tx = { ...action.payload, status };
+    console.log('status')
+    console.log(status)
+    if(status.result === 'failure'){
+      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true))
+      yield put(blockchainActions.setError.success(status.error))
+    }
+    // TODO use block explorer for this
+    const tx = { ...action.payload, status: status.result };
     const result = yield call(sendTxToDb, tx);
     if (result === 'success') {
       yield put(walletActions.sendTransfer.success());
@@ -92,6 +103,7 @@ function* sendTransferLLMWorker(action) {
     console.log(status)
     if(status.result === 'failure'){
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true))
+      yield put(blockchainActions.setError.success(status.error))
     }
     // TODO use block explorer for this
     const tx = { ...action.payload, status: status.result };

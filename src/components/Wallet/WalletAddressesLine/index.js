@@ -84,7 +84,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
 
     if (isAddressValid) {
       dispatch(walletActions.sendTransferLLM.call(values));
-      handleModalOpen();
+      handleModalLLMOpen();
     } else {
       notificationRef.current.addError({ text: 'Invalid address.' });
     }
