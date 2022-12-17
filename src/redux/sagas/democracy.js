@@ -9,8 +9,6 @@ import {
   voteOnReferendum
 } from '../../api/nodeRpcCall';
 
-import api from '../../api';
-
 import { blockchainSelectors } from '../selectors';
 
 import { democracyActions } from '../actions';

@@ -6,8 +6,6 @@ export const {
   sendTransferLLM,
   stakeToPolka,
   stakeToLiberland,
-  getThreeTx,
-  getMoreTx,
   setCurrentPageNumber,
   getValidators,
   getNominatorTargets,

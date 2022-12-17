@@ -9,15 +9,9 @@ const AllTransactions = () => {
   const dispatch = useDispatch();
   const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
 
-  const onclickGetMoreTx = () => {
-    dispatch(walletActions.getMoreTx.call());
-  };
-
   useEffect(() => {
-    dispatch(walletActions.getMoreTx.call());
     return () => {
       dispatch(walletActions.setCurrentPageNumber.success(0));
-      dispatch(walletActions.getMoreTx.success([]));
     };
   }, [dispatch]);
 
@@ -26,7 +20,6 @@ const AllTransactions = () => {
       <WalletTransactionHistory
         transactionHistory={transactionHistory.reverse()}
         textForBtn="Load more transaction"
-        bottomButtonOnclick={onclickGetMoreTx}
       />
     </>
   );

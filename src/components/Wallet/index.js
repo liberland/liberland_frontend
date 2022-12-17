@@ -33,7 +33,6 @@ const Wallet = () => {
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
-    dispatch(walletActions.getThreeTx.call());
     dispatch(walletActions.getValidators.call());
     dispatch(walletActions.getNominatorTargets.call());
   }, [dispatch]);

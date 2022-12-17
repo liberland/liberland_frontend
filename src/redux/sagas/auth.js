@@ -14,18 +14,33 @@ import api from '../../api';
 
 const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
+const fakeUser = {
+  email:'fake eimail',
+  about: 'fake about',
+  gender: 'soviet Bukhanka ambulance truck',
+  id: 13,
+  languages: ['english'],
+  lastName: 'Utajinovic',
+  name: 'Porezije',
+  occupation: 'Theftstopper',
+  origin: 'schizo brain',
+  role: {non_citizen: 'non_citizen'},
+}
 function* signInWorker(action) {
   try {
     const { credentials, history, ssoAccessTokenHash } = action.payload;
-    const { data: user } = yield call(api.post, '/users/signin', credentials);
-    user.ssoAccessTokenHash = ssoAccessTokenHash;
+    //const { data: user } = yield call(api.post, '/users/signin', credentials);
+    //user.ssoAccessTokenHash = ssoAccessTokenHash;
     yield put(blockchainActions.setUserWallet.success(credentials.wallet_address));
     yield sessionStorage.setItem('userWalletAddress', credentials.wallet_address);
     yield sessionStorage.setItem('ssoAccessTokenHash', ssoAccessTokenHash);
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
-      user.role = yield call(getUserRoleRpc, credentials.wallet_address);
-      yield put(authActions.signIn.success(user));
+      //user.role = yield call(getUserRoleRpc, credentials.wallet_address);
+      let ourFakeUser = fakeUser;
+      ourFakeUser.ssoAccessTokenHash = ssoAccessTokenHash;
+      ourFakeUser.role = yield call(getUserRoleRpc, credentials.wallet_address);;
+      yield put(authActions.signIn.success(ourFakeUser));
       yield put(blockchainActions.getCurrentBlockNumber.call());
       yield call(history.push, routes.home.index);
     } else {
@@ -39,7 +54,9 @@ function* signInWorker(action) {
 function* verifySessionWorker() {
   try {
     const walletAddress = yield sessionStorage.getItem('userWalletAddress');
-    const { data: { user, success } } = yield call(api.get, '/users/check_session');
+    //const { data: { user, success } } = yield call(api.get, '/users/check_session');
+    let ourFakeUser = fakeUser
+    let success = true
     let extensions = yield web3Enable('Liberland dapp');
     yield put(blockchainActions.setUserWallet.success(walletAddress));
     if (extensions.length === 0) {
@@ -53,10 +70,10 @@ function* verifySessionWorker() {
       }
     }
     if (extensions.length) {
-      user.role = yield call(getUserRoleRpc, walletAddress);
+      ourFakeUser.role = yield call(getUserRoleRpc, walletAddress);
     }
     if (success) {
-      yield put(authActions.verifySession.success(user));
+      yield put(authActions.verifySession.success(ourFakeUser));
       yield put(blockchainActions.getCurrentBlockNumber.call());
     } else {
       throw new Error();
@@ -68,7 +85,7 @@ function* verifySessionWorker() {
 
 function* signOutWorker() {
   try {
-    yield call(api.post, '/users/logout');
+    //yield call(api.post, '/users/logout');
     yield put(authActions.signOut.success());
     yield put(blockchainActions.setUserWallet.success(''));
     yield sessionStorage.clear();
@@ -79,7 +96,6 @@ function* signOutWorker() {
 
 function* initGetDataFromNodeWorker() {
   yield put(walletActions.getWallet.call());
-  yield put(walletActions.getThreeTx.call());
   yield put(walletActions.getValidators.call());
   const walletAddress = yield sessionStorage.getItem('userWalletAddress');
   yield put(walletActions.getNominatorTargets.call(walletAddress));

@@ -38,8 +38,6 @@ const walletReducer = handleActions(
       walletActions.stakeToLiberland.call,
       walletActions.sendTransfer.call,
       walletActions.sendTransferLLM.call,
-      walletActions.getThreeTx.call,
-      walletActions.getMoreTx.call,
       walletActions.getValidators.call,
       walletActions.getNominatorTargets.call,
     )]: (state) => ({
@@ -49,16 +47,6 @@ const walletReducer = handleActions(
     [walletActions.getWallet.success]: (state, action) => ({
       ...state,
       walletInfo: action.payload,
-    }),
-    [walletActions.getThreeTx.success]: (state, action) => ({
-      ...state,
-      historyTx: action.payload.rows,
-      countAllRows: action.payload.count,
-      gettingWalletInfo: initialState.gettingWalletInfo,
-    }),
-    [walletActions.getMoreTx.success]: (state, action) => ({
-      ...state,
-      allHistoryTx: action.payload,
     }),
     [walletActions.setCurrentPageNumber.success]: (state, action) => ({
       ...state,
@@ -83,8 +71,6 @@ const walletReducer = handleActions(
       walletActions.sendTransferLLM.success,
       walletActions.sendTransfer.failure,
       walletActions.sendTransferLLM.failure,
-      walletActions.getMoreTx.success,
-      walletActions.getMoreTx.failure,
       walletActions.getValidators.success,
       walletActions.getValidators.failure,
       walletActions.getNominatorTargets.failure,

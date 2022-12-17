@@ -23,8 +23,6 @@ export default function* rootSaga() {
     walletSagas.sendTransferLLMWatcher(),
     walletSagas.stakeToPolkaWatcher(),
     walletSagas.stakeToLiberlandWatcher(),
-    walletSagas.getThreeTxWatcher(),
-    walletSagas.getMoreTxWatcher(),
     walletSagas.getValidatorsWatcher(),
     walletSagas.getNominatorTargetsWatcher(),
 

@@ -288,11 +288,7 @@ const setNewNominatorTargets = async (newNominatorTargets, walletAddress) => {
 
 const getDemocracyReferendums = async (address) => {
   try {
-    console.log('called with address');
-    console.log(address);
     const ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
-    console.log('ssoAccessTokenHashSEXSION STORAGE');
-    console.log(ssoAccessTokenHash);
     const api = await ApiPromise.create({ provider });
     const proposals = await api.query.democracy.publicProps();
     const referendumInfoOf = await api.query.democracy.referendumInfoOf(['0x767a116c005fc82e2604b07e70872c4e25ccd1d57a62c5cdabdf0d4e7ab76e29']);
@@ -301,8 +297,6 @@ const getDemocracyReferendums = async (address) => {
     const dispatch = await api.derive.democracy.dispatchQueue();
     const userVotes = await api.query.democracy.votingOf(address);
     const proposalsDerive = await api.derive.democracy.proposals();
-    console.log('proposalsDerive');
-    console.log(proposalsDerive);
     const proposalData = [];
     proposals.toHuman().forEach((proposalItem) => {
       proposalData.push({
