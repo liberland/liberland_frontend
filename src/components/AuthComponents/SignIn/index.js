@@ -66,7 +66,7 @@ const SignIn = () => {
         <p>Welcome back, you’ve been missed!</p>
         <Button medium>
           <Wallet />
-          Sign In with wallet
+          (fake)Sign In with wallet
         </Button>
 
         <p className={styles.divider}>
@@ -81,37 +81,6 @@ const SignIn = () => {
                 <option value={el.address}>{el.address}</option>
               ))}
             </select>
-          </div>
-          <div className={styles.inputWrapper}>
-            <TextInput
-              register={register}
-              name="email"
-              placeholder="Your Email"
-              errorTitle="Email"
-              required
-              error={errors.email}
-              withIcon
-              Icon={MailAt}
-            />
-            {
-              errors.email
-              && <span className={styles.error}>{errors.email.message}</span>
-            }
-          </div>
-          <div className={styles.inputWrapper}>
-            <PasswordInput
-              register={register}
-              name="password"
-              placeholder="Password"
-              required
-              error={errors.password}
-              withIcon
-              Icon={Lock}
-            />
-            {
-              errors.password && errors.password.message
-              && <span className={styles.error}>{errors.password.message}</span>
-            }
           </div>
           <div className={styles.additionalActions}>
             <CheckboxInput
