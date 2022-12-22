@@ -1,9 +1,9 @@
 import { createActions } from 'redux-actions';
 
 export const {
-  getCurrentLaws,
+  getLegislation,
 } = createActions({
-  GET_CURRENT_LAWS: {
+  GET_LEGISLATION: {
     call: undefined,
     success: undefined,
     failure: undefined,

@@ -8,7 +8,7 @@ export default {
     wallet: '/home/wallet',
     voting: '/home/voting',
     profile: '/home/profile',
-    constitution: '/home/law',
+    legislation: '/home/legislation',
   },
   documents: {
     myAccount: '/home/documents/my-account',
@@ -19,6 +19,9 @@ export default {
   voting: {
     congressionalAssemble: '/home/voting/congressional-assemble',
     referendum: '/home/voting/referendum',
+  },
+  legislation: {
+    view: '/home/legislation/:tier',
   },
   wallet: {
     allTransactions: '/home/wallet/all-transactions',
