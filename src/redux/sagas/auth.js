@@ -12,10 +12,10 @@ import {
 import routes from '../../router';
 import api from '../../api';
 
-const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
+const delay = (time) => new Promise((resolve) => { setTimeout(resolve, time); });
 
 const fakeUser = {
-  email:'fake eimail',
+  email: 'fake eimail',
   about: 'fake about',
   gender: 'soviet Bukhanka ambulance truck',
   id: 13,
@@ -24,25 +24,15 @@ const fakeUser = {
   name: 'Porezije',
   occupation: 'Theftstopper',
   origin: 'schizo brain',
-  role: {non_citizen: 'non_citizen'},
-}
-const fakeUserMissingData= {
-  about: 'fake about',
-  gender: 'soviet Bukhanka ambulance truck',
-  languages: ['fakelang'],
-  lastName: 'fakelastname',
-  name: 'fakename',
-  occupation: 'fakeoccupation',
-  origin: 'fake schizo brain',
-  role: {non_citizen: 'non_citizen'},
-}
+  role: { non_citizen: 'non_citizen' },
+};
 function* signInWorker(action) {
   try {
     const { credentials, history, ssoAccessTokenHash } = action.payload;
     api.defaults.headers.common['X-token'] = ssoAccessTokenHash;
     const { data: user } = yield call(api.get, '/users/me');
-    console.log('user')
-    console.log(user)
+    console.log('user');
+    console.log(user);
     user.ssoAccessTokenHash = ssoAccessTokenHash;
     yield put(blockchainActions.setUserWallet.success(credentials.wallet_address));
     yield sessionStorage.setItem('userWalletAddress', credentials.wallet_address);
@@ -50,7 +40,7 @@ function* signInWorker(action) {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc, credentials.wallet_address);
-      let comboUser = {...fakeUser, ...user};
+      const comboUser = { ...fakeUser, ...user };
       comboUser.ssoAccessTokenHash = ssoAccessTokenHash;
       comboUser.role = yield call(getUserRoleRpc, credentials.wallet_address);
       yield put(authActions.signIn.success(comboUser));
@@ -66,15 +56,15 @@ function* signInWorker(action) {
 
 function* verifySessionWorker() {
   try {
-    console.log('verify sesh')
+    console.log('verify sesh');
     const walletAddress = yield sessionStorage.getItem('userWalletAddress');
     const ssoAccessTokenHash = yield sessionStorage.getItem('ssoAccessTokenHash');
-    console.log('ssoAccessTokenHash')
-    console.log(ssoAccessTokenHash)
+    console.log('ssoAccessTokenHash');
+    console.log(ssoAccessTokenHash);
     api.defaults.headers.common['X-token'] = ssoAccessTokenHash;
     const { data: user } = yield call(api.get, '/users/me');
-    console.log('user')
-    console.log(user)
+    console.log('user');
+    console.log(user);
     let extensions = yield web3Enable('Liberland dapp');
     yield put(blockchainActions.setUserWallet.success(walletAddress));
     if (extensions.length === 0) {
@@ -82,7 +72,7 @@ function* verifySessionWorker() {
       // Hack, is caused by web3Enable needing a fully loaded page to work,
       // but i am not sure how to do it other way without larger refactor
       while (retryCounter < 30 && extensions.length === 0) {
-        ++retryCounter;
+        retryCounter += 1;
         yield call(delay, 1000);
         extensions = yield call(web3Enable, 'Liberland dapp');
       }
@@ -90,11 +80,11 @@ function* verifySessionWorker() {
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc, walletAddress);
     }
-    let comboUser = {...fakeUser, ...user};
+    const comboUser = { ...fakeUser, ...user };
     yield put(authActions.verifySession.success(comboUser));
     yield put(blockchainActions.getCurrentBlockNumber.call());
   } catch (error) {
-    console.log('verify sesh fail')
+    console.log('verify sesh fail');
     yield put(authActions.verifySession.failure());
   }
 }

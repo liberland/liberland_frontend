@@ -4,13 +4,13 @@ import cx from 'classnames';
 
 import styles from './styles.module.scss';
 
-const CheckboxInput = ({
+function CheckboxInput({
   register,
   name,
   required = false,
   errorTitle,
   label,
-}) => {
+}) {
   const [isChecked, setIsChecked] = useState(false);
 
   const handleCheck = () => setIsChecked(!isChecked);
@@ -25,7 +25,7 @@ const CheckboxInput = ({
         name={name}
         readOnly
       />
-      <div className={cx(styles.checkbox)} checked={isChecked} onClick={handleCheck}>
+      <div className={cx(styles.checkbox)} onClick={handleCheck}>
         <svg className={cx(styles.checkboxIcon, { [styles.checkboxIconHidden]: !isChecked })} viewBox="0 0 24 24">
           <polyline points="20 6 9 17 4 12" />
         </svg>
@@ -33,6 +33,6 @@ const CheckboxInput = ({
       <span className={styles.checkboxLabel}>{label}</span>
     </div>
   );
-};
+}
 
 export default CheckboxInput;

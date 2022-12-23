@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-import PropTypes, { bool } from 'prop-types';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
-import eCardImage from '../../../../assets/images/e_card_image.svg';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 
-const ValidatorCard = ({
-  avatarImage,
+function ValidatorCard({
   name,
   commission,
   blocked,
@@ -13,8 +11,10 @@ const ValidatorCard = ({
   toggleSelectedValidator,
   validatorAddress,
   selectingValidatorsDisabled,
-}) => {
-  const test = '';
+}) {
+  let status = '';
+  if (nominatedByMe) status = '✅';
+  else if (selectingValidatorsDisabled) status = 'MAX';
 
   return (
     <div className={styles.nominatorCardWrapper}>
@@ -23,33 +23,35 @@ const ValidatorCard = ({
         <div className={styles.avatarName}>{name}</div>
       </div>
       <div className={styles.listItem}>{commission}</div>
-      <div className={styles.listItem}><div className={blocked ? styles.blocked : styles.available}>{blocked ? 'Blocked' : 'Available' }</div></div>
+      <div className={styles.listItem}>
+        <div className={blocked ? styles.blocked : styles.available}>
+          {blocked ? 'Blocked' : 'Available'}
+        </div>
+      </div>
       <div className={styles.listItem} onClick={() => toggleSelectedValidator(validatorAddress)}>
         <div className={styles.checkBox}>
-          <div>{nominatedByMe ? '✅' : selectingValidatorsDisabled ? 'MAX' : '' }</div>
+          <div>{status}</div>
         </div>
       </div>
 
     </div>
   );
-};
+}
 
 ValidatorCard.defaultProps = {
-  avatarImage: '',
   name: 'Test Validator',
   commission: '5%',
   blocked: false,
-  nominatedByMe: 'No',
+  nominatedByMe: false,
   validatorAddress: '',
   selectingValidatorsDisabled: false,
 };
 
 ValidatorCard.propTypes = {
-  avatarImage: PropTypes.string,
   name: PropTypes.string,
   commission: PropTypes.string,
   blocked: PropTypes.bool,
-  nominatedByMe: PropTypes.string,
+  nominatedByMe: PropTypes.bool,
   toggleSelectedValidator: PropTypes.func.isRequired,
   validatorAddress: PropTypes.string,
   selectingValidatorsDisabled: PropTypes.bool,

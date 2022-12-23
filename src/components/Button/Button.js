@@ -4,7 +4,7 @@ import cx from 'classnames';
 
 import styles from './styles.module.scss';
 
-const Button = ({
+function Button({
   children,
   type = 'button',
   primary,
@@ -19,11 +19,12 @@ const Button = ({
   green,
   grey,
   red,
-}) => (
-  <button
-    onClick={onClick}
-    type={type}
-    className={
+}) {
+  return (
+    <button
+      onClick={onClick}
+      type={type}
+      className={
       cx(styles.button, className, {
         [styles.primary]: primary,
         [styles.secondary]: secondary,
@@ -37,10 +38,11 @@ const Button = ({
         [styles.red]: red,
       })
     }
-  >
-    {children}
-  </button>
-);
+    >
+      {children}
+    </button>
+  );
+}
 
 Button.defaultProps = {
   type: 'button',

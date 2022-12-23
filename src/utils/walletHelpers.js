@@ -19,7 +19,9 @@ export const formatMeritTransaction = (merits) => {
   return `${prefix} ${formatter.format(absIntMerits)} grains`;
 };
 export const formatPolkadotBalance = (polkadotBalance) => {
-  const polkadotFormattedBalance = formatBalance(polkadotBalance, { withSi: false, withUnit: false, decimals: 0 });
+  const polkadotFormattedBalance = formatBalance(polkadotBalance, {
+    withSi: false, withUnit: false, decimals: 0,
+  });
   return parseInt(polkadotFormattedBalance.replace('.', '')) / 10;
 };
 

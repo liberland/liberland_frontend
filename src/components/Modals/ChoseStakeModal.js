@@ -6,12 +6,13 @@ import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
-const ChoseStakeModal = ({
+function ChoseStakeModal({
   // eslint-disable-next-line react/prop-types,max-len
   closeModal, handleSubmit, register, modalShown, setModalShown, handleSubmitStakePolka, handleSubmitStakeLiberland,
-}) => (
-  <>
-    { modalShown === 0 && (
+}) {
+  return (
+    <>
+      { modalShown === 0 && (
       <form className={styles.ChoseStakeModal}>
         <div className={styles.buttonWrapper}>
           <Button
@@ -37,8 +38,8 @@ const ChoseStakeModal = ({
           </Button>
         </div>
       </form>
-    )}
-    { modalShown === 1
+      )}
+      { modalShown === 1
    && (
    <form
      className={styles.getCitizenshipModal}
@@ -70,7 +71,7 @@ const ChoseStakeModal = ({
    </form>
    ) }
 
-    { modalShown === 2
+      { modalShown === 2
   && (
   <form
     className={styles.getCitizenshipModal}
@@ -101,13 +102,16 @@ const ChoseStakeModal = ({
     </div>
   </form>
   )}
-  </>
-);
+    </>
+  );
+}
 
-const ChoseStakeModalWrapper = (props) => (
-  <ModalRoot>
-    <ChoseStakeModal {...props} />
-  </ModalRoot>
-);
+function ChoseStakeModalWrapper(props) {
+  return (
+    <ModalRoot>
+      <ChoseStakeModal {...props} />
+    </ModalRoot>
+  );
+}
 
 export default ChoseStakeModalWrapper;

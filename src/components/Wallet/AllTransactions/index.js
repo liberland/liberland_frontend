@@ -5,24 +5,20 @@ import WalletTransactionHistory from '../WalletTransactionHistory';
 import { walletActions } from '../../../redux/actions';
 import { walletSelectors } from '../../../redux/selectors';
 
-const AllTransactions = () => {
+function AllTransactions() {
   const dispatch = useDispatch();
   const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
 
-  useEffect(() => {
-    return () => {
-      dispatch(walletActions.setCurrentPageNumber.success(0));
-    };
+  useEffect(() => () => {
+    dispatch(walletActions.setCurrentPageNumber.success(0));
   }, [dispatch]);
 
   return (
-    <>
-      <WalletTransactionHistory
-        transactionHistory={transactionHistory.reverse()}
-        textForBtn="Load more transaction"
-      />
-    </>
+    <WalletTransactionHistory
+      transactionHistory={transactionHistory.reverse()}
+      textForBtn="Load more transaction"
+    />
   );
-};
+}
 
 export default AllTransactions;

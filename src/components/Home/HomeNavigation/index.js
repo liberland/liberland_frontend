@@ -8,6 +8,7 @@ import NavigationLink from '../NavigationLink';
 import RoleHOC from '../../../hocs/RoleHOC';
 import router from '../../../router';
 import Header from '../../AuthComponents/Header';
+import GetCitizenshipCard from '../Cards/GetCitizenshipCard';
 
 // ASSETS
 import styles from './styles.module.scss';
@@ -21,8 +22,6 @@ import VotingIcon from '../../../assets/icons/voting.svg';
 import VotingIconActive from '../../../assets/icons/active-voting.svg';
 import ConstitutionIcon from '../../../assets/icons/constitution.svg';
 import ConstitutionIconActive from '../../../assets/icons/active-constitution.svg';
-import AssemblyIcon from '../../../assets/icons/assembly.svg';
-import AssemblyIconActive from '../../../assets/icons/active-assembly.svg';
 
 // REDUX
 import { userSelectors, walletSelectors } from '../../../redux/selectors';
@@ -31,10 +30,9 @@ import { userSelectors, walletSelectors } from '../../../redux/selectors';
 // import roleEnums from '../../../constants/roleEnums';
 
 // UTILS
-import prettyNumber from '../../../utils/prettyNumber';
-import {formatMerits} from "../../../utils/walletHelpers";
+import { formatMerits } from '../../../utils/walletHelpers';
 
-const HomeNavigation = () => {
+function HomeNavigation() {
   const location = useLocation();
   const roles = useSelector(userSelectors.selectUserRole);
   const name = useSelector(userSelectors.selectUserName);
@@ -46,7 +44,7 @@ const HomeNavigation = () => {
       route: router.home.profile,
       title: `${name} ${lastName}`,
       access: ['citizen', 'assemblyMember', 'non_citizen'],
-      icon: () => <Avatar name={`${name} ${lastName}`} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
+      icon: <Avatar name={`${name} ${lastName}`} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
       description: `${formatMerits(totalBalance)} LLM`,
     },
     {
@@ -117,6 +115,6 @@ const HomeNavigation = () => {
     </div>
 
   );
-};
+}
 
 export default HomeNavigation;

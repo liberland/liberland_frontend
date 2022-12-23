@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import {
-  Switch, Route, Redirect, useLocation,
+  Switch, Route, Redirect,
 } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { votingActions } from '../../redux/actions';
 
@@ -12,12 +12,9 @@ import router from '../../router';
 
 import CongressionalAssemble from './CongressionalAssemble';
 import styles from './styles.module.scss';
-import { votingSelectors } from '../../redux/selectors';
 import Referendum from './Referendum';
 
-const Voting = () => {
-  const location = useLocation();
-
+function Voting() {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -59,6 +56,6 @@ const Voting = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Voting;

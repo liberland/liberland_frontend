@@ -1,31 +1,31 @@
 import {
-  put, takeLatest, call, cps, select,
+  put, takeLatest, call, select,
 } from 'redux-saga/effects';
 
 import {
   getCongressMembersWithIdentity,
   getDemocracyReferendums,
   secondProposal,
-  voteOnReferendum
+  voteOnReferendum,
 } from '../../api/nodeRpcCall';
 
 import { blockchainSelectors } from '../selectors';
 
 import { democracyActions } from '../actions';
 
-//WORKERS
+// WORKERS
 
 function* getDemocracyWorker() {
   try {
-    let walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    //TODO use user wallet address once chain is in good state
-    //walletAddress = '5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo';
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    // TODO use user wallet address once chain is in good state
+    // walletAddress = '5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo';
     const directDemocracyInfo = yield call(getDemocracyReferendums, walletAddress);
     const currentCongressMembers = yield call(getCongressMembersWithIdentity, walletAddress);
-    const democracy = {...directDemocracyInfo, ...currentCongressMembers}
-    console.log('democracy')
-    console.log(democracy)
-    yield put(democracyActions.getDemocracy.success({democracy}))
+    const democracy = { ...directDemocracyInfo, ...currentCongressMembers };
+    console.log('democracy');
+    console.log(democracy);
+    yield put(democracyActions.getDemocracy.success({ democracy }));
   } catch (e) {
     yield put(democracyActions.getDemocracy.failure(e));
   }
@@ -33,12 +33,13 @@ function* getDemocracyWorker() {
 
 function* secondProposalWorker(action) {
   try {
-    let walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    //TODO use user wallet address once chain is in good state
-    //walletAddress = '5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo';
-    console.log('action.payload')
-    console.log(action.payload)
-    yield call(secondProposal, ...[walletAddress, action.payload.proposalIndex])
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    // TODO use user wallet address once chain is in good state
+    // walletAddress = '5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo';
+    console.log('action.payload');
+    console.log(action.payload);
+    yield call(secondProposal, ...[walletAddress, action.payload.proposalIndex]);
+    return true;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Error in secondProposalWorker', e);
@@ -48,10 +49,11 @@ function* secondProposalWorker(action) {
 
 function* voteReferendumWorker(action) {
   try {
-    let walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    //TODO use user wallet address once chain is in good state
-    //walletAddress = '5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo';
-    yield call(voteOnReferendum, ...[walletAddress, action.payload.referendumIndex, action.payload.voteType])
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    // TODO use user wallet address once chain is in good state
+    // walletAddress = '5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo';
+    yield call(voteOnReferendum, ...[walletAddress, action.payload.referendumIndex, action.payload.voteType]);
+    return true;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Error in voteonreferendum', e);
@@ -59,29 +61,29 @@ function* voteReferendumWorker(action) {
   }
 }
 
-//WATCHERS
+// WATCHERS
 
 function* getDemocracyWatcher() {
-  try{
-    yield takeLatest(democracyActions.getDemocracy.call, getDemocracyWorker)
-  } catch (e){
-    yield put(democracyActions.getDemocracy.failure(e))
+  try {
+    yield takeLatest(democracyActions.getDemocracy.call, getDemocracyWorker);
+  } catch (e) {
+    yield put(democracyActions.getDemocracy.failure(e));
   }
 }
 
 function* secondProposalWatcher() {
-  try{
-    yield takeLatest(democracyActions.secondProposal.call, secondProposalWorker)
-  } catch (e){
-    yield put(democracyActions.secondProposal.failure(e))
+  try {
+    yield takeLatest(democracyActions.secondProposal.call, secondProposalWorker);
+  } catch (e) {
+    yield put(democracyActions.secondProposal.failure(e));
   }
 }
 
 function* voteOnReferendumWatcher() {
-  try{
-    yield takeLatest(democracyActions.voteOnReferendum.call, voteReferendumWorker)
-  } catch (e){
-    yield put(democracyActions.voteOnReferendum.failure(e))
+  try {
+    yield takeLatest(democracyActions.voteOnReferendum.call, voteReferendumWorker);
+  } catch (e) {
+    yield put(democracyActions.voteOnReferendum.failure(e));
   }
 }
 

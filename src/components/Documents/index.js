@@ -27,40 +27,42 @@ const navigationList = [
   },
 ];
 
-const Documents = () => (
-  <div className={styles.documentsWrapper}>
-    <Tabs navigationList={navigationList} />
+function Documents() {
+  return (
+    <div className={styles.documentsWrapper}>
+      <Tabs navigationList={navigationList} />
 
-    <div>
-      <Switch>
-        <Route
-          path={router.documents.myAccount}
-          component={() => <Profile className={styles.withoutMargin} />}
-        />
-        <Route
-          path={router.documents.citizenshipHistory}
-          component={() => <div>Citizenship History</div>}
-        />
-        <Route
-          path={router.documents.courtCases}
-          component={() => <div>Court cases</div>}
-        />
-        <Route
-          path={router.documents.landOwnership}
-          component={() => <div>Land ownership</div>}
-        />
-        <Route
-          exact
-          path={router.home.documents}
-          render={() => (
-            <RoleHOC>
-              <Redirect to={router.documents.myAccount} />
-            </RoleHOC>
-          )}
-        />
-      </Switch>
+      <div>
+        <Switch>
+          <Route
+            path={router.documents.myAccount}
+            render={() => <Profile className={styles.withoutMargin} />}
+          />
+          <Route
+            path={router.documents.citizenshipHistory}
+            render={() => <div>Citizenship History</div>}
+          />
+          <Route
+            path={router.documents.courtCases}
+            render={() => <div>Court cases</div>}
+          />
+          <Route
+            path={router.documents.landOwnership}
+            render={() => <div>Land ownership</div>}
+          />
+          <Route
+            exact
+            path={router.home.documents}
+            render={() => (
+              <RoleHOC>
+                <Redirect to={router.documents.myAccount} />
+              </RoleHOC>
+            )}
+          />
+        </Switch>
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
 export default Documents;

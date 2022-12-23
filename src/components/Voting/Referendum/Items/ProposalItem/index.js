@@ -1,22 +1,24 @@
-import React, { useMemo } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
-import Card from "../../../../Card";
+import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
 
 const endorseButton = (buttonEndorseCallback, userDidEndorse, referendumInfo) => (userDidEndorse ? (
-    <Button medium gray>
-      Already endorsed
-    </Button>
-  )
+  <Button medium gray>
+    Already endorsed
+  </Button>
+)
   : (
     <Button medium primary onClick={() => { buttonEndorseCallback(referendumInfo); }}>
       Endorse
     </Button>
   ));
 
-const ProposalItem = ({
-  name, createdBy, currentEndorsement, externalLink, description, userDidEndorse, hash, buttonEndorseCallback, proposalIndex
- }) => {
+function ProposalItem({
+  name, createdBy, currentEndorsement, externalLink, description,
+  userDidEndorse, hash, buttonEndorseCallback, proposalIndex,
+}) {
   return (
     <Card
       title={name}
@@ -51,6 +53,17 @@ const ProposalItem = ({
         </div>
       </div>
     </Card>
-  )
+  );
 }
+ProposalItem.propTypes = {
+  name: PropTypes.string.isRequired,
+  createdBy: PropTypes.string.isRequired,
+  currentEndorsement: PropTypes.string.isRequired,
+  externalLink: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  userDidEndorse: PropTypes.bool.isRequired,
+  hash: PropTypes.string.isRequired,
+  buttonEndorseCallback: PropTypes.func.isRequired,
+  proposalIndex: PropTypes.number.isRequired,
+};
 export default ProposalItem;

@@ -1,5 +1,5 @@
 import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
-import { BN, BN_ZERO } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import axios from 'axios';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
@@ -45,21 +45,21 @@ const getBalanceByAddress = async (address) => {
 };
 
 const sendTransfer = async (payload, callback) => {
-  console.log('payload')
-  console.log(payload)
+  console.log('payload');
+  console.log(payload);
   const { account_to, amount, account_from } = payload;
   const api = await ApiPromise.create({ provider });
   const transferExtrinsic = api.tx.balances.transfer(account_to, (amount));
   const injector = await web3FromSource('polkadot-js');
   transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    console.log('dispatchError')
-    console.log(dispatchError)
-    console.log('events')
-    console.log(events)
-    events.forEach(event => {
-      console.log('event.method')
-      console.log(event.method)
-    })
+    console.log('dispatchError');
+    console.log(dispatchError);
+    console.log('events');
+    console.log(events);
+    events.forEach((event) => {
+      console.log('event.method');
+      console.log(event.method);
+    });
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
@@ -127,9 +127,9 @@ const politiPool = async (payload, callback) => {
   const politiPoolExtrinsic = api.tx.llm.politicsLock(meritsToGrains(amount));
 
   const injector = await web3FromSource('polkadot-js');
-  politiPoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    console.log('dispatchError')
-    console.log(dispatchError?.toString())
+  politiPoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
+    console.log('dispatchError');
+    console.log(dispatchError?.toString());
 
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
@@ -153,7 +153,7 @@ const getUserRoleRpc = async (walletAddress) => {
     }
     return { non_citizen: 'non_citizen' };
   } catch (e) {
-  // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console
     console.log('error', e);
   }
   return null;
@@ -186,12 +186,12 @@ const getResultByHashRpc = async (blockHash) => {
   // map between the extrinsics and events
   signedBlock.block.extrinsics.forEach(({ method: { method, section } }, index) => {
     allRecords
-    // filter the specific events based on the phase and then the
-    // index of our extrinsic in the block
+      // filter the specific events based on the phase and then the
+      // index of our extrinsic in the block
       .filter(({ phase }) => phase.isApplyExtrinsic
-            && phase.asApplyExtrinsic.eq(index))
-    // test the events against the specific types we are looking for
-    // eslint-disable-next-line consistent-return
+        && phase.asApplyExtrinsic.eq(index))
+      // test the events against the specific types we are looking for
+      // eslint-disable-next-line consistent-return
       .forEach(({ event }) => {
         if (api.events.system.ExtrinsicSuccess.is(event)) {
           // extract the data for this event
@@ -248,11 +248,11 @@ const getValidators = async () => {
     ...validatorIdentityQueries,
   ]);
   validatorsData.forEach((validatorData, index) => {
-    const validatorHumanData = validatorData.toHuman();
+    const data = validatorData.toHuman();
     const dataToAdd = {
-      ...((validatorHumanData?.commission !== undefined) && { commission: validatorHumanData.commission }),
-      ...((validatorHumanData?.blocked !== undefined) && { blocked: validatorHumanData.blocked }),
-      ...((validatorHumanData?.info?.display?.Raw !== undefined) && { displayName: validatorHumanData?.info?.display?.Raw }),
+      ...((data?.commission !== undefined) && { commission: data.commission }),
+      ...((data?.blocked !== undefined) && { blocked: data.blocked }),
+      ...((data?.info?.display?.Raw !== undefined) && { displayName: data?.info?.display?.Raw }),
     };
     validators[index % numOfValidators] = {
       ...validators[index % numOfValidators],
@@ -277,12 +277,11 @@ const setNewNominatorTargets = async (newNominatorTargets, walletAddress) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
-      callback(null, 'done');
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.log(':( transaction failed', error);
-    callback(error);
+    throw (error);
   });
 };
 
@@ -291,12 +290,10 @@ const getDemocracyReferendums = async (address) => {
     const ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
     const api = await ApiPromise.create({ provider });
     const proposals = await api.query.democracy.publicProps();
-    const referendumInfoOf = await api.query.democracy.referendumInfoOf(['0x767a116c005fc82e2604b07e70872c4e25ccd1d57a62c5cdabdf0d4e7ab76e29']);
-    const apideriveReferendums = await api.derive.democracy.referendums();
+    let apideriveReferendums = await api.derive.democracy.referendums();
     const apideriveReferendumsActive = await api.derive.democracy.referendumsActive();
-    const dispatch = await api.derive.democracy.dispatchQueue();
     const userVotes = await api.query.democracy.votingOf(address);
-    const proposalsDerive = await api.derive.democracy.proposals();
+    let proposalsDerive = await api.derive.democracy.proposals();
     const proposalData = [];
     proposals.toHuman().forEach((proposalItem) => {
       proposalData.push({
@@ -319,31 +316,33 @@ const getDemocracyReferendums = async (address) => {
     });
 
     const crossReferencedReferendumsData = [];
-    apideriveReferendums.forEach((referendum) => {
+    apideriveReferendums = apideriveReferendums.map((referendum) => {
       console.log('human index');
       console.log(referendum.index.toHuman());
       const referendumIndex = referendum.index.toHuman();
-      let centralizedBackendItem = {};
-      centralizedReferendumsData.forEach((centralizedData) => {
-        if (parseInt(centralizedData.chainIndex) === parseInt(referendumIndex)) {
-          centralizedBackendItem = centralizedData;
+      let centralizedData = {};
+      centralizedReferendumsData.forEach((data) => {
+        if (parseInt(data.chainIndex) === parseInt(referendumIndex)) {
+          centralizedData = data;
         }
       });
-      referendum.centralizedData = centralizedBackendItem;
-      crossReferencedReferendumsData.push(referendum);
+      const newRef = { ...referendum, centralizedData };
+      crossReferencedReferendumsData.push(newRef);
+      return newRef;
     });
 
     const crossReferencedProposalsData = [];
-    proposalsDerive.forEach((proposal) => {
+    proposalsDerive = proposalsDerive.map((proposal) => {
       const proposalIndex = proposal.index;
-      let centralizedBackendItem = {};
-      centralizedReferendumsData.forEach((centralizedData) => {
-        if (parseInt(centralizedData.chainIndex) === parseInt(proposalIndex)) {
-          centralizedBackendItem = centralizedData;
+      let centralizedData = {};
+      centralizedReferendumsData.forEach((data) => {
+        if (parseInt(data.chainIndex) === parseInt(proposalIndex)) {
+          centralizedData = data;
         }
       });
-      proposal.centralizedData = centralizedBackendItem;
-      crossReferencedProposalsData.push(proposal);
+      const newProp = { ...proposal, centralizedData };
+      crossReferencedProposalsData.push(newProp);
+      return newProp;
     });
 
     // const referendums = api.query.democracy.publicProps();
@@ -408,9 +407,10 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
 const getProposalHash = async (values, legislationIndex) => {
   console.log('GETTING PROPOSAL HASH');
   const api = await ApiPromise.create({ provider });
-  // const extrinsicEncoded = api.tx.system.remark(values.legislationTier + values.legislationName + values.forumLink, values.legislationContent).method.toHex();
   const extrinsicEncoded = api.tx.liberlandLegislation.addLaw(
-    parseInt(values.legislationTier), legislationIndex, values.legislationContent,
+    parseInt(values.legislationTier),
+    legislationIndex,
+    values.legislationContent,
   ).method.toHex();
   const storageFee = api.consts.democracy.preimageByteDeposit.mul(new BN((extrinsicEncoded.length - 2) / 2));
   const hash = { encodedHash: blake2AsHex(extrinsicEncoded), extrinsicEncoded, storageFee };
@@ -445,14 +445,14 @@ const submitProposal = async (walletAddress, values) => {
   const hash = await getProposalHash(values, legislationIndex);
   const notePreimageTx = api.tx.democracy.notePreimage(hash.extrinsicEncoded);
   const proposeTx = api.tx.democracy.propose(hash.encodedHash, hash.storageFee);
-  notePreimageTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
-    if (status.isInBlock) {
+  notePreimageTx.signAndSend(walletAddress, { signer: injector.signer }, ({ preimageStatus }) => {
+    if (preimageStatus.isInBlock) {
       // eslint-disable-next-line no-console
-      console.log(`Completed NOTEPREIMAGE at block hash #${status.asInBlock.toString()}`);
-      proposeTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
-        if (status.isInBlock) {
+      console.log(`Completed NOTEPREIMAGE at block hash #${preimageStatus.asInBlock.toString()}`);
+      proposeTx.signAndSend(walletAddress, { signer: injector.signer }, ({ proposeStatus }) => {
+        if (proposeStatus.isInBlock) {
           // eslint-disable-next-line no-console
-          console.log(`Completed PROPOSE at block hash #${status.asInBlock.toString()}`);
+          console.log(`Completed PROPOSE at block hash #${proposeStatus.asInBlock.toString()}`);
         }
       }).catch((error) => {
         // eslint-disable-next-line no-console
@@ -551,7 +551,11 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
    const allVotes = useCall<Record<string, AccountId[]>>(api.derive.council.votes, undefined, transformVotes);
    */
 
-  return { currentCongressMembers: crossReferencedCouncilMemberIdentities, candidates: crossReferencedCandidateIdentities, currentCandidateVotesByUser: crossReferencedCurrentCandidateVotesByUser };
+  return {
+    currentCongressMembers: crossReferencedCouncilMemberIdentities,
+    candidates: crossReferencedCandidateIdentities,
+    currentCandidateVotesByUser: crossReferencedCurrentCandidateVotesByUser,
+  };
 };
 
 const voteForCongress = async (listofVotes, walletAddress) => {

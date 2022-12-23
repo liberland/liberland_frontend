@@ -1,14 +1,30 @@
-import React, { useMemo } from 'react';
-import { formatBalance } from '@polkadot/util';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
-import {formatPolkadotBalance, grainsInMeritDecimals} from "../../../../../utils/walletHelpers";
+import { formatPolkadotBalance } from '../../../../../utils/walletHelpers';
 
 const voteButtons = (buttonVoteCallback, referendumInfo) => (
   <div className={styles.buttonContainer}>
-    <Button small primary green className={styles.yayButton} onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}>Vote Aye</Button>
-    <Button small primary red className={styles.nayButton} onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}>Vote Nay</Button>
+    <Button
+      small
+      primary
+      green
+      className={styles.yayButton}
+      onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}
+    >
+      Vote Aye
+    </Button>
+    <Button
+      small
+      primary
+      red
+      className={styles.nayButton}
+      onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}
+    >
+      Vote Nay
+    </Button>
   </div>
 );
 
@@ -26,11 +42,13 @@ const alreadyVotedButton = (alreadyVoted) => (alreadyVoted === 'Aye'
     </Button>
   ));
 
-const ReferendumItem = ({
-  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, alreadyVoted, buttonVoteCallback, votingTimeLeft, referendumIndex
-}) => {
-
-  const progressBarRatio = yayVotes > 0 ? `${(formatPolkadotBalance(yayVotes)) / (formatPolkadotBalance(yayVotes) + formatPolkadotBalance(nayVotes)) * 100}%` : '0%';
+function ReferendumItem({
+  name, createdBy, externalLink, description, yayVotes, nayVotes, hash,
+  alreadyVoted, buttonVoteCallback, votingTimeLeft, referendumIndex,
+}) {
+  const totalVotes = formatPolkadotBalance(yayVotes) + formatPolkadotBalance(nayVotes);
+  const ratio = formatPolkadotBalance(yayVotes) / totalVotes;
+  const progressBarRatio = yayVotes > 0 ? `${100 * ratio}%` : '0%';
   return (
     <Card
       title={name}
@@ -71,7 +89,9 @@ const ReferendumItem = ({
             <a href={externalLink}>Read discussion</a>
           </div>
           <div>
-            <span className={styles.votingTimeText}>Voting ends in:</span> <b>{votingTimeLeft}</b>
+            <span className={styles.votingTimeText}>Voting ends in:</span>
+            {' '}
+            <b>{votingTimeLeft}</b>
           </div>
         </div>
         <div className={styles.description}>
@@ -88,5 +108,19 @@ const ReferendumItem = ({
       </div>
     </Card>
   );
+}
+
+ReferendumItem.propTypes = {
+  name: PropTypes.string.isRequired,
+  createdBy: PropTypes.string.isRequired,
+  externalLink: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  yayVotes: PropTypes.number.isRequired,
+  nayVotes: PropTypes.number.isRequired,
+  hash: PropTypes.string.isRequired,
+  alreadyVoted: PropTypes.string.isRequired,
+  buttonVoteCallback: PropTypes.func.isRequired,
+  votingTimeLeft: PropTypes.string.isRequired,
+  referendumIndex: PropTypes.number.isRequired,
 };
 export default ReferendumItem;

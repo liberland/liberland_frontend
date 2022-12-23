@@ -13,19 +13,16 @@ import { errorsSelectors, blockchainSelectors } from '../../../redux/selectors';
 import styles from './styles.module.scss';
 // COMPONENTS
 import { ReactComponent as Divider } from '../../../assets/icons/divider.svg';
-import { ReactComponent as Lock } from '../../../assets/icons/lock.svg';
-import { ReactComponent as MailAt } from '../../../assets/icons/mail-at.svg';
 import { ReactComponent as Wallet } from '../../../assets/icons/wallet.svg';
 import Header from '../Header';
-import { CheckboxInput, PasswordInput, TextInput } from '../../InputComponents';
+import { CheckboxInput } from '../../InputComponents';
 import router from '../../../router';
 import Button from '../../Button/Button';
 
-const SignIn = () => {
+function SignIn() {
   const {
     handleSubmit,
     register,
-    formState: { errors },
     setError,
   } = useForm();
   const dispatch = useDispatch();
@@ -37,14 +34,17 @@ const SignIn = () => {
   const beginToken = queryString.indexOf('=');
   const endToken = queryString.indexOf('&');
   const ssoAccessTokenHash = queryString.substring(beginToken + 1, endToken);
-  if(!ssoAccessTokenHash) {
-    alert(`Due to stupid but temporary reasons, you should get here through this link, otherwise bugs will happen ${process.env.REACT_APP_SSO_API_IMPLICIT_LINK}`)
+  if (!ssoAccessTokenHash) {
+    // eslint-disable-next-line max-len
+    alert(`Due to stupid but temporary reasons, you should get here through this link, otherwise bugs will happen ${process.env.REACT_APP_SSO_API_IMPLICIT_LINK}`);
   }
 
   useEffect(() => {
     if (apiError) {
-      setError('email',
-        apiError.data.error);
+      setError(
+        'email',
+        apiError.data.error,
+      );
     }
   }, [apiError, setError, dispatch]);
 
@@ -78,7 +78,7 @@ const SignIn = () => {
           <div className={styles.inputWrapper}>
             <select className={styles.addressSwitcher} {...register('wallet_address')} required>
               { allAccounts.map((el) => (
-                <option value={el.address}>{el.address}</option>
+                <option key={el.address} value={el.address}>{el.address}</option>
               ))}
             </select>
           </div>
@@ -100,6 +100,6 @@ const SignIn = () => {
       </div>
     </div>
   );
-};
+}
 
 export default SignIn;

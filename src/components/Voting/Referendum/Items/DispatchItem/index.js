@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
-import Button from '../../../../Button/Button';
 
-const DispatchItem = ({
-  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, timeLeftUntilImplemented
-}) => {
+function DispatchItem({
+  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, timeLeftUntilImplemented,
+}) {
   const progressBarRatio = yayVotes > 0 ? `${((yayVotes) / (yayVotes + nayVotes)) * 100}%` : '0%';
   return (
     <Card
@@ -47,7 +47,9 @@ const DispatchItem = ({
             <a href={externalLink}>Read discussion</a>
           </div>
           <div>
-            <span className={styles.votingTimeText}>Implements in:</span> <b>{timeLeftUntilImplemented}</b>
+            <span className={styles.votingTimeText}>Implements in:</span>
+            {' '}
+            <b>{timeLeftUntilImplemented}</b>
           </div>
         </div>
         <div className={styles.description}>
@@ -56,5 +58,15 @@ const DispatchItem = ({
       </div>
     </Card>
   );
+}
+DispatchItem.propTypes = {
+  name: PropTypes.string.isRequired,
+  createdBy: PropTypes.string.isRequired,
+  externalLink: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  hash: PropTypes.string.isRequired,
+  yayVotes: PropTypes.number.isRequired,
+  nayVotes: PropTypes.number.isRequired,
+  timeLeftUntilImplemented: PropTypes.string.isRequired,
 };
 export default DispatchItem;

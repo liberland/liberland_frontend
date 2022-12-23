@@ -6,7 +6,7 @@ import assemblyReducer from './assembly';
 import votingReducer from './voting';
 import lawReducer from './law';
 import blockchainReducer from './blockchain';
-import democracyReducer from "./democracy";
+import democracyReducer from './democracy';
 
 const rootReducer = combineReducers({
   user: userReducer,

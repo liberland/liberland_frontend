@@ -11,8 +11,9 @@ import { ReactComponent as StarIcon } from '../../assets/icons/star.svg';
 import { ReactComponent as DotsIcon } from '../../assets/icons/three-dots.svg';
 import styles from './styles.module.scss';
 
-const Feed = () => {
+function Feed() {
   const [view, setView] = useState('tile');
+  /* eslint-disable max-len */
   const news = [{
     title: 'Staking guide',
     date: 'Apr 11, 2022',
@@ -45,6 +46,7 @@ const Feed = () => {
     hashtags: ['#Wallet', '#Blockchain'],
     type: 'liberland',
   }];
+  /* eslint-enable max-len */
 
   const handleChangeView = (type) => setView(type);
 
@@ -54,26 +56,37 @@ const Feed = () => {
         <h3 className={styles.feedHeaderText}>Recent updates</h3>
         <div className={styles.viewButtons}>
           {view === 'tile' ? <FeedIconActive /> : <FeedIcon onClick={() => handleChangeView('tile')} />}
-          {view === 'list' ? <ListIconActive /> : <ListIcon onClick={() => handleChangeView('list')} /> }
+          {view === 'list' ? <ListIconActive /> : <ListIcon onClick={() => handleChangeView('list')} />}
         </div>
       </div>
       <div className={styles.cardWrapper}>
         {
           news.map((newsItem) => (
-            <Card className={cx({ [styles.tile]: view === 'tile', [styles.list]: view === 'list' })}>
+            <Card
+              key={newsItem.title}
+              className={cx({ [styles.tile]: view === 'tile', [styles.list]: view === 'list' })}
+              title=""
+            >
               <h3 className={styles.cardTitle}>{newsItem.title}</h3>
               <p className={styles.cardInfo}>
                 {newsItem.date}
                 {' '}
                 •
                 {' '}
-                <span className={cx(styles.author, { [styles.green]: newsItem.type === 'president', [styles.yellow]: newsItem.type === 'liberland' })}>{newsItem.author}</span>
+                <span className={cx(styles.author, {
+                  [styles.green]: newsItem.type === 'president',
+                  [styles.yellow]: newsItem.type === 'liberland',
+                })}
+                >
+                  {newsItem.author}
+                </span>
               </p>
               <p className={cx(styles.cardInfo, styles.withMargin)}>{newsItem.text}</p>
               <div className={styles.cardFooter}>
                 <div>
                   {newsItem.hashtags.map((hashtag, index) => (
                     <Status
+                      key={hashtag}
                       className={cx({
                         [styles.greenStatus]: !index && newsItem.type === 'president',
                         [styles.yellowStatus]: !index && newsItem.type === 'liberland',
@@ -95,6 +108,6 @@ const Feed = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Feed;

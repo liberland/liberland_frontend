@@ -2,12 +2,12 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 
-const Notification = ({
+function Notification({
   mode,
   text,
   heading,
   onClose,
-}) => {
+}) {
   const classes = useMemo(
     () => [styles.notification, styles[mode]].join(' '),
     [mode],
@@ -19,7 +19,7 @@ const Notification = ({
       <p>{text}</p>
     </div>
   );
-};
+}
 
 Notification.propTypes = {
   mode: PropTypes.string,

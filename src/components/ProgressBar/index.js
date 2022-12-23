@@ -3,13 +3,16 @@ import React from 'react';
 import styles from './styles.module.scss';
 
 // eslint-disable-next-line react/prop-types
-const ProgressBar = ({ percent, maxValue = 0, currentValue = 0 }) => {
+function ProgressBar({ percent, maxValue = 0, currentValue = 0 }) {
   if (maxValue > 0 && currentValue >= 0) {
     const fillingPercent = currentValue === 0 ? 0 : ((currentValue * 100) / maxValue);
     return (
       <div className={styles.wrapperDraft}>
         <div className={styles.containerDraft}>
-          <div className={fillingPercent === 100 ? styles.progressDraftGreen : styles.progressDraft} style={{ width: `${fillingPercent}%` }} />
+          <div
+            className={fillingPercent === 100 ? styles.progressDraftGreen : styles.progressDraft}
+            style={{ width: `${fillingPercent}%` }}
+          />
         </div>
       </div>
     );
@@ -26,6 +29,6 @@ const ProgressBar = ({ percent, maxValue = 0, currentValue = 0 }) => {
       </p>
     </div>
   );
-};
+}
 
 export default ProgressBar;

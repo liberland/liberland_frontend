@@ -1,12 +1,12 @@
 import {
-  put, call, takeLatest, select, take, all,
+  put, call, takeLatest,
 } from 'redux-saga/effects';
 import { web3Enable } from '@polkadot/extension-dapp';
 import { blockchainActions } from '../actions';
 
 import { getCurrentBlockNumberRpc, getAllWalletsRpc } from '../../api/nodeRpcCall';
 
-const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
+const delay = (time) => new Promise((resolve) => { setTimeout(resolve, time); });
 
 // WORKERS
 
@@ -29,7 +29,7 @@ function* getAllWalletsWorker() {
       // Hack, is caused by web3Enable needing a fully loaded page to work,
       // but i am not sure how to do it other way without larger refactor
       while (retryCounter < 30 && extensions.length === 0) {
-        ++retryCounter;
+        retryCounter += 1;
         yield call(delay, 1000);
         extensions = yield call(web3Enable, 'Liberland dapp');
       }
@@ -49,10 +49,10 @@ function* getAllWalletsWorker() {
 }
 
 function* clearErrorsWorker(action) {
-  console.log('action')
-  console.log(action)
-  yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(action.payload))
-  yield put(blockchainActions.setError.success(''))
+  console.log('action');
+  console.log(action);
+  yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(action.payload));
+  yield put(blockchainActions.setError.success(''));
 }
 
 // WATCHERS
@@ -72,7 +72,7 @@ function* getAllWalletsWatcher() {
 }
 
 function* clearErrorsWatcher() {
-  yield takeLatest(blockchainActions.setErrorExistsAndUnacknowledgedByUser.call, clearErrorsWorker)
+  yield takeLatest(blockchainActions.setErrorExistsAndUnacknowledgedByUser.call, clearErrorsWorker);
 }
 
 export {

@@ -9,7 +9,7 @@ import router from '../../../router';
 
 import styles from './styles.module.scss';
 
-const HomeHeader = () => {
+function HomeHeader() {
   const name = useSelector(userSelectors.selectUserName);
   const lastName = useSelector(userSelectors.selectUserLastName);
   const titles = {
@@ -46,7 +46,14 @@ const HomeHeader = () => {
         </div>
         <div className={styles.avatarWrapper}>
           <div ref={trigger} className={styles.avatar}>
-            <Avatar name={`${name} ${lastName}`} round onClick={toggleDropdown} size="47px" fgColor="#F1C823" color="#FDF4E0" />
+            <Avatar
+              round
+              name={`${name} ${lastName}`}
+              onClick={toggleDropdown}
+              size="47px"
+              fgColor="#F1C823"
+              color="#FDF4E0"
+            />
           </div>
           {isOpen && (
             <div className={styles.dropdown} ref={dropdown}>
@@ -57,6 +64,6 @@ const HomeHeader = () => {
       </div>
     </div>
   );
-};
+}
 
 export default HomeHeader;

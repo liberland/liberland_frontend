@@ -7,10 +7,10 @@ import { useSelector } from 'react-redux';
 import {
   userSelectors, walletSelectors,
 } from '../../redux/selectors';
-import ErrorModal from "../ErrorModal";
+import ErrorModal from '../ErrorModal';
 
 // eslint-disable-next-line react/prop-types
-const Loader = ({ children }) => {
+function Loader({ children }) {
   const isSignInFetching = useSelector(userSelectors.selectIsSignInFetching);
   const isGettingWalletInfo = useSelector(walletSelectors.selectorGettingWalletInfo);
 
@@ -55,6 +55,6 @@ const Loader = ({ children }) => {
       </ErrorModal>
     </div>
   );
-};
+}
 
 export default Loader;

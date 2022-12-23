@@ -7,18 +7,17 @@ import { ReactComponent as PasswordEye } from '../../assets/icons/password-eye.s
 
 import styles from './styles.module.scss';
 
-const PasswordInput = ({
+function PasswordInput({
   register,
   name,
   placeholder,
   required = false,
   pattern = false,
   validate = false,
-  error = false,
   width = 350,
   withIcon = false,
   Icon,
-}) => {
+}) {
   const [show, setShow] = useState(false);
 
   const handleShow = () => setShow(!show);
@@ -36,14 +35,12 @@ const PasswordInput = ({
           validate,
           required: required && 'This field is required',
         })}
-        show={show}
-        error={error}
         width={width}
       />
       <div />
       <PasswordEye onClick={handleShow} className={styles.passwordEye} />
     </div>
   );
-};
+}
 
 export default PasswordInput;

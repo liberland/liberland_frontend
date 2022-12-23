@@ -1,14 +1,12 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
 import { democracySelectors } from '../../../redux/selectors';
-import styles from './styles.module.scss';
 
 import CurrentAssemble from './CurrentAssemble';
 import CandidateVoting from './CandidateVoting';
 
-const CongressionalAssemble = () => {
+function CongressionalAssemble() {
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [eligibleUnselectedCandidates, setEligibleUnselectedCandidates] = useState([]);
@@ -42,31 +40,33 @@ const CongressionalAssemble = () => {
     setDidChangeSelectedCandidates(true);
   };
 
-  const moveSelectedCandidate = (politician, direction) => {
-    const newSelectedCandidates = selectedCandidates.slice();
-    let selectedPoliticianArrayIndex = findPoliticianIndex(selectedCandidates, politician);
-    let swapPlaceWithIndex = direction==='up'? selectedPoliticianArrayIndex - 1 : selectedPoliticianArrayIndex + 1;
-    if(swapPlaceWithIndex < 0 || swapPlaceWithIndex > (newSelectedCandidates.length - 1)) {
-      return false
-    }
-    let swapWithPolitician = newSelectedCandidates[swapPlaceWithIndex];
-    newSelectedCandidates[swapPlaceWithIndex] = politician;
-    newSelectedCandidates[selectedPoliticianArrayIndex] = swapWithPolitician;
-    setSelectedCandidates(newSelectedCandidates);
-    setDidChangeSelectedCandidates(true);
-  };
-
   const findPoliticianIndex = (ar, el) => {
     let indexOfPolitician = false;
-    for (let i = 0; i < ar.length; i++) {
+    for (let i = 0; i < ar.length; i += 1) {
       if (ar[i].rawIdentity === el.rawIdentity) { indexOfPolitician = i; }
     }
     return indexOfPolitician;
   };
 
+  const moveSelectedCandidate = (politician, direction) => {
+    const newSelectedCandidates = selectedCandidates.slice();
+    const selectedPoliticianArrayIndex = findPoliticianIndex(selectedCandidates, politician);
+    const swapPlaceWithIndex = direction === 'up' ? selectedPoliticianArrayIndex - 1 : selectedPoliticianArrayIndex + 1;
+    if (swapPlaceWithIndex < 0 || swapPlaceWithIndex > (newSelectedCandidates.length - 1)) {
+      return false;
+    }
+    const swapWithPolitician = newSelectedCandidates[swapPlaceWithIndex];
+    newSelectedCandidates[swapPlaceWithIndex] = politician;
+    newSelectedCandidates[selectedPoliticianArrayIndex] = swapWithPolitician;
+    setSelectedCandidates(newSelectedCandidates);
+    setDidChangeSelectedCandidates(true);
+    return true;
+  };
+
   useEffect(() => {
     setSelectedCandidates(democracy?.democracy?.currentCandidateVotesByUser);
-    let filteredEligibleUnselectedCandidates = democracy?.democracy?.currentCongressMembers?.concat(democracy?.democracy?.candidates);
+    const currentCongressMembers = democracy?.democracy?.currentCongressMembers;
+    let filteredEligibleUnselectedCandidates = currentCongressMembers?.concat(democracy?.democracy?.candidates);
     filteredEligibleUnselectedCandidates = filteredEligibleUnselectedCandidates?.filter((candidate) => {
       let shouldKeep = true;
       democracy?.democracy?.currentCandidateVotesByUser?.forEach((votedForCandidate) => {
@@ -79,11 +79,10 @@ const CongressionalAssemble = () => {
     setEligibleUnselectedCandidates(filteredEligibleUnselectedCandidates);
   }, [democracy]);
 
-  const onSubmitVote = () => {};
   return (
     <div>
       <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />
-      <div style={{height:'15px'}}></div>
+      <div style={{ height: '15px' }} />
       <CandidateVoting
         eligibleUnselectedCandidates={eligibleUnselectedCandidates}
         selectedCandidates={selectedCandidates}
@@ -95,6 +94,6 @@ const CongressionalAssemble = () => {
 
     </div>
   );
-};
+}
 
 export default CongressionalAssemble;

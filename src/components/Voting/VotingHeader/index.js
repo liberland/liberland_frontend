@@ -20,7 +20,7 @@ const navigationList = [
     title: 'Referendum',
   },
 ];
-const VotingHeader = () => {
+function VotingHeader() {
   const history = useHistory();
   const dispatch = useDispatch();
 
@@ -39,6 +39,6 @@ const VotingHeader = () => {
       </Button>
     </>
   );
-};
+}
 
 export default VotingHeader;

@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import styles from './styles.module.scss';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
-import SearchBar from '../../SearchBar';
-import ValidatorCard from './ValidatorCard/ValidatorCard';
 import ValidatorList from './ValidatorList/ValidatorList';
-import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import Button from '../../Button/Button';
 import { setNewNominatorTargets } from '../../../api/nodeRpcCall';
 
-const Nominator = ({
-  testProp,
-}) => {
+function Nominator() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   const validators = useSelector(walletSelectors.selectorValidators);
@@ -35,8 +28,6 @@ const Nominator = ({
     console.log(currentlySelectedValidators);
     setSelectedValidatorsAsTargets([...currentlySelectedValidators]);
   };
-
-  const [searchTerm, setSearchTerm] = useState(null);
 
   const updateNominations = (newNominations) => {
     console.log('updating nominations');
@@ -81,14 +72,6 @@ const Nominator = ({
       </div>
     </div>
   );
-};
-
-Nominator.defaultProps = {
-  testProp: 'test',
-};
-
-Nominator.propTypes = {
-  testProp: PropTypes.string,
-};
+}
 
 export default Nominator;

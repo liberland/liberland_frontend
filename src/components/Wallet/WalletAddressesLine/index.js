@@ -11,7 +11,7 @@ import NotificationPortal from '../../NotificationPortal';
 import { walletActions } from '../../../redux/actions';
 import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
 
-import {ChoseStakeModal, SendLLDModal, SendLLMModal } from '../../Modals';
+import { ChoseStakeModal, SendLLDModal, SendLLMModal } from '../../Modals';
 
 import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
@@ -23,9 +23,9 @@ import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
 import router from '../../../router';
 import Tabs from '../../Tabs';
-import {dollarsToGrains, meritsToGrains} from '../../../utils/walletHelpers';
+import { dollarsToGrains } from '../../../utils/walletHelpers';
 
-const WalletAddressesLine = ({ walletAddress }) => {
+function WalletAddressesLine({ walletAddress }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenStake, setIsModalOpenStake] = useState(false);
   const [isModalOpenLLM, setIsModalOpenLLM] = useState(false);
@@ -179,7 +179,7 @@ const WalletAddressesLine = ({ walletAddress }) => {
       </div>
     </>
   );
-};
+}
 
 WalletAddressesLine.defaultProps = {
   walletAddress: '',
