@@ -15,7 +15,7 @@ const getBalanceByAddress = async (address) => {
     const api = await ApiPromise.create({ provider });
     // TODO get this in one transaction?
     const LLDData = await api.query.system.account(address);
-    const LLMData = await api.query.llm.llmBalance(address);
+    const LLMData = await api.query.assets.account(1, address);
     const LLMPolitiPool = await api.query.llm.llmPolitics(address);
     const LLMPolitiPoolData = LLMPolitiPool.toJSON();
     const LLDWalletData = LLDData.toJSON();
@@ -28,13 +28,13 @@ const getBalanceByAddress = async (address) => {
         amount: LLDWalletData.data.miscFrozen,
       },
       liquidMerits: {
-        amount: LLMWalletData,
+        amount: LLMWalletData.balance,
       },
       totalAmount: {
         amount: LLDWalletData.data.free,
       },
       meritsTotalAmount: {
-        amount: LLMWalletData,
+        amount: LLMWalletData.balance,
       },
     };
   } catch (e) {
