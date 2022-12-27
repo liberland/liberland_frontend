@@ -8,11 +8,8 @@ import styles from './styles.module.scss';
 import ReferendumItem from './Items/ReferendumItem';
 import { VoteOnReferendumModal } from '../../Modals';
 import { ProposeReferendumModal } from '../../Modals';
-import DispatchItem from './Items/DispatchItem';
-import {formatDemocracyMerits, formatMerits} from "../../../utils/walletHelpers";
-import {democracyActions, walletActions} from "../../../redux/actions";
+import {democracyActions} from "../../../redux/actions";
 import Button from "../../Button/Button";
-import axios from "axios";
 import {submitProposal} from "../../../api/nodeRpcCall";
 
 const Referendum = () => {
@@ -69,7 +66,6 @@ const Referendum = () => {
                   description={referendum.centralizedData.description ? referendum.centralizedData.description : 'No description'}
                   yayVotes={referendum.votedAye}
                   nayVotes={referendum.votedNay}
-                  //nayVotes={formatDemocracyMerits(parseInt(referendum.votedNay.words[0]))}
                   hash={referendum.imageHash}
                   alreadyVoted={
                     (referendum.allAye.reduce((previousValue, currentValue) => {

@@ -3,7 +3,6 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import axios from 'axios';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
-import { meritsToGrains } from '../utils/walletHelpers';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -77,7 +76,7 @@ const sendTransferLLM = async (payload, callback) => {
   console.log(callback);
   const { account_to, amount, account_from } = payload;
   const api = await ApiPromise.create({ provider });
-  const transferExtrinsic = api.tx.llm.sendLlm(account_to, (meritsToGrains(amount)));
+  const transferExtrinsic = api.tx.llm.sendLlm(account_to, (amount));
 
   const injector = await web3FromSource('polkadot-js');
   transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status }) => {
@@ -124,7 +123,7 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
 const politiPool = async (payload, callback) => {
   const { values: { amount }, walletAddress } = payload;
   const api = await ApiPromise.create({ provider });
-  const politiPoolExtrinsic = api.tx.llm.politicsLock(meritsToGrains(amount));
+  const politiPoolExtrinsic = api.tx.llm.politicsLock(amount);
 
   const injector = await web3FromSource('polkadot-js');
   politiPoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {

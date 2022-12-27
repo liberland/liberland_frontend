@@ -23,7 +23,7 @@ import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
 import router from '../../../router';
 import Tabs from '../../Tabs';
-import {dollarsToGrains, meritsToGrains} from '../../../utils/walletHelpers';
+import {dollarsToGrains} from '../../../utils/walletHelpers';
 
 const WalletAddressesLine = ({ walletAddress }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);

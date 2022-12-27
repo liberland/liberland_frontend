@@ -3,7 +3,7 @@ import { formatBalance } from '@polkadot/util';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
-import {formatPolkadotBalance, grainsInMeritDecimals} from "../../../../../utils/walletHelpers";
+import {formatPolkadotBalance} from "../../../../../utils/walletHelpers";
 
 const voteButtons = (buttonVoteCallback, referendumInfo) => (
   <div className={styles.buttonContainer}>
