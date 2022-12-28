@@ -408,12 +408,10 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
 const getProposalHash = async (values, legislationIndex) => {
   console.log('GETTING PROPOSAL HASH');
   const api = await ApiPromise.create({ provider });
-  // const extrinsicEncoded = api.tx.system.remark(values.legislationTier + values.legislationName + values.forumLink, values.legislationContent).method.toHex();
   const extrinsicEncoded = api.tx.liberlandLegislation.addLaw(
     parseInt(values.legislationTier), legislationIndex, values.legislationContent,
   ).method.toHex();
-  const storageFee = api.consts.democracy.preimageByteDeposit.mul(new BN((extrinsicEncoded.length - 2) / 2));
-  const hash = { encodedHash: blake2AsHex(extrinsicEncoded), extrinsicEncoded, storageFee };
+  const hash = { encodedHash: blake2AsHex(extrinsicEncoded), extrinsicEncoded };
   return hash;
 };
 
@@ -443,8 +441,9 @@ const submitProposal = async (walletAddress, values) => {
   });
   const legislationIndex = centralizedMetadata.data.id;
   const hash = await getProposalHash(values, legislationIndex);
-  const notePreimageTx = api.tx.democracy.notePreimage(hash.extrinsicEncoded);
-  const proposeTx = api.tx.democracy.propose(hash.encodedHash, hash.storageFee);
+  const notePreimageTx = api.tx.preimage.notePreimage(hash.extrinsicEncoded);
+  const minDeposit = api.consts.democracy.minimumDeposit;
+  const proposeTx = api.tx.democracy.propose({'Legacy': hash.encodedHash}, minDeposit);
   notePreimageTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
