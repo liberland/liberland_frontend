@@ -153,7 +153,7 @@ const getUserRoleRpc = async (walletAddress) => {
     }
     return { non_citizen: 'non_citizen' };
   } catch (e) {
-  // eslint-disable-next-line no-console
+    // eslint-disable-next-line no-console
     console.log('error', e);
   }
   return null;
@@ -186,12 +186,12 @@ const getResultByHashRpc = async (blockHash) => {
   // map between the extrinsics and events
   signedBlock.block.extrinsics.forEach(({ method: { method, section } }, index) => {
     allRecords
-    // filter the specific events based on the phase and then the
-    // index of our extrinsic in the block
+      // filter the specific events based on the phase and then the
+      // index of our extrinsic in the block
       .filter(({ phase }) => phase.isApplyExtrinsic
-            && phase.asApplyExtrinsic.eq(index))
-    // test the events against the specific types we are looking for
-    // eslint-disable-next-line consistent-return
+        && phase.asApplyExtrinsic.eq(index))
+      // test the events against the specific types we are looking for
+      // eslint-disable-next-line consistent-return
       .forEach(({ event }) => {
         if (api.events.system.ExtrinsicSuccess.is(event)) {
           // extract the data for this event
@@ -579,6 +579,28 @@ const voteForCongress = async (listofVotes, walletAddress) => {
   });
 };
 
+const getLegislation = async (tier) => {
+  try {
+    const api = await ApiPromise.create({ provider });
+
+    const legislationRaw = await api.query.liberlandLegislation.laws.entries(tier);
+    const legislationHuman = legislationRaw.map((x) => ({
+      key: x[0].toHuman(), value: x[1].toHuman()
+    }));
+
+    const legislation = legislationHuman.map(({ key, value }) => ({
+      tier: key[0],
+      index: key[1],
+      content: value,
+    }));
+    return legislation;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+    return {};
+  }
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -598,4 +620,5 @@ export {
   submitProposal,
   getCongressMembersWithIdentity,
   voteForCongress,
+  getLegislation,
 };

@@ -3,6 +3,7 @@ import * as authSagas from './auth';
 import * as walletSagas from './wallet';
 import * as blockchainSagas from './blockchain';
 import * as democracySagas from './democracy';
+import * as legislationSagas from './legislation';
 
 export default function* rootSaga() {
   yield all([
@@ -30,5 +31,8 @@ export default function* rootSaga() {
     democracySagas.getDemocracyWatcher(),
     democracySagas.secondProposalWatcher(),
     democracySagas.voteOnReferendumWatcher(),
+
+    // LEGISLATION
+    legislationSagas.getLegislationWatcher(),
   ]);
 }

@@ -4,9 +4,9 @@ import errorsReducer from './errors';
 import walletReducer from './wallet';
 import assemblyReducer from './assembly';
 import votingReducer from './voting';
-import lawReducer from './law';
+import legislationReducer from './legislation';
 import blockchainReducer from './blockchain';
-import democracyReducer from "./democracy";
+import democracyReducer from './democracy';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -14,7 +14,7 @@ const rootReducer = combineReducers({
   wallet: walletReducer,
   assembly: assemblyReducer,
   voting: votingReducer,
-  law: lawReducer,
+  legislation: legislationReducer,
   blockchain: blockchainReducer,
   democracy: democracyReducer,
 });

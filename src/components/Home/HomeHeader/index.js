@@ -20,7 +20,7 @@ const HomeHeader = () => {
     [router.documents.courtCases]: 'My documents',
     [router.documents.landOwnership]: 'My documents',
     [router.home.feed]: `Hi, ${name} ${lastName}!`,
-    [router.home.constitution]: 'Law',
+    [router.home.legislation]: 'Legislation',
     [router.home.voting]: 'Voting',
     [router.voting.congressionalAssemble]: 'Voting',
     [router.voting.referendum]: 'Voting',

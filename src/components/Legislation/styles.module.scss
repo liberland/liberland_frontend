@@ -1,0 +1,15 @@
+.legislationWrapper {
+  padding: 8px 30px;
+  min-height: 760px;
+}
+
+.navWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;;
+  margin-bottom: 40px;
+
+  & > div {
+    margin: 0;
+  }
+}

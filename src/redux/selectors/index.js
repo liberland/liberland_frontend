@@ -3,6 +3,7 @@ import * as userSelectors from './userSelectors';
 import * as walletSelectors from './walletSelectors';
 import * as blockchainSelectors from './blockchainSelectors';
 import * as democracySelectors from './democracy';
+import * as legislationSelectors from './legislation';
 
 export {
   errorsSelectors,
@@ -10,4 +11,5 @@ export {
   walletSelectors,
   blockchainSelectors,
   democracySelectors,
+  legislationSelectors,
 };

@@ -78,8 +78,8 @@ const HomeNavigation = () => {
       activeIcon: VotingIconActive,
     },
     {
-      route: router.home.constitution,
-      title: 'Law',
+      route: router.home.legislation,
+      title: 'Legislation',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
       activeIcon: ConstitutionIconActive,
