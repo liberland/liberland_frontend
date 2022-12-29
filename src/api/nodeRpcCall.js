@@ -499,7 +499,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     candidatesIdentityQueries.push([api.query.identity.identityOf, candidate[0]]);
   });
 
-  const candidateIdentities = await api.queryMulti([
+  const candidateIdentities = candidatesIdentityQueries.length == 0 ? [] : await api.queryMulti([
     ...candidatesIdentityQueries,
   ]);
 
@@ -524,7 +524,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     currentCandidateVotesByUserIdentityQueries.push([api.query.identity.identityOf, currentCandidateVote]);
   });
 
-  const currentCandidateVotesByUserIdentities = await api.queryMulti(
+  const currentCandidateVotesByUserIdentities = currentCandidateVotesByUserIdentityQueries.length == 0 ? [] : await api.queryMulti(
     [
       ...currentCandidateVotesByUserIdentityQueries,
     ],
