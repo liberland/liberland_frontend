@@ -7,7 +7,7 @@ import React, {
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 
-import { useNotofication } from '../../hooks/useNotificationPortal';
+import { useNotification } from '../../hooks/useNotificationPortal';
 import Notification from '../Notification';
 
 import styles from './styles.module.scss';
@@ -15,7 +15,7 @@ import styles from './styles.module.scss';
 const NotificationPortal = forwardRef(({ closingTime }, ref) => {
   const [notifications, setNotifications] = useState([]);
   const [removing, setRemoving] = useState('');
-  const { loaded, portalId } = useNotofication();
+  const { loaded, portalId } = useNotification();
 
   const removeNotifications = (id) => {
     setNotifications(notifications.filter((n) => n.id !== id));

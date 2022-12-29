@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export const useNotofication = () => {
+export const useNotification = () => {
   const [loaded, setLoaded] = useState(false);
   const [portalId] = useState(new Date().valueOf() * Math.random());
 
