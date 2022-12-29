@@ -296,15 +296,20 @@ const getDemocracyReferendums = async (address) => {
     const apideriveReferendumsActive = await api.derive.democracy.referendumsActive();
     const dispatch = await api.derive.democracy.dispatchQueue();
     const userVotes = await api.query.democracy.votingOf(address);
-    const proposalsDerive = await api.derive.democracy.proposals();
-    const proposalData = [];
-    proposals.toHuman().forEach((proposalItem) => {
-      proposalData.push({
-        index: proposalItem[0],
-        preimageHash: proposalItem[1],
-        proposer: proposalItem[2],
-      });
-    });
+    const proposalData = proposals.toHuman().map((proposalItem) => ({
+      index: proposalItem[0],
+      boundedCall: proposalItem[1],
+      proposer: proposalItem[2],
+    }));
+
+    const deposits = await api.query.democracy.depositOf.multi(proposalData.map(({ index }) => index));
+
+    const proposalsWithDeposits = proposalData.map((proposal, idx) => (
+      {
+        seconds: deposits[idx].toHuman()[0],
+        ...proposal,
+      }
+    ));
 
     // TODO REFACTOR
     let centralizedReferendumsData = [];
@@ -334,7 +339,7 @@ const getDemocracyReferendums = async (address) => {
     });
 
     const crossReferencedProposalsData = [];
-    proposalsDerive.forEach((proposal) => {
+    proposalsWithDeposits.forEach((proposal) => {
       const proposalIndex = proposal.index;
       let centralizedBackendItem = {};
       centralizedReferendumsData.forEach((centralizedData) => {
@@ -354,7 +359,6 @@ const getDemocracyReferendums = async (address) => {
       crossReferencedProposalsData,
       apideriveReferendumsActive,
       userVotes: userVotes.toHuman(),
-      proposalsDerive,
       centralizedReferendumsData,
     };
   } catch (e) {
@@ -367,7 +371,7 @@ const getDemocracyReferendums = async (address) => {
 const secondProposal = async (walletAddress, proposal) => {
   const api = await ApiPromise.create({ provider });
   const injector = await web3FromAddress(walletAddress);
-  const secondExtrinsic = api.tx.democracy.second(proposal, 2000);
+  const secondExtrinsic = api.tx.democracy.second(proposal);
   secondExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
@@ -443,7 +447,7 @@ const submitProposal = async (walletAddress, values) => {
   const hash = await getProposalHash(values, legislationIndex);
   const notePreimageTx = api.tx.preimage.notePreimage(hash.extrinsicEncoded);
   const minDeposit = api.consts.democracy.minimumDeposit;
-  const proposeTx = api.tx.democracy.propose({'Legacy': hash.encodedHash}, minDeposit);
+  const proposeTx = api.tx.democracy.propose({ 'Legacy': hash.encodedHash }, minDeposit);
   notePreimageTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
