@@ -100,7 +100,7 @@ const Referendum = () => {
         <Card title="Proposals">
           <div>
             {
-              democracy.democracy?.proposalsDerive.map((proposal) => {
+              democracy.democracy?.crossReferencedProposalsData.map((proposal) => {
                 return (<ProposalItem
                   name={proposal.centralizedData.hash ? proposal.centralizedData.hash : 'Onchain proposal'}
                   createdBy={proposal.centralizedData.username ? proposal.centralizedData.username : proposal.proposer}
@@ -108,7 +108,7 @@ const Referendum = () => {
                   externalLink={proposal.centralizedData.link ? proposal.centralizedData.link : 'https://forum.liberland.org/'}
                   description={proposal.centralizedData.description ? proposal.centralizedData.description : 'No description'}
                   userDidEndorse={(proposal.seconds.includes(userWalletAddress) || proposal.proposer === userWalletAddress)}
-                  hash={proposal.imageHash}
+                  boundedCall={proposal.boundedCall}
                   buttonEndorseCallback={handleModalOpenEndorse}
                   proposalIndex={proposal.index}
                 />)
