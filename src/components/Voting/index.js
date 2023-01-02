@@ -15,7 +15,7 @@ import styles from './styles.module.scss';
 import { votingSelectors } from '../../redux/selectors';
 import Referendum from './Referendum';
 
-const Voting = () => {
+function Voting() {
   const location = useLocation();
 
   const dispatch = useDispatch();
@@ -59,6 +59,6 @@ const Voting = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Voting;

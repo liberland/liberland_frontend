@@ -21,7 +21,7 @@ import { CheckboxInput, PasswordInput, TextInput } from '../../InputComponents';
 import router from '../../../router';
 import Button from '../../Button/Button';
 
-const SignIn = () => {
+function SignIn() {
   const {
     handleSubmit,
     register,
@@ -37,14 +37,16 @@ const SignIn = () => {
   const beginToken = queryString.indexOf('=');
   const endToken = queryString.indexOf('&');
   const ssoAccessTokenHash = queryString.substring(beginToken + 1, endToken);
-  if(!ssoAccessTokenHash) {
-    alert(`Due to stupid but temporary reasons, you should get here through this link, otherwise bugs will happen ${process.env.REACT_APP_SSO_API_IMPLICIT_LINK}`)
+  if (!ssoAccessTokenHash) {
+    alert(`Due to stupid but temporary reasons, you should get here through this link, otherwise bugs will happen ${process.env.REACT_APP_SSO_API_IMPLICIT_LINK}`);
   }
 
   useEffect(() => {
     if (apiError) {
-      setError('email',
-        apiError.data.error);
+      setError(
+        'email',
+        apiError.data.error,
+      );
     }
   }, [apiError, setError, dispatch]);
 
@@ -100,6 +102,6 @@ const SignIn = () => {
       </div>
     </div>
   );
-};
+}
 
 export default SignIn;

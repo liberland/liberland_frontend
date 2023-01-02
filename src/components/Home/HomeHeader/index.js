@@ -9,7 +9,7 @@ import router from '../../../router';
 
 import styles from './styles.module.scss';
 
-const HomeHeader = () => {
+function HomeHeader() {
   const name = useSelector(userSelectors.selectUserName);
   const lastName = useSelector(userSelectors.selectUserLastName);
   const titles = {
@@ -57,6 +57,6 @@ const HomeHeader = () => {
       </div>
     </div>
   );
-};
+}
 
 export default HomeHeader;

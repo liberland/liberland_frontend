@@ -4,7 +4,7 @@ import styles from './styles.module.scss';
 import eCardImage from '../../../../assets/images/e_card_image.svg';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 
-const ValidatorCard = ({
+function ValidatorCard({
   avatarImage,
   name,
   commission,
@@ -13,7 +13,7 @@ const ValidatorCard = ({
   toggleSelectedValidator,
   validatorAddress,
   selectingValidatorsDisabled,
-}) => {
+}) {
   const test = '';
 
   return (
@@ -32,7 +32,7 @@ const ValidatorCard = ({
 
     </div>
   );
-};
+}
 
 ValidatorCard.defaultProps = {
   avatarImage: '',

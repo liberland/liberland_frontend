@@ -4,12 +4,14 @@ import PropTypes from 'prop-types';
 
 import styles from './styles.module.scss';
 
-const Card = ({ title, children, className }) => (
-  <div className={cx(styles.card, className)}>
-    <h3 className={styles.cardTitle}>{title}</h3>
-    {children}
-  </div>
-);
+function Card({ title, children, className }) {
+  return (
+    <div className={cx(styles.card, className)}>
+      <h3 className={styles.cardTitle}>{title}</h3>
+      {children}
+    </div>
+  );
+}
 
 Card.propTypes = {
   title: PropTypes.string.isRequired,

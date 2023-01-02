@@ -5,9 +5,9 @@ import styles from './styles.module.scss';
 import { ReactComponent as SearchIcon } from '../../assets/icons/search.svg';
 import { TextInput } from '../InputComponents';
 
-const SearchBar = ({
+function SearchBar({
   setSearchTerm,
-}) => {
+}) {
   const {
     handleSubmit,
     register,
@@ -27,7 +27,7 @@ const SearchBar = ({
       </form>
     </div>
   );
-};
+}
 
 SearchBar.propTypes = {
   setSearchTerm: PropTypes.func.isRequired,

@@ -1,10 +1,10 @@
 import React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { blockchainSelectors } from '../../redux/selectors';
 import Button from '../Button/Button';
-import {blockchainActions} from "../../redux/actions";
+import { blockchainActions } from '../../redux/actions';
 
-const ErrorModal = ({ children }) => {
+function ErrorModal({ children }) {
   const errorExistsAndUnacknowledged = useSelector(blockchainSelectors.errorExistsAndUnacknowledgedByUser);
   const blockchainError = useSelector(blockchainSelectors.blockchainError);
   const dispatch = useDispatch();
@@ -38,25 +38,32 @@ const ErrorModal = ({ children }) => {
             flexDirection: 'column',
             borderRadius: 10,
             padding: '25px',
-            paddingBottom: '10px'
+            paddingBottom: '10px',
           }}
         >
           <p style={{
             fontWeight: '1.5rem',
-            marginBottom: '2.5rem'
-          }}>{blockchainError?.details}</p>
+            marginBottom: '2.5rem',
+          }}
+          >
+            {blockchainError?.details}
+          </p>
           <br />
-          <Button primary onClick={() => {
-            console.log('clicked button')
-            dispatch(blockchainActions.setErrorExistsAndUnacknowledgedByUser.call(false))
-          }
-          }>Ok</Button>
+          <Button
+            primary
+            onClick={() => {
+              console.log('clicked button');
+              dispatch(blockchainActions.setErrorExistsAndUnacknowledgedByUser.call(false));
+            }}
+          >
+            Ok
+          </Button>
         </div>
       </div>
     )}
       { children }
     </div>
   );
-};
+}
 
 export default ErrorModal;

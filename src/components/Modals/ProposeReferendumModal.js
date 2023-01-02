@@ -6,10 +6,10 @@ import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
-const ProposeReferendumModal = ({
-  handleSubmit, closeModal, register, onSubmitPropose
-}) => (
-  <>
+function ProposeReferendumModal({
+  handleSubmit, closeModal, register, onSubmitPropose,
+}) {
+  return (
     <form
       className={styles.getCitizenshipModal}
       onSubmit={handleSubmit(onSubmitPropose)}
@@ -20,28 +20,28 @@ const ProposeReferendumModal = ({
       <TextInput
         register={register}
         name="legislationTier"
-        placeholder='1'
+        placeholder="1"
       />
 
       <div className={styles.title}>Legislation Name</div>
       <TextInput
         register={register}
         name="legislationName"
-        placeholder='legislationName'
+        placeholder="legislationName"
       />
 
       <div className={styles.title}>Forum Link</div>
       <TextInput
         register={register}
         name="forumLink"
-        placeholder='forumLink'
+        placeholder="forumLink"
       />
 
       <div className={styles.title}>Legislation Content</div>
       <TextInput
         register={register}
         name="legislationContent"
-        placeholder='legislationContent'
+        placeholder="legislationContent"
       />
 
       <div className={styles.buttonWrapper}>
@@ -60,14 +60,15 @@ const ProposeReferendumModal = ({
         </Button>
       </div>
     </form>
-  </>
+  );
+}
 
-);
-
-const VoteOnReferendumModalWrapper = (props) => (
-  <ModalRoot>
-    <ProposeReferendumModal {...props} />
-  </ModalRoot>
-);
+function VoteOnReferendumModalWrapper(props) {
+  return (
+    <ModalRoot>
+      <ProposeReferendumModal {...props} />
+    </ModalRoot>
+  );
+}
 
 export default VoteOnReferendumModalWrapper;

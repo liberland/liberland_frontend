@@ -10,10 +10,10 @@ import Button from '../Button/Button';
 // STYLES
 import styles from './styles.module.scss';
 
-const SendLLMModal = ({
+function SendLLMModal({
   // eslint-disable-next-line react/prop-types
   onSubmit, closeModal, addressFrom, setSendAddress,
-}) => {
+}) {
   const {
     handleSubmit,
     register,
@@ -74,12 +74,14 @@ const SendLLMModal = ({
       </div>
     </form>
   );
-};
+}
 
-const SendLLMModalWrapper = (props) => (
-  <ModalRoot>
-    <SendLLMModal {...props} />
-  </ModalRoot>
-);
+function SendLLMModalWrapper(props) {
+  return (
+    <ModalRoot>
+      <SendLLMModal {...props} />
+    </ModalRoot>
+  );
+}
 
 export default SendLLMModalWrapper;

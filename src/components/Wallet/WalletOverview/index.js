@@ -21,9 +21,9 @@ import Card from '../../Card';
 import styles from './styles.module.scss';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 
-const WalletOverview = ({
+function WalletOverview({
   totalBalance, balances, liquidMerits,
-}) => {
+}) {
   const [isModalOpenStake, setIsModalOpenStake] = useState(false);
   const [modalShown, setModalShown] = useState(1);
   const { handleSubmit, register } = useForm();
@@ -146,7 +146,7 @@ const WalletOverview = ({
       )}
     </Card>
   );
-};
+}
 WalletOverview.defaultProps = {
   totalBalance: 0,
   balances: {},

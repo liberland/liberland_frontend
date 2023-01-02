@@ -3,9 +3,9 @@ import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
 
-const DispatchItem = ({
-  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, timeLeftUntilImplemented
-}) => {
+function DispatchItem({
+  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, timeLeftUntilImplemented,
+}) {
   const progressBarRatio = yayVotes > 0 ? `${((yayVotes) / (yayVotes + nayVotes)) * 100}%` : '0%';
   return (
     <Card
@@ -47,7 +47,9 @@ const DispatchItem = ({
             <a href={externalLink}>Read discussion</a>
           </div>
           <div>
-            <span className={styles.votingTimeText}>Implements in:</span> <b>{timeLeftUntilImplemented}</b>
+            <span className={styles.votingTimeText}>Implements in:</span>
+            {' '}
+            <b>{timeLeftUntilImplemented}</b>
           </div>
         </div>
         <div className={styles.description}>
@@ -56,5 +58,5 @@ const DispatchItem = ({
       </div>
     </Card>
   );
-};
+}
 export default DispatchItem;

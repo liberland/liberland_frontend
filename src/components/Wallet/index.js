@@ -17,7 +17,7 @@ import Nominator from './Nominator';
 import router from '../../router';
 import RoleHOC from '../../hocs/RoleHOC';
 
-const Wallet = () => {
+function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const balances = useSelector(walletSelectors.selectorBalances);
   const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
@@ -95,6 +95,6 @@ const Wallet = () => {
       )}
     </>
   );
-};
+}
 
 export default Wallet;

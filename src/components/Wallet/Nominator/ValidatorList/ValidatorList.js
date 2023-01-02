@@ -8,32 +8,33 @@ import arrowsUpDown from '../../../../assets/icons/up-and-down-arrows.svg';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 import { blockchainSelectors, walletSelectors } from '../../../../redux/selectors';
 
-const ValidatorList = ({
+function ValidatorList({
   validators,
   selectedValidatorsAsTargets,
   selectingValidatorsDisabled,
   toggleSelectedValidator,
-}) => (
-  <div>
-    <div className={styles.validatorsListHeader}>
-      <div className={styles.listItemName}>
-        Name &nbsp;
-        {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
+}) {
+  return (
+    <div>
+      <div className={styles.validatorsListHeader}>
+        <div className={styles.listItemName}>
+          Name &nbsp;
+          {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
+        </div>
+        <div className={styles.listItem}>
+          Commission &nbsp;
+          {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
+        </div>
+        <div className={styles.listItem}>
+          Allowed &nbsp;
+          {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
+        </div>
+        <div className={styles.listItem}>
+          Nominated by me &nbsp;
+          {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
+        </div>
       </div>
-      <div className={styles.listItem}>
-        Commission &nbsp;
-        {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
-      </div>
-      <div className={styles.listItem}>
-        Allowed &nbsp;
-        {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
-      </div>
-      <div className={styles.listItem}>
-        Nominated by me &nbsp;
-        {/* <img className={styles.arrowsUpDown} src={arrowsUpDown} alt="" /> */}
-      </div>
-    </div>
-    {
+      {
         validators.map((validator) => (
           <ValidatorCard
             name={validator.displayName ? validator.displayName : validator.address}
@@ -46,8 +47,9 @@ const ValidatorList = ({
           />
         ))
       }
-  </div>
-);
+    </div>
+  );
+}
 
 ValidatorList.defaultProps = {
   prop: 'test',

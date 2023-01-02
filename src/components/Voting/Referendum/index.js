@@ -1,21 +1,20 @@
 import React, { useMemo, useState } from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import {blockchainSelectors, democracySelectors, userSelectors} from '../../../redux/selectors';
+import axios from 'axios';
+import { blockchainSelectors, democracySelectors, userSelectors } from '../../../redux/selectors';
 import ProposalItem from './Items/ProposalItem';
 import Card from '../../Card';
 import styles from './styles.module.scss';
 import ReferendumItem from './Items/ReferendumItem';
-import { VoteOnReferendumModal } from '../../Modals';
-import { ProposeReferendumModal } from '../../Modals';
+import { VoteOnReferendumModal, ProposeReferendumModal } from '../../Modals';
 import DispatchItem from './Items/DispatchItem';
-import {formatDemocracyMerits, formatMerits} from "../../../utils/walletHelpers";
-import {democracyActions, walletActions} from "../../../redux/actions";
-import Button from "../../Button/Button";
-import axios from "axios";
-import {submitProposal} from "../../../api/nodeRpcCall";
+import { formatDemocracyMerits, formatMerits } from '../../../utils/walletHelpers';
+import { democracyActions, walletActions } from '../../../redux/actions';
+import Button from '../../Button/Button';
+import { submitProposal } from '../../../api/nodeRpcCall';
 
-const Referendum = () => {
+function Referendum() {
   const userId = useSelector(userSelectors.selectUserId);
   const [isModalOpenVote, setIsModalOpenVote] = useState(false);
   const [isModalOpenPropose, setIsModalOpenPropose] = useState(false);
@@ -42,51 +41,51 @@ const Referendum = () => {
     setModalShown(2);
   };
   const handleSubmitSecondForm = (values) => {
-    console.log(values)
+    console.log(values);
     dispatch(democracyActions.secondProposal.call(values));
-  }
+  };
   const handleSubmitVoteForm = (values) => {
-    dispatch(democracyActions.voteOnReferendum.call({...values, voteType: selectedVoteType}));
-  }
+    dispatch(democracyActions.voteOnReferendum.call({ ...values, voteType: selectedVoteType }));
+  };
   const handleSubmitPropose = (values) => {
-    submitProposal(userWalletAddress, values)
-  }
+    submitProposal(userWalletAddress, values);
+  };
   return (
     <div>
       <div className={styles.referendumsSection}>
         <div className={styles.proposeReferendumLine}>
-          <Button small primary onClick={() => { handleModalOpenPropose() }}>Propose</Button>
+          <Button small primary onClick={() => { handleModalOpenPropose(); }}>Propose</Button>
         </div>
         <Card title="Referendums" className={styles.referendumsCard}>
           <div>
             {
               democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
                 <ReferendumItem
-                  name= {referendum.centralizedData.hash ? referendum.centralizedData.hash : 'Onchain referendum'}
+                  name={referendum.centralizedData.hash ? referendum.centralizedData.hash : 'Onchain referendum'}
                   createdBy={referendum.centralizedData.username ? referendum.centralizedData.username : 'Unknown'}
                   currentEndorsement="??"
                   externalLink={referendum.centralizedData.link ? referendum.centralizedData.link : 'https://forum.liberland.org/'}
                   description={referendum.centralizedData.description ? referendum.centralizedData.description : 'No description'}
                   yayVotes={referendum.votedAye}
                   nayVotes={referendum.votedNay}
-                  //nayVotes={formatDemocracyMerits(parseInt(referendum.votedNay.words[0]))}
+                  // nayVotes={formatDemocracyMerits(parseInt(referendum.votedNay.words[0]))}
                   hash={referendum.imageHash}
                   alreadyVoted={
                     (referendum.allAye.reduce((previousValue, currentValue) => {
-                      if(currentValue.accountId == userWalletAddress){
+                      if (currentValue.accountId == userWalletAddress) {
                         return previousValue + 1;
                       }
-                      else return previousValue;
-                    }, 0)  > 0 ) ? 'Aye'
+                      return previousValue;
+                    }, 0) > 0) ? 'Aye'
                       : (referendum.allNay.reduce((previousValue, currentValue) => {
-                      if(currentValue.accountId == userWalletAddress){
-                        return previousValue + 1;
-                      }
-                      else return previousValue;
-                    }, 0)  > 0 ) ? 'Nay' : false
+                        if (currentValue.accountId == userWalletAddress) {
+                          return previousValue + 1;
+                        }
+                        return previousValue;
+                      }, 0) > 0) ? 'Nay' : false
                   }
-                  /*alreadyVoted={referendum.allAye.includes(userWalletAddress) ? 'Aye'
-                    : referendum.allNay.includes(userWalletAddress) ? 'Nay' : false}*/
+                  /* alreadyVoted={referendum.allAye.includes(userWalletAddress) ? 'Aye'
+                    : referendum.allNay.includes(userWalletAddress) ? 'Nay' : false} */
                   buttonVoteCallback={handleModalOpenVote}
                   votingTimeLeft="Query system or something for this"
                   referendumIndex={parseInt(referendum.index)}
@@ -100,8 +99,8 @@ const Referendum = () => {
         <Card title="Proposals">
           <div>
             {
-              democracy.democracy?.crossReferencedProposalsData.map((proposal) => {
-                return (<ProposalItem
+              democracy.democracy?.crossReferencedProposalsData.map((proposal) => (
+                <ProposalItem
                   name={proposal.centralizedData.hash ? proposal.centralizedData.hash : 'Onchain proposal'}
                   createdBy={proposal.centralizedData.username ? proposal.centralizedData.username : proposal.proposer}
                   currentEndorsement={`${proposal.seconds.length} Citizens supported`}
@@ -111,16 +110,15 @@ const Referendum = () => {
                   boundedCall={proposal.boundedCall}
                   buttonEndorseCallback={handleModalOpenEndorse}
                   proposalIndex={proposal.index}
-                />)
-              })
+                />
+              ))
             }
           </div>
         </Card>
       </div>
       <div className={styles.referendumsSection}>
         <Card title="Dispatches">
-          <div>
-          </div>
+          <div />
           {isModalOpenVote && (
             <VoteOnReferendumModal
               closeModal={handleModalOpenVote}
@@ -146,5 +144,5 @@ const Referendum = () => {
       </div>
     </div>
   );
-};
+}
 export default Referendum;
