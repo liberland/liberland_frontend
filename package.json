@@ -50,10 +50,6 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test:jest": "react-scripts test --watchAll=false --forceExit",
-    "eject": "react-scripts eject",
     "precommit": "lint-staged",
     "eslint": "node_modules/.bin/eslint src/",
     "webpack-dev-server": "webpack-dev-server",
