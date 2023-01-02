@@ -294,7 +294,6 @@ const getDemocracyReferendums = async (address) => {
     const ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
     const api = await ApiPromise.create({ provider });
     const proposals = await api.query.democracy.publicProps();
-    const referendumInfoOf = await api.query.democracy.referendumInfoOf(['0x767a116c005fc82e2604b07e70872c4e25ccd1d57a62c5cdabdf0d4e7ab76e29']);
     const apideriveReferendums = await api.derive.democracy.referendums();
     const apideriveReferendumsActive = await api.derive.democracy.referendumsActive();
     const dispatch = await api.derive.democracy.dispatchQueue();
