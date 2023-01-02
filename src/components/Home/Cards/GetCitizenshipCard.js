@@ -7,7 +7,7 @@ import styles from './styles.module.scss';
 import Button from '../../Button/Button';
 import { GetCitizenshipModal } from '../../Modals';
 
-const GetCitizenshipCard = () => {
+function GetCitizenshipCard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
@@ -26,6 +26,6 @@ const GetCitizenshipCard = () => {
       {isModalOpen && <GetCitizenshipModal onSubmit={handleSubmit} closeModal={handleModalOpen} />}
     </>
   );
-};
+}
 
 export default GetCitizenshipCard;

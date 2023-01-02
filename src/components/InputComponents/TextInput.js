@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import styles from './styles.module.scss';
 
-const TextInput = ({
+function TextInput({
   register,
   name,
   placeholder,
@@ -20,27 +20,29 @@ const TextInput = ({
   setSendAddress,
   value,
   disabled = false,
-}) => (
-  <div className={styles.inputWrapper}>
-    {Icon && <Icon className={styles.inputIcon} />}
-    <input
-      className={cx(styles.input, { [styles.withIcon]: Icon && withIcon })}
-      name={name}
-      placeholder={placeholder}
-      width={width}
-      error={error}
-      value={value}
-      onInput={(e) => setSendAddress(e.target.value)}
-      disabled={disabled}
-      {...register(name, {
-        validate,
-        pattern,
-        required: required && `${errorTitle} is required`,
-      })}
-    />
-    <div />
-  </div>
-);
+}) {
+  return (
+    <div className={styles.inputWrapper}>
+      {Icon && <Icon className={styles.inputIcon} />}
+      <input
+        className={cx(styles.input, { [styles.withIcon]: Icon && withIcon })}
+        name={name}
+        placeholder={placeholder}
+        width={width}
+        error={error}
+        value={value}
+        onInput={(e) => setSendAddress(e.target.value)}
+        disabled={disabled}
+        {...register(name, {
+          validate,
+          pattern,
+          required: required && `${errorTitle} is required`,
+        })}
+      />
+      <div />
+    </div>
+  );
+}
 
 TextInput.propTypes = {
   setSendAddress: PropTypes.func,

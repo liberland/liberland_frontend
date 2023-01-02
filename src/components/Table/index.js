@@ -4,7 +4,7 @@ import { useTable } from 'react-table';
 
 import styles from './styles.module.scss';
 
-const Table = ({ columns, data, rowProps }) => {
+function Table({ columns, data, rowProps }) {
   const tableInstance = useTable({ columns, data });
 
   const {
@@ -55,7 +55,7 @@ const Table = ({ columns, data, rowProps }) => {
       </tbody>
     </table>
   );
-};
+}
 
 Table.defaultProps = {
   columns: [],

@@ -48,21 +48,21 @@ const getBalanceByAddress = async (address) => {
 };
 
 const sendTransfer = async (payload, callback) => {
-  console.log('payload')
-  console.log(payload)
+  console.log('payload');
+  console.log(payload);
   const { account_to, amount, account_from } = payload;
   const api = await ApiPromise.create({ provider });
   const transferExtrinsic = api.tx.balances.transfer(account_to, (amount));
   const injector = await web3FromSource('polkadot-js');
   transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    console.log('dispatchError')
-    console.log(dispatchError)
-    console.log('events')
-    console.log(events)
-    events.forEach(event => {
-      console.log('event.method')
-      console.log(event.method)
-    })
+    console.log('dispatchError');
+    console.log(dispatchError);
+    console.log('events');
+    console.log(events);
+    events.forEach((event) => {
+      console.log('event.method');
+      console.log(event.method);
+    });
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
@@ -131,8 +131,8 @@ const politiPool = async (payload, callback) => {
 
   const injector = await web3FromSource('polkadot-js');
   politiPoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    console.log('dispatchError')
-    console.log(dispatchError?.toString())
+    console.log('dispatchError');
+    console.log(dispatchError?.toString());
 
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
@@ -414,9 +414,7 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
 const getProposalHash = async (values, legislationIndex) => {
   console.log('GETTING PROPOSAL HASH');
   const api = await ApiPromise.create({ provider });
-  const extrinsicEncoded = api.tx.liberlandLegislation.addLaw(
-    parseInt(values.legislationTier), legislationIndex, values.legislationContent,
-  ).method.toHex();
+  const extrinsicEncoded = api.tx.liberlandLegislation.addLaw(parseInt(values.legislationTier), legislationIndex, values.legislationContent).method.toHex();
   const hash = { encodedHash: blake2AsHex(extrinsicEncoded), extrinsicEncoded };
   return hash;
 };
@@ -449,7 +447,7 @@ const submitProposal = async (walletAddress, values) => {
   const hash = await getProposalHash(values, legislationIndex);
   const notePreimageTx = api.tx.preimage.notePreimage(hash.extrinsicEncoded);
   const minDeposit = api.consts.democracy.minimumDeposit;
-  const proposeTx = api.tx.democracy.propose({ 'Legacy': hash.encodedHash }, minDeposit);
+  const proposeTx = api.tx.democracy.propose({ Legacy: hash.encodedHash }, minDeposit);
   notePreimageTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
@@ -590,7 +588,7 @@ const getLegislation = async (tier) => {
 
     const legislationRaw = await api.query.liberlandLegislation.laws.entries(tier);
     const legislationHuman = legislationRaw.map((x) => ({
-      key: x[0].toHuman(), value: x[1].toHuman()
+      key: x[0].toHuman(), value: x[1].toHuman(),
     }));
 
     const legislation = legislationHuman.map(({ key, value }) => ({

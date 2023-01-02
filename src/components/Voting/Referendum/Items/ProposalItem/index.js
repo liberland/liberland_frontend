@@ -1,47 +1,41 @@
 import React, { useMemo } from 'react';
 import styles from './styles.module.scss';
-import Card from "../../../../Card";
+import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
 
 const endorseButton = (buttonEndorseCallback, userDidEndorse, referendumInfo) => (userDidEndorse ? (
-    <Button medium gray>
-      Already endorsed
-    </Button>
-  )
+  <Button medium gray>
+    Already endorsed
+  </Button>
+)
   : (
     <Button medium primary onClick={() => { buttonEndorseCallback(referendumInfo); }}>
       Endorse
     </Button>
   ));
 
-const LegacyHash = ({hash}) => {
-  return hash;
-}
+const LegacyHash = ({ hash }) => hash;
 
-const Inline = () => {
-  return "Inline call";
-}
+const Inline = () => 'Inline call';
 
-const Lookup = ({hash}) => {
-  return hash;
-}
+const Lookup = ({ hash }) => hash;
 
-const BoundedCall = ({call}) => {
-  if ("Legacy" in call) {
-    return <LegacyHash hash={call["Legacy"]["hash_"]} />;
-  } else if ("Inline" in call) {
-    console.warn("Inline call details:", call);
+function BoundedCall({ call }) {
+  if ('Legacy' in call) {
+    return <LegacyHash hash={call.Legacy.hash_} />;
+  } if ('Inline' in call) {
+    console.warn('Inline call details:', call);
     return <Inline />;
-  } else if ("Lookup" in call) {
-    return <Lookup hash={call["Lookup"]["hash_"]} />;
+  } if ('Lookup' in call) {
+    return <Lookup hash={call.Lookup.hash_} />;
   }
-  console.warn("Unknown call details:", call);
-  return "Unknown type of call.";
+  console.warn('Unknown call details:', call);
+  return 'Unknown type of call.';
 }
 
-const ProposalItem = ({
-  name, createdBy, currentEndorsement, externalLink, description, userDidEndorse, boundedCall, buttonEndorseCallback, proposalIndex
- }) => {
+function ProposalItem({
+  name, createdBy, currentEndorsement, externalLink, description, userDidEndorse, boundedCall, buttonEndorseCallback, proposalIndex,
+}) {
   return (
     <Card
       title={name}
@@ -76,6 +70,6 @@ const ProposalItem = ({
         </div>
       </div>
     </Card>
-  )
+  );
 }
 export default ProposalItem;

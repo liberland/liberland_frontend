@@ -4,13 +4,13 @@ import cx from 'classnames';
 
 import styles from './styles.module.scss';
 
-const CheckboxInput = ({
+function CheckboxInput({
   register,
   name,
   required = false,
   errorTitle,
   label,
-}) => {
+}) {
   const [isChecked, setIsChecked] = useState(false);
 
   const handleCheck = () => setIsChecked(!isChecked);
@@ -33,6 +33,6 @@ const CheckboxInput = ({
       <span className={styles.checkboxLabel}>{label}</span>
     </div>
   );
-};
+}
 
 export default CheckboxInput;

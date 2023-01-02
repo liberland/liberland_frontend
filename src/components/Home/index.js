@@ -14,34 +14,36 @@ import Legislation from '../Legislation';
 import AllTransactions from '../Wallet/AllTransactions';
 import styles from './styles.module.scss';
 
-const Home = () => (
-  <div>
-    <div className={styles.homeContentWrapper}>
-      <HomeNavigation />
-      <div className={styles.homeMain}>
-        <HomeHeader />
-        <Switch>
-          <Route path={router.home.profile} component={Profile} />
-          <Route path={router.home.feed} component={Feed} />
-          <Route path={router.home.documents} component={Documents} />
-          <Route path={router.home.wallet} component={Wallet} />
-          <Route path={router.home.voting} component={Voting} />
-          <Route path={router.home.legislation} component={Legislation} />
-          <Route path={router.wallet.allTransactions} component={AllTransactions} />
+function Home() {
+  return (
+    <div>
+      <div className={styles.homeContentWrapper}>
+        <HomeNavigation />
+        <div className={styles.homeMain}>
+          <HomeHeader />
+          <Switch>
+            <Route path={router.home.profile} component={Profile} />
+            <Route path={router.home.feed} component={Feed} />
+            <Route path={router.home.documents} component={Documents} />
+            <Route path={router.home.wallet} component={Wallet} />
+            <Route path={router.home.voting} component={Voting} />
+            <Route path={router.home.legislation} component={Legislation} />
+            <Route path={router.wallet.allTransactions} component={AllTransactions} />
 
-          <Route
-            exact
-            path={router.home.index}
-            render={() => (
-              <RoleHOC>
-                <Redirect to={router.home.feed} />
-              </RoleHOC>
-            )}
-          />
-        </Switch>
+            <Route
+              exact
+              path={router.home.index}
+              render={() => (
+                <RoleHOC>
+                  <Redirect to={router.home.feed} />
+                </RoleHOC>
+              )}
+            />
+          </Switch>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+}
 
 export default Home;

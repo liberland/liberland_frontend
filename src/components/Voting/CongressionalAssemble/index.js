@@ -8,7 +8,7 @@ import styles from './styles.module.scss';
 import CurrentAssemble from './CurrentAssemble';
 import CandidateVoting from './CandidateVoting';
 
-const CongressionalAssemble = () => {
+function CongressionalAssemble() {
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [eligibleUnselectedCandidates, setEligibleUnselectedCandidates] = useState([]);
@@ -44,12 +44,12 @@ const CongressionalAssemble = () => {
 
   const moveSelectedCandidate = (politician, direction) => {
     const newSelectedCandidates = selectedCandidates.slice();
-    let selectedPoliticianArrayIndex = findPoliticianIndex(selectedCandidates, politician);
-    let swapPlaceWithIndex = direction==='up'? selectedPoliticianArrayIndex - 1 : selectedPoliticianArrayIndex + 1;
-    if(swapPlaceWithIndex < 0 || swapPlaceWithIndex > (newSelectedCandidates.length - 1)) {
-      return false
+    const selectedPoliticianArrayIndex = findPoliticianIndex(selectedCandidates, politician);
+    const swapPlaceWithIndex = direction === 'up' ? selectedPoliticianArrayIndex - 1 : selectedPoliticianArrayIndex + 1;
+    if (swapPlaceWithIndex < 0 || swapPlaceWithIndex > (newSelectedCandidates.length - 1)) {
+      return false;
     }
-    let swapWithPolitician = newSelectedCandidates[swapPlaceWithIndex];
+    const swapWithPolitician = newSelectedCandidates[swapPlaceWithIndex];
     newSelectedCandidates[swapPlaceWithIndex] = politician;
     newSelectedCandidates[selectedPoliticianArrayIndex] = swapWithPolitician;
     setSelectedCandidates(newSelectedCandidates);
@@ -83,7 +83,7 @@ const CongressionalAssemble = () => {
   return (
     <div>
       <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />
-      <div style={{height:'15px'}}></div>
+      <div style={{ height: '15px' }} />
       <CandidateVoting
         eligibleUnselectedCandidates={eligibleUnselectedCandidates}
         selectedCandidates={selectedCandidates}
@@ -95,6 +95,6 @@ const CongressionalAssemble = () => {
 
     </div>
   );
-};
+}
 
 export default CongressionalAssemble;

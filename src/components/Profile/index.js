@@ -21,7 +21,7 @@ import startOfKyc from '../../assets/icons/startOfKyc.svg';
 import Card from '../Card';
 import { userRolesHelper } from '../../utils/userRolesHelper';
 
-const Profile = ({ className }) => {
+function Profile({ className }) {
   const userName = useSelector(userSelectors.selectUserName);
   const lastName = useSelector(userSelectors.selectUserLastName);
   const userBalance = useSelector(walletSelectors.selectorLiquidMeritsBalance);
@@ -129,7 +129,7 @@ const Profile = ({ className }) => {
       </div>
     </Card>
   );
-};
+}
 
 Profile.defaultProps = {
   className: '',

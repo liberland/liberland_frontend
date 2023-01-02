@@ -16,7 +16,7 @@ const paymentTypeIcons = {
   refund: <RefundIcon />,
 };
 
-/*const WalletTransactionHistory = ({ transactionHistory, textForBtn, bottomButtonOnclick }) => (
+/* const WalletTransactionHistory = ({ transactionHistory, textForBtn, bottomButtonOnclick }) => (
   <Card title="Transaction History" className={styles.cardWrapper}>
     <div className={styles.transactionHistoryCard}>
       <div className={styles.transactionHistoryCardHeader}>
@@ -80,13 +80,15 @@ const paymentTypeIcons = {
       </Button>
     </div>
   </Card>
-);*/
+); */
 
-const WalletTransactionHistory = ({ transactionHistory, textForBtn, bottomButtonOnclick }) => (
-  <Card title="Transaction History" className={styles.cardWrapper}>
-    <div className={styles.transactionHistoryCard}>
-      Refactor in progress
-    </div>
-  </Card>
-);
+function WalletTransactionHistory({ transactionHistory, textForBtn, bottomButtonOnclick }) {
+  return (
+    <Card title="Transaction History" className={styles.cardWrapper}>
+      <div className={styles.transactionHistoryCard}>
+        Refactor in progress
+      </div>
+    </Card>
+  );
+}
 export default WalletTransactionHistory;

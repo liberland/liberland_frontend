@@ -3,7 +3,7 @@ import { formatBalance } from '@polkadot/util';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
-import {formatPolkadotBalance, grainsInMeritDecimals} from "../../../../../utils/walletHelpers";
+import { formatPolkadotBalance, grainsInMeritDecimals } from '../../../../../utils/walletHelpers';
 
 const voteButtons = (buttonVoteCallback, referendumInfo) => (
   <div className={styles.buttonContainer}>
@@ -26,10 +26,9 @@ const alreadyVotedButton = (alreadyVoted) => (alreadyVoted === 'Aye'
     </Button>
   ));
 
-const ReferendumItem = ({
-  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, alreadyVoted, buttonVoteCallback, votingTimeLeft, referendumIndex
-}) => {
-
+function ReferendumItem({
+  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, alreadyVoted, buttonVoteCallback, votingTimeLeft, referendumIndex,
+}) {
   const progressBarRatio = yayVotes > 0 ? `${(formatPolkadotBalance(yayVotes)) / (formatPolkadotBalance(yayVotes) + formatPolkadotBalance(nayVotes)) * 100}%` : '0%';
   return (
     <Card
@@ -71,7 +70,9 @@ const ReferendumItem = ({
             <a href={externalLink}>Read discussion</a>
           </div>
           <div>
-            <span className={styles.votingTimeText}>Voting ends in:</span> <b>{votingTimeLeft}</b>
+            <span className={styles.votingTimeText}>Voting ends in:</span>
+            {' '}
+            <b>{votingTimeLeft}</b>
           </div>
         </div>
         <div className={styles.description}>
@@ -88,5 +89,5 @@ const ReferendumItem = ({
       </div>
     </Card>
   );
-};
+}
 export default ReferendumItem;

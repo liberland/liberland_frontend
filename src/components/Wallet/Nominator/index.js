@@ -11,9 +11,9 @@ import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import Button from '../../Button/Button';
 import { setNewNominatorTargets } from '../../../api/nodeRpcCall';
 
-const Nominator = ({
+function Nominator({
   testProp,
-}) => {
+}) {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   const validators = useSelector(walletSelectors.selectorValidators);
@@ -81,7 +81,7 @@ const Nominator = ({
       </div>
     </div>
   );
-};
+}
 
 Nominator.defaultProps = {
   testProp: 'test',

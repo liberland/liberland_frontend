@@ -32,9 +32,9 @@ import { userSelectors, walletSelectors } from '../../../redux/selectors';
 
 // UTILS
 import prettyNumber from '../../../utils/prettyNumber';
-import {formatMerits} from "../../../utils/walletHelpers";
+import { formatMerits } from '../../../utils/walletHelpers';
 
-const HomeNavigation = () => {
+function HomeNavigation() {
   const location = useLocation();
   const roles = useSelector(userSelectors.selectUserRole);
   const name = useSelector(userSelectors.selectUserName);
@@ -117,6 +117,6 @@ const HomeNavigation = () => {
     </div>
 
   );
-};
+}
 
 export default HomeNavigation;

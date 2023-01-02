@@ -9,29 +9,31 @@ import router from '../../router';
 
 import styles from './styles.module.scss';
 
-const Legislation = () => (
-  <div className={styles.legislationWrapper}>
-    <div className={styles.navWrapper}>
-      <LegislationHeader />
-    </div>
+function Legislation() {
+  return (
+    <div className={styles.legislationWrapper}>
+      <div className={styles.navWrapper}>
+        <LegislationHeader />
+      </div>
 
-    <div>
-      <Switch>
-        <Route
-          exact
-          path={router.legislation.view}
-          component={LegislationView}
-        />
-        <Route
-          exact
-          path={router.home.legislation}
-          render={() => (
-            <Redirect to={`${router.home.legislation}/0`} />
-          )}
-        />
-      </Switch>
+      <div>
+        <Switch>
+          <Route
+            exact
+            path={router.legislation.view}
+            component={LegislationView}
+          />
+          <Route
+            exact
+            path={router.home.legislation}
+            render={() => (
+              <Redirect to={`${router.home.legislation}/0`} />
+            )}
+          />
+        </Switch>
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
 export default Legislation;

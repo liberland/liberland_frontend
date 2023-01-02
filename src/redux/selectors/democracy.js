@@ -15,4 +15,4 @@ const selectorGettingDemocracyInfo = createSelector(
 export {
   selectorDemocracyInfo,
   selectorGettingDemocracyInfo,
-}
+};

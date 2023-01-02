@@ -11,7 +11,7 @@ import { ReactComponent as StarIcon } from '../../assets/icons/star.svg';
 import { ReactComponent as DotsIcon } from '../../assets/icons/three-dots.svg';
 import styles from './styles.module.scss';
 
-const Feed = () => {
+function Feed() {
   const [view, setView] = useState('tile');
   const news = [{
     title: 'Staking guide',
@@ -95,6 +95,6 @@ const Feed = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Feed;

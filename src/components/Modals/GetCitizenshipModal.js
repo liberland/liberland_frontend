@@ -10,10 +10,10 @@ import Button from '../Button/Button';
 // STYLES
 import styles from './styles.module.scss';
 
-const GetCitizenshipModal = ({
+function GetCitizenshipModal({
   // eslint-disable-next-line react/prop-types
   onSubmit, closeModal,
-}) => {
+}) {
   const {
     handleSubmit,
     register,
@@ -68,12 +68,14 @@ const GetCitizenshipModal = ({
       </div>
     </form>
   );
-};
+}
 
-const GetCitizenshipModalWrapper = (props) => (
-  <ModalRoot>
-    <GetCitizenshipModal {...props} />
-  </ModalRoot>
-);
+function GetCitizenshipModalWrapper(props) {
+  return (
+    <ModalRoot>
+      <GetCitizenshipModal {...props} />
+    </ModalRoot>
+  );
+}
 
 export default GetCitizenshipModalWrapper;

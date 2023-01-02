@@ -49,10 +49,10 @@ function* getAllWalletsWorker() {
 }
 
 function* clearErrorsWorker(action) {
-  console.log('action')
-  console.log(action)
-  yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(action.payload))
-  yield put(blockchainActions.setError.success(''))
+  console.log('action');
+  console.log(action);
+  yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(action.payload));
+  yield put(blockchainActions.setError.success(''));
 }
 
 // WATCHERS
@@ -72,7 +72,7 @@ function* getAllWalletsWatcher() {
 }
 
 function* clearErrorsWatcher() {
-  yield takeLatest(blockchainActions.setErrorExistsAndUnacknowledgedByUser.call, clearErrorsWorker)
+  yield takeLatest(blockchainActions.setErrorExistsAndUnacknowledgedByUser.call, clearErrorsWorker);
 }
 
 export {

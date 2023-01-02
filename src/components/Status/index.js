@@ -4,16 +4,21 @@ import cx from 'classnames';
 
 import styles from './styles.module.scss';
 
-const Status = ({
+function Status({
   status, completed, declined, pending, className,
-}) => (
-  <span
-    className={cx(styles.status, className,
-      { [styles.completed]: completed, [styles.declined]: declined, [styles.pending]: pending })}
-  >
-    {status}
-  </span>
-);
+}) {
+  return (
+    <span
+      className={cx(
+        styles.status,
+        className,
+        { [styles.completed]: completed, [styles.declined]: declined, [styles.pending]: pending },
+      )}
+    >
+      {status}
+    </span>
+  );
+}
 
 Status.defaultProps = {
   completed: false,

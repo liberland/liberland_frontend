@@ -34,6 +34,8 @@ const navigationList = [
   },
 ];
 
-const LegislationHeader = () => <Tabs navigationList={navigationList} />;
+function LegislationHeader() {
+  return <Tabs navigationList={navigationList} />;
+}
 
 export default LegislationHeader;

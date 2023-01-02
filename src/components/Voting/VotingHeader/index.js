@@ -13,10 +13,10 @@ const navigationList = [
   },
 ];
 
-const VotingHeader = () => {
+function VotingHeader() {
   return (
     <Tabs navigationList={navigationList} />
   );
-};
+}
 
 export default VotingHeader;
