@@ -19,10 +19,6 @@ const votingReducer = handleActions(
       ...state,
       isVotingRequested: true,
     }),
-    [votingActions.getListOfCandidacy.success]: (state, action) => ({
-      ...state,
-      candidateList: action.payload,
-    }),
     [votingActions.addCandidacyToElectoralSheet.success]: (state, action) => ({
       ...state,
       electoralSheet: action.payload,
@@ -46,7 +42,6 @@ const votingReducer = handleActions(
     [combineActions(
       votingActions.addMyCandidacy.failure,
       votingActions.addMyCandidacy.success,
-      votingActions.getListOfCandidacy.failure,
       votingActions.sendElectoralSheet.success,
       votingActions.sendElectoralSheet.failure,
     )]: (state) => ({
