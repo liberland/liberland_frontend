@@ -66,7 +66,7 @@ function* sendTransferWorker(action) {
       yield put(blockchainActions.setError.success(status.error));
     }
     // TODO use block explorer for this
-    if (result === 'success') {
+    if (status.result === 'success') {
       yield put(walletActions.sendTransfer.success());
       yield put(walletActions.getWallet.call());
     } else {
@@ -91,8 +91,8 @@ function* sendTransferLLMWorker(action) {
     }
     // TODO use block explorer for this
     console.log('result');
-    console.log(result);
-    if (result === 'success') {
+    console.log(status.result);
+    if (status.result === 'success') {
       yield put(walletActions.sendTransferLLM.success());
       yield put(walletActions.getWallet.call());
     } else {
