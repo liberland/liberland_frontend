@@ -21,7 +21,6 @@ function Nominator({
   const [selectedValidatorsAsTargets, setSelectedValidatorsAsTargets] = useState(nominatorTargets);
   const isMaxNumValidatorsSelected = (selectedValidators) => selectedValidators.length > 15;
   const toggleSelectedValidator = (validatorAddress) => {
-    console.log('toggling selected validator');
     let currentlySelectedValidators = selectedValidatorsAsTargets;
     if (currentlySelectedValidators.includes(validatorAddress)) {
       currentlySelectedValidators = currentlySelectedValidators.filter((e) => e !== validatorAddress);
@@ -31,16 +30,12 @@ function Nominator({
     } else {
       currentlySelectedValidators.push(validatorAddress);
     }
-    console.log('currentlySelectedValidators');
-    console.log(currentlySelectedValidators);
     setSelectedValidatorsAsTargets([...currentlySelectedValidators]);
   };
 
   const [searchTerm, setSearchTerm] = useState(null);
 
   const updateNominations = (newNominations) => {
-    console.log('updating nominations');
-    console.log(newNominations);
     setNewNominatorTargets(newNominations, userWalletAddress);
   };
 

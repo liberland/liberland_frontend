@@ -24,11 +24,13 @@ function BoundedCall({ call }) {
   if ('Legacy' in call) {
     return <LegacyHash hash={call.Legacy.hash_} />;
   } if ('Inline' in call) {
+    // eslint-disable-next-line no-console
     console.warn('Inline call details:', call);
     return <Inline />;
   } if ('Lookup' in call) {
     return <Lookup hash={call.Lookup.hash_} />;
   }
+  // eslint-disable-next-line no-console
   console.warn('Unknown call details:', call);
   return 'Unknown type of call.';
 }

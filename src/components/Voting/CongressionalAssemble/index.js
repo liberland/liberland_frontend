@@ -13,8 +13,6 @@ function CongressionalAssemble() {
   const [selectedCandidates, setSelectedCandidates] = useState([]);
   const [eligibleUnselectedCandidates, setEligibleUnselectedCandidates] = useState([]);
   const [didChangeSelectedCandidates, setDidChangeSelectedCandidates] = useState(false);
-  console.log('democracycngrs ass');
-  console.log(democracy);
 
   const selectCandidate = (politician) => {
     const newSelectedCandidates = selectedCandidates;
