@@ -1,9 +1,7 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
 import { democracySelectors } from '../../../redux/selectors';
-import styles from './styles.module.scss';
 
 import CurrentAssemble from './CurrentAssemble';
 import CandidateVoting from './CandidateVoting';
@@ -79,7 +77,6 @@ function CongressionalAssemble() {
     setEligibleUnselectedCandidates(filteredEligibleUnselectedCandidates);
   }, [democracy]);
 
-  const onSubmitVote = () => {};
   return (
     <div>
       <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />

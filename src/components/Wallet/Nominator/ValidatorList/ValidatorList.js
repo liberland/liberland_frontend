@@ -1,12 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
 import styles from './styles.module.scss';
 import ValidatorCard from '../ValidatorCard/ValidatorCard';
-import { ReactComponent as ArrowBlueUpIcon } from '../../../../assets/icons/arrow-blue-up.svg';
-import arrowsUpDown from '../../../../assets/icons/up-and-down-arrows.svg';
-import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
-import { blockchainSelectors, walletSelectors } from '../../../../redux/selectors';
 
 function ValidatorList({
   validators,

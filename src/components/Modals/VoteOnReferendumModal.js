@@ -10,7 +10,7 @@ const renderVoteButton = (vote) => (vote === 'Aye' ? <Button green medium type="
 
 function VoteOnReferendumModal({
   // eslint-disable-next-line react/prop-types,max-len
-  closeModal, handleSubmit, register, modalShown, setModalShown, onSubmitSecond, onSubmitVote, voteType, referendumInfo,
+  closeModal, handleSubmit, register, modalShown, onSubmitSecond, onSubmitVote, voteType, referendumInfo,
 }) {
   return (
     <>

@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */ // remove after refactoring history back in
 import React from 'react';
 import Button from '../../Button/Button';
 import Card from '../../Card';

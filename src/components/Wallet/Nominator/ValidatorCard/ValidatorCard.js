@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-import PropTypes, { bool } from 'prop-types';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
-import eCardImage from '../../../../assets/images/e_card_image.svg';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 
 function ValidatorCard({
-  avatarImage,
   name,
   commission,
   blocked,
@@ -14,8 +12,6 @@ function ValidatorCard({
   validatorAddress,
   selectingValidatorsDisabled,
 }) {
-  const test = '';
-
   return (
     <div className={styles.nominatorCardWrapper}>
       <div className={styles.avatarProfile}>

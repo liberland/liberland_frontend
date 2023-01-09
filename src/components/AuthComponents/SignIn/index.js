@@ -13,11 +13,9 @@ import { errorsSelectors, blockchainSelectors } from '../../../redux/selectors';
 import styles from './styles.module.scss';
 // COMPONENTS
 import { ReactComponent as Divider } from '../../../assets/icons/divider.svg';
-import { ReactComponent as Lock } from '../../../assets/icons/lock.svg';
-import { ReactComponent as MailAt } from '../../../assets/icons/mail-at.svg';
 import { ReactComponent as Wallet } from '../../../assets/icons/wallet.svg';
 import Header from '../Header';
-import { CheckboxInput, PasswordInput, TextInput } from '../../InputComponents';
+import { CheckboxInput } from '../../InputComponents';
 import router from '../../../router';
 import Button from '../../Button/Button';
 
@@ -25,7 +23,6 @@ function SignIn() {
   const {
     handleSubmit,
     register,
-    formState: { errors },
     setError,
   } = useForm();
   const dispatch = useDispatch();

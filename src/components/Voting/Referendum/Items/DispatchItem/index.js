@@ -1,7 +1,6 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
-import Button from '../../../../Button/Button';
 
 function DispatchItem({
   name, createdBy, externalLink, description, yayVotes, nayVotes, hash, timeLeftUntilImplemented,

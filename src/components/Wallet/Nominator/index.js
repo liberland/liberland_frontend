@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
-import SearchBar from '../../SearchBar';
-import ValidatorCard from './ValidatorCard/ValidatorCard';
 import ValidatorList from './ValidatorList/ValidatorList';
-import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import Button from '../../Button/Button';
 import { setNewNominatorTargets } from '../../../api/nodeRpcCall';
 
-function Nominator({
-  testProp,
-}) {
+function Nominator() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   const validators = useSelector(walletSelectors.selectorValidators);
@@ -35,8 +29,6 @@ function Nominator({
     console.log(currentlySelectedValidators);
     setSelectedValidatorsAsTargets([...currentlySelectedValidators]);
   };
-
-  const [searchTerm, setSearchTerm] = useState(null);
 
   const updateNominations = (newNominations) => {
     console.log('updating nominations');
