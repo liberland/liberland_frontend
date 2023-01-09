@@ -9,6 +9,7 @@ export const {
   setCurrentPageNumber,
   getValidators,
   getNominatorTargets,
+  setNominatorTargets,
 } = createActions({
   GET_WALLET: {
     call: undefined,
@@ -56,6 +57,11 @@ export const {
     failure: undefined,
   },
   GET_NOMINATOR_TARGETS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SET_NOMINATOR_TARGETS: {
     call: undefined,
     success: undefined,
     failure: undefined,

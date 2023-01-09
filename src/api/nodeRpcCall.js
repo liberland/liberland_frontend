@@ -262,7 +262,8 @@ const getNominatorTargets = async (walletId) => {
   return nominations?.toHuman()?.targets ? nominations?.toHuman()?.targets : [];
 };
 
-const setNewNominatorTargets = async (newNominatorTargets, walletAddress) => {
+const setNominatorTargets = async (payload, callback) => {
+  const { newNominatorTargets, walletAddress } = payload;
   const injector = await web3FromAddress(walletAddress);
   const api = await getApi();
   const setNewTargets = await api.tx.staking.nominate(newNominatorTargets);
@@ -270,7 +271,7 @@ const setNewNominatorTargets = async (newNominatorTargets, walletAddress) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
-      callback(null, 'done');
+      callback(null, status.asInBlock.toString());
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
@@ -596,7 +597,7 @@ export {
   getResultByHashRpc,
   getValidators,
   getNominatorTargets,
-  setNewNominatorTargets,
+  setNominatorTargets,
   getDemocracyReferendums,
   secondProposal,
   voteOnReferendum,

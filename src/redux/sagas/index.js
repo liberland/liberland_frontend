@@ -26,6 +26,7 @@ export default function* rootSaga() {
     walletSagas.stakeToLiberlandWatcher(),
     walletSagas.getValidatorsWatcher(),
     walletSagas.getNominatorTargetsWatcher(),
+    walletSagas.setNominatorTargetsWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),

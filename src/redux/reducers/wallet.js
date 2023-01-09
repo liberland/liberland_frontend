@@ -40,6 +40,7 @@ const walletReducer = handleActions(
       walletActions.sendTransferLLM.call,
       walletActions.getValidators.call,
       walletActions.getNominatorTargets.call,
+      walletActions.setNominatorTargets.call,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
@@ -74,6 +75,8 @@ const walletReducer = handleActions(
       walletActions.getValidators.success,
       walletActions.getValidators.failure,
       walletActions.getNominatorTargets.failure,
+      walletActions.setNominatorTargets.success,
+      walletActions.setNominatorTargets.failure,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,
