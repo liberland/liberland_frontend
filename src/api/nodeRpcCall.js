@@ -14,6 +14,17 @@ const getApi = () => {
   return __apiCache;
 };
 
+const crossReference = (blockchainData, centralizedData) => (
+  blockchainData.map((item) => (
+    {
+      ...item,
+      centralizedData: centralizedData.find((cItem) => (
+        parseInt(cItem.chainIndex) == parseInt(item.index.toHuman())
+      )),
+    }
+  ))
+);
+
 // TODO: Need refactor when blockchain node update
 const getBalanceByAddress = async (address) => {
   try {
@@ -314,31 +325,15 @@ const getDemocracyReferendums = async (address) => {
       centralizedReferendumsData = result.data;
     });
 
-    const crossReferencedReferendumsData = [];
-    apideriveReferendums.forEach((referendum) => {
-      const referendumIndex = referendum.index.toHuman();
-      let centralizedBackendItem = {};
-      centralizedReferendumsData.forEach((centralizedData) => {
-        if (parseInt(centralizedData.chainIndex) === parseInt(referendumIndex)) {
-          centralizedBackendItem = centralizedData;
-        }
-      });
-      referendum.centralizedData = centralizedBackendItem;
-      crossReferencedReferendumsData.push(referendum);
-    });
+    const crossReferencedReferendumsData = crossReference(
+      apideriveReferendums,
+      centralizedReferendumsData,
+    );
 
-    const crossReferencedProposalsData = [];
-    proposalsWithDeposits.forEach((proposal) => {
-      const proposalIndex = proposal.index;
-      let centralizedBackendItem = {};
-      centralizedReferendumsData.forEach((centralizedData) => {
-        if (parseInt(centralizedData.chainIndex) === parseInt(proposalIndex)) {
-          centralizedBackendItem = centralizedData;
-        }
-      });
-      proposal.centralizedData = centralizedBackendItem;
-      crossReferencedProposalsData.push(proposal);
-    });
+    const crossReferencedProposalsData = crossReference(
+      proposalsWithDeposits,
+      centralizedReferendumsData,
+    );
 
     // const referendums = api.query.democracy.publicProps();
     return {
@@ -468,6 +463,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
   ]);
 
   const crossReferencedCouncilMemberIdentities = [];
+
   councilMemberIdentities.forEach((councilMemberIdentity) => {
     const toHumanIdentity = councilMemberIdentity.toHuman();
     // address use councilmembers.shift as its same ordering as councilmemberidentities
