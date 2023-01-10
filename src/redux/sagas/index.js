@@ -31,6 +31,7 @@ export default function* rootSaga() {
     democracySagas.getDemocracyWatcher(),
     democracySagas.secondProposalWatcher(),
     democracySagas.voteOnReferendumWatcher(),
+    democracySagas.proposeWatcher(),
 
     // LEGISLATION
     legislationSagas.getLegislationWatcher(),

@@ -17,6 +17,9 @@ const democracyReducer = handleActions(
   {
     [combineActions(
       democracyActions.getDemocracy.call,
+      democracyActions.propose.call,
+      democracyActions.secondProposal.call,
+      democracyActions.voteOnReferendum.call,
     )]: (state) => ({
       ...state,
       gettingDemocracyInfo: true,
