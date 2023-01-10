@@ -8,7 +8,12 @@ import { meritsToGrains } from '../utils/walletHelpers';
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
-const getApi = () => ApiPromise.create({ provider, noInitWarn: true})
+let __apiCache = null;
+const getApi = () => {
+  if(__apiCache === null)
+    __apiCache = ApiPromise.create({ provider });
+  return __apiCache;
+};
 
 // TODO: Need refactor when blockchain node update
 const getBalanceByAddress = async (address) => {
