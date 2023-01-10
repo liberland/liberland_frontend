@@ -85,7 +85,7 @@ const NotificationPortal = forwardRef(({ closingTime }, ref) => {
       ))}
     </div>,
     document.getElementById(portalId),
-  ) : <></>;
+  ) : null;
 });
 
 NotificationPortal.propTypes = {

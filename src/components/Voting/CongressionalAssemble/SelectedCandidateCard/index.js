@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 import libertarianTorch from '../../../../assets/images/libertariantorch.png';
@@ -32,5 +33,13 @@ function SelectedCandidateCard({
     </div>
   );
 }
+
+SelectedCandidateCard.propTypes = {
+  politician: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+  }).isRequired,
+  unselectCandidate: PropTypes.func.isRequired,
+  moveSelectedCandidate: PropTypes.func.isRequired,
+};
 
 export default SelectedCandidateCard;

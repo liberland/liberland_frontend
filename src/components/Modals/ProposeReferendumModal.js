@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';
@@ -62,6 +63,13 @@ function ProposeReferendumModal({
     </form>
   );
 }
+
+ProposeReferendumModal.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
+  closeModal: PropTypes.func.isRequired,
+  register: PropTypes.func.isRequired,
+  onSubmitPropose: PropTypes.func.isRequired,
+};
 
 function VoteOnReferendumModalWrapper(props) {
   return (

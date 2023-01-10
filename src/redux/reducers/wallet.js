@@ -5,7 +5,7 @@ const initialState = {
   walletInfo: {
     balances: {
       liberstake: {
-        amount: 0,
+        amount: '0x0',
       },
       polkastake: {
         amount: 0,
@@ -14,7 +14,7 @@ const initialState = {
         amount: 0,
       },
       totalAmount: {
-        amount: 0,
+        amount: '0x0',
       },
       meritsTotalAmount: {
         amount: 0,

@@ -14,12 +14,15 @@ function Card({ title, children, className }) {
 }
 
 Card.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   children: PropTypes.node,
   className: PropTypes.string,
 };
+
 Card.defaultProps = {
+  title: null,
   children: [],
   className: '',
 };
+
 export default Card;

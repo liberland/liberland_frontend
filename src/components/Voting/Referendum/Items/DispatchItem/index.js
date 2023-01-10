@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 
@@ -58,4 +59,16 @@ function DispatchItem({
     </Card>
   );
 }
+
+DispatchItem.propTypes = {
+  name: PropTypes.string.isRequired,
+  createdBy: PropTypes.string.isRequired,
+  externalLink: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  yayVotes: PropTypes.number.isRequired,
+  nayVotes: PropTypes.number.isRequired,
+  hash: PropTypes.string.isRequired,
+  timeLeftUntilImplemented: PropTypes.string.isRequired,
+};
+
 export default DispatchItem;

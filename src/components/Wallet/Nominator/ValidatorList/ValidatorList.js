@@ -47,11 +47,13 @@ function ValidatorList({
   );
 }
 
-ValidatorList.defaultProps = {
-  prop: 'test',
-};
 ValidatorList.propTypes = {
-  validators: PropTypes.arrayOf(PropTypes.object).isRequired,
+  validators: PropTypes.arrayOf(PropTypes.shape({
+    displayName: PropTypes.string,
+    address: PropTypes.string.isRequired,
+    commission: PropTypes.string.isRequired,
+    blocked: PropTypes.bool.isRequired,
+  })).isRequired,
   selectedValidatorsAsTargets: PropTypes.arrayOf(PropTypes.string).isRequired,
   selectingValidatorsDisabled: PropTypes.bool.isRequired,
   toggleSelectedValidator: PropTypes.func.isRequired,
