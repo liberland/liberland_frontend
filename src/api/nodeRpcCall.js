@@ -18,10 +18,15 @@ const getApi = () => {
 const getBalanceByAddress = async (address) => {
   try {
     const api = await getApi();
-    // TODO get this in one transaction?
-    const LLDData = await api.query.system.account(address);
-    const LLMData = await api.query.assets.account(1, address);
-    const LLMPolitiPool = await api.query.llm.llmPolitics(address);
+    const [
+      LLDData,
+      LLMData,
+      LLMPolitiPool,
+    ] = await api.queryMulti([
+      [api.query.system.account, address],
+      [api.query.assets.account, [1, address]],
+      [api.query.llm.llmPolitics, address],
+    ]);
     const LLMPolitiPoolData = LLMPolitiPool.toJSON();
     const LLDWalletData = LLDData.toJSON();
     const LLMWalletData = LLMData.toJSON();
@@ -283,10 +288,22 @@ const getDemocracyReferendums = async (address) => {
   try {
     const ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
     const api = await getApi();
-    const proposals = await api.query.democracy.publicProps();
-    const apideriveReferendums = await api.derive.democracy.referendums();
-    const apideriveReferendumsActive = await api.derive.democracy.referendumsActive();
-    const userVotes = await api.query.democracy.votingOf(address);
+    const [
+      proposals,
+      userVotes,
+    ] = await api.queryMulti([
+      api.query.democracy.publicProps,
+      [api.query.democracy.votingOf, address],
+    ]);
+
+    const [
+      apideriveReferendums,
+      apideriveReferendumsActive,
+    ] = await Promise.all([ // api.queryMulti doesnt work with api.derive :(
+      api.derive.democracy.referendums(),
+      api.derive.democracy.referendumsActive(),
+    ]);
+
     const proposalData = proposals.toHuman().map((proposalItem) => ({
       index: proposalItem[0],
       boundedCall: proposalItem[1],
@@ -456,7 +473,15 @@ const submitProposal = async (walletAddress, values) => {
 
 const getCongressMembersWithIdentity = async (walletAddress) => {
   const api = await getApi();
-  let councilMembers = await api.query.council.members();
+  let [
+    councilMembers,
+    candidates,
+    currentCandidateVotesByUserQuery,
+  ] = await api.queryMulti([
+    api.query.council.members,
+    api.query.elections.candidates,
+    [api.query.elections.voting, walletAddress],
+  ]);
   councilMembers = councilMembers.toHuman();
   const councilMembersIdentityQueries = [];
   councilMembers.forEach((councilMember) => {
@@ -480,7 +505,6 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     });
   });
 
-  let candidates = await api.query.elections.candidates();
   candidates = candidates.toHuman();
   // TODO isolate in function ?
   const candidatesIdentityQueries = [];
@@ -505,7 +529,6 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     });
   });
 
-  const currentCandidateVotesByUserQuery = await api.query.elections.voting(walletAddress);
   const currentCandidateVotesByUser = currentCandidateVotesByUserQuery.toHuman().votes;
 
   const currentCandidateVotesByUserIdentityQueries = [];
