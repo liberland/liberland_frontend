@@ -13,8 +13,7 @@ import {
 // import api from '../../api';
 
 import { blockchainActions, walletActions } from '../actions';
-import { blockchainSelectors, walletSelectors } from '../selectors';
-import { setErrorExistsAndUnacknowledgedByUser } from '../actions/blockchain';
+import { blockchainSelectors } from '../selectors';
 
 // WORKERS
 

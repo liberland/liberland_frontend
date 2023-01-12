@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styles from './styles.module.scss';
 import PoliticanCard from '../PoliticianCard/Index';
 import Card from '../../../Card';

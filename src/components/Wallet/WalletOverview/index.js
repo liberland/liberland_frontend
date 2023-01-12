@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
-import cx from 'classnames';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { walletActions } from '../../../redux/actions';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
-
-import prettyNumber from '../../../utils/prettyNumber';
 
 import { ReactComponent as ArrowYellowUpIcon } from '../../../assets/icons/arrow-yellow-up.svg';
 import { ReactComponent as ArrowYellowDownIcon } from '../../../assets/icons/arrow-yellow-down.svg';
@@ -92,25 +89,22 @@ function WalletOverview({
     <Card className={styles.overviewWrapper} title="Overview">
       <div className={styles.overViewCard}>
         {
-          overviewInfo.map((cardInfo) => {
-            const isDiffPositive = cardInfo.diff > 0;
-
-            return (
-              <div
-                className={styles.cardInfo}
-                key={cardInfo.title}
-                onClick={() => handleModalOpenStake(cardInfo.title)}
-              >
-                {/* <div className={styles.cardInfoIcon}>{cardInfo.getIcon()}</div> */}
-                <div className={styles.cardInfoAmountWrapper}>
-                  <p className={styles.cardInfoAmount}>
-                    {cardInfo.amount}
-                    <span>
-                      {' '}
-                      {cardInfo.currency}
-                    </span>
-                  </p>
-                  {/* <p className={cx(styles.cardInfoAmountDiff, {
+          overviewInfo.map((cardInfo) => (
+            <div
+              className={styles.cardInfo}
+              key={cardInfo.title}
+              onClick={() => handleModalOpenStake(cardInfo.title)}
+            >
+              {/* <div className={styles.cardInfoIcon}>{cardInfo.getIcon()}</div> */}
+              <div className={styles.cardInfoAmountWrapper}>
+                <p className={styles.cardInfoAmount}>
+                  {cardInfo.amount}
+                  <span>
+                    {' '}
+                    {cardInfo.currency}
+                  </span>
+                </p>
+                {/* <p className={cx(styles.cardInfoAmountDiff, {
                     [styles.cardInfoAmountDiffRed]: !isDiffPositive,
                     [styles.cardInfoAmountDiffGreen]: isDiffPositive,
                   })}
@@ -126,11 +120,10 @@ function WalletOverview({
                       </svg>
                     )}
                   </p> */}
-                </div>
-                <p className={styles.cardInfoTitle}>{cardInfo.title}</p>
               </div>
-            );
-          })
+              <p className={styles.cardInfoTitle}>{cardInfo.title}</p>
+            </div>
+          ))
         }
       </div>
       {isModalOpenStake && (

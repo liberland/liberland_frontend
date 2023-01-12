@@ -20,7 +20,16 @@
     "no-console": 0,
     "max-len": ["error", 120],
     "no-alert": 0,
-    "radix": ["error", "as-needed"]
+    "radix": ["error", "as-needed"],
+    "no-unused-vars": [
+      "error",
+      {
+        "vars": "all",
+        "args": "after-used",
+        "argsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ]
   },
   "env": {
     "browser": true,

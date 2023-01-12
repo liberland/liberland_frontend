@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, call, cps, select,
+  put, takeLatest, call, select,
 } from 'redux-saga/effects';
 
 import {

@@ -1,9 +1,8 @@
-import React, { useMemo } from 'react';
-import { formatBalance } from '@polkadot/util';
+import React from 'react';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
-import { formatPolkadotBalance } from "../../../../../utils/walletHelpers";
+import { formatPolkadotBalance } from '../../../../../utils/walletHelpers';
 
 const voteButtons = (buttonVoteCallback, referendumInfo) => (
   <div className={styles.buttonContainer}>
