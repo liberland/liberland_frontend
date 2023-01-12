@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import styles from './styles.module.scss';
 import Card from '../../../Card';
@@ -41,7 +41,7 @@ function CandidateVoting({
             </div>
             <div className={styles.currentlySelectedCandidatesList}>
               {
-                selectedCandidates?.map((currentCandidateVoteByUser) => <SelectedCandidateCard politician={currentCandidateVoteByUser} unselectCandidate={unselectCandidate} moveSelectedCandidate={moveSelectedCandidate} />)
+                selectedCandidates?.map((currentCandidateVoteByUser) => <SelectedCandidateCard key={currentCandidateVoteByUser.name} politician={currentCandidateVoteByUser} unselectCandidate={unselectCandidate} moveSelectedCandidate={moveSelectedCandidate} />)
               }
             </div>
           </div>

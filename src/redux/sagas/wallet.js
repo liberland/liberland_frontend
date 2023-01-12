@@ -13,8 +13,7 @@ import {
 // import api from '../../api';
 
 import { blockchainActions, walletActions } from '../actions';
-import { blockchainSelectors, walletSelectors } from '../selectors';
-import { setErrorExistsAndUnacknowledgedByUser } from '../actions/blockchain';
+import { blockchainSelectors } from '../selectors';
 
 // WORKERS
 
@@ -59,7 +58,7 @@ function* sendTransferWorker(action) {
       yield put(blockchainActions.setError.success(status.error));
     }
     // TODO use block explorer for this
-    if (result === 'success') {
+    if (status.result === 'success') {
       yield put(walletActions.sendTransfer.success());
       yield put(walletActions.getWallet.call());
     } else {
@@ -80,6 +79,7 @@ function* sendTransferLLMWorker(action) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(status.error));
     }
+
     if (result === 'success') {
       yield put(walletActions.sendTransferLLM.success());
       yield put(walletActions.getWallet.call());

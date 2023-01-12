@@ -5,14 +5,9 @@ import styles from './styles.module.scss';
 import { ReactComponent as SearchIcon } from '../../assets/icons/search.svg';
 import { TextInput } from '../InputComponents';
 
-function SearchBar({
-  setSearchTerm,
-}) {
+function SearchBar() {
   const {
-    handleSubmit,
     register,
-    formState: { errors },
-    setError,
   } = useForm();
   return (
     <div className={styles.searchBarWrapper}>

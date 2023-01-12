@@ -1,21 +1,17 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
-import { blockchainSelectors, democracySelectors, userSelectors } from '../../../redux/selectors';
+import { blockchainSelectors, democracySelectors } from '../../../redux/selectors';
 import ProposalItem from './Items/ProposalItem';
 import Card from '../../Card';
 import styles from './styles.module.scss';
 import ReferendumItem from './Items/ReferendumItem';
 import { VoteOnReferendumModal, ProposeReferendumModal } from '../../Modals';
-import DispatchItem from './Items/DispatchItem';
-import { formatDemocracyMerits, formatMerits } from '../../../utils/walletHelpers';
-import { democracyActions, walletActions } from '../../../redux/actions';
+import { democracyActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import { submitProposal } from '../../../api/nodeRpcCall';
 
 function Referendum() {
-  const userId = useSelector(userSelectors.selectUserId);
   const [isModalOpenVote, setIsModalOpenVote] = useState(false);
   const [isModalOpenPropose, setIsModalOpenPropose] = useState(false);
   const [modalShown, setModalShown] = useState(1);
@@ -60,6 +56,7 @@ function Referendum() {
             {
               democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
                 <ReferendumItem
+                  key={referendum.index}
                   name={referendum.centralizedData.hash ? referendum.centralizedData.hash : 'Onchain referendum'}
                   createdBy={referendum.centralizedData.username ? referendum.centralizedData.username : 'Unknown'}
                   currentEndorsement="??"
@@ -100,6 +97,7 @@ function Referendum() {
             {
               democracy.democracy?.crossReferencedProposalsData.map((proposal) => (
                 <ProposalItem
+                  key={proposal.index}
                   name={proposal.centralizedData.hash ? proposal.centralizedData.hash : 'Onchain proposal'}
                   createdBy={proposal.centralizedData.username ? proposal.centralizedData.username : proposal.proposer}
                   currentEndorsement={`${proposal.seconds.length} Citizens supported`}

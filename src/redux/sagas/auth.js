@@ -26,16 +26,6 @@ const fakeUser = {
   origin: 'schizo brain',
   role: { non_citizen: 'non_citizen' },
 };
-const fakeUserMissingData = {
-  about: 'fake about',
-  gender: 'soviet Bukhanka ambulance truck',
-  languages: ['fakelang'],
-  lastName: 'fakelastname',
-  name: 'fakename',
-  occupation: 'fakeoccupation',
-  origin: 'fake schizo brain',
-  role: { non_citizen: 'non_citizen' },
-};
 function* signInWorker(action) {
   try {
     const { credentials, history, ssoAccessTokenHash } = action.payload;

@@ -1,5 +1,4 @@
 import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
-import { BN, BN_ZERO } from '@polkadot/util';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import axios from 'axios';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
@@ -287,7 +286,6 @@ const getDemocracyReferendums = async (address) => {
     const proposals = await api.query.democracy.publicProps();
     const apideriveReferendums = await api.derive.democracy.referendums();
     const apideriveReferendumsActive = await api.derive.democracy.referendumsActive();
-    const dispatch = await api.derive.democracy.dispatchQueue();
     const userVotes = await api.query.democracy.votingOf(address);
     const proposalData = proposals.toHuman().map((proposalItem) => ({
       index: proposalItem[0],

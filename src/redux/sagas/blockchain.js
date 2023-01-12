@@ -1,5 +1,5 @@
 import {
-  put, call, takeLatest, select, take, all,
+  put, call, takeLatest,
 } from 'redux-saga/effects';
 import { web3Enable } from '@polkadot/extension-dapp';
 import { blockchainActions } from '../actions';
