@@ -57,6 +57,7 @@ function Referendum() {
             {
               democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
                 <ReferendumItem
+                  key={referendum.index}
                   name={referendum.centralizedData.hash ? referendum.centralizedData.hash : 'Onchain referendum'}
                   createdBy={referendum.centralizedData.username ? referendum.centralizedData.username : 'Unknown'}
                   currentEndorsement="??"
@@ -97,6 +98,7 @@ function Referendum() {
             {
               democracy.democracy?.crossReferencedProposalsData.map((proposal) => (
                 <ProposalItem
+                  key={proposal.index}
                   name={proposal.centralizedData.hash ? proposal.centralizedData.hash : 'Onchain proposal'}
                   createdBy={proposal.centralizedData.username ? proposal.centralizedData.username : proposal.proposer}
                   currentEndorsement={`${proposal.seconds.length} Citizens supported`}

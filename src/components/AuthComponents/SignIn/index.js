@@ -77,7 +77,7 @@ function SignIn() {
           <div className={styles.inputWrapper}>
             <select className={styles.addressSwitcher} {...register('wallet_address')} required>
               { allAccounts.map((el) => (
-                <option value={el.address}>{el.address}</option>
+                <option key={el.address} value={el.address}>{el.address}</option>
               ))}
             </select>
           </div>

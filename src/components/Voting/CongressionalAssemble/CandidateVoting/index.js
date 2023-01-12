@@ -41,7 +41,7 @@ function CandidateVoting({
             </div>
             <div className={styles.currentlySelectedCandidatesList}>
               {
-                selectedCandidates?.map((currentCandidateVoteByUser) => <SelectedCandidateCard politician={currentCandidateVoteByUser} unselectCandidate={unselectCandidate} moveSelectedCandidate={moveSelectedCandidate} />)
+                selectedCandidates?.map((currentCandidateVoteByUser) => <SelectedCandidateCard key={currentCandidateVoteByUser.name} politician={currentCandidateVoteByUser} unselectCandidate={unselectCandidate} moveSelectedCandidate={moveSelectedCandidate} />)
               }
             </div>
           </div>
