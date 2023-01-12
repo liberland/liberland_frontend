@@ -37,6 +37,7 @@ function ValidatorList({
       {
         validators.map((validator) => (
           <ValidatorCard
+            key={validator.address}
             name={validator.displayName ? validator.displayName : validator.address}
             validatorAddress={validator.address}
             commission={validator.commission}
