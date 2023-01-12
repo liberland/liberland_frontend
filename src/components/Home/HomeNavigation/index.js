@@ -8,6 +8,7 @@ import NavigationLink from '../NavigationLink';
 import RoleHOC from '../../../hocs/RoleHOC';
 import router from '../../../router';
 import Header from '../../AuthComponents/Header';
+import GetCitizenshipCard from '../Cards/GetCitizenshipCard';
 
 // ASSETS
 import styles from './styles.module.scss';
