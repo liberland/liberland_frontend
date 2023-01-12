@@ -37,7 +37,6 @@ function Referendum() {
     setModalShown(2);
   };
   const handleSubmitSecondForm = (values) => {
-    console.log(values);
     dispatch(democracyActions.secondProposal.call(values));
   };
   const handleSubmitVoteForm = (values) => {

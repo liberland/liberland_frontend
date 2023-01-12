@@ -23,8 +23,6 @@ function* getDemocracyWorker() {
     const directDemocracyInfo = yield call(getDemocracyReferendums, walletAddress);
     const currentCongressMembers = yield call(getCongressMembersWithIdentity, walletAddress);
     const democracy = { ...directDemocracyInfo, ...currentCongressMembers };
-    console.log('democracy');
-    console.log(democracy);
     yield put(democracyActions.getDemocracy.success({ democracy }));
   } catch (e) {
     yield put(democracyActions.getDemocracy.failure(e));
@@ -36,12 +34,10 @@ function* secondProposalWorker(action) {
     const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     // TODO use user wallet address once chain is in good state
     // walletAddress = '5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo';
-    console.log('action.payload');
-    console.log(action.payload);
     yield call(secondProposal, ...[walletAddress, action.payload.proposalIndex]);
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Error in secondProposalWorker', e);
+    console.error('Error in secondProposalWorker', e);
     return 'failure';
   }
 }
@@ -54,7 +50,7 @@ function* voteReferendumWorker(action) {
     yield call(voteOnReferendum, ...[walletAddress, action.payload.referendumIndex, action.payload.voteType]);
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Error in voteonreferendum', e);
+    console.error('Error in voteonreferendum', e);
     return 'failure';
   }
 }

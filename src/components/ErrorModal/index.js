@@ -52,7 +52,6 @@ function ErrorModal({ children }) {
           <Button
             primary
             onClick={() => {
-              console.log('clicked button');
               dispatch(blockchainActions.setErrorExistsAndUnacknowledgedByUser.call(false));
             }}
           >

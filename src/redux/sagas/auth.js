@@ -31,8 +31,6 @@ function* signInWorker(action) {
     const { credentials, history, ssoAccessTokenHash } = action.payload;
     api.defaults.headers.common['X-token'] = ssoAccessTokenHash;
     const { data: user } = yield call(api.get, '/users/me');
-    console.log('user');
-    console.log(user);
     user.ssoAccessTokenHash = ssoAccessTokenHash;
     yield put(blockchainActions.setUserWallet.success(credentials.wallet_address));
     yield sessionStorage.setItem('userWalletAddress', credentials.wallet_address);
@@ -56,15 +54,10 @@ function* signInWorker(action) {
 
 function* verifySessionWorker() {
   try {
-    console.log('verify sesh');
     const walletAddress = yield sessionStorage.getItem('userWalletAddress');
     const ssoAccessTokenHash = yield sessionStorage.getItem('ssoAccessTokenHash');
-    console.log('ssoAccessTokenHash');
-    console.log(ssoAccessTokenHash);
     api.defaults.headers.common['X-token'] = ssoAccessTokenHash;
     const { data: user } = yield call(api.get, '/users/me');
-    console.log('user');
-    console.log(user);
     let extensions = yield web3Enable('Liberland dapp');
     yield put(blockchainActions.setUserWallet.success(walletAddress));
     if (extensions.length === 0) {
@@ -84,7 +77,6 @@ function* verifySessionWorker() {
     yield put(authActions.verifySession.success(comboUser));
     yield put(blockchainActions.getCurrentBlockNumber.call());
   } catch (error) {
-    console.log('verify sesh fail');
     yield put(authActions.verifySession.failure());
   }
 }

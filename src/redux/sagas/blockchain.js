@@ -16,7 +16,7 @@ function* getCurrentBlockNumberWorker() {
     yield put(blockchainActions.getCurrentBlockNumber.success(bockNumber));
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log(e);
+    console.error(e);
     yield put(blockchainActions.getCurrentBlockNumber.failure(e));
   }
 }
@@ -43,14 +43,12 @@ function* getAllWalletsWorker() {
     }
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log(e);
+    console.error(e);
     yield put(blockchainActions.getAllWallets.failure(e));
   }
 }
 
 function* clearErrorsWorker(action) {
-  console.log('action');
-  console.log(action);
   yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(action.payload));
   yield put(blockchainActions.setError.success(''));
 }
@@ -66,7 +64,7 @@ function* getAllWalletsWatcher() {
     yield takeLatest(blockchainActions.getAllWallets.call, getAllWalletsWorker);
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log(e);
+    console.error(e);
     yield put(blockchainActions.updateDateElections.failure(e));
   }
 }
