@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList/ValidatorList';
 import Button from '../../Button/Button';
-import { setNewNominatorTargets } from '../../../api/nodeRpcCall';
+import { walletActions } from '../../../redux/actions';
 
 function Nominator() {
-  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const dispatch = useDispatch();
 
   const validators = useSelector(walletSelectors.selectorValidators);
   const nominatorTargets = useSelector(walletSelectors.selectorNominatorTargets);
@@ -27,8 +28,8 @@ function Nominator() {
     setSelectedValidatorsAsTargets([...currentlySelectedValidators]);
   };
 
-  const updateNominations = (newNominations) => {
-    setNewNominatorTargets(newNominations, userWalletAddress);
+  const updateNominations = (newNominatorTargets) => {
+    dispatch(walletActions.setNominatorTargets.call({ newNominatorTargets, walletAddress }));
   };
 
   const goToAdvancedPage = () => {

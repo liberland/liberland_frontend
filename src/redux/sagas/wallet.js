@@ -9,6 +9,7 @@ import {
   stakeToPolkaBondAndExtra,
   politiPool,
   getResultByHashRpc, getValidators, getNominatorTargets,
+  setNominatorTargets,
 } from '../../api/nodeRpcCall';
 // import api from '../../api';
 
@@ -116,6 +117,27 @@ function* getNominatorTargetsWorker() {
   }
 }
 
+function* setNominatorTargetsWorker(action) {
+  try {
+    const blockHash = yield cps(setNominatorTargets, action.payload);
+    const status = yield call(getResultByHashRpc, blockHash);
+    if (status.result === 'failure') {
+      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+      yield put(blockchainActions.setError.success(status.error));
+    }
+    if (status.result === 'success') {
+      yield put(walletActions.setNominatorTargets.success());
+      yield put(walletActions.getWallet.call());
+    } else {
+      yield put(walletActions.setNominatorTargets.failure());
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    yield put(walletActions.setNominatorTargets.failure(e));
+  }
+}
+
 // WATCHERS
 
 function* getWalletWatcher() {
@@ -178,6 +200,14 @@ function* getNominatorTargetsWatcher() {
   }
 }
 
+function* setNominatorTargetsWatcher() {
+  try {
+    yield takeLatest(walletActions.setNominatorTargets.call, setNominatorTargetsWorker);
+  } catch (e) {
+    yield put(walletActions.setNominatorTargets.failure(e));
+  }
+}
+
 export {
   getWalletWatcher,
   sendTransferWatcher,
@@ -186,4 +216,5 @@ export {
   stakeToLiberlandWatcher,
   getValidatorsWatcher,
   getNominatorTargetsWatcher,
+  setNominatorTargetsWatcher,
 };
