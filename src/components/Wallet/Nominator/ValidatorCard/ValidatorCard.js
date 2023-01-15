@@ -35,7 +35,7 @@ ValidatorCard.defaultProps = {
   name: 'Test Validator',
   commission: '5%',
   blocked: false,
-  nominatedByMe: 'No',
+  nominatedByMe: false,
   validatorAddress: '',
   selectingValidatorsDisabled: false,
 };
@@ -45,7 +45,7 @@ ValidatorCard.propTypes = {
   name: PropTypes.string,
   commission: PropTypes.string,
   blocked: PropTypes.bool,
-  nominatedByMe: PropTypes.string,
+  nominatedByMe: PropTypes.bool,
   toggleSelectedValidator: PropTypes.func.isRequired,
   validatorAddress: PropTypes.string,
   selectingValidatorsDisabled: PropTypes.bool,

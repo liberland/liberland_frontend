@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';
@@ -9,8 +10,8 @@ import styles from './styles.module.scss';
 const renderVoteButton = (vote) => (vote === 'Aye' ? <Button green medium type="submit">Vote Aye</Button> : <Button red medium type="submit">Vote Nay</Button>);
 
 function VoteOnReferendumModal({
-  // eslint-disable-next-line react/prop-types,max-len
-  closeModal, handleSubmit, register, modalShown, onSubmitSecond, onSubmitVote, voteType, referendumInfo,
+  closeModal, handleSubmit, register, modalShown, onSubmitSecond, onSubmitVote,
+  voteType, referendumInfo,
 }) {
   return (
     <>
@@ -73,6 +74,21 @@ function VoteOnReferendumModal({
     </>
   );
 }
+
+VoteOnReferendumModal.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+  handleSubmit: PropTypes.func.isRequired,
+  register: PropTypes.func.isRequired,
+  modalShown: PropTypes.number.isRequired,
+  onSubmitSecond: PropTypes.func.isRequired,
+  onSubmitVote: PropTypes.func.isRequired,
+  voteType: PropTypes.string.isRequired,
+  referendumInfo: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    referendumIndex: PropTypes.number.isRequired,
+    proposalIndex: PropTypes.number.isRequired,
+  }).isRequired,
+};
 
 function VoteOnReferendumModalWrapper(props) {
   return (

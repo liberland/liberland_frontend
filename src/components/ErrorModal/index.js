@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import { useDispatch, useSelector } from 'react-redux';
 import { blockchainSelectors } from '../../redux/selectors';
 import Button from '../Button/Button';
@@ -64,5 +66,9 @@ function ErrorModal({ children }) {
     </div>
   );
 }
+
+ErrorModal.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 
 export default ErrorModal;

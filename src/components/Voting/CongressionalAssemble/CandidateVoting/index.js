@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import styles from './styles.module.scss';
 import Card from '../../../Card';
@@ -50,5 +51,19 @@ function CandidateVoting({
     </div>
   );
 }
+
+const candidate = PropTypes.shape({
+  name: PropTypes.string.isRequired,
+  rawIdentity: PropTypes.string.isRequired,
+});
+
+CandidateVoting.propTypes = {
+  eligibleUnselectedCandidates: PropTypes.arrayOf(candidate).isRequired,
+  selectedCandidates: PropTypes.arrayOf(candidate).isRequired,
+  selectCandidate: PropTypes.func.isRequired,
+  unselectCandidate: PropTypes.func.isRequired,
+  moveSelectedCandidate: PropTypes.func.isRequired,
+  didChangeSelectedCandidates: PropTypes.bool.isRequired,
+};
 
 export default CandidateVoting;

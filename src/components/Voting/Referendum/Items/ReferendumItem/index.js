@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
@@ -89,4 +90,19 @@ function ReferendumItem({
     </Card>
   );
 }
+
+ReferendumItem.propTypes = {
+  name: PropTypes.string.isRequired,
+  createdBy: PropTypes.string.isRequired,
+  externalLink: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  yayVotes: PropTypes.number.isRequired,
+  nayVotes: PropTypes.number.isRequired,
+  hash: PropTypes.string.isRequired,
+  alreadyVoted: PropTypes.bool.isRequired,
+  buttonVoteCallback: PropTypes.func.isRequired,
+  votingTimeLeft: PropTypes.string.isRequired,
+  referendumIndex: PropTypes.number.isRequired,
+};
+
 export default ReferendumItem;

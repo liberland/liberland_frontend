@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
@@ -74,4 +75,36 @@ function ProposalItem({
     </Card>
   );
 }
+
+const call = PropTypes.oneOfType([
+  PropTypes.shape({
+    Legacy: PropTypes.shape({
+      hash_: PropTypes.string.isRequired,
+    }).isRequired,
+  }),
+  PropTypes.shape({
+    Lookup: PropTypes.shape({
+      hash_: PropTypes.string.isRequired,
+    }).isRequired,
+  }),
+  PropTypes.shape({
+    // eslint-disable-next-line react/forbid-prop-types
+    Inline: PropTypes.any.isRequired,
+  }),
+]);
+
+BoundedCall.propTypes = { call: call.isRequired };
+
+ProposalItem.propTypes = {
+  name: PropTypes.string.isRequired,
+  createdBy: PropTypes.string.isRequired,
+  currentEndorsement: PropTypes.string.isRequired,
+  externalLink: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  userDidEndorse: PropTypes.bool.isRequired,
+  boundedCall: call.isRequired,
+  buttonEndorseCallback: PropTypes.bool.isRequired,
+  proposalIndex: PropTypes.number.isRequired,
+};
+
 export default ProposalItem;

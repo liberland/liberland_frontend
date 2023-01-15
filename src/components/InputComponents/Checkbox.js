@@ -25,7 +25,7 @@ function CheckboxInput({
         name={name}
         readOnly
       />
-      <div className={cx(styles.checkbox)} checked={isChecked} onClick={handleCheck}>
+      <div className={cx(styles.checkbox)} onClick={handleCheck}>
         <svg className={cx(styles.checkboxIcon, { [styles.checkboxIconHidden]: !isChecked })} viewBox="0 0 24 24">
           <polyline points="20 6 9 17 4 12" />
         </svg>

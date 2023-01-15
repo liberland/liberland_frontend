@@ -26,7 +26,7 @@ const getBalanceByAddress = async (address) => {
     const LLDWalletData = LLDData.toJSON();
     const LLMWalletData = LLMData.toJSON();
 
-    const LLMBalance = LLMWalletData?.balance ?? 0;
+    const LLMBalance = LLMWalletData?.balance ?? '0x0';
 
     return {
       liberstake: {

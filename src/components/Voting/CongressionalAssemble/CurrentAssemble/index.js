@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import PoliticanCard from '../PoliticianCard/Index';
 import Card from '../../../Card';
@@ -22,4 +23,9 @@ function CurrentAssemble({
   );
 }
 
+CurrentAssemble.propTypes = {
+  currentCongressMembers: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+  })).isRequired,
+};
 export default CurrentAssemble;

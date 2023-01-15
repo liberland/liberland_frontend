@@ -141,19 +141,19 @@ function WalletOverview({
   );
 }
 WalletOverview.defaultProps = {
-  totalBalance: 0,
+  totalBalance: '0x0',
   balances: {},
   liquidMerits: 0,
 };
 
 WalletOverview.propTypes = {
-  totalBalance: PropTypes.number,
+  totalBalance: PropTypes.string,
   balances: PropTypes.shape({
     free: PropTypes.shape({
-      amount: PropTypes.number,
+      amount: PropTypes.string,
     }),
     liberstake: PropTypes.shape({
-      amount: PropTypes.number,
+      amount: PropTypes.string,
     }),
     polkastake: PropTypes.shape({
       amount: PropTypes.number,
