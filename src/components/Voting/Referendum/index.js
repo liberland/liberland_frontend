@@ -9,7 +9,6 @@ import ReferendumItem from './Items/ReferendumItem';
 import { VoteOnReferendumModal, ProposeReferendumModal } from '../../Modals';
 import { democracyActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
-import { submitProposal } from '../../../api/nodeRpcCall';
 
 function Referendum() {
   const [isModalOpenVote, setIsModalOpenVote] = useState(false);
@@ -38,12 +37,15 @@ function Referendum() {
   };
   const handleSubmitSecondForm = (values) => {
     dispatch(democracyActions.secondProposal.call(values));
+    handleModalOpenEndorse();
   };
   const handleSubmitVoteForm = (values) => {
     dispatch(democracyActions.voteOnReferendum.call({ ...values, voteType: selectedVoteType }));
+    handleModalOpenVote();
   };
   const handleSubmitPropose = (values) => {
-    submitProposal(userWalletAddress, values);
+    dispatch(democracyActions.propose.call({ values, userWalletAddress }));
+    handleModalOpenPropose();
   };
   return (
     <div>

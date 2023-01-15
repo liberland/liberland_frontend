@@ -30,7 +30,7 @@ export const formatMeritTransaction = (merits_raw) => {
 };
 export const formatPolkadotBalance = (polkadotBalance) => {
   const polkadotFormattedBalance = formatBalance(polkadotBalance, { withSi: false, withUnit: false, decimals: 0 });
-  return valueToBN(polkadotFormattedBalance.replace('.', '')).div(10);
+  return valueToBN(polkadotFormattedBalance.replace('.', '')).div(new BN(10)).toString();
 };
 
 export const dollarsToGrains = (dollars) => valueToBN(dollars).mul(grainsInDollar);

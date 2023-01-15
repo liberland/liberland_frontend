@@ -370,7 +370,7 @@ const getDemocracyReferendums = async (address) => {
   }
 };
 
-const secondProposal = async (walletAddress, proposal) => {
+const secondProposal = async (walletAddress, proposal, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
   const secondExtrinsic = api.tx.democracy.second(proposal);
@@ -378,14 +378,16 @@ const secondProposal = async (walletAddress, proposal) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+      callback(null, status.asInBlock.toString());
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction failed', error);
+    callback(error);
   });
 };
 
-const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
+const voteOnReferendum = async (walletAddress, referendumIndex, voteType, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
   const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
@@ -404,10 +406,12 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed VOTE at block hash #${status.asInBlock.toString()}`);
+      callback(null, status.asInBlock.toString());
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction VOTE failed', error);
+    callback(error);
   });
 };
 
@@ -418,7 +422,7 @@ const getProposalHash = async (values, legislationIndex) => {
   return hash;
 };
 
-const submitProposal = async (walletAddress, values) => {
+const submitProposal = async (walletAddress, values, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
   const nextChainIndexQuery = await api.query.democracy.referendumCount();
@@ -455,15 +459,18 @@ const submitProposal = async (walletAddress, values) => {
         if (status.isInBlock) {
           // eslint-disable-next-line no-console
           console.log(`Completed PROPOSE at block hash #${status.asInBlock.toString()}`);
+          callback(null, status.asInBlock.toString());
         }
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.error(':( transaction PROPOSE failed', error);
+        callback(error);
       });
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction NOTEPREIMAGE failed', error);
+    callback(error);
   });
 };
 
