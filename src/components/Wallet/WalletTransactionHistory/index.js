@@ -1,6 +1,8 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */ // remove after refactoring history back in
 import React from 'react';
+import { gql, useQuery } from '@apollo/client';
+import { useSelector } from 'react-redux';
 import Button from '../../Button/Button';
 import Card from '../../Card';
 
@@ -11,6 +13,51 @@ import styles from './styles.module.scss';
 import Status from '../../Status';
 import { formatMeritTransaction } from '../../../utils/walletHelpers';
 
+import { blockchainSelectors } from '../../../redux/selectors';
+
+const dollarsQuery = gql`
+    query Transfers($orderBy: [TransfersOrderBy!], $filter: TransferFilter) {
+      query {
+        transfers(orderBy: $orderBy, filter: $filter) {
+          nodes {
+            id
+            fromId
+            toId
+            value
+            extrinsicIndex
+            eventIndex
+            block {
+              id
+              number
+              timestamp
+            }
+          }
+        }
+      }
+    }
+`;
+
+const meritsQuery = gql`
+    query Merits($orderBy: [MeritsOrderBy!], $filter: MeritFilter) {
+      query {
+        merits(orderBy: $orderBy, filter: $filter) {
+          nodes {
+            id
+            fromId
+            toId
+            value
+            extrinsicIndex
+            eventIndex
+            block {
+              id
+              number
+              timestamp
+            }
+          }
+        }
+      }
+    }
+`;
 const paymentTypeIcons = {
   failure: <FailedIcon />,
   success: <CheckIcon />,
@@ -84,6 +131,31 @@ const paymentTypeIcons = {
 ); */
 
 function WalletTransactionHistory({ transactionHistory, textForBtn, bottomButtonOnclick }) {
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector).toString();
+  const variables = {
+    orderBy: ['BLOCK_NUMBER_DESC', 'EVENT_INDEX_DESC'],
+    filter: {
+      or: [
+        {
+          fromId: {
+            equalTo: walletAddress.toLowerCase(),
+          },
+        },
+        {
+          toId: {
+            equalTo: walletAddress.toLowerCase(),
+          },
+        },
+      ],
+    },
+  };
+
+  const pollInterval = 1000;
+  const lld = useQuery(dollarsQuery, { variables, pollInterval });
+  const llm = useQuery(meritsQuery, { variables, pollInterval });
+  if (llm.data) console.log('LLM Transfers: ', llm.data.query.merits.nodes);
+  if (lld.data) console.log('LLD ransfers: ', lld.data.query.transfers.nodes);
+
   return (
     <Card title="Transaction History" className={styles.cardWrapper}>
       <div className={styles.transactionHistoryCard}>
