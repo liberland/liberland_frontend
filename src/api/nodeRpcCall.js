@@ -9,8 +9,7 @@ const { ApiPromise, WsProvider } = require('@polkadot/api');
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 let __apiCache = null;
 const getApi = () => {
-  if(__apiCache === null)
-    __apiCache = ApiPromise.create({ provider });
+  if (__apiCache === null) __apiCache = ApiPromise.create({ provider });
   return __apiCache;
 };
 
@@ -43,7 +42,6 @@ const getBalanceByAddress = async (address) => {
     const LLMWalletData = LLMData.toJSON();
 
     const LLMBalance = LLMWalletData?.balance ?? '0x0';
-
     return {
       liberstake: {
         amount: LLMPolitiPoolData,
@@ -589,6 +587,40 @@ const voteForCongress = async (listofVotes, walletAddress) => {
   });
 };
 
+const castVetoForLegislation = async (tier, index, walletAddress) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+
+  const vetoExtrinsic = api.tx.liberlandLegislation.submitVeto(tier, index);
+
+  vetoExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed VETO at block hash #${status.asInBlock.toString()}`);
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction VETO failed', error);
+  });
+};
+
+const revertVetoForLegislation = async (tier, index, walletAddress) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+
+  const revertVetoExtrinsic = api.tx.liberlandLegislation.revertVeto(tier, index);
+
+  revertVetoExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed REVERT VETO at block hash #${status.asInBlock.toString()}`);
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction REVERT VETO failed', error);
+  });
+};
+
 const getLegislation = async (tier) => {
   try {
     const api = await getApi();
@@ -598,11 +630,37 @@ const getLegislation = async (tier) => {
       key: x[0].toHuman(), value: x[1].toHuman(),
     }));
 
+    const legislationVetosRawArray = await Promise.all(legislationHuman.map(({ key }) => (
+      api.query.liberlandLegislation.vetos.entries(key[0], key[1])
+    )));
+
+    const legislationVetosHuman = [];
+    legislationVetosRawArray.forEach((rawVetos) => {
+      legislationVetosHuman.push(
+        rawVetos.map((x) => ({
+          vetoInfo: x[0].toHuman(), value: x[1].toHuman(),
+        })),
+      );
+    });
+
+    const vetosByIndex = {};
+    legislationVetosHuman.forEach((vetos) => {
+      vetos.forEach((veto) => {
+        if (veto.vetoInfo[1] in vetosByIndex) {
+          vetosByIndex[veto.vetoInfo[1]].push(veto.vetoInfo[2]);
+        } else {
+          vetosByIndex[veto.vetoInfo[1]] = [veto.vetoInfo[2]];
+        }
+      });
+    });
+
     const legislation = legislationHuman.map(({ key, value }) => ({
       tier: key[0],
       index: key[1],
       content: value,
+      vetos: vetosByIndex[key[1]] ? vetosByIndex[key[1]] : [],
     }));
+
     return legislation;
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -631,4 +689,6 @@ export {
   getCongressMembersWithIdentity,
   voteForCongress,
   getLegislation,
+  castVetoForLegislation,
+  revertVetoForLegislation,
 };
