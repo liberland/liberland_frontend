@@ -60,7 +60,7 @@ function Feed() {
       <div className={styles.cardWrapper}>
         {
           news.map((newsItem) => (
-            <Card key={newsItem.title+newsItem.date} className={cx({ [styles.tile]: view === 'tile', [styles.list]: view === 'list' })}>
+            <Card key={newsItem.title + newsItem.date} className={cx({ [styles.tile]: view === 'tile', [styles.list]: view === 'list' })}>
               <h3 className={styles.cardTitle}>{newsItem.title}</h3>
               <p className={styles.cardInfo}>
                 {newsItem.date}

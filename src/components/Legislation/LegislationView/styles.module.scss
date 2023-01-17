@@ -1,3 +1,24 @@
 .legislationCard {
     margin-bottom: 15px;
 }
+.legislationInfoContainer {
+    flex-direction: row;
+    display: flex;
+}
+.legislationContent {
+    align-items: flex-start;
+    flex: 4;
+    display: flex;
+}
+.vetoContent {
+    align-items: flex-end;
+    flex: 1;
+    display: flex;
+}
+.vetoInfo {
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    flex-direction: column;
+    margin-right: 1rem;
+}
