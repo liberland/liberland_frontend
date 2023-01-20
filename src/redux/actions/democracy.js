@@ -5,6 +5,9 @@ export const {
   secondProposal,
   voteOnReferendum,
   propose,
+  voteForCongress,
+  castVeto,
+  revertVeto
 } = createActions({
   GET_DEMOCRACY: {
     call: undefined,
@@ -22,6 +25,21 @@ export const {
     failure: undefined,
   },
   PROPOSE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  VOTE_FOR_CONGRESS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CAST_VETO: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  REVERT_VETO: {
     call: undefined,
     success: undefined,
     failure: undefined,

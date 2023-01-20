@@ -31,6 +31,14 @@ const democracyReducer = handleActions(
     [combineActions(
       democracyActions.getDemocracy.success,
       democracyActions.getDemocracy.failure,
+      democracyActions.secondProposal.failure,
+      democracyActions.secondProposal.success,
+      democracyActions.voteForCongress.success,
+      democracyActions.voteForCongress.failure,
+      democracyActions.voteOnReferendum.failure,
+      democracyActions.voteOnReferendum.success,
+      democracyActions.propose.success,
+      democracyActions.propose.failure,
     )]: (state) => ({
       ...state,
       gettingDemocracyInfo: initialState.gettingDemocracyInfo,
