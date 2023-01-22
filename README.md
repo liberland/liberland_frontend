@@ -27,6 +27,7 @@ api- PORT=8010 npm run start
 sso- npm run development
 web old - npm run start
 cdn - PORT=8020 npm run start
+chain explorer - https://github.com/liberland/chain_explorer/ - setup the dev instance as described in README with graphql engine running on port 3000
 
 blockchain cargo run --release -- --dev
 
