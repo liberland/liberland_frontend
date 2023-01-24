@@ -81,7 +81,7 @@ function* sendTransferLLMWorker(action) {
       yield put(blockchainActions.setError.success(status.error));
     }
 
-    if (result === 'success') {
+    if (status.result === 'success') {
       yield put(walletActions.sendTransferLLM.success());
       yield put(walletActions.getWallet.call());
     } else {
