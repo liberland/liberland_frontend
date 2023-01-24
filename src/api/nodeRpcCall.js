@@ -18,7 +18,7 @@ const crossReference = (blockchainData, centralizedData) => (
     {
       ...item,
       centralizedData: centralizedData.find((cItem) => (
-        parseInt(cItem.chainIndex) == parseInt(item.index.toHuman())
+        parseInt(cItem.chainIndex) == parseInt(item.index)
       )),
     }
   ))
@@ -448,7 +448,8 @@ const submitProposal = async (walletAddress, values, callback) => {
   const hash = await getProposalHash(values, legislationIndex);
   const notePreimageTx = api.tx.preimage.notePreimage(hash.extrinsicEncoded);
   const minDeposit = api.consts.democracy.minimumDeposit;
-  const proposeTx = api.tx.democracy.propose({ Legacy: hash.encodedHash }, minDeposit);
+  const proposeCall = parseInt(values.legislationTier) === 0 ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
+  const proposeTx = proposeCall({ Legacy: hash.encodedHash }, minDeposit);
   notePreimageTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
