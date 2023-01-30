@@ -59,11 +59,11 @@ function Referendum() {
               democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
                 <ReferendumItem
                   key={referendum.index}
-                  name={referendum.centralizedData.hash ? referendum.centralizedData.hash : 'Onchain referendum'}
-                  createdBy={referendum.centralizedData.username ? referendum.centralizedData.username : 'Unknown'}
+                  name={referendum?.centralizedData?.hash ? referendum.centralizedData.hash : 'Onchain referendum'}
+                  createdBy={referendum?.centralizedData?.username ? referendum.centralizedData.username : 'Unknown'}
                   currentEndorsement="??"
-                  externalLink={referendum.centralizedData.link ? referendum.centralizedData.link : 'https://forum.liberland.org/'}
-                  description={referendum.centralizedData.description ? referendum.centralizedData.description : 'No description'}
+                  externalLink={referendum?.centralizedData?.link ? referendum.centralizedData.link : 'https://forum.liberland.org/'}
+                  description={referendum?.centralizedData?.description ? referendum.centralizedData.description : 'Onchain referendum with no description'}
                   yayVotes={referendum.votedAye}
                   nayVotes={referendum.votedNay}
                   // nayVotes={formatDemocracyMerits(parseInt(referendum.votedNay.words[0]))}
@@ -100,11 +100,11 @@ function Referendum() {
               democracy.democracy?.crossReferencedProposalsData.map((proposal) => (
                 <ProposalItem
                   key={proposal.index}
-                  name={proposal.centralizedData.hash ? proposal.centralizedData.hash : 'Onchain proposal'}
-                  createdBy={proposal.centralizedData.username ? proposal.centralizedData.username : proposal.proposer}
+                  name={proposal?.centralizedData?.hash ? proposal.centralizedData.hash : 'Onchain proposal'}
+                  createdBy={proposal?.centralizedData?.username ? proposal.centralizedData.username : proposal.proposer}
                   currentEndorsement={`${proposal.seconds.length} Citizens supported`}
-                  externalLink={proposal.centralizedData.link ? proposal.centralizedData.link : 'https://forum.liberland.org/'}
-                  description={proposal.centralizedData.description ? proposal.centralizedData.description : 'No description'}
+                  externalLink={proposal?.centralizedData?.link ? proposal.centralizedData.link : 'https://forum.liberland.org/'}
+                  description={proposal?.centralizedData?.description ? proposal.centralizedData.description : 'Onchain proposal with no description'}
                   userDidEndorse={(proposal.seconds.includes(userWalletAddress) || proposal.proposer === userWalletAddress)}
                   boundedCall={proposal.boundedCall}
                   buttonEndorseCallback={handleModalOpenEndorse}

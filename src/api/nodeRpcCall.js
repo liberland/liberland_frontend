@@ -2,7 +2,8 @@ import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extensi
 import { blake2AsHex } from '@polkadot/util-crypto';
 import axios from 'axios';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
-import { meritsToGrains } from '../utils/walletHelpers';
+import {dollarsToGrains, meritsToGrains} from '../utils/walletHelpers';
+import {handleMyDispatchErrors} from "../utils/therapist";
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -13,8 +14,8 @@ const getApi = () => {
   return __apiCache;
 };
 
-const crossReference = (blockchainData, centralizedData) => (
-  blockchainData.map((item) => (
+const crossReference = (blockchainData, centralizedData) => {
+  return blockchainData.map((item) => (
     {
       ...item,
       centralizedData: centralizedData.find((cItem) => (
@@ -22,7 +23,7 @@ const crossReference = (blockchainData, centralizedData) => (
       )),
     }
   ))
-);
+};
 
 // TODO: Need refactor when blockchain node update
 const getBalanceByAddress = async (address) => {
@@ -72,15 +73,19 @@ const sendTransfer = async (payload, callback) => {
   const transferExtrinsic = api.tx.balances.transfer(account_to, (amount));
   const injector = await web3FromSource('polkadot-js');
   transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, status.asInBlock.toString());
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction failed', error);
-    callback(error);
+    callback({isError: true, details: error.toString()});
   });
 };
 
@@ -90,45 +95,47 @@ const sendTransferLLM = async (payload, callback) => {
   const transferExtrinsic = api.tx.llm.sendLlm(account_to, (meritsToGrains(amount)));
 
   const injector = await web3FromSource('polkadot-js');
-  transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status }) => {
+  transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, status.asInBlock.toString());
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction failed', error);
-    callback(error);
+    callback({isError: true, details: error.toString()});
   });
 };
 
 const stakeToPolkaBondAndExtra = async (payload, callback) => {
-  try {
-    const { values: { amount }, isUserHaveStake, walletAddress } = payload;
-    const api = await getApi();
-    const transferExtrinsic = isUserHaveStake
-      ? await api.tx.staking.bondExtra(`${amount}000000000000`)
-      : await api.tx.staking.bond(walletAddress, `${amount}000000000000`, 'Staked');
+  const { values: { amount }, isUserHaveStake, walletAddress } = payload;
+  const api = await getApi();
+  const transferExtrinsic = isUserHaveStake
+    ? await api.tx.staking.bondExtra(dollarsToGrains(amount))
+    : await api.tx.staking.bond(walletAddress, dollarsToGrains(amount), 'Staked');
 
-    const injector = await web3FromSource('polkadot-js');
-    // eslint-disable-next-line max-len
-    await transferExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
-      if (status.isInBlock) {
-        // eslint-disable-next-line no-console
-        console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
-        callback(null, 'done');
-      }
-    }).catch((error) => {
+  const injector = await web3FromSource('polkadot-js');
+  // eslint-disable-next-line max-len
+  await transferExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
       // eslint-disable-next-line no-console
-      console.error(':( transaction failed', error);
-      callback(error);
-    });
-  } catch (e) {
+      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
     // eslint-disable-next-line no-console
-    console.error(e);
-    callback(e);
-  }
+    console.error(':( transaction failed', error);
+    callback({isError: true, details: error.toString()});
+  });
 };
 
 const politiPool = async (payload, callback) => {
@@ -138,15 +145,19 @@ const politiPool = async (payload, callback) => {
 
   const injector = await web3FromSource('polkadot-js');
   politiPoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, status.asInBlock.toString());
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction failed', error);
-    callback(error);
+    callback({isError: true, details: error.toString()});
   });
 };
 
@@ -179,63 +190,6 @@ const getCurrentBlockNumberRpc = async () => {
 };
 
 const getAllWalletsRpc = async () => web3Accounts();
-
-const getResultByHashRpc = async (blockHash) => {
-  const api = await getApi();
-  const signedBlock = await api.rpc.chain.getBlock(blockHash);
-  const allRecords = await api.query.system.events.at(signedBlock.block.header.hash);
-  let result = '';
-  const error = {
-    error: false,
-    details: '',
-  };
-
-  // map between the extrinsics and events
-  signedBlock.block.extrinsics.forEach(({ method: { method, section } }, index) => {
-    allRecords
-      // filter the specific events based on the phase and then the
-      // index of our extrinsic in the block
-      .filter(({ phase }) => phase.isApplyExtrinsic
-        && phase.asApplyExtrinsic.eq(index))
-      // test the events against the specific types we are looking for
-      // eslint-disable-next-line consistent-return
-      .forEach(({ event }) => {
-        if (api.events.system.ExtrinsicSuccess.is(event)) {
-          // extract the data for this event
-          // (In TS, because of the guard above, these will be typed)
-          const [dispatchInfo] = event.data;
-
-          // eslint-disable-next-line no-console
-          console.log(`${section}.${method}:: ExtrinsicSuccess:: ${dispatchInfo.toString()}`);
-          result = 'success';
-        } else if (api.events.system.ExtrinsicFailed.is(event)) {
-          // extract the data for this event
-          const [dispatchError] = event.data;
-          let errorInfo;
-
-          // decode the error
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            // (For specific known errors, we can also do a check against the
-            // api.errors.<module>.<ErrorName>.is(dispatchError.asModule) guard)
-            const decoded = api.registry.findMetaError(dispatchError.asModule);
-            // eslint-disable-next-line no-console
-            console.log('decoded  ', decoded);
-
-            errorInfo = `${decoded.docs}`;
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            errorInfo = dispatchError.toString();
-          }
-          error.details = errorInfo;
-          // eslint-disable-next-line no-console
-          console.error(`${section}.${method}:: ExtrinsicFailed:: ${errorInfo}`);
-          result = 'failure';
-        }
-      });
-  });
-  return { result, error };
-};
 
 const getValidators = async () => {
   const api = await getApi();
@@ -281,16 +235,20 @@ const setNominatorTargets = async (payload, callback) => {
   const injector = await web3FromAddress(walletAddress);
   const api = await getApi();
   const setNewTargets = await api.tx.staking.nominate(newNominatorTargets);
-  await setNewTargets.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+  await setNewTargets.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
-      callback(null, status.asInBlock.toString());
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction failed', error);
-    callback(error);
+    callback({isError: true, details: error.toString()});
   });
 };
 
@@ -372,16 +330,20 @@ const secondProposal = async (walletAddress, proposal, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
   const secondExtrinsic = api.tx.democracy.second(proposal);
-  secondExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+  secondExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, status.asInBlock.toString());
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction failed', error);
-    callback(error);
+    callback({isError: true, details: error.toString()});
   });
 };
 
@@ -400,16 +362,20 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType, callba
     },
   });
 
-  voteExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+  voteExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed VOTE at block hash #${status.asInBlock.toString()}`);
-      callback(null, status.asInBlock.toString());
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
-    console.error(':( transaction VOTE failed', error);
-    callback(error);
+    console.error(':( transaction failed', error);
+    callback({isError: true, details: error.toString()});
   });
 };
 
@@ -454,22 +420,26 @@ const submitProposal = async (walletAddress, values, callback) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed NOTEPREIMAGE at block hash #${status.asInBlock.toString()}`);
-      proposeTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+      proposeTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+        let errorData = handleMyDispatchErrors(dispatchError, api)
         if (status.isInBlock) {
           // eslint-disable-next-line no-console
           console.log(`Completed PROPOSE at block hash #${status.asInBlock.toString()}`);
-          callback(null, status.asInBlock.toString());
+          callback(null, {
+            blockHash: status.asInBlock.toString(),
+            errorData
+          });
         }
       }).catch((error) => {
         // eslint-disable-next-line no-console
         console.error(':( transaction PROPOSE failed', error);
-        callback(error);
+        callback({isError: true, details: error.toString()});
       });
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
-    console.error(':( transaction NOTEPREIMAGE failed', error);
-    callback(error);
+    console.error(':( transaction failed', error);
+    callback({isError: true, details: error.toString()});
   });
 };
 
@@ -567,7 +537,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
   return { currentCongressMembers: crossReferencedCouncilMemberIdentities, candidates: crossReferencedCandidateIdentities, currentCandidateVotesByUser: crossReferencedCurrentCandidateVotesByUser };
 };
 
-const voteForCongress = async (listofVotes, walletAddress) => {
+const voteForCongress = async (listofVotes, walletAddress, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
   const votes = listofVotes.map((vote) => vote.rawIdentity);
@@ -577,48 +547,66 @@ const voteForCongress = async (listofVotes, walletAddress) => {
 
   const voteExtrinsic = api.tx.elections.vote(votes, LLMPolitiPoolData);
 
-  voteExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+  voteExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed VOTE at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction VOTE failed', error);
+    callback({isError: true, details: error.toString()});
   });
 };
 
-const castVetoForLegislation = async (tier, index, walletAddress) => {
+const castVetoForLegislation = async (tier, index, walletAddress, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
 
   const vetoExtrinsic = api.tx.liberlandLegislation.submitVeto(tier, index);
 
-  vetoExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+  vetoExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed VETO at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction VETO failed', error);
+    callback({isError: true, details: error.toString()});
   });
 };
 
-const revertVetoForLegislation = async (tier, index, walletAddress) => {
+const revertVetoForLegislation = async (tier, index, walletAddress, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
 
   const revertVetoExtrinsic = api.tx.liberlandLegislation.revertVeto(tier, index);
 
-  revertVetoExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+  revertVetoExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed REVERT VETO at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction REVERT VETO failed', error);
+    callback({isError: true, details: error.toString()});
   });
 };
 
@@ -679,7 +667,6 @@ export {
   getUserRoleRpc,
   getCurrentBlockNumberRpc,
   getAllWalletsRpc,
-  getResultByHashRpc,
   getValidators,
   getNominatorTargets,
   setNominatorTargets,
