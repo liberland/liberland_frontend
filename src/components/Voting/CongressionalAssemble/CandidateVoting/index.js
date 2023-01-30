@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import styles from './styles.module.scss';
 import Card from '../../../Card';
 import CandidateCard from '../CandidateCard';
@@ -8,11 +8,13 @@ import SelectedCandidateCard from '../SelectedCandidateCard';
 import Button from '../../../Button/Button';
 import { voteForCongress } from '../../../../api/nodeRpcCall';
 import { blockchainSelectors } from '../../../../redux/selectors';
+import {democracyActions, walletActions} from "../../../../redux/actions";
 
 function CandidateVoting({
   eligibleUnselectedCandidates, selectedCandidates, selectCandidate, unselectCandidate, moveSelectedCandidate, didChangeSelectedCandidates,
 }) {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const dispatch = useDispatch();
   return (
     <div>
       <Card title="">
@@ -36,7 +38,7 @@ function CandidateVoting({
               <div>My preference ordered Votes</div>
             </div>
             <div className={styles.candidatesSubtext}>
-              <Button primary={didChangeSelectedCandidates} medium onClick={() => voteForCongress(selectedCandidates, userWalletAddress)}>
+              <Button primary={didChangeSelectedCandidates} medium onClick={() => dispatch(democracyActions.voteForCongress.call({selectedCandidates: selectedCandidates, userWalletAddress: userWalletAddress}))}>
                 Update Vote
               </Button>
             </div>

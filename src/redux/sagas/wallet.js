@@ -8,7 +8,7 @@ import {
   sendTransferLLM,
   stakeToPolkaBondAndExtra,
   politiPool,
-  getResultByHashRpc, getValidators, getNominatorTargets,
+  getValidators, getNominatorTargets,
   setNominatorTargets,
 } from '../../api/nodeRpcCall';
 // import api from '../../api';
@@ -30,67 +30,80 @@ function* getWalletWorker() {
 
 function* stakeToPolkaWorker(action) {
   try {
-    yield cps(stakeToPolkaBondAndExtra, action.payload);
-    yield put(walletActions.stakeToPolka.success());
-    yield put(walletActions.getWallet.call());
-  } catch (e) {
-    yield put(walletActions.stakeToPolka.failure(e));
+    const { blockHash, errorData } = yield cps(stakeToPolkaBondAndExtra, action.payload);
+    console.log('errorData')
+    console.log(errorData)
+    if (errorData.isError) {
+      console.log('is error')
+      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+      yield put(blockchainActions.setError.success(errorData));
+      yield put(walletActions.stakeToPolka.failure())
+    } else {
+      yield put(walletActions.stakeToPolka.success());
+      yield put(walletActions.getWallet.call());
+    }
+  } catch (errorData) {
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(walletActions.stakeToPolka.failure(errorData));
   }
 }
 
 function* stakeToLiberlandWorker(action) {
   try {
-    const blockHash = yield cps(politiPool, action.payload);
-    const status = yield call(getResultByHashRpc, blockHash);
-    yield put(walletActions.stakeToPolka.success());
-    yield put(walletActions.getWallet.call());
-  } catch
-  (e) {
-    yield put(walletActions.stakeToLiberland.failure(e));
+    const { blockHash, errorData } = yield cps(politiPool, action.payload);
+    if (errorData.isError) {
+      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+      yield put(blockchainActions.setError.success(errorData));
+      yield put(walletActions.stakeToLiberland.failure())
+    } else {
+      yield put(walletActions.stakeToLiberland.success());
+      yield put(walletActions.getWallet.call());
+    }
+  } catch (errorData) {
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(walletActions.stakeToLiberland.failure(errorData));
   }
 }
 
 function* sendTransferWorker(action) {
   try {
-    const blockHash = yield cps(sendTransfer, action.payload);
-    const status = yield call(getResultByHashRpc, blockHash);
-    if (status.result === 'failure') {
+    const { blockHash, errorData } = yield cps(sendTransfer, action.payload);
+    if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(status.error));
-    }
-    // TODO use block explorer for this
-    if (status.result === 'success') {
+      yield put(blockchainActions.setError.success(errorData));
+      yield put(walletActions.sendTransfer.failure(errorData));
+    } else {
       yield put(walletActions.sendTransfer.success());
       yield put(walletActions.getWallet.call());
-    } else {
-      yield put(walletActions.sendTransfer.failure());
     }
-  } catch (e) {
+  } catch (errorData) {
     // eslint-disable-next-line no-console
-    console.error(e);
-    yield put(walletActions.sendTransfer.failure(e));
+    console.error(errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(walletActions.sendTransfer.failure(errorData));
   }
 }
 
 function* sendTransferLLMWorker(action) {
   try {
-    const blockHash = yield cps(sendTransferLLM, action.payload);
-    const status = yield call(getResultByHashRpc, blockHash);
-    if (status.result === 'failure') {
+    const { blockHash, errorData } = yield cps(sendTransferLLM, action.payload);
+    if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(status.error));
-    }
-
-    if (status.result === 'success') {
+      yield put(blockchainActions.setError.success(errorData));
+      yield put(walletActions.sendTransferLLM.failure(errorData));
+    } else {
       yield put(walletActions.sendTransferLLM.success());
       yield put(walletActions.getWallet.call());
-    } else {
-      yield put(walletActions.sendTransferLLM.failure());
     }
-  } catch (e) {
+  } catch (errorData) {
     // eslint-disable-next-line no-console
-    console.error(e);
-    yield put(walletActions.sendTransferLLM.failure(e));
+    console.error(errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(walletActions.sendTransferLLM.failure(errorData));
   }
 }
 
@@ -119,22 +132,21 @@ function* getNominatorTargetsWorker() {
 
 function* setNominatorTargetsWorker(action) {
   try {
-    const blockHash = yield cps(setNominatorTargets, action.payload);
-    const status = yield call(getResultByHashRpc, blockHash);
-    if (status.result === 'failure') {
+    const { blockHash, errorData } = yield cps(setNominatorTargets, action.payload);
+    if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(status.error));
-    }
-    if (status.result === 'success') {
+      yield put(blockchainActions.setError.success(errorData));
+      yield put(walletActions.setNominatorTargets.failure());
+    } else {
       yield put(walletActions.setNominatorTargets.success());
       yield put(walletActions.getWallet.call());
-    } else {
-      yield put(walletActions.setNominatorTargets.failure());
     }
-  } catch (e) {
+  } catch (errorData) {
     // eslint-disable-next-line no-console
-    console.error(e);
-    yield put(walletActions.setNominatorTargets.failure(e));
+    console.error(errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(walletActions.setNominatorTargets.failure(errorData));
   }
 }
 
