@@ -36,6 +36,7 @@ function HomeHeader() {
 
   const handleLogout = () => {
     dispatch(authActions.signOut.call(history));
+    window.location.replace(process.env.REACT_APP_SSO_API_LOGOUT_IMPLICIT_LINK);
   };
 
   return (

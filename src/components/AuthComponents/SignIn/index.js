@@ -18,6 +18,7 @@ import Header from '../Header';
 import { CheckboxInput } from '../../InputComponents';
 import router from '../../../router';
 import Button from '../../Button/Button';
+import axios from "axios";
 
 function SignIn() {
   const {
@@ -34,9 +35,6 @@ function SignIn() {
   const beginToken = queryString.indexOf('=');
   const endToken = queryString.indexOf('&');
   const ssoAccessTokenHash = queryString.substring(beginToken + 1, endToken);
-  if (!ssoAccessTokenHash) {
-    alert(`Due to stupid but temporary reasons, you should get here through this link, otherwise bugs will happen ${process.env.REACT_APP_SSO_API_IMPLICIT_LINK}`);
-  }
 
   useEffect(() => {
     if (apiError) {
@@ -45,7 +43,21 @@ function SignIn() {
         apiError.data.error,
       );
     }
-  }, [apiError, setError, dispatch]);
+    if(ssoAccessTokenHash) {
+      const api2 = axios.create({
+        baseURL: process.env.REACT_APP_API2,
+        withCredentials: true,
+      });
+      api2.defaults.headers.common['X-token'] = ssoAccessTokenHash;
+
+      api2.get('/users/me').then((result) => {
+        const walletAddress = allAccounts.find( account => account.address === result?.data?.blockchainAddress)
+        if(walletAddress) {
+          onSubmit({wallet_address: walletAddress.address, rememberMe: false})
+        }
+      });
+    }
+  }, [apiError, setError, dispatch, ssoAccessTokenHash, allAccounts]);
 
   const onSubmit = (values) => {
     dispatch(authActions.signIn.call({
@@ -55,6 +67,10 @@ function SignIn() {
     }));
   };
 
+  const goToLiberlandSignin = () => {
+    window.location.replace(process.env.REACT_APP_SSO_API_IMPLICIT_LINK);
+  }
+
   return (
     <div>
       <div className={styles.headerWrapper}>
@@ -63,11 +79,10 @@ function SignIn() {
       <div className={styles.signInWrapper}>
         <h3>Sign In to Liberland</h3>
         <p>Welcome back, you’ve been missed!</p>
-        <Button medium>
+        <Button medium primary onClick={() => goToLiberlandSignin()}>
           <Wallet />
-          (fake)Sign In with wallet
+          Liberland Sign in
         </Button>
-
         <p className={styles.divider}>
           <Divider />
           OR
@@ -90,7 +105,7 @@ function SignIn() {
             />
             <Link to={router.signIn}>Forgot password?</Link>
           </div>
-          <Button primary type="submit">Sign In</Button>
+          <Button type="submit">Wallet sign in (WIP)</Button>
         </form>
         <p className={styles.signUpInfo}>
           Don&apos;t have have account yet?
