@@ -293,7 +293,7 @@ const getDemocracyReferendums = async (address) => {
       baseURL: process.env.REACT_APP_API2,
       withCredentials: true,
     });
-    api2.defaults.headers.common['x-auth-token'] = ssoAccessTokenHash;
+    api2.defaults.headers.common['X-token'] = ssoAccessTokenHash;
 
     await api2.get('/referenda').then((result) => {
       centralizedReferendumsData = result.data;
