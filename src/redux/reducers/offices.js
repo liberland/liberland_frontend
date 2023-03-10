@@ -1,0 +1,104 @@
+import { handleActions, combineActions } from 'redux-actions';
+import { officesActions } from '../actions';
+
+const initialState = {
+  identity: null,
+  isGetIdentity: false,
+  companyRequest: null,
+  isGetCompanyRequest: null,
+  companyRegistration: null,
+  isGetCompanyRegistration: null,
+  loading: false,
+};
+
+const officesReducer = handleActions({
+  [combineActions(
+    officesActions.getIdentity.call,
+    officesActions.getCompanyRequest.call,
+    officesActions.getCompanyRegistration.call,
+    officesActions.registerCompany.call,
+    officesActions.provideJudgement.call,
+  )]: (state) => ({
+    ...state,
+    loading: true,
+  }),
+  [combineActions(
+    officesActions.getIdentity.success,
+    officesActions.getCompanyRequest.success,
+    officesActions.getCompanyRegistration.success,
+    officesActions.registerCompany.success,
+    officesActions.provideJudgement.success,
+    officesActions.getIdentity.failure,
+    officesActions.getCompanyRequest.failure,
+    officesActions.getCompanyRegistration.failure,
+    officesActions.registerCompany.failure,
+    officesActions.provideJudgement.failure,
+  )]: (state) => ({
+    ...state,
+    loading: false,
+  }),
+  [officesActions.getIdentity.call]: (state, action) => ({
+    ...state,
+    identity: {
+      address: action.payload,
+      identity: null,
+    },
+    isGetIdentity: true,
+  }),
+  [officesActions.getIdentity.success]: (state, action) => ({
+    ...state,
+    identity: {
+      address: state.identity.address,
+      identity: action.payload,
+    },
+    isGetIdentity: false,
+  }),
+  [officesActions.getIdentity.failure]: (state) => ({
+    ...state,
+    isGetIdentity: false,
+  }),
+
+  [officesActions.getCompanyRequest.call]: (state, action) => ({
+    ...state,
+    companyRequest: {
+      entity_id: action.payload,
+      request: null,
+    },
+    isGetCompanyRequest: true,
+  }),
+  [officesActions.getCompanyRequest.success]: (state, action) => ({
+    ...state,
+    companyRequest: {
+      entity_id: state.companyRequest.entity_id,
+      request: action.payload,
+    },
+    isGetCompanyRequest: false,
+  }),
+  [officesActions.getCompanyRequest.failure]: (state) => ({
+    ...state,
+    isGetCompanyRequest: false,
+  }),
+
+  [officesActions.getCompanyRegistration.call]: (state, action) => ({
+    ...state,
+    companyRegistration: {
+      entity_id: action.payload,
+      registration: null,
+    },
+    isGetCompanyRegistration: true,
+  }),
+  [officesActions.getCompanyRegistration.success]: (state, action) => ({
+    ...state,
+    companyRegistration: {
+      entity_id: state.companyRegistration.entity_id,
+      registration: action.payload,
+    },
+    isGetCompanyRegistration: false,
+  }),
+  [officesActions.getCompanyRegistration.failure]: (state) => ({
+    ...state,
+    isGetCompanyRegistration: false,
+  }),
+}, initialState);
+
+export default officesReducer;

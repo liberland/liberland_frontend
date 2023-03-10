@@ -11,6 +11,7 @@ import Documents from '../Documents';
 import Voting from '../Voting';
 import Feed from '../Feed';
 import Legislation from '../Legislation';
+import Offices from '../Offices';
 import AllTransactions from '../Wallet/AllTransactions';
 import styles from './styles.module.scss';
 
@@ -28,6 +29,7 @@ function Home() {
             <Route path={router.home.wallet} component={Wallet} />
             <Route path={router.home.voting} component={Voting} />
             <Route path={router.home.legislation} component={Legislation} />
+            <Route path={router.home.offices} component={Offices} />
             <Route path={router.wallet.allTransactions} component={AllTransactions} />
 
             <Route

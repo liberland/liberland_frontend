@@ -9,6 +9,11 @@ export default {
     voting: '/home/voting',
     profile: '/home/profile',
     legislation: '/home/legislation',
+    offices: '/home/offices',
+  },
+  offices: {
+    identity: '/home/offices/identity',
+    companyRegistry: '/home/offices/company_registry',
   },
   documents: {
     myAccount: '/home/documents/my-account',

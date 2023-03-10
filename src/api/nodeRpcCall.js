@@ -25,6 +25,89 @@ const crossReference = (blockchainData, centralizedData) => {
   ))
 };
 
+const getIdentity = async (address) => {
+  try {
+    const api = await getApi();
+    const identity = await api.query.identity.identityOf(address);
+    return identity;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+}
+
+const provideJudgement = async ({address, hash, walletAddress}, callback) => {
+  const api = await getApi();
+  let judgement = api.createType('IdentityJudgement', 'KnownGood')
+  const judgementCall = api.tx.identity.provideJudgement(0, address, judgement, hash);
+  const proxied = api.tx.identityOffice.execute(judgementCall);
+  const injector = await web3FromSource('polkadot-js');
+  proxied.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      console.log(events);
+      // eslint-disable-next-line no-console
+      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction failed', error);
+    callback({isError: true, details: error.toString()});
+  });
+}
+
+const getCompanyRequest = async (entity_id) => {
+  try {
+    const api = await getApi();
+    const request = await api.query.companyRegistry.requests(0, entity_id);
+    return request;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+}
+
+const getCompanyRegistration = async (entity_id) => {
+  try {
+    const api = await getApi();
+    const registration = await api.query.companyRegistry.registries(0, entity_id);
+    return registration;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+}
+
+const registerCompany = async ({company_id, hash, walletAddress}, callback) => {
+  const api = await getApi();
+  const registerCall = api.tx.companyRegistry.registerEntity(0, company_id, hash);
+  const proxied = api.tx.companyRegistryOffice.execute(registerCall);
+  const injector = await web3FromSource('polkadot-js');
+  proxied.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      console.log(events);
+      // eslint-disable-next-line no-console
+      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction failed', error);
+    callback({isError: true, details: error.toString()});
+  });
+}
+
 // TODO: Need refactor when blockchain node update
 const getBalanceByAddress = async (address) => {
   try {
@@ -679,4 +762,9 @@ export {
   getLegislation,
   castVetoForLegislation,
   revertVetoForLegislation,
+  getIdentity,
+  provideJudgement,
+  getCompanyRequest,
+  getCompanyRegistration,
+  registerCompany,
 };

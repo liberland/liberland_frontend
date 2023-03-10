@@ -18,10 +18,15 @@ const blockchainError = createSelector(
   blockchainReducer,
   (reducer) => reducer.error,
 );
+const blockNumber = createSelector(
+  blockchainReducer,
+  (reducer) => reducer.currentBlockNumber,
+);
 
 export {
   allWalletsSelector,
   userWalletAddressSelector,
   errorExistsAndUnacknowledgedByUser,
   blockchainError,
+  blockNumber,
 };
