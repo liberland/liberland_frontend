@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 // REDUX
 import {
   userSelectors, walletSelectors, democracySelectors,
+  officesSelectors,
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
 
@@ -14,11 +15,13 @@ function Loader({ children }) {
   const isSignInFetching = useSelector(userSelectors.selectIsSignInFetching);
   const isGettingWalletInfo = useSelector(walletSelectors.selectorGettingWalletInfo);
   const isGettingDemocracyInfo = useSelector(democracySelectors.selectorGettingDemocracyInfo);
+  const isLoadingOffices = useSelector(officesSelectors.selectorIsLoading);
 
   const isLoading = [
     isSignInFetching,
     isGettingWalletInfo,
     isGettingDemocracyInfo,
+    isLoadingOffices,
   ].some((isFetching) => isFetching);
 
   return (

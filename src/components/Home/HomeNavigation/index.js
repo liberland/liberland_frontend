@@ -82,6 +82,13 @@ function HomeNavigation() {
       icon: ConstitutionIcon,
       activeIcon: ConstitutionIconActive,
     },
+    {
+      route: router.home.offices,
+      title: 'Offices',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: ConstitutionIcon,
+      activeIcon: ConstitutionIconActive,
+    },
   ];
 
   return (
