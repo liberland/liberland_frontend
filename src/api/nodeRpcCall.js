@@ -4,6 +4,8 @@ import axios from 'axios';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import {dollarsToGrains, meritsToGrains} from '../utils/walletHelpers';
 import {handleMyDispatchErrors} from "../utils/therapist";
+import {newCompanyDataObject} from "../utils/defaultData";
+import {walletActions} from "../redux/actions";
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -86,6 +88,8 @@ const getCompanyRegistration = async (entity_id) => {
 }
 
 const registerCompany = async ({company_id, hash, walletAddress}, callback) => {
+  console.log('hash')
+  console.log(hash.toHuman())
   const api = await getApi();
   const registerCall = api.tx.companyRegistry.registerEntity(0, company_id, hash);
   const proxied = api.tx.companyRegistryOffice.execute(registerCall);
@@ -741,6 +745,168 @@ const getLegislation = async (tier) => {
   }
 };
 
+const getOfficialUserRegistryEntries = async (walletAddress) => {
+  const api = await getApi();
+  const ownerEntites = await api.query.companyRegistry.ownerEntities.entries(walletAddress)
+
+  const ownerEntitesHuman = ownerEntites.map((x) => ({
+    key: x[0].toHuman(), value: x[1].toHuman(),
+  }));
+  let ownsEntityIds = []
+  ownerEntitesHuman.forEach(oe => {
+    ownsEntityIds.push(oe['key'][1])
+  })
+  let requestQueries = []
+  let registeredQueries = []
+  ownsEntityIds.forEach(entityId => {
+    requestQueries.push([api.query.companyRegistry.requests, [0, entityId]])
+    registeredQueries.push([api.query.companyRegistry.registries, [0, entityId]])
+  })
+  let companyRegistryRawData = []
+  // Skip queryMulti if no companies, otherwise errors out
+  if(ownsEntityIds.length !== 0) {
+    companyRegistryRawData = await api.queryMulti([
+      ...requestQueries,
+      ...registeredQueries
+    ])
+  }
+  let companyRequestsByWallet = []
+  let registeredCompaniesByWallet = []
+  let supportedObject = JSON.parse(JSON.stringify(newCompanyDataObject))
+  companyRegistryRawData.forEach((companyRegistryEntity, index) => {
+    const dataToHuman = companyRegistryEntity.toHuman()
+    if(dataToHuman){
+      let companyData = JSON.parse(dataToHuman.data)
+      const staticFields = []
+      const dynamicFields = []
+      dataToHuman.data = companyData
+      supportedObject.staticFields.forEach(staticField => {
+        if (staticField.key in companyData){
+          let fieldObject = staticField
+          fieldObject.display = companyData[staticField.key]
+          staticFields.push(fieldObject)
+        }
+      })
+      supportedObject.dynamicFields.forEach(dynamicField => {
+        if(dynamicField.key in companyData){
+          let fieldObject = dynamicField
+          let fieldObjectData = []
+          companyData[dynamicField.key].forEach(dynamicFieldDataArray => {
+            //Format using fields data
+            let crossReferencedFieldDataArray = []
+            for(const key in dynamicFieldDataArray){
+              if(!key.includes('IsEncrypted')){
+                let pushObject = {}
+                let keyIsEncrypted = key + 'IsEncrypted'
+                pushObject['key'] = key
+                pushObject['display'] = dynamicFieldDataArray[key]
+                pushObject['isEncrypted'] = dynamicFieldDataArray[keyIsEncrypted]
+                crossReferencedFieldDataArray.push(JSON.parse(JSON.stringify(pushObject)))
+              }
+            }
+            fieldObjectData.push(crossReferencedFieldDataArray)
+          })
+
+          fieldObject.data = JSON.parse(JSON.stringify(fieldObjectData))
+          dynamicFields.push(fieldObject)
+        }
+      })
+      dataToHuman.staticFields = JSON.parse(JSON.stringify(staticFields))
+      dataToHuman.dynamicFields = JSON.parse(JSON.stringify(dynamicFields))
+      if (index < ownsEntityIds.length){
+        let dataObject = {...dataToHuman, id: ownsEntityIds[index]}
+        companyRequestsByWallet.push(dataObject)
+      } else {
+        let dataObject = {...dataToHuman, id: ownsEntityIds[index - ownsEntityIds.length]}
+        registeredCompaniesByWallet.push(dataObject)
+      }
+    }
+  })
+
+  const METAVERSTE_NFTs_ID = 1
+  const LAND_NFTs_ID = 0
+
+  let metaverseLandForOwner = []
+  let landForOwner = []
+
+  let ownerLand = await Promise.all([
+    api.query.nfts.account.entries(walletAddress, LAND_NFTs_ID),
+    api.query.nfts.account.entries(walletAddress, METAVERSTE_NFTs_ID)
+  ])
+
+  const landForOwnerIds = []
+  const landMetadataQueries =[]
+  const metaverseLandForOwnerIds = []
+  const metaverseLandMetadataQueries = []
+  const ownerLandHuman = ownerLand[0].map(x => {
+    const landObject = { ...x[0].toHuman() }
+    landForOwnerIds.push(landObject[2])
+    landMetadataQueries.push([api.query.nfts.itemMetadataOf, [LAND_NFTs_ID, parseInt(landObject[2])]])
+    return landObject
+  });
+  const ownerMetaverseLandHuman = ownerLand[1].map(x => {
+    const metaverseLandObject = { ...x[0].toHuman() }
+    metaverseLandForOwnerIds.push(metaverseLandObject[2])
+    metaverseLandMetadataQueries.push([api.query.nfts.itemMetadataOf, [METAVERSTE_NFTs_ID, parseInt(metaverseLandObject[2])]])
+    return metaverseLandObject
+  });
+
+  let landAttributes = []
+  // only query if something to query, otherwise never resolves
+  if(landMetadataQueries.length !== 0 || metaverseLandMetadataQueries.length !== 0) {
+    landAttributes = await api.queryMulti([
+      ...landMetadataQueries,
+      ...metaverseLandMetadataQueries
+    ])
+  }
+
+  landAttributes.forEach((landAttribute, index) => {
+    if(index < landForOwnerIds.length) {
+      landForOwner.push({id: landForOwnerIds[index], data: landAttribute.toHuman()})
+    } else {
+      metaverseLandForOwner.push({id: metaverseLandForOwnerIds[index - landForOwnerIds.length], data: landAttribute.toHuman()})
+    }
+  })
+
+  return {
+    companies: {
+      registered: registeredCompaniesByWallet,
+      requested: companyRequestsByWallet
+    },
+    land: {
+      physical: landForOwner,
+      metaverse: metaverseLandForOwner
+    },
+    assets: [],
+    other: []
+  }
+}
+
+const requestCompanyRegistration = async (walletAddress, companyDataObject, callback)  => {
+
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+
+  //TODO read instead of hardcoded true for editablebyregistrar
+  const requestCompanyRegistrationExtrinsic = api.tx.companyRegistry.requestEntity(0, JSON.stringify(companyDataObject), true);
+
+  requestCompanyRegistrationExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed REQUEST COMPANY REGISTRATION at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction REQUEST COMPANY REGISTRATION failed', error);
+    callback({isError: true, details: error.toString()});
+  });
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -767,4 +933,6 @@ export {
   getCompanyRequest,
   getCompanyRegistration,
   registerCompany,
+  getOfficialUserRegistryEntries,
+  requestCompanyRegistration
 };

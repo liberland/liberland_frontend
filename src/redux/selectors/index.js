@@ -5,6 +5,7 @@ import * as blockchainSelectors from './blockchainSelectors';
 import * as democracySelectors from './democracy';
 import * as legislationSelectors from './legislation';
 import * as officesSelectors from './offices';
+import * as registriesSelectors from './registries';
 
 export {
   errorsSelectors,
@@ -14,4 +15,5 @@ export {
   democracySelectors,
   legislationSelectors,
   officesSelectors,
+  registriesSelectors,
 };

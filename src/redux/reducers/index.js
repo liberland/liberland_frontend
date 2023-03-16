@@ -8,6 +8,7 @@ import legislationReducer from './legislation';
 import blockchainReducer from './blockchain';
 import democracyReducer from './democracy';
 import officesReducer from './offices';
+import registriesReducer from './registries';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   blockchain: blockchainReducer,
   democracy: democracyReducer,
   offices: officesReducer,
+  registries: registriesReducer,
 });
 
 export default rootReducer;

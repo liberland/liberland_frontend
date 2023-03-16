@@ -9,6 +9,7 @@ export default {
     voting: '/home/voting',
     profile: '/home/profile',
     legislation: '/home/legislation',
+    registries: '/home/registries',
     offices: '/home/offices',
   },
   offices: {
@@ -32,5 +33,13 @@ export default {
     allTransactions: '/home/wallet/all-transactions',
     validatorsStaking: '/home/wallet/validators-staking',
     overView: '/home/wallet/overview',
+  },
+  registries: {
+    overview: '/home/registries',
+    companies: '/home/registries/companies',
+    companiesCRUD: '/home/registries/companiesCRUD',
+    land: '/home/registries/land',
+    assets: '/home/registries/assets',
+    other: '/home/registries/other',
   },
 };

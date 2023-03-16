@@ -1,0 +1,17 @@
+@import '../../../assets/base/variables';
+.companyCardContainer{
+  background-color: $transparent3;
+  margin-bottom: 0.75rem;
+}
+.companyContentContainer{
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+}
+.buttonSeparation{
+  margin:0.25rem;
+}
+.newCompanyButton{
+  margin: 0.5rem;
+}
