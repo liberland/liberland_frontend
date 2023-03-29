@@ -21,6 +21,8 @@ import WalletIconActive from '../../../assets/icons/active-wallet.svg';
 import VotingIcon from '../../../assets/icons/voting.svg';
 import VotingIconActive from '../../../assets/icons/active-voting.svg';
 import ConstitutionIcon from '../../../assets/icons/constitution.svg';
+import RegistriesIcon from '../../../assets/icons/documents.svg';
+import RegistriesIconActive from '../../../assets/icons/active-documents.svg';
 import ConstitutionIconActive from '../../../assets/icons/active-constitution.svg';
 
 // REDUX
@@ -88,6 +90,13 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
       activeIcon: ConstitutionIconActive,
+    },
+    {
+      route: router.home.registries,
+      title: 'Registries',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: RegistriesIcon,
+      activeIcon: RegistriesIconActive,
     },
   ];
 

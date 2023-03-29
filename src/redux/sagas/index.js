@@ -5,6 +5,7 @@ import * as blockchainSagas from './blockchain';
 import * as democracySagas from './democracy';
 import * as legislationSagas from './legislation';
 import * as officesSagas from './offices';
+import * as registriesSagas from './registries';
 
 export default function* rootSaga() {
   yield all([
@@ -47,5 +48,10 @@ export default function* rootSaga() {
     officesSagas.getCompanyRequestWatcher(),
     officesSagas.getCompanyRegistrationWatcher(),
     officesSagas.registerCompanyWatcher(),
+
+    //REGISTRIES
+    registriesSagas.getOfficialUserRegistryEntriesWatcher(),
+    registriesSagas.setRegistryCRUDActionWatcher(),
+    registriesSagas.requestCompanyRegistrationWatcher()
   ]);
 }

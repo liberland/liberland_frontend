@@ -22,9 +22,9 @@ bargain album current caught tragic slab identify squirrel embark black drip imi
 
 
 ##Local development
-Local dev - start api and auth servers, both with nvm use 10.21.0
-api- PORT=8010 npm run start
-sso- npm run development
+Local dev - start api and auth servers, both with nvm use 12
+api- PORT=8020 npm run start
+sso- npm run start
 web old - npm run start
 cdn - PORT=8020 npm run start
 chain explorer - https://github.com/liberland/chain_explorer/ - setup the dev instance as described in README with graphql engine running on port 3000

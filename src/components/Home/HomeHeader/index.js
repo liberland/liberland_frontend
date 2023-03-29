@@ -22,6 +22,7 @@ function HomeHeader() {
     [router.home.feed]: `Hi, ${name} ${lastName}!`,
     [router.home.legislation]: 'Legislation',
     [router.home.offices]: 'Offices',
+    [router.home.registries]: 'Registries',
     [router.home.voting]: 'Voting',
     [router.voting.congressionalAssemble]: 'Voting',
     [router.voting.referendum]: 'Voting',
