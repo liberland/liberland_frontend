@@ -8,6 +8,7 @@ import {
   secondProposal,
   voteOnReferendum,
   submitProposal, voteForCongress, castVetoForLegislation, revertVetoForLegislation,
+  delegateDemocracy, undelegateDemocracy,
 } from '../../api/nodeRpcCall';
 
 import { blockchainSelectors } from '../selectors';
@@ -152,6 +153,44 @@ function* revertVetoWorker(action) {
   }
 }
 
+function* delegateWorker(action) {
+  try {
+    const { blockHash, errorData } = yield cps(delegateDemocracy, action.payload.values.delegateAddress, action.payload.userWalletAddress);
+    if (errorData.isError) {
+      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+      yield put(blockchainActions.setError.success(errorData));
+      yield put(democracyActions.delegate.failure(errorData));
+    } else {
+      yield put(democracyActions.delegate.success())
+      yield put(democracyActions.getDemocracy.call());
+    }
+  } catch (errorData) {
+    console.log('Error in delegate worker', errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(democracyActions.delegate.failure(errorData));
+  }
+}
+
+function* undelegateWorker(action) {
+  try {
+    const { blockHash, errorData } = yield cps(undelegateDemocracy, action.payload.userWalletAddress);
+    if (errorData.isError) {
+      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+      yield put(blockchainActions.setError.success(errorData));
+      yield put(democracyActions.undelegate.failure(errorData));
+    } else {
+      yield put(democracyActions.undelegate.success())
+      yield put(democracyActions.getDemocracy.call());
+    }
+  } catch (errorData) {
+    console.log('Error in undelegate worker', errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(democracyActions.undelegate.failure(errorData));
+  }
+}
+
 // WATCHERS
 
 function* getDemocracyWatcher() {
@@ -210,6 +249,22 @@ function* revertVetoWatcher() {
   }
 }
 
+function* delegateWatcher() {
+  try {
+    yield takeLatest(democracyActions.delegate.call, delegateWorker);
+  } catch (e) {
+    yield put(democracyActions.delegate.failure(e));
+  }
+}
+
+function* undelegateWatcher() {
+  try {
+    yield takeLatest(democracyActions.undelegate.call, undelegateWorker);
+  } catch (e) {
+    yield put(democracyActions.undelegate.failure(e));
+  }
+}
+
 export {
   getDemocracyWatcher,
   secondProposalWatcher,
@@ -217,5 +272,7 @@ export {
   proposeWatcher,
   voteForCongressWatcher,
   castVetoWatcher,
-  revertVetoWatcher
+  revertVetoWatcher,
+  delegateWatcher,
+  undelegateWatcher,
 };

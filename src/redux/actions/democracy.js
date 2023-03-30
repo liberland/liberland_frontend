@@ -7,7 +7,9 @@ export const {
   propose,
   voteForCongress,
   castVeto,
-  revertVeto
+  revertVeto,
+  delegate,
+  undelegate
 } = createActions({
   GET_DEMOCRACY: {
     call: undefined,
@@ -40,6 +42,16 @@ export const {
     failure: undefined,
   },
   REVERT_VETO: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  DELEGATE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  UNDELEGATE: {
     call: undefined,
     success: undefined,
     failure: undefined,

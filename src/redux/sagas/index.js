@@ -40,6 +40,8 @@ export default function* rootSaga() {
     democracySagas.voteForCongressWatcher(),
     democracySagas.castVetoWatcher(),
     democracySagas.revertVetoWatcher(),
+    democracySagas.delegateWatcher(),
+    democracySagas.undelegateWatcher(),
 
     // LEGISLATION
     legislationSagas.getLegislationWatcher(),
