@@ -547,9 +547,10 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     councilMembersIdentityQueries.push([api.query.identity.identityOf, councilMember]);
   });
 
-  const councilMemberIdentities = await api.queryMulti([
-    ...councilMembersIdentityQueries,
-  ]);
+  const councilMemberIdentities = councilMembersIdentityQueries.length == 0 ? [] :
+    await api.queryMulti([
+      ...councilMembersIdentityQueries,
+    ]);
 
   const crossReferencedCouncilMemberIdentities = [];
 
