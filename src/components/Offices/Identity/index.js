@@ -115,6 +115,16 @@ function IdentityAnalysis({ identity }) {
   );
 }
 
+function parseData(d) {
+  if (d.isNone) return <em>&lt;empty&gt;</em>;
+  if (!d.isRaw) return <em>&lt;unsupported type - not None nor Raw&gt;</em>;
+
+  // we can assume it's raw
+  const bytes = d.asRaw;
+  // and we assume its utf-8
+  return new TextDecoder("utf-8").decode(bytes);
+}
+
 function IdentityTable({ info }) {
   const columns = [
     {
@@ -129,15 +139,15 @@ function IdentityTable({ info }) {
 
   const extra_additional = info.additional.filter((i) => !i[0].eq("citizen") && !i[0].eq("eligible_on"));
   const data = [
-    { k: "Display name",  v: info.display.toString() },
-    { k: "Legal",         v: info.legal.toString() },
-    { k: "Web",           v: info.web.toString() },
-    { k: "Riot",          v: info.riot.toString() },
-    { k: "Email",         v: info.email.toString() },
-    { k: "PGP",           v: info.pgpFingerprint.toString() },
-    { k: "Image",         v: info.image.toString() },
-    { k: "Twitter",       v: info.twitter.toString() },
-    { k: "Custom fields", v: <pre>{JSON.stringify(extra_additional.map(i => i.toString()))}</pre> },
+    { k: "Display name",  v: parseData(info.display) },
+    { k: "Legal",         v: parseData(info.legal) },
+    { k: "Web",           v: parseData(info.web) },
+    { k: "Riot",          v: parseData(info.riot) },
+    { k: "Email",         v: parseData(info.email) },
+    { k: "PGP",           v: parseData(info.pgpFingerprint) },
+    { k: "Image",         v: parseData(info.image) },
+    { k: "Twitter",       v: parseData(info.twitter) },
+    { k: "Custom fields", v: <pre>{JSON.stringify(extra_additional.map(parseData))}</pre> },
   ]
 
   console.log(data);
