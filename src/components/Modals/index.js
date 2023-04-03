@@ -4,6 +4,7 @@ import SendLLMModal from './SendLLMModal';
 import ChoseStakeModal from './ChoseStakeModal';
 import VoteOnReferendumModal from './VoteOnReferendumModal';
 import ProposeReferendumModal from './ProposeReferendumModal';
+import OnchainIdentityModal from './OnchainIdentityModal';
 
 export {
   GetCitizenshipModal,
@@ -12,4 +13,5 @@ export {
   ChoseStakeModal,
   VoteOnReferendumModal,
   ProposeReferendumModal,
+  OnchainIdentityModal,
 };

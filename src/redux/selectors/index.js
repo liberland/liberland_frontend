@@ -6,6 +6,7 @@ import * as democracySelectors from './democracy';
 import * as legislationSelectors from './legislation';
 import * as officesSelectors from './offices';
 import * as registriesSelectors from './registries';
+import * as identitySelectors from './identity';
 
 export {
   errorsSelectors,
@@ -16,4 +17,5 @@ export {
   legislationSelectors,
   officesSelectors,
   registriesSelectors,
+  identitySelectors,
 };

@@ -1,13 +1,13 @@
 import { createActions } from 'redux-actions';
 
 export const {
-  getIdentity,
+  officeGetIdentity,
   provideJudgement,
   getCompanyRequest,
   getCompanyRegistration,
   registerCompany,
 } = createActions({
-  GET_IDENTITY: {
+  OFFICE_GET_IDENTITY: {
     call: undefined,
     success: undefined,
     failure: undefined,
