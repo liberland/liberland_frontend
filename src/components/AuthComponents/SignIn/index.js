@@ -25,6 +25,8 @@ function SignIn() {
     handleSubmit,
     register,
     setError,
+    setValue,
+    watch,
   } = useForm();
   const dispatch = useDispatch();
   const history = useHistory();
@@ -100,8 +102,9 @@ function SignIn() {
             <CheckboxInput
               register={register}
               name="rememberMe"
-              placeholder="Password"
               label="Remember me?"
+              setValue={setValue}
+              watch={watch}
             />
             <Link to={router.signIn}>Forgot password?</Link>
           </div>

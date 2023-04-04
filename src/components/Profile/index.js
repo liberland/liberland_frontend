@@ -48,11 +48,11 @@ function Profile({ className }) {
   };
 
   const handleSubmitOnchainIdentity = (values) => {
-    let citizen = false;
     let eligible_on = null;
 
-    if (values.date_of_birth) {
-      citizen = true;
+    if (values.older_than_13) {
+      eligible_on = new Date(0)
+    } else if (values.date_of_birth) {
       const dob = new Date(values.date_of_birth);
       eligible_on = new Date(dob.getFullYear()+13, dob.getMonth(), dob.getDate());
     }
@@ -62,7 +62,8 @@ function Profile({ className }) {
       legal: values.legal,
       web: values.web,
       email: values.email,
-      citizen, eligible_on, 
+      citizen: values.citizen,
+      eligible_on, 
     }
 
     dispatch(identityActions.setIdentity.call({userWalletAddress, values: params}));
@@ -70,6 +71,7 @@ function Profile({ className }) {
   };
 
   const {judgements, info} = identity?.isSome ? identity.unwrap() : {};
+  const date_of_birth = parseDOB(info?.additional, blockNumber);
 
   const displayName = `${userName} ${lastName}`;
 
@@ -175,7 +177,10 @@ function Profile({ className }) {
                 <li>Legal: {parseIdentityData(info?.legal) ?? <em>&lt;empty&gt;</em>}</li>
                 <li>Web: {parseIdentityData(info?.web) ?? <em>&lt;empty&gt;</em>}</li>
                 <li>Email: {parseIdentityData(info?.email) ?? <em>&lt;empty&gt;</em>}</li>
-                <li>Date of birth: {parseDOB(info?.additional, blockNumber) ?? <em>&lt;empty&gt;</em>}</li>
+                { date_of_birth === false ?
+                  <li>Date of birth: old enough to vote</li> :
+                  <li>Date of birth: {date_of_birth ?? <em>&lt;empty&gt;</em>}</li>
+                }
                 <li>Citizen: {parseCitizen(info?.additional) ? "YES" : "NO"}</li>
                 <li>Citizenship confirmed: {parseCitizenshipJudgement(judgements) ? "YES" : "NO"}</li>
               </ul>
