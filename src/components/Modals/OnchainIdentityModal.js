@@ -1,38 +1,51 @@
 // LIBS
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';
-import { TextInput, DateInput } from '../InputComponents';
+import { TextInput, DateInput, CheckboxInput } from '../InputComponents';
 import Button from '../Button/Button';
 
 // STYLES
 import styles from './styles.module.scss';
 
-import { parseIdentityData, parseDOB, parseCitizenshipJudgement } from '../../utils/identityParser';
+import { parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement } from '../../utils/identityParser';
 
 function OnchainIdentityModal({
   onSubmit, closeModal, identity, blockNumber, name,
 }) {
   let defaultValues = {};
   let isKnownGood = false;
+  let identityCitizen = false;
+  let identityDOB = false;
   if (identity.isSome) {
     const {judgements, info} = identity.unwrap();
+    identityCitizen = parseCitizen(info.additional);
+    identityDOB = parseDOB(info.additional, blockNumber);
+
     defaultValues = {
       display: parseIdentityData(info.display) ?? name,
       legal: parseIdentityData(info.legal) ?? name,
       web: parseIdentityData(info.web),
       email: parseIdentityData(info.email),
-      date_of_birth: parseDOB(info.additional, blockNumber),
-    }
+      date_of_birth: identityDOB ?? undefined,
+      older_than_13: !identityDOB,
+      citizen: identityCitizen,
+    };
+
     isKnownGood = parseCitizenshipJudgement(judgements);
   }
 
   const {
     handleSubmit,
     register,
+    watch,
+    setValue,
   } = useForm({ defaultValues });
+
+  const isCitizen = watch('citizen');
+  const isOlderThan13 = watch('older_than_13');
 
   return (
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
@@ -72,21 +85,33 @@ function OnchainIdentityModal({
         placeholder="Email"
       />
 
-      {/* FIXME CheckboxInput is broken, it always sends citizen=false
       <div className={styles.title}>Are you or do you want to become a citizen?</div>
       <CheckboxInput
         register={register}
         name="citizen"
+        setValue={setValue}
+        watch={watch}
+        label="I am or want to become a citizen"
       />
-      
-      For now we set citizen=1 if date of birth is present
-      */}
-      <div className={styles.title}>Date of birth</div>
-      <DateInput
-        register={register}
-        name="date_of_birth"
-        placeholder="Date of birth"
-      />
+
+      { !isCitizen ? null :
+        <>
+          <div className={styles.title}>Date of birth</div>
+          <CheckboxInput
+            register={register}
+            name="older_than_13"
+            setValue={setValue}
+            watch={watch}
+            label="I'm 13 or older"
+          />
+          {isOlderThan13 ? null :
+            <DateInput
+              register={register}
+              name="date_of_birth"
+              placeholder="Date of birth"
+            />}
+        </>
+      }
 
       <div className={styles.buttonWrapper}>
         <Button

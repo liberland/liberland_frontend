@@ -8,7 +8,7 @@ export function parseIdentityData(d) {
 }
 
 export function parseEligibleOn(eligible_on) {
-  const bytes = eligible_on.asRaw; // little-endian
+  const bytes = new Uint8Array(eligible_on.asRaw); // little-endian
   bytes.reverse(); // big-endian
   const hex = Buffer.from(bytes).toString('hex');
   return parseInt(hex, 16);
@@ -45,6 +45,8 @@ export function parseDOB(additional, currentBlockNumber) {
   if (!eligible_on.isRaw) return undefined;
   const now = new Date(); // FIXME we should get a time at which blockNumber was actually fetched
   const eligibleOnBlockNumber = parseEligibleOn(eligible_on);
+  if (eligibleOnBlockNumber == 0) return false; // was eligible before blockchain started
+
   const msFromNow = (eligibleOnBlockNumber - currentBlockNumber) * 6 * 1000;
   const eligibleOnDate = new Date(now.getTime() + msFromNow);
   const birthDate = new Date(eligibleOnDate.getFullYear() - 13, eligibleOnDate.getMonth(), eligibleOnDate.getDate());

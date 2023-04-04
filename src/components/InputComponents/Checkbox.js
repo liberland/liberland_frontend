@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import cx from 'classnames';
 
 import styles from './styles.module.scss';
@@ -10,21 +10,21 @@ function CheckboxInput({
   required = false,
   errorTitle,
   label,
+  setValue,
+  watch,
 }) {
-  const [isChecked, setIsChecked] = useState(false);
+  const isChecked = watch(name);
 
-  const handleCheck = () => setIsChecked(!isChecked);
+  const handleCheck = () => {
+    setValue(name, !isChecked);
+  }
+
+  useEffect(() => {
+    register(name);
+  }, [register, name]);
 
   return (
     <div className={styles.checkboxInputWrapper}>
-      <input
-        className={cx(styles.hiddenInput)}
-        checked={isChecked}
-        type="checkbox"
-        {...register(name, { required: required && `${errorTitle} is required` })}
-        name={name}
-        readOnly
-      />
       <div className={cx(styles.checkbox)} onClick={handleCheck}>
         <svg className={cx(styles.checkboxIcon, { [styles.checkboxIconHidden]: !isChecked })} viewBox="0 0 24 24">
           <polyline points="20 6 9 17 4 12" />
