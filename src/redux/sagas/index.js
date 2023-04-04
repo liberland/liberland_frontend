@@ -30,6 +30,7 @@ export default function* rootSaga() {
     walletSagas.getValidatorsWatcher(),
     walletSagas.getNominatorTargetsWatcher(),
     walletSagas.setNominatorTargetsWatcher(),
+    walletSagas.unpoolWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),

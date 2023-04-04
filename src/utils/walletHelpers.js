@@ -7,7 +7,7 @@ export const grainsInDemocracyMerit = new BN('1000000000000');
 export const formatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 
 // take string or number and parse to BN using correct base
-const valueToBN = (i) => {
+export const valueToBN = (i) => {
   const s = i.toString();
   if (s.startsWith && s.startsWith('0x')) {
     return new BN(s.slice(2), 16);

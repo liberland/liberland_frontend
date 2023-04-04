@@ -19,6 +19,7 @@ const initialState = {
       meritsTotalAmount: {
         amount: 0,
       },
+      electionLock: 0,
     },
   },
   gettingWalletInfo: false,
@@ -41,6 +42,7 @@ const walletReducer = handleActions(
       walletActions.getValidators.call,
       walletActions.getNominatorTargets.call,
       walletActions.setNominatorTargets.call,
+      walletActions.unpool.call,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
@@ -77,6 +79,8 @@ const walletReducer = handleActions(
       walletActions.getNominatorTargets.failure,
       walletActions.setNominatorTargets.success,
       walletActions.setNominatorTargets.failure,
+      walletActions.unpool.success,
+      walletActions.unpool.failure,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,

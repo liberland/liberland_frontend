@@ -10,6 +10,7 @@ import {
   politiPool,
   getValidators, getNominatorTargets,
   setNominatorTargets,
+  unpool,
 } from '../../api/nodeRpcCall';
 // import api from '../../api';
 
@@ -46,6 +47,24 @@ function* stakeToPolkaWorker(action) {
     yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
     yield put(blockchainActions.setError.success(errorData));
     yield put(walletActions.stakeToPolka.failure(errorData));
+  }
+}
+
+function* unpoolWorker(action) {
+  try {
+    const { blockHash, errorData } = yield cps(unpool, action.payload);
+    if (errorData.isError) {
+      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+      yield put(blockchainActions.setError.success(errorData));
+      yield put(walletActions.unpool.failure())
+    } else {
+      yield put(walletActions.unpool.success());
+      yield put(walletActions.getWallet.call());
+    }
+  } catch (errorData) {
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(walletActions.unpool.failure(errorData));
   }
 }
 
@@ -184,6 +203,14 @@ function* stakeToPolkaWatcher() {
   }
 }
 
+function* unpoolWatcher() {
+  try {
+    yield takeLatest(walletActions.unpool.call, unpoolWorker);
+  } catch (e) {
+    yield put(walletActions.unpool.failure(e));
+  }
+}
+
 function* stakeToLiberlandWatcher() {
   try {
     yield takeLatest(walletActions.stakeToLiberland.call, stakeToLiberlandWorker);
@@ -229,4 +256,5 @@ export {
   getValidatorsWatcher,
   getNominatorTargetsWatcher,
   setNominatorTargetsWatcher,
+  unpoolWatcher,
 };

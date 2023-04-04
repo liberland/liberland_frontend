@@ -175,10 +175,12 @@ const getBalanceByAddress = async (address) => {
       LLDData,
       LLMData,
       LLMPolitiPool,
+      electionLock,
     ] = await api.queryMulti([
       [api.query.system.account, address],
       [api.query.assets.account, [1, address]],
       [api.query.llm.llmPolitics, address],
+      [api.query.llm.electionlock, address],
     ]);
     const LLMPolitiPoolData = LLMPolitiPool.toJSON();
     const LLDWalletData = LLDData.toJSON();
@@ -201,6 +203,7 @@ const getBalanceByAddress = async (address) => {
       meritsTotalAmount: {
         amount: LLMBalance,
       },
+      electionLock: electionLock.toJSON(),
     };
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -264,6 +267,28 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
   const injector = await web3FromSource('polkadot-js');
   // eslint-disable-next-line max-len
   await transferExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction failed', error);
+    callback({isError: true, details: error.toString()});
+  });
+};
+
+const unpool = async (walletAddress, callback) => {
+  const api = await getApi();
+  const unpoolExtrinsic = api.tx.llm.politicsUnlock();
+
+  const injector = await web3FromSource('polkadot-js');
+  unpoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
     let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
@@ -991,5 +1016,6 @@ export {
   registerCompany,
   getOfficialUserRegistryEntries,
   setIdentity,
-  requestCompanyRegistration
+  requestCompanyRegistration,
+  unpool,
 };
