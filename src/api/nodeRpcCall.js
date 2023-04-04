@@ -419,6 +419,52 @@ const setNominatorTargets = async (payload, callback) => {
   });
 };
 
+const delegateDemocracy = async (delegateeAddress, walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
+  const LLMPolitiPoolData = LLMPolitiPool.toJSON();
+  const delegateExtrinsic = api.tx.democracy.delegate(delegateeAddress, "None", LLMPolitiPoolData);
+
+  delegateExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed DELEGATE at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction failed', error);
+    callback({isError: true, details: error.toString()});
+  });
+};
+
+const undelegateDemocracy = async (walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const undelegateExtrinsic = api.tx.democracy.undelegate();
+
+  undelegateExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed UNDELEGATE at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction failed', error);
+    callback({isError: true, details: error.toString()});
+  });
+};
+
 const getDemocracyReferendums = async (address) => {
   try {
     const ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
@@ -1018,4 +1064,6 @@ export {
   setIdentity,
   requestCompanyRegistration,
   unpool,
+  delegateDemocracy,
+  undelegateDemocracy,
 };

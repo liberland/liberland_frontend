@@ -8,9 +8,14 @@
 }
 
 .proposeReferendumLine {
-  display: grid;
-  flex: 1;
-  height: 3rem;
-  align-items: flex-end;
-  justify-items: flex-end;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 40px;
+    margin-bottom: 10px;
+}
+
+.proposeReferendumLine * {
+  margin-left: 10px;
 }

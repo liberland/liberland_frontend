@@ -27,7 +27,7 @@ const alreadyVotedButton = (alreadyVoted) => (alreadyVoted === 'Aye'
   ));
 
 function ReferendumItem({
-  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, alreadyVoted, buttonVoteCallback, votingTimeLeft, referendumIndex,
+  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, alreadyVoted, buttonVoteCallback, votingTimeLeft, referendumIndex, delegating,
 }) {
   const progressBarRatio = yayVotes > 0 ? `${(formatPolkadotBalance(yayVotes)) / (formatPolkadotBalance(yayVotes) + formatPolkadotBalance(nayVotes)) * 100}%` : '0%';
   return (
@@ -80,9 +80,15 @@ function ReferendumItem({
         </div>
         <div className={styles.buttonContainer}>
           {
-            alreadyVoted
+            (alreadyVoted
               ? alreadyVotedButton(alreadyVoted)
-              : voteButtons(buttonVoteCallback, { name, referendumIndex })
+              :
+              (
+                delegating
+                ? "Undelegate to vote individually"
+                : voteButtons(buttonVoteCallback, { name, referendumIndex })
+              )
+            )
 
           }
         </div>
@@ -103,6 +109,7 @@ ReferendumItem.propTypes = {
   buttonVoteCallback: PropTypes.func.isRequired,
   votingTimeLeft: PropTypes.string.isRequired,
   referendumIndex: PropTypes.number.isRequired,
+  delegating: PropTypes.bool.isRequired,
 };
 
 export default ReferendumItem;

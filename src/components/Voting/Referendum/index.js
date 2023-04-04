@@ -6,13 +6,14 @@ import ProposalItem from './Items/ProposalItem';
 import Card from '../../Card';
 import styles from './styles.module.scss';
 import ReferendumItem from './Items/ReferendumItem';
-import { VoteOnReferendumModal, ProposeReferendumModal } from '../../Modals';
+import { VoteOnReferendumModal, ProposeReferendumModal, DelegateModal, UndelegateModal } from '../../Modals';
 import { democracyActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 
 function Referendum() {
   const [isModalOpenVote, setIsModalOpenVote] = useState(false);
   const [isModalOpenPropose, setIsModalOpenPropose] = useState(false);
+  const [isModalOpenUndelegate, setIsModalOpenUndelegate] = useState(false);
   const [modalShown, setModalShown] = useState(1);
   const [selectedReferendumInfo, setSelectedReferendumInfo] = useState({ name: 'Referendum' });
   const [selectedVoteType, setSelectedVoteType] = useState('Nay');
@@ -29,6 +30,9 @@ function Referendum() {
   };
   const handleModalOpenPropose = () => {
     setIsModalOpenPropose(!isModalOpenPropose);
+  };
+  const handleModalOpenUndelegate = () => {
+    setIsModalOpenUndelegate(!isModalOpenUndelegate);
   };
   const handleModalOpenEndorse = (referendumInfo) => {
     setIsModalOpenVote(!isModalOpenVote);
@@ -47,10 +51,23 @@ function Referendum() {
     dispatch(democracyActions.propose.call({ values, userWalletAddress }));
     handleModalOpenPropose();
   };
+  const handleSubmitUndelegate = (values) => {
+    dispatch(democracyActions.undelegate.call({ userWalletAddress }))
+    handleModalOpenUndelegate();
+  };
+  const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
   return (
     <div>
       <div className={styles.referendumsSection}>
         <div className={styles.proposeReferendumLine}>
+          {
+            delegatingTo ?
+            <>
+                Delegating to: {delegatingTo}
+                <Button small primary onClick={() => { handleModalOpenUndelegate(); }}>Undelegate</Button>
+            </>
+            : null
+          }
           <Button small primary onClick={() => { handleModalOpenPropose(); }}>Propose</Button>
         </div>
         <Card title="Referendums" className={styles.referendumsCard}>
@@ -68,6 +85,7 @@ function Referendum() {
                   nayVotes={referendum.votedNay}
                   // nayVotes={formatDemocracyMerits(parseInt(referendum.votedNay.words[0]))}
                   hash={referendum.imageHash}
+                  delegating={delegatingTo !== undefined}
                   alreadyVoted={
                     (referendum.allAye.reduce((previousValue, currentValue) => {
                       if (currentValue.accountId == userWalletAddress) {
@@ -137,6 +155,14 @@ function Referendum() {
               handleSubmit={handleSubmit}
               register={register}
               onSubmitPropose={handleSubmitPropose}
+            />
+          )}
+          {isModalOpenUndelegate && (
+            <UndelegateModal
+              closeModal={handleModalOpenUndelegate}
+              handleSubmit={handleSubmit}
+              delegatee={delegatingTo}
+              onSubmitUndelegate={handleSubmitUndelegate}
             />
           )}
         </Card>
