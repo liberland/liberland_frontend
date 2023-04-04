@@ -8,22 +8,17 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
 function DelegateModal({
-  handleSubmit, closeModal, register, onSubmitDelegate,
+  handleSubmit, closeModal, register, onSubmitDelegate, delegateAddress,
 }) {
   return (
     <form
       className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmitDelegate)}
+      onSubmit={() => {}}
     >
       <div className={styles.h3}>Delegate your votes</div>
 
 
-      <div className={styles.title}>Address of person you want to delegate to. You can only delegate to current Congress members.</div>
-      <TextInput
-        register={register}
-        name="delegateAddress"
-        placeholder="address"
-      />
+      <div className={styles.title}>You will delegate your votes to address {delegateAddress} that belongs to a Congress Member.</div>
 
       <div className={styles.buttonWrapper}>
         <Button
@@ -36,6 +31,7 @@ function DelegateModal({
           primary
           medium
           type="submit"
+          onClick={() => {onSubmitDelegate(delegateAddress)}}
         >
           Delegate
         </Button>

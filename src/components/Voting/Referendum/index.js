@@ -13,7 +13,6 @@ import Button from '../../Button/Button';
 function Referendum() {
   const [isModalOpenVote, setIsModalOpenVote] = useState(false);
   const [isModalOpenPropose, setIsModalOpenPropose] = useState(false);
-  const [isModalOpenDelegate, setIsModalOpenDelegate] = useState(false);
   const [isModalOpenUndelegate, setIsModalOpenUndelegate] = useState(false);
   const [modalShown, setModalShown] = useState(1);
   const [selectedReferendumInfo, setSelectedReferendumInfo] = useState({ name: 'Referendum' });
@@ -31,9 +30,6 @@ function Referendum() {
   };
   const handleModalOpenPropose = () => {
     setIsModalOpenPropose(!isModalOpenPropose);
-  };
-  const handleModalOpenDelegate = () => {
-    setIsModalOpenDelegate(!isModalOpenDelegate);
   };
   const handleModalOpenUndelegate = () => {
     setIsModalOpenUndelegate(!isModalOpenUndelegate);
@@ -55,10 +51,6 @@ function Referendum() {
     dispatch(democracyActions.propose.call({ values, userWalletAddress }));
     handleModalOpenPropose();
   };
-  const handleSubmitDelegate = (values) => {
-    dispatch(democracyActions.delegate.call({ values, userWalletAddress }))
-    handleModalOpenDelegate();
-  };
   const handleSubmitUndelegate = (values) => {
     dispatch(democracyActions.undelegate.call({ userWalletAddress }))
     handleModalOpenUndelegate();
@@ -74,8 +66,7 @@ function Referendum() {
                 Delegating to: {delegatingTo}
                 <Button small primary onClick={() => { handleModalOpenUndelegate(); }}>Undelegate</Button>
             </>
-            :
-            <Button small primary onClick={() => { handleModalOpenDelegate(); }}>Delegate</Button>
+            : null
           }
           <Button small primary onClick={() => { handleModalOpenPropose(); }}>Propose</Button>
         </div>
@@ -164,14 +155,6 @@ function Referendum() {
               handleSubmit={handleSubmit}
               register={register}
               onSubmitPropose={handleSubmitPropose}
-            />
-          )}
-          {isModalOpenDelegate && (
-            <DelegateModal
-              closeModal={handleModalOpenDelegate}
-              handleSubmit={handleSubmit}
-              register={register}
-              onSubmitDelegate={handleSubmitDelegate}
             />
           )}
           {isModalOpenUndelegate && (
