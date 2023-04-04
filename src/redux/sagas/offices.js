@@ -17,9 +17,9 @@ import { officesActions, blockchainActions } from '../actions';
 function* getIdentityWorker(action) {
   try {
     const identity = yield call(getIdentity, action.payload);
-    yield put(officesActions.getIdentity.success(identity));
+    yield put(officesActions.officeGetIdentity.success(identity));
   } catch (e) {
-    yield put(officesActions.getIdentity.failure(e));
+    yield put(officesActions.officeGetIdentity.failure(e));
   }
 }
 
@@ -32,7 +32,7 @@ function* provideJudgementWorker(action) {
       yield put(officesActions.provideJudgement.failure())
     } else {
       yield put(officesActions.provideJudgement.success())
-      yield put(officesActions.getIdentity.call(action.payload.address))
+      yield put(officesActions.officeGetIdentity.call(action.payload.address))
     }
   } catch (errorData) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
@@ -83,9 +83,9 @@ function* registerCompanyworker(action) {
 
 function* getIdentityWatcher() {
   try {
-    yield takeLatest(officesActions.getIdentity.call, getIdentityWorker);
+    yield takeLatest(officesActions.officeGetIdentity.call, getIdentityWorker);
   } catch (e) {
-    yield put(officesActions.getIdentity.failure(e));
+    yield put(officesActions.officeGetIdentity.failure(e));
   }
 }
 

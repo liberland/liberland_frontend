@@ -63,6 +63,61 @@ const provideJudgement = async ({address, hash, walletAddress}, callback) => {
   });
 }
 
+const citizenAdditionals = (blockNumber, eligible_on_date) => {
+  if(!eligible_on_date) return [];
+
+  const now = Date.now();
+  const seconds_till_eligible = eligible_on_date.getTime() - now;
+  const blocks_till_eligible = seconds_till_eligible / 6000;
+  let eligible_on_bn = blockNumber + blocks_till_eligible;
+  eligible_on_bn = eligible_on_bn > 0 ? eligible_on_bn : 0;
+  eligible_on_bn = Math.ceil(eligible_on_bn);
+  const eligible_on_buf = new ArrayBuffer(4);
+  new DataView(eligible_on_buf).setUint32(0, eligible_on_bn, true);
+  const eligible_on_bytes = new Uint8Array(eligible_on_buf);
+
+  return [
+    [{"Raw": "citizen"}, {"Raw": "1"}],
+    [{"Raw": "eligible_on"}, {"Raw": [...eligible_on_bytes]}],
+  ];
+}
+
+const setIdentity = async (values, walletAddress, callback) => {
+  const asData = v => v ? { Raw: v } : null;
+  const api = await getApi();
+  const blockNumber = await api.derive.chain.bestNumber();
+  const info = {
+    additional: values.citizen ? citizenAdditionals(blockNumber.toNumber(), values.eligible_on) : null,
+    display: asData(values.display),
+    legal: asData(values.legal),
+    web: asData(values.web),
+    email: asData(values.email),
+    riot: asData(null),
+    image: asData(null),
+    twitter: asData(null),
+  };
+  console.log(info);
+  
+  const setCall = api.tx.identity.setIdentity(info);
+  const injector = await web3FromSource('polkadot-js');
+  setCall.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      console.log(events);
+      // eslint-disable-next-line no-console
+      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction failed', error);
+    callback({isError: true, details: error.toString()});
+  });
+}
+
 const getCompanyRequest = async (entity_id) => {
   try {
     const api = await getApi();
@@ -935,5 +990,6 @@ export {
   getCompanyRegistration,
   registerCompany,
   getOfficialUserRegistryEntries,
+  setIdentity,
   requestCompanyRegistration
 };

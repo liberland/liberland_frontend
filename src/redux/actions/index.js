@@ -7,6 +7,7 @@ import * as blockchainActions from './blockchain';
 import * as democracyActions from './democracy';
 import * as officesActions from './offices';
 import * as registriesActions from './registries';
+import * as identityActions from './identity';
 
 export {
   authActions,
@@ -18,4 +19,5 @@ export {
   democracyActions,
   registriesActions,
   officesActions,
+  identityActions,
 };

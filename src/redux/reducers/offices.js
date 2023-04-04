@@ -13,7 +13,7 @@ const initialState = {
 
 const officesReducer = handleActions({
   [combineActions(
-    officesActions.getIdentity.call,
+    officesActions.officeGetIdentity.call,
     officesActions.getCompanyRequest.call,
     officesActions.getCompanyRegistration.call,
     officesActions.registerCompany.call,
@@ -23,12 +23,12 @@ const officesReducer = handleActions({
     loading: true,
   }),
   [combineActions(
-    officesActions.getIdentity.success,
+    officesActions.officeGetIdentity.success,
     officesActions.getCompanyRequest.success,
     officesActions.getCompanyRegistration.success,
     officesActions.registerCompany.success,
     officesActions.provideJudgement.success,
-    officesActions.getIdentity.failure,
+    officesActions.officeGetIdentity.failure,
     officesActions.getCompanyRequest.failure,
     officesActions.getCompanyRegistration.failure,
     officesActions.registerCompany.failure,
@@ -37,7 +37,7 @@ const officesReducer = handleActions({
     ...state,
     loading: false,
   }),
-  [officesActions.getIdentity.call]: (state, action) => ({
+  [officesActions.officeGetIdentity.call]: (state, action) => ({
     ...state,
     identity: {
       address: action.payload,
@@ -45,7 +45,7 @@ const officesReducer = handleActions({
     },
     isGetIdentity: true,
   }),
-  [officesActions.getIdentity.success]: (state, action) => ({
+  [officesActions.officeGetIdentity.success]: (state, action) => ({
     ...state,
     identity: {
       address: state.identity.address,
@@ -53,7 +53,7 @@ const officesReducer = handleActions({
     },
     isGetIdentity: false,
   }),
-  [officesActions.getIdentity.failure]: (state) => ({
+  [officesActions.officeGetIdentity.failure]: (state) => ({
     ...state,
     isGetIdentity: false,
   }),

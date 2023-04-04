@@ -6,6 +6,7 @@ import * as democracySagas from './democracy';
 import * as legislationSagas from './legislation';
 import * as officesSagas from './offices';
 import * as registriesSagas from './registries';
+import * as identitySagas from './identity';
 
 export default function* rootSaga() {
   yield all([
@@ -41,6 +42,10 @@ export default function* rootSaga() {
 
     // LEGISLATION
     legislationSagas.getLegislationWatcher(),
+
+    // IDENTITY
+    identitySagas.setIdentityWatcher(),
+    identitySagas.getIdentityWatcher(),
 
     // OFFICES
     officesSagas.getIdentityWatcher(),

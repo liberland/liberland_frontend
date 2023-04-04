@@ -20,7 +20,7 @@ function IdentityForm() {
 
   const onSubmit = ({ account }) => {
     dispatch(blockchainActions.getCurrentBlockNumber.call());
-    dispatch(officesActions.getIdentity.call(account));
+    dispatch(officesActions.officeGetIdentity.call(account));
   };
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>

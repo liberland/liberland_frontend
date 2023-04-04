@@ -1,11 +1,11 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import Avatar from 'react-avatar';
 import cx from 'classnames';
 
 import Button from '../Button/Button';
-import { userSelectors, walletSelectors } from '../../redux/selectors';
+import { userSelectors, walletSelectors, blockchainSelectors, identitySelectors } from '../../redux/selectors';
 
 import truncate from '../../utils/truncate';
 
@@ -20,6 +20,9 @@ import genderImage from '../../assets/icons/gender.svg';
 import startOfKyc from '../../assets/icons/startOfKyc.svg';
 import Card from '../Card';
 import { userRolesHelper } from '../../utils/userRolesHelper';
+import { OnchainIdentityModal } from '../Modals';
+import { identityActions } from '../../redux/actions';
+import { parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement } from '../../utils/identityParser';
 
 function Profile({ className }) {
   const userName = useSelector(userSelectors.selectUserName);
@@ -32,6 +35,43 @@ function Profile({ className }) {
   const language = useSelector(userSelectors.selectUserLanguages);
   const occupation = useSelector(userSelectors.selectUserOccupation);
   const gender = useSelector(userSelectors.selectUserGender);
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const blockNumber = useSelector(blockchainSelectors.blockNumber);
+  const identity = useSelector(identitySelectors.selectorIdentity);
+
+  const dispatch = useDispatch();
+
+  const [isModalOpenOnchainIdentity, setIsModalOpenOnchainIdentity] = useState(false);
+
+  const toggleModalOnchainIdentity = () => {
+    setIsModalOpenOnchainIdentity(!isModalOpenOnchainIdentity);
+  };
+
+  const handleSubmitOnchainIdentity = (values) => {
+    let citizen = false;
+    let eligible_on = null;
+
+    if (values.date_of_birth) {
+      citizen = true;
+      const dob = new Date(values.date_of_birth);
+      eligible_on = new Date(dob.getFullYear()+13, dob.getMonth(), dob.getDate());
+    }
+
+    const params = {
+      display: values.display,
+      legal: values.legal,
+      web: values.web,
+      email: values.email,
+      citizen, eligible_on, 
+    }
+
+    dispatch(identityActions.setIdentity.call({userWalletAddress, values: params}));
+    toggleModalOnchainIdentity();
+  };
+
+  const {judgements, info} = identity?.isSome ? identity.unwrap() : {};
+
+  const displayName = `${userName} ${lastName}`;
 
   return (
     <Card className={cx(styles.profile, className)}>
@@ -39,7 +79,7 @@ function Profile({ className }) {
         <div className={styles.wrapperBlock}>
           <div className={styles.avatar}>
             <div className={styles.avatarImage}>
-              <Avatar name={`${userName} ${lastName}`} round size="251" color="#FDF4E0" />
+              <Avatar name={displayName} round size="251" color="#FDF4E0" />
             </div>
             <Button medium>Edit Your Profile</Button>
           </div>
@@ -75,7 +115,7 @@ function Profile({ className }) {
           <div className={styles.userNameBalance}>
             <div className={styles.userNameRole}>
               <h3>
-                {`${userName} ${lastName}` }
+                {displayName}
               </h3>
               <div>
                 <img src={liberlandEmblemImage} alt="" />
@@ -126,7 +166,33 @@ function Profile({ className }) {
             </div>
           </div>
         </div>
+        <div className={styles.wrapperBlock}>
+          <div className={styles.aboutUser}>
+            <h3>On-chain identity</h3>
+            <div className={styles.itemFooterAbout}>
+              <ul>
+                <li>Display: {parseIdentityData(info?.display) ?? <em>&lt;empty&gt;</em>}</li>
+                <li>Legal: {parseIdentityData(info?.legal) ?? <em>&lt;empty&gt;</em>}</li>
+                <li>Web: {parseIdentityData(info?.web) ?? <em>&lt;empty&gt;</em>}</li>
+                <li>Email: {parseIdentityData(info?.email) ?? <em>&lt;empty&gt;</em>}</li>
+                <li>Date of birth: {parseDOB(info?.additional, blockNumber) ?? <em>&lt;empty&gt;</em>}</li>
+                <li>Citizen: {parseCitizen(info?.additional) ? "YES" : "NO"}</li>
+                <li>Citizenship confirmed: {parseCitizenshipJudgement(judgements) ? "YES" : "NO"}</li>
+              </ul>
+            </div>
+            <Button medium primary onClick={toggleModalOnchainIdentity}>Update identity</Button>
+          </div>
+        </div>
       </div>
+      {isModalOpenOnchainIdentity && (
+        <OnchainIdentityModal
+          closeModal={toggleModalOnchainIdentity}
+          onSubmit={handleSubmitOnchainIdentity}
+          identity={identity}
+          blockNumber={blockNumber}
+          name={displayName}
+        />
+      )}
     </Card>
   );
 }
