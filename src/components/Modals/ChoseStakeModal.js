@@ -1,15 +1,25 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { BN } from '@polkadot/util';
+
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
+import { walletSelectors } from '../../redux/selectors';
+import { valueToBN, formatMerits } from '../../utils/walletHelpers';
 
 function ChoseStakeModal({
   // eslint-disable-next-line react/prop-types,max-len
-  closeModal, handleSubmit, register, modalShown, setModalShown, handleSubmitStakePolka, handleSubmitStakeLiberland,
+  closeModal, handleSubmit, register, modalShown, setModalShown, handleSubmitStakePolka, handleSubmitStakeLiberland, handleSubmitUnpool,
 }) {
+  const balances = useSelector(walletSelectors.selectorBalances);
+  const unpool_amount = valueToBN(balances.liberstake.amount).mul(new BN(8742)).div(new BN(1000000));
+  const unpool_liquid = valueToBN(balances.liquidMerits.amount).add(unpool_amount);
+  const unpool_stake = valueToBN(balances.liberstake.amount).sub(unpool_amount);
+
   return (
     <>
       { modalShown === 0 && (
@@ -21,6 +31,13 @@ function ChoseStakeModal({
             onClick={() => setModalShown(2)}
           >
             PolitiPool
+          </Button>
+          <Button
+            primary
+            medium
+            onClick={() => setModalShown(3)}
+          >
+            Unpool
           </Button>
           <Button
             primary
@@ -98,6 +115,37 @@ function ChoseStakeModal({
         type="submit"
       >
         Stake
+      </Button>
+    </div>
+  </form>
+  )}
+
+      { modalShown === 3
+  && (
+  <form
+    className={styles.getCitizenshipModal}
+    onSubmit={handleSubmit(handleSubmitUnpool)}
+  >
+    <div className={styles.h3}>Unpool</div>
+    <div className={styles.title}>
+      Are you sure you want to go on welfare and temporarily forfeit your citizenship rights such as voting for a month?
+      This will instantly turn {formatMerits(unpool_amount)} LLM from pooled into liquid for a
+      total of {formatMerits(unpool_stake)} pooled LLM and {formatMerits(unpool_liquid)} liquid.
+    </div>
+
+    <div className={styles.buttonWrapper}>
+      <Button
+        medium
+        onClick={closeModal}
+      >
+        Cancel
+      </Button>
+      <Button
+        primary
+        medium
+        type="submit"
+      >
+        Unpool
       </Button>
     </div>
   </form>

@@ -21,35 +21,6 @@ import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 function WalletOverview({
   totalBalance, balances, liquidMerits,
 }) {
-  const [isModalOpenStake, setIsModalOpenStake] = useState(false);
-  const [modalShown, setModalShown] = useState(1);
-  const { handleSubmit, register } = useForm();
-  const dispatch = useDispatch();
-
-  const handleModalOpenStake = (title) => {
-    setIsModalOpenStake(!isModalOpenStake);
-
-    if (title === 'Liberstake') {
-      setModalShown(2);
-    } else if (title === 'Polkastake') {
-      setModalShown(1);
-    } else {
-      setIsModalOpenStake(false);
-    }
-  };
-
-  const isUserHaveStake = useSelector(walletSelectors.selectorIsUserHaveStake);
-  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-
-  const handleSubmitStakePolka = (values) => {
-    dispatch(walletActions.stakeToPolka.call({ values, isUserHaveStake, walletAddress }));
-    handleModalOpenStake();
-  };
-  const handleSubmitStakeLiberland = (values) => {
-    dispatch(walletActions.stakeToLiberland.call({ values, isUserHaveStake, walletAddress }));
-    handleModalOpenStake();
-  };
-
   const overviewInfo = [
     {
       amount: formatMerits(balances.liberstake.amount),
@@ -93,7 +64,6 @@ function WalletOverview({
             <div
               className={styles.cardInfo}
               key={cardInfo.title}
-              onClick={() => handleModalOpenStake(cardInfo.title)}
             >
               {/* <div className={styles.cardInfoIcon}>{cardInfo.getIcon()}</div> */}
               <div className={styles.cardInfoAmountWrapper}>
@@ -126,17 +96,6 @@ function WalletOverview({
           ))
         }
       </div>
-      {isModalOpenStake && (
-        <ChoseStakeModal
-          closeModal={handleModalOpenStake}
-          handleSubmit={handleSubmit}
-          register={register}
-          modalShown={modalShown}
-          setModalShown={setModalShown}
-          handleSubmitStakePolka={handleSubmitStakePolka}
-          handleSubmitStakeLiberland={handleSubmitStakeLiberland}
-        />
-      )}
     </Card>
   );
 }

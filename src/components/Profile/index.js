@@ -38,6 +38,9 @@ function Profile({ className }) {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const identity = useSelector(identitySelectors.selectorIdentity);
+  const walletInfo = useSelector(walletSelectors.selectorWalletInfo);
+  const lockBlocks = walletInfo?.balances?.electionLock - blockNumber;
+  const lockDays = lockBlocks > 0 ? lockBlocks * 6 / 3600 / 24 : 0;
 
   const dispatch = useDispatch();
 
@@ -135,6 +138,11 @@ function Profile({ className }) {
                   {walletAddress ? truncate(walletAddress, 13) : ''}
                 </span>
               </div>
+              { lockDays <= 0 ? null :
+                <div>
+                  Unpooling in effect: {lockDays.toFixed(2)} days remaining.
+                </div>
+              }
             </div>
           </div>
         </div>

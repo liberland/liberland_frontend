@@ -98,6 +98,10 @@ function WalletAddressesLine({ walletAddress }) {
     dispatch(walletActions.stakeToLiberland.call({ values, walletAddress }));
     handleModalOpenStake();
   };
+  const handleSubmitUnpool = () => {
+    dispatch(walletActions.unpool.call(walletAddress));
+    handleModalOpenStake();
+  };
 
   const navigationList = [
     {
@@ -174,6 +178,7 @@ function WalletAddressesLine({ walletAddress }) {
           setModalShown={setModalShown}
           handleSubmitStakePolka={handleSubmitStakePolka}
           handleSubmitStakeLiberland={handleSubmitStakeLiberland}
+          handleSubmitUnpool={handleSubmitUnpool}
         />
         )}
       </div>

@@ -10,6 +10,7 @@ export const {
   getValidators,
   getNominatorTargets,
   setNominatorTargets,
+  unpool,
 } = createActions({
   GET_WALLET: {
     call: undefined,
@@ -62,6 +63,11 @@ export const {
     failure: undefined,
   },
   SET_NOMINATOR_TARGETS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  UNPOOL: {
     call: undefined,
     success: undefined,
     failure: undefined,
