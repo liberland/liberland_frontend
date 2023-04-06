@@ -8,7 +8,7 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
 function DelegateModal({
-  handleSubmit, closeModal, register, onSubmitDelegate, delegateAddress,
+  closeModal, onSubmitDelegate, delegateAddress, currentlyDelegatingTo,
 }) {
   return (
     <form
@@ -17,6 +17,9 @@ function DelegateModal({
     >
       <div className={styles.h3}>Delegate your votes</div>
 
+
+      { !currentlyDelegatingTo ? null :
+        <div className={styles.title}>You're currently delegating to {currentlyDelegatingTo}</div> }
 
       <div className={styles.title}>You will delegate your votes to address {delegateAddress} that belongs to a Congress Member.</div>
 
