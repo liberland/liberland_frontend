@@ -9,16 +9,19 @@ import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { walletSelectors } from '../../redux/selectors';
-import { valueToBN, formatMerits } from '../../utils/walletHelpers';
+import { valueToBN, formatMerits, dollarsToGrains } from '../../utils/walletHelpers';
 
 function ChoseStakeModal({
   // eslint-disable-next-line react/prop-types,max-len
   closeModal, handleSubmit, register, modalShown, setModalShown, handleSubmitStakePolka, handleSubmitStakeLiberland, handleSubmitUnpool,
+  errors,
 }) {
   const balances = useSelector(walletSelectors.selectorBalances);
   const unpool_amount = valueToBN(balances.liberstake.amount).mul(new BN(8742)).div(new BN(1000000));
   const unpool_liquid = valueToBN(balances.liquidMerits.amount).add(unpool_amount);
   const unpool_stake = valueToBN(balances.liberstake.amount).sub(unpool_amount);
+  console.log(errors);
+
 
   return (
     <>
@@ -64,11 +67,19 @@ function ChoseStakeModal({
    >
      <div className={styles.h3}>Validator Stake</div>
      <div className={styles.title}>Amount LLD</div>
+     
      <TextInput
        register={register}
        name="amount"
        placeholder="Amount LLD"
+       validate={v =>
+        valueToBN(balances.liquidAmount.amount).sub(
+            dollarsToGrains(v)
+          ).gte(dollarsToGrains(1)) || 'You must leave at least 1 LLD unstaked'
+       }
      />
+     { errors?.amount?.type == "validate" ?
+     <p className={styles.error}>{errors.amount.message}</p> : null}
 
      <div className={styles.buttonWrapper}>
        <Button
