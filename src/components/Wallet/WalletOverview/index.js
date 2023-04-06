@@ -47,7 +47,7 @@ function WalletOverview({
       currency: 'LLM',
     },
     {
-      amount: formatDollars(totalBalance),
+      amount: formatDollars(balances.liquidAmount.amount),
       title: 'Liquid LLD',
       diff: -0.6,
       // eslint-disable-next-line no-constant-condition

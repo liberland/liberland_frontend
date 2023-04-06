@@ -16,6 +16,9 @@ const initialState = {
       totalAmount: {
         amount: '0x0',
       },
+      liquidAmount: {
+        amount: '0x0',
+      },
       meritsTotalAmount: {
         amount: 0,
       },
