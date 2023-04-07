@@ -21,7 +21,7 @@ function PoliticanCard({
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
 
-  const delegating = democracy.democracy?.userVotes?.Delegating?.target;
+  const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
   const handleModalOpenDelegate = () => {
     setIsModalOpenDelegate(!isModalOpenDelegate);
   };
@@ -38,9 +38,12 @@ function PoliticanCard({
       </div>
       <div className={styles.politicianVotingPower}>
         <div className={styles.politicianVotingPowerItems}>
-          { delegating ? null :
+          { politician.rawIdentity === userWalletAddress ? null :
             <div className={styles.buttonWrapper}>
-              <Button small primary onClick={handleModalOpenDelegate}>Delegate</Button> 
+              { delegatingTo === politician.rawIdentity ?
+                <Button small grey>Delegated</Button> :
+                <Button small primary onClick={handleModalOpenDelegate}>Delegate</Button> 
+              }
             </div>
           }
           <div>
@@ -57,10 +60,9 @@ function PoliticanCard({
       {isModalOpenDelegate && (
         <DelegateModal
           closeModal={handleModalOpenDelegate}
-          handleSubmit={handleSubmit}
-          register={register}
           onSubmitDelegate={handleSubmitDelegate}
           delegateAddress={politician.rawIdentity}
+          currentlyDelegatingTo={delegatingTo}
         />
       )}
     </div>
