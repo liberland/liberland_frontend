@@ -37,16 +37,18 @@ import { formatMerits } from '../../../utils/walletHelpers';
 function HomeNavigation() {
   const location = useLocation();
   const roles = useSelector(userSelectors.selectUserRole);
-  const name = useSelector(userSelectors.selectUserName);
-  const lastName = useSelector(userSelectors.selectUserLastName);
+  const name = useSelector(userSelectors.selectUserGivenName);
+  const lastName = useSelector(userSelectors.selectUserFamilyName);
   const totalBalance = useSelector(walletSelectors.selectorTotalLLM);
 
+  const title = name && lastName ? `${name} ${lastName}` : "Profile";
+  const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   const navigationList = [
     {
       route: router.home.profile,
-      title: `${name} ${lastName}`,
+      title: title,
       access: ['citizen', 'assemblyMember', 'non_citizen'],
-      icon: () => <Avatar name={`${name} ${lastName}`} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
+      icon: () => <Avatar name={fullName} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
       description: `${formatMerits(totalBalance)} LLM`,
     },
     {

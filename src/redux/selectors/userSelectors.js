@@ -30,18 +30,18 @@ const selectUserId = createSelector(
     return user.id;
   },
 );
-const selectUserName = createSelector(
+const selectUserGivenName = createSelector(
   selectUser,
   (user) => {
     if (!user) return null;
-    return user.name;
+    return user.givenName;
   },
 );
-const selectUserLastName = createSelector(
+const selectUserFamilyName = createSelector(
   selectUser,
   (user) => {
     if (!user) return null;
-    return user.lastName;
+    return user.familyName;
   },
 );
 const selectUserOrigin = createSelector(
@@ -97,8 +97,8 @@ export {
   selectUserId,
   selectIsSignInFetching,
   selectUserAbout,
-  selectUserName,
-  selectUserLastName,
+  selectUserGivenName,
+  selectUserFamilyName,
   selectUserOrigin,
   selectUserOccupation,
   selectUserGender,

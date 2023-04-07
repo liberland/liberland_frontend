@@ -10,8 +10,9 @@ import router from '../../../router';
 import styles from './styles.module.scss';
 
 function HomeHeader() {
-  const name = useSelector(userSelectors.selectUserName);
-  const lastName = useSelector(userSelectors.selectUserLastName);
+  const name = useSelector(userSelectors.selectUserGivenName);
+  const lastName = useSelector(userSelectors.selectUserFamilyName);
+  const hiMsg = name && lastName ? `Hi, ${name} ${lastName}!` : "Hi!";
   const titles = {
     [router.home.profile]: 'My profile',
     [router.home.documents]: 'My documents',
@@ -19,7 +20,7 @@ function HomeHeader() {
     [router.documents.citizenshipHistory]: 'My documents',
     [router.documents.courtCases]: 'My documents',
     [router.documents.landOwnership]: 'My documents',
-    [router.home.feed]: `Hi, ${name} ${lastName}!`,
+    [router.home.feed]: hiMsg,
     [router.home.legislation]: 'Legislation',
     [router.home.offices]: 'Offices',
     [router.home.registries]: 'Registries',
@@ -41,6 +42,7 @@ function HomeHeader() {
     window.location.replace(process.env.REACT_APP_SSO_API_LOGOUT_IMPLICIT_LINK);
   };
 
+  const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   return (
     <div className={styles.homeHeaderWrapper}>
       <div className={styles.homeHeaderAccountWrapper}>
@@ -49,7 +51,7 @@ function HomeHeader() {
         </div>
         <div className={styles.avatarWrapper}>
           <div ref={trigger} className={styles.avatar}>
-            <Avatar name={`${name} ${lastName}`} round onClick={toggleDropdown} size="47px" fgColor="#F1C823" color="#FDF4E0" />
+            <Avatar name={fullName} round onClick={toggleDropdown} size="47px" fgColor="#F1C823" color="#FDF4E0" />
           </div>
           {isOpen && (
             <div className={styles.dropdown} ref={dropdown}>

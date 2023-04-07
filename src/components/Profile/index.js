@@ -25,8 +25,8 @@ import { identityActions } from '../../redux/actions';
 import { parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement } from '../../utils/identityParser';
 
 function Profile({ className }) {
-  const userName = useSelector(userSelectors.selectUserName);
-  const lastName = useSelector(userSelectors.selectUserLastName);
+  const userName = useSelector(userSelectors.selectUserGivenName);
+  const lastName = useSelector(userSelectors.selectUserFamilyName);
   const userBalance = useSelector(walletSelectors.selectorLiquidMeritsBalance);
   const walletAddress = useSelector(walletSelectors.selectorWalletAddress);
   const userRole = useSelector(userSelectors.selectUserRole);
@@ -76,7 +76,7 @@ function Profile({ className }) {
   const {judgements, info} = identity?.isSome ? identity.unwrap() : {};
   const date_of_birth = parseDOB(info?.additional, blockNumber);
 
-  const displayName = `${userName} ${lastName}`;
+  const displayName = userName && lastName ? `${userName} ${lastName}` : "";
 
   return (
     <Card className={cx(styles.profile, className)}>
@@ -120,14 +120,16 @@ function Profile({ className }) {
           <div className={styles.userNameBalance}>
             <div className={styles.userNameRole}>
               <h3>
-                {displayName}
+                {displayName || "Account"}
               </h3>
               <div>
                 <img src={liberlandEmblemImage} alt="" />
+                {/*
                 <span>
                   {` ${userRolesHelper.getUserRolesString(userRole)} `}
                 </span>
                 {(userRolesHelper.getUserRolesString(userRole) !== 'Non citizen') ? 'of Liberland' : ''}
+                */}
               </div>
             </div>
             <div className="bottom-block">
@@ -148,6 +150,7 @@ function Profile({ className }) {
             </div>
           </div>
         </div>
+        {/*
         <div className={styles.wrapperBlock}>
           <div className={styles.aboutUser}>
             <h3>About Me</h3>
@@ -176,6 +179,7 @@ function Profile({ className }) {
             </div>
           </div>
         </div>
+        */}
         <div className={styles.wrapperBlock}>
           <div className={styles.aboutUser}>
             <h3>On-chain identity</h3>
