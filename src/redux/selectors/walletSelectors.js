@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { valueToBN } from '../../utils/walletHelpers';
 
 const walletReducer = (state) => state.wallet;
 
@@ -40,12 +41,9 @@ const selectorTotalLLM = createSelector(
   ),
 );
 
-const selectorIsUserHaveStake = createSelector(
+const selectorIsUserHavePolkaStake = createSelector(
   selectorBalances,
-  (reducer) => {
-    if ((reducer.liberstake.amount === 0) && (reducer.polkastake.amount === 0)) return false;
-    return true;
-  },
+  (reducer) => valueToBN(reducer.polkastake.amount).gt(valueToBN(0))
 );
 
 const selectorHistoryTx = createSelector(
@@ -86,7 +84,7 @@ export {
   selectorTotalBalance,
   selectorTotalLLM,
   selectorWalletAddress,
-  selectorIsUserHaveStake,
+  selectorIsUserHavePolkaStake,
   selectorHistoryTx,
   selectorCountAllRows,
   selectorCurrentPageNumber,
