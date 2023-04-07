@@ -7,6 +7,12 @@ const legislation = createSelector(
   (reducer) => reducer.legislation,
 );
 
+const gettingLegislation = createSelector(
+  legislationReducer,
+  (reducer) => reducer.isGetLegislation,
+);
+
 export {
   legislation,
+  gettingLegislation,
 };

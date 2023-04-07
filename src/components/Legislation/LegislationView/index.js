@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import {democracyActions, legislationActions} from '../../../redux/actions';
+import { legislationActions } from '../../../redux/actions';
 import { blockchainSelectors, legislationSelectors } from '../../../redux/selectors';
 import Card from '../../Card';
-import { castVetoForLegislation, revertVetoForLegislation } from '../../../api/nodeRpcCall';
 
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
@@ -42,8 +41,8 @@ const LegislationView = () => {
           <div>
             {
               l?.vetos?.includes(userWalletAddress)
-                ? <Button small red onClick={() => dispatch(democracyActions.revertVeto.call({tier: tier, index: l.index, userWalletAddress: userWalletAddress}))}>Revert Veto</Button>
-                : <Button small primary onClick={() => dispatch(democracyActions.castVeto.call({tier: tier, index: l.index, userWalletAddress: userWalletAddress}))}>Cast Veto</Button>
+                ? <Button small red onClick={() => dispatch(legislationActions.revertVeto.call({tier: tier, index: l.index, userWalletAddress: userWalletAddress}))}>Revert Veto</Button>
+                : <Button small primary onClick={() => dispatch(legislationActions.castVeto.call({tier: tier, index: l.index, userWalletAddress: userWalletAddress}))}>Cast Veto</Button>
             }
           </div>
         </div>
