@@ -45,6 +45,7 @@ export default function* rootSaga() {
     legislationSagas.getLegislationWatcher(),
     legislationSagas.castVetoWatcher(),
     legislationSagas.revertVetoWatcher(),
+    legislationSagas.getCitizenCountWatcher(),
 
     // IDENTITY
     identitySagas.setIdentityWatcher(),

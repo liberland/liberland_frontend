@@ -4,6 +4,7 @@ export const {
   getLegislation,
   castVeto,
   revertVeto,
+  getCitizenCount,
 } = createActions({
   GET_LEGISLATION: {
     call: undefined,
@@ -16,6 +17,11 @@ export const {
     failure: undefined,
   },
   REVERT_VETO: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_CITIZEN_COUNT: {
     call: undefined,
     success: undefined,
     failure: undefined,

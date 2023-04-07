@@ -3,12 +3,14 @@ import { legislationActions } from '../actions';
 
 const initialState = {
   legislation: [],
+  citizenCount: undefined,
   isGetLegislation: false,
 };
 
 const legislationReducer = handleActions({
   [combineActions(
     legislationActions.getLegislation.call,
+    legislationActions.getCitizenCount.call,
     legislationActions.castVeto.call,
     legislationActions.revertVeto.call
   )]: (state) => ({
@@ -18,6 +20,8 @@ const legislationReducer = handleActions({
   [combineActions(
     legislationActions.castVeto.failure,
     legislationActions.castVeto.success,
+    legislationActions.getCitizenCount.failure,
+    legislationActions.getCitizenCount.success,
     legislationActions.getLegislation.failure,
     legislationActions.getLegislation.success,
     legislationActions.revertVeto.failure,
@@ -25,6 +29,14 @@ const legislationReducer = handleActions({
   )]: (state) => ({
     ...state,
     isGetLegislation: false,
+  }),
+  [legislationActions.getCitizenCount.call]: (state) => ({
+    ...state,
+    citizenCount: undefined
+  }),
+  [legislationActions.getCitizenCount.success]: (state, action) => ({
+    ...state,
+    citizenCount: action.payload
   }),
   [legislationActions.getLegislation.call]: (state, action) => ({
     ...state,

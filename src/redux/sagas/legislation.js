@@ -3,7 +3,7 @@ import {
 } from 'redux-saga/effects';
 
 import {
-  getLegislation, castVetoForLegislation, revertVetoForLegislation,
+  getLegislation, castVetoForLegislation, revertVetoForLegislation, getCitizenCount,
 } from '../../api/nodeRpcCall';
 
 import { blockchainActions, legislationActions } from '../actions';
@@ -19,6 +19,15 @@ function* getLegislationWorker(action) {
     }));
   } catch (e) {
     yield put(legislationActions.getLegislation.failure(e));
+  }
+}
+
+function* getCitizenCountWorker() {
+  try {
+    const count = yield call(getCitizenCount);
+    yield put(legislationActions.getCitizenCount.success(count));
+  } catch (e) {
+    yield put(legislationActions.getCitizenCount.failure(e));
   }
 }
 
@@ -72,6 +81,14 @@ function* getLegislationWatcher() {
   }
 }
 
+function* getCitizenCountWatcher() {
+  try {
+    yield takeLatest(legislationActions.getCitizenCount.call, getCitizenCountWorker);
+  } catch (e) {
+    yield put(legislationActions.getCitizenCount.failure(e));
+  }
+}
+
 function* castVetoWatcher() {
   try {
     yield takeLatest(legislationActions.castVeto.call, castVetoWorker);
@@ -91,6 +108,7 @@ function* revertVetoWatcher() {
 
 export {
   getLegislationWatcher,
+  getCitizenCountWatcher,
   castVetoWatcher,
   revertVetoWatcher,
 };

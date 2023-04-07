@@ -12,16 +12,16 @@ const LegislationView = () => {
   const { tier } = useParams();
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const citizens = useSelector(legislationSelectors.citizenCount);
 
   useEffect(() => {
     dispatch(legislationActions.getLegislation.call(tier));
+    dispatch(legislationActions.getCitizenCount.call());
   }, [dispatch, tier, legislationActions]);
 
   const legislation = useSelector(legislationSelectors.legislation);
 
   if (!legislation[tier]) return 'Loading...';
-
-  console.log(legislation);
 
   return legislation[tier].map((l) => (
     <Card className={styles.legislationCard} title={`#${l.index}`} key={l.index}>
@@ -32,9 +32,9 @@ const LegislationView = () => {
         <div className={styles.vetoContent}>
           <div className={styles.vetoInfo}>
             <div>
-              <b>{l?.vetos?.length}</b>
+              {l?.vetos?.length}
               {' '}
-              / xyz
+              / {citizens}
             </div>
             <div>Citizens vetoed</div>
           </div>

@@ -1038,6 +1038,18 @@ const requestCompanyRegistration = async (walletAddress, companyDataObject, call
   });
 }
 
+const getCitizenCount = async () => {
+  try {
+    const api = await getApi();
+    const count = await api.query.llm.citizens()
+    return count.toNumber();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1070,4 +1082,5 @@ export {
   unpool,
   delegateDemocracy,
   undelegateDemocracy,
+  getCitizenCount
 };
