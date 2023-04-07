@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';
-import { TextInput } from '../InputComponents';
+import { TextInput, SelectInput } from '../InputComponents';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
@@ -18,10 +18,17 @@ function ProposeReferendumModal({
       <div className={styles.h3}>Propose a new Referendum</div>
 
       <div className={styles.title}>Legislation Tier</div>
-      <TextInput
+      <SelectInput
         register={register}
         name="legislationTier"
-        placeholder="1"
+        options={[
+          { value: "0", display: "Constitution"},
+          { value: "2", display: "Law"},
+          { value: "3", display: "Tier3"}, // FIXME proper names
+          { value: "4", display: "Tier4"},
+          { value: "5", display: "Tier5"},
+          { value: "6", display: "Decision"},
+        ]}
       />
 
       <div className={styles.title}>Legislation Name</div>
