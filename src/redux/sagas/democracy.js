@@ -34,7 +34,7 @@ function* getDemocracyWorker() {
 function* secondProposalWorker(action) {
   try {
     const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { blockHash, errorData } = yield cps(secondProposal, walletAddress, action.payload.proposalIndex, 3);
+    const { blockHash, errorData } = yield cps(secondProposal, walletAddress, action.payload.proposalIndex);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
