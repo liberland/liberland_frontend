@@ -182,6 +182,7 @@ const getBalanceByAddress = async (address) => {
       [api.query.llm.llmPolitics, address],
       [api.query.llm.electionlock, address],
     ]);
+    const derivedLLDBalances = await api.derive.balances.all(address);
     const LLMPolitiPoolData = LLMPolitiPool.toJSON();
     const LLDWalletData = LLDData.toJSON();
     const LLMWalletData = LLMData.toJSON();
@@ -199,6 +200,9 @@ const getBalanceByAddress = async (address) => {
       },
       totalAmount: {
         amount: LLDWalletData.data.free,
+      },
+      liquidAmount: {
+        amount: derivedLLDBalances.availableBalance,
       },
       meritsTotalAmount: {
         amount: LLMBalance,

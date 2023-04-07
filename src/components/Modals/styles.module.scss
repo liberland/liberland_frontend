@@ -25,6 +25,12 @@
     font-weight: 500;
   }
 
+  & .error {
+    font-size: 16px;
+    color: $errorText;
+    font-weight: 500;
+  }
+
   & .title {
     font-size: 14px;
     font-weight: 600;

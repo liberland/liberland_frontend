@@ -31,7 +31,9 @@ function WalletAddressesLine({ walletAddress }) {
   const [isModalOpenLLM, setIsModalOpenLLM] = useState(false);
   const [modalShown, setModalShown] = useState(0);
   const [sendAddress, setSendAddress] = useState('');
-  const { handleSubmit, register } = useForm();
+  const { handleSubmit, formState: {errors}, register } = useForm({
+    mode: 'all',
+  });
   const dispatch = useDispatch();
   const notificationRef = useRef();
   const addresses = {
@@ -179,6 +181,7 @@ function WalletAddressesLine({ walletAddress }) {
           handleSubmitStakePolka={handleSubmitStakePolka}
           handleSubmitStakeLiberland={handleSubmitStakeLiberland}
           handleSubmitUnpool={handleSubmitUnpool}
+          errors={errors}
         />
         )}
       </div>
