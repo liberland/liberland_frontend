@@ -152,8 +152,6 @@ function Referendum() {
           {isModalOpenPropose && (
             <ProposeReferendumModal
               closeModal={handleModalOpenPropose}
-              handleSubmit={handleSubmit}
-              register={register}
               onSubmitPropose={handleSubmitPropose}
             />
           )}
