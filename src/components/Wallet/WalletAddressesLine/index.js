@@ -41,7 +41,7 @@ function WalletAddressesLine({ walletAddress }) {
     validatorAddress: '0x0A1B23Be38A1dbc2A833D051780698CBbd9911FB',
   };
 
-  const isUserHaveStake = useSelector(walletSelectors.selectorIsUserHaveStake);
+  const isUserHavePolkaStake = useSelector(walletSelectors.selectorIsUserHavePolkaStake);
   const userWalletAddressSelector = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   const handleCopyClick = () => {
@@ -93,7 +93,7 @@ function WalletAddressesLine({ walletAddress }) {
   };
 
   const handleSubmitStakePolka = (values) => {
-    dispatch(walletActions.stakeToPolka.call({ values, isUserHaveStake, walletAddress }));
+    dispatch(walletActions.stakeToPolka.call({ values, isUserHavePolkaStake, walletAddress }));
     handleModalOpenStake();
   };
   const handleSubmitStakeLiberland = (values) => {

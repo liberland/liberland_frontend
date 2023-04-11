@@ -262,9 +262,9 @@ const sendTransferLLM = async (payload, callback) => {
 };
 
 const stakeToPolkaBondAndExtra = async (payload, callback) => {
-  const { values: { amount }, isUserHaveStake, walletAddress } = payload;
+  const { values: { amount }, isUserHavePolkaStake, walletAddress } = payload;
   const api = await getApi();
-  const transferExtrinsic = isUserHaveStake
+  const transferExtrinsic = isUserHavePolkaStake
     ? await api.tx.staking.bondExtra(dollarsToGrains(amount))
     : await api.tx.staking.bond(walletAddress, dollarsToGrains(amount), 'Staked');
 
