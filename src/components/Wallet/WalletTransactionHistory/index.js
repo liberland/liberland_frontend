@@ -92,7 +92,8 @@ function WalletTransactionHistory({ _transactionHistory, textForBtn, bottomButto
     ? llm.data.query.merits.nodes.map((n) => ({ asset: 'LLM', ...n }))
       .concat(lld.data.query.transfers.nodes.map((n) => ({ asset: 'LLD', ...n })))
     : [];
-  transactionHistory.sort((a, b) => a.block.number - b.block.number);
+  transactionHistory.sort((a, b) => b.block.number - a.block.number);
+  console.log(transactionHistory)
 
   return (
     <Card title="Transaction History" className={styles.cardWrapper}>
