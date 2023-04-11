@@ -15,7 +15,7 @@ import api from '../../api';
 
 const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
-const fakeUser = {
+/*const fakeUser = {
   email: 'fake eimail',
   about: 'fake about',
   gender: 'soviet Bukhanka ambulance truck',
@@ -26,12 +26,13 @@ const fakeUser = {
   occupation: 'Theftstopper',
   origin: 'schizo brain',
   role: { non_citizen: 'non_citizen' },
-};
+};*/
 function* signInWorker(action) {
   try {
     const { credentials, history, ssoAccessTokenHash } = action.payload;
     api.defaults.headers.common['X-token'] = ssoAccessTokenHash;
     const { data: user } = yield call(api.get, '/users/me');
+    console.log(user);
     user.ssoAccessTokenHash = ssoAccessTokenHash;
     yield put(blockchainActions.setUserWallet.success(credentials.wallet_address));
     yield sessionStorage.setItem('userWalletAddress', credentials.wallet_address);
@@ -39,7 +40,8 @@ function* signInWorker(action) {
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc, credentials.wallet_address);
-      const comboUser = { ...fakeUser, ...user };
+      //const comboUser = { ...fakeUser, ...user };
+      const comboUser = { ...user };
       comboUser.ssoAccessTokenHash = ssoAccessTokenHash;
       comboUser.role = yield call(getUserRoleRpc, credentials.wallet_address);
       yield put(authActions.signIn.success(comboUser));
