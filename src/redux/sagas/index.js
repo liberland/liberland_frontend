@@ -38,13 +38,14 @@ export default function* rootSaga() {
     democracySagas.voteOnReferendumWatcher(),
     democracySagas.proposeWatcher(),
     democracySagas.voteForCongressWatcher(),
-    democracySagas.castVetoWatcher(),
-    democracySagas.revertVetoWatcher(),
     democracySagas.delegateWatcher(),
     democracySagas.undelegateWatcher(),
 
     // LEGISLATION
     legislationSagas.getLegislationWatcher(),
+    legislationSagas.castVetoWatcher(),
+    legislationSagas.revertVetoWatcher(),
+    legislationSagas.getCitizenCountWatcher(),
 
     // IDENTITY
     identitySagas.setIdentityWatcher(),

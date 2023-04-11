@@ -7,6 +7,18 @@ const legislation = createSelector(
   (reducer) => reducer.legislation,
 );
 
+const gettingLegislation = createSelector(
+  legislationReducer,
+  (reducer) => reducer.isGetLegislation,
+);
+
+const citizenCount = createSelector(
+  legislationReducer,
+  (reducer) => reducer.citizenCount,
+);
+
 export {
   legislation,
+  gettingLegislation,
+  citizenCount,
 };

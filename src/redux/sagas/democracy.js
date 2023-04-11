@@ -7,13 +7,13 @@ import {
   getDemocracyReferendums,
   secondProposal,
   voteOnReferendum,
-  submitProposal, voteForCongress, castVetoForLegislation, revertVetoForLegislation,
+  submitProposal, voteForCongress,
   delegateDemocracy, undelegateDemocracy,
 } from '../../api/nodeRpcCall';
 
 import { blockchainSelectors } from '../selectors';
 
-import {blockchainActions, democracyActions} from '../actions';
+import {blockchainActions, democracyActions, legislationActions} from '../actions';
 
 // WORKERS
 
@@ -114,45 +114,6 @@ function* voteForCongressWorker(action) {
   }
 }
 
-function* castVetoWorker(action) {
-  try {
-    const { blockHash, errorData } = yield cps(castVetoForLegislation, action.payload.tier, action.payload.index, action.payload.userWalletAddress);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(democracyActions.castVeto.failure(errorData));
-    }
-    else {
-      yield put(democracyActions.castVeto.success())
-      yield put(democracyActions.getDemocracy.call());
-    }
-  } catch (errorData) {
-    console.log('Error in veto legislation worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(democracyActions.castVeto.failure(errorData));
-  }
-}
-
-function* revertVetoWorker(action) {
-  try {
-    const { blockHash, errorData } = yield cps(revertVetoForLegislation, action.payload.tier, action.payload.index, action.payload.userWalletAddress);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(democracyActions.revertVeto.failure(errorData));
-    } else {
-      yield put(democracyActions.revertVeto.success())
-      yield put(democracyActions.getDemocracy.call());
-    }
-  } catch (errorData) {
-    console.log('Error in veto legislation worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(democracyActions.revertVeto.failure(errorData));
-  }
-}
-
 function* delegateWorker(action) {
   try {
     const { blockHash, errorData } = yield cps(delegateDemocracy, action.payload.values.delegateAddress, action.payload.userWalletAddress);
@@ -233,22 +194,6 @@ function* voteForCongressWatcher() {
   }
 }
 
-function* castVetoWatcher() {
-  try {
-    yield takeLatest(democracyActions.castVeto.call, castVetoWorker);
-  } catch (e) {
-    yield put(democracyActions.castVeto.failure(e));
-  }
-}
-
-function* revertVetoWatcher() {
-  try {
-    yield takeLatest(democracyActions.revertVeto.call, revertVetoWorker);
-  } catch (e) {
-    yield put(democracyActions.revertVeto.failure(e));
-  }
-}
-
 function* delegateWatcher() {
   try {
     yield takeLatest(democracyActions.delegate.call, delegateWorker);
@@ -271,8 +216,6 @@ export {
   voteOnReferendumWatcher,
   proposeWatcher,
   voteForCongressWatcher,
-  castVetoWatcher,
-  revertVetoWatcher,
   delegateWatcher,
   undelegateWatcher,
 };

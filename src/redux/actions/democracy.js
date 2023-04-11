@@ -6,8 +6,6 @@ export const {
   voteOnReferendum,
   propose,
   voteForCongress,
-  castVeto,
-  revertVeto,
   delegate,
   undelegate
 } = createActions({
@@ -32,16 +30,6 @@ export const {
     failure: undefined,
   },
   VOTE_FOR_CONGRESS: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  CAST_VETO: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  REVERT_VETO: {
     call: undefined,
     success: undefined,
     failure: undefined,

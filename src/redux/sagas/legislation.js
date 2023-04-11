@@ -1,12 +1,12 @@
 import {
-  put, takeLatest, call,
+  put, takeLatest, call, cps,
 } from 'redux-saga/effects';
 
 import {
-  getLegislation,
+  getLegislation, castVetoForLegislation, revertVetoForLegislation, getCitizenCount,
 } from '../../api/nodeRpcCall';
 
-import { legislationActions } from '../actions';
+import { blockchainActions, legislationActions } from '../actions';
 
 // WORKERS
 
@@ -22,6 +22,55 @@ function* getLegislationWorker(action) {
   }
 }
 
+function* getCitizenCountWorker() {
+  try {
+    const count = yield call(getCitizenCount);
+    yield put(legislationActions.getCitizenCount.success(count));
+  } catch (e) {
+    yield put(legislationActions.getCitizenCount.failure(e));
+  }
+}
+
+function* castVetoWorker(action) {
+  try {
+    const { blockHash, errorData } = yield cps(castVetoForLegislation, action.payload.tier, action.payload.index, action.payload.userWalletAddress);
+    if (errorData.isError) {
+      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+      yield put(blockchainActions.setError.success(errorData));
+      yield put(legislationActions.castVeto.failure(errorData));
+    }
+    else {
+      yield put(legislationActions.castVeto.success())
+      yield put(legislationActions.getLegislation.call(action.payload.tier));
+    }
+  } catch (errorData) {
+    console.log('Error in veto legislation worker', errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(legislationActions.castVeto.failure(errorData));
+  }
+}
+
+function* revertVetoWorker(action) {
+  try {
+    const { blockHash, errorData } = yield cps(revertVetoForLegislation, action.payload.tier, action.payload.index, action.payload.userWalletAddress);
+    if (errorData.isError) {
+      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+      yield put(blockchainActions.setError.success(errorData));
+      yield put(legislationActions.revertVeto.failure(errorData));
+    } else {
+      yield put(legislationActions.revertVeto.success())
+      yield put(legislationActions.getLegislation.call(action.payload.tier));
+    }
+  } catch (errorData) {
+    console.log('Error in veto legislation worker', errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(legislationActions.revertVeto.failure(errorData));
+  }
+}
+
+
 // WATCHERS
 
 function* getLegislationWatcher() {
@@ -32,6 +81,34 @@ function* getLegislationWatcher() {
   }
 }
 
+function* getCitizenCountWatcher() {
+  try {
+    yield takeLatest(legislationActions.getCitizenCount.call, getCitizenCountWorker);
+  } catch (e) {
+    yield put(legislationActions.getCitizenCount.failure(e));
+  }
+}
+
+function* castVetoWatcher() {
+  try {
+    yield takeLatest(legislationActions.castVeto.call, castVetoWorker);
+  } catch (e) {
+    yield put(legislationActions.castVeto.failure(e));
+  }
+}
+
+function* revertVetoWatcher() {
+  try {
+    yield takeLatest(legislationActions.revertVeto.call, revertVetoWorker);
+  } catch (e) {
+    yield put(legislationActions.revertVeto.failure(e));
+  }
+}
+
+
 export {
   getLegislationWatcher,
+  getCitizenCountWatcher,
+  castVetoWatcher,
+  revertVetoWatcher,
 };

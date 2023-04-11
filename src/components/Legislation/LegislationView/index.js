@@ -1,10 +1,9 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import {democracyActions, legislationActions} from '../../../redux/actions';
+import { legislationActions } from '../../../redux/actions';
 import { blockchainSelectors, legislationSelectors } from '../../../redux/selectors';
 import Card from '../../Card';
-import { castVetoForLegislation, revertVetoForLegislation } from '../../../api/nodeRpcCall';
 
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
@@ -13,16 +12,16 @@ const LegislationView = () => {
   const { tier } = useParams();
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const citizens = useSelector(legislationSelectors.citizenCount);
 
   useEffect(() => {
     dispatch(legislationActions.getLegislation.call(tier));
+    dispatch(legislationActions.getCitizenCount.call());
   }, [dispatch, tier, legislationActions]);
 
   const legislation = useSelector(legislationSelectors.legislation);
 
   if (!legislation[tier]) return 'Loading...';
-
-  console.log(legislation);
 
   return legislation[tier].map((l) => (
     <Card className={styles.legislationCard} title={`#${l.index}`} key={l.index}>
@@ -33,17 +32,17 @@ const LegislationView = () => {
         <div className={styles.vetoContent}>
           <div className={styles.vetoInfo}>
             <div>
-              <b>{l?.vetos?.length}</b>
+              {l?.vetos?.length}
               {' '}
-              / xyz
+              / {citizens}
             </div>
             <div>Citizens vetoed</div>
           </div>
           <div>
             {
               l?.vetos?.includes(userWalletAddress)
-                ? <Button small red onClick={() => dispatch(democracyActions.revertVeto.call({tier: tier, index: l.index, userWalletAddress: userWalletAddress}))}>Revert Veto</Button>
-                : <Button small primary onClick={() => dispatch(democracyActions.castVeto.call({tier: tier, index: l.index, userWalletAddress: userWalletAddress}))}>Cast Veto</Button>
+                ? <Button small red onClick={() => dispatch(legislationActions.revertVeto.call({tier: tier, index: l.index, userWalletAddress: userWalletAddress}))}>Revert Veto</Button>
+                : <Button small primary onClick={() => dispatch(legislationActions.castVeto.call({tier: tier, index: l.index, userWalletAddress: userWalletAddress}))}>Cast Veto</Button>
             }
           </div>
         </div>
