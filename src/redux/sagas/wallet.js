@@ -159,6 +159,7 @@ function* setNominatorTargetsWorker(action) {
     } else {
       yield put(walletActions.setNominatorTargets.success());
       yield put(walletActions.getWallet.call());
+      yield put(walletActions.getNominatorTargets.call());
     }
   } catch (errorData) {
     // eslint-disable-next-line no-console
