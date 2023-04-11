@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useForm } from 'react-hook-form';
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';
@@ -8,8 +9,15 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
 function ProposeReferendumModal({
-  handleSubmit, closeModal, register, onSubmitPropose,
+  closeModal, onSubmitPropose,
 }) {
+  const { handleSubmit, formState: { errors }, register } = useForm({
+    mode: 'all',
+    defaultValues: {
+      legislationTier: "2",
+    }
+  });
+  console.log(errors);
   return (
     <form
       className={styles.getCitizenshipModal}
@@ -33,24 +41,33 @@ function ProposeReferendumModal({
 
       <div className={styles.title}>Legislation Name</div>
       <TextInput
+        required={true}
+        errorTitle="Name"
         register={register}
         name="legislationName"
         placeholder="legislationName"
       />
+      { errors?.legislationName?.message ? <div className={styles.error}>{errors.legislationName.message}</div> : null }
 
       <div className={styles.title}>Forum Link</div>
       <TextInput
+        required={true}
+        errorTitle="Forum link"
         register={register}
         name="forumLink"
         placeholder="forumLink"
       />
+      { errors?.forumLink?.message ? <div className={styles.error}>{errors.forumLink.message}</div> : null }
 
       <div className={styles.title}>Legislation Content</div>
       <TextInput
+        required={true}
+        errorTitle="Content"
         register={register}
         name="legislationContent"
         placeholder="legislationContent"
       />
+      { errors?.legislationContent?.message ? <div className={styles.error}>{errors.legislationContent.message}</div> : null }
 
       <div className={styles.buttonWrapper}>
         <Button
