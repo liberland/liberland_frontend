@@ -76,10 +76,10 @@ function* verifySessionWorker() {
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc, walletAddress);
     }
-    const comboUser = { ...fakeUser, ...user };
-    yield put(authActions.verifySession.success(comboUser));
+    yield put(authActions.verifySession.success(user));
     yield put(blockchainActions.getCurrentBlockNumber.call());
   } catch (error) {
+    console.error(error);
     yield put(authActions.verifySession.failure());
   }
 }

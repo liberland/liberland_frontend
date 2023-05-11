@@ -8,6 +8,7 @@ import * as democracyActions from './democracy';
 import * as officesActions from './offices';
 import * as registriesActions from './registries';
 import * as identityActions from './identity';
+import * as bridgeActions from './bridge';
 
 export {
   authActions,
@@ -20,4 +21,5 @@ export {
   registriesActions,
   officesActions,
   identityActions,
+  bridgeActions,
 };

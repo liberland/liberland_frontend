@@ -114,6 +114,10 @@ function WalletAddressesLine({ walletAddress }) {
       route: router.wallet.validatorsStaking,
       title: 'Validator staking',
     },
+    {
+      route: router.wallet.ethBridge,
+      title: 'Ethereum bridge',
+    },
   ];
 
   return (
