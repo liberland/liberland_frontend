@@ -97,7 +97,7 @@ const setIdentity = async (values, walletAddress, callback) => {
     twitter: asData(null),
   };
   console.log(info);
-  
+
   const setCall = api.tx.identity.setIdentity(info);
   const injector = await web3FromSource('polkadot-js');
   setCall.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
@@ -1050,6 +1050,90 @@ const getCitizenCount = async () => {
   }
 }
 
+const getLandNFTMetadataJson = async (collection_id, nft_id) => {
+  const api = await ApiPromise.create({
+    provider,
+    types: {
+      "Coords": {
+        "lat": "u64",
+        "long": "u64",
+      },
+      "LandMetadata": {
+        "demarcation": "BoundedVec<Coords, u32>",
+        "type": "Text",
+        "status": "Text",
+      }
+    }
+  });
+
+  const result = await api.query.nfts.itemMetadataOf(collection_id, nft_id);
+  const rawMetadata = result.unwrap().data; // unwrap will fail if there's no metadata for this item
+  const metadataUint = api.createType('LandMetadata', rawMetadata).toJSON();
+  const metadata = {
+    ...metadataUint,
+    demarcation: metadataUint.demarcation.map(c => ({
+      lat: c.lat/10000000,
+      long: c.long/10000000,
+    }))
+  };
+  return metadata;
+}
+const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress) => {
+  const injector = await web3FromAddress(walletAddress);
+  const api = await ApiPromise.create({
+    provider,
+    types: {
+      "Coords": {
+        "lat": "u64",
+        "long": "u64",
+      },
+      "LandMetadata": {
+        "demarcation": "BoundedVec<Coords, u32>",
+        "type": "Text",
+        "status": "Text",
+      }
+    }
+  });
+  /*let metadata = {
+    type: "test",
+    status: "test",
+    demarcation: [
+      { lat: 45.7723532, long: 18.8870918 },
+      { lat: 45.7721717, long: 18.8871917 },
+      { lat: 45.7723330, long: 18.8877504 },
+    ]
+  };*/
+
+// SCALE doesn't support floats, we need to convert coords to int
+  let metadataUint = {
+    ...metadata,
+    demarcation: metadata.demarcation.map(c => ({
+      lat: parseInt(c.lat*10000000),
+      long: parseInt(c.long*10000000)
+    })),
+  };
+  let polkadotJsApiObject = api.createType('LandMetadata', metadataUint);
+  let scaleEncoded = polkadotJsApiObject.toHex();
+
+  const metadataExtrinsic = api.tx.nfts.setMetadata(collection_id, nft_id, scaleEncoded);
+  const officeExtrinsic = api.tx.metaverseLandRegistryOffice.execute(metadataExtrinsic);
+// scaleEncoded is ready to be used for setting metadata
+// this data will be validated and will be rejected if encoded incorrectly or data is nonsensical (not on liberland island, self-intersecting plot lines, less then 3 points)
+  officeExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    //console.log(r)
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed REQUEST COMPANY REGISTRATION at block hash #${status.asInBlock.toString()}`);
+      console.log('errorData')
+      console.log(errorData)
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction EDIT METADATA failed', error);
+  })
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1082,5 +1166,7 @@ export {
   unpool,
   delegateDemocracy,
   undelegateDemocracy,
-  getCitizenCount
+  getCitizenCount,
+  getLandNFTMetadataJson,
+  setLandNFTMetadata
 };

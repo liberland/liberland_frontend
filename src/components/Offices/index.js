@@ -9,6 +9,7 @@ import CompanyRegistry from './CompanyRegistry';
 import router from '../../router';
 
 import styles from './styles.module.scss';
+import LandRegistry from "./LandRegistry";
 
 function Offices() {
   return (
@@ -35,6 +36,11 @@ function Offices() {
             render={() => (
               <Redirect to={router.offices.identity} />
             )}
+          />
+          <Route
+            exact
+            path={router.offices.landRegistry}
+            component={LandRegistry}
           />
         </Switch>
       </div>

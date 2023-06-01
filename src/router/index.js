@@ -15,6 +15,7 @@ export default {
   offices: {
     identity: '/home/offices/identity',
     companyRegistry: '/home/offices/company_registry',
+    landRegistry: '/home/offices/land_registry',
   },
   documents: {
     myAccount: '/home/documents/my-account',

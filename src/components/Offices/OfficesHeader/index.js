@@ -12,6 +12,10 @@ const navigationList = [
     route: `${router.offices.companyRegistry}`,
     title: 'Company Registry',
   },
+  {
+    route: `${router.offices.landRegistry}`,
+    title: 'Land Registry',
+  },
 ];
 
 function OfficesHeader() {
