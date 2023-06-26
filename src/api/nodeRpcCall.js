@@ -39,7 +39,68 @@ const getIdentity = async (address) => {
   }
 }
 
-const provideJudgement = async ({address, hash, walletAddress}, callback) => {
+const bridgeSubscribe = async (asset, receipt_id, onChange) => {
+  const api = await getApi();
+  let bridge;
+  if (asset == "LLM") bridge = api.query.ethLLMBridge;
+  else if (asset == "LLD") bridge = api.query.ethLLDBridge;
+  // returns unsub func
+  return {
+    unsubscribe: await bridge.statusOf(receipt_id, onChange)
+  }
+} 
+
+const bridgeDeposit = async ({ asset, amount, ethereumRecipient }, walletAddress, callback) => {
+  const api = await getApi();
+  let bridge;
+  if (asset == "LLM") bridge = api.tx.ethLLMBridge;
+  else if (asset == "LLD") bridge = api.tx.ethLLDBridge;
+  else throw new Exception("Unknown asset");
+
+  const call = bridge.deposit(amount, ethereumRecipient);
+  const injector = await web3FromSource('polkadot-js');
+  call.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api);
+    if (status.isInBlock) {
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        status,
+        events,
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
+const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress, callback) => {
+  const api = await getApi();
+  let bridge;
+  if (asset == "LLM") bridge = api.tx.ethLLMBridge;
+  else if (asset == "LLD") bridge = api.tx.ethLLDBridge;
+  else throw new Exception("Unknown asset");
+
+  const call = bridge.withdraw(receipt_id);
+  const injector = await web3FromSource('polkadot-js');
+  call.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api);
+    if (status.isInBlock) {
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
+const provideJudgement = async ({ address, hash, walletAddress }, callback) => {
   const api = await getApi();
   let judgement = api.createType('IdentityJudgement', 'KnownGood')
   const judgementCall = api.tx.identity.provideJudgement(0, address, judgement, hash);
@@ -97,7 +158,7 @@ const setIdentity = async (values, walletAddress, callback) => {
     twitter: asData(null),
   };
   console.log(info);
-
+  
   const setCall = api.tx.identity.setIdentity(info);
   const injector = await web3FromSource('polkadot-js');
   setCall.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
@@ -1134,6 +1195,18 @@ const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress
   })
 }
 
+const getBlockEvents = async (blockHash) => {
+  try {
+    const api = await getApi();
+    const apiAt = await api.at(blockHash);
+    return await apiAt.query.system.events();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1168,5 +1241,9 @@ export {
   undelegateDemocracy,
   getCitizenCount,
   getLandNFTMetadataJson,
-  setLandNFTMetadata
+  setLandNFTMetadata,
+  bridgeWithdraw,
+  bridgeSubscribe,
+  bridgeDeposit,
+  getBlockEvents,
 };

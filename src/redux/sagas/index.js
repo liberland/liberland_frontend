@@ -7,6 +7,7 @@ import * as legislationSagas from './legislation';
 import * as officesSagas from './offices';
 import * as registriesSagas from './registries';
 import * as identitySagas from './identity';
+import * as bridgeSagas from './bridge';
 
 export default function* rootSaga() {
   yield all([
@@ -61,6 +62,10 @@ export default function* rootSaga() {
     //REGISTRIES
     registriesSagas.getOfficialUserRegistryEntriesWatcher(),
     registriesSagas.setRegistryCRUDActionWatcher(),
-    registriesSagas.requestCompanyRegistrationWatcher()
+    registriesSagas.requestCompanyRegistrationWatcher(),
+
+    // BRIDGE
+    bridgeSagas.withdrawWatcher(),
+    bridgeSagas.depositWatcher(),
   ]);
 }

@@ -29,6 +29,9 @@ function HomeHeader() {
     [router.voting.referendum]: 'Voting',
     [router.home.wallet]: 'Wallet',
     [router.wallet.validatorsStaking]: 'Validator Staking',
+    [router.wallet.ethBridge]: 'Ethereum Bridge',
+    [router.wallet.ethBridgeDeposit]: 'Ethereum Bridge',
+    [router.wallet.ethBridgeWithdraw]: 'Ethereum Bridge',
   };
   const dispatch = useDispatch();
   const history = useHistory();

@@ -10,6 +10,7 @@ import democracyReducer from './democracy';
 import officesReducer from './offices';
 import registriesReducer from './registries';
 import identityReducer from './identity';
+import bridgeReducer from './bridge';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -23,6 +24,7 @@ const rootReducer = combineReducers({
   offices: officesReducer,
   registries: registriesReducer,
   identity: identityReducer,
+  bridge: bridgeReducer,
 });
 
 export default rootReducer;
