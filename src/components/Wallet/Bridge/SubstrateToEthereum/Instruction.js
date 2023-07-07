@@ -20,19 +20,9 @@ export function Instruction() {
         <li>After transaction is confirmed, Bridge network will transfer funds over to Ethereum. It takes ~1 minute.</li>
         <li>After transfer, there's a security freeze of 1h. Your funds are safely kept in Bridge during this period.</li>
         <li>
-          After the freeze you can claim the coins on Ethereum. This costs
-          {lldFee}
+          After the freeze you can claim the coins on Ethereum. This costs {lldFee} ETH for {bridges.LLD.token.symbol}
           {' '}
-          ETH for
-          {bridges.LLD.token.symbol}
-          {' '}
-          transfer and
-          {llmFee}
-          {' '}
-          ETH for
-          {bridges.LLM.token.symbol}
-          {' '}
-          transfer (plus standard transaction fees).
+          transfer and {llmFee} ETH for {bridges.LLM.token.symbol} transfer (plus standard transaction fees).
         </li>
       </ol>
     </div>

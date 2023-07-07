@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, cps, call,
+  put, takeLatest, cps, call, select,
 } from 'redux-saga/effects';
 
 import {
@@ -10,6 +10,8 @@ import {
 
 import { bridgeActions, blockchainActions } from '../actions';
 import { subToEthReceiptId } from '../../utils/bridge';
+import { getSubstrateOutgoingReceipts } from '../../api/explorer';
+import { blockchainSelectors, bridgeSelectors } from '../selectors';
 
 // WORKERS
 
@@ -81,6 +83,16 @@ function* depositWorker(action) {
   }
 }
 
+function* getTransfersToEthereumWorker() {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const res = yield call(getSubstrateOutgoingReceipts, walletAddress);
+  yield put(bridgeActions.getTransfersToEthereum.success(res));
+}
+
+function* getTransfersToSubstrateWorker() {
+  yield put(bridgeActions.getTransfersToSubstrate.success({'LLM': {}, 'LLD': {}}));
+}
+
 // WATCHERS
 
 function* withdrawWatcher() {
@@ -99,7 +111,25 @@ function* depositWatcher() {
   }
 }
 
+function* getTransfersToEthereumWatcher() {
+  try {
+    yield takeLatest(bridgeActions.getTransfersToEthereum.call, getTransfersToEthereumWorker);
+  } catch (e) {
+    yield put(bridgeActions.getTransfersToEthereum.failure(e));
+  }
+}
+
+function* getTransfersToSubstrateWatcher() {
+  try {
+    yield takeLatest(bridgeActions.getTransfersToSubstrate.call, getTransfersToSubstrateWorker);
+  } catch (e) {
+    yield put(bridgeActions.getTransfersToSubstrate.failure(e));
+  }
+}
+
 export {
   withdrawWatcher,
   depositWatcher,
+  getTransfersToEthereumWatcher,
+  getTransfersToSubstrateWatcher,
 };

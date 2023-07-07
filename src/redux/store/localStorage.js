@@ -3,8 +3,11 @@ import { initialState } from "../reducers/bridge";
 export const bridgeTransfersLocalStorageMiddleware = ({ getState }) => {
     return (next) => (action) => {
         const res = next(action);
-        localStorage.setItem('bridgeTransfers', JSON.stringify(
-            getState()['bridge']['transfers']
+        localStorage.setItem('bridgeTransfersToSubstrate', JSON.stringify(
+            getState()['bridge']['transfers']['toSubstrate']
+        ));
+        localStorage.setItem('bridgeTransfersToEthereum', JSON.stringify(
+            getState()['bridge']['transfers']['toEthereum']
         ));
         return res;
     };
@@ -12,13 +15,15 @@ export const bridgeTransfersLocalStorageMiddleware = ({ getState }) => {
 
 
 export const initBridgeTransfersStore = () => {
-    if (localStorage.getItem("bridgeTransfers") !== null) {
-        return {
-            bridge: {
-                ...initialState,
-                transfers: JSON.parse(localStorage.getItem("bridgeTransfers"))
-            }
-        };
+    let state = { bridge: { ...initialState }};
+    if (localStorage.getItem("bridgeTransfersToSubstrate") !== null) {
+        state.bridge.transfers.toSubstrate = JSON.parse(localStorage.getItem("bridgeTransfersToSubstrate"));
+        state.bridge.transfers.toSubstrateInitialized = true;
     }
+    if (localStorage.getItem("bridgeTransfersToEthereum") !== null) {
+        state.bridge.transfers.toEthereum = JSON.parse(localStorage.getItem("bridgeTransfersToEthereum"));
+        state.bridge.transfers.toEthereumInitialized = true;
+    }
+    return state;
 }
 

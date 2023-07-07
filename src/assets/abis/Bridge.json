@@ -133,16 +133,22 @@
       "anonymous": false,
       "inputs": [
         {
+          "indexed": true,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "substrateRecipient",
+          "type": "bytes32"
+        },
+        {
           "indexed": false,
           "internalType": "uint256",
           "name": "amount",
           "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "bytes32",
-          "name": "substrateRecipient",
-          "type": "bytes32"
         }
       ],
       "name": "OutgoingReceipt",
@@ -152,7 +158,7 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "bytes32",
           "name": "receiptId",
           "type": "bytes32"
@@ -266,16 +272,22 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "bytes32",
           "name": "receiptId",
           "type": "bytes32"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "relay",
           "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "substrateBlockNumber",
+          "type": "uint64"
         }
       ],
       "name": "Vote",
@@ -907,7 +919,7 @@
       "outputs": [
         {
           "internalType": "bool",
-          "name": "",
+          "name": "voted_",
           "type": "bool"
         }
       ],

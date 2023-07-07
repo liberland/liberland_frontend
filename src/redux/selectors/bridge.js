@@ -7,9 +7,19 @@ const isLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+const areToEthereumTransfersInitialized = createSelector(
+  bridgeReducer,
+  (reducer) => reducer.transfers.toEthereumInitialized,
+);
+
 const toEthereumTransfers = createSelector(
   bridgeReducer,
   (reducer) => reducer.transfers.toEthereum,
+);
+
+const areToSubstrateTransfersInitialized = createSelector(
+  bridgeReducer,
+  (reducer) => reducer.transfers.toSubstrateInitialized,
 );
 
 const toSubstrateTransfers = createSelector(
@@ -21,4 +31,6 @@ export {
   isLoading,
   toSubstrateTransfers,
   toEthereumTransfers,
+  areToEthereumTransfersInitialized,
+  areToSubstrateTransfersInitialized,
 };

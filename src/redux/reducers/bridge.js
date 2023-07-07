@@ -4,10 +4,12 @@ import { bridgeActions } from '../actions';
 export const initialState = {
   loading: false,
   transfers: {
+    toSubstrateInitialized: false,
     toSubstrate: {
       LLM: {},
       LLD: {},
     },
+    toEthereumInitialized: false,
     toEthereum: {
       LLM: {},
       LLD: {},
@@ -18,6 +20,8 @@ export const initialState = {
 const bridgeReducer = handleActions(
   {
     [combineActions(
+      bridgeActions.getTransfersToEthereum.call,
+      bridgeActions.getTransfersToSubstrate.call,
       bridgeActions.withdraw.call,
       bridgeActions.deposit.call,
     )]: (state) => ({
@@ -30,6 +34,10 @@ const bridgeReducer = handleActions(
       bridgeActions.withdraw.failure,
       bridgeActions.deposit.success,
       bridgeActions.deposit.failure,
+      bridgeActions.getTransfersToEthereum.success,
+      bridgeActions.getTransfersToEthereum.failure,
+      bridgeActions.getTransfersToSubstrate.success,
+      bridgeActions.getTransfersToSubstrate.failure,
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
@@ -90,6 +98,24 @@ const bridgeReducer = handleActions(
         }
       }
     },
+
+    [bridgeActions.getTransfersToEthereum.success]: (state, action) => ({
+      ...state,
+      transfers: {
+        ...state.transfers,
+        toEthereumInitialized: true,
+        toEthereum: action.payload,
+      }
+    }),
+
+    [bridgeActions.getTransfersToSubstrate.success]: (state, action) => ({
+      ...state,
+      transfers: {
+        ...state.transfers,
+        toSubstrateInitialized: true,
+        toSubstrate: action.payload,
+      }
+    }),
   },
   initialState,
 );

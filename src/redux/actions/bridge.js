@@ -5,6 +5,8 @@ export const {
   withdraw,
   updateTransferStatus,
   updateTransferWithdrawTx,
+  getTransfersToEthereum,
+  getTransfersToSubstrate,
 } = createActions({
   DEPOSIT: {
     call: undefined,
@@ -21,5 +23,15 @@ export const {
   },
   UPDATE_TRANSFER_WITHDRAW_TX: {
     set: undefined,
-  }
+  },
+  GET_TRANSFERS_TO_ETHEREUM: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_TRANSFERS_TO_SUBSTRATE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
 });
