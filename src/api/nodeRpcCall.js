@@ -254,7 +254,7 @@ const getBalanceByAddress = async (address) => {
         amount: LLMPolitiPoolData,
       },
       polkastake: {
-        amount: LLDWalletData.data.miscFrozen,
+        amount: LLDWalletData.data.frozen ?? LLDWalletData.data.miscFrozen,
       },
       liquidMerits: {
         amount: LLMBalance,
