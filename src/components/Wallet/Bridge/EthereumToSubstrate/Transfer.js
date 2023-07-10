@@ -11,8 +11,7 @@ import useSubstrateBridgeTransfer from '../../../../hooks/useSubstrateBridgeTran
 export function Transfer({ ethBridge, transfer }) {
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const { args } = ethBridge.contract.interface.parseTransaction(transfer.burn.transaction);
-  const rawSubstrateState = useSubstrateBridgeTransfer(ethBridge.asset, transfer.receipt_id);
+  const rawSubstrateState = useSubstrateBridgeTransfer(transfer.asset, transfer.txHash, transfer.receipt_id);
   const substrateBlockNumber = useSelector(blockchainSelectors.blockNumber); // FIXME this isn't updating realtime and we need this realtime
 
   const withdraw = () => {
@@ -36,7 +35,7 @@ export function Transfer({ ethBridge, transfer }) {
   }
 
   let state;
-  if (!transfer.burn.receipt) {
+  if (!transfer.receipt_id) {
     state = 'Waiting for tx confirmation';
   } else if (substrateState === 'unknown') {
     state = 'Waiting for tx to be finalized (~15 minutes)';
@@ -54,11 +53,11 @@ export function Transfer({ ethBridge, transfer }) {
 
   return (
     <tr>
-      <td>{new Date(transfer.burn.submittedAt).toLocaleString()}</td>
+      <td>{new Date(transfer.date).toLocaleString()}</td>
       <td>{transfer.receipt_id ? transfer.receipt_id : 'pending'}</td>
-      <td>{encodeAddress(args.substrateRecipient)}</td>
+      <td>{encodeAddress(transfer.substrateRecipient)}</td>
       <td>
-        {ethers.utils.formatUnits(args.amount, ethBridge.token.decimals)}
+        {ethers.utils.formatUnits(transfer.amount, ethBridge.token.decimals)}
         {' '}
         {ethBridge.token.symbol}
       </td>

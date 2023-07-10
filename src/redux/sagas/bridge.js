@@ -2,6 +2,8 @@ import {
   put, takeLatest, cps, call, select,
 } from 'redux-saga/effects';
 
+import { ethers } from 'ethers';
+
 import {
   bridgeDeposit,
   bridgeWithdraw,
@@ -9,9 +11,11 @@ import {
 } from '../../api/nodeRpcCall';
 
 import { bridgeActions, blockchainActions } from '../actions';
-import { subToEthReceiptId } from '../../utils/bridge';
+import { ethToSubReceiptId, ethToSubReceiptIdFromEvent, subToEthReceiptId } from '../../utils/bridge';
 import { getSubstrateOutgoingReceipts } from '../../api/explorer';
 import { blockchainSelectors, bridgeSelectors } from '../selectors';
+import { bridgeBurn, getEthereumOutgoingReceipts, getTxReceipt } from '../../api/eth';
+import { bridgeTransfersLocalStorageMiddleware } from '../store/localStorage';
 
 // WORKERS
 
@@ -83,14 +87,72 @@ function* depositWorker(action) {
   }
 }
 
-function* getTransfersToEthereumWorker() {
-  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  const res = yield call(getSubstrateOutgoingReceipts, walletAddress);
-  yield put(bridgeActions.getTransfersToEthereum.success(res));
+function* burnWorker(action) {
+  const txHash = yield call(bridgeBurn, action.payload);
+  const { asset, amount, substrateRecipient } = action.payload;
+  const transfer = {
+    txHash,
+    asset,
+    amount: ethers.utils.formatUnits(amount, 0),
+    substrateRecipient,
+    date: Date.now(),
+    receipt_id: null,
+    blockHash: null,
+    status: null,
+  }
+  yield put(bridgeActions.burn.success(transfer));
+  yield put(bridgeActions.monitorBurn.call(transfer));
 }
 
-function* getTransfersToSubstrateWorker() {
-  yield put(bridgeActions.getTransfersToSubstrate.success({'LLM': {}, 'LLD': {}}));
+function* monitorBurnWorker(action) {
+  const ethers_receipt = yield call(getTxReceipt, action.payload);
+  const receipt_id = ethToSubReceiptId(ethers_receipt);
+  const { txHash, asset } = action.payload;
+  yield put(bridgeActions.monitorBurn.success({ txHash, asset, receipt_id, blockHash: ethers_receipt.blockHash}));
+}
+
+function* getTransfersToEthereumWorker() {
+  const preload = yield select(bridgeSelectors.toEthereumPreload);
+  if (!preload) {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const res = yield call(getSubstrateOutgoingReceipts, walletAddress);
+    yield put(bridgeActions.getTransfersToEthereum.success(res));
+  } else {
+    yield put(bridgeActions.getTransfersToEthereum.success({}));
+  }
+}
+
+function* getTransfersToSubstrateWorker({ payload: address }) {
+  const preload = yield select(bridgeSelectors.toSubstratePreload);
+  if (!preload) {
+    const events = yield call(getEthereumOutgoingReceipts, address);
+    const _reducer = asset => (transfers, event) => {
+      const txHash = event.transactionHash;
+      transfers[txHash] = {
+        txHash,
+        asset,
+        amount: ethers.utils.formatUnits(event.args.amount, 0),
+        substrateRecipient: event.args.substrateRecipient,
+        date: 1000 * event.blockTimestamp,
+        receipt_id: ethToSubReceiptIdFromEvent(event),
+        blockHash: event.blockHash,
+        status: null,
+      };
+      return transfers;
+    };
+    let transfers = events.LLD.reduce(_reducer('LLD'), {});
+    transfers = events.LLM.reduce(_reducer('LLM'), transfers);
+
+    console.log(transfers);
+    yield put(bridgeActions.getTransfersToSubstrate.success(transfers));
+  } else {
+    const transfers = yield select(bridgeSelectors.toSubstrateTransfers);
+    const pending = Object.values(transfers).filter(t => t.receipt_id === null);
+    for (const transfer of pending) {
+      yield put(bridgeActions.monitorBurn.call(transfer));
+    }
+    yield put(bridgeActions.getTransfersToSubstrate.success({}));
+  }
 }
 
 // WATCHERS
@@ -111,9 +173,25 @@ function* depositWatcher() {
   }
 }
 
+function* burnWatcher() {
+  try {
+    yield takeLatest(bridgeActions.burn.call, burnWorker);
+  } catch (e) {
+    yield put(bridgeActions.burn.failure(e));
+  }
+}
+
+function* monitorBurnWatcher() {
+  try {
+    yield takeLatest(bridgeActions.monitorBurn.call, monitorBurnWorker);
+  } catch (e) {
+    yield put(bridgeActions.monitorBurn.failure(e));
+  }
+}
+
 function* getTransfersToEthereumWatcher() {
   try {
-    yield takeLatest(bridgeActions.getTransfersToEthereum.call, getTransfersToEthereumWorker);
+    yield takeLatest(bridgeActions.getTransfersToEthereum.call, getTransfersToEthereumWorker); 
   } catch (e) {
     yield put(bridgeActions.getTransfersToEthereum.failure(e));
   }
@@ -130,6 +208,8 @@ function* getTransfersToSubstrateWatcher() {
 export {
   withdrawWatcher,
   depositWatcher,
+  burnWatcher,
+  monitorBurnWatcher,
   getTransfersToEthereumWatcher,
   getTransfersToSubstrateWatcher,
 };

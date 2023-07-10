@@ -60,16 +60,8 @@ export const getSubstrateOutgoingReceipts = async (substrate_address) => {
         receipt_id: r.receiptId,
     }));
 
-    const res = {
-        LLM: receipts.filter(r => r.asset === "LLM").reduce((o, r) => {
-            o[r.receipt_id] = r;
-            return o;
-        }, {}),
-        LLD: receipts.filter(r => r.asset === "LLD").reduce((o, r) => {
-            o[r.receipt_id] = r;
-            return o;
-        }, {})
-    };
-
-    return res;
+    return receipts.reduce((o, r) => {
+        o[r.receipt_id] = r;
+        return o;
+    }, {});
 }

@@ -10,27 +10,21 @@ import { bridgeActions } from '../../../../redux/actions';
 export function Transfers() {
   const dispatch = useDispatch();
 
-  const areToEthereumTransfersInitialized = useSelector(bridgeSelectors.areToEthereumTransfersInitialized);
+  const initialized = useSelector(bridgeSelectors.toEthereumInitialized);
   useEffect(() => {
-    dispatch(bridgeActions.getTransfersToEthereum.call());
-  }, [dispatch, areToEthereumTransfersInitialized]);
-
-  const areToSubstrateTransfersInitialized = useSelector(bridgeSelectors.areToSubstrateTransfersInitialized);
-  useEffect(() => {
-    dispatch(bridgeActions.getTransfersToSubstrate.call());
-  }, [dispatch, areToSubstrateTransfersInitialized]);
+    if (!initialized)
+      dispatch(bridgeActions.getTransfersToEthereum.call());
+  }, [dispatch, initialized]);
 
   const transfers = useSelector(bridgeSelectors.toEthereumTransfers);
   const ethBridges = useEthBridges();
   const blockNumber = useBlockNumber();
   if (!ethBridges || !blockNumber) return 'Loading...'; // FIXME proper loader
-  const allTransfers = [
-    ...Object.values(transfers.LLM),
-    ...Object.values(transfers.LLD),
-  ].sort((a, b) => b.date - a.date);
+  const allTransfers = Object.values(transfers).sort((a, b) => b.date - a.date);
 
   if (allTransfers.length === 0) return null;
 
+  console.log(allTransfers);
   return (
     <table className={styles.transferTable}>
       <thead>

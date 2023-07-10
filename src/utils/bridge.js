@@ -72,6 +72,15 @@ const _ethToSubReceiptId = (
     return blake2AsHex(data, 256);
 };
 
+export const ethToSubReceiptIdFromEvent = (event) => {
+    const block_hash = event.blockHash;
+    const idx = event.logIndex;
+    const amount = event.args.amount;
+    const recipient = event.args.substrateRecipient;
+
+    return _ethToSubReceiptId(block_hash, idx, amount, recipient);
+}
+
 export const ethToSubReceiptId = (ethers_receipt) => {
     const abi = new ethers.utils.Interface(BridgeABI.abi);
     const logs = ethers_receipt?.logs;

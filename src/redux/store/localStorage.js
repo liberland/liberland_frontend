@@ -18,11 +18,11 @@ export const initBridgeTransfersStore = () => {
     let state = { bridge: { ...initialState }};
     if (localStorage.getItem("bridgeTransfersToSubstrate") !== null) {
         state.bridge.transfers.toSubstrate = JSON.parse(localStorage.getItem("bridgeTransfersToSubstrate"));
-        state.bridge.transfers.toSubstrateInitialized = true;
+        state.bridge.transfers.toSubstratePreload = state.bridge.transfers.toSubstrate;
     }
     if (localStorage.getItem("bridgeTransfersToEthereum") !== null) {
         state.bridge.transfers.toEthereum = JSON.parse(localStorage.getItem("bridgeTransfersToEthereum"));
-        state.bridge.transfers.toEthereumInitialized = true;
+        state.bridge.transfers.toEthereumPreload = state.bridge.transfers.toSubstrate;
     }
     return state;
 }

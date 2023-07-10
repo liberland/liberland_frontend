@@ -67,6 +67,8 @@ export default function* rootSaga() {
     // BRIDGE
     bridgeSagas.withdrawWatcher(),
     bridgeSagas.depositWatcher(),
+    bridgeSagas.burnWatcher(),
+    bridgeSagas.monitorBurnWatcher(),
     bridgeSagas.getTransfersToEthereumWatcher(),
     bridgeSagas.getTransfersToSubstrateWatcher(),
   ]);

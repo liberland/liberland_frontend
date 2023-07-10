@@ -2,16 +2,19 @@ import React from 'react';
 import { ethers } from 'ethers';
 import { useForm } from 'react-hook-form';
 import { useContractFunction } from '@usedapp/core';
-import { decodeAddress } from '@polkadot/keyring';
 
 import { isValidSubstrateAddress } from '../../../../utils/bridge';
 import Button from '../../../Button/Button';
 import { SelectInput, TextInput } from '../../../InputComponents';
-import { ASSETS } from '../../../../hooks/useEthBridges';
+import { ASSETS } from '../../../../api/eth';
 
 import styles from '../styles.module.scss';
+import { useDispatch } from 'react-redux';
+import { bridgeActions } from '../../../../redux/actions';
 
 export function NewTransfer({ ethBridges }) {
+  const dispatch = useDispatch();
+
   const {
     handleSubmit,
     register,
@@ -27,12 +30,10 @@ export function NewTransfer({ ethBridges }) {
 
   const ethBridge = ethBridges[watch('asset')];
 
-  const { send: burnSend } = useContractFunction(ethBridge.contract, 'burn', { transactionName: 'burn' });
-
   const onSubmit = (values) => {
     const amount = ethers.utils.parseUnits(values.amount, ethBridge.token.decimals);
-    const account_id = decodeAddress(values.recipient);
-    burnSend(amount, account_id);
+    const substrateRecipient = values.recipient;
+    dispatch(bridgeActions.burn.call({ asset: values.asset, amount, substrateRecipient }));
     reset();
   };
 
