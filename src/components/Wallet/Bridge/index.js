@@ -24,7 +24,15 @@ const navigationList = [
 ];
 
 function Bridge() {
-  const { account } = useEthers();
+  const { account, switchNetwork, chainId } = useEthers()
+
+  const goodChainId = parseInt(process.env.REACT_APP_ETHER_CHAIN_ID);
+  useEffect(() => {
+    (async () => {
+      if (chainId !== goodChainId)
+        await switchNetwork(goodChainId)
+    })();
+  }, [chainId, switchNetwork, goodChainId]);
 
   const dispatch = useDispatch();
 
@@ -41,6 +49,7 @@ function Bridge() {
   }, [dispatch, account, toSubstrateInitialized]);
 
   if (!account) return <Card className={styles.bridgeWrapper}><Connect /></Card>;
+  if (chainId !== goodChainId) return <Card className={styles.bridgeWrapper}>Change network in MetaMask</Card>;
 
   return (
     <>

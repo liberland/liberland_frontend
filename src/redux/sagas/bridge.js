@@ -16,7 +16,6 @@ import { ethToSubReceiptId, ethToSubReceiptIdFromEvent, subToEthReceiptId } from
 import { getSubstrateOutgoingReceipts } from '../../api/explorer';
 import { blockchainSelectors, bridgeSelectors } from '../selectors';
 import { bridgeBurn, getEthereumOutgoingReceipts, getTxReceipt } from '../../api/eth';
-import { bridgeTransfersLocalStorageMiddleware } from '../store/localStorage';
 
 // WORKERS
 
@@ -86,81 +85,106 @@ function* depositWorker(action) {
 }
 
 function* burnWorker(action) {
-  const txHash = yield call(bridgeBurn, action.payload);
-  const { asset, amount, substrateRecipient } = action.payload;
-  const transfer = {
-    txHash,
-    asset,
-    amount: ethers.utils.formatUnits(amount, 0),
-    substrateRecipient,
-    date: Date.now(),
-    receipt_id: null,
-    blockHash: null,
-    status: null,
-    withdrawTx: false,
+  try {
+    const txHash = yield call(bridgeBurn, action.payload);
+    const { asset, amount, substrateRecipient } = action.payload;
+    const transfer = {
+      txHash,
+      asset,
+      amount: ethers.utils.formatUnits(amount, 0),
+      substrateRecipient,
+      date: Date.now(),
+      receipt_id: null,
+      blockHash: null,
+      status: null,
+      withdrawTx: false,
+    }
+    yield put(bridgeActions.burn.success(transfer));
+    yield put(bridgeActions.monitorBurn.call(transfer));
+  } catch (e) {
+    console.error(e);
+    throw e;
   }
-  yield put(bridgeActions.burn.success(transfer));
-  yield put(bridgeActions.monitorBurn.call(transfer));
 }
 
 function* monitorBurnWorker(action) {
-  const ethers_receipt = yield call(getTxReceipt, action.payload);
-  const receipt_id = ethToSubReceiptId(ethers_receipt);
-  const { txHash, asset } = action.payload;
-  yield put(bridgeActions.monitorBurn.success({ txHash, asset, receipt_id, blockHash: ethers_receipt.blockHash }));
+  try {
+    const ethers_receipt = yield call(getTxReceipt, action.payload);
+    const receipt_id = ethToSubReceiptId(ethers_receipt);
+    const { txHash, asset } = action.payload;
+    yield put(bridgeActions.monitorBurn.success({ txHash, asset, receipt_id, blockHash: ethers_receipt.blockHash }));
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 }
 
 function* getTransfersToEthereumWorker() {
-  const preload = yield select(bridgeSelectors.toEthereumPreload);
-  if (!preload) {
-    console.log("No preload to eth");
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const res = yield call(getSubstrateOutgoingReceipts, walletAddress);
-    yield put(bridgeActions.getTransfersToEthereum.success(res));
-  } else {
-    console.log("Preload to eth");
-    yield put(bridgeActions.getTransfersToEthereum.success({}));
+  try {
+    const preload = yield select(bridgeSelectors.toEthereumPreload);
+    if (!preload) {
+      console.log("No preload to eth");
+      const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+      const res = yield call(getSubstrateOutgoingReceipts, walletAddress);
+      yield put(bridgeActions.getTransfersToEthereum.success(res));
+    } else {
+      console.log("Preload to eth");
+      yield put(bridgeActions.getTransfersToEthereum.success({}));
+    }
+  } catch (e) {
+    console.error(e);
+    throw e;
   }
 }
 
 function* getTransfersToSubstrateWorker({ payload: address }) {
-  const preload = yield select(bridgeSelectors.toSubstratePreload);
-  if (!preload) {
-    console.log("No preload to substrate");
-    const events = yield call(getEthereumOutgoingReceipts, address);
-    const _reducer = asset => (transfers, event) => {
-      const txHash = event.transactionHash;
-      transfers[txHash] = {
-        txHash,
-        asset,
-        amount: ethers.utils.formatUnits(event.args.amount, 0),
-        substrateRecipient: event.args.substrateRecipient,
-        date: 1000 * event.blockTimestamp,
-        receipt_id: ethToSubReceiptIdFromEvent(event),
-        blockHash: event.blockHash,
-        status: null,
-        withdrawTx: false,
+  try {
+    const preload = yield select(bridgeSelectors.toSubstratePreload);
+    if (!preload) {
+      console.log("No preload to substrate");
+      const events = yield call(getEthereumOutgoingReceipts, address);
+      const _reducer = asset => (transfers, event) => {
+        const txHash = event.transactionHash;
+        transfers[txHash] = {
+          txHash,
+          asset,
+          amount: ethers.utils.formatUnits(event.args.amount, 0),
+          substrateRecipient: event.args.substrateRecipient,
+          date: 1000 * event.blockTimestamp,
+          receipt_id: ethToSubReceiptIdFromEvent(event),
+          blockHash: event.blockHash,
+          status: null,
+          withdrawTx: false,
+        };
+        return transfers;
       };
-      return transfers;
-    };
-    let transfers = events.LLD.reduce(_reducer('LLD'), {});
-    transfers = events.LLM.reduce(_reducer('LLM'), transfers);
-    yield put(bridgeActions.getTransfersToSubstrate.success(transfers));
-  } else {
-    console.log("Preload to substrate");
-    const transfers = yield select(bridgeSelectors.toSubstrateTransfers);
-    const pending = Object.values(transfers).filter(t => t.receipt_id === null);
-    for (const transfer of pending) {
-      yield put(bridgeActions.monitorBurn.call(transfer));
+      let transfers = events.LLD.reduce(_reducer('LLD'), {});
+      transfers = events.LLM.reduce(_reducer('LLM'), transfers);
+      yield put(bridgeActions.getTransfersToSubstrate.success(transfers));
+    } else {
+      console.log("Preload to substrate");
+      const transfers = yield select(bridgeSelectors.toSubstrateTransfers);
+      const pending = Object.values(transfers).filter(t => t.receipt_id === null);
+      for (const transfer of pending) {
+        yield put(bridgeActions.monitorBurn.call(transfer));
+      }
+      yield put(bridgeActions.getTransfersToSubstrate.success({}));
     }
-    yield put(bridgeActions.getTransfersToSubstrate.success({}));
+  } catch (e) {
+    console.error(e);
+    throw e;
   }
 }
 
 function* getWithdrawalDelaysWorker() {
-  const LLM = yield call(bridgeWithdrawalDelay, 'LLM');
-  const LLD = yield call(bridgeWithdrawalDelay, 'LLD');
-  yield put(bridgeActions.getWithdrawalDelays.success({ LLM: LLM.toNumber(), LLD: LLD.toNumber() }));
+  try {
+    const LLM = yield call(bridgeWithdrawalDelay, 'LLM');
+    const LLD = yield call(bridgeWithdrawalDelay, 'LLD');
+    yield put(bridgeActions.getWithdrawalDelays.success({ LLM: LLM.toNumber(), LLD: LLD.toNumber() }));
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 }
 
 // WATCHERS

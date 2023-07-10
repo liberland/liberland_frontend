@@ -13,17 +13,11 @@ let __provider;
 const _getProvider = async () => {
     if (!__provider) {
         __provider = new ethers.providers.Web3Provider(window.ethereum);
-        const chainId = '0x'+parseInt(process.env.REACT_APP_ETHER_CHAIN_ID).toString(16);
-        await __provider.provider.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId }],
-        });
-
-        __provider.on("network", (newNetwork, oldNetwork) => {
-            if (oldNetwork) {
-                window.location.reload();
-            }
-        });
+        await __provider.send("eth_requestAccounts", []);
+        window.ethereum.on('chainChanged', (chainId) => window.location.reload());
+        const { chainId } = await __provider.getNetwork();
+        if (chainId != parseInt(proces.env.REACT_APP_ETHERS_CHAIN_ID))
+            throw new Error("Invalid chain");
     }
     return __provider;
 }
