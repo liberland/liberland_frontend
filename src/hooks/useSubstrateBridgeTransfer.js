@@ -29,5 +29,5 @@ export default function useSubstrateBridgeTransfer(asset, txHash, receipt_id) {
         // unsub is excluded from deps on purpose, otherwise we'd immediately unsubscribe
     }, [setUnsub, dispatch, asset, receipt_id]);
 
-    return transfers[receipt_id];
+    return transfers[txHash];
 };

@@ -100,6 +100,16 @@ const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress, callback) =>
   });
 }
 
+const bridgeWithdrawalDelay = async (asset) => {
+  const api = await getApi();
+  let bridge;
+  if (asset == "LLM") bridge = api.consts.ethLLMBridge;
+  else if (asset == "LLD") bridge = api.consts.ethLLDBridge;
+  else throw new Exception("Unknown asset");
+
+  return bridge.withdrawalDelay;
+}
+
 const provideJudgement = async ({ address, hash, walletAddress }, callback) => {
   const api = await getApi();
   let judgement = api.createType('IdentityJudgement', 'KnownGood')
@@ -1246,4 +1256,5 @@ export {
   bridgeSubscribe,
   bridgeDeposit,
   getBlockEvents,
+  bridgeWithdrawalDelay,
 };

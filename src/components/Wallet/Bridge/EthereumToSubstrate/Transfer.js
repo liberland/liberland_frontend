@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ethers } from 'ethers';
 import { useDispatch, useSelector } from 'react-redux';
 import { encodeAddress } from '@polkadot/util-crypto';
 
 import Button from '../../../Button/Button';
 import { bridgeActions } from '../../../../redux/actions';
-import { blockchainSelectors } from '../../../../redux/selectors';
+import { blockchainSelectors, bridgeSelectors } from '../../../../redux/selectors';
 import useSubstrateBridgeTransfer from '../../../../hooks/useSubstrateBridgeTransfer';
 
 export function Transfer({ ethBridge, transfer }) {
@@ -13,6 +13,12 @@ export function Transfer({ ethBridge, transfer }) {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const rawSubstrateState = useSubstrateBridgeTransfer(transfer.asset, transfer.txHash, transfer.receipt_id);
   const substrateBlockNumber = useSelector(blockchainSelectors.blockNumber); // FIXME this isn't updating realtime and we need this realtime
+  const withdrawalDelays = useSelector(bridgeSelectors.withdrawalDelays);
+
+  useEffect(() => {
+    if (withdrawalDelays === null)
+      dispatch(bridgeActions.getWithdrawalDelays.call());
+  }, [dispatch, withdrawalDelays])
 
   const withdraw = () => {
     dispatch(bridgeActions.withdraw.call({
@@ -20,13 +26,16 @@ export function Transfer({ ethBridge, transfer }) {
       values: {
         asset: ethBridge.asset,
         receipt_id: transfer.receipt_id,
+        txHash: transfer.txHash,
       },
     }));
   };
 
+  if (!withdrawalDelays) return null;
+
   let substrateState = 'unknown'; // unknown, voting, approved, ready, processed
   if (rawSubstrateState?.status?.isApproved) {
-    const withdrawalDelayInBlocks = ethBridge.mintDelay.toNumber();
+    const withdrawalDelayInBlocks = withdrawalDelays[transfer.asset];
     const approvedOn = rawSubstrateState.status.asApproved.toNumber();
     if (substrateBlockNumber >= withdrawalDelayInBlocks + approvedOn) substrateState = 'ready';
     else substrateState = 'approved';
@@ -43,7 +52,7 @@ export function Transfer({ ethBridge, transfer }) {
     state = 'Processing (~1h)';
   } else if (substrateState === 'approved') {
     state = 'Processing (~1h)';
-  } else if (substrateState !== 'processed' && !rawSubstrateState?.withdraw_tx) {
+  } else if (substrateState !== 'processed' && !rawSubstrateState?.withdrawTx) {
     state = 'Unlock ready';
   } else if (substrateState !== 'processed') {
     state = 'Waiting for unlock tx confirmation';

@@ -1,21 +1,12 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { useBlockNumber } from '@usedapp/core';
 import { bridgeSelectors } from '../../../../redux/selectors';
 import { useEthBridges } from '../../../../hooks/useEthBridges';
 import { Transfer } from './Transfer';
 import styles from '../styles.module.scss';
-import { bridgeActions } from '../../../../redux/actions';
 
 export function Transfers() {
-  const dispatch = useDispatch();
-
-  const initialized = useSelector(bridgeSelectors.toEthereumInitialized);
-  useEffect(() => {
-    if (!initialized)
-      dispatch(bridgeActions.getTransfersToEthereum.call());
-  }, [dispatch, initialized]);
-
   const transfers = useSelector(bridgeSelectors.toEthereumTransfers);
   const ethBridges = useEthBridges();
   const blockNumber = useBlockNumber();
@@ -24,7 +15,6 @@ export function Transfers() {
 
   if (allTransfers.length === 0) return null;
 
-  console.log(allTransfers);
   return (
     <table className={styles.transferTable}>
       <thead>

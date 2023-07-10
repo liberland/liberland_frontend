@@ -10,7 +10,8 @@ export const initialState = {
     toEthereumPreload: null,
     toEthereumInitialized: false,
     toEthereum: {},
-  }
+  },
+  withdrawalDelays: null,
 };
 
 const bridgeReducer = handleActions(
@@ -21,6 +22,7 @@ const bridgeReducer = handleActions(
       bridgeActions.withdraw.call,
       bridgeActions.deposit.call,
       bridgeActions.burn.call,
+      bridgeActions.getWithdrawalDelays.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -37,6 +39,8 @@ const bridgeReducer = handleActions(
       bridgeActions.getTransfersToEthereum.failure,
       bridgeActions.getTransfersToSubstrate.success,
       bridgeActions.getTransfersToSubstrate.failure,
+      bridgeActions.getWithdrawalDelays.success,
+      bridgeActions.getWithdrawalDelays.failure,
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
@@ -64,6 +68,11 @@ const bridgeReducer = handleActions(
       }
     }),
 
+    [bridgeActions.getWithdrawalDelays.success]: (state, action) => ({
+      ...state,
+      withdrawalDelays: action.payload,
+    }),
+
     [bridgeActions.monitorBurn.success]: (state, action) => ({
       ...state,
       transfers: {
@@ -80,17 +89,17 @@ const bridgeReducer = handleActions(
     }),
 
     [bridgeActions.updateTransferWithdrawTx.set]: (state, action) => {
-      const { receipt_id, withdraw_tx } = action.payload;
-      let transfer = state.transfers.toSubstrate[receipt_id] ?? {};
+      const { txHash, withdrawTx } = action.payload;
+      let transfer = state.transfers.toSubstrate[txHash] ?? {};
       return {
         ...state,
         transfers: {
           ...state.transfers,
           toSubstrate: {
             ...state.transfers.toSubstrate,
-            [receipt_id]: {
+            [txHash]: {
               ...transfer,
-              withdraw_tx
+              withdrawTx
             }
           }
         }
