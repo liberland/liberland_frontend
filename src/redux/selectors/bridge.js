@@ -2,23 +2,42 @@ import { createSelector } from 'reselect';
 
 const bridgeReducer = (state) => state.bridge;
 
-const isLoading = createSelector(
+export const isLoading = createSelector(
   bridgeReducer,
   (reducer) => reducer.loading,
 );
 
-const toEthereumTransfers = createSelector(
+export const toEthereumPreload = createSelector(
+  bridgeReducer,
+  (reducer) => reducer.transfers.toEthereumPreload,
+);
+
+export const toSubstratePreload = createSelector(
+  bridgeReducer,
+  (reducer) => reducer.transfers.toSubstratePreload,
+);
+
+export const toEthereumInitialized = createSelector(
+  bridgeReducer,
+  (reducer) => reducer.transfers.toEthereumInitialized,
+);
+
+export const toSubstrateInitialized = createSelector(
+  bridgeReducer,
+  (reducer) => reducer.transfers.toSubstrateInitialized,
+);
+
+export const toEthereumTransfers = createSelector(
   bridgeReducer,
   (reducer) => reducer.transfers.toEthereum,
 );
 
-const toSubstrateTransfers = createSelector(
+export const toSubstrateTransfers = createSelector(
   bridgeReducer,
   (reducer) => reducer.transfers.toSubstrate,
 );
 
-export {
-  isLoading,
-  toSubstrateTransfers,
-  toEthereumTransfers,
-};
+export const withdrawalDelays = createSelector(
+  bridgeReducer,
+  (reducer) => reducer.withdrawalDelays,
+);

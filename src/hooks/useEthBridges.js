@@ -1,12 +1,7 @@
 import { useCall, useEthers, useToken, useTokenBalance } from "@usedapp/core";
 import { Contract } from "ethers";
 import BridgeABI from "../assets/abis/Bridge.json";
-
-export const ASSETS = ["LLM", "LLD"];
-const ADDRESSES = {
-    LLM: process.env.REACT_APP_LLM_BRIDGE,
-    LLD: process.env.REACT_APP_LLD_BRIDGE,
-};
+import { ASSETS, ADDRESSES } from "../api/eth";
 
 function useEthBridge(asset) {
     // FIXME pass this through redux?

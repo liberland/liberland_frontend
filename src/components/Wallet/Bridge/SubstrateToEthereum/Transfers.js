@@ -11,10 +11,7 @@ export function Transfers() {
   const ethBridges = useEthBridges();
   const blockNumber = useBlockNumber();
   if (!ethBridges || !blockNumber) return 'Loading...'; // FIXME proper loader
-  const allTransfers = [
-    ...Object.values(transfers.LLM),
-    ...Object.values(transfers.LLD),
-  ].sort((a, b) => b.date - a.date);
+  const allTransfers = Object.values(transfers).sort((a, b) => b.date - a.date);
 
   if (allTransfers.length === 0) return null;
 

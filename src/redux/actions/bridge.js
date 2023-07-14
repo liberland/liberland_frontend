@@ -3,8 +3,13 @@ import { createActions } from 'redux-actions';
 export const {
   deposit,
   withdraw,
+  burn,
+  monitorBurn,
   updateTransferStatus,
   updateTransferWithdrawTx,
+  getTransfersToEthereum,
+  getTransfersToSubstrate,
+  getWithdrawalDelays,
 } = createActions({
   DEPOSIT: {
     call: undefined,
@@ -16,10 +21,35 @@ export const {
     success: undefined,
     failure: undefined,
   },
+  BURN: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  MONITOR_BURN: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
   UPDATE_TRANSFER_STATUS: {
     set: undefined,
   },
   UPDATE_TRANSFER_WITHDRAW_TX: {
     set: undefined,
-  }
+  },
+  GET_TRANSFERS_TO_ETHEREUM: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_TRANSFERS_TO_SUBSTRATE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_WITHDRAWAL_DELAYS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
 });

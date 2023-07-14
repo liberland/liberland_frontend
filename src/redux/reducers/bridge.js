@@ -4,22 +4,25 @@ import { bridgeActions } from '../actions';
 export const initialState = {
   loading: false,
   transfers: {
-    toSubstrate: {
-      LLM: {},
-      LLD: {},
-    },
-    toEthereum: {
-      LLM: {},
-      LLD: {},
-    },
-  }
+    toSubstratePreload: null,
+    toSubstrateInitialized: false,
+    toSubstrate: {},
+    toEthereumPreload: null,
+    toEthereumInitialized: false,
+    toEthereum: {},
+  },
+  withdrawalDelays: null,
 };
 
 const bridgeReducer = handleActions(
   {
     [combineActions(
+      bridgeActions.getTransfersToEthereum.call,
+      bridgeActions.getTransfersToSubstrate.call,
       bridgeActions.withdraw.call,
       bridgeActions.deposit.call,
+      bridgeActions.burn.call,
+      bridgeActions.getWithdrawalDelays.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -30,6 +33,14 @@ const bridgeReducer = handleActions(
       bridgeActions.withdraw.failure,
       bridgeActions.deposit.success,
       bridgeActions.deposit.failure,
+      bridgeActions.burn.success,
+      bridgeActions.burn.failure,
+      bridgeActions.getTransfersToEthereum.success,
+      bridgeActions.getTransfersToEthereum.failure,
+      bridgeActions.getTransfersToSubstrate.success,
+      bridgeActions.getTransfersToSubstrate.failure,
+      bridgeActions.getWithdrawalDelays.success,
+      bridgeActions.getWithdrawalDelays.failure,
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
@@ -41,29 +52,54 @@ const bridgeReducer = handleActions(
         ...state.transfers,
         toEthereum: {
           ...state.transfers.toEthereum,
-          [action.payload.asset]: {
-            ...state.transfers.toEthereum[action.payload.asset],
-            [action.payload.receipt_id]: action.payload,
+          [action.payload.receipt_id]: action.payload,
+        }
+      }
+    }),
+
+    [bridgeActions.burn.success]: (state, action) => ({
+      ...state,
+      transfers: {
+        ...state.transfers,
+        toSubstrate: {
+          ...state.transfers.toSubstrate,
+          [action.payload.txHash]: action.payload,
+        }
+      }
+    }),
+
+    [bridgeActions.getWithdrawalDelays.success]: (state, action) => ({
+      ...state,
+      withdrawalDelays: action.payload,
+    }),
+
+    [bridgeActions.monitorBurn.success]: (state, action) => ({
+      ...state,
+      transfers: {
+        ...state.transfers,
+        toSubstrate: {
+          ...state.transfers.toSubstrate,
+          [action.payload.txHash]: {
+            ...state.transfers.toSubstrate[action.payload.txHash],
+            receipt_id: action.payload.receipt_id,
+            blockHash: action.payload.blockHash,
           }
         }
       }
     }),
 
     [bridgeActions.updateTransferWithdrawTx.set]: (state, action) => {
-      const { asset, receipt_id, withdraw_tx } = action.payload;
-      let transfer = state.transfers.toSubstrate[asset][receipt_id] ?? {};
+      const { txHash, withdrawTx } = action.payload;
+      let transfer = state.transfers.toSubstrate[txHash] ?? {};
       return {
         ...state,
         transfers: {
           ...state.transfers,
           toSubstrate: {
             ...state.transfers.toSubstrate,
-            [asset]: {
-              ...state.transfers.toSubstrate[asset],
-              [receipt_id]: {
-                ...transfer,
-                withdraw_tx
-              }
+            [txHash]: {
+              ...transfer,
+              withdrawTx
             }
           }
         }
@@ -71,25 +107,46 @@ const bridgeReducer = handleActions(
     },
 
     [bridgeActions.updateTransferStatus.set]: (state, action) => {
-      const { asset, receipt_id, status } = action.payload;
-      let transfer = state.transfers.toSubstrate[asset][receipt_id] ?? {};
+      const { txHash, status } = action.payload;
+      let transfer = state.transfers.toSubstrate[txHash] ?? {};
       return {
         ...state,
         transfers: {
           ...state.transfers,
           toSubstrate: {
             ...state.transfers.toSubstrate,
-            [asset]: {
-              ...state.transfers.toSubstrate[asset],
-              [receipt_id]: {
-                ...transfer,
-                status
-              }
+            [txHash]: {
+              ...transfer,
+              status
             }
           }
         }
       }
     },
+
+    [bridgeActions.getTransfersToEthereum.success]: (state, action) => ({
+      ...state,
+      transfers: {
+        ...state.transfers,
+        toEthereumInitialized: true,
+        toEthereum: {
+          ...state.transfers.toEthereum,
+          ...action.payload,
+        }
+      }
+    }),
+
+    [bridgeActions.getTransfersToSubstrate.success]: (state, action) => ({
+      ...state,
+      transfers: {
+        ...state.transfers,
+        toSubstrateInitialized: true,
+        toSubstrate: {
+          ...state.transfers.toSubstrate,
+          ...action.payload,
+        }
+      }
+    }),
   },
   initialState,
 );

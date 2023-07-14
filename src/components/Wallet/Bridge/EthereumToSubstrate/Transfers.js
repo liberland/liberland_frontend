@@ -1,29 +1,14 @@
 import React from 'react';
-import { useTransactions, compareAddress } from '@usedapp/core';
+import { useSelector } from 'react-redux';
+import { bridgeSelectors } from '../../../../redux/selectors';
 
 import { Transfer } from './Transfer';
-import { ethToSubReceiptId } from '../../../../utils/bridge';
 
 import styles from '../styles.module.scss';
 
-const addressInList = (addr, lst) => lst.some((v) => compareAddress(v, addr) === 0);
-
 export function Transfers({ ethBridges }) {
-  const { transactions } = useTransactions();
-  const bridges = Object.values(ethBridges);
-  const bridgeAddresses = bridges.map((b) => b.contract.address);
-  const contractTransactions = transactions.filter((tx) => addressInList(tx.transaction.to, bridgeAddresses));
-  const burns = contractTransactions.filter((tx) => tx.transactionName === 'burn');
-
-  const transfers = burns.map((tx) => {
-    const receipt_id = tx.receipt ? ethToSubReceiptId(tx.receipt) : null;
-    return {
-      receipt_id,
-      burn: tx,
-    };
-  });
-
-  if (transfers.length === 0) return null;
+  const transfers = useSelector(bridgeSelectors.toSubstrateTransfers);
+  const allTransfers = Object.values(transfers).sort((a, b) => b.date - a.date);
 
   return (
     <table className={styles.transferTable}>
@@ -38,9 +23,9 @@ export function Transfers({ ethBridges }) {
         </tr>
       </thead>
       <tbody>
-        {transfers.map((t) => {
-          const bridge = bridges.find((b) => compareAddress(b.contract.address, t.burn.transaction.to) === 0);
-          return <Transfer key={t.burn.transaction.hash} ethBridge={bridge} transfer={t} />;
+        {allTransfers.map((t) => {
+          const bridge = ethBridges[t.asset];
+          return <Transfer key={t.txHash} ethBridge={bridge} transfer={t} />;
         })}
       </tbody>
     </table>

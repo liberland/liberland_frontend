@@ -4,7 +4,7 @@ import { bridgeSelectors } from '../redux/selectors';
 import { bridgeActions } from '../redux/actions';
 import { bridgeSubscribe } from '../api/nodeRpcCall';
 
-export default function useSubstrateBridgeTransfer(asset, receipt_id) {
+export default function useSubstrateBridgeTransfer(asset, txHash, receipt_id) {
     const dispatch = useDispatch();
     const [unsub, setUnsub] = useState({ unsub: null });
     const transfers = useSelector(bridgeSelectors.toSubstrateTransfers);
@@ -18,7 +18,7 @@ export default function useSubstrateBridgeTransfer(asset, receipt_id) {
         (async () => {
             setUnsub(await bridgeSubscribe(asset, receipt_id, (status) => {
                 if (deinitializing) return;
-                dispatch(bridgeActions.updateTransferStatus.set({ asset, receipt_id, status }));
+                dispatch(bridgeActions.updateTransferStatus.set({ asset, txHash, status }));
             }));
         })();
 
@@ -29,5 +29,5 @@ export default function useSubstrateBridgeTransfer(asset, receipt_id) {
         // unsub is excluded from deps on purpose, otherwise we'd immediately unsubscribe
     }, [setUnsub, dispatch, asset, receipt_id]);
 
-    return transfers[asset][receipt_id];
+    return transfers[txHash];
 };

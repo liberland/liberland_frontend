@@ -1,19 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ethers } from 'ethers';
 import { useDispatch, useSelector } from 'react-redux';
 import { encodeAddress } from '@polkadot/util-crypto';
 
 import Button from '../../../Button/Button';
 import { bridgeActions } from '../../../../redux/actions';
-import { blockchainSelectors } from '../../../../redux/selectors';
+import { blockchainSelectors, bridgeSelectors } from '../../../../redux/selectors';
 import useSubstrateBridgeTransfer from '../../../../hooks/useSubstrateBridgeTransfer';
 
 export function Transfer({ ethBridge, transfer }) {
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const { args } = ethBridge.contract.interface.parseTransaction(transfer.burn.transaction);
-  const rawSubstrateState = useSubstrateBridgeTransfer(ethBridge.asset, transfer.receipt_id);
+  const rawSubstrateState = useSubstrateBridgeTransfer(transfer.asset, transfer.txHash, transfer.receipt_id);
   const substrateBlockNumber = useSelector(blockchainSelectors.blockNumber); // FIXME this isn't updating realtime and we need this realtime
+  const withdrawalDelays = useSelector(bridgeSelectors.withdrawalDelays);
+
+  useEffect(() => {
+    if (withdrawalDelays === null)
+      dispatch(bridgeActions.getWithdrawalDelays.call());
+  }, [dispatch, withdrawalDelays])
 
   const withdraw = () => {
     dispatch(bridgeActions.withdraw.call({
@@ -21,13 +26,16 @@ export function Transfer({ ethBridge, transfer }) {
       values: {
         asset: ethBridge.asset,
         receipt_id: transfer.receipt_id,
+        txHash: transfer.txHash,
       },
     }));
   };
 
+  if (!withdrawalDelays) return null;
+
   let substrateState = 'unknown'; // unknown, voting, approved, ready, processed
   if (rawSubstrateState?.status?.isApproved) {
-    const withdrawalDelayInBlocks = ethBridge.mintDelay.toNumber();
+    const withdrawalDelayInBlocks = withdrawalDelays[transfer.asset];
     const approvedOn = rawSubstrateState.status.asApproved.toNumber();
     if (substrateBlockNumber >= withdrawalDelayInBlocks + approvedOn) substrateState = 'ready';
     else substrateState = 'approved';
@@ -36,7 +44,7 @@ export function Transfer({ ethBridge, transfer }) {
   }
 
   let state;
-  if (!transfer.burn.receipt) {
+  if (!transfer.receipt_id) {
     state = 'Waiting for tx confirmation';
   } else if (substrateState === 'unknown') {
     state = 'Waiting for tx to be finalized (~15 minutes)';
@@ -44,7 +52,7 @@ export function Transfer({ ethBridge, transfer }) {
     state = 'Processing (~1h)';
   } else if (substrateState === 'approved') {
     state = 'Processing (~1h)';
-  } else if (substrateState !== 'processed' && !rawSubstrateState?.withdraw_tx) {
+  } else if (substrateState !== 'processed' && !rawSubstrateState?.withdrawTx) {
     state = 'Unlock ready';
   } else if (substrateState !== 'processed') {
     state = 'Waiting for unlock tx confirmation';
@@ -54,11 +62,11 @@ export function Transfer({ ethBridge, transfer }) {
 
   return (
     <tr>
-      <td>{new Date(transfer.burn.submittedAt).toLocaleString()}</td>
+      <td>{new Date(transfer.date).toLocaleString()}</td>
       <td>{transfer.receipt_id ? transfer.receipt_id : 'pending'}</td>
-      <td>{encodeAddress(args.substrateRecipient)}</td>
+      <td>{encodeAddress(transfer.substrateRecipient)}</td>
       <td>
-        {ethers.utils.formatUnits(args.amount, ethBridge.token.decimals)}
+        {ethers.utils.formatUnits(transfer.amount, ethBridge.token.decimals)}
         {' '}
         {ethBridge.token.symbol}
       </td>

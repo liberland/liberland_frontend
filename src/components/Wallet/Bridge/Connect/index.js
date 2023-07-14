@@ -7,9 +7,7 @@ function Connect() {
   if (account) {
     return (
       <>
-        Connected Ethereum wallet:
-        {account}
-        .
+        Connected Ethereum wallet: {account}.
       </>
     );
   }
