@@ -11,8 +11,34 @@ const { ApiPromise, WsProvider } = require('@polkadot/api');
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 let __apiCache = null;
-const getApi = () => {
-  if (__apiCache === null) __apiCache = ApiPromise.create({ provider });
+const getApi = async () => {
+  if (__apiCache === null) {
+    __apiCache = await ApiPromise.create({ provider });
+    __apiCache.registerTypes({
+      "LLData": {
+        "_enum": {
+          "None": "Null",
+          "Raw": "Vec<u8>",
+          "BlakeTwo256": "H256",
+          "Sha256": "H256",
+          "Keccak256": "H256",
+          "ShaThree256": "H256",
+        }
+      },
+      "LLAdditional": "(LLData, LLData)",
+      "PalletIdentityIdentityInfo": {
+        "additional": "Vec<LLAdditional>",
+        "display": "LLData",
+        "legal": "LLData",
+        "web": "LLData",
+        "riot": "LLData",
+        "email": "LLData",
+        "pgpFingerprint": "Option<H160>",
+        "image": "LLData",
+        "twitter": "LLData",
+      }
+    });
+  }
   return __apiCache;
 };
 
@@ -157,7 +183,7 @@ const setIdentity = async (values, walletAddress, callback) => {
   const asData = v => v ? { Raw: v } : null;
   const api = await getApi();
   const blockNumber = await api.derive.chain.bestNumber();
-  const info = {
+  const info = api.createType("PalletIdentityIdentityInfo", {
     additional: values.citizen ? citizenAdditionals(blockNumber.toNumber(), values.eligible_on) : null,
     display: asData(values.display),
     legal: asData(values.legal),
@@ -166,8 +192,7 @@ const setIdentity = async (values, walletAddress, callback) => {
     riot: asData(null),
     image: asData(null),
     twitter: asData(null),
-  };
-  console.log(info);
+  });
   
   const setCall = api.tx.identity.setIdentity(info);
   const injector = await web3FromSource('polkadot-js');
