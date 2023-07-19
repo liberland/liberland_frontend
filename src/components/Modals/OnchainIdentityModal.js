@@ -10,7 +10,7 @@ import Button from '../Button/Button';
 // STYLES
 import styles from './styles.module.scss';
 
-import { parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement } from '../../utils/identityParser';
+import { parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement, parseLegal } from '../../utils/identityParser';
 
 function OnchainIdentityModal({
   onSubmit, closeModal, identity, blockNumber, name,
@@ -26,7 +26,7 @@ function OnchainIdentityModal({
 
     defaultValues = {
       display: parseIdentityData(info.display) ?? name,
-      legal: parseIdentityData(info.legal) ?? name,
+      legal: parseLegal(info) ?? name,
       web: parseIdentityData(info.web),
       email: parseIdentityData(info.email),
       date_of_birth: identityDOB ?? undefined,
