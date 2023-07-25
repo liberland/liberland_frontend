@@ -16,7 +16,7 @@ const _getProvider = async () => {
         await __provider.send("eth_requestAccounts", []);
         window.ethereum.on('chainChanged', (chainId) => window.location.reload());
         const { chainId } = await __provider.getNetwork();
-        if (chainId != parseInt(proces.env.REACT_APP_ETHERS_CHAIN_ID))
+        if (chainId != parseInt(process.env.REACT_APP_ETHER_CHAIN_ID))
             throw new Error("Invalid chain");
     }
     return __provider;
