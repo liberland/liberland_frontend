@@ -134,7 +134,18 @@ const provideJudgement = async ({ address, hash, walletAddress }, callback) => {
   });
 }
 
-const citizenAdditionals = (blockNumber, eligible_on_date) => {
+const getLegalAdditionals = (legal) => {
+  const chunks = [];
+  for (let i = 0; i < legal.length; i += 32) {
+    chunks.push([
+      {"Raw": "legal"},
+      {"Raw": legal.substr(i, 32)}
+    ]);
+  }
+  return chunks;
+}
+
+const getCitizenAdditionals = (blockNumber, eligible_on_date) => {
   if(!eligible_on_date) return [];
 
   const now = Date.now();
@@ -157,10 +168,12 @@ const setIdentity = async (values, walletAddress, callback) => {
   const asData = v => v ? { Raw: v } : null;
   const api = await getApi();
   const blockNumber = await api.derive.chain.bestNumber();
+  const legalAdditionals = values.legal ? getLegalAdditionals(values.legal) : [];
+  const citizenAdditionals = values.citizen ? getCitizenAdditionals(blockNumber.toNumber(), values.eligible_on) : [];
   const info = {
-    additional: values.citizen ? citizenAdditionals(blockNumber.toNumber(), values.eligible_on) : null,
+    additional: legalAdditionals.concat(citizenAdditionals),
     display: asData(values.display),
-    legal: asData(values.legal),
+    legal: asData(null),
     web: asData(values.web),
     email: asData(values.email),
     riot: asData(null),

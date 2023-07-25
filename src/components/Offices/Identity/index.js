@@ -137,7 +137,10 @@ function IdentityTable({ info }) {
     },
   ];
 
-  const extra_additional = info.additional.filter((i) => !i[0].eq("citizen") && !i[0].eq("eligible_on"));
+  const extra_additional = info.additional
+    .filter((i) => !i[0].eq("citizen") && !i[0].eq("eligible_on"))
+    .map(([k, v]) => [parseData(k), parseData(v)]);
+
   const data = [
     { k: "Display name",  v: parseData(info.display) },
     { k: "Legal",         v: parseData(info.legal) },
@@ -147,7 +150,7 @@ function IdentityTable({ info }) {
     { k: "PGP",           v: parseData(info.pgpFingerprint) },
     { k: "Image",         v: parseData(info.image) },
     { k: "Twitter",       v: parseData(info.twitter) },
-    { k: "Custom fields", v: <pre>{JSON.stringify(extra_additional.map(parseData))}</pre> },
+    { k: "Custom fields", v: <pre>{JSON.stringify(extra_additional)}</pre> },
   ]
 
   console.log(data);

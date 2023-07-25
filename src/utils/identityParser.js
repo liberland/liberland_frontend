@@ -52,3 +52,17 @@ export function parseDOB(additional, currentBlockNumber) {
   const birthDate = new Date(eligibleOnDate.getFullYear() - 13, eligibleOnDate.getMonth(), eligibleOnDate.getDate());
   return birthDate.toISOString().slice(0, 10);
 }
+
+export function parseLegal(info) {
+  if (!info) return undefined;
+  if (!info.additional) return undefined;
+
+  const parts = info.additional
+    .filter(([key, _]) => key.eq('legal'))
+    .map(([_, v]) => parseIdentityData(v))
+    .filter(x => x !== undefined);
+
+  if (parts.length == 0) return parseIdentityData(info.legal);
+
+  return parts.join('');
+}

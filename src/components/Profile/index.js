@@ -22,7 +22,7 @@ import Card from '../Card';
 import { userRolesHelper } from '../../utils/userRolesHelper';
 import { OnchainIdentityModal } from '../Modals';
 import { identityActions } from '../../redux/actions';
-import { parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement } from '../../utils/identityParser';
+import { parseLegal, parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement } from '../../utils/identityParser';
 
 function Profile({ className }) {
   const userName = useSelector(userSelectors.selectUserGivenName);
@@ -186,7 +186,7 @@ function Profile({ className }) {
             <div className={styles.itemFooterAbout}>
               <ul>
                 <li>Display: {parseIdentityData(info?.display) ?? <em>&lt;empty&gt;</em>}</li>
-                <li>Legal: {parseIdentityData(info?.legal) ?? <em>&lt;empty&gt;</em>}</li>
+                <li>Legal: {parseLegal(info) ?? <em>&lt;empty&gt;</em>}</li>
                 <li>Web: {parseIdentityData(info?.web) ?? <em>&lt;empty&gt;</em>}</li>
                 <li>Email: {parseIdentityData(info?.email) ?? <em>&lt;empty&gt;</em>}</li>
                 { date_of_birth === false ?
