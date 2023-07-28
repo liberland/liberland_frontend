@@ -27,10 +27,16 @@ const selectorBalances = createSelector(
   (reducer) => reducer.balances,
 );
 
+const selectorAddressLLMBalance = createSelector(
+  officesReducer,
+  (reducer) => reducer.addressLLMBalance,
+);
+
 export {
   selectorIdentity,
   selectorCompanyRequest,
   selectorCompanyRegistration,
   selectorIsLoading,
   selectorBalances,
+  selectorAddressLLMBalance,
 };
