@@ -105,7 +105,7 @@ function WalletAddressesLine({ walletAddress }) {
     handleModalOpenStake();
   };
 
-  const navigationList = [
+  let navigationList = [
     {
       route: router.wallet.overView,
       title: 'Wallet',
@@ -114,11 +114,14 @@ function WalletAddressesLine({ walletAddress }) {
       route: router.wallet.validatorsStaking,
       title: 'Validator staking',
     },
-    {
+  ];
+
+  if (process.env.REACT_APP_BRIDGE_TAB_ENABLED == 'true') {
+    navigationList.push({
       route: router.wallet.ethBridge,
       title: 'Ethereum bridge',
-    },
-  ];
+    })
+  }
 
   return (
     <>
