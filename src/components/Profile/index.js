@@ -6,6 +6,7 @@ import cx from 'classnames';
 
 import Button from '../Button/Button';
 import { userSelectors, walletSelectors, blockchainSelectors, identitySelectors } from '../../redux/selectors';
+import { formatDollars, formatMerits } from '../../utils/walletHelpers';
 
 import truncate from '../../utils/truncate';
 
@@ -27,7 +28,6 @@ import { parseLegal, parseIdentityData, parseDOB, parseCitizen, parseCitizenship
 function Profile({ className }) {
   const userName = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
-  const userBalance = useSelector(walletSelectors.selectorLiquidMeritsBalance);
   const walletAddress = useSelector(walletSelectors.selectorWalletAddress);
   const userRole = useSelector(userSelectors.selectUserRole);
   const aboutUser = useSelector(userSelectors.selectUserAbout);
@@ -39,6 +39,8 @@ function Profile({ className }) {
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const identity = useSelector(identitySelectors.selectorIdentity);
   const walletInfo = useSelector(walletSelectors.selectorWalletInfo);
+  const balances = useSelector(walletSelectors.selectorBalances);
+  const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
   const lockBlocks = walletInfo?.balances?.electionLock - blockNumber;
   const lockDays = lockBlocks > 0 ? lockBlocks * 6 / 3600 / 24 : 0;
 
@@ -134,10 +136,19 @@ function Profile({ className }) {
             </div>
             <div className="bottom-block">
               <div className={styles.balance}>
-                balance:
                 <span>
-                  {`${userBalance} LLM`}
+                  {`${formatMerits(liquidMerits)} LLM (liquid)`}
                 </span>
+              <div className={styles.balance}>
+                <span>
+                  {`${formatMerits(balances.liberstake.amount)} LLM (Politipooled)`}
+                </span>
+              </div>
+              <div className={styles.balance}>
+                <span>
+                  {`${formatDollars(balances.liquidAmount.amount)} LLD`}
+                </span>
+              </div>
                 <span className={styles.walletAddress}>
                   {walletAddress ? truncate(walletAddress, 13) : ''}
                 </span>
