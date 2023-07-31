@@ -1,7 +1,7 @@
 import { createActions } from 'redux-actions';
 
 export const {
-  getCurrentBlockNumber,
+  bestBlockNumber,
   getPeriodAndVotingDuration,
   setElectionsBlock,
   updateDateElections,
@@ -11,10 +11,8 @@ export const {
   getErrorExistsAndUnacknowledgedByUser,
   setError,
 } = createActions({
-  GET_CURRENT_BLOCK_NUMBER: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
+  BEST_BLOCK_NUMBER: {
+    value: undefined,
   },
   GET_PERIOD_AND_VOTING_DURATION: {
     call: undefined,

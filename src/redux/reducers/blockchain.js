@@ -15,17 +15,13 @@ const initialState = {
 };
 
 const blockchainReducer = handleActions({
-  [blockchainActions.getCurrentBlockNumber.success]: (state, action) => ({
+  [blockchainActions.bestBlockNumber.value]: (state, action) => ({
     ...state,
-    currentBlockNumber: action.payload,
+    currentBlockNumber: action.payload.bestNumber,
   }),
   [blockchainActions.getPeriodAndVotingDuration.success]: (state, action) => ({
     ...state,
     periodAndVotingDuration: action.payload,
-  }),
-  [blockchainActions.getCurrentBlockNumber.failure]: (state, action) => ({
-    ...state,
-    currentBlockNumber: action.payload,
   }),
   [blockchainActions.setElectionsBlock.success]: (state, action) => ({
     ...state,

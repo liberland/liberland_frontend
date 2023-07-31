@@ -432,11 +432,11 @@ const getUserRoleRpc = async (walletAddress) => {
   return null;
 };
 
-const getCurrentBlockNumberRpc = async () => {
+const subscribeBestBlockNumber = async (onNewBlockNumber) => {
   try {
     const api = await getApi();
-    const bestNumber = await api.derive.chain.bestNumber();
-    return (bestNumber.toNumber());
+    const unsub = await api.derive.chain.bestNumber((bestNumber) => onNewBlockNumber(bestNumber.toNumber()));
+    return unsub;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error('error', e);
@@ -1237,7 +1237,7 @@ export {
   stakeToPolkaBondAndExtra,
   politiPool,
   getUserRoleRpc,
-  getCurrentBlockNumberRpc,
+  subscribeBestBlockNumber,
   getAllWalletsRpc,
   getValidators,
   getNominatorTargets,

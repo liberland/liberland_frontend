@@ -18,7 +18,7 @@ export default function* rootSaga() {
     authSagas.initGetDataFromNodeWatcher(),
 
     // // BLOCKCHAIN
-    blockchainSagas.fetchBlockNumberWatcher(),
+    blockchainSagas.subscribeBestBlockNumberSaga(),
     blockchainSagas.getAllWalletsWatcher(),
     blockchainSagas.clearErrorsWatcher(),
 
