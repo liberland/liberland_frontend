@@ -164,14 +164,26 @@ const getCitizenAdditionals = (blockNumber, eligible_on_date) => {
   ];
 }
 
+const getEResidentAdditionals = () => {
+  return [
+    [{"Raw": "eresident"}, {"Raw": "1"}],
+  ];
+}
+
+const buildAdditionals = (values, blockNumber) => {
+  const citizenAdditionalsData = values.citizen ? getCitizenAdditionals(blockNumber, values.eligible_on) : []
+  const eResidentAdditionalsData = values.eresident ? getEResidentAdditionals() : []
+  const legalAdditionals = values.legal ? getLegalAdditionals(values.legal) : [];
+  
+  return [...citizenAdditionalsData, ...eResidentAdditionalsData, ...legalAdditionals]
+}
+
 const setIdentity = async (values, walletAddress, callback) => {
   const asData = v => v ? { Raw: v } : null;
   const api = await getApi();
   const blockNumber = await api.derive.chain.bestNumber();
-  const legalAdditionals = values.legal ? getLegalAdditionals(values.legal) : [];
-  const citizenAdditionals = values.citizen ? getCitizenAdditionals(blockNumber.toNumber(), values.eligible_on) : [];
   const info = {
-    additional: legalAdditionals.concat(citizenAdditionals),
+    additional: buildAdditionals(values, blockNumber.toNumber()),
     display: asData(values.display),
     legal: asData(null),
     web: asData(values.web),

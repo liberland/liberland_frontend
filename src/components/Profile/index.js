@@ -68,7 +68,8 @@ function Profile({ className }) {
       web: values.web,
       email: values.email,
       citizen: values.citizen,
-      eligible_on, 
+      eligible_on,
+      eresident: values.e_resident
     }
 
     dispatch(identityActions.setIdentity.call({userWalletAddress, values: params}));

@@ -1,5 +1,5 @@
 // LIBS
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 // COMPONENTS
@@ -13,7 +13,7 @@ import styles from './styles.module.scss';
 import { parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement, parseLegal } from '../../utils/identityParser';
 
 function OnchainIdentityModal({
-  onSubmit, closeModal, identity, blockNumber, name,
+  onSubmit, closeModal, identity, blockNumber, name
 }) {
   let defaultValues = {};
   let isKnownGood = false;
@@ -32,6 +32,7 @@ function OnchainIdentityModal({
       date_of_birth: identityDOB ?? undefined,
       older_than_13: !identityDOB,
       citizen: identityCitizen,
+      e_resident: !identityCitizen
     };
 
     isKnownGood = parseCitizenshipJudgement(judgements);
@@ -42,20 +43,27 @@ function OnchainIdentityModal({
     register,
     watch,
     setValue,
-  } = useForm({ defaultValues });
+    trigger,
+    formState: { errors }
+  } = useForm({ mode: 'all', defaultValues });
 
   const isCitizen = watch('citizen');
   const isOlderThan13 = watch('older_than_13');
+  const isEResident = watch('e_resident');
+
+  useEffect(() => {
+    trigger(['citizen', 'e_resident'])
+  }, [trigger, isCitizen, isEResident])
 
   return (
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.h3}>Update on-chain identity</div>
       <div className={styles.description}>
-        You are going to update your identity stored on blockchain. This needs to be up-to-date for your citizenship.
+        You are going to update your identity stored on blockchain. This needs to be up-to-date for your citizenship or e-residency.
       </div>
       { !isKnownGood ? null :
         <div className={styles.description}>
-          Warning! Your identity is currently confirmed by citizenship office as valid. Changing it will require reapproval - you'll temporarily lose citizenship rights onchain.
+          Warning! Your identity is currently confirmed by citizenship office as valid. Changing it will require reapproval - you'll temporarily lose citizenship or e-resident rights onchain.
         </div>
       }
 
@@ -84,14 +92,29 @@ function OnchainIdentityModal({
         name="email"
         placeholder="Email"
       />
-
+      <div className={styles.title}>Are you or do you want to become an e-resident?</div>
+      <CheckboxInput
+        register={register}
+        name="e_resident"
+        label="I am or want to become a e-resident"
+        validate={isCheckbox => {
+          if (isCitizen && isCheckbox)
+              return "You can't be both a citizen and an e-resident"
+            return true
+          }
+          }
+      />
       <div className={styles.title}>Are you or do you want to become a citizen?</div>
       <CheckboxInput
         register={register}
         name="citizen"
-        setValue={setValue}
-        watch={watch}
         label="I am or want to become a citizen"
+        validate={isCheckbox => {
+          if (isEResident && isCheckbox)
+              return "You can't be both a citizen and an e-resident"
+            return true
+          }
+         }
       />
 
       { !isCitizen ? null :
@@ -100,8 +123,6 @@ function OnchainIdentityModal({
           <CheckboxInput
             register={register}
             name="older_than_13"
-            setValue={setValue}
-            watch={watch}
             label="I'm 13 or older"
           />
           {isOlderThan13 ? null :
@@ -112,6 +133,11 @@ function OnchainIdentityModal({
             />}
         </>
       }
+
+
+      <div className={styles.error}>
+        {errors?.e_resident?.message || errors?.citizen?.message}
+      </div>
 
       <div className={styles.buttonWrapper}>
         <Button

@@ -103,8 +103,6 @@ function SignIn() {
               register={register}
               name="rememberMe"
               label="Remember me?"
-              setValue={setValue}
-              watch={watch}
             />
             <Link to={router.signIn}>Forgot password?</Link>
           </div>
