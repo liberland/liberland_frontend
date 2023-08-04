@@ -16,6 +16,7 @@ export default {
     identity: '/home/offices/identity',
     companyRegistry: '/home/offices/company_registry',
     landRegistry: '/home/offices/land_registry',
+    finances: '/home/offices/finances',
   },
   documents: {
     myAccount: '/home/documents/my-account',

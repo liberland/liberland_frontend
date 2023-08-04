@@ -39,6 +39,37 @@ const getIdentity = async (address) => {
   }
 }
 
+const getLlmBalances = async (addresses) => {
+  try {
+    const api = await getApi();
+    const balances = await api.query.assets.account.multi(addresses.map(a => [1, a]));
+    return addresses.reduce((acc, addr, idx) => {
+      if (balances[idx].isSome)
+        return Object.assign(acc, { [addr]: balances[idx].unwrap().balance })
+      else
+        return Object.assign(acc, { [addr]: 0 })
+    }, {});
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+}
+
+const getLldBalances = async (addresses) => {
+  try {
+    const api = await getApi();
+    const balances = await api.query.system.account.multi(addresses);
+    return addresses.reduce((acc, addr, idx) => {
+      return Object.assign(acc, { [addr]: balances[idx].data.free })
+    }, {});
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+}
+
 const bridgeSubscribe = async (asset, receipt_id, onChange) => {
   const api = await getApi();
   let bridge;
@@ -1270,4 +1301,6 @@ export {
   bridgeDeposit,
   getBlockEvents,
   bridgeWithdrawalDelay,
+  getLlmBalances,
+  getLldBalances,
 };

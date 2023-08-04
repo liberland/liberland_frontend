@@ -9,6 +9,10 @@ const initialState = {
   companyRegistration: null,
   isGetCompanyRegistration: null,
   loading: false,
+  balances: {
+    LLD: {},
+    LLM: {},
+  },
 };
 
 const officesReducer = handleActions({
@@ -18,6 +22,7 @@ const officesReducer = handleActions({
     officesActions.getCompanyRegistration.call,
     officesActions.registerCompany.call,
     officesActions.provideJudgement.call,
+    officesActions.getBalances.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -28,11 +33,13 @@ const officesReducer = handleActions({
     officesActions.getCompanyRegistration.success,
     officesActions.registerCompany.success,
     officesActions.provideJudgement.success,
+    officesActions.getBalances.success,
     officesActions.officeGetIdentity.failure,
     officesActions.getCompanyRequest.failure,
     officesActions.getCompanyRegistration.failure,
     officesActions.registerCompany.failure,
     officesActions.provideJudgement.failure,
+    officesActions.getBalances.failure,
   )]: (state) => ({
     ...state,
     loading: false,
@@ -98,6 +105,19 @@ const officesReducer = handleActions({
   [officesActions.getCompanyRegistration.failure]: (state) => ({
     ...state,
     isGetCompanyRegistration: false,
+  }),
+
+  [officesActions.getBalances.call]: (state) => ({
+    ...state,
+    balances: initialState.balances,
+  }),
+  [officesActions.getBalances.success]: (state, action) => ({
+    ...state,
+    balances: action.payload,
+  }),
+  [officesActions.getBalances.failure]: (state) => ({
+    ...state,
+    balances: initialState.balances,
   }),
 }, initialState);
 

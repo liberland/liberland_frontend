@@ -16,6 +16,10 @@ const navigationList = [
     route: `${router.offices.landRegistry}`,
     title: 'Land Registry',
   },
+  {
+    route: `${router.offices.finances}`,
+    title: 'Government Finances',
+  },
 ];
 
 function OfficesHeader() {
