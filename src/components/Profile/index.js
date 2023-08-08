@@ -22,7 +22,7 @@ import startOfKyc from '../../assets/icons/startOfKyc.svg';
 import Card from '../Card';
 import { OnchainIdentityModal } from '../Modals';
 import { identityActions } from '../../redux/actions';
-import { parseLegal, parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement, parseEResident } from '../../utils/identityParser';
+import { parseLegal, parseIdentityData, parseDOB, parseAdditionalFlag, parseCitizenshipJudgement } from '../../utils/identityParser';
 
 function Profile({ className }) {
   const userName = useSelector(userSelectors.selectUserGivenName);
@@ -204,8 +204,8 @@ function Profile({ className }) {
                   <li>Date of birth: old enough to vote</li> :
                   <li>Date of birth: {date_of_birth ?? <em>&lt;empty&gt;</em>}</li>
                 }
-                <li>Citizen: {parseCitizen(info?.additional) ? "YES" : "NO"}</li>
-                <li>E-resident: {parseEResident(info?.additional) ? "YES" : "NO"}</li>
+                <li>Citizen: {parseAdditionalFlag(info?.additional, 'citizen') ? "YES" : "NO"}</li>
+                <li>E-resident: {parseAdditionalFlag(info?.additional, 'eresident') ? "YES" : "NO"}</li>
                 <li>Identity confirmed: {parseCitizenshipJudgement(judgements) ? "YES" : "NO"}</li>
               </ul>
             </div>
