@@ -50,23 +50,12 @@ function MissingIdentity() {
   return 'This wallet has no identity set on the chain. Please contact wallet owner.';
 }
 
-function CitizenAnalysis({ identity }) {
-  let citizen_value = identity.info.additional.find(([key, _]) => key.eq('citizen'));
+function IdentityFlagAnalysis({ identity, field }) {
+  let citizen_value = identity.info.additional.find(([key, _]) => key.eq(field));
   if (!citizen_value) return <div>MISSING <CancelIcon/></div>;
 
   [, citizen_value] = citizen_value;
   if (citizen_value.isRaw && citizen_value.eq('1')) {
-    return <div><OkIcon /></div>;
-  }
-  return <div>INVALID <CancelIcon/></div>;
-}
-
-function EResidentAnalysis({ identity }) {
-  let e_resident_value = identity.info.additional.find(([key, _]) => key.eq('eresident'));
-  if (!e_resident_value) return <div>MISSING <CancelIcon/></div>;
-
-  [, e_resident_value] = e_resident_value;
-  if (e_resident_value.isRaw && e_resident_value.eq('1')) {
     return <div><OkIcon /></div>;
   }
   return <div>INVALID <CancelIcon/></div>;
@@ -115,11 +104,11 @@ function IdentityAnalysis({ identity }) {
       data={[
         {
           "desc": "E-resident identity field",
-          "res": <EResidentAnalysis identity={identity} />,
+          "res": <IdentityFlagAnalysis identity={identity} field={'eresident'}/>,
         },
         {
           "desc": "Citizen identity field",
-          "res": <CitizenAnalysis identity={identity} />,
+          "res": <IdentityFlagAnalysis identity={identity} field={'citizen'}/>,
         },
         {
           "desc": <>Age check (<span className={styles.monospace}>eligible_on</span>)</>,
