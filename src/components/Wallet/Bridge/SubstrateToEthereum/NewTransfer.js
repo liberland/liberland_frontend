@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ethers } from 'ethers';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,7 +9,7 @@ import {
   formatDollars, formatMerits, meritsToGrains, dollarsToGrains,
   valueToBN,
 } from '../../../../utils/walletHelpers';
-import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
+import { walletSelectors, blockchainSelectors, bridgeSelectors } from '../../../../redux/selectors';
 import { bridgeActions } from '../../../../redux/actions';
 
 import styles from '../styles.module.scss';
@@ -21,8 +21,15 @@ export function NewTransfer() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const balances = useSelector(walletSelectors.selectorBalances);
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
+  const bridgesConstants = useSelector(bridgeSelectors.bridgesConstants);
   const lldLiquid = formatDollars(balances.liquidAmount.amount);
   const llmLiquid = formatMerits(liquidMerits);
+  
+  useEffect(() => {
+    if (bridgesConstants === null)
+      dispatch(bridgeActions.getBridgesConstants.call());
+  }, [dispatch, bridgesConstants])
+
 
   const {
     handleSubmit,
@@ -36,6 +43,8 @@ export function NewTransfer() {
       asset: 'LLM',
     },
   });
+
+  if (!bridgesConstants) return null;
 
   const onSubmit = (values) => {
     dispatch(bridgeActions.deposit.call({
@@ -51,6 +60,8 @@ export function NewTransfer() {
 
   const asset = watch('asset');
   const selectedBalance = asset === 'LLM' ? liquidMerits : balances.liquidAmount.amount;
+  const minTransfer = bridgesConstants[asset].minimumTransfer;
+
   return (
     <form className={styles.transferForm} onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.input}>
@@ -75,7 +86,14 @@ export function NewTransfer() {
           register={register}
           name="amount"
           placeholder="Amount"
-          validate={(v) => v === '' || valueToBN(selectedBalance).gte(toGrains(asset, v)) || 'Insufficient balance'}
+          validate={(v) => {
+            if (v === '') return true;
+            const grains = toGrains(asset, v);
+            if (valueToBN(selectedBalance).lt(grains)) return 'Insufficient balance';
+            const formatted = asset === 'LLM' ? formatMerits(minTransfer) : formatDollars(minTransfer);
+            if (grains.lt(minTransfer)) return `Too low amount - minimum transfer is ${formatted} ${asset}`;
+            return true;
+          }}
         />
         {errors?.amount?.type === 'validate'
           ? <p className={styles.error}>{errors.amount.message}</p> : null}

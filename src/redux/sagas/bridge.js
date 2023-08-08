@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 import {
   bridgeDeposit,
   bridgeWithdraw,
-  bridgeWithdrawalDelay,
+  bridgeConstants,
   getBlockEvents,
 } from '../../api/nodeRpcCall';
 
@@ -176,11 +176,11 @@ function* getTransfersToSubstrateWorker({ payload: address }) {
   }
 }
 
-function* getWithdrawalDelaysWorker() {
+function* getBridgesConstantsWorker() {
   try {
-    const LLM = yield call(bridgeWithdrawalDelay, 'LLM');
-    const LLD = yield call(bridgeWithdrawalDelay, 'LLD');
-    yield put(bridgeActions.getWithdrawalDelays.success({ LLM: LLM.toNumber(), LLD: LLD.toNumber() }));
+    const LLM = yield call(bridgeConstants, 'LLM');
+    const LLD = yield call(bridgeConstants, 'LLD');
+    yield put(bridgeActions.getBridgesConstants.success({ LLM, LLD }));
   } catch (e) {
     console.error(e);
     throw e;
@@ -237,11 +237,11 @@ function* getTransfersToSubstrateWatcher() {
   }
 }
 
-function* getWithdrawalDelaysWatcher() {
+function* getBridgesConstantsWatcher() {
   try {
-    yield takeLatest(bridgeActions.getWithdrawalDelays.call, getWithdrawalDelaysWorker);
+    yield takeLatest(bridgeActions.getBridgesConstants.call, getBridgesConstantsWorker);
   } catch (e) {
-    yield put(bridgeActions.getWithdrawalDelays.failure(e));
+    yield put(bridgeActions.getBridgesConstants.failure(e));
   }
 }
 
@@ -252,5 +252,5 @@ export {
   monitorBurnWatcher,
   getTransfersToEthereumWatcher,
   getTransfersToSubstrateWatcher,
-  getWithdrawalDelaysWatcher,
+  getBridgesConstantsWatcher,
 };

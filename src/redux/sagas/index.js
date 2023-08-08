@@ -72,6 +72,6 @@ export default function* rootSaga() {
     bridgeSagas.monitorBurnWatcher(),
     bridgeSagas.getTransfersToEthereumWatcher(),
     bridgeSagas.getTransfersToSubstrateWatcher(),
-    bridgeSagas.getWithdrawalDelaysWatcher(),
+    bridgeSagas.getBridgesConstantsWatcher(),
   ]);
 }

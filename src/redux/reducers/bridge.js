@@ -11,7 +11,7 @@ export const initialState = {
     toEthereumInitialized: false,
     toEthereum: {},
   },
-  withdrawalDelays: null,
+  bridgesConstants: null,
 };
 
 const bridgeReducer = handleActions(
@@ -22,7 +22,7 @@ const bridgeReducer = handleActions(
       bridgeActions.withdraw.call,
       bridgeActions.deposit.call,
       bridgeActions.burn.call,
-      bridgeActions.getWithdrawalDelays.call,
+      bridgeActions.getBridgesConstants.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -39,8 +39,8 @@ const bridgeReducer = handleActions(
       bridgeActions.getTransfersToEthereum.failure,
       bridgeActions.getTransfersToSubstrate.success,
       bridgeActions.getTransfersToSubstrate.failure,
-      bridgeActions.getWithdrawalDelays.success,
-      bridgeActions.getWithdrawalDelays.failure,
+      bridgeActions.getBridgesConstants.success,
+      bridgeActions.getBridgesConstants.failure,
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
@@ -68,9 +68,9 @@ const bridgeReducer = handleActions(
       }
     }),
 
-    [bridgeActions.getWithdrawalDelays.success]: (state, action) => ({
+    [bridgeActions.getBridgesConstants.success]: (state, action) => ({
       ...state,
-      withdrawalDelays: action.payload,
+      bridgesConstants: action.payload,
     }),
 
     [bridgeActions.monitorBurn.success]: (state, action) => ({
