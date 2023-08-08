@@ -57,6 +57,11 @@
     },
     {
       "inputs": [],
+      "name": "TooSmallAmount",
+      "type": "error"
+    },
+    {
+      "inputs": [],
       "name": "TooSoon",
       "type": "error"
     },
@@ -565,11 +570,29 @@
           "internalType": "uint256",
           "name": "supplyLimit_",
           "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minTransfer_",
+          "type": "uint256"
         }
       ],
       "name": "initialize",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "minTransfer",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -724,6 +747,19 @@
         }
       ],
       "name": "setFee",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "minTransfer_",
+          "type": "uint256"
+        }
+      ],
+      "name": "setMinTransfer",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
