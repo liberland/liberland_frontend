@@ -14,6 +14,16 @@ export function parseEligibleOn(eligible_on) {
   return parseInt(hex, 16);
 }
 
+export function parseEResident(additional) {
+  if (!additional) return false;
+
+  let e_resident = additional.find(([key, _]) => key.eq('eresident'));
+  if(!e_resident) return false;
+  [, e_resident] = e_resident;
+  if (!e_resident.isRaw) return false;
+  return e_resident.eq("1");
+}
+
 export function parseCitizen(additional) {
   if (!additional) return false;
 

@@ -20,10 +20,9 @@ import occupationImage from '../../assets/icons/occuoation.svg';
 import genderImage from '../../assets/icons/gender.svg';
 import startOfKyc from '../../assets/icons/startOfKyc.svg';
 import Card from '../Card';
-import { userRolesHelper } from '../../utils/userRolesHelper';
 import { OnchainIdentityModal } from '../Modals';
 import { identityActions } from '../../redux/actions';
-import { parseLegal, parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement } from '../../utils/identityParser';
+import { parseLegal, parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement, parseEResident } from '../../utils/identityParser';
 
 function Profile({ className }) {
   const userName = useSelector(userSelectors.selectUserGivenName);
@@ -206,7 +205,8 @@ function Profile({ className }) {
                   <li>Date of birth: {date_of_birth ?? <em>&lt;empty&gt;</em>}</li>
                 }
                 <li>Citizen: {parseCitizen(info?.additional) ? "YES" : "NO"}</li>
-                <li>Citizenship confirmed: {parseCitizenshipJudgement(judgements) ? "YES" : "NO"}</li>
+                <li>E-resident: {parseEResident(info?.additional) ? "YES" : "NO"}</li>
+                <li>Identity confirmed: {parseCitizenshipJudgement(judgements) ? "YES" : "NO"}</li>
               </ul>
             </div>
             <Button medium primary onClick={toggleModalOnchainIdentity}>Update identity</Button>
