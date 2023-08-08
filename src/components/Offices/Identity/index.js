@@ -61,6 +61,18 @@ function CitizenAnalysis({ identity }) {
   return <div>INVALID <CancelIcon/></div>;
 }
 
+function EResidentAnalysis({ identity }) {
+  let e_resident_value = identity.info.additional.find(([key, _]) => key.eq('eresident'));
+  console.log({e_resident_value})
+  if (!e_resident_value) return <div>MISSING <CancelIcon/></div>;
+
+  [, e_resident_value] = e_resident_value;
+  if (e_resident_value.isRaw && e_resident_value.eq('1')) {
+    return <div><OkIcon /></div>;
+  }
+  return <div>INVALID <CancelIcon/></div>;
+}
+
 function parseEligibleOn(eligible_on) {
   const bytes = eligible_on.asRaw; // little-endian
   bytes.reverse(); // big-endian
@@ -103,6 +115,10 @@ function IdentityAnalysis({ identity }) {
       ]}
       data={[
         {
+          "desc": "E-resident identity field",
+          "res": <EResidentAnalysis identity={identity} />,
+        },
+        {
           "desc": "Citizen identity field",
           "res": <CitizenAnalysis identity={identity} />,
         },
@@ -138,7 +154,9 @@ function IdentityTable({ info }) {
   ];
 
   const extra_additional = info.additional
-    .filter((i) => !i[0].eq("citizen") && !i[0].eq("eligible_on"))
+    .filter((i) => {
+      return !i[0].eq("citizen") && !i[0].eq("eligible_on") && !i[0].eq("eresident")
+    })
     .map(([k, v]) => [parseData(k), parseData(v)]);
 
   const data = [
