@@ -63,7 +63,6 @@ function CitizenAnalysis({ identity }) {
 
 function EResidentAnalysis({ identity }) {
   let e_resident_value = identity.info.additional.find(([key, _]) => key.eq('eresident'));
-  console.log({e_resident_value})
   if (!e_resident_value) return <div>MISSING <CancelIcon/></div>;
 
   [, e_resident_value] = e_resident_value;
