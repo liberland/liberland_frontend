@@ -11,6 +11,7 @@ export default {
     legislation: '/home/legislation',
     registries: '/home/registries',
     offices: '/home/offices',
+    validators: '/home/validators',
   },
   offices: {
     identity: '/home/offices/identity',
@@ -46,4 +47,9 @@ export default {
     assets: '/home/registries/assets',
     other: '/home/registries/other',
   },
+  validators: {
+    overview: '/home/validators',
+    hello: '/home/validators/hello',
+    world: '/home/validators/world',
+  }
 };
