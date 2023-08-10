@@ -49,7 +49,5 @@ export default {
   },
   validators: {
     overview: '/home/validators',
-    hello: '/home/validators/hello',
-    world: '/home/validators/world',
   }
 };

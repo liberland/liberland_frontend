@@ -8,14 +8,6 @@ const navigationList = [
     route: `${router.validators.overview}`,
     title: 'Overview',
   },
-  {
-    route: `${router.validators.hello}`,
-    title: 'Hello',
-  },
-  {
-    route: `${router.validators.world}`,
-    title: 'World',
-  },
 ];
 
 function RegistriesHeader() {

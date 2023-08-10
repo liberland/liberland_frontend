@@ -4,13 +4,14 @@ import {
 } from 'react-router-dom';
 import router from '../../router';
 
-import HelloWorld from "./HelloWorld";
+import HelloWorld from "./Overview";
 import ValidatorsHeader from "./ValidatorsHeader"
+import styles from './styles.module.scss';
 
 function Validators() {
   return (
-    <div>
-      <div>
+    <div className={styles.validatorsWrapper}>
+      <div className={styles.navWrapper}>
         <ValidatorsHeader />
       </div>
       <div>
@@ -18,16 +19,6 @@ function Validators() {
           <Route
             exact
             path={router.validators.overview}
-            component={HelloWorld}
-          />
-          <Route
-            exact
-            path={router.validators.hello}
-            component={HelloWorld}
-          />
-          <Route
-            exact
-            path={router.validators.world}
             component={HelloWorld}
           />
         </Switch>
