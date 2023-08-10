@@ -19,9 +19,10 @@ export const getAddressLLM = async (walletAddress) => {
   const { data } = await api.get("/users", {
     params: {
       blockchainAddress: walletAddress,
-      limit: 1,
     },
   });
+
+  if (data.length > 1) throw new Error(`Address belongs to ${data.length} users`);
 
   return ethers.utils.parseUnits(data[0].merits.toFixed(12), 12);
 };

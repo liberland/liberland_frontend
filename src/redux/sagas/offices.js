@@ -13,7 +13,7 @@ import {
 } from '../../api/nodeRpcCall';
 
 import { officesActions, blockchainActions } from '../actions';
-import { getAddressLLM } from '../../api/backend';
+import * as backend from '../../api/backend';
 
 // WORKERS
 
@@ -93,13 +93,13 @@ function* getBalancesWorker(action) {
   }
 }
 
-function* getAddressLLMWorker(action) {
+function* getBackendAddressLLMWorker(action) {
   try {
-    const llmBalance = yield call(getAddressLLM, action.payload.walletAddress);
-    yield put(officesActions.getAddressLlm.success({ llmBalance }));
+    const backendLlmBalance = yield call(backend.getAddressLLM, action.payload.walletAddress);
+    yield put(officesActions.getBackendAddressLlm.success({ backendLlmBalance }));
   } catch (e) {
     console.log(e)
-    yield put(officesActions.getAddressLlm.failure(e));
+    yield put(officesActions.getBackendAddressLlm.failure(e));
   }
 }
 
@@ -154,17 +154,17 @@ function* getBalancesWatcher() {
 }
 
 
-function* getAddressLLMWatcher() {
+function* getBackendAddressLLMWatcher() {
   try {
-    yield takeLatest(officesActions.getAddressLlm.call, getAddressLLMWorker);
+    yield takeLatest(officesActions.getBackendAddressLlm.call, getBackendAddressLLMWorker);
   } catch (e) {
     console.log(e)
-    yield put(officesActions.getAddressLlm.failure(e));
+    yield put(officesActions.getBackendAddressLlm.failure(e));
   }
 }
 
 export {
-  getAddressLLMWatcher,
+  getBackendAddressLLMWatcher,
   getIdentityWatcher,
   provideJudgementWatcher,
   getCompanyRequestWatcher,

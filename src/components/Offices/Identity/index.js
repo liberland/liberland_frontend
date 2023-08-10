@@ -21,7 +21,7 @@ function IdentityForm() {
 
   const onSubmit = ({ account }) => {
     dispatch(officesActions.officeGetIdentity.call(account));
-    dispatch(officesActions.getAddressLlm.call({ walletAddress: account }));
+    dispatch(officesActions.getBackendAddressLlm.call({ walletAddress: account }));
   };
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
@@ -120,7 +120,7 @@ function IdentityAnalysis({ identity }) {
   );
 }
 
-function TokenTable({ llmBalance }) {
+function TokenTable({ backendLlmBalance }) {
   return (
     <Table
       columns={[
@@ -136,11 +136,11 @@ function TokenTable({ llmBalance }) {
       data={[
         {
           "desc": "LLM balance",
-          "res": llmBalance ? ethers.utils.formatUnits(llmBalance, 12) : null,
+          "res": backendLlmBalance ? ethers.utils.formatUnits(backendLlmBalance, 12) : null,
         },
         {
           "desc": "LLD balance",
-          "res": llmBalance ?  ethers.utils.formatUnits(llmBalance.mul(10), 12) : null,
+          "res": backendLlmBalance ?  ethers.utils.formatUnits(backendLlmBalance.mul(10), 12) : null,
         },
       ]}
     />
@@ -191,7 +191,7 @@ function IdentityTable({ info }) {
   return <Table columns={columns} data={data} />;
 }
 
-function IdentityInfo({ identity, llmBalance }) {
+function IdentityInfo({ identity, backendLlmBalance }) {
   const dispatch = useDispatch();
   const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
   if (identity === null) return null;
@@ -221,7 +221,7 @@ function IdentityInfo({ identity, llmBalance }) {
         <div className={styles.h4}>Candidate's identity:</div>
         <IdentityTable info={info} />
         <IdentityAnalysis identity={identity} />
-        <TokenTable llmBalance={llmBalance} />
+        <TokenTable backendLlmBalance={backendLlmBalance} />
         <div className={styles.h4}>Current status:</div>
         <div>
           Current judgement: {judgement}
@@ -243,12 +243,12 @@ function IdentityInfo({ identity, llmBalance }) {
 
 function Identity() {
   const identity = useSelector(officesSelectors.selectorIdentity);
-  const llmBalance = useSelector(officesSelectors.selectorAddressLLMBalance);
+  const backendLlmBalance = useSelector(officesSelectors.selectorBackendAddressLLMBalance);
   
   return (
     <>
       <IdentityForm />
-      <IdentityInfo identity={identity} llmBalance={llmBalance}/>
+      <IdentityInfo identity={identity} backendLlmBalance={backendLlmBalance}/>
     </>
   );
 }

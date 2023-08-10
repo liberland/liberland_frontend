@@ -13,7 +13,7 @@ const initialState = {
     LLD: {},
     LLM: {},
   },
-  addressLLMBalance: null,
+  backendAddressLLMBalance: null,
 };
 
 const officesReducer = handleActions({
@@ -24,7 +24,7 @@ const officesReducer = handleActions({
     officesActions.registerCompany.call,
     officesActions.provideJudgement.call,
     officesActions.getBalances.call,
-    officesActions.getAddressLlm.call,
+    officesActions.getBackendAddressLlm.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -36,25 +36,25 @@ const officesReducer = handleActions({
     officesActions.registerCompany.success,
     officesActions.provideJudgement.success,
     officesActions.getBalances.success,
-    officesActions.getAddressLlm.success,
+    officesActions.getBackendAddressLlm.success,
     officesActions.officeGetIdentity.failure,
     officesActions.getCompanyRequest.failure,
     officesActions.getCompanyRegistration.failure,
     officesActions.registerCompany.failure,
     officesActions.provideJudgement.failure,
     officesActions.getBalances.failure,
-    officesActions.getAddressLlm.failure,
+    officesActions.getBackendAddressLlm.failure,
   )]: (state) => ({
     ...state,
     loading: false,
   }),
-  [officesActions.getAddressLlm.call]: (state) => ({
+  [officesActions.getBackendAddressLlm.call]: (state) => ({
     ...state,
-    addressLLMBalance: null,
+    backendAddressLLMBalance: null,
   }),
-  [officesActions.getAddressLlm.success]: (state, action) => ({
+  [officesActions.getBackendAddressLlm.success]: (state, action) => ({
     ...state,
-    addressLLMBalance: action.payload.llmBalance,
+    backendAddressLLMBalance: action.payload.backendLlmBalance,
   }),
   [officesActions.officeGetIdentity.call]: (state, action) => ({
     ...state,
