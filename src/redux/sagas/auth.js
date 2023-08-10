@@ -45,7 +45,6 @@ function* signInWorker(action) {
       comboUser.ssoAccessTokenHash = ssoAccessTokenHash;
       comboUser.role = yield call(getUserRoleRpc, credentials.wallet_address);
       yield put(authActions.signIn.success(comboUser));
-      yield put(blockchainActions.getCurrentBlockNumber.call());
       yield call(history.push, routes.home.index);
     } else {
       yield put(authActions.signIn.failure());
@@ -77,7 +76,6 @@ function* verifySessionWorker() {
       user.role = yield call(getUserRoleRpc, walletAddress);
     }
     yield put(authActions.verifySession.success(user));
-    yield put(blockchainActions.getCurrentBlockNumber.call());
   } catch (error) {
     console.error(error);
     yield put(authActions.verifySession.failure());
