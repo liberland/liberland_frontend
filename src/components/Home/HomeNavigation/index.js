@@ -100,6 +100,13 @@ function HomeNavigation() {
       icon: RegistriesIcon,
       activeIcon: RegistriesIconActive,
     },
+    {
+      route: router.home.validators,
+      title: 'Validators',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: RegistriesIcon,
+      activeIcon: RegistriesIconActive,
+    },
   ];
 
   return (

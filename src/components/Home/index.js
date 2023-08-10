@@ -12,6 +12,7 @@ import Voting from '../Voting';
 import Feed from '../Feed';
 import Legislation from '../Legislation';
 import Offices from '../Offices';
+import Validators from '../Validators';
 import Registries from '../Registries';
 import AllTransactions from '../Wallet/AllTransactions';
 import styles from './styles.module.scss';
@@ -33,7 +34,7 @@ function Home() {
             <Route path={router.home.registries} component={Registries} />
             <Route path={router.home.offices} component={Offices} />
             <Route path={router.wallet.allTransactions} component={AllTransactions} />
-
+            <Route path={router.home.validators} component={Validators} />
             <Route
               exact
               path={router.home.index}
