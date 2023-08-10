@@ -8,6 +8,8 @@ import {
   getCompanyRequest,
   getCompanyRegistration,
   registerCompany,
+  getLlmBalances,
+  getLldBalances,
 } from '../../api/nodeRpcCall';
 
 import { officesActions, blockchainActions } from '../actions';
@@ -79,6 +81,17 @@ function* registerCompanyworker(action) {
   }
 }
 
+function* getBalancesWorker(action) {
+  try {
+    const lldBalances = yield call(getLldBalances, action.payload);
+    const llmBalances = yield call(getLlmBalances, action.payload);
+    yield put(officesActions.getBalances.success({ LLD: lldBalances, LLM: llmBalances }));
+  } catch (e) {
+    console.error(e);
+    yield put(officesActions.getBalances.failure(e));
+  }
+}
+
 // WATCHERS
 
 function* getIdentityWatcher() {
@@ -121,10 +134,19 @@ function* registerCompanyWatcher() {
   }
 }
 
+function* getBalancesWatcher() {
+  try {
+    yield takeLatest(officesActions.getBalances.call, getBalancesWorker);
+  } catch (e) {
+    yield put(officesActions.getBalances.failure(e));
+  }
+}
+
 export {
   getIdentityWatcher,
   provideJudgementWatcher,
   getCompanyRequestWatcher,
   getCompanyRegistrationWatcher,
   registerCompanyWatcher,
+  getBalancesWatcher,
 };
