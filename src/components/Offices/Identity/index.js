@@ -244,7 +244,7 @@ function IdentityInfo({ identity, backendLlmBalance }) {
 function Identity() {
   const identity = useSelector(officesSelectors.selectorIdentity);
   const backendLlmBalance = useSelector(officesSelectors.selectorBackendAddressLLMBalance);
- console.log({backendLlmBalance})
+
   return (
     <>
       <IdentityForm />
