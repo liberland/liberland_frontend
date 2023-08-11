@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux';
 // REDUX
 import {
   userSelectors, walletSelectors, democracySelectors,
-  officesSelectors, identitySelectors, legislationSelectors, bridgeSelectors,
+  officesSelectors, identitySelectors, legislationSelectors, bridgeSelectors, validatorSelectors,
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
 
@@ -19,6 +19,7 @@ function Loader({ children }) {
   const isLoadingIdentity = useSelector(identitySelectors.selectorIsLoading);
   const isLoadingLegislation = useSelector(legislationSelectors.gettingLegislation);
   const isLoadingBridge = useSelector(bridgeSelectors.isLoading);
+  const isLoadingValidator = useSelector(validatorSelectors.isLoading);
 
   const isLoading = [
     isSignInFetching,
@@ -28,6 +29,7 @@ function Loader({ children }) {
     isLoadingIdentity,
     isLoadingLegislation,
     isLoadingBridge,
+    isLoadingValidator,
   ].some((isFetching) => isFetching);
 
   return (

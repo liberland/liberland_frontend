@@ -8,6 +8,7 @@ import * as officesSelectors from './offices';
 import * as registriesSelectors from './registries';
 import * as identitySelectors from './identity';
 import * as bridgeSelectors from './bridge';
+import * as validatorSelectors from './validator';
 
 export {
   errorsSelectors,
@@ -20,4 +21,5 @@ export {
   registriesSelectors,
   identitySelectors,
   bridgeSelectors,
+  validatorSelectors,
 };

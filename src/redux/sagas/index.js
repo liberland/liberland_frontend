@@ -8,6 +8,7 @@ import * as officesSagas from './offices';
 import * as registriesSagas from './registries';
 import * as identitySagas from './identity';
 import * as bridgeSagas from './bridge';
+import * as validatorSagas from './validator';
 
 export default function* rootSaga() {
   yield all([
@@ -73,5 +74,9 @@ export default function* rootSaga() {
     bridgeSagas.getTransfersToEthereumWatcher(),
     bridgeSagas.getTransfersToSubstrateWatcher(),
     bridgeSagas.getBridgesConstantsWatcher(),
+
+    // VALIDATOR
+    validatorSagas.payoutWatcher(),
+    validatorSagas.getPendingRewardsWatcher(),
   ]);
 }

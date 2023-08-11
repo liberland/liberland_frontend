@@ -9,6 +9,7 @@ import * as officesActions from './offices';
 import * as registriesActions from './registries';
 import * as identityActions from './identity';
 import * as bridgeActions from './bridge';
+import * as validatorActions from './validator';
 
 export {
   authActions,
@@ -22,4 +23,5 @@ export {
   officesActions,
   identityActions,
   bridgeActions,
+  validatorActions,
 };

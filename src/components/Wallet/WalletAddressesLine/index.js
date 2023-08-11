@@ -8,7 +8,7 @@ import cx from 'classnames';
 import Button from '../../Button/Button';
 import NotificationPortal from '../../NotificationPortal';
 
-import { walletActions } from '../../../redux/actions';
+import { validatorActions, walletActions } from '../../../redux/actions';
 import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
 
 import { ChoseStakeModal, SendLLDModal, SendLLMModal } from '../../Modals';
@@ -104,6 +104,10 @@ function WalletAddressesLine({ walletAddress }) {
     dispatch(walletActions.unpool.call(walletAddress));
     handleModalOpenStake();
   };
+  const handleSubmitPayout = () => {
+    dispatch(validatorActions.payout.call());
+    handleModalOpenStake();
+  };
 
   let navigationList = [
     {
@@ -188,6 +192,7 @@ function WalletAddressesLine({ walletAddress }) {
           handleSubmitStakePolka={handleSubmitStakePolka}
           handleSubmitStakeLiberland={handleSubmitStakeLiberland}
           handleSubmitUnpool={handleSubmitUnpool}
+          handleSubmitPayout={handleSubmitPayout}
           errors={errors}
         />
         )}
