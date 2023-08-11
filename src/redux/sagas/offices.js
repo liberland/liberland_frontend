@@ -73,7 +73,7 @@ function* registerCompanyworker(action) {
       yield put(officesActions.registerCompany.failure())
     } else {
       yield put(officesActions.registerCompany.success())
-      yield put(officesActions.getCompanyRequest.call(action.payload.entity_id))
+      yield put(officesActions.getCompanyRequest.call(actiblockchainActions.setError.successon.payload.entity_id))
     }
   } catch (errorData) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
@@ -98,7 +98,11 @@ function* getBackendAddressLLMWorker(action) {
     const backendLlmBalance = yield call(backend.getAddressLLM, action.payload.walletAddress);
     yield put(officesActions.getBackendAddressLlm.success({ backendLlmBalance }));
   } catch (e) {
-    console.log(e)
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success({
+      isError: true,
+      details: e.toString()
+    }));
     yield put(officesActions.getBackendAddressLlm.failure(e));
   }
 }
@@ -158,7 +162,6 @@ function* getBackendAddressLLMWatcher() {
   try {
     yield takeLatest(officesActions.getBackendAddressLlm.call, getBackendAddressLLMWorker);
   } catch (e) {
-    console.log(e)
     yield put(officesActions.getBackendAddressLlm.failure(e));
   }
 }

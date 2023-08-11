@@ -136,11 +136,11 @@ function TokenTable({ backendLlmBalance }) {
       data={[
         {
           "desc": "LLM balance",
-          "res": backendLlmBalance ? ethers.utils.formatUnits(backendLlmBalance, 12) : null,
+          "res": backendLlmBalance ? ethers.utils.formatUnits(backendLlmBalance, 12) : 0,
         },
         {
           "desc": "LLD balance",
-          "res": backendLlmBalance ?  ethers.utils.formatUnits(backendLlmBalance.mul(10), 12) : null,
+          "res": backendLlmBalance ?  ethers.utils.formatUnits(backendLlmBalance.mul(10), 12) : 0,
         },
       ]}
     />
@@ -244,7 +244,7 @@ function IdentityInfo({ identity, backendLlmBalance }) {
 function Identity() {
   const identity = useSelector(officesSelectors.selectorIdentity);
   const backendLlmBalance = useSelector(officesSelectors.selectorBackendAddressLLMBalance);
-  
+ console.log({backendLlmBalance})
   return (
     <>
       <IdentityForm />
