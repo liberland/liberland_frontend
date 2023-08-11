@@ -1,5 +1,4 @@
 import axios from "axios";
-import { ethers } from "ethers";
 
 const getApi = () => {
   const ssoAccessTokenHash = sessionStorage.getItem("ssoAccessTokenHash");
@@ -22,7 +21,5 @@ export const getAddressLLM = async (walletAddress) => {
     },
   });
 
-  if (data.length > 1) throw new Error(`Address belongs to ${data.length} users`);
-
-  return ethers.utils.parseUnits(data[0].merits.toFixed(12), 12);
+  return data;
 };

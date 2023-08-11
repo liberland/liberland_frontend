@@ -1,6 +1,7 @@
 import {
   put, takeLatest, call, cps,
 } from 'redux-saga/effects';
+import { ethers } from "ethers";
 
 import {
   getIdentity,
@@ -73,7 +74,7 @@ function* registerCompanyworker(action) {
       yield put(officesActions.registerCompany.failure())
     } else {
       yield put(officesActions.registerCompany.success())
-      yield put(officesActions.getCompanyRequest.call(blockchainActions.setError.successon.payload.entity_id))
+      yield put(officesActions.getCompanyRequest.call(action.payload.entity_id))
     }
   } catch (errorData) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
@@ -96,7 +97,16 @@ function* getBalancesWorker(action) {
 function* getBackendAddressLLMWorker(action) {
   try {
     const backendLlmBalance = yield call(backend.getAddressLLM, action.payload.walletAddress);
-    yield put(officesActions.getBackendAddressLlm.success({ backendLlmBalance }));
+
+    if (backendLlmBalance.length > 1)
+      throw new Error(`Address belongs to ${backendLlmBalance.length} users`);
+
+    yield put(officesActions.getBackendAddressLlm.success({ 
+      backendLlmBalance: ethers.utils.parseUnits(
+        backendLlmBalance[0].merits.toFixed(12),
+        12
+      ) 
+    }));
   } catch (e) {
     yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
     yield put(blockchainActions.setError.success({
