@@ -18,7 +18,7 @@ export default function* rootSaga() {
     authSagas.initGetDataFromNodeWatcher(),
 
     // // BLOCKCHAIN
-    blockchainSagas.fetchBlockNumberWatcher(),
+    blockchainSagas.subscribeBestBlockNumberSaga(),
     blockchainSagas.getAllWalletsWatcher(),
     blockchainSagas.clearErrorsWatcher(),
 
@@ -58,6 +58,7 @@ export default function* rootSaga() {
     officesSagas.getCompanyRequestWatcher(),
     officesSagas.getCompanyRegistrationWatcher(),
     officesSagas.registerCompanyWatcher(),
+    officesSagas.getBalancesWatcher(),
 
     //REGISTRIES
     registriesSagas.getOfficialUserRegistryEntriesWatcher(),
@@ -71,6 +72,6 @@ export default function* rootSaga() {
     bridgeSagas.monitorBurnWatcher(),
     bridgeSagas.getTransfersToEthereumWatcher(),
     bridgeSagas.getTransfersToSubstrateWatcher(),
-    bridgeSagas.getWithdrawalDelaysWatcher(),
+    bridgeSagas.getBridgesConstantsWatcher(),
   ]);
 }

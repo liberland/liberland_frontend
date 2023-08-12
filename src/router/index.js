@@ -11,11 +11,13 @@ export default {
     legislation: '/home/legislation',
     registries: '/home/registries',
     offices: '/home/offices',
+    validators: '/home/validators',
   },
   offices: {
     identity: '/home/offices/identity',
     companyRegistry: '/home/offices/company_registry',
     landRegistry: '/home/offices/land_registry',
+    finances: '/home/offices/finances',
   },
   documents: {
     myAccount: '/home/documents/my-account',
@@ -46,4 +48,7 @@ export default {
     assets: '/home/registries/assets',
     other: '/home/registries/other',
   },
+  validators: {
+    overview: '/home/validators',
+  }
 };

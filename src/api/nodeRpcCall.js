@@ -39,6 +39,37 @@ const getIdentity = async (address) => {
   }
 }
 
+const getLlmBalances = async (addresses) => {
+  try {
+    const api = await getApi();
+    const balances = await api.query.assets.account.multi(addresses.map(a => [1, a]));
+    return addresses.reduce((acc, addr, idx) => {
+      if (balances[idx].isSome)
+        return Object.assign(acc, { [addr]: balances[idx].unwrap().balance })
+      else
+        return Object.assign(acc, { [addr]: 0 })
+    }, {});
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+}
+
+const getLldBalances = async (addresses) => {
+  try {
+    const api = await getApi();
+    const balances = await api.query.system.account.multi(addresses);
+    return addresses.reduce((acc, addr, idx) => {
+      return Object.assign(acc, { [addr]: balances[idx].data.free })
+    }, {});
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+}
+
 const bridgeSubscribe = async (asset, receipt_id, onChange) => {
   const api = await getApi();
   let bridge;
@@ -100,14 +131,24 @@ const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress, callback) =>
   });
 }
 
-const bridgeWithdrawalDelay = async (asset) => {
+const bridgeMinTransfer = async (asset) => {
   const api = await getApi();
   let bridge;
   if (asset == "LLM") bridge = api.consts.ethLLMBridge;
   else if (asset == "LLD") bridge = api.consts.ethLLDBridge;
   else throw new Exception("Unknown asset");
 
-  return bridge.withdrawalDelay;
+  return bridge.minTransfer;
+}
+
+const bridgeConstants = async (asset) => {
+  const api = await getApi();
+  let bridge;
+  if (asset == "LLM") bridge = api.consts.ethLLMBridge;
+  else if (asset == "LLD") bridge = api.consts.ethLLDBridge;
+  else throw new Exception("Unknown asset");
+
+  return bridge;
 }
 
 const provideJudgement = async ({ address, hash, walletAddress }, callback) => {
@@ -432,11 +473,11 @@ const getUserRoleRpc = async (walletAddress) => {
   return null;
 };
 
-const getCurrentBlockNumberRpc = async () => {
+const subscribeBestBlockNumber = async (onNewBlockNumber) => {
   try {
     const api = await getApi();
-    const bestNumber = await api.derive.chain.bestNumber();
-    return (bestNumber.toNumber());
+    const unsub = await api.derive.chain.bestNumber((bestNumber) => onNewBlockNumber(bestNumber.toNumber()));
+    return unsub;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error('error', e);
@@ -1237,7 +1278,7 @@ export {
   stakeToPolkaBondAndExtra,
   politiPool,
   getUserRoleRpc,
-  getCurrentBlockNumberRpc,
+  subscribeBestBlockNumber,
   getAllWalletsRpc,
   getValidators,
   getNominatorTargets,
@@ -1269,5 +1310,7 @@ export {
   bridgeSubscribe,
   bridgeDeposit,
   getBlockEvents,
-  bridgeWithdrawalDelay,
+  getLlmBalances,
+  getLldBalances,
+  bridgeConstants,
 };

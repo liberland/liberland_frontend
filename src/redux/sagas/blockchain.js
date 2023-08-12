@@ -1,25 +1,14 @@
 import {
-  put, call, takeLatest,
+  put, call, takeLatest, take,
 } from 'redux-saga/effects';
 import { web3Enable } from '@polkadot/extension-dapp';
 import { blockchainActions } from '../actions';
-
-import { getCurrentBlockNumberRpc, getAllWalletsRpc } from '../../api/nodeRpcCall';
+import { eventChannel } from 'redux-saga';
+import { subscribeBestBlockNumber, getAllWalletsRpc } from '../../api/nodeRpcCall';
 
 const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
 
 // WORKERS
-
-function* getCurrentBlockNumberWorker() {
-  try {
-    const bockNumber = yield call(getCurrentBlockNumberRpc);
-    yield put(blockchainActions.getCurrentBlockNumber.success(bockNumber));
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    yield put(blockchainActions.getCurrentBlockNumber.failure(e));
-  }
-}
 
 function* getAllWalletsWorker() {
   try {
@@ -55,10 +44,6 @@ function* clearErrorsWorker(action) {
 
 // WATCHERS
 
-function* fetchBlockNumberWatcher() {
-  yield takeLatest(blockchainActions.getCurrentBlockNumber.call, getCurrentBlockNumberWorker);
-}
-
 function* getAllWalletsWatcher() {
   try {
     yield takeLatest(blockchainActions.getAllWallets.call, getAllWalletsWorker);
@@ -73,8 +58,21 @@ function* clearErrorsWatcher() {
   yield takeLatest(blockchainActions.setErrorExistsAndUnacknowledgedByUser.call, clearErrorsWorker);
 }
 
+function* subscribeBestBlockNumberSaga() {
+  const channel = eventChannel(emitter => {
+    const unsubPromise = subscribeBestBlockNumber(emitter);
+    return () => unsubPromise.then(unsub => unsub());
+  });
+
+  while (true) {
+    const bestNumber = yield take(channel);
+    yield put(blockchainActions.bestBlockNumber.value({ bestNumber }));
+  }
+}
+
+
 export {
-  fetchBlockNumberWatcher,
   getAllWalletsWatcher,
   clearErrorsWatcher,
+  subscribeBestBlockNumberSaga,
 };

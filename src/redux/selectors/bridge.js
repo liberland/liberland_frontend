@@ -37,7 +37,7 @@ export const toSubstrateTransfers = createSelector(
   (reducer) => reducer.transfers.toSubstrate,
 );
 
-export const withdrawalDelays = createSelector(
+export const bridgesConstants = createSelector(
   bridgeReducer,
-  (reducer) => reducer.withdrawalDelays,
+  (reducer) => reducer.bridgesConstants,
 );

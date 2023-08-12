@@ -24,6 +24,7 @@ function HomeHeader() {
     [router.home.legislation]: 'Legislation',
     [router.home.offices]: 'Offices',
     [router.home.registries]: 'Registries',
+    [router.home.validators]: 'Validators',
     [router.home.voting]: 'Voting',
     [router.voting.congressionalAssemble]: 'Voting',
     [router.voting.referendum]: 'Voting',

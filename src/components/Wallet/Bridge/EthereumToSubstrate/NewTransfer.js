@@ -44,13 +44,13 @@ export function NewTransfer({ ethBridges }) {
           register={register}
           name="asset"
           options={
-                        ASSETS.map(
-                          (asset) => ({
-                            value: asset,
-                            display: `${asset} (balance: ${ethers.utils.formatUnits(ethBridges[asset].balance, ethBridges[asset].token.decimals)} ${ethBridges[asset].token.symbol})`,
-                          }),
-                        )
-                    }
+              ASSETS.map(
+                (asset) => ({
+                  value: asset,
+                  display: `${asset} (balance: ${ethers.utils.formatUnits(ethBridges[asset].balance, ethBridges[asset].token.decimals)} ${ethBridges[asset].token.symbol})`,
+                }),
+              )
+          }
         />
       </div>
 
@@ -59,7 +59,13 @@ export function NewTransfer({ ethBridges }) {
           register={register}
           name="amount"
           placeholder="Amount"
-          validate={(v) => v === '' || ethBridge.balance.gte(ethers.utils.parseUnits(v, ethBridge.token.decimals)) || 'Insufficient balance'}
+          validate={(v) => {
+            if (v === '') return true;
+            const parsed = ethers.utils.parseUnits(v, ethBridge.token.decimals);
+            if (ethBridge.balance.lt(parsed)) return 'Insufficient balance';
+            if (parsed.lt(ethBridge.minTransfer)) return `Too low amount - minimum transfer is ${ethers.utils.formatUnits(ethBridge.minTransfer, ethBridge.token.decimals)} ${ethBridge.token.symbol}`;
+            return true;
+          }}
         />
         {errors?.amount?.type === 'validate'
           ? <p className={styles.error}>{errors.amount.message}</p> : null}

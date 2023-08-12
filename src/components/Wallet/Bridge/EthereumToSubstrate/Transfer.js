@@ -13,12 +13,12 @@ export function Transfer({ ethBridge, transfer }) {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const rawSubstrateState = useSubstrateBridgeTransfer(transfer.asset, transfer.txHash, transfer.receipt_id);
   const substrateBlockNumber = useSelector(blockchainSelectors.blockNumber); // FIXME this isn't updating realtime and we need this realtime
-  const withdrawalDelays = useSelector(bridgeSelectors.withdrawalDelays);
+  const bridgesConstants = useSelector(bridgeSelectors.bridgesConstants);
 
   useEffect(() => {
-    if (withdrawalDelays === null)
-      dispatch(bridgeActions.getWithdrawalDelays.call());
-  }, [dispatch, withdrawalDelays])
+    if (bridgesConstants === null)
+      dispatch(bridgeActions.getBridgesConstants.call());
+  }, [dispatch, bridgesConstants])
 
   const withdraw = () => {
     dispatch(bridgeActions.withdraw.call({
@@ -31,11 +31,11 @@ export function Transfer({ ethBridge, transfer }) {
     }));
   };
 
-  if (!withdrawalDelays) return null;
+  if (!bridgesConstants) return null;
 
   let substrateState = 'unknown'; // unknown, voting, approved, ready, processed
   if (rawSubstrateState?.status?.isApproved) {
-    const withdrawalDelayInBlocks = withdrawalDelays[transfer.asset];
+    const withdrawalDelayInBlocks = bridgesConstants[transfer.asset].withdrawalDelay.toNumber();
     const approvedOn = rawSubstrateState.status.asApproved.toNumber();
     if (substrateBlockNumber >= withdrawalDelayInBlocks + approvedOn) substrateState = 'ready';
     else substrateState = 'approved';

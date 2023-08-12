@@ -22,9 +22,15 @@ const selectorIsLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+const selectorBalances = createSelector(
+  officesReducer,
+  (reducer) => reducer.balances,
+);
+
 export {
   selectorIdentity,
   selectorCompanyRequest,
   selectorCompanyRegistration,
   selectorIsLoading,
+  selectorBalances,
 };

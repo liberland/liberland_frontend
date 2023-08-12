@@ -6,10 +6,11 @@ import {
 import OfficesHeader from './OfficesHeader';
 import Identity from './Identity';
 import CompanyRegistry from './CompanyRegistry';
+import LandRegistry from "./LandRegistry";
+import Finances from "./Finances";
 import router from '../../router';
 
 import styles from './styles.module.scss';
-import LandRegistry from "./LandRegistry";
 
 function Offices() {
   return (
@@ -41,6 +42,11 @@ function Offices() {
             exact
             path={router.offices.landRegistry}
             component={LandRegistry}
+          />
+          <Route
+            exact
+            path={router.offices.finances}
+            component={Finances}
           />
         </Switch>
       </div>
