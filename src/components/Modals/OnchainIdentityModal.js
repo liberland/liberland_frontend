@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';
-import { TextInput, DateInput, CheckboxInput } from '../InputComponents';
+import { TextInput, DateInput, CheckboxInput, SelectInput } from '../InputComponents';
 import Button from '../Button/Button';
 
 // STYLES
@@ -18,10 +18,13 @@ function OnchainIdentityModal({
   let defaultValues = {};
   let isKnownGood = false;
   let identityCitizen = false;
+  let eResident = false;
   let identityDOB = false;
   if (identity.isSome) {
     const {judgements, info} = identity.unwrap();
     identityCitizen = parseAdditionalFlag(info.additional, 'citizen');
+    eResident = parseAdditionalFlag(info.additional, 'eresident');
+
     identityDOB = parseDOB(info.additional, blockNumber);
 
     defaultValues = {
@@ -32,7 +35,7 @@ function OnchainIdentityModal({
       date_of_birth: identityDOB ?? undefined,
       older_than_13: !identityDOB,
       citizen: identityCitizen,
-      e_resident: !identityCitizen
+      e_resident: eResident
     };
 
     isKnownGood = parseCitizenshipJudgement(judgements);
@@ -42,18 +45,13 @@ function OnchainIdentityModal({
     handleSubmit,
     register,
     watch,
-    setValue,
-    trigger,
     formState: { errors }
   } = useForm({ mode: 'all', defaultValues });
 
   const isCitizen = watch('citizen');
-  const isOlderThan13 = watch('older_than_13');
   const isEResident = watch('e_resident');
-
-  useEffect(() => {
-    trigger(['citizen', 'e_resident'])
-  }, [trigger, isCitizen, isEResident])
+  const isOlderThan13 = watch('older_than_13');
+  const onChainIdentity = watch('onChainIdentity');
 
   return (
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
@@ -92,32 +90,18 @@ function OnchainIdentityModal({
         name="email"
         placeholder="Email"
       />
-      <div className={styles.title}>Are you or do you want to become an e-resident?</div>
-      <CheckboxInput
+      <div className={styles.title}>I am or want to become a</div>
+      <SelectInput
         register={register}
-        name="e_resident"
-        label="I am or want to become a e-resident"
-        validate={isCheckbox => {
-          if (isCitizen && isCheckbox)
-              return "You can't be both a citizen and an e-resident"
-            return true
-          }
-          }
-      />
-      <div className={styles.title}>Are you or do you want to become a citizen?</div>
-      <CheckboxInput
-        register={register}
-        name="citizen"
-        label="I am or want to become a citizen"
-        validate={isCheckbox => {
-          if (isEResident && isCheckbox)
-              return "You can't be both a citizen and an e-resident"
-            return true
-          }
-         }
+        name="onChainIdentity"
+        options={[
+          { value: "0", display: "E-resident", selected: !isCitizen && isEResident},
+          { value: "1", display: "Citizen", selected: isCitizen && isEResident},
+          { value: "2", display: "Neither", selected: !isCitizen && !isEResident},
+        ]}
       />
 
-      { !isCitizen ? null :
+      { !(onChainIdentity === "1") ? null :
         <>
           <div className={styles.title}>Date of birth</div>
           <CheckboxInput

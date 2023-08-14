@@ -66,12 +66,11 @@ function Profile({ className }) {
       legal: values.legal,
       web: values.web,
       email: values.email,
-      citizen: values.citizen,
+      onChainIdentity: values.onChainIdentity,
       eligible_on,
-      eresident: values.e_resident
     }
 
-    dispatch(identityActions.setIdentity.call({userWalletAddress, values: params}));
+    dispatch(identityActions.setIdentity.call({ userWalletAddress, values: params }));
     toggleModalOnchainIdentity();
   };
 

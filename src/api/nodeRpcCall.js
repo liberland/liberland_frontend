@@ -171,11 +171,26 @@ const getEResidentAdditionals = () => {
 }
 
 const buildAdditionals = (values, blockNumber) => {
-  const citizenAdditionalsData = values.citizen ? getCitizenAdditionals(blockNumber, values.eligible_on) : []
-  const eResidentAdditionalsData = values.eresident ? getEResidentAdditionals() : []
-  const legalAdditionals = values.legal ? getLegalAdditionals(values.legal) : [];
-  
-  return [...citizenAdditionalsData, ...eResidentAdditionalsData, ...legalAdditionals]
+  const additionals = []
+
+  if (values.onChainIdentity === "1") {
+    additionals.push(
+        ...getCitizenAdditionals(blockNumber, values.eligible_on),
+        ...getEResidentAdditionals()
+    )
+  } else if (values.onChainIdentity === "0") {
+    additionals.push(
+        ...getEResidentAdditionals()
+      )
+  }
+
+  if (values.legal) {
+    additionals.push(
+        ...getLegalAdditionals(values.legal)
+    )
+  }
+
+  return additionals
 }
 
 const setIdentity = async (values, walletAddress, callback) => {
