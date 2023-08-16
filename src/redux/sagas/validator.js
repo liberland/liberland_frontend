@@ -6,6 +6,7 @@ import { BN_ZERO } from '@polkadot/util';
 import {
   batchPayoutStakers, getNextSessionValidators, getNominators,
   getSessionValidators, getStakersRewards, getStakingLedger, getStakingValidators,
+  getAppliedSlashes, getUnappliedSlashes,
 } from '../../api/nodeRpcCall';
 
 import { blockchainActions, validatorActions } from '../actions';
@@ -31,6 +32,7 @@ function* payoutWorker() {
     }
     yield put(validatorActions.payout.success());
   } catch (errorData) {
+    // eslint-disable-next-line no-console
     console.log('Error payoutStakers worker', errorData);
     yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
     yield put(blockchainActions.setError.success(errorData));
@@ -75,6 +77,45 @@ function* getInfoWorker() {
   }
 }
 
+function* getSlashesWorker() {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const unappliedSlashesRaw = yield call(getUnappliedSlashes);
+  const unappliedSlashes = unappliedSlashesRaw
+    .map(([[era], slashes]) => slashes
+      .map(({ validator, own, others }) => ({
+        era,
+        validatorSlash: validator.eq(walletAddress) ? own : null,
+        nominatorSlash: others.find(([account, _]) => account.eq(walletAddress))?.[1] ?? null,
+      }))
+      .filter(({ validatorSlash, nominatorSlash }) => (validatorSlash || nominatorSlash)))
+    .flatten();
+
+  const appliedSlashesRaw = yield call(getAppliedSlashes);
+  const appliedSlashesMap = {};
+  appliedSlashesRaw.validator.forEach(([{ args: [era, account] }, slash]) => {
+    if (!account.eq(walletAddress) || slash.isNone) return;
+    const amount = slash.unwrap()[1];
+    if (amount.lte(BN_ZERO)) return;
+    if (!appliedSlashesMap[era]) appliedSlashesMap[era] = {};
+    appliedSlashesMap[era].validatorSlash = amount;
+  });
+  appliedSlashesRaw.nominator.forEach(([[era, account], slash]) => {
+    if (!account.eq(walletAddress) || slash.isNone) return;
+    const amount = slash.unwrap();
+    if (amount.lte(BN_ZERO)) return;
+    if (!appliedSlashesMap[era]) appliedSlashesMap[era] = {};
+    appliedSlashesMap[era].nominatorSlash = amount;
+  });
+
+  const appliedSlashes = Object.keys(appliedSlashesMap).map((era) => ({
+    era,
+    nominatorSlash: appliedSlashesMap[era].nominatorSlash ?? BN_ZERO,
+    validatorSlash: appliedSlashesMap[era].validatorSlash ?? BN_ZERO,
+  }));
+
+  yield put(validatorActions.getSlashes.success({ unappliedSlashes, appliedSlashes }));
+}
+
 // WATCHERS
 
 function* payoutWatcher() {
@@ -101,8 +142,17 @@ function* getInfoWatcher() {
   }
 }
 
+function* getSlashesWatcher() {
+  try {
+    yield takeLatest(validatorActions.getSlashes.call, getSlashesWorker);
+  } catch (e) {
+    yield put(validatorActions.getSlashes.failure(e));
+  }
+}
+
 export {
   payoutWatcher,
   getPendingRewardsWatcher,
   getInfoWatcher,
+  getSlashesWatcher,
 };

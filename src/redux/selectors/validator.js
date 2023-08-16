@@ -16,3 +16,13 @@ export const info = createSelector(
   validatorReducer,
   (reducer) => reducer.info,
 );
+
+export const appliedSlashes = createSelector(
+  validatorReducer,
+  (reducer) => reducer.appliedSlashes,
+);
+
+export const unappliedSlashes = createSelector(
+  validatorReducer,
+  (reducer) => reducer.unappliedSlashes,
+);

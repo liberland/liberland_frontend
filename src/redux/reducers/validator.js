@@ -11,6 +11,8 @@ const initialState = {
     isStakingValidator: null,
     isNominator: null,
   },
+  appliedSlashes: null,
+  unappliedSlashes: null,
 };
 
 const validatorReducer = handleActions({
@@ -18,6 +20,7 @@ const validatorReducer = handleActions({
     validatorActions.payout.call,
     validatorActions.getPendingRewards.call,
     validatorActions.getInfo.call,
+    validatorActions.getSlashes.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -29,9 +32,15 @@ const validatorReducer = handleActions({
     validatorActions.getPendingRewards.failure,
     validatorActions.getInfo.success,
     validatorActions.getInfo.failure,
+    validatorActions.getSlashes.success,
+    validatorActions.getSlashes.failure,
   )]: (state) => ({
     ...state,
     loading: false,
+  }),
+  [validatorActions.getPendingRewards.call]: (state) => ({
+    ...state,
+    pendingRewards: initialState.pendingRewards,
   }),
   [validatorActions.getPendingRewards.success]: (state, action) => ({
     ...state,
@@ -40,6 +49,16 @@ const validatorReducer = handleActions({
   [validatorActions.getInfo.success]: (state, action) => ({
     ...state,
     info: action.payload,
+  }),
+  [validatorActions.getSlashes.call]: (state) => ({
+    ...state,
+    appliedSlashes: initialState.appliedSlashes,
+    unappliedSlashes: initialState.unappliedSlashes,
+  }),
+  [validatorActions.getSlashes.success]: (state, action) => ({
+    ...state,
+    appliedSlashes: action.payload.appliedSlashes,
+    unappliedSlashes: action.payload.unappliedSlashes,
   }),
 }, initialState);
 

@@ -1355,6 +1355,20 @@ const getStakingLedger = async (controller) => {
   return await api.query.staking.ledger(controller);
 }
 
+const getAppliedSlashes = async () => {
+  const api = await getApi();
+
+  return {
+    validator: await api.query.staking.validatorSlashInEra.entries(),
+    nominator: await api.query.staking.nominatorSlashInEra.entries(),
+  }
+}
+
+const getUnappliedSlashes = async () => {
+  const api = await getApi();
+  return await api.query.staking.unappliedSlashes.entries();
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1404,4 +1418,6 @@ export {
   getStakingValidators,
   getNominators,
   getStakingLedger,
+  getAppliedSlashes,
+  getUnappliedSlashes,
 };
