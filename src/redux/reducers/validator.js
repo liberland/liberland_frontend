@@ -21,6 +21,7 @@ const validatorReducer = handleActions({
     validatorActions.getPendingRewards.call,
     validatorActions.getInfo.call,
     validatorActions.getSlashes.call,
+    validatorActions.setSessionKeys.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -34,6 +35,8 @@ const validatorReducer = handleActions({
     validatorActions.getInfo.failure,
     validatorActions.getSlashes.success,
     validatorActions.getSlashes.failure,
+    validatorActions.setSessionKeys.success,
+    validatorActions.setSessionKeys.failure,
   )]: (state) => ({
     ...state,
     loading: false,

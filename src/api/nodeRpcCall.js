@@ -1376,6 +1376,28 @@ const getUnappliedSlashes = async () => {
   return await api.query.staking.unappliedSlashes.entries();
 }
 
+const setSessionKeys = async (keys, walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const EMPTY_PROOF = new Uint8Array();
+  const extrinsic = api.tx.session.setKeys(keys, EMPTY_PROOF);
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed session.setKeys at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( session.setKeys transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1427,4 +1449,5 @@ export {
   getStakingLedger,
   getAppliedSlashes,
   getUnappliedSlashes,
+  setSessionKeys,
 };

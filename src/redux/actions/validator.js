@@ -5,6 +5,7 @@ export const {
   getPendingRewards,
   getInfo,
   getSlashes,
+  setSessionKeys,
 } = createActions({
   PAYOUT: {
     call: undefined,
@@ -22,6 +23,11 @@ export const {
     failure: undefined,
   },
   GET_SLASHES: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SET_SESSION_KEYS: {
     call: undefined,
     success: undefined,
     failure: undefined,

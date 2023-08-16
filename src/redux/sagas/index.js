@@ -80,5 +80,6 @@ export default function* rootSaga() {
     validatorSagas.getPendingRewardsWatcher(),
     validatorSagas.getInfoWatcher(),
     validatorSagas.getSlashesWatcher(),
+    validatorSagas.setSessionKeysWatcher(),
   ]);
 }
