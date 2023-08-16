@@ -20,8 +20,6 @@ function ChoseStakeModal({
   const unpool_amount = valueToBN(balances.liberstake.amount).mul(new BN(8742)).div(new BN(1000000));
   const unpool_liquid = valueToBN(balances.liquidMerits.amount).add(unpool_amount);
   const unpool_stake = valueToBN(balances.liberstake.amount).sub(unpool_amount);
-  console.log(errors);
-
 
   return (
     <>

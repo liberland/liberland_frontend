@@ -12,7 +12,7 @@ const RegistriesOverview = () => {
     dispatch(registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress))
   }, [dispatch, registriesActions])
   const registries = useSelector(registriesSelectors.registries);
-  console.log(registries)
+
   return (
     <div>
       <Card title={"Companies"} key={"Companies"}>

@@ -21,7 +21,6 @@ function IdentityForm() {
 
   const onSubmit = ({ account }) => {
     dispatch(officesActions.officeGetIdentity.call(account));
-    dispatch(officesActions.getBackendAddressLlm.call({ walletAddress: account }));
   };
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
@@ -59,7 +58,7 @@ function IdentityFlagAnalysis({ identity, field }) {
   if (citizen_value.isRaw && citizen_value.eq('1')) {
     return <div><OkIcon /></div>;
   }
-  return <div>INVALID <CancelIcon/></div>;
+  return <div>INVALID <CancelIcon /></div>;
 }
 
 function parseEligibleOn(eligible_on) {
@@ -71,9 +70,9 @@ function parseEligibleOn(eligible_on) {
 
 function EligibleOnAnalysis({ identity }) {
   let eligible_on = identity.info.additional.find(([key, _]) => key.eq('eligible_on'));
-  if (!eligible_on) return <div>MISSING <CancelIcon/></div>;
+  if (!eligible_on) return <div>MISSING <CancelIcon /></div>;
   [, eligible_on] = eligible_on;
-  if (!eligible_on.isRaw) return <div>INVALID <CancelIcon/></div>;
+  if (!eligible_on.isRaw) return <div>INVALID <CancelIcon /></div>;
 
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const [now,] = useState(new Date());
@@ -83,7 +82,7 @@ function EligibleOnAnalysis({ identity }) {
 
   return (
     <div>
-      Candidate claims that they&apos;re 13 or older on date:<br/>
+      Candidate claims that they&apos;re 13 or older on date:<br />
       {eligibleOnDate.toString()}
     </div>
   );
@@ -120,7 +119,7 @@ function IdentityAnalysis({ identity }) {
   );
 }
 
-function TokenTable({ backendLlmBalance }) {
+function TokenTable({ backendMerits, backendDollars }) {
   return (
     <Table
       columns={[
@@ -136,11 +135,11 @@ function TokenTable({ backendLlmBalance }) {
       data={[
         {
           "desc": "LLM balance",
-          "res": backendLlmBalance ? ethers.utils.formatUnits(backendLlmBalance, 12) : 0,
+          "res": backendMerits ? ethers.utils.formatUnits(backendMerits, 12) : 0,
         },
         {
           "desc": "LLD balance",
-          "res": backendLlmBalance ?  ethers.utils.formatUnits(backendLlmBalance.mul(10), 12) : 0,
+          "res": backendDollars ? ethers.utils.formatUnits(backendDollars, 12) : 0,
         },
       ]}
     />
@@ -187,41 +186,44 @@ function IdentityTable({ info }) {
     { k: "Custom fields", v: <pre>{JSON.stringify(extra_additional)}</pre> },
   ]
 
-  console.log(data);
   return <Table columns={columns} data={data} />;
 }
 
-function IdentityInfo({ identity, backendLlmBalance }) {
+function IdentityInfo() {
   const dispatch = useDispatch();
+  let { address, onchain, backend } = useSelector(officesSelectors.selectorIdentity);
   const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
-  if (identity === null) return null;
-  const { address } = identity;
-  identity = identity.identity;
-  if (identity === null) return null;
-  if (identity.isNone) return <MissingIdentity />;
 
-  identity = identity.unwrap();
-  const { hash } = identity.info;
+  if (onchain === null) return null;
+  if (onchain.isNone) return <MissingIdentity />;
+
+  onchain = onchain.unwrap();
+  const { hash } = onchain.info;
+
+  const backendMerits = backend?.merits ?? 0
+  const backendDollars = backendMerits?.div(10);
 
   const onClick = () => {
-    dispatch(officesActions.provideJudgement.call({
+    dispatch(officesActions.provideJudgementAndAssets.call({
       walletAddress: sender,
       address,
+      uid: backend?.uid,
       hash,
+      merits: backendMerits,
+      dollars: backendDollars,
     }));
   };
 
-  const judgements = identity.judgements.filter((i) => i[0].eq(0)).map((i) => i[1]);
+  const judgements = onchain.judgements.filter((i) => i[0].eq(0)).map((i) => i[1]);
   const judgement = judgements.length > 0 ? judgements[0].toString() : "none";
 
-  const { info } = identity;
   return (
     <>
       <div className={styles.identityInfo}>
         <div className={styles.h4}>Candidate's identity:</div>
-        <IdentityTable info={info} />
-        <IdentityAnalysis identity={identity} />
-        <TokenTable backendLlmBalance={backendLlmBalance} />
+        <IdentityTable info={onchain.info} />
+        <IdentityAnalysis identity={onchain} />
+        <TokenTable {...{ backendMerits, backendDollars }} />
         <div className={styles.h4}>Current status:</div>
         <div>
           Current judgement: {judgement}
@@ -234,7 +236,7 @@ function IdentityInfo({ identity, backendLlmBalance }) {
           medium
           onClick={onClick}
         >
-          Provide KnownGood judgement
+          Provide KnownGood judgement and transfer LLM and LLD
         </Button>
       </div>
     </>
@@ -242,13 +244,10 @@ function IdentityInfo({ identity, backendLlmBalance }) {
 }
 
 function Identity() {
-  const identity = useSelector(officesSelectors.selectorIdentity);
-  const backendLlmBalance = useSelector(officesSelectors.selectorBackendAddressLLMBalance);
-
   return (
     <>
       <IdentityForm />
-      <IdentityInfo identity={identity} backendLlmBalance={backendLlmBalance}/>
+      <IdentityInfo />
     </>
   );
 }
