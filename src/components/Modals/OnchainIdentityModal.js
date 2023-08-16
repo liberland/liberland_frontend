@@ -104,7 +104,7 @@ function OnchainIdentityModal({
         ]}
       />
 
-      { !(onChainIdentity === "1") ? null :
+      { !(onChainIdentity === "citizen") ? null :
         <>
           <div className={styles.title}>Date of birth</div>
           <CheckboxInput
