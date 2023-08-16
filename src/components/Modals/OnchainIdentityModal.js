@@ -20,10 +20,16 @@ function OnchainIdentityModal({
   let identityCitizen = false;
   let eResident = false;
   let identityDOB = false;
+
   if (identity.isSome) {
     const {judgements, info} = identity.unwrap();
     identityCitizen = parseAdditionalFlag(info.additional, 'citizen');
     eResident = parseAdditionalFlag(info.additional, 'eresident');
+    const onChainIdentity = identityCitizen && eResident ? 
+            "citizen" : 
+            !identityCitizen && eResident ? 
+              "eresident" : 
+              "neither"
 
     identityDOB = parseDOB(info.additional, blockNumber);
 
@@ -34,8 +40,7 @@ function OnchainIdentityModal({
       email: parseIdentityData(info.email),
       date_of_birth: identityDOB ?? undefined,
       older_than_13: !identityDOB,
-      citizen: identityCitizen,
-      e_resident: eResident
+      onChainIdentity
     };
 
     isKnownGood = parseCitizenshipJudgement(judgements);
@@ -48,8 +53,6 @@ function OnchainIdentityModal({
     formState: { errors }
   } = useForm({ mode: 'all', defaultValues });
 
-  const isCitizen = watch('citizen');
-  const isEResident = watch('e_resident');
   const isOlderThan13 = watch('older_than_13');
   const onChainIdentity = watch('onChainIdentity');
 
@@ -94,13 +97,6 @@ function OnchainIdentityModal({
       <SelectInput
         register={register}
         name="onChainIdentity"
-        defaultValue={
-          isCitizen && isEResident ? 
-            "citizen" : 
-            !isCitizen && isEResident ? 
-              "eresident" : 
-              "neither"
-            }
         options={[
           { value: "eresident", display: "E-resident"},
           { value: "citizen", display: "Citizen"},
