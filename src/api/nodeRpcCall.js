@@ -173,12 +173,12 @@ const getEResidentAdditionals = () => {
 const buildAdditionals = (values, blockNumber) => {
   const additionals = []
 
-  if (values.onChainIdentity === "1") {
+  if (values.onChainIdentity === "citizen") {
     additionals.push(
         ...getCitizenAdditionals(blockNumber, values.eligible_on),
         ...getEResidentAdditionals()
     )
-  } else if (values.onChainIdentity === "0") {
+  } else if (values.onChainIdentity === "eresident") {
     additionals.push(
         ...getEResidentAdditionals()
       )

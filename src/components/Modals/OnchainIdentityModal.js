@@ -94,10 +94,17 @@ function OnchainIdentityModal({
       <SelectInput
         register={register}
         name="onChainIdentity"
+        defaultValue={
+          isCitizen && isEResident ? 
+            "citizen" : 
+            !isCitizen && isEResident ? 
+              "eresident" : 
+              "neither"
+            }
         options={[
-          { value: "0", display: "E-resident", selected: !isCitizen && isEResident},
-          { value: "1", display: "Citizen", selected: isCitizen && isEResident},
-          { value: "2", display: "Neither", selected: !isCitizen && !isEResident},
+          { value: "eresident", display: "E-resident"},
+          { value: "citizen", display: "Citizen"},
+          { value: "neither", display: "Neither"},
         ]}
       />
 

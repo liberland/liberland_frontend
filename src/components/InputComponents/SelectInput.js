@@ -12,6 +12,7 @@ function SelectInput({
   withIcon = false,
   Icon,
   disabled = false,
+  defaultValue
 }) {
   return (
     <div className={styles.inputWrapper}>
@@ -21,6 +22,7 @@ function SelectInput({
         name={name}
         width={width}
         disabled={disabled}
+        defaultValue={defaultValue}
         {...register(name)}
       >
         {options.map(
