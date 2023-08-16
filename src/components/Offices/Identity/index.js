@@ -10,6 +10,7 @@ import { officesActions, blockchainActions } from '../../../redux/actions';
 import { officesSelectors, blockchainSelectors } from '../../../redux/selectors';
 import styles from './styles.module.scss';
 import Table from "../../Table";
+import { ethers } from 'ethers';
 
 function IdentityForm() {
   const dispatch = useDispatch();
@@ -20,6 +21,7 @@ function IdentityForm() {
 
   const onSubmit = ({ account }) => {
     dispatch(officesActions.officeGetIdentity.call(account));
+    dispatch(officesActions.getBackendAddressLlm.call({ walletAddress: account }));
   };
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
@@ -118,6 +120,33 @@ function IdentityAnalysis({ identity }) {
   );
 }
 
+function TokenTable({ backendLlmBalance }) {
+  return (
+    <Table
+      columns={[
+        {
+          Header: "User balance in centralized database",
+          accessor: "desc",
+        },
+        {
+          Header: "",
+          accessor: "res"
+        }
+      ]}
+      data={[
+        {
+          "desc": "LLM balance",
+          "res": backendLlmBalance ? ethers.utils.formatUnits(backendLlmBalance, 12) : 0,
+        },
+        {
+          "desc": "LLD balance",
+          "res": backendLlmBalance ?  ethers.utils.formatUnits(backendLlmBalance.mul(10), 12) : 0,
+        },
+      ]}
+    />
+  );
+}
+
 function parseData(d) {
   if (d.isNone) return <em>&lt;empty&gt;</em>;
   if (!d.isRaw) return <em>&lt;unsupported type - not None nor Raw&gt;</em>;
@@ -162,7 +191,7 @@ function IdentityTable({ info }) {
   return <Table columns={columns} data={data} />;
 }
 
-function IdentityInfo({ identity }) {
+function IdentityInfo({ identity, backendLlmBalance }) {
   const dispatch = useDispatch();
   const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
   if (identity === null) return null;
@@ -192,6 +221,7 @@ function IdentityInfo({ identity }) {
         <div className={styles.h4}>Candidate's identity:</div>
         <IdentityTable info={info} />
         <IdentityAnalysis identity={identity} />
+        <TokenTable backendLlmBalance={backendLlmBalance} />
         <div className={styles.h4}>Current status:</div>
         <div>
           Current judgement: {judgement}
@@ -213,10 +243,12 @@ function IdentityInfo({ identity }) {
 
 function Identity() {
   const identity = useSelector(officesSelectors.selectorIdentity);
+  const backendLlmBalance = useSelector(officesSelectors.selectorBackendAddressLLMBalance);
+
   return (
     <>
       <IdentityForm />
-      <IdentityInfo identity={identity} />
+      <IdentityInfo identity={identity} backendLlmBalance={backendLlmBalance}/>
     </>
   );
 }

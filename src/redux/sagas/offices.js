@@ -1,6 +1,7 @@
 import {
   put, takeLatest, call, cps,
 } from 'redux-saga/effects';
+import { ethers } from "ethers";
 
 import {
   getIdentity,
@@ -13,6 +14,7 @@ import {
 } from '../../api/nodeRpcCall';
 
 import { officesActions, blockchainActions } from '../actions';
+import * as backend from '../../api/backend';
 
 // WORKERS
 
@@ -92,6 +94,29 @@ function* getBalancesWorker(action) {
   }
 }
 
+function* getBackendAddressLLMWorker(action) {
+  try {
+    const backendLlmBalance = yield call(backend.getAddressLLM, action.payload.walletAddress);
+
+    if (backendLlmBalance.length > 1)
+      throw new Error(`Address belongs to ${backendLlmBalance.length} users`);
+
+    yield put(officesActions.getBackendAddressLlm.success({ 
+      backendLlmBalance: ethers.utils.parseUnits(
+        backendLlmBalance[0].merits.toFixed(12),
+        12
+      ) 
+    }));
+  } catch (e) {
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success({
+      isError: true,
+      details: e.toString()
+    }));
+    yield put(officesActions.getBackendAddressLlm.failure(e));
+  }
+}
+
 // WATCHERS
 
 function* getIdentityWatcher() {
@@ -142,7 +167,17 @@ function* getBalancesWatcher() {
   }
 }
 
+
+function* getBackendAddressLLMWatcher() {
+  try {
+    yield takeLatest(officesActions.getBackendAddressLlm.call, getBackendAddressLLMWorker);
+  } catch (e) {
+    yield put(officesActions.getBackendAddressLlm.failure(e));
+  }
+}
+
 export {
+  getBackendAddressLLMWatcher,
   getIdentityWatcher,
   provideJudgementWatcher,
   getCompanyRequestWatcher,
