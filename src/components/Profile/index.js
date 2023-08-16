@@ -20,10 +20,9 @@ import occupationImage from '../../assets/icons/occuoation.svg';
 import genderImage from '../../assets/icons/gender.svg';
 import startOfKyc from '../../assets/icons/startOfKyc.svg';
 import Card from '../Card';
-import { userRolesHelper } from '../../utils/userRolesHelper';
 import { OnchainIdentityModal } from '../Modals';
 import { identityActions } from '../../redux/actions';
-import { parseLegal, parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement } from '../../utils/identityParser';
+import { parseLegal, parseIdentityData, parseDOB, parseAdditionalFlag, parseCitizenshipJudgement } from '../../utils/identityParser';
 
 function Profile({ className }) {
   const userName = useSelector(userSelectors.selectUserGivenName);
@@ -67,11 +66,11 @@ function Profile({ className }) {
       legal: values.legal,
       web: values.web,
       email: values.email,
-      citizen: values.citizen,
-      eligible_on, 
+      onChainIdentity: values.onChainIdentity,
+      eligible_on,
     }
 
-    dispatch(identityActions.setIdentity.call({userWalletAddress, values: params}));
+    dispatch(identityActions.setIdentity.call({ userWalletAddress, values: params }));
     toggleModalOnchainIdentity();
   };
 
@@ -204,8 +203,9 @@ function Profile({ className }) {
                   <li>Date of birth: old enough to vote</li> :
                   <li>Date of birth: {date_of_birth ?? <em>&lt;empty&gt;</em>}</li>
                 }
-                <li>Citizen: {parseCitizen(info?.additional) ? "YES" : "NO"}</li>
-                <li>Citizenship confirmed: {parseCitizenshipJudgement(judgements) ? "YES" : "NO"}</li>
+                <li>Citizen: {parseAdditionalFlag(info?.additional, 'citizen') ? "YES" : "NO"}</li>
+                <li>E-resident: {parseAdditionalFlag(info?.additional, 'eresident') ? "YES" : "NO"}</li>
+                <li>Identity confirmed: {parseCitizenshipJudgement(judgements) ? "YES" : "NO"}</li>
               </ul>
             </div>
             <Button medium primary onClick={toggleModalOnchainIdentity}>Update identity</Button>

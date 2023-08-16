@@ -78,16 +78,26 @@
   margin-right: 17px;
   border: 1px solid #d4d4d4;
   cursor: pointer;
+  position: relative
+}
+
+.checkbox input{
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0
 }
 
 .checkboxIcon {
   fill: none;
   stroke: $text4;
   stroke-width: 2px;
+  visibility: hidden;
+  position: absolute
 }
 
-.checkboxIconHidden {
-  visibility: hidden;
+.checkbox input:checked ~ .checkboxIcon {
+  visibility: visible;
 }
 
 .checkboxLabel{

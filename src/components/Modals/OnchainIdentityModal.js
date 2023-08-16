@@ -1,27 +1,36 @@
 // LIBS
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';
-import { TextInput, DateInput, CheckboxInput } from '../InputComponents';
+import { TextInput, DateInput, CheckboxInput, SelectInput } from '../InputComponents';
 import Button from '../Button/Button';
 
 // STYLES
 import styles from './styles.module.scss';
 
-import { parseIdentityData, parseDOB, parseCitizen, parseCitizenshipJudgement, parseLegal } from '../../utils/identityParser';
+import { parseIdentityData, parseDOB, parseAdditionalFlag, parseCitizenshipJudgement, parseLegal } from '../../utils/identityParser';
 
 function OnchainIdentityModal({
-  onSubmit, closeModal, identity, blockNumber, name,
+  onSubmit, closeModal, identity, blockNumber, name
 }) {
   let defaultValues = {};
   let isKnownGood = false;
   let identityCitizen = false;
+  let eResident = false;
   let identityDOB = false;
+
   if (identity.isSome) {
     const {judgements, info} = identity.unwrap();
-    identityCitizen = parseCitizen(info.additional);
+    identityCitizen = parseAdditionalFlag(info.additional, 'citizen');
+    eResident = parseAdditionalFlag(info.additional, 'eresident');
+    const onChainIdentity = identityCitizen && eResident ? 
+            "citizen" : 
+            !identityCitizen && eResident ? 
+              "eresident" : 
+              "neither"
+
     identityDOB = parseDOB(info.additional, blockNumber);
 
     defaultValues = {
@@ -31,7 +40,7 @@ function OnchainIdentityModal({
       email: parseIdentityData(info.email),
       date_of_birth: identityDOB ?? undefined,
       older_than_13: !identityDOB,
-      citizen: identityCitizen,
+      onChainIdentity
     };
 
     isKnownGood = parseCitizenshipJudgement(judgements);
@@ -41,21 +50,21 @@ function OnchainIdentityModal({
     handleSubmit,
     register,
     watch,
-    setValue,
-  } = useForm({ defaultValues });
+    formState: { errors }
+  } = useForm({ mode: 'all', defaultValues });
 
-  const isCitizen = watch('citizen');
   const isOlderThan13 = watch('older_than_13');
+  const onChainIdentity = watch('onChainIdentity');
 
   return (
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.h3}>Update on-chain identity</div>
       <div className={styles.description}>
-        You are going to update your identity stored on blockchain. This needs to be up-to-date for your citizenship.
+        You are going to update your identity stored on blockchain. This needs to be up-to-date for your citizenship or e-residency.
       </div>
       { !isKnownGood ? null :
         <div className={styles.description}>
-          Warning! Your identity is currently confirmed by citizenship office as valid. Changing it will require reapproval - you'll temporarily lose citizenship rights onchain.
+          Warning! Your identity is currently confirmed by citizenship office as valid. Changing it will require reapproval - you'll temporarily lose citizenship or e-resident rights onchain.
         </div>
       }
 
@@ -84,24 +93,23 @@ function OnchainIdentityModal({
         name="email"
         placeholder="Email"
       />
-
-      <div className={styles.title}>Are you or do you want to become a citizen?</div>
-      <CheckboxInput
+      <div className={styles.title}>I am or want to become a</div>
+      <SelectInput
         register={register}
-        name="citizen"
-        setValue={setValue}
-        watch={watch}
-        label="I am or want to become a citizen"
+        name="onChainIdentity"
+        options={[
+          { value: "eresident", display: "E-resident"},
+          { value: "citizen", display: "Citizen"},
+          { value: "neither", display: "Neither"},
+        ]}
       />
 
-      { !isCitizen ? null :
+      { !(onChainIdentity === "citizen") ? null :
         <>
           <div className={styles.title}>Date of birth</div>
           <CheckboxInput
             register={register}
             name="older_than_13"
-            setValue={setValue}
-            watch={watch}
             label="I'm 13 or older"
           />
           {isOlderThan13 ? null :
@@ -112,6 +120,11 @@ function OnchainIdentityModal({
             />}
         </>
       }
+
+
+      <div className={styles.error}>
+        {errors?.e_resident?.message || errors?.citizen?.message}
+      </div>
 
       <div className={styles.buttonWrapper}>
         <Button

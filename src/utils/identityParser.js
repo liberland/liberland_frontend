@@ -14,10 +14,10 @@ export function parseEligibleOn(eligible_on) {
   return parseInt(hex, 16);
 }
 
-export function parseCitizen(additional) {
+export function parseAdditionalFlag(additional, flag) {
   if (!additional) return false;
 
-  let citizen = additional.find(([key, _]) => key.eq('citizen'));
+  let citizen = additional.find(([key, _]) => key.eq(flag));
   if(!citizen) return false;
   [, citizen] = citizen;
   if (!citizen.isRaw) return false;

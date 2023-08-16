@@ -23,7 +23,16 @@ function SelectInput({
         disabled={disabled}
         {...register(name)}
       >
-        {options.map((option) => <option key={option.value} value={option.value}>{option.display}</option>)}
+        {options.map(
+          (option) => 
+            <option 
+              key={option.value}
+              value={option.value}
+              selected={option.selected}
+            >
+              {option.display}
+            </option>
+          )}
       </select>
     </div>
   );
