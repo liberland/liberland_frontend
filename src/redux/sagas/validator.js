@@ -7,6 +7,7 @@ import {
   batchPayoutStakers, getNextSessionValidators, getNominators,
   getSessionValidators, getStakersRewards, getStakingLedger, getStakingValidators,
   getAppliedSlashes, getUnappliedSlashes,
+  setSessionKeys,
 } from '../../api/nodeRpcCall';
 
 import { blockchainActions, validatorActions } from '../actions';
@@ -116,6 +117,21 @@ function* getSlashesWorker() {
   yield put(validatorActions.getSlashes.success({ unappliedSlashes, appliedSlashes }));
 }
 
+function* setSessionKeysWorker({ payload: { keys } }) {
+  try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const { errorData } = yield cps(setSessionKeys, keys, walletAddress);
+    if (errorData.isError) throw errorData;
+    yield put(validatorActions.setSessionKeys.success());
+  } catch (errorData) {
+    // eslint-disable-next-line no-console
+    console.log('Error setSessionKeys worker', errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(validatorActions.setSessionKeys.failure(errorData));
+  }
+}
+
 // WATCHERS
 
 function* payoutWatcher() {
@@ -150,9 +166,18 @@ function* getSlashesWatcher() {
   }
 }
 
+function* setSessionKeysWatcher() {
+  try {
+    yield takeLatest(validatorActions.setSessionKeys.call, setSessionKeysWorker);
+  } catch (e) {
+    yield put(validatorActions.setSessionKeys.failure(e));
+  }
+}
+
 export {
   payoutWatcher,
   getPendingRewardsWatcher,
   getInfoWatcher,
   getSlashesWatcher,
+  setSessionKeysWatcher,
 };
