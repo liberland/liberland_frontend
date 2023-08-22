@@ -21,6 +21,8 @@ const initialState = {
 const validatorReducer = handleActions({
   [combineActions(
     validatorActions.payout.call,
+    validatorActions.validate.call,
+    validatorActions.chill.call,
     validatorActions.getPendingRewards.call,
     validatorActions.getInfo.call,
     validatorActions.getSlashes.call,
@@ -34,8 +36,9 @@ const validatorReducer = handleActions({
     loading: true,
   }),
   [combineActions(
-    validatorActions.payout.success,
     validatorActions.payout.failure,
+    validatorActions.validate.failure,
+    validatorActions.chill.failure,
     validatorActions.getPendingRewards.success,
     validatorActions.getPendingRewards.failure,
     validatorActions.getInfo.success,

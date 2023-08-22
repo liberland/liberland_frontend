@@ -6,6 +6,7 @@ import SetSessionKeysButton from '../SetSessionKeysButton';
 import RewardsConfig from '../RewardsConfig';
 import NominatorsList from '../NominatorsList';
 import Stats from '../Stats';
+import StartStopButton from '../StartStopButton';
 
 export default function Overview() {
   return (
@@ -13,6 +14,7 @@ export default function Overview() {
       <Status />
       <Slashes />
       <SetSessionKeysButton />
+      <StartStopButton />
       <PendingRewards />
       <RewardsConfig />
       <NominatorsList />
