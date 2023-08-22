@@ -4,7 +4,7 @@ import {
 
 import { BN_ZERO } from '@polkadot/util';
 import {
-  batchPayoutStakers, getNextSessionValidators, getNominators,
+  batchPayoutStakers, getIdentities, getNextSessionValidators, getNominators,
   getSessionValidators, getStakersRewards, getStakingLedger, getStakingValidators,
   getAppliedSlashes, getUnappliedSlashes,
   setSessionKeys,
@@ -56,7 +56,8 @@ function* getInfoWorker() {
   const sessionValidators = yield call(getSessionValidators);
   const nextSessionValidators = yield call(getNextSessionValidators);
   const stakingValidators = yield call(getStakingValidators);
-  const nominators = yield call(getNominators);
+  const nominatorsRaw = yield call(getNominators);
+  const nominators = nominatorsRaw.map(([{ args: [nominator] }]) => nominator.toString());
   const ledgerRaw = yield call(getStakingLedger, walletAddress);
 
   if (ledgerRaw.isNone) {
@@ -155,6 +156,22 @@ function* getPayeeWorker() {
   yield put(validatorActions.getPayee.success({ payee }));
 }
 
+function* getNominatorsWorker() {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const nominatorsRaw = yield call(getNominators);
+  const nominatorsAddresses = nominatorsRaw
+    .filter(([_, nominations]) => nominations.isSome)
+    .map(([{ args: [nominator] }, nominations]) => (
+      [
+        nominator.toString(),
+        nominations.unwrap().targets.map((t) => t.toString()),
+      ]))
+    .filter(([_, nominations]) => nominations.includes(walletAddress))
+    .map(([nominator]) => nominator);
+  const nominators = yield call(getIdentities, nominatorsAddresses);
+  yield put(validatorActions.getNominators.success({ nominators }));
+}
+
 // WATCHERS
 
 function* payoutWatcher() {
@@ -213,6 +230,14 @@ function* getPayeeWatcher() {
   }
 }
 
+function* getNominatorsWatcher() {
+  try {
+    yield takeLatest(validatorActions.getNominators.call, getNominatorsWorker);
+  } catch (e) {
+    yield put(validatorActions.getNominators.failure(e));
+  }
+}
+
 export {
   payoutWatcher,
   getPendingRewardsWatcher,
@@ -221,4 +246,5 @@ export {
   setSessionKeysWatcher,
   getPayeeWatcher,
   setPayeeWatcher,
+  getNominatorsWatcher,
 };
