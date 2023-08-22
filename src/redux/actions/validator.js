@@ -10,6 +10,8 @@ export const {
   setPayee,
   getNominators,
   getStakerRewards,
+  validate,
+  chill,
 } = createActions({
   PAYOUT: {
     call: undefined,
@@ -52,6 +54,16 @@ export const {
     failure: undefined,
   },
   GET_STAKER_REWARDS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  VALIDATE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CHILL: {
     call: undefined,
     success: undefined,
     failure: undefined,

@@ -1462,6 +1462,51 @@ const getIdentities = async (addresses) => {
   }));
 }
 
+const stakingChill = async (walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const extrinsic = api.tx.staking.chill();
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed staking.chill at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( staking.chill transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
+const stakingValidate = async (commission, blocked, keys, walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const EMPTY_PROOF = new Uint8Array();
+  const setKeys = api.tx.session.setKeys(keys, EMPTY_PROOF);
+  const validate = api.tx.staking.validate({ commission, blocked });
+  const extrinsic = api.tx.utility.batchAll([setKeys, validate]);
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed staking.validate at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( staking.validate transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1518,5 +1563,7 @@ export {
   setStakingPayee,
   getIdentities,
   applyForCongress,
-  getCongressCandidates
+  getCongressCandidates,
+  stakingValidate,
+  stakingChill,
 };

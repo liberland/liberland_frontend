@@ -9,6 +9,7 @@ import {
   getAppliedSlashes, getUnappliedSlashes,
   setSessionKeys,
   getStakingPayee, setStakingPayee,
+  stakingValidate, stakingChill,
 } from '../../api/nodeRpcCall';
 
 import { blockchainActions, validatorActions } from '../actions';
@@ -33,6 +34,7 @@ function* payoutWorker() {
       if (errorData.isError) throw errorData;
     }
     yield put(validatorActions.payout.success());
+    yield put(validatorActions.getPendingRewards.call());
   } catch (errorData) {
     // eslint-disable-next-line no-console
     console.log('Error payoutStakers worker', errorData);
@@ -181,6 +183,38 @@ function* getNominatorsWorker() {
   yield put(validatorActions.getNominators.success({ nominators }));
 }
 
+function* validateWorker({ payload: { commission, blocked, keys }}) {
+  try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const { errorData } = yield cps(stakingValidate, commission, blocked, keys, walletAddress);
+    if (errorData.isError) throw errorData;
+    yield put(validatorActions.validate.success());
+    yield put(validatorActions.getInfo.call());
+  } catch (errorData) {
+    // eslint-disable-next-line no-console
+    console.error('Error validate worker', errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(validatorActions.validate.failure(errorData));
+  }
+}
+
+function* chillWorker() {
+  try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const { errorData } = yield cps(stakingChill, walletAddress);
+    if (errorData.isError) throw errorData;
+    yield put(validatorActions.chill.success());
+    yield put(validatorActions.getInfo.call());
+  } catch (errorData) {
+    // eslint-disable-next-line no-console
+    console.error('Error validate worker', errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(validatorActions.chill.failure(errorData));
+  }
+}
+
 // WATCHERS
 
 function* payoutWatcher() {
@@ -255,6 +289,22 @@ function* getStakerRewardsWatcher() {
   }
 }
 
+function* validateWatcher() {
+  try {
+    yield takeLatest(validatorActions.validate.call, validateWorker);
+  } catch (e) {
+    yield put(validatorActions.validate.failure(e));
+  }
+}
+
+function* chillWatcher() {
+  try {
+    yield takeLatest(validatorActions.chill.call, chillWorker);
+  } catch (e) {
+    yield put(validatorActions.chill.failure(e));
+  }
+}
+
 export {
   payoutWatcher,
   getPendingRewardsWatcher,
@@ -265,4 +315,6 @@ export {
   setPayeeWatcher,
   getNominatorsWatcher,
   getStakerRewardsWatcher,
+  validateWatcher,
+  chillWatcher,
 };

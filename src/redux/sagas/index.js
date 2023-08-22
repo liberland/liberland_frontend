@@ -86,6 +86,8 @@ export default function* rootSaga() {
     validatorSagas.setPayeeWatcher(),
     validatorSagas.getNominatorsWatcher(),
     validatorSagas.getStakerRewardsWatcher(),
+    validatorSagas.validateWatcher(),
+    validatorSagas.chillWatcher(),
 
     // CONGRESS
     congressSagas.applyForCongressWatcher(),
