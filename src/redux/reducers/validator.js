@@ -14,6 +14,7 @@ const initialState = {
   appliedSlashes: null,
   unappliedSlashes: null,
   payee: null,
+  nominators: [],
 };
 
 const validatorReducer = handleActions({
@@ -25,6 +26,7 @@ const validatorReducer = handleActions({
     validatorActions.setSessionKeys.call,
     validatorActions.getPayee.call,
     validatorActions.setPayee.call,
+    validatorActions.getNominators.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -43,6 +45,8 @@ const validatorReducer = handleActions({
     validatorActions.getPayee.success,
     validatorActions.getPayee.failure,
     validatorActions.setPayee.failure,
+    validatorActions.getNominators.success,
+    validatorActions.getNominators.failure,
   )]: (state) => ({
     ...state,
     loading: false,
@@ -72,6 +76,10 @@ const validatorReducer = handleActions({
   [validatorActions.getPayee.success]: (state, action) => ({
     ...state,
     payee: action.payload.payee,
+  }),
+  [validatorActions.getNominators.success]: (state, action) => ({
+    ...state,
+    nominators: action.payload.nominators,
   }),
 }, initialState);
 

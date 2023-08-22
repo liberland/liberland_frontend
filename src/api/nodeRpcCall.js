@@ -1353,8 +1353,7 @@ const getStakingValidators = async () => {
 
 const getNominators = async () => {
   const api = await getApi();
-  const rawData = await api.query.staking.nominators.keys()
-  return rawData.map(v => v.args[0].toString());
+  return await api.query.staking.nominators.entries();
 }
 
 const getStakingLedger = async (controller) => {
@@ -1425,6 +1424,15 @@ const setStakingPayee = async (destination, walletAddress, callback) => {
   });
 }
 
+const getIdentities = async (addresses) => {
+  const api = await getApi();
+  const raw = await api.query.identity.identityOf.multi(addresses);
+  return raw.map((identity, idx) => ({
+    address: addresses[idx],
+    identity: identity.isSome ? identity.unwrap().info : null,
+  }));
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1479,4 +1487,5 @@ export {
   setSessionKeys,
   getStakingPayee,
   setStakingPayee,
+  getIdentities,
 };

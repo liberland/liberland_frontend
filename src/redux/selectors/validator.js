@@ -31,3 +31,8 @@ export const payee = createSelector(
   validatorReducer,
   (reducer) => reducer.payee,
 );
+
+export const nominators = createSelector(
+  validatorReducer,
+  (reducer) => reducer.nominators,
+);

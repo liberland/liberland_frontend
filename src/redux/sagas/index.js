@@ -83,5 +83,6 @@ export default function* rootSaga() {
     validatorSagas.setSessionKeysWatcher(),
     validatorSagas.getPayeeWatcher(),
     validatorSagas.setPayeeWatcher(),
+    validatorSagas.getNominatorsWatcher(),
   ]);
 }
