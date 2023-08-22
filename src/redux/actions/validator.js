@@ -6,6 +6,8 @@ export const {
   getInfo,
   getSlashes,
   setSessionKeys,
+  getPayee,
+  setPayee,
 } = createActions({
   PAYOUT: {
     call: undefined,
@@ -28,6 +30,16 @@ export const {
     failure: undefined,
   },
   SET_SESSION_KEYS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_PAYEE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SET_PAYEE: {
     call: undefined,
     success: undefined,
     failure: undefined,

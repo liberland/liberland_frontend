@@ -8,6 +8,7 @@ import {
   getSessionValidators, getStakersRewards, getStakingLedger, getStakingValidators,
   getAppliedSlashes, getUnappliedSlashes,
   setSessionKeys,
+  getStakingPayee, setStakingPayee,
 } from '../../api/nodeRpcCall';
 
 import { blockchainActions, validatorActions } from '../actions';
@@ -132,6 +133,28 @@ function* setSessionKeysWorker({ payload: { keys } }) {
   }
 }
 
+function* setPayeeWorker(action) {
+  try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const { errorData } = yield cps(setStakingPayee, action.payload.payee, walletAddress);
+    if (errorData.isError) throw errorData;
+    yield put(validatorActions.setPayee.success());
+    yield put(validatorActions.getPayee.call());
+  } catch (errorData) {
+    // eslint-disable-next-line no-console
+    console.log('Error setPayee worker', errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(validatorActions.setPayee.failure(errorData));
+  }
+}
+
+function* getPayeeWorker() {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const payee = yield call(getStakingPayee, walletAddress);
+  yield put(validatorActions.getPayee.success({ payee }));
+}
+
 // WATCHERS
 
 function* payoutWatcher() {
@@ -174,10 +197,28 @@ function* setSessionKeysWatcher() {
   }
 }
 
+function* setPayeeWatcher() {
+  try {
+    yield takeLatest(validatorActions.setPayee.call, setPayeeWorker);
+  } catch (e) {
+    yield put(validatorActions.setPayee.failure(e));
+  }
+}
+
+function* getPayeeWatcher() {
+  try {
+    yield takeLatest(validatorActions.getPayee.call, getPayeeWorker);
+  } catch (e) {
+    yield put(validatorActions.getPayee.failure(e));
+  }
+}
+
 export {
   payoutWatcher,
   getPendingRewardsWatcher,
   getInfoWatcher,
   getSlashesWatcher,
   setSessionKeysWatcher,
+  getPayeeWatcher,
+  setPayeeWatcher,
 };

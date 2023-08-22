@@ -26,3 +26,8 @@ export const unappliedSlashes = createSelector(
   validatorReducer,
   (reducer) => reducer.unappliedSlashes,
 );
+
+export const payee = createSelector(
+  validatorReducer,
+  (reducer) => reducer.payee,
+);
