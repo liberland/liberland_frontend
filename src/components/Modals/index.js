@@ -7,6 +7,7 @@ import ProposeReferendumModal from './ProposeReferendumModal';
 import OnchainIdentityModal from './OnchainIdentityModal';
 import DelegateModal from './DelegateModal';
 import UndelegateModal from './UndelegateModal';
+import StakingRewardsDestinationModal from './StakingRewardsDestinationModal';
 
 export {
   GetCitizenshipModal,
@@ -18,4 +19,5 @@ export {
   OnchainIdentityModal,
   DelegateModal,
   UndelegateModal,
+  StakingRewardsDestinationModal,
 };

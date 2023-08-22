@@ -1398,6 +1398,33 @@ const setSessionKeys = async (keys, walletAddress, callback) => {
   });
 }
 
+const getStakingPayee = async (stash) => {
+  const api = await getApi();
+
+  return await api.query.staking.payee(stash);
+}
+
+const setStakingPayee = async (destination, walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const extrinsic = api.tx.staking.setPayee(destination);
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed staking.setPayee at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( staking.setPayee transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1450,4 +1477,6 @@ export {
   getAppliedSlashes,
   getUnappliedSlashes,
   setSessionKeys,
+  getStakingPayee,
+  setStakingPayee,
 };

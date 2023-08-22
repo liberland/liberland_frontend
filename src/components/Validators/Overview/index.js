@@ -3,6 +3,7 @@ import Slashes from './Slashes';
 import PendingRewards from './PendingRewards';
 import Status from '../Status';
 import SetSessionKeysButton from '../SetSessionKeysButton';
+import RewardsConfig from '../RewardsConfig';
 
 export default function Overview() {
   return (
@@ -11,6 +12,7 @@ export default function Overview() {
       <Slashes />
       <SetSessionKeysButton />
       <PendingRewards />
+      <RewardsConfig />
     </div>
   );
 }
