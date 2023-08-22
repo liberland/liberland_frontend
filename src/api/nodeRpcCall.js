@@ -1298,6 +1298,34 @@ const getBlockEvents = async (blockHash) => {
   }
 }
 
+const batchPayoutStakers = async (targets, walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const calls = targets.map(({validator, era}) => api.tx.staking.payoutStakers(validator, era))
+  const extrinsic = api.tx.utility.batch(calls);
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed staking.payoutStakers batch at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( batched staking.payoutStakers transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
+const getStakersRewards = async (accounts) => {
+  const api = await getApi();
+
+  return await api.derive.staking.stakerRewardsMulti(accounts, false);
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1340,4 +1368,6 @@ export {
   getLlmBalances,
   getLldBalances,
   bridgeConstants,
+  batchPayoutStakers,
+  getStakersRewards,
 };

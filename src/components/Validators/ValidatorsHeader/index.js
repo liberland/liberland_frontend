@@ -10,8 +10,6 @@ const navigationList = [
   },
 ];
 
-function RegistriesHeader() {
+export default function ValidatorsHeader() {
   return <Tabs navigationList={navigationList} />;
 }
-
-export default RegistriesHeader;

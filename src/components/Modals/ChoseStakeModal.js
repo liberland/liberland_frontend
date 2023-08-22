@@ -13,7 +13,7 @@ import { valueToBN, formatMerits, dollarsToGrains } from '../../utils/walletHelp
 
 function ChoseStakeModal({
   // eslint-disable-next-line react/prop-types,max-len
-  closeModal, handleSubmit, register, modalShown, setModalShown, handleSubmitStakePolka, handleSubmitStakeLiberland, handleSubmitUnpool,
+  closeModal, handleSubmit, register, modalShown, setModalShown, handleSubmitStakePolka, handleSubmitStakeLiberland, handleSubmitUnpool, handleSubmitPayout,
   errors,
 }) {
   const balances = useSelector(walletSelectors.selectorBalances);
@@ -41,6 +41,13 @@ function ChoseStakeModal({
             onClick={() => setModalShown(3)}
           >
             Unpool
+          </Button>
+          <Button
+            primary
+            medium
+            onClick={() => setModalShown(4)}
+          >
+            Payout staking rewards
           </Button>
           <Button
             primary
@@ -157,6 +164,37 @@ function ChoseStakeModal({
         type="submit"
       >
         Unpool
+      </Button>
+    </div>
+  </form>
+  )}
+
+    { modalShown === 4
+  && (
+  <form
+    className={styles.getCitizenshipModal}
+    onSubmit={handleSubmit(handleSubmitPayout)}
+  >
+    <div className={styles.h3}>Payout staking rewards</div>
+    <div className={styles.title}>
+      Staking rewards are paid per staking era and validator. These payouts will
+      be batched 10 at a time, but it's still possible that your wallet will ask
+      you to sign multiple transactions.
+    </div>
+
+    <div className={styles.buttonWrapper}>
+      <Button
+        medium
+        onClick={closeModal}
+      >
+        Cancel
+      </Button>
+      <Button
+        primary
+        medium
+        type="submit"
+      >
+        Payout
       </Button>
     </div>
   </form>

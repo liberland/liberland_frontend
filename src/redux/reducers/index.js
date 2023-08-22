@@ -11,6 +11,7 @@ import officesReducer from './offices';
 import registriesReducer from './registries';
 import identityReducer from './identity';
 import bridgeReducer from './bridge';
+import validatorReducer from './validator';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
   registries: registriesReducer,
   identity: identityReducer,
   bridge: bridgeReducer,
+  validator: validatorReducer,
 });
 
 export default rootReducer;

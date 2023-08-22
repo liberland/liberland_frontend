@@ -24,6 +24,7 @@ import { userSelectors } from './redux/selectors';
 import {
   authActions,
   blockchainActions,
+  validatorActions,
 } from './redux/actions';
 
 const override = css`
