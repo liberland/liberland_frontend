@@ -4,7 +4,7 @@ import {
 
 import { BN_ZERO } from '@polkadot/util';
 import {
-  batchPayoutStakers, getIdentities, getNextSessionValidators, getNominators,
+  batchPayoutStakers, getIdentities, bondAndValidate, getNextSessionValidators, getNominators,
   getSessionValidators, getStakersRewards, getStakingLedger, getStakingValidators,
   getAppliedSlashes, getUnappliedSlashes,
   setSessionKeys,
@@ -12,7 +12,7 @@ import {
   stakingValidate, stakingChill,
 } from '../../api/nodeRpcCall';
 
-import { blockchainActions, validatorActions } from '../actions';
+import { blockchainActions, validatorActions, walletActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 
 // WORKERS
@@ -215,6 +215,27 @@ function* chillWorker() {
   }
 }
 
+function* createValidatorWorker({
+  payload: {
+    bondValue, commission, payee, blocked, keys,
+  },
+}) {
+  try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const { errorData } = yield cps(bondAndValidate, bondValue, payee, commission, blocked, keys, walletAddress);
+    if (errorData.isError) throw errorData;
+    yield put(validatorActions.createValidator.success());
+    yield put(validatorActions.getInfo.call());
+    yield put(walletActions.getWallet.call());
+  } catch (errorData) {
+    // eslint-disable-next-line no-console
+    console.log('Error createValidator worker', errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(validatorActions.createValidator.failure(errorData));
+  }
+}
+
 // WATCHERS
 
 function* payoutWatcher() {
@@ -305,6 +326,14 @@ function* chillWatcher() {
   }
 }
 
+function* createValidatorWatcher() {
+  try {
+    yield takeLatest(validatorActions.createValidator.call, createValidatorWorker);
+  } catch (e) {
+    yield put(validatorActions.createValidator.failure(e));
+  }
+}
+
 export {
   payoutWatcher,
   getPendingRewardsWatcher,
@@ -317,4 +346,5 @@ export {
   getStakerRewardsWatcher,
   validateWatcher,
   chillWatcher,
+  createValidatorWatcher,
 };

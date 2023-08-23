@@ -41,7 +41,7 @@ function StakingRewardsDestinationModal({
         name="payee"
         options={[
           { value: 'Staked', display: 'Increase stake' },
-          { value: 'Stash', display: 'Deposited in account (without staking)' },
+          { value: 'Stash', display: 'Deposit in the account (without staking)' },
           { value: 'Controller', display: 'Controller (deprecated)' },
         ]}
       />

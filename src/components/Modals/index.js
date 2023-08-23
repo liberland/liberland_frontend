@@ -8,6 +8,7 @@ import OnchainIdentityModal from './OnchainIdentityModal';
 import DelegateModal from './DelegateModal';
 import UndelegateModal from './UndelegateModal';
 import StakingRewardsDestinationModal from './StakingRewardsDestinationModal';
+import CreateValidatorModal from './CreateValidatorModal';
 
 export {
   GetCitizenshipModal,
@@ -20,4 +21,5 @@ export {
   DelegateModal,
   UndelegateModal,
   StakingRewardsDestinationModal,
+  CreateValidatorModal,
 };

@@ -7,10 +7,12 @@ import RewardsConfig from '../RewardsConfig';
 import NominatorsList from '../NominatorsList';
 import Stats from '../Stats';
 import StartStopButton from '../StartStopButton';
+import CreateValidatorButton from '../CreateValidatorButton';
 
 export default function Overview() {
   return (
     <div>
+      <CreateValidatorButton />
       <Status />
       <Slashes />
       <SetSessionKeysButton />

@@ -12,6 +12,7 @@ export const {
   getStakerRewards,
   validate,
   chill,
+  createValidator,
 } = createActions({
   PAYOUT: {
     call: undefined,
@@ -64,6 +65,11 @@ export const {
     failure: undefined,
   },
   CHILL: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CREATE_VALIDATOR: {
     call: undefined,
     success: undefined,
     failure: undefined,
