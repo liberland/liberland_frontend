@@ -1507,6 +1507,31 @@ const stakingValidate = async (commission, blocked, keys, walletAddress, callbac
   });
 }
 
+const bondAndValidate = async (bondValue, payee, commission, blocked, keys, walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const bond = api.tx.staking.bond(bondValue, payee);
+  const EMPTY_PROOF = new Uint8Array();
+  const setKeys = api.tx.session.setKeys(keys, EMPTY_PROOF);
+  const validate = api.tx.staking.validate({ commission, blocked });
+  const extrinsic = api.tx.utility.batchAll([bond, setKeys, validate]);
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed bond+setKeys+validate at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( bond+setKeys+validate transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1566,4 +1591,6 @@ export {
   getCongressCandidates,
   stakingValidate,
   stakingChill,
+  getCongressCandidates,
+  bondAndValidate,
 };
