@@ -4,6 +4,7 @@ import { validatorActions } from '../actions';
 const initialState = {
   loading: false,
   pendingRewards: null,
+  stakerRewards: null,
   info: {
     stash: null,
     isSessionValidator: null,
@@ -27,6 +28,7 @@ const validatorReducer = handleActions({
     validatorActions.getPayee.call,
     validatorActions.setPayee.call,
     validatorActions.getNominators.call,
+    validatorActions.getStakerRewards.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -47,6 +49,8 @@ const validatorReducer = handleActions({
     validatorActions.setPayee.failure,
     validatorActions.getNominators.success,
     validatorActions.getNominators.failure,
+    validatorActions.getStakerRewards.success,
+    validatorActions.getStakerRewards.failure,
   )]: (state) => ({
     ...state,
     loading: false,
@@ -80,6 +84,10 @@ const validatorReducer = handleActions({
   [validatorActions.getNominators.success]: (state, action) => ({
     ...state,
     nominators: action.payload.nominators,
+  }),
+  [validatorActions.getStakerRewards.success]: (state, action) => ({
+    ...state,
+    stakerRewards: action.payload.stakerRewards,
   }),
 }, initialState);
 

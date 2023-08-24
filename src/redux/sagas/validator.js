@@ -51,6 +51,13 @@ function* getPendingRewardsWorker() {
   yield put(validatorActions.getPendingRewards.success({ pendingRewards }));
 }
 
+function* getStakerRewardsWorker() {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const allStakerRewards = yield call(getStakersRewards, [walletAddress]);
+  const stakerRewards = allStakerRewards?.[0];
+  yield put(validatorActions.getStakerRewards.success({ stakerRewards }));
+}
+
 function* getInfoWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const sessionValidators = yield call(getSessionValidators);
@@ -238,6 +245,14 @@ function* getNominatorsWatcher() {
   }
 }
 
+function* getStakerRewardsWatcher() {
+  try {
+    yield takeLatest(validatorActions.getStakerRewards.call, getStakerRewardsWorker);
+  } catch (e) {
+    yield put(validatorActions.getStakerRewards.failure(e));
+  }
+}
+
 export {
   payoutWatcher,
   getPendingRewardsWatcher,
@@ -247,4 +262,5 @@ export {
   getPayeeWatcher,
   setPayeeWatcher,
   getNominatorsWatcher,
+  getStakerRewardsWatcher,
 };
