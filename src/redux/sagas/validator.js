@@ -47,7 +47,9 @@ function* getPendingRewardsWorker() {
   const rewards = yield call(getStakersRewards, [walletAddress]);
   const pendingRewards = rewards
     .flatten()
-    .reduce((total, { eraReward }) => total.add(eraReward), BN_ZERO);
+    .map(({ validators }) => Object.values(validators))
+    .flatten()
+    .reduce((total, { value }) => total.add(value), BN_ZERO);
   yield put(validatorActions.getPendingRewards.success({ pendingRewards }));
 }
 
