@@ -84,5 +84,6 @@ export default function* rootSaga() {
     validatorSagas.getPayeeWatcher(),
     validatorSagas.setPayeeWatcher(),
     validatorSagas.getNominatorsWatcher(),
+    validatorSagas.getStakerRewardsWatcher(),
   ]);
 }

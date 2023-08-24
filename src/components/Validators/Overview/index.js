@@ -5,6 +5,7 @@ import Status from '../Status';
 import SetSessionKeysButton from '../SetSessionKeysButton';
 import RewardsConfig from '../RewardsConfig';
 import NominatorsList from '../NominatorsList';
+import Stats from '../Stats';
 
 export default function Overview() {
   return (
@@ -15,6 +16,7 @@ export default function Overview() {
       <PendingRewards />
       <RewardsConfig />
       <NominatorsList />
+      <Stats />
     </div>
   );
 }

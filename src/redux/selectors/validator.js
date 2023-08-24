@@ -36,3 +36,8 @@ export const nominators = createSelector(
   validatorReducer,
   (reducer) => reducer.nominators,
 );
+
+export const stakerRewards = createSelector(
+  validatorReducer,
+  (reducer) => reducer.stakerRewards,
+);
