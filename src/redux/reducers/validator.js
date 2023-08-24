@@ -4,12 +4,20 @@ import { validatorActions } from '../actions';
 const initialState = {
   loading: false,
   pendingRewards: null,
+  info: {
+    stash: null,
+    isSessionValidator: null,
+    isNextSessionValidator: null,
+    isStakingValidator: null,
+    isNominator: null,
+  },
 };
 
-const officesReducer = handleActions({
+const validatorReducer = handleActions({
   [combineActions(
     validatorActions.payout.call,
     validatorActions.getPendingRewards.call,
+    validatorActions.getInfo.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -19,6 +27,8 @@ const officesReducer = handleActions({
     validatorActions.payout.failure,
     validatorActions.getPendingRewards.success,
     validatorActions.getPendingRewards.failure,
+    validatorActions.getInfo.success,
+    validatorActions.getInfo.failure,
   )]: (state) => ({
     ...state,
     loading: false,
@@ -27,6 +37,10 @@ const officesReducer = handleActions({
     ...state,
     pendingRewards: action.payload.pendingRewards,
   }),
+  [validatorActions.getInfo.success]: (state, action) => ({
+    ...state,
+    info: action.payload,
+  }),
 }, initialState);
 
-export default officesReducer;
+export default validatorReducer;

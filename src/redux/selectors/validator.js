@@ -11,3 +11,8 @@ export const pendingRewards = createSelector(
   validatorReducer,
   (reducer) => reducer.pendingRewards,
 );
+
+export const info = createSelector(
+  validatorReducer,
+  (reducer) => reducer.info,
+);

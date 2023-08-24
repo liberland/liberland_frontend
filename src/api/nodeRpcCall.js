@@ -1326,6 +1326,35 @@ const getStakersRewards = async (accounts) => {
   return await api.derive.staking.stakerRewardsMulti(accounts, false);
 }
 
+const getSessionValidators = async () => {
+  const api = await getApi();
+  const rawData = await api.query.session.validators();
+  return rawData.map(v => v.toString());
+}
+
+const getNextSessionValidators = async () => {
+  const api = await getApi();
+  const data = await api.query.session.queuedKeys();
+  return data.map(([validator]) => validator.toString());
+}
+
+const getStakingValidators = async () => {
+  const api = await getApi();
+  const rawData = await api.query.staking.validators.keys()
+  return rawData.map(v => v.args[0].toString());
+}
+
+const getNominators = async () => {
+  const api = await getApi();
+  const rawData = await api.query.staking.nominators.keys()
+  return rawData.map(v => v.args[0].toString());
+}
+
+const getStakingLedger = async (controller) => {
+  const api = await getApi();
+  return await api.query.staking.ledger(controller);
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1370,4 +1399,9 @@ export {
   bridgeConstants,
   batchPayoutStakers,
   getStakersRewards,
+  getSessionValidators,
+  getNextSessionValidators,
+  getStakingValidators,
+  getNominators,
+  getStakingLedger,
 };

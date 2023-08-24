@@ -7,6 +7,7 @@ import { ChoseStakeModal } from '../../Modals';
 import { validatorSelectors } from '../../../redux/selectors';
 import Button from '../../Button/Button';
 import { validatorActions } from '../../../redux/actions';
+import Status from '../Status';
 
 function PendingRewards() {
   const dispatch = useDispatch();
@@ -62,6 +63,7 @@ function PendingRewards() {
 export default function Overview() {
   return (
     <div>
+      <Status />
       <PendingRewards />
     </div>
   );

@@ -62,7 +62,7 @@ export default function* rootSaga() {
     officesSagas.getBalancesWatcher(),
     officesSagas.getBackendAddressLLMWatcher(),
 
-    //REGISTRIES
+    // REGISTRIES
     registriesSagas.getOfficialUserRegistryEntriesWatcher(),
     registriesSagas.setRegistryCRUDActionWatcher(),
     registriesSagas.requestCompanyRegistrationWatcher(),
@@ -79,5 +79,6 @@ export default function* rootSaga() {
     // VALIDATOR
     validatorSagas.payoutWatcher(),
     validatorSagas.getPendingRewardsWatcher(),
+    validatorSagas.getInfoWatcher(),
   ]);
 }
