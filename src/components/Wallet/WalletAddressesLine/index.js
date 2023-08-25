@@ -114,10 +114,6 @@ function WalletAddressesLine({ walletAddress }) {
       route: router.wallet.overView,
       title: 'Wallet',
     },
-    {
-      route: router.wallet.validatorsStaking,
-      title: 'Validator staking',
-    },
   ];
 
   if (process.env.REACT_APP_BRIDGE_TAB_ENABLED == 'true') {
@@ -153,7 +149,7 @@ function WalletAddressesLine({ walletAddress }) {
         <div className={cx(styles.buttonsWrapper)}>
           <Button small secondary onClick={handleModalOpenStake}>
             <GraphIcon />
-            Staking
+            Politipool
           </Button>
           <Button small primary onClick={handleModalLLMOpen}>
             <UploadIcon />

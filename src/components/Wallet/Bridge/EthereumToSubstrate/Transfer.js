@@ -12,7 +12,7 @@ export function Transfer({ ethBridge, transfer }) {
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const rawSubstrateState = useSubstrateBridgeTransfer(transfer.asset, transfer.txHash, transfer.receipt_id);
-  const substrateBlockNumber = useSelector(blockchainSelectors.blockNumber); // FIXME this isn't updating realtime and we need this realtime
+  const substrateBlockNumber = useSelector(blockchainSelectors.blockNumber);
   const bridgesConstants = useSelector(bridgeSelectors.bridgesConstants);
 
   useEffect(() => {

@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList/ValidatorList';
@@ -10,6 +9,11 @@ import { walletActions } from '../../../redux/actions';
 function Nominator() {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(walletActions.getValidators.call());
+    dispatch(walletActions.getNominatorTargets.call());
+  }, [dispatch]);
 
   const validators = useSelector(walletSelectors.selectorValidators);
   const nominatorTargets = useSelector(walletSelectors.selectorNominatorTargets);
@@ -70,13 +74,5 @@ function Nominator() {
     </div>
   );
 }
-
-Nominator.defaultProps = {
-  testProp: 'test',
-};
-
-Nominator.propTypes = {
-  testProp: PropTypes.string,
-};
 
 export default Nominator;

@@ -428,7 +428,7 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
   const api = await getApi();
   const transferExtrinsic = isUserHavePolkaStake
     ? await api.tx.staking.bondExtra(dollarsToGrains(amount))
-    : await api.tx.staking.bond(walletAddress, dollarsToGrains(amount), 'Staked');
+    : await api.tx.staking.bond(dollarsToGrains(amount), 'Staked');
 
   const injector = await web3FromSource('polkadot-js');
   // eslint-disable-next-line max-len
@@ -1532,6 +1532,48 @@ const bondAndValidate = async (bondValue, payee, commission, blocked, keys, wall
   });
 }
 
+const stakingBond = async (value, walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const extrinsic = api.tx.staking.bond(value, 'Staked');
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed staking.bond at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( staking.bond transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
+const stakingBondExtra = async (value, walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const extrinsic = api.tx.staking.bondExtra(value);
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed staking.bondExtra at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( staking.bondExtra transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1591,6 +1633,7 @@ export {
   getCongressCandidates,
   stakingValidate,
   stakingChill,
-  getCongressCandidates,
   bondAndValidate,
+  stakingBond,
+  stakingBondExtra,
 };

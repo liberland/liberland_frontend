@@ -33,7 +33,7 @@ function CreateValidatorModal({
     mode: 'all',
     defaultValues: {
       bondValue: maxBond.div(grainsInDollar).toString(),
-      commission: "10",
+      commission: '10',
       allow_nominations: true,
       payee: payee ? payee.toString() : 'Staked',
     },
@@ -43,7 +43,9 @@ function CreateValidatorModal({
     const bondValue = dollarsToGrains(values.bondValue);
     const commission = (new BN(values.commission)).mul(new BN(10000000));
     const blocked = !values.allow_nominations;
-    dispatch(validatorActions.createValidator.call({ bondValue, commission, blocked, keys: values.keys, payee: values.payee, }));
+    dispatch(validatorActions.createValidator.call({
+      bondValue, commission, blocked, keys: values.keys, payee: values.payee,
+    }));
     closeModal();
   };
 

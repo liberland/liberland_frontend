@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { validatorSelectors } from '../../../redux/selectors';
-import { validatorActions } from '../../../redux/actions';
-import Button from '../../Button/Button';
-import StartValidatorModal from '../../Modals/StartValidatorModal';
+import { validatorSelectors } from '../../../../redux/selectors';
+import { validatorActions } from '../../../../redux/actions';
+import Button from '../../../Button/Button';
+import StartValidatorModal from '../../../Modals/StartValidatorModal';
 
 function StartButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);

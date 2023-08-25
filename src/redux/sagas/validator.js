@@ -9,7 +9,7 @@ import {
   getAppliedSlashes, getUnappliedSlashes,
   setSessionKeys,
   getStakingPayee, setStakingPayee,
-  stakingValidate, stakingChill,
+  stakingValidate, stakingChill, stakingBond, stakingBondExtra,
 } from '../../api/nodeRpcCall';
 
 import { blockchainActions, validatorActions, walletActions } from '../actions';
@@ -183,7 +183,7 @@ function* getNominatorsWorker() {
   yield put(validatorActions.getNominators.success({ nominators }));
 }
 
-function* validateWorker({ payload: { commission, blocked, keys }}) {
+function* validateWorker({ payload: { commission, blocked, keys } }) {
   try {
     const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     const { errorData } = yield cps(stakingValidate, commission, blocked, keys, walletAddress);
@@ -233,6 +233,30 @@ function* createValidatorWorker({
     yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
     yield put(blockchainActions.setError.success(errorData));
     yield put(validatorActions.createValidator.failure(errorData));
+  }
+}
+
+function* stakeLldWorker(action) {
+  try {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const ledgerRaw = yield call(getStakingLedger, walletAddress);
+    const { errorData } = yield cps(
+      ledgerRaw.isSome
+        ? stakingBondExtra
+        : stakingBond,
+      action.payload.bondValue,
+      walletAddress,
+    );
+    if (errorData.isError) throw errorData;
+    yield put(validatorActions.stakeLld.success());
+    yield put(walletActions.getWallet.call());
+    yield put(validatorActions.getInfo.call());
+  } catch (errorData) {
+    // eslint-disable-next-line no-console
+    console.error('Error validate worker', errorData);
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(validatorActions.stakeLld.failure(errorData));
   }
 }
 
@@ -334,6 +358,14 @@ function* createValidatorWatcher() {
   }
 }
 
+function* stakeLldWatcher() {
+  try {
+    yield takeLatest(validatorActions.stakeLld.call, stakeLldWorker);
+  } catch (e) {
+    yield put(validatorActions.stakeLld.failure(e));
+  }
+}
+
 export {
   payoutWatcher,
   getPendingRewardsWatcher,
@@ -347,4 +379,5 @@ export {
   validateWatcher,
   chillWatcher,
   createValidatorWatcher,
+  stakeLldWatcher,
 };

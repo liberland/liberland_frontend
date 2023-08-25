@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { validatorSelectors } from '../../../redux/selectors';
-import { validatorActions } from '../../../redux/actions';
-import { parseLegal, parseIdentityData } from '../../../utils/identityParser';
+import { validatorSelectors } from '../../../../redux/selectors';
+import { validatorActions } from '../../../../redux/actions';
+import { parseLegal, parseIdentityData } from '../../../../utils/identityParser';
 
 function formatNominator({ address, identity }) {
   const display = parseIdentityData(identity?.display);

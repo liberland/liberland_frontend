@@ -12,6 +12,10 @@ function ValidatorCard({
   validatorAddress,
   selectingValidatorsDisabled,
 }) {
+  let checkbox = '';
+  if (nominatedByMe) checkbox = '✅';
+  else if (selectingValidatorsDisabled) checkbox = 'MAX';
+
   return (
     <div className={styles.nominatorCardWrapper}>
       <div className={styles.avatarProfile}>
@@ -19,10 +23,12 @@ function ValidatorCard({
         <div className={styles.avatarName}>{name}</div>
       </div>
       <div className={styles.listItem}>{commission}</div>
-      <div className={styles.listItem}><div className={blocked ? styles.blocked : styles.available}>{blocked ? 'Blocked' : 'Available' }</div></div>
+      <div className={styles.listItem}>
+        <div className={blocked ? styles.blocked : styles.available}>{blocked ? 'Blocked' : 'Available' }</div>
+      </div>
       <div className={styles.listItem} onClick={() => toggleSelectedValidator(validatorAddress)}>
         <div className={styles.checkBox}>
-          <div>{nominatedByMe ? '✅' : selectingValidatorsDisabled ? 'MAX' : '' }</div>
+          <div>{checkbox}</div>
         </div>
       </div>
 
@@ -31,7 +37,6 @@ function ValidatorCard({
 }
 
 ValidatorCard.defaultProps = {
-  avatarImage: '',
   name: 'Test Validator',
   commission: '5%',
   blocked: false,
@@ -41,7 +46,6 @@ ValidatorCard.defaultProps = {
 };
 
 ValidatorCard.propTypes = {
-  avatarImage: PropTypes.string,
   name: PropTypes.string,
   commission: PropTypes.string,
   blocked: PropTypes.bool,
