@@ -1305,6 +1305,35 @@ const getBlockEvents = async (blockHash) => {
   }
 }
 
+const getCongressCandidates = async () => {
+  const api = await getApi();
+  const electionsCandidates = await api.query.elections.candidates()
+  return electionsCandidates.toHuman()
+}
+
+const applyForCongress = async (walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const electionsCandidates = await api.query.elections.candidates()
+  const extrinsic = api.tx.elections.submitCandidacy(electionsCandidates.length);
+
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed elections.submitCandidacy at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( elections.submitCandidacy transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
 const batchPayoutStakers = async (targets, walletAddress, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
@@ -1488,4 +1517,6 @@ export {
   getStakingPayee,
   setStakingPayee,
   getIdentities,
+  applyForCongress,
+  getCongressCandidates
 };

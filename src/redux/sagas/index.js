@@ -9,6 +9,7 @@ import * as registriesSagas from './registries';
 import * as identitySagas from './identity';
 import * as bridgeSagas from './bridge';
 import * as validatorSagas from './validator';
+import * as congressSagas from './congress';
 
 export default function* rootSaga() {
   yield all([
@@ -85,5 +86,9 @@ export default function* rootSaga() {
     validatorSagas.setPayeeWatcher(),
     validatorSagas.getNominatorsWatcher(),
     validatorSagas.getStakerRewardsWatcher(),
+
+    // CONGRESS
+    congressSagas.applyForCongressWatcher(),
+    congressSagas.getCongressCandidatesWatcher(),
   ]);
 }
