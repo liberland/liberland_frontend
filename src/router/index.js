@@ -12,6 +12,7 @@ export default {
     registries: '/home/registries',
     offices: '/home/offices',
     validators: '/home/validators',
+    congress: '/home/congress',
   },
   offices: {
     identity: '/home/offices/identity',
@@ -50,5 +51,8 @@ export default {
   },
   validators: {
     overview: '/home/validators',
+  },
+  congress: {
+    overview: '/home/congress',
   }
 };

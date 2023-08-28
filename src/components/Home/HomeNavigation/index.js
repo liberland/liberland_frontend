@@ -107,6 +107,13 @@ function HomeNavigation() {
       icon: RegistriesIcon,
       activeIcon: RegistriesIconActive,
     },
+    {
+      route: router.home.congress,
+      title: 'Congress',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: RegistriesIcon,
+      activeIcon: RegistriesIconActive,
+    },
   ];
 
   return (

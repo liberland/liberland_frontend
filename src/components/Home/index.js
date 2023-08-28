@@ -16,6 +16,7 @@ import Validators from '../Validators';
 import Registries from '../Registries';
 import AllTransactions from '../Wallet/AllTransactions';
 import styles from './styles.module.scss';
+import Congress from '../Congress';
 
 function Home() {
   return (
@@ -35,6 +36,7 @@ function Home() {
             <Route path={router.home.offices} component={Offices} />
             <Route path={router.wallet.allTransactions} component={AllTransactions} />
             <Route path={router.home.validators} component={Validators} />
+            <Route path={router.home.congress} component={Congress} />
             <Route
               exact
               path={router.home.index}
