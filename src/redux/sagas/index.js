@@ -79,5 +79,6 @@ export default function* rootSaga() {
     validatorSagas.payoutWatcher(),
     validatorSagas.getPendingRewardsWatcher(),
     validatorSagas.getInfoWatcher(),
+    validatorSagas.getSlashesWatcher(),
   ]);
 }

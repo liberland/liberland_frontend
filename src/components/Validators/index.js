@@ -4,8 +4,8 @@ import {
 } from 'react-router-dom';
 import router from '../../router';
 
-import HelloWorld from "./Overview";
-import ValidatorsHeader from "./ValidatorsHeader"
+import HelloWorld from './Overview';
+import ValidatorsHeader from './ValidatorsHeader';
 import styles from './styles.module.scss';
 
 function Validators() {
@@ -24,7 +24,7 @@ function Validators() {
         </Switch>
       </div>
     </div>
-  )
+  );
 }
 
 export default Validators;
