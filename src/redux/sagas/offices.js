@@ -1,11 +1,10 @@
 import {
   put, takeLatest, call, cps,
 } from 'redux-saga/effects';
-import { ethers } from "ethers";
 
 import {
   getIdentity,
-  provideJudgement,
+  provideJudgementAndAssets,
   getCompanyRequest,
   getCompanyRegistration,
   registerCompany,
@@ -20,28 +19,48 @@ import * as backend from '../../api/backend';
 
 function* getIdentityWorker(action) {
   try {
-    const identity = yield call(getIdentity, action.payload);
-    yield put(officesActions.officeGetIdentity.success(identity));
+    const onchain = yield call(getIdentity, action.payload);
+    const backendUsers = yield call(backend.getUsersByAddress, action.payload);
+    if (backendUsers.length > 1) {
+      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+      yield put(blockchainActions.setError.success({ details: "More than one user has the same address?"}));
+      return;
+    }
+    yield put(officesActions.officeGetIdentity.success({ onchain, backend: backendUsers[0] }));
   } catch (e) {
+    console.error(e)
     yield put(officesActions.officeGetIdentity.failure(e));
   }
 }
 
-function* provideJudgementWorker(action) {
+function* provideJudgementAndAssetsWorker(action) {
   try {
-    const { blockHash, errorData } = yield cps(provideJudgement, action.payload);
+    if ((action.payload.merits || action.payload.dollars) && !action.payload.uid) {
+      throw new Error("Tried to transfer LLD or LLM but we have no user id!");
+    }
+
+    const { errorData } = yield cps(provideJudgementAndAssets, action.payload);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
-      yield put(officesActions.provideJudgement.failure())
-    } else {
-      yield put(officesActions.provideJudgement.success())
-      yield put(officesActions.officeGetIdentity.call(action.payload.address))
+      yield put(officesActions.provideJudgementAndAssets.failure())
+      return;
     }
+
+    if (action.payload.merits?.gt(0)) {
+      try {
+        yield call(backend.addMeritTransaction, action.payload.uid, action.payload.merits.mul(-1))
+      } catch(e) {
+        throw { details: e.response.data.error.message };
+      }
+    }
+
+    yield put(officesActions.provideJudgementAndAssets.success())
+    yield put(officesActions.officeGetIdentity.call(action.payload.address))
   } catch (errorData) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
-      yield put(officesActions.provideJudgement.failure())
+      yield put(officesActions.provideJudgementAndAssets.failure())
   }
 }
 
@@ -94,29 +113,6 @@ function* getBalancesWorker(action) {
   }
 }
 
-function* getBackendAddressLLMWorker(action) {
-  try {
-    const backendLlmBalance = yield call(backend.getAddressLLM, action.payload.walletAddress);
-
-    if (backendLlmBalance.length > 1)
-      throw new Error(`Address belongs to ${backendLlmBalance.length} users`);
-
-    yield put(officesActions.getBackendAddressLlm.success({ 
-      backendLlmBalance: ethers.utils.parseUnits(
-        backendLlmBalance[0].merits.toFixed(12),
-        12
-      ) 
-    }));
-  } catch (e) {
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success({
-      isError: true,
-      details: e.toString()
-    }));
-    yield put(officesActions.getBackendAddressLlm.failure(e));
-  }
-}
-
 // WATCHERS
 
 function* getIdentityWatcher() {
@@ -127,11 +123,11 @@ function* getIdentityWatcher() {
   }
 }
 
-function* provideJudgementWatcher() {
+function* provideJudgementAndAssetsWatcher() {
   try {
-    yield takeLatest(officesActions.provideJudgement.call, provideJudgementWorker);
+    yield takeLatest(officesActions.provideJudgementAndAssets.call, provideJudgementAndAssetsWorker);
   } catch (e) {
-    yield put(officesActions.provideJudgement.failure(e));
+    yield put(officesActions.provideJudgementAndAssets.failure(e));
   }
 }
 
@@ -167,19 +163,9 @@ function* getBalancesWatcher() {
   }
 }
 
-
-function* getBackendAddressLLMWatcher() {
-  try {
-    yield takeLatest(officesActions.getBackendAddressLlm.call, getBackendAddressLLMWorker);
-  } catch (e) {
-    yield put(officesActions.getBackendAddressLlm.failure(e));
-  }
-}
-
 export {
-  getBackendAddressLLMWatcher,
   getIdentityWatcher,
-  provideJudgementWatcher,
+  provideJudgementAndAssetsWatcher,
   getCompanyRequestWatcher,
   getCompanyRegistrationWatcher,
   registerCompanyWatcher,

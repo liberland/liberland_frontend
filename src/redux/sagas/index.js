@@ -55,12 +55,11 @@ export default function* rootSaga() {
 
     // OFFICES
     officesSagas.getIdentityWatcher(),
-    officesSagas.provideJudgementWatcher(),
+    officesSagas.provideJudgementAndAssetsWatcher(),
     officesSagas.getCompanyRequestWatcher(),
     officesSagas.getCompanyRegistrationWatcher(),
     officesSagas.registerCompanyWatcher(),
     officesSagas.getBalancesWatcher(),
-    officesSagas.getBackendAddressLLMWatcher(),
 
     // REGISTRIES
     registriesSagas.getOfficialUserRegistryEntriesWatcher(),

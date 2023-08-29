@@ -151,16 +151,31 @@ const bridgeConstants = async (asset) => {
   return bridge;
 }
 
-const provideJudgement = async ({ address, hash, walletAddress }, callback) => {
+const provideJudgementAndAssets = async ({ address, hash, walletAddress, merits, dollars }, callback) => {
   const api = await getApi();
-  let judgement = api.createType('IdentityJudgement', 'KnownGood')
+  const calls = []
+
+  const judgement = api.createType('IdentityJudgement', 'KnownGood')
   const judgementCall = api.tx.identity.provideJudgement(0, address, judgement, hash);
-  const proxied = api.tx.identityOffice.execute(judgementCall);
+  const officeJudgementCall = api.tx.identityOffice.execute(judgementCall);
+  calls.push(officeJudgementCall)
+
+  if (dollars?.gt(0)) {
+    const lldCall = api.tx.balances.transfer(address, dollars.toString());
+    const officeLldCall = api.tx.identityOffice.execute(lldCall);
+    calls.push(officeLldCall)
+  }
+  if (merits?.gt(0)) {
+    const llmCall = api.tx.llm.sendLlmToPolitipool(address, merits.toString());
+    const officeLlmCall = api.tx.identityOffice.execute(llmCall);
+    calls.push(officeLlmCall)
+  }
+
+  const finalCall = api.tx.utility.batchAll(calls);
   const injector = await web3FromSource('polkadot-js');
-  proxied.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+  finalCall.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
     let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
-      console.log(events);
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
       callback(null, {
@@ -248,14 +263,12 @@ const setIdentity = async (values, walletAddress, callback) => {
     image: asData(null),
     twitter: asData(null),
   };
-  console.log(info);
   
   const setCall = api.tx.identity.setIdentity(info);
   const injector = await web3FromSource('polkadot-js');
   setCall.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
     let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
-      console.log(events);
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
       callback(null, {
@@ -295,8 +308,6 @@ const getCompanyRegistration = async (entity_id) => {
 }
 
 const registerCompany = async ({company_id, hash, walletAddress}, callback) => {
-  console.log('hash')
-  console.log(hash.toHuman())
   const api = await getApi();
   const registerCall = api.tx.companyRegistry.registerEntity(0, company_id, hash);
   const proxied = api.tx.companyRegistryOffice.execute(registerCall);
@@ -304,7 +315,6 @@ const registerCompany = async ({company_id, hash, walletAddress}, callback) => {
   proxied.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
     let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
-      console.log(events);
       // eslint-disable-next-line no-console
       console.log(`Completed at block hash #${status.asInBlock.toString()}`);
       callback(null, {
@@ -1272,13 +1282,10 @@ const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress
 // scaleEncoded is ready to be used for setting metadata
 // this data will be validated and will be rejected if encoded incorrectly or data is nonsensical (not on liberland island, self-intersecting plot lines, less then 3 points)
   officeExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    //console.log(r)
     let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed REQUEST COMPANY REGISTRATION at block hash #${status.asInBlock.toString()}`);
-      console.log('errorData')
-      console.log(errorData)
     }
   }).catch((error) => {
     // eslint-disable-next-line no-console
@@ -1377,7 +1384,7 @@ export {
   castVetoForLegislation,
   revertVetoForLegislation,
   getIdentity,
-  provideJudgement,
+  provideJudgementAndAssets,
   getCompanyRequest,
   getCompanyRegistration,
   registerCompany,

@@ -2,19 +2,18 @@ import { createActions } from 'redux-actions';
 
 export const {
   officeGetIdentity,
-  provideJudgement,
+  provideJudgementAndAssets,
   getCompanyRequest,
   getCompanyRegistration,
   registerCompany,
   getBalances,
-  getBackendAddressLlm,
 } = createActions({
   OFFICE_GET_IDENTITY: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  PROVIDE_JUDGEMENT: {
+  PROVIDE_JUDGEMENT_AND_ASSETS: {
     call: undefined,
     success: undefined,
     failure: undefined,
@@ -35,11 +34,6 @@ export const {
     failure: undefined,
   },
   GET_BALANCES: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  GET_BACKEND_ADDRESS_LLM: {
     call: undefined,
     success: undefined,
     failure: undefined,

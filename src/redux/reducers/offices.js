@@ -2,7 +2,11 @@ import { handleActions, combineActions } from 'redux-actions';
 import { officesActions } from '../actions';
 
 const initialState = {
-  identity: null,
+  identity: {
+    address: null,
+    onchain: null,
+    backend: null,
+  },
   isGetIdentity: false,
   companyRequest: null,
   isGetCompanyRequest: null,
@@ -22,9 +26,8 @@ const officesReducer = handleActions({
     officesActions.getCompanyRequest.call,
     officesActions.getCompanyRegistration.call,
     officesActions.registerCompany.call,
-    officesActions.provideJudgement.call,
     officesActions.getBalances.call,
-    officesActions.getBackendAddressLlm.call,
+    officesActions.provideJudgementAndAssets.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -34,33 +37,24 @@ const officesReducer = handleActions({
     officesActions.getCompanyRequest.success,
     officesActions.getCompanyRegistration.success,
     officesActions.registerCompany.success,
-    officesActions.provideJudgement.success,
     officesActions.getBalances.success,
-    officesActions.getBackendAddressLlm.success,
+    officesActions.provideJudgementAndAssets.success,
     officesActions.officeGetIdentity.failure,
     officesActions.getCompanyRequest.failure,
     officesActions.getCompanyRegistration.failure,
     officesActions.registerCompany.failure,
-    officesActions.provideJudgement.failure,
     officesActions.getBalances.failure,
-    officesActions.getBackendAddressLlm.failure,
+    officesActions.provideJudgementAndAssets.failure,
   )]: (state) => ({
     ...state,
     loading: false,
-  }),
-  [officesActions.getBackendAddressLlm.call]: (state) => ({
-    ...state,
-    backendAddressLLMBalance: null,
-  }),
-  [officesActions.getBackendAddressLlm.success]: (state, action) => ({
-    ...state,
-    backendAddressLLMBalance: action.payload.backendLlmBalance,
   }),
   [officesActions.officeGetIdentity.call]: (state, action) => ({
     ...state,
     identity: {
       address: action.payload,
-      identity: null,
+      backend: null,
+      onchain: null,
     },
     isGetIdentity: true,
   }),
@@ -68,15 +62,16 @@ const officesReducer = handleActions({
     ...state,
     identity: {
       address: state.identity.address,
-      identity: action.payload,
+      backend: action.payload.backend,
+      onchain: action.payload.onchain,
     },
     isGetIdentity: false,
   }),
   [officesActions.officeGetIdentity.failure]: (state) => ({
     ...state,
+    identity: initialState.identity,
     isGetIdentity: false,
   }),
-
   [officesActions.getCompanyRequest.call]: (state, action) => ({
     ...state,
     companyRequest: {

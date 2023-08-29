@@ -17,7 +17,7 @@ function ProposeReferendumModal({
       legislationTier: "2",
     }
   });
-  console.log(errors);
+
   return (
     <form
       className={styles.getCitizenshipModal}

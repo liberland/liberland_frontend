@@ -32,7 +32,7 @@ function* signInWorker(action) {
     const { credentials, history, ssoAccessTokenHash } = action.payload;
     api.defaults.headers.common['X-token'] = ssoAccessTokenHash;
     const { data: user } = yield call(api.get, '/users/me');
-    console.log(user);
+
     user.ssoAccessTokenHash = ssoAccessTokenHash;
     yield put(blockchainActions.setUserWallet.success(credentials.wallet_address));
     yield sessionStorage.setItem('userWalletAddress', credentials.wallet_address);

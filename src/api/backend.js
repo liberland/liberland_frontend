@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ethers } from "ethers";
 
 const getApi = () => {
   const ssoAccessTokenHash = sessionStorage.getItem("ssoAccessTokenHash");
@@ -12,14 +13,29 @@ const getApi = () => {
   return api;
 };
 
-export const getAddressLLM = async (walletAddress) => {
+export const getUsersByAddress = async (blockchainAddress) => {
   const api = getApi();
 
   const { data } = await api.get("/users", {
     params: {
-      blockchainAddress: walletAddress,
+      blockchainAddress,
     },
   });
 
-  return data;
+  return data.map(({ uid, merits }) => ({
+    uid,
+    merits: ethers.utils.parseUnits(merits.toFixed(12), 12),
+  }))
 };
+
+export const addMeritTransaction = async (userId, amount) => {
+  const api = getApi();
+
+  const formattedAmount = ethers.utils.formatUnits(amount, 12);
+  await api.post("/merit-transactions", {
+    userId,
+    amount: formattedAmount,
+    source: "blockchain-fe-app",
+    comment: "User onboarding on blockchain",
+  })
+}
