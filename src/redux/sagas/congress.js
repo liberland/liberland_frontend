@@ -10,6 +10,9 @@ import {
   getCongressCandidates,
   getMotions,
   voteAtMotions,
+  getCongressMembers,
+  getRunnersUp,
+  renounceCandidacy,
 } from '../../api/nodeRpcCall';
 
 // WORKERS
@@ -111,6 +114,39 @@ function* congressSendLlmToPolitipoolWorker({
   }
 }
 
+function* getCongressMembersWorker() {
+  const members = yield call(getCongressMembers);
+  yield put(congressActions.getCongressMembers.success(members));
+}
+
+function* getRunnersUpWorker() {
+  const runnersUp = yield call(getRunnersUp);
+  yield put(congressActions.getRunnersUp.success(runnersUp));
+}
+
+function* renounceCandidacyWorker(action) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  const { errorData } = yield cps(
+    renounceCandidacy,
+    walletAddress,
+    action.payload,
+  );
+  if (errorData.isError) {
+    yield put(
+      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
+    );
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(congressActions.renounceCandidacy.failure(errorData));
+  } else {
+    yield put(congressActions.getCongressMembers.call());
+    yield put(congressActions.getCongressCandidates.call());
+    yield put(congressActions.renounceCandidacy.success());
+  }
+}
+
 // WATCHERS
 
 export function* applyForCongressWatcher() {
@@ -170,5 +206,35 @@ export function* congressSendLlmToPolitipoolWatcher() {
     );
   } catch (e) {
     yield put(congressActions.congressSendLlmToPolitipool.failure(e));
+  }
+}
+
+export function* getCongressMembersWatcher() {
+  try {
+    yield takeLatest(
+      congressActions.getCongressMembers.call,
+      getCongressMembersWorker,
+    );
+  } catch (e) {
+    yield put(congressActions.getCongressMembers.failure(e));
+  }
+}
+
+export function* renounceCandidacyWatcher() {
+  try {
+    yield takeLatest(
+      congressActions.renounceCandidacy.call,
+      renounceCandidacyWorker,
+    );
+  } catch (e) {
+    yield put(congressActions.renounceCandidacy.failure(e));
+  }
+}
+
+export function* getRunnersUpWatcher() {
+  try {
+    yield takeLatest(congressActions.getRunnersUp.call, getRunnersUpWorker);
+  } catch (e) {
+    yield put(congressActions.getRunnersUp.failure(e));
   }
 }
