@@ -3,6 +3,7 @@ import { Switch, Route } from 'react-router-dom';
 import CongressHeader from './CongressHeader';
 import styles from './styles.module.scss';
 import Overview from './Overview';
+import Motions from './Motions';
 import router from '../../router';
 
 function Congress() {
@@ -14,6 +15,7 @@ function Congress() {
       <div>
         <Switch>
           <Route exact path={router.congress.overview} component={Overview} />
+          <Route exact path={router.congress.motions} component={Motions} />
         </Switch>
       </div>
     </div>

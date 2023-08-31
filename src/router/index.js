@@ -53,5 +53,6 @@ export default {
   },
   congress: {
     overview: '/home/congress',
+    motions: '/home/congress/motions',
   },
 };

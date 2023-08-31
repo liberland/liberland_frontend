@@ -94,5 +94,7 @@ export default function* rootSaga() {
     // CONGRESS
     congressSagas.applyForCongressWatcher(),
     congressSagas.getCongressCandidatesWatcher(),
+    congressSagas.getMotionsWatcher(),
+    congressSagas.voteAtMotionsWatcher(),
   ]);
 }
