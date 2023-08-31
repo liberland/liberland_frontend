@@ -102,5 +102,8 @@ export default function* rootSaga() {
     congressSagas.voteAtMotionsWatcher(),
     congressSagas.congressSendLlmWatcher(),
     congressSagas.congressSendLlmToPolitipoolWatcher(),
+    congressSagas.getCongressMembersWatcher(),
+    congressSagas.renounceCandidacyWatcher(),
+    congressSagas.getRunnersUpWatcher(),
   ]);
 }

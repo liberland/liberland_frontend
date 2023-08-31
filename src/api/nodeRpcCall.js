@@ -1314,6 +1314,46 @@ const getCongressCandidates = async () => {
   return electionsCandidates.toHuman()
 }
 
+const getCongressMembers = async () => {
+  const api = await getApi();
+  return await api.query.council.members()
+}
+
+const getRunnersUp = async () => {
+  const api = await getApi();
+  return await api.query.elections.runnersUp()
+}
+
+const renounceCandidacy = async (walletAddress, userStatus, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+
+  if (userStatus === "None") return;
+
+  const renounce = {[userStatus]: userStatus === "Candidate" ? 
+    (await api.query.elections.candidates()).length : null
+  }
+  const renounceCandidacyTx = await api.tx.elections.renounceCandidacy(
+    renounce
+  )
+
+  renounceCandidacyTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed elections.submitCandidacy at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( elections.submitCandidacy transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
 const applyForCongress = async (walletAddress, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
@@ -1759,4 +1799,7 @@ export {
   stakingWithdrawUnbonded,
   subscribeActiveEra,
   getStakingBondingDuration,
+  getCongressMembers,
+  renounceCandidacy,
+  getRunnersUp,
 };

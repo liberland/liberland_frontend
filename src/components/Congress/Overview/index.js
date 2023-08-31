@@ -9,22 +9,48 @@ import {
   blockchainSelectors,
 } from '../../../redux/selectors';
 import SpendingMotionModal from '../../Modals/SpendingMotionModal';
+import styles from '../styles.module.scss';
 
 export default function Overview() {
   const dispatch = useDispatch();
   const congressCandidates = useSelector(congressSelectors.congressCandidates);
+  const congressMembers = useSelector(congressSelectors.congressMembers);
+  const runnersUp = useSelector(congressSelectors.runnersUp);
+
   const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   useEffect(() => {
     dispatch(congressActions.getCongressCandidates.call());
+    dispatch(congressActions.getCongressMembers.call());
+    dispatch(congressActions.getRunnersUp.call());
   }, [dispatch]);
 
   const [isSpendingModalOpen, setIsSpendingModalOpen] = useState(false);
   const handleSpendingModalOpen = () => setIsSpendingModalOpen(!isSpendingModalOpen);
 
+  const senderIsCandidate = congressCandidates.find(
+    (candidate) => candidate[0] === sender,
+  );
+  const senderIsMember = congressMembers.find(
+    (member) => member.toHuman() === sender,
+  );
+  const senderIsRunnerUp = runnersUp.find(
+    (member) => member.toHuman() === sender,
+  );
+
+  let userStatus = 'None';
+  if (senderIsMember) userStatus = 'Member';
+  else if (senderIsCandidate) userStatus = 'Candidate';
+  else if (senderIsRunnerUp) userStatus = 'RunnerUp';
+
   return (
-    <div>
-      {!congressCandidates.find((candidate) => candidate[0] === sender) && (
+    <div className={styles.navWrapper}>
+      <span>
+        User congress status:
+        {' '}
+        {userStatus}
+      </span>
+      {!senderIsCandidate && !senderIsMember && !senderIsRunnerUp && (
         <Button
           medium
           primary
@@ -41,6 +67,15 @@ export default function Overview() {
         Create new spending
       </Button>
       {isSpendingModalOpen && <SpendingMotionModal closeModal={handleSpendingModalOpen} />}
+      {(senderIsMember || senderIsCandidate || senderIsRunnerUp) && (
+        <Button
+          medium
+          primary
+          onClick={() => dispatch(congressActions.renounceCandidacy.call(userStatus))}
+        >
+          Renounce candidacy
+        </Button>
+      )}
     </div>
   );
 }

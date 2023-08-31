@@ -16,3 +16,13 @@ export const congressMotions = createSelector(
   congressReducer,
   (reducer) => reducer.motions,
 );
+
+export const congressMembers = createSelector(
+  congressReducer,
+  (reducer) => reducer.congressMembers,
+);
+
+export const runnersUp = createSelector(
+  congressReducer,
+  (reducer) => reducer.runnersUp,
+);

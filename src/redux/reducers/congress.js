@@ -5,6 +5,8 @@ const initialState = {
   loading: false,
   congressCandidates: [],
   motions: [],
+  congressMembers: [],
+  runnersUp: [],
 };
 
 const congressReducer = handleActions(
@@ -14,6 +16,8 @@ const congressReducer = handleActions(
       congressActions.getCongressCandidates.call,
       congressActions.getMotions.call,
       congressActions.voteAtMotions.call,
+      congressActions.getCongressMembers.call,
+      congressActions.getRunnersUp.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -25,6 +29,10 @@ const congressReducer = handleActions(
       congressActions.getMotions.success,
       congressActions.getMotions.failure,
       congressActions.voteAtMotions.failure,
+      congressActions.getCongressMembers.success,
+      congressActions.getCongressMembers.failure,
+      congressActions.getRunnersUp.success,
+      congressActions.getRunnersUp.failure,
     )]: (state) => ({
       ...state,
       loading: false,
@@ -36,6 +44,14 @@ const congressReducer = handleActions(
     [congressActions.getMotions.success]: (state, action) => ({
       ...state,
       motions: action.payload,
+    }),
+    [congressActions.getCongressMembers.success]: (state, action) => ({
+      ...state,
+      congressMembers: action.payload,
+    }),
+    [congressActions.getRunnersUp.success]: (state, action) => ({
+      ...state,
+      runnersUp: action.payload,
     }),
   },
   initialState,
