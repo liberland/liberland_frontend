@@ -1,15 +1,9 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { validatorSelectors } from '../../../redux/selectors';
-import { validatorActions } from '../../../redux/actions';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { validatorSelectors } from '../../../../redux/selectors';
 
 export default function Status() {
-  const dispatch = useDispatch();
   const info = useSelector(validatorSelectors.info);
-
-  useEffect(() => {
-    dispatch(validatorActions.getInfo.call());
-  }, [dispatch]);
 
   let status;
   if (info.isSessionValidator) status = 'Active';

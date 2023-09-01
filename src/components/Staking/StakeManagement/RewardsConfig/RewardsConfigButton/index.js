@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { StakingRewardsDestinationModal } from '../../../Modals';
-import Button from '../../../Button/Button';
+import { StakingRewardsDestinationModal } from '../../../../Modals';
+import Button from '../../../../Button/Button';
 
 export default function RewardsConfigButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);

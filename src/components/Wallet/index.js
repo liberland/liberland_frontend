@@ -15,7 +15,6 @@ import WalletTransactionHistory from './WalletTransactionHistory';
 import Bridge from './Bridge';
 
 import Card from '../Card';
-import Nominator from './Nominator';
 import router from '../../router';
 import RoleHOC from '../../hocs/RoleHOC';
 
@@ -35,8 +34,6 @@ function Wallet() {
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
-    dispatch(walletActions.getValidators.call());
-    dispatch(walletActions.getNominatorTargets.call());
   }, [dispatch]);
 
   return (
@@ -50,12 +47,6 @@ function Wallet() {
                 path={router.wallet.ethBridge}
                 component={() => (
                   <Bridge />
-                )}
-              />
-              <Route
-                path={router.wallet.validatorsStaking}
-                component={() => (
-                  <Nominator />
                 )}
               />
               <Route

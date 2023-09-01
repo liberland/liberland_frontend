@@ -40,20 +40,6 @@ function ChoseStakeModal({
           >
             Unpool
           </Button>
-          <Button
-            primary
-            medium
-            onClick={() => setModalShown(4)}
-          >
-            Payout staking rewards
-          </Button>
-          <Button
-            primary
-            medium
-            onClick={() => setModalShown(1)}
-          >
-            Validator Stake
-          </Button>
 
           <Button
             medium

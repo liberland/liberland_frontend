@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip,
 } from 'recharts';
-import { validatorSelectors } from '../../../redux/selectors';
-import { validatorActions } from '../../../redux/actions';
-import { grainsInDollar } from '../../../utils/walletHelpers';
+import { validatorSelectors } from '../../../../redux/selectors';
+import { validatorActions } from '../../../../redux/actions';
+import { grainsInDollar } from '../../../../utils/walletHelpers';
 
 export default function Stats() {
   const dispatch = useDispatch();

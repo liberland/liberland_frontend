@@ -11,7 +11,7 @@ export default {
     legislation: '/home/legislation',
     registries: '/home/registries',
     offices: '/home/offices',
-    validators: '/home/validators',
+    staking: '/home/staking',
     congress: '/home/congress',
   },
   offices: {
@@ -35,7 +35,6 @@ export default {
   },
   wallet: {
     allTransactions: '/home/wallet/all-transactions',
-    validatorsStaking: '/home/wallet/validators-staking',
     ethBridge: '/home/wallet/eth-bridge',
     ethBridgeDeposit: '/home/wallet/eth-bridge/deposit',
     ethBridgeWithdraw: '/home/wallet/eth-bridge/withdraw',
@@ -49,10 +48,10 @@ export default {
     assets: '/home/registries/assets',
     other: '/home/registries/other',
   },
-  validators: {
-    overview: '/home/validators',
+  staking: {
+    overview: '/home/staking',
   },
   congress: {
     overview: '/home/congress',
-  }
+  },
 };

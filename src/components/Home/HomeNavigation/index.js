@@ -24,6 +24,7 @@ import ConstitutionIcon from '../../../assets/icons/constitution.svg';
 import RegistriesIcon from '../../../assets/icons/documents.svg';
 import RegistriesIconActive from '../../../assets/icons/active-documents.svg';
 import ConstitutionIconActive from '../../../assets/icons/active-constitution.svg';
+import GraphIcon from '../../../assets/icons/graph.svg';
 
 // REDUX
 import { userSelectors, walletSelectors } from '../../../redux/selectors';
@@ -101,8 +102,8 @@ function HomeNavigation() {
       activeIcon: RegistriesIconActive,
     },
     {
-      route: router.home.validators,
-      title: 'Validators',
+      route: router.home.staking,
+      title: 'Staking',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: RegistriesIcon,
       activeIcon: RegistriesIconActive,

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
 import { useDispatch } from 'react-redux';
-import Button from '../../Button/Button';
-import { validatorActions } from '../../../redux/actions';
-import SetSessionKeysModal from '../../Modals/SetSessionKeysModal';
+import Button from '../../../Button/Button';
+import { validatorActions } from '../../../../redux/actions';
+import SetSessionKeysModal from '../../../Modals/SetSessionKeysModal';
 
 export default function SetSessionKeysButton() {
   const dispatch = useDispatch();

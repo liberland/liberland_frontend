@@ -9,6 +9,8 @@ import DelegateModal from './DelegateModal';
 import UndelegateModal from './UndelegateModal';
 import StakingRewardsDestinationModal from './StakingRewardsDestinationModal';
 import CreateValidatorModal from './CreateValidatorModal';
+import StakeLLDModal from './StakeLLDModal';
+import StartValidatorModal from './StartValidatorModal';
 
 export {
   GetCitizenshipModal,
@@ -22,4 +24,6 @@ export {
   UndelegateModal,
   StakingRewardsDestinationModal,
   CreateValidatorModal,
+  StakeLLDModal,
+  StartValidatorModal,
 };

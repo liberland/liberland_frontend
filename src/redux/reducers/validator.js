@@ -32,6 +32,7 @@ const validatorReducer = handleActions({
     validatorActions.setPayee.call,
     validatorActions.getNominators.call,
     validatorActions.getStakerRewards.call,
+    validatorActions.stakeLld.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -56,6 +57,7 @@ const validatorReducer = handleActions({
     validatorActions.getNominators.failure,
     validatorActions.getStakerRewards.success,
     validatorActions.getStakerRewards.failure,
+    validatorActions.stakeLld.failure,
   )]: (state) => ({
     ...state,
     loading: false,

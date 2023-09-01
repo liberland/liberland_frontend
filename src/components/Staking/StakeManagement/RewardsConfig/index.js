@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { validatorSelectors } from '../../../redux/selectors';
+import { validatorSelectors } from '../../../../redux/selectors';
 import RewardsConfigButton from './RewardsConfigButton';
-import { validatorActions } from '../../../redux/actions';
+import { validatorActions } from '../../../../redux/actions';
 
 export default function RewardsConfig() {
   const dispatch = useDispatch();
