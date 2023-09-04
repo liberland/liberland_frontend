@@ -7,6 +7,7 @@ import { ChoseStakeModal } from '../../../Modals';
 import { validatorSelectors } from '../../../../redux/selectors';
 import Button from '../../../Button/Button';
 import { validatorActions } from '../../../../redux/actions';
+import styles from './../styles.module.scss'
 
 export default function PendingRewards() {
   const dispatch = useDispatch();
@@ -29,7 +30,7 @@ export default function PendingRewards() {
 
   return (
     <>
-      <div>
+      <div className={styles.rowWrapper}>
         You have
         {' '}
         {formatDollars(pendingRewards ?? 0)}

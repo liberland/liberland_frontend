@@ -7,6 +7,7 @@ import { StakeLLDModal } from '../../Modals';
 import StakingMode from './StakingMode';
 import RewardsConfig from './RewardsConfig';
 import PendingRewards from './PendingRewards';
+import styles from './styles.module.scss';
 
 export default function StakeManagement() {
   const balances = useSelector(walletSelectors.selectorBalances);
@@ -18,21 +19,31 @@ export default function StakeManagement() {
   const handleStakeModalOpen = () => setIsStakeModalOpen(!isStakeModalOpen);
 
   return (
-    <div>
-      Currently staked:
-      {' '}
-      {formatDollars(balances.polkastake.amount)}
-      {' '}
-      LLD
-      { info?.stash && (
-      <>
-        <Button small primary onClick={handleStakeModalOpen}>Add stake</Button>
-        <RewardsConfig />
-        <PendingRewards />
-      </>
-      ) }
-      { isStakeModalOpen && <StakeLLDModal closeModal={handleStakeModalOpen} />}
-      <StakingMode />
+    <div className={styles.stakingWrapper}>
+      <div className={styles.rowWrapper}>
+        <span>
+          Currently staked:
+          {' '}
+          {formatDollars(balances.polkastake.amount)}
+          {' '}
+          LLD
+        </span>
+        { info?.stash && (
+        <>
+          <Button small primary onClick={handleStakeModalOpen}>Add stake</Button>
+        </>
+        ) }
+        </div>
+        <div>
+        { info?.stash && (
+        <>
+          <PendingRewards />
+          <RewardsConfig />
+        </>
+        ) }
+        { isStakeModalOpen && <StakeLLDModal closeModal={handleStakeModalOpen} />}
+        <StakingMode />
+      </div>
     </div>
   );
 }

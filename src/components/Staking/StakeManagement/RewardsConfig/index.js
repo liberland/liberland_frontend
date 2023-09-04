@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { validatorSelectors } from '../../../../redux/selectors';
 import RewardsConfigButton from './RewardsConfigButton';
 import { validatorActions } from '../../../../redux/actions';
+import styles from './../styles.module.scss'
 
 export default function RewardsConfig() {
   const dispatch = useDispatch();
@@ -13,7 +14,7 @@ export default function RewardsConfig() {
   }, [dispatch]);
 
   return (
-    <div>
+    <div className={styles.rowWrapper}>
       Staking rewards destination:
       {' '}
       {payee?.toString()}

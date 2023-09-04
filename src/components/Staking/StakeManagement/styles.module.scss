@@ -1,0 +1,14 @@
+.stakingWrapper {
+    padding: 8px 30px;
+  }
+
+.rowWrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  
+    & > div {
+      margin: 0;
+    }
+  }

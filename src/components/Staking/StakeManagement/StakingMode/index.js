@@ -4,12 +4,13 @@ import { validatorSelectors } from '../../../../redux/selectors';
 import Button from '../../../Button/Button';
 import { validatorActions } from '../../../../redux/actions';
 import { CreateValidatorModal, StartValidatorModal, StakeLLDModal } from '../../../Modals';
+import styles from './../styles.module.scss'
 
 function SwitchToValidator() {
   const [isValidatorModalOpen, setIsValidatorModalOpen] = useState(false);
   const handleValidatorModalOpen = () => setIsValidatorModalOpen(!isValidatorModalOpen);
   return (
-    <div>
+    <div className={styles.rowWrapper}>
       Current staking mode: Nominator.
       <Button small primary onClick={handleValidatorModalOpen}>
         Switch to Validator
