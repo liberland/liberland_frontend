@@ -5,7 +5,7 @@ import { formatDollars } from '../../../../utils/walletHelpers';
 import { validatorSelectors } from '../../../../redux/selectors';
 import { validatorActions } from '../../../../redux/actions';
 import Table from '../../../Table';
-import slaschesIcon from '../../../../assets/icons/slasches.svg';
+import slashesIcon from '../../../../assets/icons/slashes.svg';
 import styles from './styles.module.scss';
 
 function SlashTable({ slashes }) {
@@ -61,8 +61,8 @@ export default function Slashes() {
       {(appliedSlashes?.length > 0 || unappliedSlashes?.length > 0) && (
         <div className={styles.headerWithIcon}>
           <img
-            className={styles.slaschesIcon}
-            src={slaschesIcon}
+            className={styles.slashesIcon}
+            src={slashesIcon}
             width="16"
             alt=""
           />
