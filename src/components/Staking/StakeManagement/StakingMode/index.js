@@ -4,18 +4,25 @@ import { validatorSelectors } from '../../../../redux/selectors';
 import Button from '../../../Button/Button';
 import { validatorActions } from '../../../../redux/actions';
 import { CreateValidatorModal, StartValidatorModal, StakeLLDModal } from '../../../Modals';
-import styles from './../styles.module.scss'
+import styles from '../styles.module.scss';
 
 function SwitchToValidator() {
   const [isValidatorModalOpen, setIsValidatorModalOpen] = useState(false);
   const handleValidatorModalOpen = () => setIsValidatorModalOpen(!isValidatorModalOpen);
   return (
-    <div className={styles.rowWrapper}>
-      Current staking mode: Nominator.
-      <Button small primary onClick={handleValidatorModalOpen}>
-        Switch to Validator
-      </Button>
-      {isValidatorModalOpen && <StartValidatorModal closeModal={handleValidatorModalOpen} />}
+    <div>
+      <div className={styles.rowWrapper}>
+        <span>Current staking mode: </span>
+        <span><b>Nominator</b></span>
+      </div>
+      <div>
+        <div className={styles.rowEnd}>
+          <Button small primary onClick={handleValidatorModalOpen}>
+            Switch to Validator
+          </Button>
+        </div>
+        {isValidatorModalOpen && <StartValidatorModal closeModal={handleValidatorModalOpen} />}
+      </div>
     </div>
   );
 }
@@ -27,10 +34,15 @@ function SwitchToNominator() {
   };
   return (
     <div>
-      Current staking mode: Validator.
-      <Button small primary onClick={chill}>
-        Switch to Nominator
-      </Button>
+      <div className={styles.rowWrapper}>
+        <span>Current staking mode: </span>
+        <span><b>Validator</b></span>
+      </div>
+      <div className={styles.rowEnd}>
+        <Button small primary onClick={chill}>
+          Switch to Nominator
+        </Button>
+      </div>
     </div>
   );
 }
@@ -47,7 +59,7 @@ function Starter() {
   const handleStakeModalOpen = () => setIsStakeModalOpen(!isStakeModalOpen);
 
   return (
-    <div>
+    <div className={styles.rowEnd}>
       <Button small primary onClick={handleStakeModalOpen}>
         Start Nominating
       </Button>

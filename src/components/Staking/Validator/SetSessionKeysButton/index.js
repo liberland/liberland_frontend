@@ -20,7 +20,7 @@ export default function SetSessionKeysButton() {
 
   return (
     <>
-      <Button medium primary onClick={toggleModal}>Change session keys</Button>
+      <Button small primary onClick={toggleModal}>Change session keys</Button>
       {isModalOpen
             && <SetSessionKeysModal closeModal={toggleModal} onSubmit={handleSubmit} />}
     </>

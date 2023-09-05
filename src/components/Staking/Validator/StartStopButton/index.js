@@ -12,7 +12,7 @@ function StartButton() {
 
   return (
     <>
-      <Button medium primary onClick={handleModalOpen}>
+      <Button small primary onClick={handleModalOpen}>
         Start Validating
       </Button>
       {isModalOpen && <StartValidatorModal closeModal={handleModalOpen} />}
@@ -28,7 +28,7 @@ function StopButton({ typeText }) {
   };
 
   return (
-    <Button medium primary onClick={stop}>
+    <Button small secondary onClick={stop}>
       Stop
       {' '}
       {typeText}

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip,
+  LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import { validatorSelectors } from '../../../../redux/selectors';
 import { validatorActions } from '../../../../redux/actions';
@@ -23,10 +23,8 @@ export default function Stats() {
   }));
 
   return (
-    <div>
+    <ResponsiveContainer height={300} width="100%">
       <LineChart
-        width={600}
-        height={300}
         data={data}
         margin={{
           top: 5, right: 20, bottom: 5, left: 0,
@@ -38,6 +36,6 @@ export default function Stats() {
         <YAxis />
         <Tooltip />
       </LineChart>
-    </div>
+    </ResponsiveContainer>
   );
 }
