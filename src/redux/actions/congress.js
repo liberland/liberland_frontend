@@ -10,6 +10,7 @@ export const {
   getCongressMembers,
   renounceCandidacy,
   getRunnersUp,
+  congressProposeLegislation,
 } = createActions({
   APPLY_FOR_CONGRESS: {
     call: undefined,
@@ -52,6 +53,11 @@ export const {
     failure: undefined,
   },
   GET_RUNNERS_UP: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_PROPOSE_LEGISLATION: {
     call: undefined,
     success: undefined,
     failure: undefined,

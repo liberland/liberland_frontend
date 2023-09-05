@@ -5,8 +5,8 @@ const initialState = {
   loading: false,
   congressCandidates: [],
   motions: [],
-  congressMembers: [],
   runnersUp: [],
+  members: [],
 };
 
 const congressReducer = handleActions(
@@ -18,6 +18,7 @@ const congressReducer = handleActions(
       congressActions.voteAtMotions.call,
       congressActions.getCongressMembers.call,
       congressActions.getRunnersUp.call,
+      congressActions.congressProposeLegislation.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -33,9 +34,17 @@ const congressReducer = handleActions(
       congressActions.getCongressMembers.failure,
       congressActions.getRunnersUp.success,
       congressActions.getRunnersUp.failure,
+      congressActions.congressProposeLegislation.failure,
+
+      // FIXME remove after we have motion fetching logic merged, PR #113, BLOCKCHAIN-131
+      congressActions.congressProposeLegislation.success,
     )]: (state) => ({
       ...state,
       loading: false,
+    }),
+    [congressActions.getCongressMembers.success]: (state, action) => ({
+      ...state,
+      members: action.payload,
     }),
     [congressActions.getCongressCandidates.success]: (state, action) => ({
       ...state,
@@ -44,10 +53,6 @@ const congressReducer = handleActions(
     [congressActions.getMotions.success]: (state, action) => ({
       ...state,
       motions: action.payload,
-    }),
-    [congressActions.getCongressMembers.success]: (state, action) => ({
-      ...state,
-      congressMembers: action.payload,
     }),
     [congressActions.getRunnersUp.success]: (state, action) => ({
       ...state,

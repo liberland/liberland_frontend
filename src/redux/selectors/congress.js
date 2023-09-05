@@ -19,7 +19,7 @@ export const congressMotions = createSelector(
 
 export const congressMembers = createSelector(
   congressReducer,
-  (reducer) => reducer.congressMembers,
+  (reducer) => reducer.members,
 );
 
 export const runnersUp = createSelector(
