@@ -10,6 +10,7 @@ import {
 } from '../../../redux/selectors';
 import SpendingMotionModal from '../../Modals/SpendingMotionModal';
 import styles from '../styles.module.scss';
+import ProposeLegislationButton from '../ProposeLegislationButton';
 
 export default function Overview() {
   const dispatch = useDispatch();
@@ -32,10 +33,10 @@ export default function Overview() {
     (candidate) => candidate[0] === sender,
   );
   const senderIsMember = congressMembers.find(
-    (member) => member.toHuman() === sender,
+    (member) => member.toString() === sender,
   );
   const senderIsRunnerUp = runnersUp.find(
-    (member) => member.toHuman() === sender,
+    (member) => member.toString() === sender,
   );
 
   let userStatus = 'None';
@@ -76,6 +77,7 @@ export default function Overview() {
           Renounce candidacy
         </Button>
       )}
+      <ProposeLegislationButton />
     </div>
   );
 }

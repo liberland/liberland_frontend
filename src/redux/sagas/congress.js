@@ -7,10 +7,11 @@ import {
   applyForCongress,
   congressSendLlm,
   congressSendLlmToPolitipool,
+  congressProposeLegislation,
   getCongressCandidates,
+  getCongressMembers,
   getMotions,
   voteAtMotions,
-  getCongressMembers,
   getRunnersUp,
   renounceCandidacy,
 } from '../../api/nodeRpcCall';
@@ -147,6 +148,25 @@ function* renounceCandidacyWorker(action) {
   }
 }
 
+function* congressProposeLegislationWorker({ payload: { index, legislationContent } }) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  const tier = 1; // International Treaty
+  const { errorData } = yield cps(congressProposeLegislation, tier, index, legislationContent, walletAddress);
+  if (errorData.isError) {
+    yield put(
+      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
+    );
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(congressActions.congressProposeLegislation.failure(errorData));
+  } else {
+    yield put(congressActions.congressProposeLegislation.success());
+    // FIXME add put for congressActions.getMotions.call() after PR #113, BLOCKCHAIN-131 is merged
+  }
+}
+
 // WATCHERS
 
 export function* applyForCongressWatcher() {
@@ -236,5 +256,15 @@ export function* getRunnersUpWatcher() {
     yield takeLatest(congressActions.getRunnersUp.call, getRunnersUpWorker);
   } catch (e) {
     yield put(congressActions.getRunnersUp.failure(e));
+  }
+}
+export function* congressProposeLegislationWatcher() {
+  try {
+    yield takeLatest(
+      congressActions.congressProposeLegislation.call,
+      congressProposeLegislationWorker,
+    );
+  } catch (e) {
+    yield put(congressActions.congressProposeLegislation.failure(e));
   }
 }

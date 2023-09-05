@@ -1728,6 +1728,30 @@ const getStakingBondingDuration = async () => {
   return api.consts.staking.bondingDuration;
 }
 
+const congressProposeLegislation = async (tier, index, legislationContent, walletAddress, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const congressmen = await api.query.council.members();
+  const threshold = parseInt(congressmen.length/2) + 1;
+  const proposal = api.tx.liberlandLegislation.addLaw(tier, index, legislationContent);
+  const length = proposal.length;
+  const extrinsic = api.tx.council.propose(threshold, proposal, length);
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed council.propose for liberlandLegislation.addLaw at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( council.propose for liberlandLegislation.addLaw transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
 
 export {
   getBalanceByAddress,
@@ -1802,4 +1826,5 @@ export {
   getCongressMembers,
   renounceCandidacy,
   getRunnersUp,
+  congressProposeLegislation,
 };
