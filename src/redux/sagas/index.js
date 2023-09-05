@@ -97,14 +97,15 @@ export default function* rootSaga() {
 
     // CONGRESS
     congressSagas.applyForCongressWatcher(),
-    congressSagas.getCongressCandidatesWatcher(),
-    congressSagas.getMotionsWatcher(),
-    congressSagas.voteAtMotionsWatcher(),
-    congressSagas.congressSendLlmWatcher(),
-    congressSagas.congressSendLlmToPolitipoolWatcher(),
-    congressSagas.getCongressMembersWatcher(),
-    congressSagas.renounceCandidacyWatcher(),
-    congressSagas.getRunnersUpWatcher(),
     congressSagas.congressProposeLegislationWatcher(),
+    congressSagas.congressRepealLegislationWatcher(),
+    congressSagas.congressSendLlmToPolitipoolWatcher(),
+    congressSagas.congressSendLlmWatcher(),
+    congressSagas.getCandidatesWatcher(),
+    congressSagas.getMembersWatcher(),
+    congressSagas.getMotionsWatcher(),
+    congressSagas.getRunnersUpWatcher(),
+    congressSagas.renounceCandidacyWatcher(),
+    congressSagas.voteAtMotionsWatcher(),
   ]);
 }

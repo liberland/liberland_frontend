@@ -2,53 +2,52 @@ import { handleActions, combineActions } from 'redux-actions';
 import { congressActions } from '../actions';
 
 const initialState = {
+  candidates: [],
   loading: false,
-  congressCandidates: [],
+  members: [],
   motions: [],
   runnersUp: [],
-  members: [],
 };
 
 const congressReducer = handleActions(
   {
     [combineActions(
       congressActions.applyForCongress.call,
-      congressActions.getCongressCandidates.call,
-      congressActions.getMotions.call,
-      congressActions.voteAtMotions.call,
-      congressActions.getCongressMembers.call,
-      congressActions.getRunnersUp.call,
       congressActions.congressProposeLegislation.call,
+      congressActions.congressRepealLegislation.call,
+      congressActions.getCandidates.call,
+      congressActions.getMembers.call,
+      congressActions.getMotions.call,
+      congressActions.getRunnersUp.call,
+      congressActions.voteAtMotions.call,
     )]: (state) => ({
       ...state,
       loading: true,
     }),
     [combineActions(
       congressActions.applyForCongress.failure,
-      congressActions.getCongressCandidates.success,
-      congressActions.getCongressCandidates.failure,
-      congressActions.getMotions.success,
-      congressActions.getMotions.failure,
-      congressActions.voteAtMotions.failure,
-      congressActions.getCongressMembers.success,
-      congressActions.getCongressMembers.failure,
-      congressActions.getRunnersUp.success,
-      congressActions.getRunnersUp.failure,
       congressActions.congressProposeLegislation.failure,
-
-      // FIXME remove after we have motion fetching logic merged, PR #113, BLOCKCHAIN-131
-      congressActions.congressProposeLegislation.success,
+      congressActions.congressRepealLegislation.failure,
+      congressActions.getCandidates.failure,
+      congressActions.getCandidates.success,
+      congressActions.getMembers.failure,
+      congressActions.getMembers.success,
+      congressActions.getMotions.failure,
+      congressActions.getMotions.success,
+      congressActions.getRunnersUp.failure,
+      congressActions.getRunnersUp.success,
+      congressActions.voteAtMotions.failure,
     )]: (state) => ({
       ...state,
       loading: false,
     }),
-    [congressActions.getCongressMembers.success]: (state, action) => ({
+    [congressActions.getCandidates.success]: (state, action) => ({
+      ...state,
+      candidates: action.payload,
+    }),
+    [congressActions.getMembers.success]: (state, action) => ({
       ...state,
       members: action.payload,
-    }),
-    [congressActions.getCongressCandidates.success]: (state, action) => ({
-      ...state,
-      congressCandidates: action.payload,
     }),
     [congressActions.getMotions.success]: (state, action) => ({
       ...state,

@@ -14,25 +14,25 @@ import ProposeLegislationButton from '../ProposeLegislationButton';
 
 export default function Overview() {
   const dispatch = useDispatch();
-  const congressCandidates = useSelector(congressSelectors.congressCandidates);
-  const congressMembers = useSelector(congressSelectors.congressMembers);
+  const candidates = useSelector(congressSelectors.candidates);
+  const members = useSelector(congressSelectors.members);
   const runnersUp = useSelector(congressSelectors.runnersUp);
 
   const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   useEffect(() => {
-    dispatch(congressActions.getCongressCandidates.call());
-    dispatch(congressActions.getCongressMembers.call());
+    dispatch(congressActions.getCandidates.call());
+    dispatch(congressActions.getMembers.call());
     dispatch(congressActions.getRunnersUp.call());
   }, [dispatch]);
 
   const [isSpendingModalOpen, setIsSpendingModalOpen] = useState(false);
   const handleSpendingModalOpen = () => setIsSpendingModalOpen(!isSpendingModalOpen);
 
-  const senderIsCandidate = congressCandidates.find(
+  const senderIsCandidate = candidates.find(
     (candidate) => candidate[0] === sender,
   );
-  const senderIsMember = congressMembers.find(
+  const senderIsMember = members.find(
     (member) => member.toString() === sender,
   );
   const senderIsRunnerUp = runnersUp.find(
@@ -60,13 +60,18 @@ export default function Overview() {
           Apply for Congress
         </Button>
       )}
-      <Button
-        medium
-        primary
-        onClick={handleSpendingModalOpen}
-      >
-        Create new spending
-      </Button>
+      {senderIsMember && (
+      <>
+        <ProposeLegislationButton />
+        <Button
+          medium
+          primary
+          onClick={handleSpendingModalOpen}
+        >
+          Create new spending
+        </Button>
+      </>
+      )}
       {isSpendingModalOpen && <SpendingMotionModal closeModal={handleSpendingModalOpen} />}
       {(senderIsMember || senderIsCandidate || senderIsRunnerUp) && (
         <Button
@@ -77,7 +82,6 @@ export default function Overview() {
           Renounce candidacy
         </Button>
       )}
-      <ProposeLegislationButton />
     </div>
   );
 }

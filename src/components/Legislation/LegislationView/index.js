@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import { legislationActions } from '../../../redux/actions';
+import { congressActions, legislationActions } from '../../../redux/actions';
 import { blockchainSelectors, legislationSelectors } from '../../../redux/selectors';
 import Card from '../../Card';
 
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
+import RepealLegislationButton from '../../Congress/RepealLegislationButton';
 
 const LegislationView = () => {
   const { tier } = useParams();
@@ -17,6 +18,7 @@ const LegislationView = () => {
   useEffect(() => {
     dispatch(legislationActions.getLegislation.call(tier));
     dispatch(legislationActions.getCitizenCount.call());
+    dispatch(congressActions.getMembers.call()); // required by RepealLegislationButton
   }, [dispatch, tier, legislationActions]);
 
   const legislation = useSelector(legislationSelectors.legislation);
@@ -34,16 +36,39 @@ const LegislationView = () => {
             <div>
               {l?.vetos?.length}
               {' '}
-              / {citizens}
+              /
+              {' '}
+              {citizens}
             </div>
             <div>Citizens vetoed</div>
           </div>
           <div>
             {
               l?.vetos?.includes(userWalletAddress)
-                ? <Button small red onClick={() => dispatch(legislationActions.revertVeto.call({tier: tier, index: l.index, userWalletAddress: userWalletAddress}))}>Revert Veto</Button>
-                : <Button small primary onClick={() => dispatch(legislationActions.castVeto.call({tier: tier, index: l.index, userWalletAddress: userWalletAddress}))}>Cast Veto</Button>
+                ? (
+                  <Button
+                    small
+                    red
+                    onClick={() => dispatch(legislationActions.revertVeto.call({
+                      tier, index: l.index, userWalletAddress,
+                    }))}
+                  >
+                    Revert Veto
+                  </Button>
+                )
+                : (
+                  <Button
+                    small
+                    primary
+                    onClick={() => dispatch(legislationActions.castVeto.call({
+                      tier, index: l.index, userWalletAddress,
+                    }))}
+                  >
+                    Cast Veto
+                  </Button>
+                )
             }
+            { tier === '1' && <RepealLegislationButton tier={tier} index={l.index} /> }
           </div>
         </div>
       </div>
