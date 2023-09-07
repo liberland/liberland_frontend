@@ -5,6 +5,8 @@ export const {
   getCongressCandidates,
   getMotions,
   voteAtMotions,
+  congressSendLlm,
+  congressSendLlmToPolitipool,
 } = createActions({
   APPLY_FOR_CONGRESS: {
     call: undefined,
@@ -22,6 +24,16 @@ export const {
     failure: undefined,
   },
   VOTE_AT_MOTIONS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_SEND_LLM: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_SEND_LLM_TO_POLITIPOOL: {
     call: undefined,
     success: undefined,
     failure: undefined,

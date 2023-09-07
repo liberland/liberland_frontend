@@ -5,6 +5,8 @@ import { congressActions, blockchainActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import {
   applyForCongress,
+  congressSendLlm,
+  congressSendLlmToPolitipool,
   getCongressCandidates,
   getMotions,
   voteAtMotions,
@@ -65,9 +67,53 @@ function* voteAtMotionsWorker(action) {
   }
 }
 
+function* congressSendLlmWorker({
+  payload: {
+    transferToAddress, transferAmount,
+  },
+}) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+  const { errorData } = yield cps(congressSendLlm, {
+    walletAddress, transferToAddress, transferAmount,
+  });
+  if (errorData.isError) {
+    yield put(
+      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
+    );
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(congressActions.congressSendLlm.failure(errorData));
+  } else {
+    yield put(congressActions.congressSendLlm.success());
+  }
+}
+
+function* congressSendLlmToPolitipoolWorker({
+  payload: {
+    transferToAddress, transferAmount,
+  },
+}) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+  const { errorData } = yield cps(congressSendLlmToPolitipool, {
+    walletAddress, transferToAddress, transferAmount,
+  });
+  if (errorData.isError) {
+    yield put(
+      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
+    );
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(congressActions.congressSendLlmToPolitipool.failure(errorData));
+  } else {
+    yield put(congressActions.congressSendLlmToPolitipool.success());
+  }
+}
+
 // WATCHERS
 
-function* applyForCongressWatcher() {
+export function* applyForCongressWatcher() {
   try {
     yield takeLatest(
       congressActions.applyForCongress.call,
@@ -78,7 +124,7 @@ function* applyForCongressWatcher() {
   }
 }
 
-function* getCongressCandidatesWatcher() {
+export function* getCongressCandidatesWatcher() {
   try {
     yield takeLatest(
       congressActions.getCongressCandidates.call,
@@ -89,7 +135,7 @@ function* getCongressCandidatesWatcher() {
   }
 }
 
-function* getMotionsWatcher() {
+export function* getMotionsWatcher() {
   try {
     yield takeLatest(congressActions.getMotions.call, getMotionsWorker);
   } catch (e) {
@@ -97,7 +143,7 @@ function* getMotionsWatcher() {
   }
 }
 
-function* voteAtMotionsWatcher() {
+export function* voteAtMotionsWatcher() {
   try {
     yield takeLatest(congressActions.voteAtMotions.call, voteAtMotionsWorker);
   } catch (e) {
@@ -105,9 +151,24 @@ function* voteAtMotionsWatcher() {
   }
 }
 
-export {
-  applyForCongressWatcher,
-  getCongressCandidatesWatcher,
-  getMotionsWatcher,
-  voteAtMotionsWatcher,
-};
+export function* congressSendLlmWatcher() {
+  try {
+    yield takeLatest(
+      congressActions.congressSendLlm.call,
+      congressSendLlmWorker,
+    );
+  } catch (e) {
+    yield put(congressActions.congressSendLlm.failure(e));
+  }
+}
+
+export function* congressSendLlmToPolitipoolWatcher() {
+  try {
+    yield takeLatest(
+      congressActions.congressSendLlmToPolitipool.call,
+      congressSendLlmToPolitipoolWorker,
+    );
+  } catch (e) {
+    yield put(congressActions.congressSendLlmToPolitipool.failure(e));
+  }
+}
