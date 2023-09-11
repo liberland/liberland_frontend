@@ -26,6 +26,22 @@ const crossReference = (blockchainData, centralizedData) => {
   ))
 };
 
+const submitExtrinsic = async (extrinsic, walletAddress) => {
+  const api = await getApi();
+  const { signer } = await web3FromAddress(walletAddress);
+  return await new Promise((resolve, reject) => {
+    extrinsic.signAndSend(walletAddress, { signer }, ({ status, events, dispatchError }) => {
+      const errorData = handleMyDispatchErrors(dispatchError, api)
+      if (status.isInBlock) {
+        const blockHash = status.asInBlock.toString();
+        console.log(errorData, events);
+        if(errorData.isError) reject({ blockHash, status, events, errorData });
+        else resolve({ blockHash, status, events });
+      }
+    });
+  });
+}
+
 const getIdentity = async (address) => {
   try {
     const api = await getApi();
@@ -1639,6 +1655,40 @@ const stakingBondExtra = async (value, walletAddress, callback) => {
   });
 }
 
+const stakingUnbond = async (value, walletAddress) => {
+  const api = await getApi();
+  return await submitExtrinsic(api.tx.staking.unbond(value), walletAddress);
+}
+
+const stakingWithdrawUnbonded = async (walletAddress) => {
+  const api = await getApi();
+  const ledger = await api.query.staking.ledger(walletAddress);
+  if (ledger.isNone) throw new Error("Account isn't a stash controller!");
+
+  const spans = await api.query.staking.slashingSpans(ledger.unwrap().stash);
+  const spanCount = spans.isSome ? spans.unwrap().prior.length + 1 : 0;
+
+  return await submitExtrinsic(api.tx.staking.withdrawUnbonded(spanCount), walletAddress);
+}
+
+const subscribeActiveEra = async (onNewEra) => {
+  try {
+    const api = await getApi();
+    const unsub = await api.query.staking.activeEra(onNewEra);
+    return unsub;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('error', e);
+  }
+  return null;
+};
+
+const getStakingBondingDuration = async () => {
+  const api = await getApi();
+  return api.consts.staking.bondingDuration;
+}
+
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1705,4 +1755,8 @@ export {
   voteAtMotions,
   congressSendLlm,
   congressSendLlmToPolitipool,
+  stakingUnbond,
+  stakingWithdrawUnbonded,
+  subscribeActiveEra,
+  getStakingBondingDuration,
 };

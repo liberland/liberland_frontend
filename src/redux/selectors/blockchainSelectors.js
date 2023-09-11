@@ -22,6 +22,10 @@ const blockNumber = createSelector(
   blockchainReducer,
   (reducer) => reducer.currentBlockNumber,
 );
+const activeEra = createSelector(
+  blockchainReducer,
+  (reducer) => reducer.activeEra,
+);
 
 export {
   allWalletsSelector,
@@ -29,4 +33,5 @@ export {
   errorExistsAndUnacknowledgedByUser,
   blockchainError,
   blockNumber,
+  activeEra,
 };

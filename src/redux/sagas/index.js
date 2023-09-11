@@ -23,6 +23,7 @@ export default function* rootSaga() {
     blockchainSagas.subscribeBestBlockNumberSaga(),
     blockchainSagas.getAllWalletsWatcher(),
     blockchainSagas.clearErrorsWatcher(),
+    blockchainSagas.subscribeActiveEraSaga(),
 
     // WALLET
     walletSagas.getWalletWatcher(),
@@ -90,6 +91,9 @@ export default function* rootSaga() {
     validatorSagas.chillWatcher(),
     validatorSagas.createValidatorWatcher(),
     validatorSagas.stakeLldWatcher(),
+    validatorSagas.getBondingDurationWatcher(),
+    validatorSagas.unbondWatcher(),
+    validatorSagas.withdrawUnbondedWatcher(),
 
     // CONGRESS
     congressSagas.applyForCongressWatcher(),

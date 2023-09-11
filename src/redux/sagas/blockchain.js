@@ -2,11 +2,11 @@ import {
   put, call, takeLatest, take,
 } from 'redux-saga/effects';
 import { web3Enable } from '@polkadot/extension-dapp';
-import { blockchainActions } from '../actions';
 import { eventChannel } from 'redux-saga';
-import { subscribeBestBlockNumber, getAllWalletsRpc } from '../../api/nodeRpcCall';
+import { blockchainActions } from '../actions';
+import { subscribeActiveEra, subscribeBestBlockNumber, getAllWalletsRpc } from '../../api/nodeRpcCall';
 
-const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
+const delay = (time) => new Promise((resolve) => { setTimeout(resolve, time); });
 
 // WORKERS
 
@@ -18,7 +18,7 @@ function* getAllWalletsWorker() {
       // Hack, is caused by web3Enable needing a fully loaded page to work,
       // but i am not sure how to do it other way without larger refactor
       while (retryCounter < 30 && extensions.length === 0) {
-        ++retryCounter;
+        retryCounter += 1;
         yield call(delay, 1000);
         extensions = yield call(web3Enable, 'Liberland dapp');
       }
@@ -59,9 +59,9 @@ function* clearErrorsWatcher() {
 }
 
 function* subscribeBestBlockNumberSaga() {
-  const channel = eventChannel(emitter => {
+  const channel = eventChannel((emitter) => {
     const unsubPromise = subscribeBestBlockNumber(emitter);
-    return () => unsubPromise.then(unsub => unsub());
+    return () => unsubPromise.then((unsub) => unsub());
   });
 
   while (true) {
@@ -70,9 +70,21 @@ function* subscribeBestBlockNumberSaga() {
   }
 }
 
+function* subscribeActiveEraSaga() {
+  const channel = eventChannel((emitter) => {
+    const unsubPromise = subscribeActiveEra(emitter);
+    return () => unsubPromise.then((unsub) => unsub());
+  });
+
+  while (true) {
+    const activeEra = yield take(channel);
+    yield put(blockchainActions.activeEra.value(activeEra));
+  }
+}
 
 export {
   getAllWalletsWatcher,
   clearErrorsWatcher,
   subscribeBestBlockNumberSaga,
+  subscribeActiveEraSaga,
 };
