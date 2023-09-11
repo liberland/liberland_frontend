@@ -41,3 +41,8 @@ export const stakerRewards = createSelector(
   validatorReducer,
   (reducer) => reducer.stakerRewards,
 );
+
+export const bondingDuration = createSelector(
+  validatorReducer,
+  (reducer) => reducer.bondingDuration,
+);

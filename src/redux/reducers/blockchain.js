@@ -1,4 +1,5 @@
 import { handleActions } from 'redux-actions';
+import { BN_ZERO } from '@polkadot/util';
 import { blockchainActions } from '../actions';
 
 const initialState = {
@@ -12,6 +13,10 @@ const initialState = {
   userWalletAddress: '',
   errorExistsAndUnacknowledgedByUser: false,
   error: '',
+  activeEra: {
+    index: BN_ZERO,
+    start: BN_ZERO,
+  },
 };
 
 const blockchainReducer = handleActions({
@@ -40,6 +45,10 @@ const blockchainReducer = handleActions({
     errorExistsAndUnacknowledgedByUser: action.payload,
   }),
   [blockchainActions.setError.success]: (state, action) => ({
+    ...state,
+    error: action.payload,
+  }),
+  [blockchainActions.activeEra.value]: (state, action) => ({
     ...state,
     error: action.payload,
   }),

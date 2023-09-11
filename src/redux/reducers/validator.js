@@ -1,4 +1,5 @@
 import { handleActions, combineActions } from 'redux-actions';
+import { BN_ZERO } from '@polkadot/util';
 import { validatorActions } from '../actions';
 
 const initialState = {
@@ -16,6 +17,7 @@ const initialState = {
   unappliedSlashes: null,
   payee: null,
   nominators: [],
+  bondingDuration: BN_ZERO,
 };
 
 const validatorReducer = handleActions({
@@ -33,6 +35,9 @@ const validatorReducer = handleActions({
     validatorActions.getNominators.call,
     validatorActions.getStakerRewards.call,
     validatorActions.stakeLld.call,
+    validatorActions.getBondingDuration.call,
+    validatorActions.unbond.call,
+    validatorActions.withdrawUnbonded.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -58,6 +63,10 @@ const validatorReducer = handleActions({
     validatorActions.getStakerRewards.success,
     validatorActions.getStakerRewards.failure,
     validatorActions.stakeLld.failure,
+    validatorActions.getBondingDuration.success,
+    validatorActions.getBondingDuration.failure,
+    validatorActions.unbond.failure,
+    validatorActions.withdrawUnbonded.failure,
   )]: (state) => ({
     ...state,
     loading: false,
@@ -95,6 +104,10 @@ const validatorReducer = handleActions({
   [validatorActions.getStakerRewards.success]: (state, action) => ({
     ...state,
     stakerRewards: action.payload.stakerRewards,
+  }),
+  [validatorActions.getBondingDuration.success]: (state, action) => ({
+    ...state,
+    bondingDuration: action.payload.bondingDuration,
   }),
 }, initialState);
 

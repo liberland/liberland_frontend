@@ -10,7 +10,11 @@ import {
   setSessionKeys,
   getStakingPayee, setStakingPayee,
   stakingValidate, stakingChill, stakingBond, stakingBondExtra,
+  getStakingBondingDuration,
+  stakingUnbond,
+  stakingWithdrawUnbonded,
 } from '../../api/nodeRpcCall';
+import { blockchainWatcher } from './base';
 
 import { blockchainActions, validatorActions, walletActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
@@ -26,7 +30,11 @@ function* payoutWorker() {
       .map(({ era, validators }) => Object.keys(validators).map((validator) => ({ era, validator })))
       .flatten();
 
-    if (rewards.length === 0) throw { details: 'No unpaid staking rewards pending' };
+    if (rewards.length === 0) {
+      const e = new Error('No unpaid staking rewards pending');
+      e.details = e.message;
+      throw e;
+    }
 
     const chunkSize = 10;
     for (let i = 0; i < rewards.length; i += chunkSize) {
@@ -78,15 +86,18 @@ function* getInfoWorker() {
       isNextSessionValidator: null,
       isStakingValidator: null,
       isNominator: null,
+      unlocking: null,
     }));
   } else {
-    const stash = ledgerRaw.unwrap().stash.toString();
+    const ledger = ledgerRaw.unwrap();
+    const stash = ledger.stash.toString();
     yield put(validatorActions.getInfo.success({
       stash,
       isSessionValidator: sessionValidators.includes(stash),
       isNextSessionValidator: nextSessionValidators.includes(stash),
       isStakingValidator: stakingValidators.includes(stash),
       isNominator: nominators.includes(stash),
+      unlocking: ledger.unlocking,
     }));
   }
 }
@@ -260,6 +271,27 @@ function* stakeLldWorker(action) {
   }
 }
 
+function* getBondingDurationWorker() {
+  const bondingDuration = yield call(getStakingBondingDuration);
+  yield put(validatorActions.getBondingDuration.success({ bondingDuration }));
+}
+
+function* unbondWorker(action) {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(stakingUnbond, action.payload.unbondValue, walletAddress);
+  yield put(validatorActions.unbond.success());
+  yield put(walletActions.getWallet.call());
+  yield put(validatorActions.getInfo.call());
+}
+
+function* withdrawUnbondedWorker() {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(stakingWithdrawUnbonded, walletAddress);
+  yield put(validatorActions.withdrawUnbonded.success());
+  yield put(walletActions.getWallet.call());
+  yield put(validatorActions.getInfo.call());
+}
+
 // WATCHERS
 
 function* payoutWatcher() {
@@ -366,6 +398,22 @@ function* stakeLldWatcher() {
   }
 }
 
+function* getBondingDurationWatcher() {
+  try {
+    yield takeLatest(validatorActions.getBondingDuration.call, getBondingDurationWorker);
+  } catch (e) {
+    yield put(validatorActions.getBondingDuration.failure(e));
+  }
+}
+
+function* unbondWatcher() {
+  yield* blockchainWatcher(validatorActions.unbond, unbondWorker);
+}
+
+function* withdrawUnbondedWatcher() {
+  yield* blockchainWatcher(validatorActions.withdrawUnbonded, withdrawUnbondedWorker);
+}
+
 export {
   payoutWatcher,
   getPendingRewardsWatcher,
@@ -380,4 +428,7 @@ export {
   chillWatcher,
   createValidatorWatcher,
   stakeLldWatcher,
+  getBondingDurationWatcher,
+  unbondWatcher,
+  withdrawUnbondedWatcher,
 };

@@ -11,6 +11,7 @@ import StakingRewardsDestinationModal from './StakingRewardsDestinationModal';
 import CreateValidatorModal from './CreateValidatorModal';
 import StakeLLDModal from './StakeLLDModal';
 import StartValidatorModal from './StartValidatorModal';
+import UnbondModal from './UnbondModal';
 
 export {
   GetCitizenshipModal,
@@ -26,4 +27,5 @@ export {
   CreateValidatorModal,
   StakeLLDModal,
   StartValidatorModal,
+  UnbondModal,
 };

@@ -10,6 +10,7 @@ export const {
   setErrorExistsAndUnacknowledgedByUser,
   getErrorExistsAndUnacknowledgedByUser,
   setError,
+  activeEra,
 } = createActions({
   BEST_BLOCK_NUMBER: {
     value: undefined,
@@ -53,5 +54,8 @@ export const {
     call: undefined,
     success: undefined,
     failure: undefined,
+  },
+  ACTIVE_ERA: {
+    value: undefined,
   },
 });

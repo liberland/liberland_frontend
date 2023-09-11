@@ -14,6 +14,9 @@ export const {
   chill,
   createValidator,
   stakeLld,
+  getBondingDuration,
+  unbond,
+  withdrawUnbonded,
 } = createActions({
   PAYOUT: {
     call: undefined,
@@ -76,6 +79,21 @@ export const {
     failure: undefined,
   },
   STAKE_LLD: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_BONDING_DURATION: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  UNBOND: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  WITHDRAW_UNBONDED: {
     call: undefined,
     success: undefined,
     failure: undefined,
