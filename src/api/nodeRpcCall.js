@@ -1901,6 +1901,17 @@ const congressProposeRepealLegislation = async (
   return await submitExtrinsic(extrinsic, walletAddress);
 }
 
+const congressSendTreasuryLld = async (transferToAddress, transferAmount, walletAddress) => {
+  const api = await getApi();
+
+  const threshold = await congressMajorityThreshold();
+  const proposal = api.tx.treasury.spend(transferAmount, transferToAddress);
+  const length = proposal.length;
+  
+  const extrinsic = api.tx.council.propose(threshold, proposal, length);
+  return await submitExtrinsic( extrinsic, walletAddress);
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1984,4 +1995,5 @@ export {
   closeCongressMotion,
   congressProposeLegislationReferendum,
   congressProposeRepealLegislation,
+  congressSendTreasuryLld,
 };

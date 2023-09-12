@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,6 +6,7 @@ import { BN_ZERO } from '@polkadot/util';
 import styles from './styles.module.scss';
 import { formatDollars } from '../../../utils/walletHelpers';
 import Button from '../../Button/Button';
+import TreasurySpendingMotionModalWrapper from '../../Modals/TreasurySpendingMotionModal';
 
 // REDUX
 import { congressActions } from '../../../redux/actions';
@@ -86,6 +87,9 @@ export default function Treasury() {
   const dispatch = useDispatch();
   const treasuryInfo = useSelector(congressSelectors.treasury);
 
+  const [isSpendingModalOpen, setIsSpendingModalOpen] = useState(false);
+  const handleSpendingModalOpen = () => setIsSpendingModalOpen(!isSpendingModalOpen);
+
   const members = useSelector(congressSelectors.members);
   const user = useSelector(blockchainSelectors.userWalletAddressSelector);
   const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
@@ -137,6 +141,12 @@ export default function Treasury() {
         {' '}
         LLD
       </div>
+      <Button primary small onClick={handleSpendingModalOpen}>
+        Propose spend
+      </Button>
+
+      {isSpendingModalOpen && <TreasurySpendingMotionModalWrapper closeModal={handleSpendingModalOpen} />}
+
       <div className={styles.proposalListHeader}>
         <div className={styles.listItemName}>
           ID

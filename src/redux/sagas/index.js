@@ -104,6 +104,7 @@ export default function* rootSaga() {
     congressSagas.congressRepealLegislationWatcher(),
     congressSagas.congressSendLlmToPolitipoolWatcher(),
     congressSagas.congressSendLlmWatcher(),
+    congressSagas.congressSendTreasuryLldWatcher(),
     congressSagas.getCandidatesWatcher(),
     congressSagas.getMembersWatcher(),
     congressSagas.getMotionsWatcher(),
