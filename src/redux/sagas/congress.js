@@ -12,6 +12,7 @@ import {
   congressRepealLegislation,
   congressSendLlm,
   congressSendLlmToPolitipool,
+  congressSendTreasuryLld,
   congressUnapproveTreasurySpend,
   getCongressCandidates,
   getCongressMembers,
@@ -275,6 +276,16 @@ function* congressProposeLegislationReferendumWorker({
   yield put(congressActions.getMotions.call());
 }
 
+function* congressSendTreasuryLldWorker({ payload: { transferToAddress, transferAmount } }) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  yield call(congressSendTreasuryLld, transferToAddress, transferAmount, walletAddress);
+
+  yield put(congressActions.congressSendTreasuryLld.success());
+}
+
 // WATCHERS
 
 export function* applyForCongressWatcher() {
@@ -421,5 +432,12 @@ export function* congressProposeLegislationReferendumWatcher() {
   yield* blockchainWatcher(
     congressActions.congressProposeLegislationReferendum,
     congressProposeLegislationReferendumWorker,
+  );
+}
+
+export function* congressSendTreasuryLldWatcher() {
+  yield* blockchainWatcher(
+    congressActions.congressSendTreasuryLld,
+    congressSendTreasuryLldWorker,
   );
 }

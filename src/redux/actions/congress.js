@@ -9,6 +9,7 @@ export const {
   congressRepealLegislation,
   congressSendLlm,
   congressSendLlmToPolitipool,
+  congressSendTreasuryLld,
   getCandidates,
   getMembers,
   getMotions,
@@ -55,6 +56,11 @@ export const {
     failure: undefined,
   },
   CONGRESS_SEND_LLM_TO_POLITIPOOL: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_SEND_TREASURY_LLD: {
     call: undefined,
     success: undefined,
     failure: undefined,
