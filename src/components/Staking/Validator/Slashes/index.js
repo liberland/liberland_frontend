@@ -5,6 +5,8 @@ import { formatDollars } from '../../../../utils/walletHelpers';
 import { validatorSelectors } from '../../../../redux/selectors';
 import { validatorActions } from '../../../../redux/actions';
 import Table from '../../../Table';
+import slashesIcon from '../../../../assets/icons/slashes.svg';
+import styles from './styles.module.scss';
 
 function SlashTable({ slashes }) {
   return (
@@ -56,20 +58,32 @@ export default function Slashes() {
 
   return (
     <>
-      {appliedSlashes?.length > 0
-        && (
-        <div>
-          Applied slashes:
-          <SlashTable slashes={appliedSlashes} />
+      {(appliedSlashes?.length > 0 || unappliedSlashes?.length > 0) && (
+        <div className={styles.headerWithIcon}>
+          <img
+            className={styles.slashesIcon}
+            src={slashesIcon}
+            width="16"
+            alt=""
+          />
+          {' '}
+          <h3>Slashes</h3>
         </div>
+      )}
+      <div className={styles.internalWrapper}>
+        {appliedSlashes?.length > 0 && (
+          <div>
+            <h4>Applied slashes:</h4>
+            <SlashTable slashes={appliedSlashes} />
+          </div>
         )}
-      {unappliedSlashes?.length > 0
-        && (
-        <div>
-          Unapplied slashes:
-          <SlashTable slashes={unappliedSlashes} />
-        </div>
+        {unappliedSlashes?.length > 0 && (
+          <div>
+            <h4>Unapplied slashes:</h4>
+            <SlashTable slashes={unappliedSlashes} />
+          </div>
         )}
+      </div>
     </>
   );
 }

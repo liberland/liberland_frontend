@@ -13,10 +13,10 @@ export default function Status() {
   else status = 'Stopped';
 
   return (
-    <div>
+    <>
       {status}
       {' '}
       {info.isNextSessionValidator && ' - scheduled for next session'}
-    </div>
+    </>
   );
 }

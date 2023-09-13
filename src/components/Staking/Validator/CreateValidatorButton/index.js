@@ -13,7 +13,7 @@ export default function CreateValidatorButton() {
 
   return (
     <>
-      <Button small secondary onClick={handleModalOpen}>
+      <Button small primary onClick={handleModalOpen}>
         Create Validator
       </Button>
       {isModalOpen && <CreateValidatorModal closeModal={handleModalOpen} />}
