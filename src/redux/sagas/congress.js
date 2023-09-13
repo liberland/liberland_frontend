@@ -3,7 +3,12 @@ import {
 } from 'redux-saga/effects';
 import { congressActions, blockchainActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
-import { applyForCongress, getCongressCandidates } from '../../api/nodeRpcCall';
+import {
+  applyForCongress,
+  getCongressCandidates,
+  getMotions,
+  voteAtMotions,
+} from '../../api/nodeRpcCall';
 
 // WORKERS
 
@@ -30,6 +35,36 @@ function* getCongressCandidatesWorker() {
   yield put(congressActions.getCongressCandidates.success(candidates));
 }
 
+function* getMotionsWorker() {
+  const motions = yield call(getMotions);
+  yield put(congressActions.getMotions.success(motions));
+}
+
+function* voteAtMotionsWorker(action) {
+  const { readableProposal, index, vote } = action.payload;
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  const { errorData } = yield cps(
+    voteAtMotions,
+    walletAddress,
+    readableProposal,
+    index,
+    vote,
+  );
+  if (errorData.isError) {
+    yield put(
+      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
+    );
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(congressActions.voteAtMotions.failure(errorData));
+  } else {
+    yield put(congressActions.getMotions.call());
+    yield put(congressActions.voteAtMotions.success());
+  }
+}
+
 // WATCHERS
 
 function* applyForCongressWatcher() {
@@ -53,4 +88,26 @@ function* getCongressCandidatesWatcher() {
     yield put(congressActions.getCongressCandidates.failure(e));
   }
 }
-export { applyForCongressWatcher, getCongressCandidatesWatcher };
+
+function* getMotionsWatcher() {
+  try {
+    yield takeLatest(congressActions.getMotions.call, getMotionsWorker);
+  } catch (e) {
+    yield put(congressActions.getMotions.failure(e));
+  }
+}
+
+function* voteAtMotionsWatcher() {
+  try {
+    yield takeLatest(congressActions.voteAtMotions.call, voteAtMotionsWorker);
+  } catch (e) {
+    yield put(congressActions.voteAtMotions.failure(e));
+  }
+}
+
+export {
+  applyForCongressWatcher,
+  getCongressCandidatesWatcher,
+  getMotionsWatcher,
+  voteAtMotionsWatcher,
+};

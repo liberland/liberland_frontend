@@ -11,3 +11,8 @@ export const congressCandidates = createSelector(
   congressReducer,
   (reducer) => reducer.congressCandidates,
 );
+
+export const congressMotions = createSelector(
+  congressReducer,
+  (reducer) => reducer.motions,
+);

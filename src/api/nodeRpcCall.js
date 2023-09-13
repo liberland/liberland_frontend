@@ -1305,6 +1305,25 @@ const getBlockEvents = async (blockHash) => {
   }
 }
 
+const getMotions = async () => {
+  const api = await getApi();
+  const proposals = await api.query.council.proposals()
+  
+  return await Promise.all(
+    proposals.map(async proposal => {
+      const [proposalOf, voting] = await api.queryMulti([
+        [api.query.council.proposalOf, proposal],
+        [api.query.council.voting, proposal]
+      ])
+      return {
+        proposal,
+        proposalOf,
+        voting,
+      }
+    })
+  )
+}
+
 const getCongressCandidates = async () => {
   const api = await getApi();
   const electionsCandidates = await api.query.elections.candidates()
@@ -1330,6 +1349,28 @@ const applyForCongress = async (walletAddress, callback) => {
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( elections.submitCandidacy transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
+const voteAtMotions = async (walletAddress, readableProposal, index, vote, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+  const extrinsic = api.tx.council.vote(readableProposal, index, vote);
+
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed council.vote at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( council.vote transaction failed', error);
     callback({ isError: true, details: error.toString() });
   });
 }
@@ -1636,4 +1677,6 @@ export {
   bondAndValidate,
   stakingBond,
   stakingBondExtra,
+  getMotions,
+  voteAtMotions,
 };
