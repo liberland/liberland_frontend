@@ -1,11 +1,10 @@
 import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import axios from 'axios';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import {dollarsToGrains, meritsToGrains} from '../utils/walletHelpers';
 import {handleMyDispatchErrors} from "../utils/therapist";
 import {newCompanyDataObject} from "../utils/defaultData";
-import {walletActions} from "../redux/actions";
+import * as centralizedBackend from './backend';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -129,16 +128,6 @@ const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress, callback) =>
     console.error(':( transaction failed', error);
     callback({ isError: true, details: error.toString() });
   });
-}
-
-const bridgeMinTransfer = async (asset) => {
-  const api = await getApi();
-  let bridge;
-  if (asset == "LLM") bridge = api.consts.ethLLMBridge;
-  else if (asset == "LLD") bridge = api.consts.ethLLDBridge;
-  else throw new Exception("Unknown asset");
-
-  return bridge.minTransfer;
 }
 
 const bridgeConstants = async (asset) => {
@@ -633,7 +622,6 @@ const undelegateDemocracy = async (walletAddress, callback) => {
 
 const getDemocracyReferendums = async (address) => {
   try {
-    const ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
     const api = await getApi();
     const [
       proposals,
@@ -666,17 +654,7 @@ const getDemocracyReferendums = async (address) => {
       }
     ));
 
-    // TODO REFACTOR
-    let centralizedReferendumsData = [];
-    const api2 = axios.create({
-      baseURL: process.env.REACT_APP_API2,
-      withCredentials: true,
-    });
-    api2.defaults.headers.common['X-token'] = ssoAccessTokenHash;
-
-    await api2.get('/referenda').then((result) => {
-      centralizedReferendumsData = result.data;
-    });
+    let centralizedReferendumsData = await centralizedBackend.getReferenda();
 
     const crossReferencedReferendumsData = crossReference(
       apideriveReferendums,
@@ -688,7 +666,6 @@ const getDemocracyReferendums = async (address) => {
       centralizedReferendumsData,
     );
 
-    // const referendums = api.query.democracy.publicProps();
     return {
       proposalData,
       apideriveReferendums,
@@ -770,18 +747,9 @@ const submitProposal = async (walletAddress, values, callback) => {
   const injector = await web3FromAddress(walletAddress);
   const nextChainIndexQuery = await api.query.democracy.referendumCount();
   const nextChainIndex = nextChainIndexQuery.toHuman();
-  const ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
-  // TODO REFACTOR
-  const api2 = axios.create({
-    baseURL: process.env.REACT_APP_API2,
-    withCredentials: true,
-  });
-  api2.defaults.headers.common['X-Token'] = ssoAccessTokenHash;
 
-  const centralizedMetadata = await api2.post('/referenda', {
-    // username: 'username',
+  const centralizedMetadata = await centralizedBackend.addReferendum({
     link: values.forumLink,
-    // personId: 10,
     chainIndex: nextChainIndex,
     name: 'Hardcoded server name',
     description: values.legislationContent,

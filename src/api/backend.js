@@ -39,3 +39,18 @@ export const addMeritTransaction = async (userId, amount) => {
     comment: "User onboarding on blockchain",
   })
 }
+
+export const getReferenda = async () => {
+  const api = getApi();
+  const { data } = await api.get("/referenda");
+  return data;
+}
+
+export const addReferendum = async ({
+  link, chainIndex, name, description, hash, additionalMetadata, proposerAddress
+}) => {
+  const api = getApi();
+  return await api.post('/referenda', {
+    link, chainIndex, name, description, hash, additionalMetadata, proposerAddress
+  });
+}
