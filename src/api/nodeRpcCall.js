@@ -1343,6 +1343,62 @@ const voteAtMotions = async (walletAddress, readableProposal, index, vote, callb
   });
 }
 
+const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmount }, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+
+  const councilMembers = await api.query.council.members()
+  const threshold = Math.ceil(councilMembers.length / 2)
+  
+  const executeProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
+  const proposal = api.tx.councilAccount.execute(executeProposal);
+  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed congress.propose for councilAccount.execute for llm.sendLlm at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( congress.propose for councilAccount.execute for llm.sendLlm transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
+const congressSendLlmToPolitipool = async ({ walletAddress, transferToAddress, transferAmount }, callback) => {
+  const api = await getApi();
+  const injector = await web3FromAddress(walletAddress);
+
+  const councilMembers = await api.query.council.members()
+  const threshold = Math.ceil(councilMembers.length / 2)
+
+  const executeProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
+  const proposal = api.tx.councilAccount.execute(executeProposal);
+  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+
+  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
+    let errorData = handleMyDispatchErrors(dispatchError, api)
+    if (status.isInBlock) {
+      // eslint-disable-next-line no-console
+      console.log(`Completed congress.propose for councilAccount.execute for llm.sendLlmToPolitipool at block hash #${status.asInBlock.toString()}`);
+      callback(null, {
+        blockHash: status.asInBlock.toString(),
+        errorData
+      });
+    }
+  }).catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error(':( congress.propose for councilAccount.execute for llm.sendLlmToPolitipool transaction failed', error);
+    callback({ isError: true, details: error.toString() });
+  });
+}
+
 const batchPayoutStakers = async (targets, walletAddress, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
@@ -1647,4 +1703,6 @@ export {
   stakingBondExtra,
   getMotions,
   voteAtMotions,
+  congressSendLlm,
+  congressSendLlmToPolitipool,
 };

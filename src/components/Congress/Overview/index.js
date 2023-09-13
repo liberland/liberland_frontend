@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../Button/Button';
 
@@ -8,6 +8,7 @@ import {
   congressSelectors,
   blockchainSelectors,
 } from '../../../redux/selectors';
+import SpendingMotionModal from '../../Modals/SpendingMotionModal';
 
 export default function Overview() {
   const dispatch = useDispatch();
@@ -17,6 +18,9 @@ export default function Overview() {
   useEffect(() => {
     dispatch(congressActions.getCongressCandidates.call());
   }, [dispatch]);
+
+  const [isSpendingModalOpen, setIsSpendingModalOpen] = useState(false);
+  const handleSpendingModalOpen = () => setIsSpendingModalOpen(!isSpendingModalOpen);
 
   return (
     <div>
@@ -29,6 +33,14 @@ export default function Overview() {
           Apply for Congress
         </Button>
       )}
+      <Button
+        medium
+        primary
+        onClick={handleSpendingModalOpen}
+      >
+        Create new spending
+      </Button>
+      {isSpendingModalOpen && <SpendingMotionModal closeModal={handleSpendingModalOpen} />}
     </div>
   );
 }
