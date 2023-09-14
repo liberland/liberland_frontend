@@ -1,31 +1,36 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { officesActions } from '../../../redux/actions';
 import { officesSelectors } from '../../../redux/selectors';
-import styles from './styles.module.scss';
-import Table from "../../Table";
-import { useDispatch, useSelector } from 'react-redux';
+import Table from '../../Table';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
+import { palletIdToAddress } from '../../../utils/pallet';
 
-const ACCOUNTS = [
+const DEFAULT_ACCOUNTS = [
   {
-    name: "Vault",
-    address: "5EYCAe5hvejUE1BUTDSnxDfCqVkADRicSKqbcJrduV1KCDmk",
+    name: 'Vault',
+    // source: frame/llm/src/lib.rs
+    palletId: 'llm/safe',
   },
   {
-    name: "Senate",
-    address: "5EYCAe5hveooUENA5d7dwq3caqM4LLBzktNumMKmhNRXu4JE",
+    name: 'Senate',
+    // source: frame/llm/src/lib.rs
+    palletId: 'lltreasu',
+  },
+];
+
+const DYNAMIC_ACCOUNTS = [
+  {
+    name: 'Citizenship Office',
+    codeName: 'identityOffice',
   },
   {
-    name: "Citizenship Office",
-    address: "5EYCAe5iXF2YZuVZv1vig4xvf1CcDVocZCWYrv3TVSXpMTYA",
+    name: 'Treasury',
+    codeName: 'treasury',
   },
   {
-    name: "Treasury",
-    address: "5EYCAe5ijiYfyeZ2JJCGq56LmPyNRAKzpG4QkoQkkQNB5e6Z",
-  },
-  {
-    name: "Congress",
-    address: "5EYCAe5g8CDuMsTief7QBxfvzDFEfws6ueXTUhsbx5V81nGH",
+    name: 'Congress',
+    codeName: 'councilAccount',
   },
   // FIXME 1 LLD faucet
 ];
@@ -33,37 +38,62 @@ const ACCOUNTS = [
 export default function Finances() {
   const dispatch = useDispatch();
   const balances = useSelector(officesSelectors.selectorBalances);
+  const pallets = useSelector(officesSelectors.selectorPallets);
+  const [accountsAddresses, setAccountsAddresses] = useState([]);
 
   useEffect(() => {
-    dispatch(officesActions.getBalances.call(ACCOUNTS.map(a => a.address)));
-  }, [])
+    dispatch(officesActions.getPalletIds.call());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (pallets) {
+      const palletIdsToFetchBalancesFor = [
+        ...DEFAULT_ACCOUNTS,
+        ...DYNAMIC_ACCOUNTS.map((account) => pallets.find((e) => e.palletName === account.codeName)),
+      ];
+
+      const palletsAndAddresses = palletIdsToFetchBalancesFor.map(
+        (palletData) => ({
+          ...palletData,
+          address: palletIdToAddress(palletData.palletId),
+        }),
+      );
+      setAccountsAddresses(palletsAndAddresses);
+
+      const addressesToFetchBalancesFor = palletsAndAddresses.map(
+        ({ address }) => address,
+      );
+      dispatch(officesActions.getBalances.call(addressesToFetchBalancesFor));
+    }
+  }, [dispatch, pallets]);
+
+  if (!pallets || !balances) return 'Loading...';
 
   return (
     <Table
       columns={[
         {
-          Header: "Name",
-          accessor: "name",
+          Header: 'Name',
+          accessor: 'name',
         },
         {
-          Header: "Address",
-          accessor: "address"
+          Header: 'Address',
+          accessor: 'address',
         },
         {
-          Header: "LLM Balance",
-          accessor: "llm"
+          Header: 'LLM Balance',
+          accessor: 'llm',
         },
         {
-          Header: "LLD Balance",
-          accessor: "lld"
+          Header: 'LLD Balance',
+          accessor: 'lld',
         },
       ]}
-      data={ACCOUNTS.map(a => {
-        return Object.assign(a, {
-          llm: formatMerits(balances.LLM[a.address] ?? 0) + ' LLM',
-          lld: formatDollars(balances.LLD[a.address] ?? 0) + ' LLD',
-        })
-      })}
+      data={accountsAddresses.map((a) => ({
+        ...a,
+        llm: `${formatMerits(balances.LLM[a.address] ?? 0)} LLM`,
+        lld: `${formatDollars(balances.LLD[a.address] ?? 0)} LLD`,
+      }))}
     />
   );
-};
+}

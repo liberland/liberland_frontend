@@ -10,6 +10,7 @@ import {
   registerCompany,
   getLlmBalances,
   getLldBalances,
+  getPalletIds,
 } from '../../api/nodeRpcCall';
 
 import { officesActions, blockchainActions } from '../actions';
@@ -23,12 +24,12 @@ function* getIdentityWorker(action) {
     const backendUsers = yield call(backend.getUsersByAddress, action.payload);
     if (backendUsers.length > 1) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success({ details: "More than one user has the same address?"}));
+      yield put(blockchainActions.setError.success({ details: 'More than one user has the same address?' }));
       return;
     }
     yield put(officesActions.officeGetIdentity.success({ onchain, backend: backendUsers[0] }));
   } catch (e) {
-    console.error(e)
+    console.error(e);
     yield put(officesActions.officeGetIdentity.failure(e));
   }
 }
@@ -36,31 +37,31 @@ function* getIdentityWorker(action) {
 function* provideJudgementAndAssetsWorker(action) {
   try {
     if ((action.payload.merits || action.payload.dollars) && !action.payload.uid) {
-      throw new Error("Tried to transfer LLD or LLM but we have no user id!");
+      throw new Error('Tried to transfer LLD or LLM but we have no user id!');
     }
 
     const { errorData } = yield cps(provideJudgementAndAssets, action.payload);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
-      yield put(officesActions.provideJudgementAndAssets.failure())
+      yield put(officesActions.provideJudgementAndAssets.failure());
       return;
     }
 
     if (action.payload.merits?.gt(0)) {
       try {
-        yield call(backend.addMeritTransaction, action.payload.uid, action.payload.merits.mul(-1))
-      } catch(e) {
+        yield call(backend.addMeritTransaction, action.payload.uid, action.payload.merits.mul(-1));
+      } catch (e) {
         throw { details: e.response.data.error.message };
       }
     }
 
-    yield put(officesActions.provideJudgementAndAssets.success())
-    yield put(officesActions.officeGetIdentity.call(action.payload.address))
+    yield put(officesActions.provideJudgementAndAssets.success());
+    yield put(officesActions.officeGetIdentity.call(action.payload.address));
   } catch (errorData) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(officesActions.provideJudgementAndAssets.failure())
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(officesActions.provideJudgementAndAssets.failure());
   }
 }
 
@@ -90,15 +91,15 @@ function* registerCompanyworker(action) {
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
-      yield put(officesActions.registerCompany.failure())
+      yield put(officesActions.registerCompany.failure());
     } else {
-      yield put(officesActions.registerCompany.success())
-      yield put(officesActions.getCompanyRequest.call(action.payload.entity_id))
+      yield put(officesActions.registerCompany.success());
+      yield put(officesActions.getCompanyRequest.call(action.payload.entity_id));
     }
   } catch (errorData) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(officesActions.registerCompany.failure())
+    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(officesActions.registerCompany.failure());
   }
 }
 
@@ -110,6 +111,16 @@ function* getBalancesWorker(action) {
   } catch (e) {
     console.error(e);
     yield put(officesActions.getBalances.failure(e));
+  }
+}
+
+function* getPalletIdsWorker(action) {
+  try {
+    const pallets = yield call(getPalletIds, action.payload);
+    yield put(officesActions.getPalletIds.success(pallets));
+  } catch (e) {
+    console.error(e);
+    yield put(officesActions.getPalletIds.failure(e));
   }
 }
 
@@ -163,6 +174,14 @@ function* getBalancesWatcher() {
   }
 }
 
+function* getPalletIdsWatcher() {
+  try {
+    yield takeLatest(officesActions.getPalletIds.call, getPalletIdsWorker);
+  } catch (e) {
+    yield put(officesActions.getPalletIds.failure(e));
+  }
+}
+
 export {
   getIdentityWatcher,
   provideJudgementAndAssetsWatcher,
@@ -170,4 +189,5 @@ export {
   getCompanyRegistrationWatcher,
   registerCompanyWatcher,
   getBalancesWatcher,
+  getPalletIdsWatcher,
 };

@@ -28,6 +28,7 @@ const officesReducer = handleActions({
     officesActions.registerCompany.call,
     officesActions.getBalances.call,
     officesActions.provideJudgementAndAssets.call,
+    officesActions.getPalletIds.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -45,6 +46,7 @@ const officesReducer = handleActions({
     officesActions.registerCompany.failure,
     officesActions.getBalances.failure,
     officesActions.provideJudgementAndAssets.failure,
+    officesActions.getPalletIds.failure,
   )]: (state) => ({
     ...state,
     loading: false,
@@ -125,6 +127,10 @@ const officesReducer = handleActions({
   [officesActions.getBalances.failure]: (state) => ({
     ...state,
     balances: initialState.balances,
+  }),
+  [officesActions.getPalletIds.success]: (state, action) => ({
+    ...state,
+    pallets: action.payload,
   }),
 }, initialState);
 
