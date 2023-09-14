@@ -32,6 +32,11 @@ const selectorBackendAddressLLMBalance = createSelector(
   (reducer) => reducer.backendAddressLLMBalance,
 );
 
+const selectorPallets = createSelector(
+  officesReducer,
+  (reducer) => reducer.pallets,
+);
+
 export {
   selectorIdentity,
   selectorCompanyRequest,
@@ -39,4 +44,5 @@ export {
   selectorIsLoading,
   selectorBalances,
   selectorBackendAddressLLMBalance,
+  selectorPallets,
 };

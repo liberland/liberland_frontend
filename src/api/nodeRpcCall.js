@@ -1912,6 +1912,12 @@ const congressSendTreasuryLld = async (transferToAddress, transferAmount, wallet
   return await submitExtrinsic( extrinsic, walletAddress);
 }
 
+const getPalletIds = async () => {
+  const api = await getApi();
+  const pallets = Object.entries(api.consts).map(([palletName, palletConsts]) => ({palletName, palletId: palletConsts.palletId}))
+  return pallets.filter(pallet => pallet.palletId)
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1996,4 +2002,5 @@ export {
   congressProposeLegislationReferendum,
   congressProposeRepealLegislation,
   congressSendTreasuryLld,
+  getPalletIds,
 };

@@ -7,6 +7,7 @@ export const {
   getCompanyRegistration,
   registerCompany,
   getBalances,
+  getPalletIds,
 } = createActions({
   OFFICE_GET_IDENTITY: {
     call: undefined,
@@ -34,6 +35,11 @@ export const {
     failure: undefined,
   },
   GET_BALANCES: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_PALLET_IDS: {
     call: undefined,
     success: undefined,
     failure: undefined,
