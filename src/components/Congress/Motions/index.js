@@ -22,32 +22,29 @@ export default function Motions() {
 
   return (
     <div>
-      {motions.map(({ proposal, proposalOf, voting }) => {
-        const readableProposal = proposal.toHuman();
-        const readableProposalOf = proposalOf.toHuman();
-        const readableVoting = voting.toHuman();
-
-        return (
-          <Motion
-            key={readableProposal}
-            proposal={readableProposal}
-            proposalOf={readableProposalOf}
-            voting={readableVoting}
-          />
-        );
-      })}
+      {motions.map(({ proposal, proposalOf, voting }) => (
+        <Motion
+          key={proposal}
+          proposal={proposal.toString()}
+          proposalOf={proposalOf.unwrap()}
+          voting={voting.unwrap()}
+        />
+      ))}
     </div>
   );
 }
 
 function Motion({ proposal, proposalOf, voting }) {
   const dispatch = useDispatch();
-  const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const userAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+
+  const threshold = voting.threshold.toNumber();
+
+  const isClosable = voting.ayes.length >= threshold;
 
   return (
     <Card
-      key={proposal}
-      title={`${proposalOf.method}`}
+      title={`${proposalOf.section}.${proposalOf.method}`}
       className={styles.cardProposalsSection}
     >
       <div>
@@ -58,27 +55,37 @@ function Motion({ proposal, proposalOf, voting }) {
           </p>
           <p>
             Aye
+            {' '}
             <b>
               {voting.ayes.length}
               /
-              {voting.threshold}
+              {threshold}
             </b>
           </p>
         </div>
-        <p>
-          Threshold:
-          {voting.threshold}
-        </p>
 
         <pre>{JSON.stringify(proposalOf.args, null, 2)}</pre>
         <div className={styles.buttonsContainer}>
-          {!voting.ayes.includes(sender) && (
+          { isClosable && (
+            <Button
+              medium
+              primary
+              onClick={() => dispatch(
+                congressActions.closeMotion.call({
+                  proposal, index: voting.index,
+                }),
+              )}
+            >
+              Close & Execute
+            </Button>
+          )}
+          {!voting.ayes.map((v) => v.toString()).includes(userAddress) && !isClosable && (
             <Button
               medium
               primary
               onClick={() => dispatch(
                 congressActions.voteAtMotions.call({
-                  readableProposal: proposal,
+                  proposal,
                   index: voting.index,
                   vote: true,
                 }),
@@ -87,13 +94,13 @@ function Motion({ proposal, proposalOf, voting }) {
               Vote aye
             </Button>
           )}
-          {!voting.nays.includes(sender) && (
+          {!voting.nays.map((v) => v.toString()).includes(userAddress) && !isClosable && (
             <Button
               medium
               secondary
               onClick={() => dispatch(
                 congressActions.voteAtMotions.call({
-                  readableProposal: proposal,
+                  proposal,
                   index: voting.index,
                   vote: false,
                 }),
@@ -108,19 +115,19 @@ function Motion({ proposal, proposalOf, voting }) {
   );
 }
 
+/* eslint-disable react/forbid-prop-types */
 Motion.propTypes = {
   proposal: PropTypes.string.isRequired,
   proposalOf: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    args: PropTypes.object.isRequired,
+    args: PropTypes.array.isRequired,
     method: PropTypes.string.isRequired,
     section: PropTypes.string.isRequired,
   }).isRequired,
   voting: PropTypes.shape({
-    index: PropTypes.string.isRequired,
-    threshold: PropTypes.string.isRequired,
-    ayes: PropTypes.arrayOf(PropTypes.string).isRequired,
-    nays: PropTypes.arrayOf(PropTypes.string).isRequired,
-    end: PropTypes.string.isRequired,
+    index: PropTypes.object.isRequired,
+    threshold: PropTypes.object.isRequired,
+    ayes: PropTypes.arrayOf(PropTypes.object).isRequired,
+    nays: PropTypes.arrayOf(PropTypes.object).isRequired,
+    end: PropTypes.object.isRequired,
   }).isRequired,
 };

@@ -90,7 +90,7 @@ export default function Treasury() {
   const user = useSelector(blockchainSelectors.userWalletAddressSelector);
   const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
 
-  const userIsMember = members.map(m => m.toString()).includes(user);
+  const userIsMember = members.map((m) => m.toString()).includes(user);
 
   useEffect(() => {
     dispatch(congressActions.getMembers.call());

@@ -6,6 +6,7 @@ import { blockchainSelectors } from '../selectors';
 import {
   applyForCongress,
   congressApproveTreasurySpend,
+  closeCongressMotion,
   congressProposeLegislation,
   congressRepealLegislation,
   congressSendLlm,
@@ -54,7 +55,7 @@ function* getMotionsWorker() {
 }
 
 function* voteAtMotionsWorker(action) {
-  const { readableProposal, index, vote } = action.payload;
+  const { proposal, index, vote } = action.payload;
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
@@ -62,7 +63,7 @@ function* voteAtMotionsWorker(action) {
   const { errorData } = yield cps(
     voteAtMotions,
     walletAddress,
-    readableProposal,
+    proposal,
     index,
     vote,
   );
@@ -223,6 +224,13 @@ function* unapproveTreasurySpendWorker({ payload: { id } }) {
   yield put(congressActions.getTreasuryInfo.call());
 }
 
+function* closeMotionWorker({ payload: { proposal, index } }) {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(closeCongressMotion, proposal, index, walletAddress);
+  yield put(congressActions.closeMotion.success());
+  yield put(congressActions.getMotions.call());
+}
+
 // WATCHERS
 
 export function* applyForCongressWatcher() {
@@ -314,6 +322,7 @@ export function* getRunnersUpWatcher() {
     yield put(congressActions.getRunnersUp.failure(e));
   }
 }
+
 export function* congressProposeLegislationWatcher() {
   try {
     yield takeLatest(
@@ -355,4 +364,8 @@ export function* unapproveTreasurySpendWatcher() {
     congressActions.unapproveTreasurySpend,
     unapproveTreasurySpendWorker,
   );
+}
+
+export function* closeMotionWatcher() {
+  yield* blockchainWatcher(congressActions.closeMotion, closeMotionWorker);
 }

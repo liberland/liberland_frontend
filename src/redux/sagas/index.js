@@ -98,6 +98,7 @@ export default function* rootSaga() {
     // CONGRESS
     congressSagas.applyForCongressWatcher(),
     congressSagas.approveTreasurySpendWatcher(),
+    congressSagas.closeMotionWatcher(),
     congressSagas.congressProposeLegislationWatcher(),
     congressSagas.congressRepealLegislationWatcher(),
     congressSagas.congressSendLlmToPolitipoolWatcher(),

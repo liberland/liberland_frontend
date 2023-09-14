@@ -19,6 +19,7 @@ const congressReducer = handleActions(
   {
     [combineActions(
       congressActions.applyForCongress.call,
+      congressActions.closeMotion.call,
       congressActions.congressProposeLegislation.call,
       congressActions.congressRepealLegislation.call,
       congressActions.getCandidates.call,
@@ -36,6 +37,7 @@ const congressReducer = handleActions(
     [combineActions(
       congressActions.applyForCongress.failure,
       congressActions.approveTreasurySpend.failure,
+      congressActions.closeMotion.failure,
       congressActions.congressProposeLegislation.failure,
       congressActions.congressRepealLegislation.failure,
       congressActions.getCandidates.failure,

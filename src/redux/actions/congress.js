@@ -3,6 +3,7 @@ import { createActions } from 'redux-actions';
 export const {
   applyForCongress,
   approveTreasurySpend,
+  closeMotion,
   congressProposeLegislation,
   congressRepealLegislation,
   congressSendLlm,
@@ -22,6 +23,11 @@ export const {
     failure: undefined,
   },
   APPROVE_TREASURY_SPEND: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CLOSE_MOTION: {
     call: undefined,
     success: undefined,
     failure: undefined,
