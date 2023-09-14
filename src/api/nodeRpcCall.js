@@ -1809,17 +1809,7 @@ const congressUnapproveTreasurySpend = async (proposalId, walletAddress) => {
 const closeCongressMotion = async (proposalHash, index, walletAddress) => {
   const api = await getApi();
   const proposal = await api.query.council.proposalOf(proposalHash);
-  /* instead of setting weight to block max, the correct way to calculate
-   * weightBound would be:
-   * const { weight: weightBound } = await api.tx(proposal.unwrap()).paymentInfo(walletAddress);
-   * but this is broken in polkadot-js-api@9.x, and we can't update to
-   * polkadot-js-api@10.x as it would require Node.js v18+...
-   * BLOCKCHAIN-199
-   */
-  const weightBound = {
-    refTime: api.consts.system.blockWeights.maxBlock.refTime.unwrap().div(BN_TWO),
-    proofSize: api.consts.system.blockWeights.maxBlock.proofSize.unwrap().div(BN_TWO),
-  };
+  const { weight: weightBound } = await api.tx(proposal.unwrap()).paymentInfo(walletAddress);
   const lengthBound = proposal.unwrap().toU8a().length;
   return await submitExtrinsic(api.tx.council.close(proposalHash, index, weightBound, lengthBound), walletAddress);
 }
