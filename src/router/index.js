@@ -41,7 +41,7 @@ export default {
     overView: '/home/wallet/overview',
   },
   registries: {
-    overview: '/home/registries',
+    overview: '/home/registries/overview',
     companies: '/home/registries/companies',
     companiesCRUD: '/home/registries/companiesCRUD',
     land: '/home/registries/land',
@@ -49,10 +49,10 @@ export default {
     other: '/home/registries/other',
   },
   staking: {
-    overview: '/home/staking',
+    overview: '/home/staking/overview',
   },
   congress: {
-    overview: '/home/congress',
+    overview: '/home/congress/overview',
     motions: '/home/congress/motions',
   },
 };
