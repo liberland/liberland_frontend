@@ -48,7 +48,6 @@ export default function Overview() {
     <div className={styles.navWrapper}>
       <span>
         User congress status:
-        {' '}
         {userStatus}
       </span>
       {!senderIsCandidate && !senderIsMember && !senderIsRunnerUp && (
