@@ -26,3 +26,8 @@ export const runnersUp = createSelector(
   congressReducer,
   (reducer) => reducer.runnersUp,
 );
+
+export const treasury = createSelector(
+  congressReducer,
+  (reducer) => reducer.treasury,
+);
