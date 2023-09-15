@@ -8,7 +8,7 @@ export default function ProposeLegislationButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
   // requires parent to dispatch getCongressMembers action
-  const members = useSelector(congressSelectors.members);
+  const members = useSelector(congressSelectors.congressMembers);
   const user = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   const userIsMember = members.includes(user);
