@@ -1838,6 +1838,45 @@ const closeCongressMotion = async (proposalHash, index, walletAddress) => {
   return await submitExtrinsic(api.tx.council.close(proposalHash, index, weightBound, lengthBound), walletAddress);
 }
 
+const congressProposeLegislationReferendum = async (
+  tier,
+  index,
+  content,
+  fastTrack,
+  votingPeriod,
+  enactmentPeriod,
+  walletAddress,
+) => {
+  const api = await getApi();
+
+  const addLaw = api.tx.liberlandLegislation.addLaw(tier, index, content).method;
+  const referendumPropose = api.tx.democracy.externalProposeMajority({
+    Lookup: { 
+      hash_: addLaw.hash,
+      len: addLaw.encodedLength,
+    },
+  });
+  const proposal = fastTrack ?
+    api.tx.utility.batchAll([
+      referendumPropose,
+      api.tx.democracy.fastTrack(
+        addLaw.hash,
+        votingPeriod,
+        enactmentPeriod,
+      )
+    ])
+    :
+    referendumPropose;
+
+  const threshold = await congressMajorityThreshold();
+
+  const extrinsic = api.tx.utility.batchAll([
+    api.tx.preimage.notePreimage(addLaw.toHex()),
+    api.tx.council.propose(threshold, proposal, proposal.length),
+  ])
+  return await submitExtrinsic( extrinsic, walletAddress);
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1919,4 +1958,5 @@ export {
   getTreasurySpendPeriod,
   getTreasuryBudget,
   closeCongressMotion,
+  congressProposeLegislationReferendum,
 };
