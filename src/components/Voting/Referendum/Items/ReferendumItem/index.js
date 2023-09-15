@@ -7,24 +7,55 @@ import { formatPolkadotBalance } from '../../../../../utils/walletHelpers';
 
 const voteButtons = (buttonVoteCallback, referendumInfo) => (
   <div className={styles.buttonContainer}>
-    <Button small primary green className={styles.yayButton} onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}>Vote Aye</Button>
-    <Button small primary red className={styles.nayButton} onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}>Vote Nay</Button>
+    <Button
+      medium
+      primary
+      green
+      className={styles.yayButton}
+      onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}>
+      Vote Aye
+    </Button>
+    <Button
+      medium
+      primary
+      red
+      className={styles.nayButton} onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}>
+      Vote Nay
+    </Button>
   </div>
 );
 
-const alreadyVotedButton = (alreadyVoted) => (alreadyVoted === 'Aye'
-  ? (
-    <Button medium green>
-      You voted: &nbsp;
-      {alreadyVoted}
-    </Button>
-  )
-  : (
-    <Button medium red>
-      You voted: &nbsp;
-      {alreadyVoted}
-    </Button>
-  ));
+const alreadyVotedButton = (buttonVoteCallback, referendumInfo, alreadyVoted) => (
+  <div className={styles.buttonContainer}>
+    {alreadyVoted === 'Aye'
+      ? (
+        <>
+          <Button primary medium green className={styles.yayButton}>
+            You voted: &nbsp;
+            {alreadyVoted}
+          </Button>
+          <Button
+            medium
+            secondary
+            red
+            className={styles.nayButton}
+            onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}>
+            Change vote to Nay
+          </Button>
+        </>
+      )
+      : (
+        <>
+          <Button primary medium red className={styles.yayButton}>
+            You voted: &nbsp;
+            {alreadyVoted}
+          </Button>
+          <Button
+            medium secondary green className={styles.nayButton} onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}>Change vote to Aye</Button>
+        </>
+      )}
+  </div>
+);
 
 function ReferendumItem({
   name, createdBy, externalLink, description, yayVotes, nayVotes, hash, alreadyVoted, buttonVoteCallback, votingTimeLeft, referendumIndex, delegating,
@@ -81,12 +112,11 @@ function ReferendumItem({
         <div className={styles.buttonContainer}>
           {
             (alreadyVoted
-              ? alreadyVotedButton(alreadyVoted)
-              :
-              (
+              ? alreadyVotedButton(buttonVoteCallback, { name, referendumIndex }, alreadyVoted)
+              : (
                 delegating
-                ? "Undelegate to vote individually"
-                : voteButtons(buttonVoteCallback, { name, referendumIndex })
+                  ? 'Undelegate to vote individually'
+                  : voteButtons(buttonVoteCallback, { name, referendumIndex })
               )
             )
 
