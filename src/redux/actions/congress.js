@@ -2,32 +2,28 @@ import { createActions } from 'redux-actions';
 
 export const {
   applyForCongress,
-  getCongressCandidates,
-  getMotions,
-  voteAtMotions,
+  congressProposeLegislation,
+  congressRepealLegislation,
   congressSendLlm,
   congressSendLlmToPolitipool,
-  getCongressMembers,
-  renounceCandidacy,
+  getCandidates,
+  getMembers,
+  getMotions,
   getRunnersUp,
-  congressProposeLegislation,
+  renounceCandidacy,
+  voteAtMotions,
 } = createActions({
   APPLY_FOR_CONGRESS: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  GET_CONGRESS_CANDIDATES: {
+  CONGRESS_PROPOSE_LEGISLATION: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  GET_MOTIONS: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  VOTE_AT_MOTIONS: {
+  CONGRESS_REPEAL_LEGISLATION: {
     call: undefined,
     success: undefined,
     failure: undefined,
@@ -42,12 +38,17 @@ export const {
     success: undefined,
     failure: undefined,
   },
-  GET_CONGRESS_MEMBERS: {
+  GET_CANDIDATES: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  RENOUNCE_CANDIDACY: {
+  GET_MEMBERS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_MOTIONS: {
     call: undefined,
     success: undefined,
     failure: undefined,
@@ -57,7 +58,12 @@ export const {
     success: undefined,
     failure: undefined,
   },
-  CONGRESS_PROPOSE_LEGISLATION: {
+  RENOUNCE_CANDIDACY: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  VOTE_AT_MOTIONS: {
     call: undefined,
     success: undefined,
     failure: undefined,

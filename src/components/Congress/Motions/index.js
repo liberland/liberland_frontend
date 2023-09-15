@@ -14,7 +14,7 @@ import {
 
 export default function Motions() {
   const dispatch = useDispatch();
-  const motions = useSelector(congressSelectors.congressMotions);
+  const motions = useSelector(congressSelectors.motions);
 
   useEffect(() => {
     dispatch(congressActions.getMotions.call());

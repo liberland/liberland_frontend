@@ -5,15 +5,16 @@ import { congressActions, blockchainActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import {
   applyForCongress,
+  congressProposeLegislation,
+  congressRepealLegislation,
   congressSendLlm,
   congressSendLlmToPolitipool,
-  congressProposeLegislation,
   getCongressCandidates,
   getCongressMembers,
   getMotions,
-  voteAtMotions,
   getRunnersUp,
   renounceCandidacy,
+  voteAtMotions,
 } from '../../api/nodeRpcCall';
 
 // WORKERS
@@ -31,14 +32,14 @@ function* applyForCongressWorker() {
     yield put(blockchainActions.setError.success(errorData));
     yield put(congressActions.applyForCongress.failure(errorData));
   } else {
-    yield put(congressActions.getCongressCandidates.call());
+    yield put(congressActions.getCandidates.call());
     yield put(congressActions.applyForCongress.success());
   }
 }
 
-function* getCongressCandidatesWorker() {
+function* getCandidatesWorker() {
   const candidates = yield call(getCongressCandidates);
-  yield put(congressActions.getCongressCandidates.success(candidates));
+  yield put(congressActions.getCandidates.success(candidates));
 }
 
 function* getMotionsWorker() {
@@ -115,9 +116,9 @@ function* congressSendLlmToPolitipoolWorker({
   }
 }
 
-function* getCongressMembersWorker() {
+function* getMembersWorker() {
   const members = yield call(getCongressMembers);
-  yield put(congressActions.getCongressMembers.success(members));
+  yield put(congressActions.getMembers.success(members));
 }
 
 function* getRunnersUpWorker() {
@@ -142,8 +143,8 @@ function* renounceCandidacyWorker(action) {
     yield put(blockchainActions.setError.success(errorData));
     yield put(congressActions.renounceCandidacy.failure(errorData));
   } else {
-    yield put(congressActions.getCongressMembers.call());
-    yield put(congressActions.getCongressCandidates.call());
+    yield put(congressActions.getMembers.call());
+    yield put(congressActions.getCandidates.call());
     yield put(congressActions.renounceCandidacy.success());
   }
 }
@@ -163,7 +164,25 @@ function* congressProposeLegislationWorker({ payload: { index, legislationConten
     yield put(congressActions.congressProposeLegislation.failure(errorData));
   } else {
     yield put(congressActions.congressProposeLegislation.success());
-    // FIXME add put for congressActions.getMotions.call() after PR #113, BLOCKCHAIN-131 is merged
+    yield put(congressActions.getMotions.call());
+  }
+}
+
+function* congressRepealLegislationWorker({ payload: { tier, index } }) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  const { errorData } = yield cps(congressRepealLegislation, tier, index, walletAddress);
+  if (errorData.isError) {
+    yield put(
+      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
+    );
+    yield put(blockchainActions.setError.success(errorData));
+    yield put(congressActions.congressRepealLegislation.failure(errorData));
+  } else {
+    yield put(congressActions.congressRepealLegislation.success());
+    yield put(congressActions.getMotions.call());
   }
 }
 
@@ -180,14 +199,14 @@ export function* applyForCongressWatcher() {
   }
 }
 
-export function* getCongressCandidatesWatcher() {
+export function* getCandidatesWatcher() {
   try {
     yield takeLatest(
-      congressActions.getCongressCandidates.call,
-      getCongressCandidatesWorker,
+      congressActions.getCandidates.call,
+      getCandidatesWorker,
     );
   } catch (e) {
-    yield put(congressActions.getCongressCandidates.failure(e));
+    yield put(congressActions.getCandidates.failure(e));
   }
 }
 
@@ -229,14 +248,14 @@ export function* congressSendLlmToPolitipoolWatcher() {
   }
 }
 
-export function* getCongressMembersWatcher() {
+export function* getMembersWatcher() {
   try {
     yield takeLatest(
-      congressActions.getCongressMembers.call,
-      getCongressMembersWorker,
+      congressActions.getMembers.call,
+      getMembersWorker,
     );
   } catch (e) {
-    yield put(congressActions.getCongressMembers.failure(e));
+    yield put(congressActions.getMembers.failure(e));
   }
 }
 
@@ -266,5 +285,16 @@ export function* congressProposeLegislationWatcher() {
     );
   } catch (e) {
     yield put(congressActions.congressProposeLegislation.failure(e));
+  }
+}
+
+export function* congressRepealLegislationWatcher() {
+  try {
+    yield takeLatest(
+      congressActions.congressRepealLegislation.call,
+      congressRepealLegislationWorker,
+    );
+  } catch (e) {
+    yield put(congressActions.congressRepealLegislation.failure(e));
   }
 }

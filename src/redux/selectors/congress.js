@@ -7,17 +7,17 @@ export const isLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
-export const congressCandidates = createSelector(
+export const candidates = createSelector(
   congressReducer,
-  (reducer) => reducer.congressCandidates,
+  (reducer) => reducer.candidates,
 );
 
-export const congressMotions = createSelector(
+export const motions = createSelector(
   congressReducer,
   (reducer) => reducer.motions,
 );
 
-export const congressMembers = createSelector(
+export const members = createSelector(
   congressReducer,
   (reducer) => reducer.members,
 );
