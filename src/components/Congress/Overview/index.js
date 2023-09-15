@@ -11,6 +11,7 @@ import {
 import SpendingMotionModal from '../../Modals/SpendingMotionModal';
 import styles from '../styles.module.scss';
 import ProposeLegislationButton from '../ProposeLegislationButton';
+import ProposeLegislationReferendumButton from '../ProposeLegislationReferendumButton';
 
 export default function Overview() {
   const dispatch = useDispatch();
@@ -63,6 +64,7 @@ export default function Overview() {
       {senderIsMember && (
       <>
         <ProposeLegislationButton />
+        <ProposeLegislationReferendumButton />
         <Button
           medium
           primary

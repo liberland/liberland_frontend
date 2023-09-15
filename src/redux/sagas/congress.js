@@ -8,6 +8,7 @@ import {
   congressApproveTreasurySpend,
   closeCongressMotion,
   congressProposeLegislation,
+  congressProposeLegislationReferendum,
   congressRepealLegislation,
   congressSendLlm,
   congressSendLlmToPolitipool,
@@ -231,6 +232,34 @@ function* closeMotionWorker({ payload: { proposal, index } }) {
   yield put(congressActions.getMotions.call());
 }
 
+function* congressProposeLegislationReferendumWorker({
+  payload: {
+    tier, index, content,
+    fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
+  },
+}) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  const BLOCKS_PER_DAY = 24 * (3600 / 6);
+  const daysToBlocks = (days) => parseInt(days) * BLOCKS_PER_DAY;
+
+  yield call(
+    congressProposeLegislationReferendum,
+    parseInt(tier),
+    parseInt(index),
+    content,
+    fastTrack,
+    daysToBlocks(fastTrackVotingPeriod),
+    daysToBlocks(fastTrackEnactmentPeriod),
+    walletAddress,
+  );
+
+  yield put(congressActions.congressProposeLegislation.success());
+  yield put(congressActions.getMotions.call());
+}
+
 // WATCHERS
 
 export function* applyForCongressWatcher() {
@@ -368,4 +397,11 @@ export function* unapproveTreasurySpendWatcher() {
 
 export function* closeMotionWatcher() {
   yield* blockchainWatcher(congressActions.closeMotion, closeMotionWorker);
+}
+
+export function* congressProposeLegislationReferendumWatcher() {
+  yield* blockchainWatcher(
+    congressActions.congressProposeLegislationReferendum,
+    congressProposeLegislationReferendumWorker,
+  );
 }

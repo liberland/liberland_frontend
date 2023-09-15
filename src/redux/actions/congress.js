@@ -5,6 +5,7 @@ export const {
   approveTreasurySpend,
   closeMotion,
   congressProposeLegislation,
+  congressProposeLegislationReferendum,
   congressRepealLegislation,
   congressSendLlm,
   congressSendLlmToPolitipool,
@@ -33,6 +34,11 @@ export const {
     failure: undefined,
   },
   CONGRESS_PROPOSE_LEGISLATION: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_PROPOSE_LEGISLATION_REFERENDUM: {
     call: undefined,
     success: undefined,
     failure: undefined,

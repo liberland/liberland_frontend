@@ -12,6 +12,7 @@ import CreateValidatorModal from './CreateValidatorModal';
 import StakeLLDModal from './StakeLLDModal';
 import StartValidatorModal from './StartValidatorModal';
 import UnbondModal from './UnbondModal';
+import CongressProposeLegislationReferendumModal from './CongressProposeLegislationReferendumModal';
 
 export {
   GetCitizenshipModal,
@@ -28,4 +29,5 @@ export {
   StakeLLDModal,
   StartValidatorModal,
   UnbondModal,
+  CongressProposeLegislationReferendumModal,
 };
