@@ -17,6 +17,7 @@ export const {
   renounceCandidacy,
   unapproveTreasurySpend,
   voteAtMotions,
+  congressProposeRepealLegislation,
 } = createActions({
   APPLY_FOR_CONGRESS: {
     call: undefined,
@@ -94,6 +95,11 @@ export const {
     failure: undefined,
   },
   VOTE_AT_MOTIONS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_PROPOSE_REPEAL_LEGISLATION: {
     call: undefined,
     success: undefined,
     failure: undefined,

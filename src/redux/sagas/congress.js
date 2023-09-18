@@ -22,8 +22,10 @@ import {
   getTreasurySpendProposals,
   renounceCandidacy,
   voteAtMotions,
+  congressProposeRepealLegislation,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
+import { daysToBlocks } from '../../utils/nodeRpcCall';
 
 // WORKERS
 
@@ -181,17 +183,33 @@ function* congressRepealLegislationWorker({ payload: { tier, index } }) {
     blockchainSelectors.userWalletAddressSelector,
   );
 
-  const { errorData } = yield cps(congressRepealLegislation, tier, index, walletAddress);
-  if (errorData.isError) {
-    yield put(
-      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
-    );
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(congressActions.congressRepealLegislation.failure(errorData));
-  } else {
-    yield put(congressActions.congressRepealLegislation.success());
-    yield put(congressActions.getMotions.call());
-  }
+  yield call(congressRepealLegislation, tier, index, walletAddress);
+
+  yield put(congressActions.congressRepealLegislation.success());
+  yield put(congressActions.getMotions.call());
+}
+
+function* congressProposeRepealLegislationWorker({
+  payload: {
+    tier, index, fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
+  },
+}) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  yield call(
+    congressProposeRepealLegislation,
+    parseInt(tier),
+    parseInt(index),
+    fastTrack,
+    daysToBlocks(fastTrackVotingPeriod),
+    daysToBlocks(fastTrackEnactmentPeriod),
+    walletAddress,
+  );
+
+  yield put(congressActions.congressProposeRepealLegislation.success());
+  yield put(congressActions.getMotions.call());
 }
 
 function* getTreasuryInfoWorker() {
@@ -241,9 +259,6 @@ function* congressProposeLegislationReferendumWorker({
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-
-  const BLOCKS_PER_DAY = 24 * (3600 / 6);
-  const daysToBlocks = (days) => parseInt(days) * BLOCKS_PER_DAY;
 
   yield call(
     congressProposeLegislationReferendum,
@@ -364,14 +379,17 @@ export function* congressProposeLegislationWatcher() {
 }
 
 export function* congressRepealLegislationWatcher() {
-  try {
-    yield takeLatest(
-      congressActions.congressRepealLegislation.call,
-      congressRepealLegislationWorker,
-    );
-  } catch (e) {
-    yield put(congressActions.congressRepealLegislation.failure(e));
-  }
+  yield* blockchainWatcher(
+    congressActions.congressRepealLegislation,
+    congressRepealLegislationWorker,
+  );
+}
+
+export function* congressProposeRepealLegislationWatcher() {
+  yield* blockchainWatcher(
+    congressActions.congressProposeRepealLegislation,
+    congressProposeRepealLegislationWorker,
+  );
 }
 
 export function* getTreasuryInfoWatcher() {
