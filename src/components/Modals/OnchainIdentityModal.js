@@ -39,7 +39,7 @@ function OnchainIdentityModal({
       web: parseIdentityData(info.web),
       email: parseIdentityData(info.email),
       date_of_birth: identityDOB ?? undefined,
-      older_than_13: !identityDOB,
+      older_than_15: !identityDOB,
       onChainIdentity
     };
 
@@ -53,7 +53,7 @@ function OnchainIdentityModal({
     formState: { errors }
   } = useForm({ mode: 'all', defaultValues });
 
-  const isOlderThan13 = watch('older_than_13');
+  const isOlderThan15 = watch('older_than_15');
   const onChainIdentity = watch('onChainIdentity');
 
   return (
@@ -109,8 +109,8 @@ function OnchainIdentityModal({
           <div className={styles.title}>Date of birth</div>
           <CheckboxInput
             register={register}
-            name="older_than_13"
-            label="I'm 13 or older"
+            name="older_than_15"
+            label="I'm 15 or older"
           />
           {isOlderThan13 ? null :
             <DateInput

@@ -82,7 +82,7 @@ function EligibleOnAnalysis({ identity }) {
 
   return (
     <div>
-      Candidate claims that they&apos;re 13 or older on date:<br />
+      Candidate claims that they&apos;re 15 or older on date:<br />
       {eligibleOnDate.toString()}
     </div>
   );

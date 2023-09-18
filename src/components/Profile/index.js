@@ -54,11 +54,11 @@ function Profile({ className }) {
   const handleSubmitOnchainIdentity = (values) => {
     let eligible_on = null;
 
-    if (values.older_than_13) {
+    if (values.older_than_15) {
       eligible_on = new Date(0)
     } else if (values.date_of_birth) {
       const dob = new Date(values.date_of_birth);
-      eligible_on = new Date(dob.getFullYear()+13, dob.getMonth(), dob.getDate());
+      eligible_on = new Date(dob.getFullYear()+15, dob.getMonth(), dob.getDate());
     }
 
     const params = {
