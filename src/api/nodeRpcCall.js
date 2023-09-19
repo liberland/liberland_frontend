@@ -1778,7 +1778,6 @@ const congressRepealLegislation = async (tier, index, walletAddress) => {
   const api = await getApi();
 
   const threshold = await congressMajorityThreshold();
-
   const proposal = api.tx.liberlandLegislation.repealLaw(tier, index);
   const extrinsics = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll(extrinsics)
