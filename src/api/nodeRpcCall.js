@@ -1399,12 +1399,17 @@ const voteAtMotions = async (walletAddress, readableProposal, index, vote, callb
   });
 }
 
+const congressMajorityThreshold = async () => {
+  const api = await getApi();
+  const congressmen = await api.query.council.members()
+  return Math.trunc(congressmen.length/2) + 1;
+}
+
 const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmount }, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
 
-  const councilMembers = await api.query.council.members()
-  const threshold = Math.ceil(councilMembers.length / 2)
+  const threshold = await congressMajorityThreshold();
   
   const executeProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
   const proposal = api.tx.councilAccount.execute(executeProposal);
@@ -1431,8 +1436,7 @@ const congressSendLlmToPolitipool = async ({ walletAddress, transferToAddress, t
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
 
-  const councilMembers = await api.query.council.members()
-  const threshold = Math.ceil(councilMembers.length / 2)
+  const threshold = await congressMajorityThreshold();
 
   const executeProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
   const proposal = api.tx.councilAccount.execute(executeProposal);
@@ -1731,8 +1735,9 @@ const getStakingBondingDuration = async () => {
 const congressProposeLegislation = async (tier, index, legislationContent, walletAddress, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
-  const congressmen = await api.query.council.members();
-  const threshold = Math.trunc(congressmen.length/2) + 1;
+
+  const threshold = await congressMajorityThreshold();
+
   const proposal = api.tx.liberlandLegislation.addLaw(tier, index, legislationContent);
   const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
   extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
@@ -1755,8 +1760,9 @@ const congressProposeLegislation = async (tier, index, legislationContent, walle
 const congressRepealLegislation = async (tier, index, walletAddress, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
-  const congressmen = await api.query.council.members();
-  const threshold = Math.trunc(congressmen.length/2) + 1;
+
+  const threshold = await congressMajorityThreshold();
+
   const proposal = api.tx.liberlandLegislation.repealLaw(tier, index);
   const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
   extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
@@ -1774,6 +1780,43 @@ const congressRepealLegislation = async (tier, index, walletAddress, callback) =
     console.error(':( council.propose for liberlandLegislation.repealLaw transaction failed', error);
     callback({ isError: true, details: error.toString() });
   });
+}
+
+const getTreasurySpendProposals = async () => {
+  const api = await getApi();
+  return await api.derive.treasury.proposals();
+}
+
+const getTreasurySpendPeriod = async () => {
+  const api = await getApi();
+  return api.consts.treasury.spendPeriod;
+}
+
+const getTreasuryBudget = async () => {
+  const api = await getApi();
+  const account = "5EYCAe5ijiYfyeZ2JJCGq56LmPyNRAKzpG4QkoQkkQNB5e6Z";
+  const balances = await api.derive.balances.account(account);
+  return balances.freeBalance;
+}
+
+const congressApproveTreasurySpend = async (proposalId, walletAddress) => {
+  const api = await getApi();
+
+  const threshold = await congressMajorityThreshold();
+
+  const proposal = api.tx.treasury.approveProposal(proposalId);
+  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+  return await submitExtrinsic(extrinsic, walletAddress);
+}
+
+const congressUnapproveTreasurySpend = async (proposalId, walletAddress) => {
+  const api = await getApi();
+
+  const threshold = await congressMajorityThreshold();
+
+  const proposal = api.tx.treasury.removeApproval(proposalId);
+  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+  return await submitExtrinsic(extrinsic, walletAddress);
 }
 
 export {
@@ -1851,4 +1894,9 @@ export {
   getRunnersUp,
   congressProposeLegislation,
   congressRepealLegislation,
+  getTreasurySpendProposals,
+  congressApproveTreasurySpend,
+  congressUnapproveTreasurySpend,
+  getTreasurySpendPeriod,
+  getTreasuryBudget,
 };

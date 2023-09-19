@@ -1,4 +1,5 @@
 import { handleActions, combineActions } from 'redux-actions';
+import { BN_ZERO } from '@polkadot/util';
 import { congressActions } from '../actions';
 
 const initialState = {
@@ -7,6 +8,11 @@ const initialState = {
   members: [],
   motions: [],
   runnersUp: [],
+  treasury: {
+    proposals: {},
+    budget: BN_ZERO,
+    period: BN_ZERO,
+  },
 };
 
 const congressReducer = handleActions(
@@ -20,12 +26,16 @@ const congressReducer = handleActions(
       congressActions.getMotions.call,
       congressActions.getRunnersUp.call,
       congressActions.voteAtMotions.call,
+      congressActions.getTreasuryInfo.call,
+      congressActions.approveTreasurySpend.call,
+      congressActions.unapproveTreasurySpend.call,
     )]: (state) => ({
       ...state,
       loading: true,
     }),
     [combineActions(
       congressActions.applyForCongress.failure,
+      congressActions.approveTreasurySpend.failure,
       congressActions.congressProposeLegislation.failure,
       congressActions.congressRepealLegislation.failure,
       congressActions.getCandidates.failure,
@@ -36,6 +46,9 @@ const congressReducer = handleActions(
       congressActions.getMotions.success,
       congressActions.getRunnersUp.failure,
       congressActions.getRunnersUp.success,
+      congressActions.getTreasuryInfo.failure,
+      congressActions.getTreasuryInfo.success,
+      congressActions.unapproveTreasurySpend.failure,
       congressActions.voteAtMotions.failure,
     )]: (state) => ({
       ...state,
@@ -56,6 +69,10 @@ const congressReducer = handleActions(
     [congressActions.getRunnersUp.success]: (state, action) => ({
       ...state,
       runnersUp: action.payload,
+    }),
+    [congressActions.getTreasuryInfo.success]: (state, action) => ({
+      ...state,
+      treasury: action.payload,
     }),
   },
   initialState,

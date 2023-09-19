@@ -5,17 +5,23 @@ import { congressActions, blockchainActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import {
   applyForCongress,
+  congressApproveTreasurySpend,
   congressProposeLegislation,
   congressRepealLegislation,
   congressSendLlm,
   congressSendLlmToPolitipool,
+  congressUnapproveTreasurySpend,
   getCongressCandidates,
   getCongressMembers,
   getMotions,
   getRunnersUp,
+  getTreasuryBudget,
+  getTreasurySpendPeriod,
+  getTreasurySpendProposals,
   renounceCandidacy,
   voteAtMotions,
 } from '../../api/nodeRpcCall';
+import { blockchainWatcher } from './base';
 
 // WORKERS
 
@@ -186,6 +192,37 @@ function* congressRepealLegislationWorker({ payload: { tier, index } }) {
   }
 }
 
+function* getTreasuryInfoWorker() {
+  const proposals = yield call(getTreasurySpendProposals);
+  const budget = yield call(getTreasuryBudget);
+  const period = yield call(getTreasurySpendPeriod);
+  yield put(congressActions.getTreasuryInfo.success({
+    proposals,
+    budget,
+    period,
+  }));
+}
+
+function* approveTreasurySpendWorker({ payload: { id } }) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  yield call(congressApproveTreasurySpend, id, walletAddress);
+  yield put(congressActions.approveTreasurySpend.success());
+  yield put(congressActions.getTreasuryInfo.call());
+}
+
+function* unapproveTreasurySpendWorker({ payload: { id } }) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  yield call(congressUnapproveTreasurySpend, id, walletAddress);
+  yield put(congressActions.unapproveTreasurySpend.success());
+  yield put(congressActions.getTreasuryInfo.call());
+}
+
 // WATCHERS
 
 export function* applyForCongressWatcher() {
@@ -297,4 +334,25 @@ export function* congressRepealLegislationWatcher() {
   } catch (e) {
     yield put(congressActions.congressRepealLegislation.failure(e));
   }
+}
+
+export function* getTreasuryInfoWatcher() {
+  yield* blockchainWatcher(
+    congressActions.getTreasuryInfo,
+    getTreasuryInfoWorker,
+  );
+}
+
+export function* approveTreasurySpendWatcher() {
+  yield* blockchainWatcher(
+    congressActions.approveTreasurySpend,
+    approveTreasurySpendWorker,
+  );
+}
+
+export function* unapproveTreasurySpendWatcher() {
+  yield* blockchainWatcher(
+    congressActions.unapproveTreasurySpend,
+    unapproveTreasurySpendWorker,
+  );
 }

@@ -52,7 +52,8 @@ export default {
     overview: '/home/staking',
   },
   congress: {
-    overview: '/home/congress',
+    overview: '/home/congress/overview',
     motions: '/home/congress/motions',
+    treasury: '/home/congress/treasury',
   },
 };
