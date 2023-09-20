@@ -7,8 +7,8 @@ import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { SelectInput, TextInput } from '../InputComponents';
 import { congressActions } from '../../redux/actions';
-import { valueToBN } from '../../utils/walletHelpers';
 import { isValidSubstrateAddress } from '../../utils/bridge';
+import { dollarsToGrains } from '../../utils/walletHelpers';
 
 import styles from './styles.module.scss';
 
@@ -31,7 +31,7 @@ function SpendingMotionModal({ closeModal }) {
       dispatch(
         congressActions.congressSendLlm.call({
           transferToAddress,
-          transferAmount,
+          transferAmount: dollarsToGrains(transferAmount),
         }),
       );
     } else if (spending === 'congressSendLlmToPolitipool') {
@@ -86,16 +86,7 @@ function SpendingMotionModal({ closeModal }) {
         name="transferAmount"
         required
         errorTitle="Amount not valid"
-        validate={(v) => {
-          try {
-            if (valueToBN(v).lt(0)) {
-              return 'Amount not valid';
-            }
-          } catch (e) {
-            return 'Amount not valid';
-          }
-          return true;
-        }}
+        validate={(v) => !Number.isNaN(parseFloat(v)) || 'Not a valid number'}
       />
       {errors?.transferAmount?.message && (
         <div className={styles.error}>{errors.transferAmount.message}</div>
