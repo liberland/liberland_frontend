@@ -8,6 +8,7 @@ import Card from '../../Card';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
 import RepealLegislationButton from '../../Congress/RepealLegislationButton';
+import ProposeRepealLegislationButton from '../../Congress/ProposeRepealLegislationButton';
 
 const LegislationView = () => {
   const { tier } = useParams();
@@ -69,6 +70,7 @@ const LegislationView = () => {
                 )
             }
             { tier === '1' && <RepealLegislationButton tier={tier} index={l.index} /> }
+            { Number(tier) >= 1 && <ProposeRepealLegislationButton tier={tier} index={l.index} /> }
           </div>
         </div>
       </div>
