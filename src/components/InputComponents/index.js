@@ -3,6 +3,7 @@ import PasswordInput from './PasswordInput';
 import CheckboxInput from './Checkbox';
 import DateInput from './DateInput';
 import SelectInput from './SelectInput';
+import TextArea from './TextArea';
 
 export {
   TextInput,
@@ -10,4 +11,5 @@ export {
   CheckboxInput,
   DateInput,
   SelectInput,
+  TextArea,
 };

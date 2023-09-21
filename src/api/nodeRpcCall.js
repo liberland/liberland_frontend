@@ -752,37 +752,41 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType, callba
   });
 };
 
-const submitProposal = async (walletAddress, values) => {
+const submitProposal = async (name, forumLink, tier, year, sections, walletAddress) => {
   const api = await getApi();
   const nextChainIndexQuery = await api.query.democracy.referendumCount();
   const nextChainIndex = nextChainIndexQuery.toHuman();
 
   const centralizedMetadata = await centralizedBackend.addReferendum({
-    link: values.forumLink,
+    link: forumLink,
     chainIndex: nextChainIndex,
-    name: 'Hardcoded server name',
-    description: values.legislationContent,
+    name,
+    description: sections.join("\n"),
     hash: 'hash not needed',
     additionalMetadata: {},
     proposerAddress: walletAddress,
   });
-
-  const addLaw = api.tx.liberlandLegislation.addLegislation(
-    parseInt(values.legislationTier), 
-    centralizedMetadata.data.id, 
-    values.legislationContent
+  const legislationIndex = centralizedMetadata.data.id;
+  const proposal = api.tx.liberlandLegislation.addLegislation(
+    tier,
+    { year, index: legislationIndex },
+    sections,
   ).method;
-
+  const hash = proposal.hash;
   const minDeposit = api.consts.democracy.minimumDeposit;
-  const proposeCall = parseInt(values.legislationTier) === 0 ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
+  const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
+  const proposeTx = proposeCall({ Lookup: {
+    hash,
+    len: proposal.encodedLength,
+  }}, minDeposit);
 
-  const existingPreimage = await api.query.preimage.preimageFor([addLaw.hash, addLaw.encodedLength])
+  const existingPreimage = await api.query.preimage.preimageFor([proposal.hash, proposal.encodedLength])
   const extrinsic = existingPreimage.isNone
   ? api.tx.utility.batchAll([
-      api.tx.preimage.notePreimage(addLaw.toHex()),
-      proposeCall({ Lookup: addLaw.hash }, minDeposit),
+      api.tx.preimage.notePreimage(proposal.toHex()),
+      proposeTx,
     ])
-  : proposeCall({ Lookup: addLaw.hash }, minDeposit);
+  : proposeTx;
 
   return await submitExtrinsic(extrinsic, walletAddress);
 };
@@ -909,98 +913,46 @@ const voteForCongress = async (listofVotes, walletAddress, callback) => {
   });
 };
 
-const castVetoForLegislation = async (tier, index, walletAddress, callback) => {
+const castVetoForLegislation = async (tier, id, section, walletAddress) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
-
-  const vetoExtrinsic = api.tx.liberlandLegislation.submitVeto(tier, index);
-
-  vetoExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed VETO at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction VETO failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  const vetoExtrinsic = api.tx.liberlandLegislation.submitVeto(tier, id, section);
+  return await submitExtrinsic(vetoExtrinsic, walletAddress);
 };
 
-const revertVetoForLegislation = async (tier, index, walletAddress, callback) => {
+const revertVetoForLegislation = async (tier, id, section, walletAddress) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
-
-  const revertVetoExtrinsic = api.tx.liberlandLegislation.revertVeto(tier, index);
-
-  revertVetoExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed REVERT VETO at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction REVERT VETO failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  const vetoExtrinsic = api.tx.liberlandLegislation.revertVeto(tier, id, section);
+  return await submitExtrinsic(vetoExtrinsic, walletAddress);
 };
 
 const getLegislation = async (tier) => {
-  try {
-    const api = await getApi();
+  const api = await getApi();
 
-    const legislationRaw = await api.query.liberlandLegislation.laws.entries(tier);
-    const legislationHuman = legislationRaw.map((x) => ({
-      key: x[0].toHuman(), value: x[1].toHuman(),
-    }));
+  const legislation = await api.query.liberlandLegislation.legislation.entries(tier);
+  const legislationById = legislation.reduce((acc, [{ args: key }, content]) => {
+    const { year, index } = key[1];
+    if(!acc[year]) acc[year] = {};
+    if(!acc[year][index]) acc[year][index] = { id: { year, index }, vetos: [], sections: [] }
+    acc[year][index].sections.push({vetos: [], content});
+    return acc;
+  }, {})
 
-    const legislationVetosRawArray = await Promise.all(legislationHuman.map(({ key }) => (
-      api.query.liberlandLegislation.vetos.entries(key[0], key[1])
-    )));
+  const vetos = await api.query.liberlandLegislation.vetos.entries(tier);
+  vetos.filter(([_, isVeto]) => isVeto).forEach(([key]) => {
+    const [_, {year, index}, section, accountId] = key.args;
+    if(!legislationById[year]) legislationById[year] = {};
+    if(!legislationById[year][index]) legislationById[year][index] = { id: { year, index }, vetos: [], sections: [] };
+    if(section.isSome) {
+      const sectionId = section.unwrap().toNumber();
+      if(!legislationById[year][index].sections[sectionId]) return;
+      legislationById[year][index].sections[sectionId].vetos.push(accountId)
+    } else {
+      if(!legislationById[year][index]) return;
+      legislationById[year][index].vetos.push(accountId)
+    }
+  });
 
-    const legislationVetosHuman = [];
-    legislationVetosRawArray.forEach((rawVetos) => {
-      legislationVetosHuman.push(
-        rawVetos.map((x) => ({
-          vetoInfo: x[0].toHuman(), value: x[1].toHuman(),
-        })),
-      );
-    });
-
-    const vetosByIndex = {};
-    legislationVetosHuman.forEach((vetos) => {
-      vetos.forEach((veto) => {
-        if (veto.vetoInfo[1] in vetosByIndex) {
-          vetosByIndex[veto.vetoInfo[1]].push(veto.vetoInfo[2]);
-        } else {
-          vetosByIndex[veto.vetoInfo[1]] = [veto.vetoInfo[2]];
-        }
-      });
-    });
-
-    const legislation = legislationHuman.map(({ key, value }) => ({
-      tier: key[0],
-      index: key[1],
-      content: value,
-      vetos: vetosByIndex[key[1]] ? vetosByIndex[key[1]] : [],
-    }));
-
-    return legislation;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    return {};
-  }
+  return legislationById;
 };
 
 const getOfficialUserRegistryEntries = async (walletAddress) => {
@@ -1390,8 +1342,7 @@ const createProposalAndVote = async (threshold, proposalContent, vote) => {
   const api = await getApi();
   const proposal = api.tx.council.propose(threshold, proposalContent, proposalContent.length);
 
-  const proposals = await api.query.council.proposals()
-  const nextProposalIndex = proposals.length
+  const nextProposalIndex = await api.query.council.proposalCount()
   const voteAye = api.tx.council.vote(proposalContent.method.hash, nextProposalIndex, vote);
 
   return [proposal, voteAye]
@@ -1727,39 +1678,24 @@ const getStakingBondingDuration = async () => {
   return api.consts.staking.bondingDuration;
 }
 
-const congressProposeLegislation = async (tier, index, legislationContent, walletAddress, callback) => {
+const congressProposeLegislation = async (tier, id, sections, walletAddress) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
-
   const threshold = await congressMajorityThreshold();
-
-  const proposal = api.tx.liberlandLegislation.addLaw(tier, index, legislationContent);
+  const proposal = api.tx.liberlandLegislation.addLegislation(tier, id, sections);
   const extrinsics = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll(extrinsics)
-
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed council.propose for liberlandLegislation.addLaw at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( council.propose for liberlandLegislation.addLaw transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return await submitExtrinsic(extrinsic, walletAddress);
 }
 
-const congressRepealLegislation = async (tier, index, walletAddress) => {
+const congressRepealLegislation = async (tier, id, section, walletAddress) => {
   const api = await getApi();
 
   const threshold = await congressMajorityThreshold();
 
-  const proposal = api.tx.liberlandLegislation.repealLaw(tier, index);
+  const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
+  const proposal = section !== null ?
+    api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness)
+    : api.tx.liberlandLegislation.repealLegislation(tier, id, witness);
   const extrinsics = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll(extrinsics)
 
@@ -1843,39 +1779,47 @@ const congressProposeReferendum = async (
   const threshold = await congressMajorityThreshold();
 
   const proposeAndVote = await createProposalAndVote(threshold, proposal, true)
-  const extrinsic = api.tx.utility.batchAll([
-    api.tx.preimage.notePreimage(referendumProposal.toHex()),
-    ...proposeAndVote,
-  ])
+  const existingPreimage = await api.query.preimage.preimageFor([proposal.hash, proposal.encodedLength])
+  const extrinsic = api.tx.utility.batchAll(
+    existingPreimage.isNone
+    ? [
+        api.tx.preimage.notePreimage(referendumProposal.toHex()),
+        ...proposeAndVote,
+      ]
+    : proposeAndVote)
   return await submitExtrinsic(extrinsic, walletAddress);
 }
 
-const congressProposeLegislationReferendum = async (
+const congressProposeLegislationViaReferendum = async (
   tier,
-  index,
-  content,
+  id,
+  sections,
   fastTrack,
   votingPeriod,
   enactmentPeriod,
   walletAddress,
 ) => {
   const api = await getApi();
-  const addLaw = api.tx.liberlandLegislation.addLaw(tier, index, content).method;
-  return await congressProposeReferendum(addLaw, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
+  const addLegislation = api.tx.liberlandLegislation.addLegislation(tier, id, sections).method;
+  return await congressProposeReferendum(addLegislation, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
 }
 
 
 const congressProposeRepealLegislation = async (
   tier,
-  index,
+  id,
+  section,
   fastTrack,
   votingPeriod,
   enactmentPeriod,
   walletAddress,
 ) => {
   const api = await getApi();
-  const repealLaw = api.tx.liberlandLegislation.repealLaw(tier, index).method;
-  return await congressProposeReferendum(repealLaw, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
+  const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
+  const repealLegislation = section !== null ?
+    api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness).method
+    : api.tx.liberlandLegislation.repealLegislation(tier, id, witness).method;
+  return await congressProposeReferendum(repealLegislation, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
 }
 
 const congressSendTreasuryLld = async (transferToAddress, transferAmount, walletAddress) => {
@@ -1901,8 +1845,64 @@ const congressDemocracyBlacklist = async (proposalHash, referendumIndex, walletA
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.democracy.blacklist(proposalHash, referendumIndex ?? null);
   
-  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+  const extrinsic = api.tx.utility.batchAll(await createProposalAndVote(threshold, proposal, true));
   return await submitExtrinsic( extrinsic, walletAddress);
+}
+
+const proposeAmendLegislation = async (tier, id, section, content, walletAddress) => {
+  const api = await getApi();
+  const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
+  const proposal = api.tx.liberlandLegislation.amendLegislation(
+    tier,
+    id,
+    section,
+    content,
+    witness,
+  ).method;
+  const notePreimageTx = api.tx.preimage.notePreimage(proposal.toHex());
+  const minDeposit = api.consts.democracy.minimumDeposit;
+  const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
+  const proposeTx = proposeCall({ Lookup: {
+    hash: proposal.hash,
+    len: proposal.encodedLength,
+  }}, minDeposit);
+  const existingPreimage = await api.query.preimage.preimageFor([proposal.hash, proposal.encodedLength])
+  const extrinsic = existingPreimage.isNone ?
+    api.tx.utility.batchAll([notePreimageTx, proposeTx])
+    : proposeTx;
+  return await submitExtrinsic(extrinsic, walletAddress);
+}
+
+const congressAmendLegislation = async (tier, id, section, content, walletAddress) => {
+  const api = await getApi();
+  const threshold = await congressMajorityThreshold();
+  const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
+  const proposal = api.tx.liberlandLegislation.amendLegislation(tier, id, section, content, witness);
+  const extrinsic = api.tx.utility.batchAll(await createProposalAndVote(threshold, proposal, true));
+  return await submitExtrinsic(extrinsic, walletAddress);
+}
+
+const congressAmendLegislationViaReferendum = async (
+  tier,
+  id,
+  section,
+  content,
+  fastTrack,
+  votingPeriod,
+  enactmentPeriod,
+  walletAddress,
+) => {
+  const api = await getApi();
+
+  const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
+  const amendLegislation = api.tx.liberlandLegislation.amendLegislation(
+    tier,
+    id,
+    section,
+    content,
+    witness
+  ).method;
+  return await congressProposeReferendum(amendLegislation, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
 }
 
 export {
@@ -1986,9 +1986,12 @@ export {
   getTreasurySpendPeriod,
   getTreasuryBudget,
   closeCongressMotion,
-  congressProposeLegislationReferendum,
+  congressProposeLegislationViaReferendum,
   congressProposeRepealLegislation,
   congressSendTreasuryLld,
   getPalletIds,
-  congressDemocracyBlacklist
+  congressDemocracyBlacklist,
+  proposeAmendLegislation,
+  congressAmendLegislation,
+  congressAmendLegislationViaReferendum,
 };

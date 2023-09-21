@@ -4,8 +4,12 @@ export const {
   applyForCongress,
   approveTreasurySpend,
   closeMotion,
+  congressAmendLegislation,
+  congressAmendLegislationViaReferendum,
+  congressDemocracyBlacklist,
   congressProposeLegislation,
-  congressProposeLegislationReferendum,
+  congressProposeLegislationViaReferendum,
+  congressProposeRepealLegislation,
   congressRepealLegislation,
   congressSendLlm,
   congressSendLlmToPolitipool,
@@ -18,8 +22,6 @@ export const {
   renounceCandidacy,
   unapproveTreasurySpend,
   voteAtMotions,
-  congressProposeRepealLegislation,
-  congressDemocracyBlacklist,
 } = createActions({
   APPLY_FOR_CONGRESS: {
     call: undefined,
@@ -36,12 +38,32 @@ export const {
     success: undefined,
     failure: undefined,
   },
+  CONGRESS_AMEND_LEGISLATION: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_AMEND_LEGISLATION_VIA_REFERENDUM: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_DEMOCRACY_BLACKLIST: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
   CONGRESS_PROPOSE_LEGISLATION: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  CONGRESS_PROPOSE_LEGISLATION_REFERENDUM: {
+  CONGRESS_PROPOSE_LEGISLATION_VIA_REFERENDUM: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_PROPOSE_REPEAL_LEGISLATION: {
     call: undefined,
     success: undefined,
     failure: undefined,
@@ -102,16 +124,6 @@ export const {
     failure: undefined,
   },
   VOTE_AT_MOTIONS: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  CONGRESS_PROPOSE_REPEAL_LEGISLATION: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  CONGRESS_DEMOCRACY_BLACKLIST: {
     call: undefined,
     success: undefined,
     failure: undefined,

@@ -1,25 +1,22 @@
 import {
-  put, takeLatest, call, cps,
+  put, takeLatest, call, select,
 } from 'redux-saga/effects';
 
 import {
   getLegislation, castVetoForLegislation, revertVetoForLegislation, getCitizenCount,
 } from '../../api/nodeRpcCall';
-
-import { blockchainActions, legislationActions } from '../actions';
+import { blockchainWatcher } from './base';
+import { legislationActions } from '../actions';
+import { blockchainSelectors } from '../selectors';
 
 // WORKERS
 
-function* getLegislationWorker(action) {
-  try {
-    const legislation = yield call(getLegislation, action.payload);
-    yield put(legislationActions.getLegislation.success({
-      tier: action.payload,
-      legislation,
-    }));
-  } catch (e) {
-    yield put(legislationActions.getLegislation.failure(e));
-  }
+function* getLegislationWorker({ payload: { tier } }) {
+  const legislation = yield call(getLegislation, tier);
+  yield put(legislationActions.getLegislation.success({
+    tier,
+    legislation,
+  }));
 }
 
 function* getCitizenCountWorker() {
@@ -31,54 +28,24 @@ function* getCitizenCountWorker() {
   }
 }
 
-function* castVetoWorker(action) {
-  try {
-    const { blockHash, errorData } = yield cps(castVetoForLegislation, action.payload.tier, action.payload.index, action.payload.userWalletAddress);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(legislationActions.castVeto.failure(errorData));
-    }
-    else {
-      yield put(legislationActions.castVeto.success())
-      yield put(legislationActions.getLegislation.call(action.payload.tier));
-    }
-  } catch (errorData) {
-    console.log('Error in veto legislation worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(legislationActions.castVeto.failure(errorData));
-  }
+function* castVetoWorker({ payload: { tier, id, section } }) {
+  const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(castVetoForLegislation, tier, id, section, userWalletAddress);
+  yield put(legislationActions.castVeto.success());
+  yield put(legislationActions.getLegislation.call({ tier }));
 }
 
-function* revertVetoWorker(action) {
-  try {
-    const { blockHash, errorData } = yield cps(revertVetoForLegislation, action.payload.tier, action.payload.index, action.payload.userWalletAddress);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(legislationActions.revertVeto.failure(errorData));
-    } else {
-      yield put(legislationActions.revertVeto.success())
-      yield put(legislationActions.getLegislation.call(action.payload.tier));
-    }
-  } catch (errorData) {
-    console.log('Error in veto legislation worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(legislationActions.revertVeto.failure(errorData));
-  }
+function* revertVetoWorker({ payload: { tier, id, section } }) {
+  const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(revertVetoForLegislation, tier, id, section, userWalletAddress);
+  yield put(legislationActions.revertVeto.success());
+  yield put(legislationActions.getLegislation.call({ tier }));
 }
-
 
 // WATCHERS
 
 function* getLegislationWatcher() {
-  try {
-    yield takeLatest(legislationActions.getLegislation.call, getLegislationWorker);
-  } catch (e) {
-    yield put(legislationActions.getLegislation.failure(e));
-  }
+  yield* blockchainWatcher(legislationActions.getLegislation, getLegislationWorker);
 }
 
 function* getCitizenCountWatcher() {
@@ -90,21 +57,12 @@ function* getCitizenCountWatcher() {
 }
 
 function* castVetoWatcher() {
-  try {
-    yield takeLatest(legislationActions.castVeto.call, castVetoWorker);
-  } catch (e) {
-    yield put(legislationActions.castVeto.failure(e));
-  }
+  yield* blockchainWatcher(legislationActions.castVeto, castVetoWorker);
 }
 
 function* revertVetoWatcher() {
-  try {
-    yield takeLatest(legislationActions.revertVeto.call, revertVetoWorker);
-  } catch (e) {
-    yield put(legislationActions.revertVeto.failure(e));
-  }
+  yield* blockchainWatcher(legislationActions.revertVeto, revertVetoWorker);
 }
-
 
 export {
   getLegislationWatcher,

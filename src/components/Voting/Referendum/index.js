@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { blockchainSelectors, democracySelectors } from '../../../redux/selectors';
@@ -7,14 +8,14 @@ import Card from '../../Card';
 import styles from './styles.module.scss';
 import ReferendumItem from './Items/ReferendumItem';
 import {
-  VoteOnReferendumModal, ProposeReferendumModal, UndelegateModal,
+  VoteOnReferendumModal, UndelegateModal,
 } from '../../Modals';
 import { democracyActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
+import router from '../../../router';
 
 function Referendum() {
   const [isModalOpenVote, setIsModalOpenVote] = useState(false);
-  const [isModalOpenPropose, setIsModalOpenPropose] = useState(false);
   const [isModalOpenUndelegate, setIsModalOpenUndelegate] = useState(false);
   const [modalShown, setModalShown] = useState(1);
   const [selectedReferendumInfo, setSelectedReferendumInfo] = useState({ name: 'Referendum' });
@@ -34,9 +35,6 @@ function Referendum() {
     setSelectedVoteType(voteType);
     setModalShown(1);
   };
-  const handleModalOpenPropose = () => {
-    setIsModalOpenPropose(!isModalOpenPropose);
-  };
   const handleModalOpenUndelegate = () => {
     setIsModalOpenUndelegate(!isModalOpenUndelegate);
   };
@@ -52,10 +50,6 @@ function Referendum() {
   const handleSubmitVoteForm = (values) => {
     dispatch(democracyActions.voteOnReferendum.call({ ...values, voteType: selectedVoteType }));
     handleModalOpenVote();
-  };
-  const handleSubmitPropose = (values) => {
-    dispatch(democracyActions.propose.call({ values, userWalletAddress }));
-    handleModalOpenPropose();
   };
   const handleSubmitUndelegate = () => {
     dispatch(democracyActions.undelegate.call({ userWalletAddress }));
@@ -83,7 +77,7 @@ function Referendum() {
               )
               : null
           }
-          <Button small primary onClick={handleModalOpenPropose}>Propose</Button>
+          <Link to={router.voting.addLegislation}><Button small primary>Propose</Button></Link>
         </div>
         <Card title="Referendums" className={styles.referendumsCard}>
           <div>
@@ -152,12 +146,6 @@ function Referendum() {
               voteType={selectedVoteType}
               onSubmitSecond={handleSubmitSecondForm}
               onSubmitVote={handleSubmitVoteForm}
-            />
-          )}
-          {isModalOpenPropose && (
-            <ProposeReferendumModal
-              closeModal={handleModalOpenPropose}
-              onSubmitPropose={handleSubmitPropose}
             />
           )}
           {isModalOpenUndelegate && (

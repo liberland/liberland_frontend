@@ -13,6 +13,7 @@ import router from '../../router';
 import CongressionalAssemble from './CongressionalAssemble';
 import styles from './styles.module.scss';
 import Referendum from './Referendum';
+import { AddLegislation } from './Referendum/ProposalForms/AddLegislation/AddLegislation';
 
 function Voting() {
   const dispatch = useDispatch();
@@ -42,6 +43,10 @@ function Voting() {
           <Route
             path={router.voting.referendum}
             component={Referendum}
+          />
+          <Route
+            path={router.voting.addLegislation}
+            component={AddLegislation}
           />
           <Route
             exact

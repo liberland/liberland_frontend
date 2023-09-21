@@ -44,6 +44,7 @@ export default function* rootSaga() {
     democracySagas.voteForCongressWatcher(),
     democracySagas.delegateWatcher(),
     democracySagas.undelegateWatcher(),
+    democracySagas.proposeAmendLegislationWatcher(),
 
     // LEGISLATION
     legislationSagas.getLegislationWatcher(),
@@ -100,8 +101,12 @@ export default function* rootSaga() {
     congressSagas.applyForCongressWatcher(),
     congressSagas.approveTreasurySpendWatcher(),
     congressSagas.closeMotionWatcher(),
+    congressSagas.congressAmendLegislationViaReferendumWatcher(),
+    congressSagas.congressAmendLegislationWatcher(),
+    congressSagas.congressDemocracyBlacklistWatcher(),
+    congressSagas.congressProposeLegislationViaReferendumWatcher(),
     congressSagas.congressProposeLegislationWatcher(),
-    congressSagas.congressProposeLegislationReferendumWatcher(),
+    congressSagas.congressProposeRepealLegislationWatcher(),
     congressSagas.congressRepealLegislationWatcher(),
     congressSagas.congressSendLlmToPolitipoolWatcher(),
     congressSagas.congressSendLlmWatcher(),
@@ -114,7 +119,5 @@ export default function* rootSaga() {
     congressSagas.renounceCandidacyWatcher(),
     congressSagas.unapproveTreasurySpendWatcher(),
     congressSagas.voteAtMotionsWatcher(),
-    congressSagas.congressProposeRepealLegislationWatcher(),
-    congressSagas.congressDemocracyBlacklistWatcher(),
   ]);
 }

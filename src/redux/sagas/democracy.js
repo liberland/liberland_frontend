@@ -8,12 +8,10 @@ import {
   secondProposal,
   voteOnReferendum,
   submitProposal, voteForCongress,
-  delegateDemocracy, undelegateDemocracy,
+  delegateDemocracy, undelegateDemocracy, proposeAmendLegislation,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
-
 import { blockchainSelectors } from '../selectors';
-
 import { blockchainActions, democracyActions } from '../actions';
 
 // WORKERS
@@ -56,12 +54,8 @@ function* secondProposalWorker(action) {
 function* voteReferendumWorker(action) {
   try {
     const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { errorData } = yield cps(
-      voteOnReferendum,
-      walletAddress,
-      action.payload.referendumIndex,
-      action.payload.voteType,
-    );
+    const { referendumIndex, voteType } = action.payload;
+    const { errorData } = yield cps(voteOnReferendum, walletAddress, referendumIndex, voteType);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
@@ -79,24 +73,21 @@ function* voteReferendumWorker(action) {
   }
 }
 
-function* proposeWorker({
-  payload: {
-    userWalletAddress, values,
-  },
-}) {
-  yield call(submitProposal, userWalletAddress, values);
-
+function* proposeWorker(action) {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const {
+    name, forumLink, tier, sections,
+  } = action.payload;
+  const year = new Date().getFullYear();
+  yield call(submitProposal, name, forumLink, tier, year, sections, walletAddress);
   yield put(democracyActions.propose.success());
   yield put(democracyActions.getDemocracy.call());
 }
 
 function* voteForCongressWorker(action) {
   try {
-    const { errorData } = yield cps(
-      voteForCongress,
-      action.payload.selectedCandidates,
-      action.payload.userWalletAddress,
-    );
+    const { selectedCandidates, userWalletAddress } = action.payload;
+    const { errorData } = yield cps(voteForCongress, selectedCandidates, userWalletAddress);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
@@ -116,11 +107,8 @@ function* voteForCongressWorker(action) {
 
 function* delegateWorker(action) {
   try {
-    const { errorData } = yield cps(
-      delegateDemocracy,
-      action.payload.values.delegateAddress,
-      action.payload.userWalletAddress,
-    );
+    const { values, userWalletAddress } = action.payload;
+    const { errorData } = yield cps(delegateDemocracy, values.delegateAddress, userWalletAddress);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
@@ -140,10 +128,7 @@ function* delegateWorker(action) {
 
 function* undelegateWorker(action) {
   try {
-    const { errorData } = yield cps(
-      undelegateDemocracy,
-      action.payload.userWalletAddress,
-    );
+    const { errorData } = yield cps(undelegateDemocracy, action.payload.userWalletAddress);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
@@ -159,6 +144,16 @@ function* undelegateWorker(action) {
     yield put(blockchainActions.setError.success(errorData));
     yield put(democracyActions.undelegate.failure(errorData));
   }
+}
+
+function* proposeAmendLegislationWorker(action) {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const {
+    tier, id, section, content,
+  } = action.payload;
+  yield call(proposeAmendLegislation, tier, id, section, content, walletAddress);
+  yield put(democracyActions.proposeAmendLegislation.success());
+  yield put(democracyActions.getDemocracy.call());
 }
 
 // WATCHERS
@@ -188,10 +183,7 @@ function* voteOnReferendumWatcher() {
 }
 
 function* proposeWatcher() {
-  yield* blockchainWatcher(
-    democracyActions.propose,
-    proposeWorker,
-  );
+  yield* blockchainWatcher(democracyActions.propose, proposeWorker);
 }
 
 function* voteForCongressWatcher() {
@@ -218,12 +210,17 @@ function* undelegateWatcher() {
   }
 }
 
+function* proposeAmendLegislationWatcher() {
+  yield* blockchainWatcher(democracyActions.proposeAmendLegislation, proposeAmendLegislationWorker);
+}
+
 export {
-  getDemocracyWatcher,
-  secondProposalWatcher,
-  voteOnReferendumWatcher,
-  proposeWatcher,
-  voteForCongressWatcher,
   delegateWatcher,
+  getDemocracyWatcher,
+  proposeAmendLegislationWatcher,
+  proposeWatcher,
+  secondProposalWatcher,
   undelegateWatcher,
+  voteForCongressWatcher,
+  voteOnReferendumWatcher,
 };

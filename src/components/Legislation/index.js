@@ -27,7 +27,7 @@ function Legislation() {
             exact
             path={router.home.legislation}
             render={() => (
-              <Redirect to={`${router.home.legislation}/0`} />
+              <Redirect to={`${router.home.legislation}/Constitution`} />
             )}
           />
         </Switch>
