@@ -12,17 +12,28 @@ import { congressActions } from '../../redux/actions';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
 
 function CongressRepealLegislationFastTrackModal({
-  closeModal, tier, index,
+  closeModal, tier, id,
 }) {
   const dispatch = useDispatch();
   const {
     handleSubmit, formState: { errors }, register, watch,
   } = useForm({
-    defaultValues: { tier, index, ...FastTrackDefaults },
+    defaultValues: {
+      tier,
+      year: id.year,
+      index: id.index,
+      ...FastTrackDefaults
+    },
   });
 
-  const onSubmitRepeal = (values) => {
-    dispatch(congressActions.congressProposeRepealLegislation.call(values));
+  const onSubmitRepeal = ({ fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod }) => {
+    dispatch(congressActions.congressProposeRepealLegislation.call({
+      tier,
+      id,
+      fastTrack,
+      fastTrackVotingPeriod,
+      fastTrackEnactmentPeriod,
+    }));
     closeModal();
   };
 
@@ -39,13 +50,23 @@ function CongressRepealLegislationFastTrackModal({
         name="tier"
         disabled
         options={[
-          { value: '1', display: 'International Treaties' },
-          { value: '2', display: 'Tier 2' },
-          { value: '3', display: 'Tier 3' },
-          { value: '4', display: 'Tier 4' },
-          { value: '5', display: 'Tier 5' },
-          { value: '6', display: 'Decisions' },
+          { value: 'InternationalTreaty', display: 'International Treaty' },
+          { value: 'Law', display: 'Law' },
+          { value: 'Tier3', display: 'Tier 3' },
+          { value: 'Tier4', display: 'Tier 4' },
+          { value: 'Tier5', display: 'Tier 5' },
+          { value: 'Decision', display: 'Decision' },
         ]}
+      />
+
+      <div className={styles.title}>Legislation Year</div>
+      <TextInput
+        required
+        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
+        errorTitle="Year"
+        register={register}
+        name="year"
+        disabled
       />
 
       <div className={styles.title}>Legislation Index</div>
@@ -82,7 +103,10 @@ function CongressRepealLegislationFastTrackModal({
 CongressRepealLegislationFastTrackModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
-  index: PropTypes.string.isRequired,
+  id: PropTypes.shape({
+    year: PropTypes.number.isRequired,
+    index: PropTypes.number.isRequired,
+  }).isRequired,
 };
 
 function CongressRepealLegislationFastTrackModalWrapper(props) {

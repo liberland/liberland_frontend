@@ -11,15 +11,19 @@ import styles from './styles.module.scss';
 import { congressActions } from '../../redux/actions';
 
 function CongressRepealLegislationModal({
-  closeModal, tier, index,
+  closeModal, tier, id,
 }) {
   const dispatch = useDispatch();
   const { handleSubmit, register } = useForm({
-    defaultValues: { tier, index },
+    defaultValues: {
+      tier,
+      year: id.year,
+      index: id.index,
+    }
   });
 
   const onSubmitRepeal = () => {
-    dispatch(congressActions.congressRepealLegislation.call({ tier, index }));
+    dispatch(congressActions.congressRepealLegislation.call({ tier, id }));
     closeModal();
   };
 
@@ -36,8 +40,18 @@ function CongressRepealLegislationModal({
         name="tier"
         disabled
         options={[
-          { value: '1', display: 'International Treaty' },
+          { value: 'InternationalTreaty', display: 'International Treaty' },
         ]}
+      />
+
+      <div className={styles.title}>Legislation Year</div>
+      <TextInput
+        required
+        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
+        errorTitle="Year"
+        register={register}
+        name="year"
+        disabled
       />
 
       <div className={styles.title}>Legislation Index</div>
@@ -72,7 +86,10 @@ function CongressRepealLegislationModal({
 CongressRepealLegislationModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
-  index: PropTypes.string.isRequired,
+  id: PropTypes.shape({
+    year: PropTypes.number.isRequired,
+    index: PropTypes.number.isRequired,
+  }).isRequired,
 };
 
 function CongressRepealLegislationModalWrapper(props) {

@@ -8,7 +8,7 @@ import {
   congressSelectors,
 } from '../../../redux/selectors';
 
-export default function ProposeRepealLegislationButton({ tier, index }) {
+export default function ProposeRepealLegislationButton({ tier, id }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
 
@@ -28,7 +28,7 @@ export default function ProposeRepealLegislationButton({ tier, index }) {
         <CongressRepealLegislationFastTrackModal
           closeModal={handleModalOpen}
           tier={tier}
-          index={index}
+          id={id}
         />
       )}
     </div>
@@ -37,5 +37,8 @@ export default function ProposeRepealLegislationButton({ tier, index }) {
 
 ProposeRepealLegislationButton.propTypes = {
   tier: PropTypes.string.isRequired,
-  index: PropTypes.string.isRequired,
+  id: PropTypes.shape({
+    year: PropTypes.number.isRequired,
+    index: PropTypes.number.isRequired,
+  }).isRequired,
 };

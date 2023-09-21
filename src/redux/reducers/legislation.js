@@ -2,7 +2,7 @@ import { handleActions, combineActions } from 'redux-actions';
 import { legislationActions } from '../actions';
 
 const initialState = {
-  legislation: [],
+  legislation: {},
   citizenCount: undefined,
   isGetLegislation: false,
 };
@@ -12,7 +12,7 @@ const legislationReducer = handleActions({
     legislationActions.getLegislation.call,
     legislationActions.getCitizenCount.call,
     legislationActions.castVeto.call,
-    legislationActions.revertVeto.call
+    legislationActions.revertVeto.call,
   )]: (state) => ({
     ...state,
     isGetLegislation: true,
@@ -32,11 +32,11 @@ const legislationReducer = handleActions({
   }),
   [legislationActions.getCitizenCount.call]: (state) => ({
     ...state,
-    citizenCount: undefined
+    citizenCount: undefined,
   }),
   [legislationActions.getCitizenCount.success]: (state, action) => ({
     ...state,
-    citizenCount: action.payload
+    citizenCount: action.payload,
   }),
   [legislationActions.getLegislation.call]: (state, action) => ({
     ...state,

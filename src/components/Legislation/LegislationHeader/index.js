@@ -5,31 +5,31 @@ import router from '../../../router';
 
 const navigationList = [
   {
-    route: `${router.home.legislation}/0`,
+    route: `${router.home.legislation}/Constitution`,
     title: 'Constitution',
   },
   {
-    route: `${router.home.legislation}/1`,
+    route: `${router.home.legislation}/InternationalTreaty`,
     title: 'International Treaties',
   },
   {
-    route: `${router.home.legislation}/2`,
-    title: 'Tier 2',
+    route: `${router.home.legislation}/Law`,
+    title: 'Law',
   },
   {
-    route: `${router.home.legislation}/3`,
+    route: `${router.home.legislation}/Tier3`,
     title: 'Tier 3',
   },
   {
-    route: `${router.home.legislation}/4`,
+    route: `${router.home.legislation}/Tier4`,
     title: 'Tier 4',
   },
   {
-    route: `${router.home.legislation}/5`,
+    route: `${router.home.legislation}/Tier5`,
     title: 'Tier 5',
   },
   {
-    route: `${router.home.legislation}/6`,
+    route: `${router.home.legislation}/Decision`,
     title: 'Decisions',
   },
 ];

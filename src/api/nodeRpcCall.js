@@ -754,7 +754,7 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType, callba
 
 const getProposalHash = async (values, legislationIndex) => {
   const api = await getApi();
-  const extrinsicEncoded = api.tx.liberlandLegislation.addLaw(parseInt(values.legislationTier), legislationIndex, values.legislationContent).method.toHex();
+  const extrinsicEncoded = api.tx.liberlandLegislation.addLaw(values.legislationTier, { year: values.legislationYear, index: legislationIndex }, values.legislationContent).method.toHex();
   const hash = { encodedHash: blake2AsHex(extrinsicEncoded), extrinsicEncoded };
   return hash;
 };
@@ -929,11 +929,11 @@ const voteForCongress = async (listofVotes, walletAddress, callback) => {
   });
 };
 
-const castVetoForLegislation = async (tier, index, walletAddress, callback) => {
+const castVetoForLegislation = async (tier, id, walletAddress, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
 
-  const vetoExtrinsic = api.tx.liberlandLegislation.submitVeto(tier, index);
+  const vetoExtrinsic = api.tx.liberlandLegislation.submitVeto(tier, id);
 
   vetoExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
     let errorData = handleMyDispatchErrors(dispatchError, api)
@@ -952,11 +952,11 @@ const castVetoForLegislation = async (tier, index, walletAddress, callback) => {
   });
 };
 
-const revertVetoForLegislation = async (tier, index, walletAddress, callback) => {
+const revertVetoForLegislation = async (tier, id, walletAddress, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
 
-  const revertVetoExtrinsic = api.tx.liberlandLegislation.revertVeto(tier, index);
+  const revertVetoExtrinsic = api.tx.liberlandLegislation.revertVeto(tier, id);
 
   revertVetoExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
     let errorData = handleMyDispatchErrors(dispatchError, api)
@@ -979,43 +979,29 @@ const getLegislation = async (tier) => {
   try {
     const api = await getApi();
 
-    const legislationRaw = await api.query.liberlandLegislation.laws.entries(tier);
-    const legislationHuman = legislationRaw.map((x) => ({
-      key: x[0].toHuman(), value: x[1].toHuman(),
+    const legislation = await api.query.liberlandLegislation.laws.entries(tier);
+    const legislationVetos = await Promise.all(legislation.map(([key]) => {
+      return api.query.liberlandLegislation.vetos.entries(key.args[0], key.args[1]);
     }));
 
-    const legislationVetosRawArray = await Promise.all(legislationHuman.map(({ key }) => (
-      api.query.liberlandLegislation.vetos.entries(key[0], key[1])
-    )));
-
-    const legislationVetosHuman = [];
-    legislationVetosRawArray.forEach((rawVetos) => {
-      legislationVetosHuman.push(
-        rawVetos.map((x) => ({
-          vetoInfo: x[0].toHuman(), value: x[1].toHuman(),
-        })),
-      );
-    });
-
-    const vetosByIndex = {};
-    legislationVetosHuman.forEach((vetos) => {
-      vetos.forEach((veto) => {
-        if (veto.vetoInfo[1] in vetosByIndex) {
-          vetosByIndex[veto.vetoInfo[1]].push(veto.vetoInfo[2]);
+    const vetosById = {};
+    legislationVetos.forEach((vetos) => {
+      vetos.forEach(([key]) => {
+        const [ _, id, account ] = key.args;
+        if (id in vetosById) {
+          vetosById[id].push(account.toString());
         } else {
-          vetosByIndex[veto.vetoInfo[1]] = [veto.vetoInfo[2]];
+          vetosById[id] = [account.toString()];
         }
       });
     });
 
-    const legislation = legislationHuman.map(({ key, value }) => ({
-      tier: key[0],
-      index: key[1],
-      content: value,
-      vetos: vetosByIndex[key[1]] ? vetosByIndex[key[1]] : [],
+    return legislation.map(([ { args }, value ]) => ({
+      tier: args[0].toString(),
+      id: args[1],
+      content: value.toHuman(),
+      vetos: vetosById[args[1]] ?? [],
     }));
-
-    return legislation;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -1733,13 +1719,13 @@ const getStakingBondingDuration = async () => {
   return api.consts.staking.bondingDuration;
 }
 
-const congressProposeLegislation = async (tier, index, legislationContent, walletAddress, callback) => {
+const congressProposeLegislation = async (tier, id, legislationContent, walletAddress, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
 
   const threshold = await congressMajorityThreshold();
 
-  const proposal = api.tx.liberlandLegislation.addLaw(tier, index, legislationContent);
+  const proposal = api.tx.liberlandLegislation.addLaw(tier, id, legislationContent);
   const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
   extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
     let errorData = handleMyDispatchErrors(dispatchError, api)
@@ -1758,12 +1744,12 @@ const congressProposeLegislation = async (tier, index, legislationContent, walle
   });
 }
 
-const congressRepealLegislation = async (tier, index, walletAddress) => {
+const congressRepealLegislation = async (tier, id, walletAddress) => {
   const api = await getApi();
 
   const threshold = await congressMajorityThreshold();
 
-  const proposal = api.tx.liberlandLegislation.repealLaw(tier, index);
+  const proposal = api.tx.liberlandLegislation.repealLaw(tier, id);
   const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
 
   return await submitExtrinsic( extrinsic, walletAddress);
@@ -1826,7 +1812,7 @@ const closeCongressMotion = async (proposalHash, index, walletAddress) => {
 
 const congressProposeLegislationReferendum = async (
   tier,
-  index,
+  id,
   content,
   fastTrack,
   votingPeriod,
@@ -1835,7 +1821,7 @@ const congressProposeLegislationReferendum = async (
 ) => {
   const api = await getApi();
 
-  const addLaw = api.tx.liberlandLegislation.addLaw(tier, index, content).method;
+  const addLaw = api.tx.liberlandLegislation.addLaw(tier, id, content).method;
   const referendumPropose = api.tx.democracy.externalProposeMajority({
     Lookup: { 
       hash_: addLaw.hash,
@@ -1865,7 +1851,7 @@ const congressProposeLegislationReferendum = async (
 
 const congressProposeRepealLegislation = async (
   tier,
-  index,
+  id,
   fastTrack,
   votingPeriod,
   enactmentPeriod,
@@ -1873,7 +1859,7 @@ const congressProposeRepealLegislation = async (
 ) => {
   const api = await getApi();
 
-  const repealLaw = api.tx.liberlandLegislation.repealLaw(tier, index).method;
+  const repealLaw = api.tx.liberlandLegislation.repealLaw(tier, id).method;
   const referendumPropose = api.tx.democracy.externalProposeMajority({
     Lookup: { 
       hash_: repealLaw.hash,

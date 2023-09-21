@@ -160,13 +160,12 @@ function* renounceCandidacyWorker(action) {
   }
 }
 
-function* congressProposeLegislationWorker({ payload: { index, legislationContent } }) {
+function* congressProposeLegislationWorker({ payload: { tier, id, legislationContent } }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
 
-  const tier = 1; // International Treaty
-  const { errorData } = yield cps(congressProposeLegislation, tier, index, legislationContent, walletAddress);
+  const { errorData } = yield cps(congressProposeLegislation, tier, id, legislationContent, walletAddress);
   if (errorData.isError) {
     yield put(
       blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
@@ -179,12 +178,12 @@ function* congressProposeLegislationWorker({ payload: { index, legislationConten
   }
 }
 
-function* congressRepealLegislationWorker({ payload: { tier, index } }) {
+function* congressRepealLegislationWorker({ payload: { tier, id } }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
 
-  yield call(congressRepealLegislation, tier, index, walletAddress);
+  yield call(congressRepealLegislation, tier, id, walletAddress);
 
   yield put(congressActions.congressRepealLegislation.success());
   yield put(congressActions.getMotions.call());
@@ -192,7 +191,7 @@ function* congressRepealLegislationWorker({ payload: { tier, index } }) {
 
 function* congressProposeRepealLegislationWorker({
   payload: {
-    tier, index, fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
+    tier, id, fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
   },
 }) {
   const walletAddress = yield select(
@@ -201,8 +200,8 @@ function* congressProposeRepealLegislationWorker({
 
   yield call(
     congressProposeRepealLegislation,
-    parseInt(tier),
-    parseInt(index),
+    tier,
+    id,
     fastTrack,
     daysToBlocks(fastTrackVotingPeriod),
     daysToBlocks(fastTrackEnactmentPeriod),
@@ -253,7 +252,7 @@ function* closeMotionWorker({ payload: { proposal, index } }) {
 
 function* congressProposeLegislationReferendumWorker({
   payload: {
-    tier, index, content,
+    tier, id, content,
     fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
   },
 }) {
@@ -263,8 +262,8 @@ function* congressProposeLegislationReferendumWorker({
 
   yield call(
     congressProposeLegislationReferendum,
-    parseInt(tier),
-    parseInt(index),
+    tier,
+    id,
     content,
     fastTrack,
     daysToBlocks(fastTrackVotingPeriod),

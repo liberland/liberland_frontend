@@ -22,11 +22,29 @@ function CongressProposeLegislationReferendumModal({
     watch,
   } = useForm({
     mode: 'all',
-    defaultValues: FastTrackDefaults,
+    defaultValues: {
+      year: new Date().getFullYear(),
+      FastTrackDefaults,
+    },
   });
 
-  const onSubmitPropose = (values) => {
-    dispatch(congressActions.congressProposeLegislationReferendum.call(values));
+  const onSubmitPropose = ({
+    tier,
+    year,
+    index,
+    content,
+    fastTrack,
+    fastTrackVotingPeriod,
+    fastTrackEnactmentPeriod,
+  }) => {
+    dispatch(congressActions.congressProposeLegislationReferendum.call({
+      tier,
+      id: { year, index },
+      content,
+      fastTrack,
+      fastTrackVotingPeriod,
+      fastTrackEnactmentPeriod,
+    }));
     closeModal();
   };
 
@@ -49,14 +67,25 @@ function CongressProposeLegislationReferendumModal({
         name="tier"
         options={[
           // no constitution, as it requires propose_rich
-          { value: '2', display: 'International Treaty' },
-          { value: '2', display: 'Law' },
-          { value: '3', display: 'Tier3' }, // FIXME proper names
-          { value: '4', display: 'Tier4' },
-          { value: '5', display: 'Tier5' },
-          { value: '6', display: 'Decision' },
+          { value: 'InternationalTreaty', display: 'International Treaty' },
+          { value: 'Law', display: 'Law' },
+          { value: 'Tier3', display: 'Tier3' }, // FIXME proper names
+          { value: 'Tier4', display: 'Tier4' },
+          { value: 'Tier5', display: 'Tier5' },
+          { value: 'Decision', display: 'Decision' },
         ]}
       />
+
+      <div className={styles.title}>Legislation Year</div>
+      <TextInput
+        required
+        errorTitle="Year"
+        register={register}
+        name="year"
+        placeholder="Legislation year"
+        validate={validateIndex}
+      />
+      { errors?.year?.message ? <div className={styles.error}>{errors.year.message}</div> : null }
 
       <div className={styles.title}>Legislation Index</div>
       <TextInput

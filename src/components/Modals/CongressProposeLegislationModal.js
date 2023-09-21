@@ -14,10 +14,20 @@ function CongressProposeLegislationModal({
   closeModal,
 }) {
   const dispatch = useDispatch();
-  const { handleSubmit, formState: { errors }, register } = useForm({ mode: 'all' });
+  const { handleSubmit, formState: { errors }, register } = useForm({
+    mode: 'all',
+    defaultValues: {
+      tier: 'InternationalTreaty',
+      year: new Date().getFullYear(),
+    }
+  });
 
-  const onSubmitPropose = (values) => {
-    dispatch(congressActions.congressProposeLegislation.call(values));
+  const onSubmitPropose = ({ tier, year, index, legislationContent}) => {
+    dispatch(congressActions.congressProposeLegislation.call({
+      tier,
+      id: { year, index },
+      legislationContent,
+    }));
     closeModal();
   };
 
@@ -34,9 +44,19 @@ function CongressProposeLegislationModal({
         name="tier"
         disabled
         options={[
-          { value: '1', display: 'International Treaty' },
+          { value: 'InternationalTreaty', display: 'International Treaty' },
         ]}
       />
+
+      <div className={styles.title}>Legislation Year</div>
+      <TextInput
+        required
+        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
+        errorTitle="Year"
+        register={register}
+        name="year"
+      />
+      { errors?.year?.message && <div className={styles.error}>{errors.year.message}</div> }
 
       <div className={styles.title}>Legislation Index</div>
       <TextInput

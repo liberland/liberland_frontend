@@ -5,7 +5,7 @@ import Button from '../../Button/Button';
 import CongressRepealLegislationModal from '../../Modals/CongressRepealLegislationModal';
 import { blockchainSelectors, congressSelectors } from '../../../redux/selectors';
 
-export default function RepealLegislationButton({ tier, index }) {
+export default function RepealLegislationButton({ tier, id }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
 
@@ -21,12 +21,15 @@ export default function RepealLegislationButton({ tier, index }) {
       <Button small primary onClick={handleModalOpen}>
         Propose Congress motion to repeal
       </Button>
-      {isModalOpen && <CongressRepealLegislationModal closeModal={handleModalOpen} tier={tier} index={index} />}
+      {isModalOpen && <CongressRepealLegislationModal closeModal={handleModalOpen} tier={tier} id={id} />}
     </div>
   );
 }
 
 RepealLegislationButton.propTypes = {
   tier: PropTypes.string.isRequired,
-  index: PropTypes.string.isRequired,
+  id: PropTypes.shape({
+    year: PropTypes.number.isRequired,
+    index: PropTypes.number.isRequired,
+  }).isRequired,
 };

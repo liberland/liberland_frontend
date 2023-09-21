@@ -13,7 +13,7 @@ import {
 
 import { blockchainSelectors } from '../selectors';
 
-import {blockchainActions, democracyActions, legislationActions} from '../actions';
+import {blockchainActions, democracyActions} from '../actions';
 
 // WORKERS
 
@@ -77,7 +77,8 @@ function* proposeWorker(action) {
   try {
     const walletAddress = action.payload.userWalletAddress;
     const { values } = action.payload;
-    const { blockHash, errorData } = yield cps(submitProposal, walletAddress, values);
+    const legislationYear = new Date().getFullYear();
+    const { blockHash, errorData } = yield cps(submitProposal, walletAddress, { ...values, legislationYear });
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));

@@ -14,7 +14,7 @@ function ProposeReferendumModal({
   const { handleSubmit, formState: { errors }, register } = useForm({
     mode: 'all',
     defaultValues: {
-      legislationTier: "2",
+      legislationTier: "Law",
     }
   });
 
@@ -30,12 +30,12 @@ function ProposeReferendumModal({
         register={register}
         name="legislationTier"
         options={[
-          { value: "0", display: "Constitution"},
-          { value: "2", display: "Law"},
-          { value: "3", display: "Tier3"}, // FIXME proper names
-          { value: "4", display: "Tier4"},
-          { value: "5", display: "Tier5"},
-          { value: "6", display: "Decision"},
+          { value: "Constitution", display: "Constitution"},
+          { value: "Law", display: "Law"},
+          { value: "Tier3", display: "Tier3"}, // FIXME proper names
+          { value: "Tier4", display: "Tier4"},
+          { value: "Tier5", display: "Tier5"},
+          { value: "Decision", display: "Decision"},
         ]}
       />
 

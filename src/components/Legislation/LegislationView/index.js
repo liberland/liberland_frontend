@@ -17,7 +17,7 @@ const LegislationView = () => {
   const citizens = useSelector(legislationSelectors.citizenCount);
 
   useEffect(() => {
-    dispatch(legislationActions.getLegislation.call(tier));
+    dispatch(legislationActions.getLegislation.call({ tier }));
     dispatch(legislationActions.getCitizenCount.call());
     dispatch(congressActions.getMembers.call()); // required by RepealLegislationButton
   }, [dispatch, tier, legislationActions]);
@@ -27,7 +27,7 @@ const LegislationView = () => {
   if (!legislation[tier]) return 'Loading...';
 
   return legislation[tier].map((l) => (
-    <Card className={styles.legislationCard} title={`#${l.index}`} key={l.index}>
+    <Card className={styles.legislationCard} title={`${l.id.year}-${l.id.index}`} key={l.id}>
       <div className={styles.legislationInfoContainer}>
         <div className={styles.legislationContent}>
           {l.content}
@@ -51,7 +51,7 @@ const LegislationView = () => {
                     small
                     red
                     onClick={() => dispatch(legislationActions.revertVeto.call({
-                      tier, index: l.index, userWalletAddress,
+                      tier, id: l.id, userWalletAddress,
                     }))}
                   >
                     Revert Veto
@@ -62,15 +62,15 @@ const LegislationView = () => {
                     small
                     primary
                     onClick={() => dispatch(legislationActions.castVeto.call({
-                      tier, index: l.index, userWalletAddress,
+                      tier, id: l.id, userWalletAddress,
                     }))}
                   >
                     Cast Veto
                   </Button>
                 )
             }
-            { tier === '1' && <RepealLegislationButton tier={tier} index={l.index} /> }
-            { Number(tier) >= 1 && <ProposeRepealLegislationButton tier={tier} index={l.index} /> }
+            { tier === 'InternationalTreaty' && <RepealLegislationButton tier={tier} id={l.id} /> }
+            { tier !== 'Constitution' && <ProposeRepealLegislationButton tier={tier} id={l.id} /> }
           </div>
         </div>
       </div>
