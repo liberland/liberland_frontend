@@ -6,10 +6,40 @@
 .navWrapper {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;;
+  align-items: flex-start;
   margin-bottom: 40px;
 
   & > div {
     margin: 0;
   }
+}
+
+.rowWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  & > div {
+    margin: 0;
+  }
+}
+
+.rowEnd {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+
+  > * {
+    margin: 0 4px;
+  }
+}
+
+.navCol {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
 }

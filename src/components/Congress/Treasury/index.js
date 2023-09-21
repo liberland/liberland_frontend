@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN_ZERO } from '@polkadot/util';
 import styles from './styles.module.scss';
+import congressStyles from '../styles.module.scss';
 import { formatDollars } from '../../../utils/walletHelpers';
 import Button from '../../Button/Button';
 import TreasurySpendingMotionModalWrapper from '../../Modals/TreasurySpendingMotionModal';
@@ -17,7 +18,11 @@ import {
 import router from '../../../router';
 
 function Proposal({
-  id, council, proposal: { beneficiary, value }, approved, userIsMember,
+  id,
+  council,
+  proposal: { beneficiary, value },
+  approved,
+  userIsMember,
 }) {
   const dispatch = useDispatch();
 
@@ -30,36 +35,38 @@ function Proposal({
   };
 
   return (
-    <div className={styles.proposalWrapper}>
-      <div className={styles.listItemName}>{id.toString()}</div>
-      <div className={styles.listItem}>
-        {beneficiary.toString()}
-      </div>
-      <div className={styles.listItem}>
+    <tr className={styles.proposalWrapper}>
+      <td className={styles.listItem}>{id.toString()}</td>
+      <td className={styles.listItem}>
+        <small>{beneficiary.toString()}</small>
+      </td>
+      <td className={styles.listItem}>
         {formatDollars(value)}
         {' '}
         LLD
-      </div>
-      <div className={styles.listItem}>
-        {approved ? 'YES' : 'NO'}
-        {council.length > 0 && <Link to={router.congress.motions}>See change motion</Link>}
-      </div>
+      </td>
+      <td className={styles.listItem}>
+        <b>{approved ? 'YES' : 'NO'}</b>
+        {council.length > 0 && (
+          <Link to={router.congress.motions}>See change motion</Link>
+        )}
+      </td>
       {userIsMember && (
-        <div className={styles.listItem}>
-          {approved
-            ? (
+        <td className={styles.listItem}>
+          <div className={congressStyles.rowEnd}>
+            {approved ? (
               <Button primary small onClick={unapprove}>
                 Unapprove
               </Button>
-            )
-            : (
+            ) : (
               <Button primary small onClick={approve}>
                 Approve
               </Button>
             )}
-        </div>
+          </div>
+        </td>
       )}
-    </div>
+    </tr>
   );
 }
 
@@ -116,75 +123,101 @@ export default function Treasury() {
   const remainingBudget = treasuryInfo.budget.sub(totalApproved);
 
   return (
-    <div>
-      <div>
-        Spend period:
-        {periodDays}
-        {' '}
-        days
+    <div className={congressStyles.congressWrapper}>
+      <div className={congressStyles.rowWrapper}>
+        <div className={congressStyles.navCol}>
+          <h4>Spend period</h4>
+          <p>
+            {periodDays}
+            {' '}
+            days
+          </p>
+        </div>
+        <div className={congressStyles.navCol}>
+          <h4>Spend period</h4>
+          <p>
+            {periodDays}
+            {' '}
+            days
+          </p>
+        </div>
+        <div className={congressStyles.navCol}>
+          <h4>Current period ends in</h4>
+          <p>
+            {periodRemainingDays}
+            {' '}
+            days
+          </p>
+        </div>
+        <div className={congressStyles.navCol}>
+          <h4>Total budget</h4>
+          <p>
+            {formatDollars(treasuryInfo.budget)}
+            {' '}
+            LLD
+          </p>
+        </div>
+        <div className={congressStyles.navCol}>
+          <h4>Remaining budget</h4>
+          <p>
+            {formatDollars(remainingBudget)}
+            {' '}
+            LLD
+          </p>
+        </div>
+        <div className={congressStyles.rowEnd}>
+          <Button primary medium onClick={handleSpendingModalOpen}>
+            Propose spend
+          </Button>
+        </div>
       </div>
       <div>
-        Current period ends in
-        {periodRemainingDays}
-        {' '}
-        days
-      </div>
-      <div>
-        Total budget:
-        {formatDollars(treasuryInfo.budget)}
-        {' '}
-        LLD
-      </div>
-      <div>
-        Remaining budget:
-        {formatDollars(remainingBudget)}
-        {' '}
-        LLD
-      </div>
-      <Button primary small onClick={handleSpendingModalOpen}>
-        Propose spend
-      </Button>
-
-      {isSpendingModalOpen && <TreasurySpendingMotionModalWrapper closeModal={handleSpendingModalOpen} />}
-
-      <div className={styles.proposalListHeader}>
-        <div className={styles.listItemName}>
-          ID
-        </div>
-        <div className={styles.listItem}>
-          Beneficiary
-        </div>
-        <div className={styles.listItem}>
-          Value
-        </div>
-        <div className={styles.listItem}>
-          Approved
-        </div>
-        {userIsMember && (
-          <div className={styles.listItem}>
-            Actions
-          </div>
+        {isSpendingModalOpen && (
+          <TreasurySpendingMotionModalWrapper
+            closeModal={handleSpendingModalOpen}
+          />
         )}
+
+        <table>
+          <thead>
+            {(treasuryInfo.proposals.approvals.length > 0
+              || treasuryInfo.proposals.proposals.length > 0) && (
+              <tr className={styles.proposalListHeader}>
+                <th className={styles.listItem}>ID</th>
+                <th className={styles.listItem}>Beneficiary</th>
+                <th className={styles.listItem}>Value</th>
+                <th className={styles.listItem}>Approved</th>
+                {userIsMember && <th className={styles.listItem}>Actions</th>}
+              </tr>
+            )}
+          </thead>
+          <tbody>
+            {treasuryInfo.proposals.approvals.map(
+              ({ id, proposal, council }) => (
+                <Proposal
+                  key={id.toString()}
+                  id={id}
+                  council={council}
+                  proposal={proposal}
+                  userIsMember={userIsMember}
+                  approved
+                />
+              ),
+            )}
+            {treasuryInfo.proposals.proposals.map(
+              ({ id, proposal, council }) => (
+                <Proposal
+                  key={id.toString()}
+                  id={id}
+                  council={council}
+                  proposal={proposal}
+                  userIsMember={userIsMember}
+                />
+              ),
+            )}
+          </tbody>
+        </table>
       </div>
-      {treasuryInfo.proposals.approvals.map(({ id, proposal, council }) => (
-        <Proposal
-          key={id.toString()}
-          id={id}
-          council={council}
-          proposal={proposal}
-          userIsMember={userIsMember}
-          approved
-        />
-      ))}
-      {treasuryInfo.proposals.proposals.map(({ id, proposal, council }) => (
-        <Proposal
-          key={id.toString()}
-          id={id}
-          council={council}
-          proposal={proposal}
-          userIsMember={userIsMember}
-        />
-      ))}
     </div>
   );
 }

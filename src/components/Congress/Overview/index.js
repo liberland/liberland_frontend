@@ -33,9 +33,7 @@ export default function Overview() {
   const senderIsCandidate = candidates.find(
     (candidate) => candidate[0] === sender,
   );
-  const senderIsMember = members.find(
-    (member) => member.toString() === sender,
-  );
+  const senderIsMember = members.find((member) => member.toString() === sender);
   const senderIsRunnerUp = runnersUp.find(
     (member) => member.toString() === sender,
   );
@@ -46,44 +44,48 @@ export default function Overview() {
   else if (senderIsRunnerUp) userStatus = 'RunnerUp';
 
   return (
-    <div className={styles.navWrapper}>
-      <span>
-        User congress status:
-        {' '}
-        {userStatus}
-      </span>
-      {!senderIsCandidate && !senderIsMember && !senderIsRunnerUp && (
-        <Button
-          medium
-          primary
-          onClick={() => dispatch(congressActions.applyForCongress.call())}
-        >
-          Apply for Congress
-        </Button>
-      )}
-      {senderIsMember && (
-      <>
-        <ProposeLegislationButton />
-        <ProposeLegislationReferendumButton />
-        <Button
-          medium
-          primary
-          onClick={handleSpendingModalOpen}
-        >
-          Create new spending
-        </Button>
-      </>
-      )}
-      {isSpendingModalOpen && <SpendingMotionModal closeModal={handleSpendingModalOpen} />}
-      {(senderIsMember || senderIsCandidate || senderIsRunnerUp) && (
-        <Button
-          medium
-          primary
-          onClick={() => dispatch(congressActions.renounceCandidacy.call(userStatus))}
-        >
-          Renounce candidacy
-        </Button>
-      )}
+    <div className={styles.congressWrapper}>
+      <div className={styles.rowWrapper}>
+        <div className={styles.navCol}>
+          <h4>User congress status</h4>
+          <p>
+            {' '}
+            {userStatus}
+          </p>
+        </div>
+        <div className={styles.rowEnd}>
+          {!senderIsCandidate && !senderIsMember && !senderIsRunnerUp && (
+            <Button
+              small
+              primary
+              onClick={() => dispatch(congressActions.applyForCongress.call())}
+            >
+              Apply for Congress
+            </Button>
+          )}
+          {senderIsMember && (
+            <>
+              <ProposeLegislationButton />
+              <ProposeLegislationReferendumButton />
+              <Button medium primary onClick={handleSpendingModalOpen}>
+                Create new spending
+              </Button>
+            </>
+          )}
+          {isSpendingModalOpen && (
+            <SpendingMotionModal closeModal={handleSpendingModalOpen} />
+          )}
+          {(senderIsMember || senderIsCandidate || senderIsRunnerUp) && (
+            <Button
+              medium
+              secondary
+              onClick={() => dispatch(congressActions.renounceCandidacy.call(userStatus))}
+            >
+              Renounce candidacy
+            </Button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

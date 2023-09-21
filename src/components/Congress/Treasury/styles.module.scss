@@ -2,46 +2,52 @@
 @import '../../../assets/base/fonts';
 
 .proposalWrapper {
-  display: flex;
-  height: 50px;
   width: 100%;
-  font-size: 18px;
-  align-items: flex-start;
-  justify-content: center;
-  border-radius: 20px;
-  background: $secondary3;
-  margin-top: 10px;
-  flex-direction: row;
+  margin-top: 20px;
+
+  .listItem {
+    background: $secondary3;
+  }
+}
+
+.proposalWrapper:nth-child(even) {
+  .listItem {
+    background: $transparent3
+  }
 }
 
 .proposalWrapper:hover {
-  background: $primary;
+  .listItem {
+    background: $primary;
+  }
 }
 
 .listItem {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+  text-align: right;
+  padding: 8px; 
 }
 
-.listItemName {
-  display: flex;
-  flex: 5;
-  align-items: center;
-  height: 100%;
-  margin-left: 15px;
+.listItem:first-child {
+  border: 0px solid;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.listItem:last-child {
+  border: 0px solid;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
 .proposalListHeader {
-  display: flex;
-  height: 50px;
-  width: 100%;
   font-size: 18px;
-  align-items: flex-start;
-  justify-content: center;
   border-radius: 20px;
   margin-top: 10px;
-  flex-direction: row;
+  text-align: right;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
