@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import Button from '../../Button/Button';
 import router from '../../../router';
 
-export default function ProposeLegislationButton() {
+export default function ProposeLegislationViaReferendumButton() {
   return (
-    <Link to={router.congress.addLegislation}>
+    <Link to={router.congress.addLegislationViaReferendum}>
       <Button medium primary>
-        Propose International Treaty
+        Propose Referendum
       </Button>
     </Link>
   );

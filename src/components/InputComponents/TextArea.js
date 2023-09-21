@@ -1,38 +1,47 @@
 /* eslint-disable react/prop-types */
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import cx from 'classnames';
-import PropTypes from 'prop-types';
 
 import styles from './styles.module.scss';
 
-function TextInput({
+function TextArea({
   register,
+  watch,
   name,
   placeholder,
   required = false,
   pattern = false,
   validate = false,
   width = 350,
-  error,
   errorTitle,
   withIcon = false,
   Icon,
-  setSendAddress,
   value,
   disabled = false,
   onPaste,
 }) {
+  const ref = useRef(null);
+  const v = watch ? watch(name) : null;
+
+  useEffect(() => {
+    if (!ref.current || v === null) return;
+    const textarea = ref.current.querySelector('textarea');
+    const oldHeight = parseInt(textarea.style.height);
+    textarea.style.height = 'inherit';
+    const newHeight = Math.max(textarea.scrollHeight, Number.isNaN(oldHeight) ? 0 : oldHeight);
+    textarea.style.height = `${newHeight}px`;
+  }, [ref.current, v]);
+
   return (
-    <div className={styles.inputWrapper}>
+    <div ref={ref} className={styles.inputWrapper}>
       {Icon && <Icon className={styles.inputIcon} />}
-      <input
+      <textarea
+        ref={ref}
         className={cx(styles.input, { [styles.withIcon]: Icon && withIcon })}
         name={name}
         placeholder={placeholder}
         width={width}
-        error={error}
         value={value}
-        onInput={(e) => setSendAddress(e.target.value)}
         disabled={disabled}
         onPaste={onPaste}
         {...register(name, {
@@ -46,12 +55,4 @@ function TextInput({
   );
 }
 
-TextInput.propTypes = {
-  setSendAddress: PropTypes.func,
-};
-
-TextInput.defaultProps = {
-  setSendAddress: () => null,
-};
-
-export default TextInput;
+export default TextArea;

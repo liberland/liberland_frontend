@@ -6,6 +6,10 @@ import Overview from './Overview';
 import Motions from './Motions';
 import router from '../../router';
 import Treasury from './Treasury';
+// eslint-disable-next-line max-len
+import { CongressAddLegislation } from '../Voting/Referendum/ProposalForms/CongressAddLegislation/CongressAddLegislation';
+// eslint-disable-next-line max-len
+import { CongressAddLegislationViaReferendum } from '../Voting/Referendum/ProposalForms/CongressAddLegislationViaReferendum/CongressAddLegislationViaReferendum';
 
 function Congress() {
   return (
@@ -18,6 +22,12 @@ function Congress() {
           <Route exact path={router.congress.overview} component={Overview} />
           <Route exact path={router.congress.motions} component={Motions} />
           <Route exact path={router.congress.treasury} component={Treasury} />
+          <Route exact path={router.congress.addLegislation} component={CongressAddLegislation} />
+          <Route
+            exact
+            path={router.congress.addLegislationViaReferendum}
+            component={CongressAddLegislationViaReferendum}
+          />
           <Route
             exact
             path={router.home.congress}

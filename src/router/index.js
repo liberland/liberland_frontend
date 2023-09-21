@@ -29,6 +29,7 @@ export default {
   voting: {
     congressionalAssemble: '/home/voting/congressional-assemble',
     referendum: '/home/voting/referendum',
+    addLegislation: '/home/voting/add-legislation',
   },
   legislation: {
     view: '/home/legislation/:tier',
@@ -55,5 +56,7 @@ export default {
     overview: '/home/congress/overview',
     motions: '/home/congress/motions',
     treasury: '/home/congress/treasury',
+    addLegislation: '/home/congress/add-legislation',
+    addLegislationViaReferendum: '/home/congress/add-legislation-via-referendum',
   },
 };
