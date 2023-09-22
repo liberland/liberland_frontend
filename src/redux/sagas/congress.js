@@ -24,6 +24,7 @@ import {
   renounceCandidacy,
   voteAtMotions,
   congressProposeRepealLegislation,
+  congressDemocracyBlacklist,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { daysToBlocks } from '../../utils/nodeRpcCall';
@@ -286,6 +287,15 @@ function* congressSendTreasuryLldWorker({ payload: { transferToAddress, transfer
   yield put(congressActions.congressSendTreasuryLld.success());
 }
 
+function* congressDemocracyBlacklistWorker({ payload: { hash, referendumIndex } }) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  yield call(congressDemocracyBlacklist, hash, referendumIndex, walletAddress);
+  yield put(congressActions.congressDemocracyBlacklist.success());
+}
+
 // WATCHERS
 
 export function* applyForCongressWatcher() {
@@ -439,5 +449,12 @@ export function* congressSendTreasuryLldWatcher() {
   yield* blockchainWatcher(
     congressActions.congressSendTreasuryLld,
     congressSendTreasuryLldWorker,
+  );
+}
+
+export function* congressDemocracyBlacklistWatcher() {
+  yield* blockchainWatcher(
+    congressActions.congressDemocracyBlacklist,
+    congressDemocracyBlacklistWorker,
   );
 }

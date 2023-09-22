@@ -71,3 +71,13 @@
 .votingTimeText{
   font-size: smaller;
 }
+.rowEnd {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  margin-bottom: 20px;
+
+  > * {
+    margin: 0 4px;
+  }
+}

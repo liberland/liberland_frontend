@@ -115,5 +115,6 @@ export default function* rootSaga() {
     congressSagas.unapproveTreasurySpendWatcher(),
     congressSagas.voteAtMotionsWatcher(),
     congressSagas.congressProposeRepealLegislationWatcher(),
+    congressSagas.congressDemocracyBlacklistWatcher(),
   ]);
 }

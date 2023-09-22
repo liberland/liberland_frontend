@@ -19,6 +19,7 @@ export const {
   unapproveTreasurySpend,
   voteAtMotions,
   congressProposeRepealLegislation,
+  congressDemocracyBlacklist,
 } = createActions({
   APPLY_FOR_CONGRESS: {
     call: undefined,
@@ -106,6 +107,11 @@ export const {
     failure: undefined,
   },
   CONGRESS_PROPOSE_REPEAL_LEGISLATION: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_DEMOCRACY_BLACKLIST: {
     call: undefined,
     success: undefined,
     failure: undefined,

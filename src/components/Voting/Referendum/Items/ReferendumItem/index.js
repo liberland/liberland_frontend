@@ -1,26 +1,36 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { BN, BN_ZERO } from '@polkadot/util';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
 import { formatMerits } from '../../../../../utils/walletHelpers';
-import { BN, BN_ZERO } from '@polkadot/util';
+
+// REDUX
+import { congressActions } from '../../../../../redux/actions';
+import {
+  congressSelectors,
+} from '../../../../../redux/selectors';
 
 const voteButtons = (buttonVoteCallback, referendumInfo) => (
   <div className={styles.buttonContainer}>
     <Button
-      medium
+      small
       primary
       green
       className={styles.yayButton}
-      onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}>
+      onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}
+    >
       Vote Aye
     </Button>
     <Button
-      medium
+      small
       primary
       red
-      className={styles.nayButton} onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}>
+      className={styles.nayButton}
+      onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}
+    >
       Vote Nay
     </Button>
   </div>
@@ -40,7 +50,8 @@ const alreadyVotedButton = (buttonVoteCallback, referendumInfo, alreadyVoted) =>
             secondary
             red
             className={styles.nayButton}
-            onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}>
+            onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}
+          >
             Change vote to Nay
           </Button>
         </>
@@ -52,22 +63,81 @@ const alreadyVotedButton = (buttonVoteCallback, referendumInfo, alreadyVoted) =>
             {alreadyVoted}
           </Button>
           <Button
-            medium secondary green className={styles.nayButton} onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}>Change vote to Aye</Button>
+            medium
+            secondary
+            green
+            className={styles.nayButton}
+            onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}
+          >
+            Change vote to Aye
+          </Button>
         </>
       )}
   </div>
 );
 
+const voteButtonsContainer = (alreadyVoted, delegating, buttonVoteCallback, referendumData) => {
+  if (alreadyVoted) { return alreadyVotedButton(alreadyVoted); }
+  if (delegating) { return 'Undelegate to vote individually'; }
+  return voteButtons(buttonVoteCallback, referendumData);
+};
+
+function BlacklistButton({ hash, referendumIndex }) {
+  const dispatch = useDispatch();
+  const userIsMember = useSelector(congressSelectors.userIsMember);
+
+  useEffect(() => {
+    dispatch(congressActions.getMembers.call());
+  }, [dispatch]);
+
+  if (!userIsMember) return null;
+
+  const blacklistMotion = () => dispatch(
+    congressActions.congressDemocracyBlacklist.call({
+      hash,
+      referendumIndex,
+    }),
+  );
+
+  return (
+    <Button small secondary onClick={() => { blacklistMotion(); }}>
+      Cancel
+    </Button>
+  );
+}
+
+BlacklistButton.propTypes = {
+  hash: PropTypes.string.isRequired,
+  referendumIndex: PropTypes.number.isRequired,
+};
+
 function ReferendumItem({
-  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, alreadyVoted, buttonVoteCallback, votingTimeLeft, referendumIndex, delegating,
+  name,
+  createdBy,
+  externalLink,
+  description,
+  yayVotes,
+  nayVotes,
+  hash,
+  alreadyVoted,
+  buttonVoteCallback,
+  votingTimeLeft,
+  referendumIndex,
+  delegating,
 }) {
-  const progressBarRatio = yayVotes.gt(BN_ZERO) ? `${yayVotes.mul(new BN("100")).div(yayVotes.add(nayVotes)).toString()}%` : '0%';
+  const progressBarRatio = yayVotes.gt(BN_ZERO)
+    ? `${yayVotes.mul(new BN('100'))
+      .div(yayVotes.add(nayVotes)).toString()}%`
+    : '0%';
   return (
     <Card
       title={name}
       className={styles.referendumItemContainer}
     >
       <div>
+        <div className={styles.rowEnd}>
+          <BlacklistButton hash={hash} referendumIndex={referendumIndex} />
+        </div>
         <div className={styles.metaInfoLine}>
           <div>
             <div className={styles.metaTextInfo}>
@@ -112,15 +182,7 @@ function ReferendumItem({
         </div>
         <div className={styles.buttonContainer}>
           {
-            (alreadyVoted
-              ? alreadyVotedButton(buttonVoteCallback, { name, referendumIndex }, alreadyVoted)
-              : (
-                delegating
-                  ? 'Undelegate to vote individually'
-                  : voteButtons(buttonVoteCallback, { name, referendumIndex })
-              )
-            )
-
+            voteButtonsContainer(alreadyVoted, delegating, buttonVoteCallback, { name, referendumIndex })
           }
         </div>
       </div>
