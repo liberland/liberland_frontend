@@ -31,6 +31,7 @@ function ProposeReferendumModal({
         name="legislationTier"
         options={[
           { value: "0", display: "Constitution"},
+          { value: "1", display: "International Treaty"},
           { value: "2", display: "Law"},
           { value: "3", display: "Tier3"}, // FIXME proper names
           { value: "4", display: "Tier4"},
