@@ -24,7 +24,7 @@ const ACCOUNTS = [
     address: "5EYCAe5ijiYfyeZ2JJCGq56LmPyNRAKzpG4QkoQkkQNB5e6Z",
   },
   {
-    name: "Council",
+    name: "Congress",
     address: "5EYCAe5g8CDuMsTief7QBxfvzDFEfws6ueXTUhsbx5V81nGH",
   },
   // FIXME 1 LLD faucet

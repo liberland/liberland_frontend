@@ -134,14 +134,6 @@ export default function Treasury() {
           </p>
         </div>
         <div className={congressStyles.navCol}>
-          <h4>Spend period</h4>
-          <p>
-            {periodDays}
-            {' '}
-            days
-          </p>
-        </div>
-        <div className={congressStyles.navCol}>
           <h4>Current period ends in</h4>
           <p>
             {periodRemainingDays}
