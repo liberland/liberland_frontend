@@ -20,9 +20,9 @@ export default function ProposeRepealLegislationButton({ tier, index }) {
   if (!userIsMember) return null;
 
   return (
-    <div>
-      <Button small primary onClick={handleModalOpen}>
-        Propose law repeal
+    <>
+      <Button medium primary onClick={handleModalOpen}>
+        Propose Referendum to repeal
       </Button>
       {isModalOpen && (
         <CongressRepealLegislationFastTrackModal
@@ -31,7 +31,7 @@ export default function ProposeRepealLegislationButton({ tier, index }) {
           index={index}
         />
       )}
-    </div>
+    </>
   );
 }
 

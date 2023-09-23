@@ -17,12 +17,12 @@ export default function RepealLegislationButton({ tier, index }) {
   if (!userIsMember) return null;
 
   return (
-    <div>
-      <Button small primary onClick={handleModalOpen}>
+    <>
+      <Button medium primary onClick={handleModalOpen}>
         Propose Congress motion to repeal
       </Button>
       {isModalOpen && <CongressRepealLegislationModal closeModal={handleModalOpen} tier={tier} index={index} />}
-    </div>
+    </>
   );
 }
 

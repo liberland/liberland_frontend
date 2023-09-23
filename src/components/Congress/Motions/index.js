@@ -36,78 +36,96 @@ export default function Motions() {
 
 function Motion({ proposal, proposalOf, voting }) {
   const dispatch = useDispatch();
-  const userAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const userAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
 
+  const readableProposalOf = proposalOf.toHuman();
   const threshold = voting.threshold.toNumber();
 
   const isClosable = voting.ayes.length >= threshold;
 
   return (
     <Card
-      title={`${proposalOf.section}.${proposalOf.method}`}
+      title={`${readableProposalOf.section}.${readableProposalOf.method}`}
       className={styles.cardProposalsSection}
     >
       <div>
         <div className={styles.metaInfoLine}>
+
           <p>
             Proposal id:
             {proposal}
           </p>
-          <p>
-            Aye
-            {' '}
-            <b>
-              {voting.ayes.length}
-              /
-              {threshold}
-            </b>
-          </p>
+          <span>
+            <p>
+              Aye
+              {' '}
+              <b>
+                {voting.ayes.length}
+                /
+                {threshold}
+              </b>
+            </p>
+            <p>
+              Nay
+              {' '}
+              <b>
+                {voting.nays.length}
+                /
+                {threshold}
+              </b>
+            </p>
+          </span>
         </div>
 
-        <pre>{JSON.stringify(proposalOf.args, null, 2)}</pre>
+        <pre>{JSON.stringify(readableProposalOf.args, null, 2)}</pre>
         <div className={styles.buttonsContainer}>
-          { isClosable && (
+          {isClosable && (
             <Button
               medium
               primary
               onClick={() => dispatch(
                 congressActions.closeMotion.call({
-                  proposal, index: voting.index,
+                  proposal,
+                  index: voting.index,
                 }),
               )}
             >
               Close & Execute
             </Button>
           )}
-          {!voting.ayes.map((v) => v.toString()).includes(userAddress) && !isClosable && (
-            <Button
-              medium
-              primary
-              onClick={() => dispatch(
-                congressActions.voteAtMotions.call({
-                  proposal,
-                  index: voting.index,
-                  vote: true,
-                }),
-              )}
-            >
-              Vote aye
-            </Button>
+          {!voting.ayes.map((v) => v.toString()).includes(userAddress)
+            && !isClosable && (
+              <Button
+                small
+                primary
+                onClick={() => dispatch(
+                  congressActions.voteAtMotions.call({
+                    proposal,
+                    index: voting.index,
+                    vote: true,
+                  }),
+                )}
+              >
+                Vote aye
+              </Button>
           )}
-          {!voting.nays.map((v) => v.toString()).includes(userAddress) && !isClosable && (
-            <Button
-              medium
-              secondary
-              onClick={() => dispatch(
-                congressActions.voteAtMotions.call({
-                  proposal,
-                  index: voting.index,
-                  vote: false,
-                }),
-              )}
-            >
-              Vote nay
-            </Button>
+          {!voting.nays.map((v) => v.toString()).includes(userAddress)
+            && !isClosable && (
+              <Button
+                small
+                secondary
+                onClick={() => dispatch(
+                  congressActions.voteAtMotions.call({
+                    proposal,
+                    index: voting.index,
+                    vote: false,
+                  }),
+                )}
+              >
+                Vote nay
+              </Button>
           )}
         </div>
       </div>
@@ -122,6 +140,7 @@ Motion.propTypes = {
     args: PropTypes.array.isRequired,
     method: PropTypes.string.isRequired,
     section: PropTypes.string.isRequired,
+    toHuman: PropTypes.func.isRequired,
   }).isRequired,
   voting: PropTypes.shape({
     index: PropTypes.object.isRequired,

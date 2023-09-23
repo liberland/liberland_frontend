@@ -40,10 +40,10 @@ function TreasurySpendingMotionModal({ closeModal }) {
     >
       <h3 className={styles.h3}>Create new spending</h3>
       <span className={styles.description}>
-        Here you can create a new motion for LLM spending.
+        Here you can create a new motion for LLD spending.
       </span>
 
-      <span className={styles.title}>Recipient Address</span>
+      <div className={styles.title}>Recipient Address</div>
       <TextInput
         register={register}
         name="transferToAddress"

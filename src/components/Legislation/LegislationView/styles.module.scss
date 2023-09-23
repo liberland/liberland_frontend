@@ -4,6 +4,7 @@
 .legislationInfoContainer {
     flex-direction: row;
     display: flex;
+    margin-bottom: 15px;
 }
 .legislationContent {
     align-items: flex-start;
@@ -22,3 +23,13 @@
     flex-direction: column;
     margin-right: 1rem;
 }
+
+.rowEnd {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+  
+    > * {
+      margin: 0 4px;
+    }
+  }
