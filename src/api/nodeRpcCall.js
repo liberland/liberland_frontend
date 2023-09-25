@@ -980,9 +980,9 @@ const getLegislation = async (tier) => {
     const api = await getApi();
 
     const legislation = await api.query.liberlandLegislation.laws.entries(tier);
-    const legislationVetos = await Promise.all(legislation.map(([key]) => {
-      return api.query.liberlandLegislation.vetos.entries(key.args[0], key.args[1]);
-    }));
+    const legislationVetos = await Promise.all(legislation.map(([key]) => 
+      api.query.liberlandLegislation.vetos.entries(key.args[0], key.args[1])
+    ));
 
     const vetosById = {};
     legislationVetos.forEach((vetos) => {
