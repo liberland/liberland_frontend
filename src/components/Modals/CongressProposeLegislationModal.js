@@ -19,10 +19,12 @@ function CongressProposeLegislationModal({
     defaultValues: {
       tier: 'InternationalTreaty',
       year: new Date().getFullYear(),
-    }
+    },
   });
 
-  const onSubmitPropose = ({ tier, year, index, legislationContent}) => {
+  const onSubmitPropose = ({
+    tier, year, index, legislationContent,
+  }) => {
     dispatch(congressActions.congressProposeLegislation.call({
       tier,
       id: { year, index },
@@ -42,8 +44,8 @@ function CongressProposeLegislationModal({
       <SelectInput
         register={register}
         name="tier"
-        disabled
         options={[
+          { value: 'Constitution', display: 'Constitution' },
           { value: 'InternationalTreaty', display: 'International Treaty' },
         ]}
       />

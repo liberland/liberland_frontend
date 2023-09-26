@@ -165,17 +165,16 @@ function* congressProposeLegislationWorker({ payload: { tier, id, legislationCon
     blockchainSelectors.userWalletAddressSelector,
   );
 
-  const { errorData } = yield cps(congressProposeLegislation, tier, id, legislationContent, walletAddress);
-  if (errorData.isError) {
-    yield put(
-      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
-    );
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(congressActions.congressProposeLegislation.failure(errorData));
-  } else {
-    yield put(congressActions.congressProposeLegislation.success());
-    yield put(congressActions.getMotions.call());
-  }
+  yield call(
+    congressProposeLegislation,
+    tier,
+    id,
+    legislationContent,
+    walletAddress
+  );
+
+  yield put(congressActions.congressProposeLegislation.success());
+  yield put(congressActions.getMotions.call());
 }
 
 function* congressRepealLegislationWorker({ payload: { tier, id } }) {
@@ -378,14 +377,10 @@ export function* getRunnersUpWatcher() {
 }
 
 export function* congressProposeLegislationWatcher() {
-  try {
-    yield takeLatest(
-      congressActions.congressProposeLegislation.call,
-      congressProposeLegislationWorker,
-    );
-  } catch (e) {
-    yield put(congressActions.congressProposeLegislation.failure(e));
-  }
+  yield* blockchainWatcher(
+    congressActions.congressProposeLegislation,
+    congressProposeLegislationWorker,
+  );
 }
 
 export function* congressRepealLegislationWatcher() {

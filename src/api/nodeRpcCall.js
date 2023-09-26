@@ -1719,29 +1719,22 @@ const getStakingBondingDuration = async () => {
   return api.consts.staking.bondingDuration;
 }
 
-const congressProposeLegislation = async (tier, id, legislationContent, walletAddress, callback) => {
+const congressProposeLegislation = async (tier, id, legislationContent, walletAddress) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
 
-  const threshold = await congressMajorityThreshold();
+  let threshold;
+
+  if (tier !== "Constitution"){
+    threshold = await congressMajorityThreshold()
+  } else {
+    const congressmen = await api.query.council.members()
+    return Math.ceil((congressmen.length * 2) /3);
+  }
 
   const proposal = api.tx.liberlandLegislation.addLaw(tier, id, legislationContent);
   const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed council.propose for liberlandLegislation.addLaw at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( council.propose for liberlandLegislation.addLaw transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+
+  return await submitExtrinsic(extrinsic, walletAddress);
 }
 
 const congressRepealLegislation = async (tier, id, walletAddress) => {
@@ -1752,7 +1745,7 @@ const congressRepealLegislation = async (tier, id, walletAddress) => {
   const proposal = api.tx.liberlandLegislation.repealLaw(tier, id);
   const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
 
-  return await submitExtrinsic( extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress);
 }
 
 const getTreasurySpendProposals = async () => {
