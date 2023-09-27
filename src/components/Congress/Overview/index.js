@@ -6,7 +6,6 @@ import Button from '../../Button/Button';
 import { congressActions } from '../../../redux/actions';
 import {
   congressSelectors,
-  blockchainSelectors,
 } from '../../../redux/selectors';
 import SpendingMotionModal from '../../Modals/SpendingMotionModal';
 import styles from '../styles.module.scss';
@@ -15,11 +14,10 @@ import ProposeLegislationReferendumButton from '../ProposeLegislationReferendumB
 
 export default function Overview() {
   const dispatch = useDispatch();
-  const candidates = useSelector(congressSelectors.candidates);
-  const members = useSelector(congressSelectors.members);
-  const runnersUp = useSelector(congressSelectors.runnersUp);
 
-  const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const userIsMember = useSelector(congressSelectors.userIsMember);
+  const userIsRunnersUp = useSelector(congressSelectors.userIsRunnersUp);
+  const userIsCandidate = useSelector(congressSelectors.userIsCandidate);
 
   useEffect(() => {
     dispatch(congressActions.getCandidates.call());
@@ -30,18 +28,10 @@ export default function Overview() {
   const [isSpendingModalOpen, setIsSpendingModalOpen] = useState(false);
   const handleSpendingModalOpen = () => setIsSpendingModalOpen(!isSpendingModalOpen);
 
-  const senderIsCandidate = candidates.find(
-    (candidate) => candidate[0] === sender,
-  );
-  const senderIsMember = members.find((member) => member.toString() === sender);
-  const senderIsRunnerUp = runnersUp.find(
-    (member) => member.toString() === sender,
-  );
-
   let userStatus = 'None';
-  if (senderIsMember) userStatus = 'Member';
-  else if (senderIsCandidate) userStatus = 'Candidate';
-  else if (senderIsRunnerUp) userStatus = 'RunnerUp';
+  if (userIsMember) userStatus = 'Member';
+  else if (userIsCandidate) userStatus = 'Candidate';
+  else if (userIsRunnersUp) userStatus = 'RunnerUp';
 
   return (
     <div className={styles.congressWrapper}>
@@ -54,7 +44,7 @@ export default function Overview() {
           </p>
         </div>
         <div className={styles.rowEnd}>
-          {!senderIsCandidate && !senderIsMember && !senderIsRunnerUp && (
+          {!userIsCandidate && !userIsMember && !userIsRunnersUp && (
             <Button
               small
               primary
@@ -63,7 +53,7 @@ export default function Overview() {
               Apply for Congress
             </Button>
           )}
-          {senderIsMember && (
+          {userIsMember && (
             <>
               <ProposeLegislationButton />
               <ProposeLegislationReferendumButton />
@@ -75,7 +65,7 @@ export default function Overview() {
           {isSpendingModalOpen && (
             <SpendingMotionModal closeModal={handleSpendingModalOpen} />
           )}
-          {(senderIsMember || senderIsCandidate || senderIsRunnerUp) && (
+          {(userIsMember || userIsCandidate || userIsRunnersUp) && (
             <Button
               medium
               secondary

@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { blockchainReducer } from './blockchainSelectors';
 
 const congressReducer = (state) => state.congress;
 
@@ -12,6 +13,14 @@ export const candidates = createSelector(
   (reducer) => reducer.candidates,
 );
 
+export const userIsCandidate = createSelector(
+  congressReducer,
+  blockchainReducer,
+  (congressState, blockchainState) => congressState.candidates
+    .map((m) => m.toString())
+    .includes(blockchainState.userWalletAddress),
+);
+
 export const motions = createSelector(
   congressReducer,
   (reducer) => reducer.motions,
@@ -22,9 +31,25 @@ export const members = createSelector(
   (reducer) => reducer.members,
 );
 
+export const userIsMember = createSelector(
+  congressReducer,
+  blockchainReducer,
+  (congressState, blockchainState) => congressState.members
+    .map((m) => m.toString())
+    .includes(blockchainState.userWalletAddress),
+);
+
 export const runnersUp = createSelector(
   congressReducer,
   (reducer) => reducer.runnersUp,
+);
+
+export const userIsRunnersUp = createSelector(
+  congressReducer,
+  blockchainReducer,
+  (congressState, blockchainState) => congressState.runnersUp
+    .map((m) => m.toString())
+    .includes(blockchainState.userWalletAddress),
 );
 
 export const treasury = createSelector(
