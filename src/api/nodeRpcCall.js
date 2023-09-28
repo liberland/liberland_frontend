@@ -1406,6 +1406,17 @@ const congressMajorityThreshold = async () => {
   return Math.trunc(congressmen.length/2) + 1;
 }
 
+const createProposalAndVote = async (threshold, proposalContent, vote) => {
+  const api = await getApi();
+  const proposal = api.tx.council.propose(threshold, proposalContent, proposalContent.length);
+
+  const proposals = await api.query.council.proposals()
+  const nextProposalIndex = proposals.length
+  const voteAye = api.tx.council.vote(proposalContent.method.hash, nextProposalIndex, vote);
+
+  return [proposal, voteAye]
+}
+
 const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmount }, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
@@ -1414,7 +1425,9 @@ const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmoun
   
   const executeProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
   const proposal = api.tx.councilAccount.execute(executeProposal);
-  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+
+  const extrinsics = await createProposalAndVote(threshold, proposal, true)
+  const extrinsic = api.tx.utility.batchAll(extrinsics)
 
   extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
     let errorData = handleMyDispatchErrors(dispatchError, api)
@@ -1441,7 +1454,8 @@ const congressSendLlmToPolitipool = async ({ walletAddress, transferToAddress, t
 
   const executeProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
   const proposal = api.tx.councilAccount.execute(executeProposal);
-  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+  const extrinsics = await createProposalAndVote(threshold, proposal, true)
+  const extrinsic = api.tx.utility.batchAll(extrinsics)
 
   extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
     let errorData = handleMyDispatchErrors(dispatchError, api)
@@ -1740,7 +1754,9 @@ const congressProposeLegislation = async (tier, index, legislationContent, walle
   const threshold = await congressMajorityThreshold();
 
   const proposal = api.tx.liberlandLegislation.addLaw(tier, index, legislationContent);
-  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+  const extrinsics = await createProposalAndVote(threshold, proposal, true)
+  const extrinsic = api.tx.utility.batchAll(extrinsics)
+
   extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
     let errorData = handleMyDispatchErrors(dispatchError, api)
     if (status.isInBlock) {
@@ -1764,9 +1780,10 @@ const congressRepealLegislation = async (tier, index, walletAddress) => {
   const threshold = await congressMajorityThreshold();
 
   const proposal = api.tx.liberlandLegislation.repealLaw(tier, index);
-  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+  const extrinsics = await createProposalAndVote(threshold, proposal, true)
+  const extrinsic = api.tx.utility.batchAll(extrinsics)
 
-  return await submitExtrinsic( extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress);
 }
 
 const getTreasurySpendProposals = async () => {
@@ -1792,7 +1809,8 @@ const congressApproveTreasurySpend = async (proposalId, walletAddress) => {
   const threshold = await congressMajorityThreshold();
 
   const proposal = api.tx.treasury.approveProposal(proposalId);
-  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+  const extrinsics = await createProposalAndVote(threshold, proposal, true)
+  const extrinsic = api.tx.utility.batchAll(extrinsics)
   return await submitExtrinsic(extrinsic, walletAddress);
 }
 
@@ -1802,7 +1820,8 @@ const congressUnapproveTreasurySpend = async (proposalId, walletAddress) => {
   const threshold = await congressMajorityThreshold();
 
   const proposal = api.tx.treasury.removeApproval(proposalId);
-  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+  const extrinsics = await createProposalAndVote(threshold, proposal, true)
+  const extrinsic = api.tx.utility.batchAll(extrinsics)
   return await submitExtrinsic(extrinsic, walletAddress);
 }
 
@@ -1843,9 +1862,10 @@ const congressProposeReferendum = async (
 
   const threshold = await congressMajorityThreshold();
 
+  const proposeAndVote = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll([
     api.tx.preimage.notePreimage(referendumProposal.toHex()),
-    api.tx.council.propose(threshold, proposal, proposal.length),
+    ...proposeAndVote,
   ])
   return await submitExtrinsic(extrinsic, walletAddress);
 }
@@ -1882,10 +1902,10 @@ const congressSendTreasuryLld = async (transferToAddress, transferAmount, wallet
 
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.treasury.spend(transferAmount, transferToAddress);
-  const length = proposal.length;
   
-  const extrinsic = api.tx.council.propose(threshold, proposal, length);
-  return await submitExtrinsic( extrinsic, walletAddress);
+  const extrinsics = await createProposalAndVote(threshold, proposal, true)
+  const extrinsic = api.tx.utility.batchAll(extrinsics)
+  return await submitExtrinsic(extrinsic, walletAddress);
 }
 
 const getPalletIds = async () => {
