@@ -31,7 +31,7 @@ function WalletAddressesLine({ walletAddress }) {
   const [isModalOpenLLM, setIsModalOpenLLM] = useState(false);
   const [modalShown, setModalShown] = useState(0);
   const [sendAddress, setSendAddress] = useState('');
-  const { handleSubmit, formState: {errors}, register } = useForm({
+  const { handleSubmit, formState: { errors }, register } = useForm({
     mode: 'all',
   });
   const dispatch = useDispatch();
@@ -109,18 +109,18 @@ function WalletAddressesLine({ walletAddress }) {
     handleModalOpenStake();
   };
 
-  let navigationList = [
+  const navigationList = [
     {
       route: router.wallet.overView,
       title: 'Wallet',
     },
   ];
 
-  if (process.env.REACT_APP_BRIDGE_TAB_ENABLED == 'true') {
+  if (process.env.REACT_APP_BRIDGE_TAB_ENABLED === 'true') {
     navigationList.push({
       route: router.wallet.ethBridge,
       title: 'Ethereum bridge',
-    })
+    });
   }
 
   return (
