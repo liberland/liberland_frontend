@@ -752,16 +752,8 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType, callba
   });
 };
 
-const getProposalHash = async (values, legislationIndex) => {
+const submitProposal = async (walletAddress, values) => {
   const api = await getApi();
-  const extrinsicEncoded = api.tx.liberlandLegislation.addLaw(parseInt(values.legislationTier), legislationIndex, values.legislationContent).method.toHex();
-  const hash = { encodedHash: blake2AsHex(extrinsicEncoded), extrinsicEncoded };
-  return hash;
-};
-
-const submitProposal = async (walletAddress, values, callback) => {
-  const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const nextChainIndexQuery = await api.query.democracy.referendumCount();
   const nextChainIndex = nextChainIndexQuery.toHuman();
 
@@ -774,37 +766,25 @@ const submitProposal = async (walletAddress, values, callback) => {
     additionalMetadata: {},
     proposerAddress: walletAddress,
   });
-  const legislationIndex = centralizedMetadata.data.id;
-  const hash = await getProposalHash(values, legislationIndex);
-  const notePreimageTx = api.tx.preimage.notePreimage(hash.extrinsicEncoded);
+
+  const addLaw = api.tx.liberlandLegislation.addLegislation(
+    parseInt(values.legislationTier), 
+    centralizedMetadata.data.id, 
+    values.legislationContent
+  ).method;
+
   const minDeposit = api.consts.democracy.minimumDeposit;
   const proposeCall = parseInt(values.legislationTier) === 0 ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
-  const proposeTx = proposeCall({ Legacy: hash.encodedHash }, minDeposit);
-  notePreimageTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed NOTEPREIMAGE at block hash #${status.asInBlock.toString()}`);
-      proposeTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-        let errorData = handleMyDispatchErrors(dispatchError, api)
-        if (status.isInBlock) {
-          // eslint-disable-next-line no-console
-          console.log(`Completed PROPOSE at block hash #${status.asInBlock.toString()}`);
-          callback(null, {
-            blockHash: status.asInBlock.toString(),
-            errorData
-          });
-        }
-      }).catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(':( transaction PROPOSE failed', error);
-        callback({isError: true, details: error.toString()});
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+
+  const existingPreimage = await api.query.preimage.preimageFor([addLaw.hash, addLaw.encodedLength])
+  const extrinsic = existingPreimage.isNone
+  ? api.tx.utility.batchAll([
+      api.tx.preimage.notePreimage(addLaw.toHex()),
+      proposeCall({ Lookup: addLaw.hash }, minDeposit),
+    ])
+  : proposeCall({ Lookup: addLaw.hash }, minDeposit);
+
+  return await submitExtrinsic(extrinsic, walletAddress);
 };
 
 const getCongressMembersWithIdentity = async (walletAddress) => {
@@ -1883,6 +1863,7 @@ const congressProposeLegislationReferendum = async (
   const addLaw = api.tx.liberlandLegislation.addLaw(tier, index, content).method;
   return await congressProposeReferendum(addLaw, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
 }
+
 
 const congressProposeRepealLegislation = async (
   tier,

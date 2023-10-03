@@ -78,12 +78,12 @@ function Referendum() {
                   Delegating to:
                   {' '}
                   {delegatingTo}
-                  <Button small primary onClick={() => { handleModalOpenUndelegate(); }}>Undelegate</Button>
+                  <Button small primary onClick={handleModalOpenUndelegate}>Undelegate</Button>
                 </>
               )
               : null
           }
-          <Button small primary onClick={() => { handleModalOpenPropose(); }}>Propose</Button>
+          <Button small primary onClick={handleModalOpenPropose}>Propose</Button>
         </div>
         <Card title="Referendums" className={styles.referendumsCard}>
           <div>
