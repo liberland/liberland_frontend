@@ -1722,14 +1722,7 @@ const getStakingBondingDuration = async () => {
 const congressProposeLegislation = async (tier, id, legislationContent, walletAddress) => {
   const api = await getApi();
 
-  let threshold;
-
-  if (tier !== "Constitution"){
-    threshold = await congressMajorityThreshold()
-  } else {
-    const congressmen = await api.query.council.members()
-    return Math.ceil((congressmen.length * 2) /3);
-  }
+  const threshold = await congressMajorityThreshold()
 
   const proposal = api.tx.liberlandLegislation.addLaw(tier, id, legislationContent);
   const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
