@@ -22,6 +22,7 @@ const democracyReducer = handleActions(
       democracyActions.voteOnReferendum.call,
       democracyActions.delegate.call,
       democracyActions.undelegate.call,
+      democracyActions.voteForCongress.call,
     )]: (state) => ({
       ...state,
       gettingDemocracyInfo: true,
