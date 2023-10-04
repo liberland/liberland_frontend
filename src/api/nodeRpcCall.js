@@ -1,11 +1,11 @@
 import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
-import {dollarsToGrains, meritsToGrains} from '../utils/walletHelpers';
 import {handleMyDispatchErrors} from "../utils/therapist";
 import {newCompanyDataObject} from "../utils/defaultData";
 import * as centralizedBackend from './backend';
 import { BN_TWO } from '@polkadot/util';
+import { parseDollars, parseMerits } from '../utils/walletHelpers';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -409,7 +409,7 @@ const sendTransfer = async (payload, callback) => {
 const sendTransferLLM = async (payload, callback) => {
   const { account_to, amount, account_from } = payload;
   const api = await getApi();
-  const transferExtrinsic = api.tx.llm.sendLlm(account_to, (meritsToGrains(amount)));
+  const transferExtrinsic = api.tx.llm.sendLlm(account_to, (parseMerits(amount)));
 
   const injector = await web3FromSource('polkadot-js');
   transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status, events, dispatchError }) => {
@@ -433,8 +433,8 @@ const stakeToPolkaBondAndExtra = async (payload, callback) => {
   const { values: { amount }, isUserHavePolkaStake, walletAddress } = payload;
   const api = await getApi();
   const transferExtrinsic = isUserHavePolkaStake
-    ? await api.tx.staking.bondExtra(dollarsToGrains(amount))
-    : await api.tx.staking.bond(dollarsToGrains(amount), 'Staked');
+    ? await api.tx.staking.bondExtra(parseDollars(amount))
+    : await api.tx.staking.bond(parseDollars(amount), 'Staked');
 
   const injector = await web3FromSource('polkadot-js');
   // eslint-disable-next-line max-len
@@ -480,7 +480,7 @@ const unpool = async (walletAddress, callback) => {
 const politiPool = async (payload, callback) => {
   const { values: { amount }, walletAddress } = payload;
   const api = await getApi();
-  const politiPoolExtrinsic = api.tx.llm.politicsLock(meritsToGrains(amount));
+  const politiPoolExtrinsic = api.tx.llm.politicsLock(parseMerits(amount));
 
   const injector = await web3FromSource('polkadot-js');
   politiPoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {

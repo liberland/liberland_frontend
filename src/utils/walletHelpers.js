@@ -1,10 +1,44 @@
-import { BN, BN_ZERO, formatBalance } from '@polkadot/util';
+import { BN, BN_ONE, BN_ZERO, formatBalance } from '@polkadot/util';
+import { ethers } from 'ethers';
 
-export const grainsInMerit = new BN('1000000000000');
-export const grainsInDollar = new BN('1000000000000');
-export const grainsInDemocracyMerit = new BN('1000000000000');
+const meritDecimals = 12;
+const dollarDecimals = 12;
 
-export const formatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
+
+const _format = (value, decimals) => {
+  return formatBalance(
+    valueToBN(value),
+    {
+      decimals,
+      forceUnit: '-',
+      withSi: false,
+      locale: 'en',
+    }
+  );
+}
+
+const _parse = (value, decimals) => {
+  const ethersBN = ethers.utils.parseUnits(value, decimals);
+  return new BN(ethersBN.toHexString().replace(/^0x/, ""), "hex");
+}
+
+export const formatMerits = (grains) => _format(grains, meritDecimals);
+export const formatDollars = (grains) => _format(grains, dollarDecimals);
+export const parseMerits = (merits) => _parse(merits, meritDecimals);
+export const parseDollars = (dollars) => _parse(dollars, dollarDecimals);
+
+export const formatTransaction = (value_raw, bigSymbol, smallSymbol, decimals) => {
+  const value = valueToBN(value_raw);
+  const prefix = value.gt(BN_ZERO) ? '+' : '-';
+  const absIntvalue = value.abs();
+  if (_parse(absIntvalue, decimals).gt(BN_ONE)) {
+    return `${prefix} ${_format(absIntvalue, decimals)} ${bigSymbol}`;
+  }
+  return `${prefix} ${_format(absIntvalue, 0)} ${smallSymbol}`;
+};
+
+export const formatMeritTransaction = (merits_raw) => formatTransaction(merits_raw, 'LLM', 'grains', meritDecimals);
+export const formatDollarTransaction = (dollars_raw) => formatTransaction(dollars_raw, 'LLD', 'picoLLD', dollarDecimals);
 
 // take string or number and parse to BN using correct base
 export const valueToBN = (i) => {
@@ -14,32 +48,3 @@ export const valueToBN = (i) => {
   }
   return new BN(s);
 };
-
-export const formatMerits = (picoMerits) => formatter.format(valueToBN(picoMerits).div(grainsInMerit));
-
-// eslint-disable-next-line max-len
-export const formatDemocracyMerits = (picoMerits) => formatter.format(valueToBN(picoMerits).div(grainsInDemocracyMerit));
-
-export const formatDollars = (picoDollars) => formatter.format(valueToBN(picoDollars).div(grainsInDollar));
-export const formatPolkadotBalance = (polkadotBalance) => {
-  const polkadotFormattedBalance = formatBalance(polkadotBalance, { withSi: false, withUnit: false, decimals: 0 });
-  return valueToBN(polkadotFormattedBalance.replace('.', '')).div(new BN(10)).toString();
-};
-
-export const dollarsToGrains = (dollars) => valueToBN(dollars).mul(grainsInDollar);
-
-export const meritsToGrains = (merits) => valueToBN(merits).mul(grainsInDemocracyMerit);
-
-export const formatTransaction = (value_raw, bigSymbol, smallSymbol, decimals) => {
-  const value = valueToBN(value_raw);
-  const prefix = value.gt(BN_ZERO) ? '+' : '-';
-  const absIntvalue = value.abs();
-  if (absIntvalue.gt(decimals)) {
-    return `${prefix} ${formatter.format(absIntvalue.div(decimals))} ${bigSymbol}`;
-  }
-  return `${prefix} ${formatter.format(absIntvalue)} ${smallSymbol}`;
-};
-
-export const formatMeritTransaction = (merits_raw) => formatTransaction(merits_raw, 'LLM', 'grains', grainsInMerit);
-// eslint-disable-next-line max-len
-export const formatDollarTransaction = (dollars_raw) => formatTransaction(dollars_raw, 'LLD', 'picoLLD', grainsInDollar);

@@ -11,7 +11,7 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { validatorActions } from '../../redux/actions';
 import { validatorSelectors, walletSelectors } from '../../redux/selectors';
-import { dollarsToGrains, formatDollars, grainsInDollar } from '../../utils/walletHelpers';
+import { formatDollars, parseDollars } from '../../utils/walletHelpers';
 
 function CreateValidatorModal({
   closeModal,
@@ -22,7 +22,7 @@ function CreateValidatorModal({
   const maxBond = BN.max(
     new BN(0),
     (new BN(balances?.liquidAmount?.amount ?? 0))
-      .sub(dollarsToGrains(10)), // leave at least 10 liquid LLD...
+      .sub(parseDollars("10")), // leave at least 10 liquid LLD...
   );
 
   const {
@@ -32,7 +32,7 @@ function CreateValidatorModal({
   } = useForm({
     mode: 'all',
     defaultValues: {
-      bondValue: maxBond.div(grainsInDollar).toString(),
+      bondValue: formatDollars(maxBond).replaceAll(",", ""),
       commission: '10',
       allow_nominations: true,
       payee: payee ? payee.toString() : 'Staked',
@@ -40,7 +40,7 @@ function CreateValidatorModal({
   });
 
   const onSubmit = (values) => {
-    const bondValue = dollarsToGrains(values.bondValue);
+    const bondValue = parseDollars(values.bondValue);
     const commission = (new BN(values.commission)).mul(new BN(10000000));
     const blocked = !values.allow_nominations;
     dispatch(validatorActions.createValidator.call({
@@ -51,7 +51,7 @@ function CreateValidatorModal({
 
   const validateBondValue = (textBondValue) => {
     try {
-      const bondValue = dollarsToGrains(textBondValue);
+      const bondValue = parseDollars(textBondValue);
       if (bondValue.gt(maxBond) || bondValue.lte(BN_ZERO)) return 'Invalid amount';
       return true;
     } catch (e) {

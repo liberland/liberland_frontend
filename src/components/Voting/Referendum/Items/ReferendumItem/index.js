@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
-import { formatPolkadotBalance } from '../../../../../utils/walletHelpers';
+import { formatMerits } from '../../../../../utils/walletHelpers';
+import { BN, BN_ZERO } from '@polkadot/util';
 
 const voteButtons = (buttonVoteCallback, referendumInfo) => (
   <div className={styles.buttonContainer}>
@@ -60,7 +61,7 @@ const alreadyVotedButton = (buttonVoteCallback, referendumInfo, alreadyVoted) =>
 function ReferendumItem({
   name, createdBy, externalLink, description, yayVotes, nayVotes, hash, alreadyVoted, buttonVoteCallback, votingTimeLeft, referendumIndex, delegating,
 }) {
-  const progressBarRatio = yayVotes > 0 ? `${(formatPolkadotBalance(yayVotes)) / (formatPolkadotBalance(yayVotes) + formatPolkadotBalance(nayVotes)) * 100}%` : '0%';
+  const progressBarRatio = yayVotes.gt(BN_ZERO) ? `${yayVotes.mul(new BN("100")).div(yayVotes.add(nayVotes)).toString()}%` : '0%';
   return (
     <Card
       title={name}
@@ -86,9 +87,9 @@ function ReferendumItem({
                 <span className={styles.nayText}>Nay</span>
               </div>
               <div>
-                <span className={styles.yayText}>{formatPolkadotBalance(yayVotes)}</span>
+                <span className={styles.yayText}>{formatMerits(yayVotes)}</span>
                 /
-                <span className={styles.nayText}>{formatPolkadotBalance(nayVotes)}</span>
+                <span className={styles.nayText}>{formatMerits(nayVotes)}</span>
               </div>
             </div>
             <div className={styles.progressBar}>

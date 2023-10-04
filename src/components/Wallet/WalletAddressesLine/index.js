@@ -23,7 +23,7 @@ import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
 import router from '../../../router';
 import Tabs from '../../Tabs';
-import { dollarsToGrains } from '../../../utils/walletHelpers';
+import { parseDollars } from '../../../utils/walletHelpers';
 
 function WalletAddressesLine({ walletAddress }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,7 +71,7 @@ function WalletAddressesLine({ walletAddress }) {
     const isAddressValid = isValidAddressPolkadotAddress(sendAddress);
 
     const preparedValues = values;
-    preparedValues.amount = dollarsToGrains(preparedValues.amount);
+    preparedValues.amount = parseDollars(preparedValues.amount);
 
     if (isAddressValid) {
       dispatch(walletActions.sendTransfer.call(preparedValues));

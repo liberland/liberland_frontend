@@ -9,7 +9,7 @@ import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { walletSelectors } from '../../redux/selectors';
-import { valueToBN, formatMerits, dollarsToGrains } from '../../utils/walletHelpers';
+import { valueToBN, formatMerits, parseDollars } from '../../utils/walletHelpers';
 
 function ChoseStakeModal({
   // eslint-disable-next-line react/prop-types,max-len
@@ -17,9 +17,9 @@ function ChoseStakeModal({
   errors,
 }) {
   const balances = useSelector(walletSelectors.selectorBalances);
-  const unpool_amount = valueToBN(balances.liberstake.amount).mul(new BN(8742)).div(new BN(1000000));
-  const unpool_liquid = valueToBN(balances.liquidMerits.amount).add(unpool_amount);
-  const unpool_stake = valueToBN(balances.liberstake.amount).sub(unpool_amount);
+  const unpoolAmount = valueToBN(balances.liberstake.amount).mul(new BN(8742)).div(new BN(1000000));
+  const unpoolLiquid = valueToBN(balances.liquidMerits.amount).add(unpoolAmount);
+  const unpoolStake = valueToBN(balances.liberstake.amount).sub(unpoolAmount);
 
   return (
     <>
@@ -65,8 +65,8 @@ function ChoseStakeModal({
        placeholder="Amount LLD"
        validate={v =>
         valueToBN(balances.liquidAmount.amount).sub(
-            dollarsToGrains(v)
-          ).gte(dollarsToGrains(1)) || 'You must leave at least 1 LLD unstaked'
+            parseDollars(v)
+          ).gte(parseDollars("1")) || 'You must leave at least 1 LLD unstaked'
        }
      />
      { errors?.amount?.type == "validate" ?
@@ -131,8 +131,8 @@ function ChoseStakeModal({
     <div className={styles.h3}>Unpool</div>
     <div className={styles.title}>
       Are you sure you want to go on welfare and temporarily forfeit your citizenship rights such as voting for a month?
-      This will instantly turn {formatMerits(unpool_amount)} LLM from pooled into liquid for a
-      total of {formatMerits(unpool_stake)} pooled LLM and {formatMerits(unpool_liquid)} liquid.
+      This will instantly turn {formatMerits(unpoolAmount)} LLM from pooled into liquid for a
+      total of {formatMerits(unpoolStake)} pooled LLM and {formatMerits(unpoolLiquid)} liquid.
     </div>
 
     <div className={styles.buttonWrapper}>

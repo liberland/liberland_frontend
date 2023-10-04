@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import { validatorSelectors } from '../../../../redux/selectors';
 import { validatorActions } from '../../../../redux/actions';
-import { grainsInDollar } from '../../../../utils/walletHelpers';
+import { formatDollars } from '../../../../utils/walletHelpers';
 
 export default function Stats() {
   const dispatch = useDispatch();
@@ -19,7 +19,7 @@ export default function Stats() {
 
   const data = stakerRewards.map(({ era, validators }) => ({
     era: `Era ${era.toNumber()}`,
-    reward: Object.values(validators)[0].total.div(grainsInDollar).toNumber(),
+    reward: parseFloat(formatDollars(Object.values(validators)[0].total)),
   }));
 
   return (
