@@ -1814,6 +1814,42 @@ const closeCongressMotion = async (proposalHash, index, walletAddress) => {
   return await submitExtrinsic(api.tx.council.close(proposalHash, index, weightBound, lengthBound), walletAddress);
 }
 
+const congressProposeReferendum = async (
+  referendumProposal,
+  fastTrack,
+  votingPeriod,
+  enactmentPeriod,
+  walletAddress,
+) => {
+  const api = await getApi();
+
+  const lookup = {
+    Lookup: { 
+      hash_: referendumProposal.hash,
+      len: referendumProposal.encodedLength,
+    },
+  };
+  const proposal = fastTrack ?
+    api.tx.utility.batchAll([
+      api.tx.democracy.externalPropose(lookup),
+      api.tx.democracy.fastTrack(
+        referendumProposal.hash,
+        votingPeriod,
+        enactmentPeriod,
+      )
+    ])
+    :
+    api.tx.democracy.externalProposeMajority(lookup);
+
+  const threshold = await congressMajorityThreshold();
+
+  const extrinsic = api.tx.utility.batchAll([
+    api.tx.preimage.notePreimage(referendumProposal.toHex()),
+    api.tx.council.propose(threshold, proposal, proposal.length),
+  ])
+  return await submitExtrinsic(extrinsic, walletAddress);
+}
+
 const congressProposeLegislationReferendum = async (
   tier,
   index,
@@ -1824,33 +1860,8 @@ const congressProposeLegislationReferendum = async (
   walletAddress,
 ) => {
   const api = await getApi();
-
   const addLaw = api.tx.liberlandLegislation.addLaw(tier, index, content).method;
-  const referendumPropose = api.tx.democracy.externalProposeMajority({
-    Lookup: { 
-      hash_: addLaw.hash,
-      len: addLaw.encodedLength,
-    },
-  });
-  const proposal = fastTrack ?
-    api.tx.utility.batchAll([
-      referendumPropose,
-      api.tx.democracy.fastTrack(
-        addLaw.hash,
-        votingPeriod,
-        enactmentPeriod,
-      )
-    ])
-    :
-    referendumPropose;
-
-  const threshold = await congressMajorityThreshold();
-
-  const extrinsic = api.tx.utility.batchAll([
-    api.tx.preimage.notePreimage(addLaw.toHex()),
-    api.tx.council.propose(threshold, proposal, proposal.length),
-  ])
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await congressProposeReferendum(addLaw, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
 }
 
 const congressProposeRepealLegislation = async (
@@ -1862,33 +1873,8 @@ const congressProposeRepealLegislation = async (
   walletAddress,
 ) => {
   const api = await getApi();
-
   const repealLaw = api.tx.liberlandLegislation.repealLaw(tier, index).method;
-  const referendumPropose = api.tx.democracy.externalProposeMajority({
-    Lookup: { 
-      hash_: repealLaw.hash,
-      len: repealLaw.encodedLength,
-    },
-  });
-  const proposal = fastTrack ?
-    api.tx.utility.batchAll([
-      referendumPropose,
-      api.tx.democracy.fastTrack(
-        repealLaw.hash,
-        votingPeriod,
-        enactmentPeriod,
-      )
-    ])
-    :
-    referendumPropose;
-
-  const congressmen = await api.query.council.members();
-  const threshold = Math.trunc(congressmen.length/2) + 1;
-  const extrinsic = api.tx.utility.batchAll([
-    api.tx.preimage.notePreimage(repealLaw.toHex()),
-    api.tx.council.propose(threshold, proposal, proposal.length),
-  ])
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await congressProposeReferendum(repealLaw, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
 }
 
 const congressSendTreasuryLld = async (transferToAddress, transferAmount, walletAddress) => {
