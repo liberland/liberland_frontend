@@ -8,7 +8,7 @@ import Button from '../Button/Button';
 import { SelectInput, TextInput } from '../InputComponents';
 import { congressActions } from '../../redux/actions';
 import { isValidSubstrateAddress } from '../../utils/bridge';
-import { dollarsToGrains } from '../../utils/walletHelpers';
+import { parseDollars } from '../../utils/walletHelpers';
 
 import styles from './styles.module.scss';
 
@@ -31,7 +31,7 @@ function SpendingMotionModal({ closeModal }) {
       dispatch(
         congressActions.congressSendLlm.call({
           transferToAddress,
-          transferAmount: dollarsToGrains(transferAmount),
+          transferAmount: parseDollars(transferAmount),
         }),
       );
     } else if (spending === 'congressSendLlmToPolitipool') {

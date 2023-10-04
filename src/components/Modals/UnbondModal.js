@@ -12,7 +12,7 @@ import styles from './styles.module.scss';
 import { validatorActions } from '../../redux/actions';
 import { validatorSelectors, walletSelectors } from '../../redux/selectors';
 import {
-  dollarsToGrains, formatDollars, grainsInDollar, valueToBN,
+  parseDollars, formatDollars, valueToBN,
 } from '../../utils/walletHelpers';
 
 function UnbondModal({
@@ -30,7 +30,7 @@ function UnbondModal({
   } = useForm({
     mode: 'all',
     defaultValues: {
-      unbondValue: maxUnbond.div(grainsInDollar).toString(),
+      unbondValue: formatDollars(maxUnbond),
     },
   });
 
@@ -39,14 +39,14 @@ function UnbondModal({
   }, [dispatch]);
 
   const onSubmit = (values) => {
-    const unbondValue = dollarsToGrains(values.unbondValue);
+    const unbondValue = parseDollars(values.unbondValue);
     dispatch(validatorActions.unbond.call({ unbondValue }));
     closeModal();
   };
 
   const validateUnbondValue = (textUnbondValue) => {
     try {
-      const unbondValue = dollarsToGrains(textUnbondValue);
+      const unbondValue = parseDollars(textUnbondValue);
       if (unbondValue.gt(maxUnbond) || unbondValue.lte(BN_ZERO)) return 'Invalid amount';
       return true;
     } catch (e) {

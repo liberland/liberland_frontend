@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../../Button/Button';
 import { SelectInput, TextInput } from '../../../InputComponents';
 import {
-  formatDollars, formatMerits, meritsToGrains, dollarsToGrains,
+  formatDollars, formatMerits, parseMerits, parseDollars,
   valueToBN,
 } from '../../../../utils/walletHelpers';
 import { walletSelectors, blockchainSelectors, bridgeSelectors } from '../../../../redux/selectors';
@@ -14,7 +14,7 @@ import { bridgeActions } from '../../../../redux/actions';
 
 import styles from '../styles.module.scss';
 
-const toGrains = (asset, value) => (asset === 'LLM' ? meritsToGrains(value) : dollarsToGrains(value));
+const toGrains = (asset, value) => (asset === 'LLM' ? parseMerits(value) : parseDollars(value));
 
 export function NewTransfer() {
   const dispatch = useDispatch();

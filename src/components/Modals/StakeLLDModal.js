@@ -11,7 +11,7 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { validatorActions } from '../../redux/actions';
 import { walletSelectors } from '../../redux/selectors';
-import { dollarsToGrains, formatDollars, grainsInDollar } from '../../utils/walletHelpers';
+import { parseDollars, formatDollars } from '../../utils/walletHelpers';
 
 function StakeLLDModal({
   closeModal,
@@ -22,7 +22,7 @@ function StakeLLDModal({
   const maxBond = BN.max(
     BN_ZERO,
     (new BN(balances?.liquidAmount?.amount ?? 0))
-      .sub(dollarsToGrains(10)), // leave at least 10 liquid LLD...
+      .sub(parseDollars("10")), // leave at least 10 liquid LLD...
   );
 
   const {
@@ -32,19 +32,19 @@ function StakeLLDModal({
   } = useForm({
     mode: 'all',
     defaultValues: {
-      bondValue: maxBond.div(grainsInDollar).toString(),
+      bondValue: formatDollars(maxBond).replaceAll(",", ""),
     },
   });
 
   const onSubmit = (values) => {
-    const bondValue = dollarsToGrains(values.bondValue);
+    const bondValue = parseDollars(values.bondValue);
     dispatch(validatorActions.stakeLld.call({ bondValue }));
     closeModal();
   };
 
   const validateBondValue = (textBondValue) => {
     try {
-      const bondValue = dollarsToGrains(textBondValue);
+      const bondValue = parseDollars(textBondValue);
       if (bondValue.gt(maxBond) || bondValue.lte(BN_ZERO)) return 'Invalid amount';
       return true;
     } catch (e) {

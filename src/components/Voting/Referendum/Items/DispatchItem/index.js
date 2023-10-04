@@ -6,7 +6,7 @@ import Card from '../../../../Card';
 function DispatchItem({
   name, createdBy, externalLink, description, yayVotes, nayVotes, hash, timeLeftUntilImplemented,
 }) {
-  const progressBarRatio = yayVotes > 0 ? `${((yayVotes) / (yayVotes + nayVotes)) * 100}%` : '0%';
+  const progressBarRatio = yayVotes.gt(BN_ZERO) ? `${yayVotes.mul(new BN("100")).div(yayVotes.add(nayVotes)).toString()}%` : '0%';
   return (
     <Card
       title={name}
