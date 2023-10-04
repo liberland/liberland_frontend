@@ -93,15 +93,11 @@ Proposal.propTypes = {
 export default function Treasury() {
   const dispatch = useDispatch();
   const treasuryInfo = useSelector(congressSelectors.treasury);
+  const userIsMember = useSelector(congressSelectors.userIsMember);
+  const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
 
   const [isSpendingModalOpen, setIsSpendingModalOpen] = useState(false);
   const handleSpendingModalOpen = () => setIsSpendingModalOpen(!isSpendingModalOpen);
-
-  const members = useSelector(congressSelectors.members);
-  const user = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
-
-  const userIsMember = members.map((m) => m.toString()).includes(user);
 
   useEffect(() => {
     dispatch(congressActions.getMembers.call());

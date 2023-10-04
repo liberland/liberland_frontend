@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-const blockchainReducer = (state) => state.blockchain;
+export const blockchainReducer = (state) => state.blockchain;
 
 const allWalletsSelector = createSelector(
   blockchainReducer,
