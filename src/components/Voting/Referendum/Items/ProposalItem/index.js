@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
+
+// REDUX
+import { congressActions } from '../../../../../redux/actions';
+import {
+  congressSelectors,
+} from '../../../../../redux/selectors';
 
 const endorseButton = (buttonEndorseCallback, userDidEndorse, referendumInfo) => (userDidEndorse ? (
   <Button medium gray>
@@ -14,6 +21,29 @@ const endorseButton = (buttonEndorseCallback, userDidEndorse, referendumInfo) =>
       Endorse
     </Button>
   ));
+
+function BlacklistButton({ hash }) {
+  const dispatch = useDispatch();
+  const userIsMember = useSelector(congressSelectors.userIsMember);
+
+  useEffect(() => {
+    dispatch(congressActions.getMembers.call());
+  }, [dispatch]);
+
+  if (!userIsMember) return null;
+
+  const blacklistMotion = () => {
+    dispatch(congressActions.congressDemocracyBlacklist.call({ hash }));
+  };
+
+  return (
+    <Button small secondary onClick={blacklistMotion}>
+      Cancel
+    </Button>
+  );
+}
+
+BlacklistButton.propTypes = { hash: PropTypes.string.isRequired };
 
 const LegacyHash = ({ hash }) => hash;
 
@@ -37,7 +67,15 @@ function BoundedCall({ call }) {
 }
 
 function ProposalItem({
-  name, createdBy, currentEndorsement, externalLink, description, userDidEndorse, boundedCall, buttonEndorseCallback, proposalIndex,
+  name,
+  createdBy,
+  currentEndorsement,
+  externalLink,
+  description,
+  userDidEndorse,
+  boundedCall,
+  buttonEndorseCallback,
+  proposalIndex,
 }) {
   return (
     <Card
@@ -45,6 +83,13 @@ function ProposalItem({
       className={styles.cardProposalsSection}
     >
       <div>
+        <div className={styles.rowEnd}>
+          <BlacklistButton hash={
+            boundedCall?.Lookup?.hash_
+            ?? boundedCall?.Legacy?.hash_
+          }
+          />
+        </div>
         <div className={styles.metaInfoLine}>
           <div>
             <div className={styles.metaTextInfo}>

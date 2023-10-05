@@ -32,6 +32,7 @@ const congressReducer = handleActions(
       congressActions.getTreasuryInfo.call,
       congressActions.approveTreasurySpend.call,
       congressActions.unapproveTreasurySpend.call,
+      congressActions.congressDemocracyBlacklist.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -56,6 +57,8 @@ const congressReducer = handleActions(
       congressActions.getTreasuryInfo.success,
       congressActions.unapproveTreasurySpend.failure,
       congressActions.voteAtMotions.failure,
+      congressActions.congressDemocracyBlacklist.failure,
+      congressActions.congressDemocracyBlacklist.success,
     )]: (state) => ({
       ...state,
       loading: false,

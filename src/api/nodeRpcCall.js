@@ -1914,6 +1914,16 @@ const getPalletIds = async () => {
   return pallets.filter(pallet => pallet.palletId)
 }
 
+const congressDemocracyBlacklist = async (proposalHash, referendumIndex, walletAddress) => {
+  const api = await getApi();
+
+  const threshold = await congressMajorityThreshold();
+  const proposal = api.tx.democracy.blacklist(proposalHash, referendumIndex ?? null);
+  
+  const extrinsic = api.tx.council.propose(threshold, proposal, proposal.length);
+  return await submitExtrinsic( extrinsic, walletAddress);
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1999,4 +2009,5 @@ export {
   congressProposeRepealLegislation,
   congressSendTreasuryLld,
   getPalletIds,
+  congressDemocracyBlacklist
 };

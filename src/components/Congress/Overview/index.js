@@ -72,8 +72,8 @@ export default function Overview() {
               onClick={() => dispatch(congressActions.renounceCandidacy.call(userStatus))}
             >
               Renounce
-              {senderIsMember ? ' Congress Membership' : null}
-              {senderIsCandidate || senderIsRunnerUp ? ' Candidacy' : null}
+              {userIsMember ? ' Congress Membership' : null}
+              {userIsCandidate || userIsRunnersUp ? ' Candidacy' : null}
             </Button>
           )}
         </div>
