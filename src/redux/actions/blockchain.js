@@ -11,6 +11,7 @@ export const {
   getErrorExistsAndUnacknowledgedByUser,
   setError,
   activeEra,
+  fetchPreimage,
 } = createActions({
   BEST_BLOCK_NUMBER: {
     value: undefined,
@@ -57,5 +58,10 @@ export const {
   },
   ACTIVE_ERA: {
     value: undefined,
+  },
+  FETCH_PREIMAGE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
   },
 });

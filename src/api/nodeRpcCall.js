@@ -1905,6 +1905,16 @@ const congressAmendLegislationViaReferendum = async (
   return await congressProposeReferendum(amendLegislation, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
 }
 
+const fetchPreimage = async (hash, len) => {
+  const api = await getApi();
+  return api.query.preimage.preimageFor([hash, len]);
+}
+
+const decodeCall = async (bytes) => {
+  const api = await getApi();
+  return api.createType('Call', bytes);
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1994,4 +2004,6 @@ export {
   proposeAmendLegislation,
   congressAmendLegislation,
   congressAmendLegislationViaReferendum,
+  fetchPreimage,
+  decodeCall,
 };

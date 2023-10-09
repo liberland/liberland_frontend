@@ -24,6 +24,7 @@ export default function* rootSaga() {
     blockchainSagas.getAllWalletsWatcher(),
     blockchainSagas.clearErrorsWatcher(),
     blockchainSagas.subscribeActiveEraSaga(),
+    blockchainSagas.fetchPreimageWatcher(),
 
     // WALLET
     walletSagas.getWalletWatcher(),

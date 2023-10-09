@@ -11,6 +11,7 @@ import {
   congressSelectors,
   blockchainSelectors,
 } from '../../../redux/selectors';
+import { Proposal } from '../../Proposal';
 
 export default function Motions() {
   const dispatch = useDispatch();
@@ -40,16 +41,15 @@ function Motion({ proposal, proposalOf, voting }) {
     blockchainSelectors.userWalletAddressSelector,
   );
 
-  const readableProposalOf = proposalOf.toHuman();
   const threshold = voting.threshold.toNumber();
 
   const isClosable = voting.ayes.length >= threshold;
 
   return (
     <Card
-      title={`${readableProposalOf.section}.${readableProposalOf.method}`}
       className={styles.cardProposalsSection}
     >
+
       <div>
         <div className={styles.metaInfoLine}>
 
@@ -79,7 +79,6 @@ function Motion({ proposal, proposalOf, voting }) {
           </span>
         </div>
 
-        <pre>{JSON.stringify(readableProposalOf.args, null, 2)}</pre>
         <div className={styles.buttonsContainer}>
           {isClosable && (
             <Button
@@ -128,6 +127,7 @@ function Motion({ proposal, proposalOf, voting }) {
               </Button>
           )}
         </div>
+        <Proposal proposal={proposalOf} />
       </div>
     </Card>
   );

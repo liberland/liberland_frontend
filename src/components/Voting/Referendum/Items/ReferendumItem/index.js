@@ -12,6 +12,7 @@ import { congressActions } from '../../../../../redux/actions';
 import {
   congressSelectors,
 } from '../../../../../redux/selectors';
+import { Proposal } from '../../../../Proposal';
 
 const voteButtons = (buttonVoteCallback, referendumInfo) => (
   <div className={styles.buttonContainer}>
@@ -124,6 +125,7 @@ function ReferendumItem({
   votingTimeLeft,
   referendumIndex,
   delegating,
+  proposal,
 }) {
   const progressBarRatio = yayVotes.gt(BN_ZERO)
     ? `${yayVotes.mul(new BN('100'))
@@ -179,6 +181,10 @@ function ReferendumItem({
         </div>
         <div className={styles.description}>
           <p>{description}</p>
+        </div>
+        <div>
+          Details:
+          <Proposal {...{proposal}} />
         </div>
         <div className={styles.buttonContainer}>
           {

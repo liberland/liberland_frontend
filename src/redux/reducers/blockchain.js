@@ -17,6 +17,7 @@ const initialState = {
     index: BN_ZERO,
     start: BN_ZERO,
   },
+  preimages: {},
 };
 
 const blockchainReducer = handleActions({
@@ -52,6 +53,13 @@ const blockchainReducer = handleActions({
     ...state,
     error: action.payload,
   }),
+  [blockchainActions.fetchPreimage.success]: (state, { payload }) => ({
+    ...state,
+    preimages: {
+      ...state.preimages,
+      [payload.hash.toString()]: payload.preimage,
+    }
+  })
 }, initialState);
 
 export default blockchainReducer;

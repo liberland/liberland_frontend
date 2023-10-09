@@ -99,6 +99,7 @@ function Referendum() {
                   hash={referendum.imageHash}
                   delegating={delegatingTo !== undefined}
                   alreadyVoted={alreadyVoted(referendum)}
+                  proposal={referendum.image.proposal}
                   buttonVoteCallback={handleModalOpenVote}
                   votingTimeLeft="Query system or something for this"
                   referendumIndex={parseInt(referendum.index)}
