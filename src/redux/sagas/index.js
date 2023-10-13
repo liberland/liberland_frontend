@@ -36,6 +36,8 @@ export default function* rootSaga() {
     walletSagas.getNominatorTargetsWatcher(),
     walletSagas.setNominatorTargetsWatcher(),
     walletSagas.unpoolWatcher(),
+    walletSagas.getLlmTransfersWatcher(),
+    walletSagas.getLldTransfersWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),

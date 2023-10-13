@@ -26,10 +26,12 @@ const initialState = {
     },
   },
   gettingWalletInfo: false,
-  historyTx: [{}],
+  transfersTxHistory: {
+    LLM: [],
+    LLD: [],
+  },
   countAllRows: 0,
   currentPageNumber: 0,
-  allHistoryTx: [],
   validators: [],
   nominatorTargets: [],
 };
@@ -46,9 +48,25 @@ const walletReducer = handleActions(
       walletActions.getNominatorTargets.call,
       walletActions.setNominatorTargets.call,
       walletActions.unpool.call,
+      walletActions.getLlmTransfers.call,
+      walletActions.getLldTransfers.call,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
+    }),
+    [walletActions.getLlmTransfers.success]: (state, action) => ({
+      ...state,
+      transfersTxHistory: {
+        ...state.transfersTxHistory,
+        LLM: action.payload,
+      },
+    }),
+    [walletActions.getLldTransfers.success]: (state, action) => ({
+      ...state,
+      transfersTxHistory: {
+        ...state.transfersTxHistory,
+        LLD: action.payload,
+      },
     }),
     [walletActions.getWallet.success]: (state, action) => ({
       ...state,
@@ -84,6 +102,10 @@ const walletReducer = handleActions(
       walletActions.setNominatorTargets.failure,
       walletActions.unpool.success,
       walletActions.unpool.failure,
+      walletActions.getLlmTransfers.success,
+      walletActions.getLlmTransfers.failure,
+      walletActions.getLldTransfers.success,
+      walletActions.getLldTransfers.failure,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,

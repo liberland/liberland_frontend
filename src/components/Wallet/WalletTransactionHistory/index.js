@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */ // remove after refactoring history back in
 import React from 'react';
-import { gql, useQuery } from '@apollo/client';
 import { useSelector } from 'react-redux';
+import { BN, BN_ZERO } from '@polkadot/util';
 import Button from '../../Button/Button';
 import Card from '../../Card';
 
@@ -15,85 +15,16 @@ import { formatMeritTransaction, formatDollarTransaction } from '../../../utils/
 
 import { blockchainSelectors } from '../../../redux/selectors';
 
-const dollarsQuery = gql`
-    query Transfers($orderBy: [TransfersOrderBy!], $filter: TransferFilter) {
-      query {
-        transfers(orderBy: $orderBy, filter: $filter) {
-          nodes {
-            id
-            fromId
-            toId
-            value
-            extrinsicIndex
-            eventIndex
-            block {
-              id
-              number
-              timestamp
-            }
-          }
-        }
-      }
-    }
-`;
-
-const meritsQuery = gql`
-    query Merits($orderBy: [MeritsOrderBy!], $filter: MeritFilter) {
-      query {
-        merits(orderBy: $orderBy, filter: $filter) {
-          nodes {
-            id
-            fromId
-            toId
-            value
-            extrinsicIndex
-            eventIndex
-            block {
-              id
-              number
-              timestamp
-            }
-          }
-        }
-      }
-    }
-`;
 const paymentTypeIcons = {
   failure: <FailedIcon />,
   success: <CheckIcon />,
   refund: <RefundIcon />,
 };
 
-function WalletTransactionHistory({ _transactionHistory, textForBtn, bottomButtonOnclick }) {
+function WalletTransactionHistory({ transactionHistory, bottomButtonOnclick }) {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector).toString();
-  const variables = {
-    orderBy: ['BLOCK_NUMBER_DESC', 'EVENT_INDEX_DESC'],
-    filter: {
-      or: [
-        {
-          fromId: {
-            equalTo: walletAddress,
-          },
-        },
-        {
-          toId: {
-            equalTo: walletAddress,
-          },
-        },
-      ],
-    },
-  };
 
-  const pollInterval = 1000;
-  const lld = useQuery(dollarsQuery, { variables, pollInterval });
-  const llm = useQuery(meritsQuery, { variables, pollInterval });
-
-  const transactionHistory = llm.data && lld.data
-    ? llm.data.query.merits.nodes.map((n) => ({ asset: 'LLM', ...n }))
-      .concat(lld.data.query.transfers.nodes.map((n) => ({ asset: 'LLD', ...n })))
-    : [];
-  transactionHistory.sort((a, b) => b.block.number - a.block.number);
-
+  transactionHistory.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
   return (
     <Card title="Transaction History" className={styles.cardWrapper}>
       <div className={styles.transactionHistoryCard}>
@@ -105,9 +36,10 @@ function WalletTransactionHistory({ _transactionHistory, textForBtn, bottomButto
 
         {transactionHistory.map((transactionHistoryInfo) => {
           const value = transactionHistoryInfo.fromId === walletAddress
-            ? -transactionHistoryInfo.value
+            ? `-${transactionHistoryInfo.value}`
             : transactionHistoryInfo.value;
-          const isAmountPositive = value > 0;
+          const isAmountPositive = new BN(value).gt(BN_ZERO);
+
           return (
             <div className={styles.transactionHistoryCardMain} key={transactionHistoryInfo.id}>
               <div className={styles.paymentNumber}>
@@ -155,12 +87,6 @@ function WalletTransactionHistory({ _transactionHistory, textForBtn, bottomButto
             </div>
           );
         })}
-
-        {/* <Button onClick={bottomButtonOnclick}>
-        {textForBtn}
-        {' '}
-        &gt;
-    </Button> */}
       </div>
     </Card>
   );

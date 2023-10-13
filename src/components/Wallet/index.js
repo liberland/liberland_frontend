@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   Redirect, Route, Switch, useHistory,
 } from 'react-router-dom';
-import routes from '../../router';
+import router from '../../router';
 
 import { walletSelectors, blockchainSelectors } from '../../redux/selectors';
 import { walletActions } from '../../redux/actions';
@@ -15,7 +15,6 @@ import WalletTransactionHistory from './WalletTransactionHistory';
 import Bridge from './Bridge';
 
 import Card from '../Card';
-import router from '../../router';
 import RoleHOC from '../../hocs/RoleHOC';
 
 function Wallet() {
@@ -23,76 +22,76 @@ function Wallet() {
   const balances = useSelector(walletSelectors.selectorBalances);
   const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
-  const transactionHistory = useSelector(walletSelectors.selectorHistoryTx);
+  const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
 
   const dispatch = useDispatch();
   const history = useHistory();
 
   const redirectToViewAllTx = () => {
-    history.push(routes.wallet.allTransactions);
+    history.push(router.wallet.allTransactions);
   };
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
+    dispatch(walletActions.getLlmTransfers.call());
+    dispatch(walletActions.getLldTransfers.call());
   }, [dispatch]);
 
-  return (
-    <>
-      { (userWalletAddress !== undefined) ? (
-        <div className={styles.walletWrapper}>
-          <WalletAddressesLine walletAddress={userWalletAddress} />
-          <div>
-            <Switch>
-              <Route
-                path={router.wallet.ethBridge}
-                component={() => (
-                  <Bridge />
-                )}
-              />
-              <Route
-                path={router.wallet.overView}
-                component={() => (
-                  <div>
-                    <WalletOverview
-                      totalBalance={totalBalance}
-                      balances={balances}
-                      liquidMerits={liquidMerits}
-                    />
+  const overView = () => (
+    <div>
+      <WalletOverview
+        totalBalance={totalBalance}
+        balances={balances}
+        liquidMerits={liquidMerits}
+      />
 
-                    <WalletTransactionHistory
-                      transactionHistory={transactionHistory}
-                      textForBtn="View All Transactions"
-                      bottomButtonOnclick={redirectToViewAllTx}
-                    />
-                  </div>
-                )}
-              />
-              <Route
-                exact
-                path={router.home.wallet}
-                render={() => (
-                  <RoleHOC>
-                    <Redirect to={router.wallet.overView} />
-                  </RoleHOC>
-                )}
-              />
-            </Switch>
-          </div>
+      <WalletTransactionHistory
+        transactionHistory={transactionHistory}
+        textForBtn="View All Transactions"
+        bottomButtonOnclick={redirectToViewAllTx}
+      />
+    </div>
+  );
+
+  return (
+    (userWalletAddress !== undefined) ? (
+      <div className={styles.walletWrapper}>
+        <WalletAddressesLine walletAddress={userWalletAddress} />
+        <div>
+          <Switch>
+            <Route
+              path={router.wallet.ethBridge}
+              component={Bridge}
+            />
+            <Route
+              path={router.wallet.overView}
+              component={overView}
+            />
+            <Route
+              exact
+              path={router.home.wallet}
+              render={() => (
+                <RoleHOC>
+                  <Redirect to={router.wallet.overView} />
+                </RoleHOC>
+              )}
+            />
+          </Switch>
         </div>
-      ) : (
-        <Card>
-          <div className={styles.haveNotExtension}>
-            <span>
-              No extension installed, or you did not accept the authorization, please visit
-              {' '}
-              <a target="_blank" href="https://polkadot.js.org/extension/" rel="noopener noreferrer">polkadot.js.org</a>
-              {' '}
-              for more details.
-            </span>
-          </div>
-        </Card>
-      )}
-    </>
+      </div>
+    ) : (
+      <Card>
+        <div className={styles.haveNotExtension}>
+          <span>
+            No extension installed, or you did not accept the authorization, please visit
+            {' '}
+            <a target="_blank" href="https://polkadot.js.org/extension/" rel="noopener noreferrer">polkadot.js.org</a>
+            {' '}
+            for more details.
+          </span>
+        </div>
+      </Card>
+    )
   );
 }
 

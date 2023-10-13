@@ -43,12 +43,7 @@ const selectorTotalLLM = createSelector(
 
 const selectorIsUserHavePolkaStake = createSelector(
   selectorBalances,
-  (reducer) => valueToBN(reducer.polkastake.amount).gt(valueToBN(0))
-);
-
-const selectorHistoryTx = createSelector(
-  walletReducer,
-  (reducer) => reducer.historyTx,
+  (reducer) => valueToBN(reducer.polkastake.amount).gt(valueToBN(0)),
 );
 
 const selectorCountAllRows = createSelector(
@@ -63,7 +58,10 @@ const selectorCurrentPageNumber = createSelector(
 
 const selectorAllHistoryTx = createSelector(
   walletReducer,
-  (reducer) => reducer.allHistoryTx,
+  (reducer) => [
+    ...reducer.transfersTxHistory.LLM,
+    ...reducer.transfersTxHistory.LLD,
+  ],
 );
 
 const selectorValidators = createSelector(
@@ -85,7 +83,6 @@ export {
   selectorTotalLLM,
   selectorWalletAddress,
   selectorIsUserHavePolkaStake,
-  selectorHistoryTx,
   selectorCountAllRows,
   selectorCurrentPageNumber,
   selectorAllHistoryTx,

@@ -12,22 +12,18 @@ import {
   setNominatorTargets,
   unpool,
 } from '../../api/nodeRpcCall';
-// import api from '../../api';
-import { blockchainWatcher } from "./base";
+import { getDollarsTransfers, getMeritsTransfers } from '../../api/explorer';
 
 import { blockchainActions, walletActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
+import { blockchainWatcher } from './base';
 
 // WORKERS
 
 function* getWalletWorker() {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const balances = yield call(getBalanceByAddress, walletAddress);
-    yield put(walletActions.getWallet.success({ ...walletAddress, balances }));
-  } catch (e) {
-    yield put(walletActions.getWallet.failure(e));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const balances = yield call(getBalanceByAddress, walletAddress);
+  yield put(walletActions.getWallet.success({ ...walletAddress, balances }));
 }
 
 function* stakeToPolkaWorker(action) {
@@ -41,11 +37,11 @@ function* stakeToPolkaWorker(action) {
 function* unpoolWorker() {
   try {
     const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { blockHash, errorData } = yield cps(unpool, walletAddress);
+    const { errorData } = yield cps(unpool, walletAddress);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
-      yield put(walletActions.unpool.failure())
+      yield put(walletActions.unpool.failure());
     } else {
       yield put(walletActions.unpool.success());
       yield put(walletActions.getWallet.call());
@@ -76,37 +72,25 @@ function* sendTransferWorker(action) {
 function* sendTransferLLMWorker(action) {
   const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const { recipient, amount } = action.payload;
-  yield call(sendTransferLLM, recipient, amount, userWalletAddress)
+  yield call(sendTransferLLM, recipient, amount, userWalletAddress);
   yield put(walletActions.sendTransferLLM.success());
   yield put(walletActions.getWallet.call());
 }
 
 function* getValidatorsWorker() {
-  try {
-    const validators = yield call(getValidators);
-    yield put(walletActions.getValidators.success(validators));
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    yield put(walletActions.getValidators.failure(e));
-  }
+  const validators = yield call(getValidators);
+  yield put(walletActions.getValidators.success(validators));
 }
 
 function* getNominatorTargetsWorker() {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const nominatorTargets = yield call(getNominatorTargets, walletAddress);
-    yield put(walletActions.getNominatorTargets.success(nominatorTargets));
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    yield put(walletActions.getNominatorTargets.failure(e));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const nominatorTargets = yield call(getNominatorTargets, walletAddress);
+  yield put(walletActions.getNominatorTargets.success(nominatorTargets));
 }
 
 function* setNominatorTargetsWorker(action) {
   try {
-    const { blockHash, errorData } = yield cps(setNominatorTargets, action.payload);
+    const { errorData } = yield cps(setNominatorTargets, action.payload);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
@@ -125,14 +109,28 @@ function* setNominatorTargetsWorker(action) {
   }
 }
 
+function* getLlmTransfersWorker() {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+  const transfers = yield call(getMeritsTransfers, walletAddress);
+
+  yield put(walletActions.getLlmTransfers.success(transfers));
+}
+
+function* getLldTransfersWorker() {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+  const transfers = yield call(getDollarsTransfers, walletAddress);
+
+  yield put(walletActions.getLldTransfers.success(transfers));
+}
+
 // WATCHERS
 
 function* getWalletWatcher() {
-  try {
-    yield takeLatest(walletActions.getWallet.call, getWalletWorker);
-  } catch (e) {
-    yield put(walletActions.getWallet.failure(e));
-  }
+  yield* blockchainWatcher(walletActions.getWallet, getWalletWorker);
 }
 
 function* sendTransferWatcher() {
@@ -140,7 +138,7 @@ function* sendTransferWatcher() {
 }
 
 function* sendTransferLLMWatcher() {
-  yield* blockchainWatcher(walletActions.sendTransferLLM, sendTransferLLMWorker)
+  yield* blockchainWatcher(walletActions.sendTransferLLM, sendTransferLLMWorker);
 }
 
 function* stakeToPolkaWatcher() {
@@ -160,23 +158,11 @@ function* stakeToLiberlandWatcher() {
 }
 
 function* getValidatorsWatcher() {
-  try {
-    yield takeLatest(walletActions.getValidators.call, getValidatorsWorker);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    yield put(walletActions.getValidators.failure(e));
-  }
+  yield* blockchainWatcher(walletActions.getValidators, getValidatorsWorker);
 }
 
 function* getNominatorTargetsWatcher() {
-  try {
-    yield takeLatest(walletActions.getNominatorTargets.call, getNominatorTargetsWorker);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    yield put(walletActions.getNominatorTargets.failure(e));
-  }
+  yield* blockchainWatcher(walletActions.getNominatorTargets, getNominatorTargetsWorker);
 }
 
 function* setNominatorTargetsWatcher() {
@@ -185,6 +171,14 @@ function* setNominatorTargetsWatcher() {
   } catch (e) {
     yield put(walletActions.setNominatorTargets.failure(e));
   }
+}
+
+export function* getLlmTransfersWatcher() {
+  yield* blockchainWatcher(walletActions.getLlmTransfers, getLlmTransfersWorker);
+}
+
+export function* getLldTransfersWatcher() {
+  yield* blockchainWatcher(walletActions.getLldTransfers, getLldTransfersWorker);
 }
 
 export {
