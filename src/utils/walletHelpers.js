@@ -39,7 +39,7 @@ export const formatTransaction = (value_raw, bigSymbol, smallSymbol, decimals) =
   const value = valueToBN(value_raw);
   const prefix = value.gt(BN_ZERO) ? '+' : '-';
   const absIntvalue = value.abs();
-  if (_parse(absIntvalue, decimals).gt(BN_ONE)) {
+  if (_parse(absIntvalue.toString(), decimals).gt(BN_ONE)) {
     return `${prefix} ${_format(absIntvalue, decimals)} ${bigSymbol}`;
   }
   return `${prefix} ${_format(absIntvalue, 0)} ${smallSymbol}`;

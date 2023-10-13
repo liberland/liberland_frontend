@@ -11,6 +11,8 @@ export const {
   getNominatorTargets,
   setNominatorTargets,
   unpool,
+  getLlmTransfers,
+  getLldTransfers,
 } = createActions({
   GET_WALLET: {
     call: undefined,
@@ -68,6 +70,16 @@ export const {
     failure: undefined,
   },
   UNPOOL: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_LLM_TRANSFERS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_LLD_TRANSFERS: {
     call: undefined,
     success: undefined,
     failure: undefined,
