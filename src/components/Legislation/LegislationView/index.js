@@ -13,6 +13,7 @@ import styles from './styles.module.scss';
 import Button from '../../Button/Button';
 import RepealLegislationButton from '../../Congress/RepealLegislationButton';
 import ProposeRepealLegislationButton from '../../Congress/ProposeRepealLegislationButton';
+import CitizenProposeRepealLegislationButton from '../../Congress/CitizenProposeRepealLegislationButton';
 import AmendLegislationButton from './AmendLegislationButton';
 import CongressAmendLegislationButton from './CongressAmendLegislationButton';
 import CongressAmendLegislationViaReferendumButton from './CongressAmendLegislationViaReferendumButton';
@@ -52,7 +53,44 @@ VetoStats.propTypes = {
   section: PropTypes.number.isRequired,
 };
 
-function ActionButtons({ tier, id, section }) {
+function ExistingMotionsAndReferendums({ motion, referendum, proposal }) {
+  return (
+    <>
+      {motion
+      && (
+      <p>
+        Repeal motion:
+        <a href={`/home/congress/motions#${motion}`}>{motion}</a>
+      </p>
+      )}
+      {referendum
+      && (
+      <p>
+        Repeal referendum:
+        <a href={`/home/voting/referendum#${referendum}`}>{referendum}</a>
+      </p>
+      )}
+      {proposal
+      && (
+      <p>
+        Repeal proposal:
+        <a href={`/home/voting/referendum#${proposal}`}>{proposal}</a>
+      </p>
+      )}
+    </>
+  );
+}
+
+ExistingMotionsAndReferendums.propTypes = {
+  motion: PropTypes.string.isRequired,
+  referendum: PropTypes.string.isRequired,
+  proposal: PropTypes.string.isRequired,
+
+};
+
+function ActionButtons({
+  tier, id, section, repealMotion, repealReferendum, repealProposal,
+}) {
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
@@ -84,7 +122,7 @@ function ActionButtons({ tier, id, section }) {
           Cast Veto
         </Button>
       )}
-      {tier === 'InternationalTreaty' && (
+      {(tier === 'InternationalTreaty' && !repealMotion) && (
         <RepealLegislationButton {...{ tier, id, section }} />
       )}
       {tier !== 'Constitution' && (
@@ -97,6 +135,7 @@ function ActionButtons({ tier, id, section }) {
         <CongressAmendLegislationViaReferendumButton {...{ tier, id, section }} />
       </>
       )}
+      { (!repealReferendum && !repealProposal) && <CitizenProposeRepealLegislationButton {...{ tier, id, section }} />}
     </div>
   );
 }
@@ -110,7 +149,9 @@ const LegislationView = () => {
   useEffect(() => {
     dispatch(legislationActions.getLegislation.call({ tier }));
     dispatch(legislationActions.getCitizenCount.call());
-    dispatch(congressActions.getMembers.call()); // required by RepealLegislationButton
+
+    // required by RepealLegislationButton && CitizenProposeRepealLegislationButton
+    dispatch(congressActions.getMembers.call());
   }, [dispatch, tier, legislationActions]);
 
   const legislation = useSelector(legislationSelectors.legislation);
@@ -118,22 +159,63 @@ const LegislationView = () => {
   if (!legislation[tier]) return 'Loading...';
 
   return Object.entries(legislation[tier]).flatMap(([year, legislations]) => (
-    Object.entries(legislations).map(([index, { id, sections }]) => (
+    Object.entries(legislations).map(([index, {
+      id,
+      sections,
+      mainRepealMotion,
+      mainRepealReferendum,
+      mainRepealProposal,
+    }]) => (
       <Card
         className={styles.legislationCard}
         title={`Legislation ${year}/${index}`}
         key={`${year}-${index}`}
       >
         <VetoStats {...{ tier, id, section: null }} />
-        <ActionButtons {...{ tier, id, section: null }} />
-        {sections.map((v) => (v.content.isSome ? v.content.unwrap().toHuman() : 'Repealed')).map((content, section) => (
+        <ExistingMotionsAndReferendums
+          motion={mainRepealMotion}
+          referendum={mainRepealReferendum}
+          proposal={mainRepealProposal}
+        />
+
+        <ActionButtons {...{
+          tier,
+          id,
+          section: null,
+          repealMotion: mainRepealMotion,
+          repealReferendum: mainRepealReferendum,
+          repealProposal: mainRepealProposal,
+        }}
+        />
+        {sections
+          .map(({
+            content,
+            repealMotion,
+            repealReferendum,
+            repealProposal,
+          }, section) => (
           // eslint-disable-next-line react/no-array-index-key
-          <Card className={styles.legislationSectionCard} title={`Section #${section}`} key={section}>
-            <div className={styles.legislationContent}>{content}</div>
-            <VetoStats {...{ tier, id, section }} />
-            <ActionButtons {...{ tier, id, section }} />
-          </Card>
-        ))}
+            <Card className={styles.legislationSectionCard} title={`Section #${section}`} key={section}>
+              <div className={styles.legislationContent}>
+                { content.isSome ? content.unwrap().toHuman() : 'Repealed' }
+              </div>
+              <VetoStats {...{ tier, id, section }} />
+              <ExistingMotionsAndReferendums
+                motion={repealMotion}
+                referendum={repealReferendum}
+                proposal={repealProposal}
+              />
+              <ActionButtons {...{
+                tier,
+                id,
+                section,
+                repealMotion,
+                repealReferendum,
+                repealProposal,
+              }}
+              />
+            </Card>
+          ))}
         <AmendLegislationButton add {...{ tier, id, section: sections.length }} />
         { tier === 'InternationalTreaty'
           && <CongressAmendLegislationButton add {...{ tier, id, section: sections.length }} /> }

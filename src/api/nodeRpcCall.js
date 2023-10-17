@@ -100,16 +100,25 @@ const getApi = async () => {
   return __apiCache;
 };
 
-const crossReference = (blockchainData, centralizedData) => {
-  return blockchainData.map((item) => (
-    {
+const crossReference = (api, blockchainData, allCentralizedData, motions, isReferendum) => 
+  blockchainData.map((item) => {
+    const centralizedData = allCentralizedData.find((cItem) => (
+      parseInt(cItem.chainIndex) == parseInt(item.index)
+    ))
+
+    const blacklistMotionHash = api.tx.democracy.blacklist(
+      item.boundedCall?.Lookup?.hash_ ?? 
+      item.boundedCall?.Legacy?.hash_, 
+      isReferendum ? item.index : null
+    ).method.hash.toString()
+
+    return {
       ...item,
-      centralizedData: centralizedData.find((cItem) => (
-        parseInt(cItem.chainIndex) == parseInt(item.index)
-      )),
+      centralizedData,
+      blacklistMotion: motions.includes(blacklistMotionHash) ? blacklistMotionHash : null
     }
-  ))
-};
+  }
+);
 
 const submitExtrinsic = async (extrinsic, walletAddress) => {
   const api = await getApi();
@@ -699,17 +708,24 @@ const getDemocracyReferendums = async (address) => {
       }
     ));
 
-    let centralizedReferendumsData = await centralizedBackend.getReferenda();
+    const motions = (await api.query.council.proposals())
+      .map(propose => propose.toString())
 
+    const centralizedReferendumsData = await centralizedBackend.getReferenda();
     const crossReferencedReferendumsData = crossReference(
+      api,
       apideriveReferendums,
       centralizedReferendumsData,
-    );
-
+      motions,
+      true
+    )
     const crossReferencedProposalsData = crossReference(
+      api,
       proposalsWithDeposits,
       centralizedReferendumsData,
-    );
+      motions,
+      false
+    )
 
     return {
       proposalData,
@@ -956,32 +972,110 @@ const revertVetoForLegislation = async (tier, id, section, walletAddress) => {
 const getLegislation = async (tier) => {
   const api = await getApi();
 
-  const legislation = await api.query.liberlandLegislation.legislation.entries(tier);
-  const legislationById = legislation.reduce((acc, [{ args: key }, content]) => {
-    const { year, index } = key[1];
-    if(!acc[year]) acc[year] = {};
-    if(!acc[year][index]) acc[year][index] = { id: { year, index }, vetos: [], sections: [] }
-    acc[year][index].sections.push({vetos: [], content});
-    return acc;
-  }, {})
+  const legislation = await api.query.liberlandLegislation.legislation.entries(
+    tier
+  );
+  const legislationById = legislation.reduce(
+    (acc, [{ args: key }, content]) => {
+      const { year, index } = key[1];
+      if (!acc[year]) acc[year] = {};
+      if (!acc[year][index])
+        acc[year][index] = { id: { year, index }, vetos: [], sections: [] };
+      acc[year][index].sections.push({ vetos: [], content });
+      return acc;
+    },
+    {}
+  );
 
   const vetos = await api.query.liberlandLegislation.vetos.entries(tier);
-  vetos.filter(([_, isVeto]) => isVeto).forEach(([key]) => {
-    const [_, {year, index}, section, accountId] = key.args;
-    if(!legislationById[year]) legislationById[year] = {};
-    if(!legislationById[year][index]) legislationById[year][index] = { id: { year, index }, vetos: [], sections: [] };
-    if(section.isSome) {
-      const sectionId = section.unwrap().toNumber();
-      if(!legislationById[year][index].sections[sectionId]) return;
-      legislationById[year][index].sections[sectionId].vetos.push(accountId)
-    } else {
-      if(!legislationById[year][index]) return;
-      legislationById[year][index].vetos.push(accountId)
-    }
-  });
+  vetos
+    .filter(([_, isVeto]) => isVeto)
+    .forEach(([key]) => {
+      const [_, { year, index }, section, accountId] = key.args;
+      if (!legislationById[year]) legislationById[year] = {};
+      if (!legislationById[year][index])
+        legislationById[year][index] = {
+          id: { year, index },
+          vetos: [],
+          sections: [],
+        };
+      if (section.isSome) {
+        const sectionId = section.unwrap().toNumber();
+        if (!legislationById[year][index].sections[sectionId]) return;
+        legislationById[year][index].sections[sectionId].vetos.push(accountId);
+      } else {
+        if (!legislationById[year][index]) return;
+        legislationById[year][index].vetos.push(accountId);
+      }
+    });
 
+  const motions = (await api.query.council.proposals()).map((propose) =>
+    propose.toString()
+  );
+  const publicProps = (await api.query.democracy.publicProps())
+    .map((proposal) => {
+      if (proposal[1].isLegacy) return proposal[1].asLegacy.hash_.toString()
+      if (proposal[1].isLookup) return proposal[1].asLookup.hash_.toString()
+    }).filter((el) => el);
+  
+  const referendums = await api.query.democracy.referendumInfoOf.entries();
+  const referendumProposals = referendums
+    .map(([_, referendum]) => {
+      const unwrapedReferendum = referendum.unwrapOr(null);
+      if (!unwrapedReferendum?.isOngoing) return;
+      const proposal = unwrapedReferendum.asOngoing.proposal
+      if (proposal.isLookup) return proposal.asLookup.hash_.toString()
+      if (proposal.isLegacy) return proposal.asLegacy.hash_.toString()
+    })
+    .filter((el) => el);
+
+  const legislationVersionEntries =
+    await api.query.liberlandLegislation.legislationVersion.entries(tier);
+  const repealLegislationHashes = legislationVersionEntries.reduce(
+    (acc, [{ args: key }, witness]) => {
+      const { year, index } = key[1];
+      if (!acc[year]) acc[year] = {};
+      if (!acc[year][index])
+        acc[year][index] = {
+          sections: [],
+          proposalContent: api.tx.liberlandLegislation.repealLegislation(
+            tier,
+            { year, index },
+            witness
+          ).method.hash.toString(),
+        };
+      acc[year][index].sections.push({
+        proposalContent: api.tx.liberlandLegislation.repealLegislationSection(
+          tier,
+          { year, index },
+          acc[year][index].sections.length,
+          witness
+        ).method.hash.toString(),
+      });
+      return acc;
+    },
+    {}
+  );
+
+  Object.entries(legislationById).forEach(([year, legislations]) => {
+      Object.entries(legislations).forEach( ([index, { sections }]) => {
+        const mainrepealLegislationHash = repealLegislationHashes[year][index].proposalContent
+        legislationById[year][index].repealMotion = motions.includes(mainrepealLegislationHash) ? mainrepealLegislationHash : null;
+        legislationById[year][index].repealReferendum = referendumProposals.includes(mainrepealLegislationHash) ? mainrepealLegislationHash : null;
+        legislationById[year][index].repealProposal = publicProps.includes(mainrepealLegislationHash) ? mainrepealLegislationHash : null;
+        sections.forEach((sectionData, section) => {
+            if (sectionData.content.isNone) return;
+            const repealLegislationHash = repealLegislationHashes[year][index].sections[section].proposalContent
+            legislationById[year][index].sections[section].repealMotion = motions.includes(repealLegislationHash) ? repealLegislationHash : null;
+            legislationById[year][index].sections[section].repealReferendum = referendumProposals.includes(repealLegislationHash) ? repealLegislationHash : null;
+            legislationById[year][index].sections[section].repealProposal = publicProps.includes(repealLegislationHash) ? repealLegislationHash : null;
+          })
+      })
+  })
+  
   return legislationById;
 };
+
 
 const getOfficialUserRegistryEntries = async (walletAddress) => {
   const api = await getApi();
@@ -1775,7 +1869,7 @@ const congressProposeReferendum = async (
   const threshold = await congressMajorityThreshold();
 
   const proposeAndVote = await createProposalAndVote(threshold, proposal, true)
-  const existingPreimage = await api.query.preimage.preimageFor([proposal.hash, proposal.encodedLength])
+  const existingPreimage = await api.query.preimage.preimageFor([referendumProposal.hash, referendumProposal.encodedLength])
   const extrinsic = api.tx.utility.batchAll(
     existingPreimage.isNone
     ? [
@@ -1818,6 +1912,38 @@ const congressProposeRepealLegislation = async (
   return await congressProposeReferendum(repealLegislation, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
 }
 
+const citizenProposeRepealLegislation = async (
+  tier,
+  id,
+  section,
+  walletAddress,
+) => {
+  const api = await getApi();
+  const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
+  const repealLegislation = section !== null ?
+    api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness).method
+    : api.tx.liberlandLegislation.repealLegislation(tier, id, witness).method;
+
+  const minDeposit = api.consts.democracy.minimumDeposit;
+  const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
+  const proposeTx = proposeCall({ Lookup: {
+    hash_: repealLegislation.hash,
+    len: repealLegislation.encodedLength,
+  }}, minDeposit);
+
+
+  const existingPreimage = await api.query.preimage.preimageFor([repealLegislation.hash, repealLegislation.encodedLength])
+  const extrinsic = 
+    existingPreimage.isNone
+    ? api.tx.utility.batchAll([
+        api.tx.preimage.notePreimage(repealLegislation.toHex()),
+        proposeTx,
+      ])
+    : proposeTx
+
+  return await submitExtrinsic(extrinsic, walletAddress)
+}
+
 const congressSendTreasuryLld = async (transferToAddress, transferAmount, walletAddress) => {
   const api = await getApi();
 
@@ -1840,7 +1966,7 @@ const congressDemocracyBlacklist = async (proposalHash, referendumIndex, walletA
 
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.democracy.blacklist(proposalHash, referendumIndex ?? null);
-  
+
   const extrinsic = api.tx.utility.batchAll(await createProposalAndVote(threshold, proposal, true));
   return await submitExtrinsic( extrinsic, walletAddress);
 }
@@ -2045,4 +2171,5 @@ export {
   fetchPreimage,
   decodeCall,
   getScheduledCalls,
+  citizenProposeRepealLegislation,
 };

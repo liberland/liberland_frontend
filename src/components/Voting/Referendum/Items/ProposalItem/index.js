@@ -77,6 +77,7 @@ function ProposalItem({
   boundedCall,
   buttonEndorseCallback,
   proposalIndex,
+  blacklistMotion,
 }) {
   let hash, len;
   if ('Lookup' in boundedCall) {
@@ -90,11 +91,21 @@ function ProposalItem({
     >
       <div>
         <div className={styles.rowEnd}>
-          <BlacklistButton hash={
-            boundedCall?.Lookup?.hash_
-            ?? boundedCall?.Legacy?.hash_
-          }
-          />
+          {blacklistMotion ? (
+            <small>
+              Blacklist motion:
+              <a href={`/home/congress/motions#${blacklistMotion}`}>
+                {blacklistMotion}
+              </a>
+            </small>
+          )
+            : (
+              <BlacklistButton hash={
+              boundedCall?.Lookup?.hash_
+              ?? boundedCall?.Legacy?.hash_
+            }
+              />
+            )}
         </div>
         <div className={styles.metaInfoLine}>
           <div>
@@ -160,8 +171,9 @@ ProposalItem.propTypes = {
   description: PropTypes.string.isRequired,
   userDidEndorse: PropTypes.bool.isRequired,
   boundedCall: call.isRequired,
-  buttonEndorseCallback: PropTypes.bool.isRequired,
-  proposalIndex: PropTypes.number.isRequired,
+  buttonEndorseCallback: PropTypes.func.isRequired,
+  proposalIndex: PropTypes.string.isRequired,
+  blacklistMotion: PropTypes.string.isRequired,
 };
 
 export default ProposalItem;

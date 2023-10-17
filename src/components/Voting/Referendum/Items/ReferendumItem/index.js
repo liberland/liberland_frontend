@@ -126,6 +126,7 @@ function ReferendumItem({
   referendumIndex,
   delegating,
   proposal,
+  blacklistMotion,
 }) {
   const progressBarRatio = yayVotes.gt(BN_ZERO)
     ? `${yayVotes.mul(new BN('100'))
@@ -138,7 +139,20 @@ function ReferendumItem({
     >
       <div>
         <div className={styles.rowEnd}>
-          <BlacklistButton hash={hash} referendumIndex={referendumIndex} />
+          {blacklistMotion ? (
+            <small>
+              Blacklist motion:
+              <a href={`/home/congress/motions#${blacklistMotion}`}>
+                {blacklistMotion}
+              </a>
+            </small>
+          )
+            : (
+              <BlacklistButton
+                hash={hash}
+                referendumIndex={referendumIndex}
+              />
+            )}
         </div>
         <div className={styles.metaInfoLine}>
           <div>
@@ -209,6 +223,7 @@ ReferendumItem.propTypes = {
   votingTimeLeft: PropTypes.string.isRequired,
   referendumIndex: PropTypes.number.isRequired,
   delegating: PropTypes.bool.isRequired,
+  blacklistMotion: PropTypes.string.isRequired,
 };
 
 export default ReferendumItem;

@@ -7,12 +7,18 @@ import {
   getDemocracyReferendums,
   secondProposal,
   voteOnReferendum,
-  submitProposal, voteForCongress,
-  delegateDemocracy, undelegateDemocracy, proposeAmendLegislation, getScheduledCalls,
+  submitProposal,
+  voteForCongress,
+  delegateDemocracy,
+  undelegateDemocracy,
+  proposeAmendLegislation,
+  citizenProposeRepealLegislation,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors } from '../selectors';
-import { blockchainActions, democracyActions } from '../actions';
+import {
+  blockchainActions, democracyActions, congressActions, legislationActions,
+} from '../actions';
 
 // WORKERS
 
@@ -151,6 +157,28 @@ function* proposeAmendLegislationWorker(action) {
   yield put(democracyActions.getDemocracy.call());
 }
 
+function* citizenProposeRepealLegislationWorker({
+  payload: {
+    tier, id, section,
+  },
+}) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  yield call(
+    citizenProposeRepealLegislation,
+    tier,
+    id,
+    section,
+    walletAddress,
+  );
+
+  yield put(democracyActions.citizenProposeRepealLegislation.success());
+  yield put(congressActions.getMotions.call());
+  yield put(legislationActions.getLegislation.call({ tier }));
+}
+
 // WATCHERS
 
 function* getDemocracyWatcher() {
@@ -203,6 +231,13 @@ function* undelegateWatcher() {
 
 function* proposeAmendLegislationWatcher() {
   yield* blockchainWatcher(democracyActions.proposeAmendLegislation, proposeAmendLegislationWorker);
+}
+
+export function* citizenProposeRepealLegislationWatcher() {
+  yield* blockchainWatcher(
+    democracyActions.citizenProposeRepealLegislation,
+    citizenProposeRepealLegislationWorker,
+  );
 }
 
 export {

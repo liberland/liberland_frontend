@@ -9,6 +9,7 @@ export const {
   undelegate,
   voteForCongress,
   voteOnReferendum,
+  citizenProposeRepealLegislation,
 } = createActions({
   DELEGATE: {
     call: undefined,
@@ -46,6 +47,11 @@ export const {
     failure: undefined,
   },
   VOTE_ON_REFERENDUM: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CITIZEN_PROPOSE_REPEAL_LEGISLATION: {
     call: undefined,
     success: undefined,
     failure: undefined,
