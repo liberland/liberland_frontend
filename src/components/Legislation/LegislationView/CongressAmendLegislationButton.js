@@ -3,17 +3,14 @@ import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import CongressAmendLegislationModal from '../../Modals/CongressAmendLegislationModal';
 import Button from '../../Button/Button';
-import { blockchainSelectors, congressSelectors } from '../../../redux/selectors';
+import { congressSelectors } from '../../../redux/selectors';
 
 export default function CongressAmendLegislationButton({
   tier, id, section, add,
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // FIXME refactor after https://github.com/liberland/liberland_frontend/pull/143 is merged
-  const members = useSelector(congressSelectors.members);
-  const user = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const userIsMember = members.find((member) => member.toString() === user);
+  const userIsMember = useSelector(congressSelectors.userIsMember);
   if (!userIsMember) return null;
 
   const toggle = () => {

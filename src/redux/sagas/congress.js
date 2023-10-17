@@ -1,7 +1,9 @@
 import {
   put, takeLatest, call, cps, select,
 } from 'redux-saga/effects';
-import { congressActions, blockchainActions } from '../actions';
+import {
+  congressActions, blockchainActions, democracyActions, legislationActions,
+} from '../actions';
 import { blockchainSelectors } from '../selectors';
 import {
   applyForCongress,
@@ -182,6 +184,7 @@ function* congressRepealLegislationWorker({ payload: { tier, id, section } }) {
 
   yield put(congressActions.congressRepealLegislation.success());
   yield put(congressActions.getMotions.call());
+  yield put(legislationActions.getLegislation.call({ tier }));
 }
 
 function* congressProposeRepealLegislationWorker({
@@ -206,6 +209,7 @@ function* congressProposeRepealLegislationWorker({
 
   yield put(congressActions.congressProposeRepealLegislation.success());
   yield put(congressActions.getMotions.call());
+  yield put(legislationActions.getLegislation.call({ tier }));
 }
 
 function* getTreasuryInfoWorker() {
@@ -288,6 +292,7 @@ function* congressDemocracyBlacklistWorker({ payload: { hash, referendumIndex } 
 
   yield call(congressDemocracyBlacklist, hash, referendumIndex, walletAddress);
   yield put(congressActions.congressDemocracyBlacklist.success());
+  yield put(democracyActions.getDemocracy.call());
 }
 
 function* congressAmendLegislationWorker({

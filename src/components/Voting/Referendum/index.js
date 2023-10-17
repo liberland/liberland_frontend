@@ -104,6 +104,7 @@ function Referendum() {
                   buttonVoteCallback={handleModalOpenVote}
                   votingTimeLeft="Query system or something for this"
                   referendumIndex={parseInt(referendum.index)}
+                  blacklistMotion={referendum.blacklistMotion}
                 />
               ))
             }
@@ -127,6 +128,7 @@ function Referendum() {
                   boundedCall={proposal.boundedCall}
                   buttonEndorseCallback={handleModalOpenEndorse}
                   proposalIndex={proposal.index}
+                  blacklistMotion={proposal.blacklistMotion}
                 />
                 /* eslint-enable max-len */
               ))

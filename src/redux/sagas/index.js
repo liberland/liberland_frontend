@@ -46,6 +46,7 @@ export default function* rootSaga() {
     democracySagas.delegateWatcher(),
     democracySagas.undelegateWatcher(),
     democracySagas.proposeAmendLegislationWatcher(),
+    democracySagas.citizenProposeRepealLegislationWatcher(),
 
     // LEGISLATION
     legislationSagas.getLegislationWatcher(),
