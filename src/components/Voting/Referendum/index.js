@@ -7,6 +7,7 @@ import ProposalItem from './Items/ProposalItem';
 import Card from '../../Card';
 import styles from './styles.module.scss';
 import ReferendumItem from './Items/ReferendumItem';
+import DispatchItem from './Items/DispatchItem';
 import {
   VoteOnReferendumModal, UndelegateModal,
 } from '../../Modals';
@@ -135,30 +136,37 @@ function Referendum() {
       </div>
       <div className={styles.referendumsSection}>
         <Card title="Dispatches">
-          <div />
-          {isModalOpenVote && (
-            <VoteOnReferendumModal
-              closeModal={handleModalOpenVote}
-              handleSubmit={handleSubmit}
-              register={register}
-              modalShown={modalShown}
-              setModalShown={setModalShown}
-              referendumInfo={selectedReferendumInfo}
-              voteType={selectedVoteType}
-              onSubmitSecond={handleSubmitSecondForm}
-              onSubmitVote={handleSubmitVoteForm}
-            />
-          )}
-          {isModalOpenUndelegate && (
-            <UndelegateModal
-              closeModal={handleModalOpenUndelegate}
-              handleSubmit={handleSubmit}
-              delegatee={delegatingTo}
-              onSubmitUndelegate={handleSubmitUndelegate}
-            />
-          )}
+          <div>
+            {democracy.democracy?.scheduledCalls.map((item) => (
+              <DispatchItem
+                key={`${item.blockNumber.toString()}-${item.idx}`}
+                item={item}
+              />
+            ))}
+          </div>
         </Card>
       </div>
+      {isModalOpenVote && (
+        <VoteOnReferendumModal
+          closeModal={handleModalOpenVote}
+          handleSubmit={handleSubmit}
+          register={register}
+          modalShown={modalShown}
+          setModalShown={setModalShown}
+          referendumInfo={selectedReferendumInfo}
+          voteType={selectedVoteType}
+          onSubmitSecond={handleSubmitSecondForm}
+          onSubmitVote={handleSubmitVoteForm}
+        />
+      )}
+      {isModalOpenUndelegate && (
+        <UndelegateModal
+          closeModal={handleModalOpenUndelegate}
+          handleSubmit={handleSubmit}
+          delegatee={delegatingTo}
+          onSubmitUndelegate={handleSubmitUndelegate}
+        />
+      )}
     </div>
   );
 }

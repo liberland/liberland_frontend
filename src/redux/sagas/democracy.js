@@ -8,7 +8,7 @@ import {
   secondProposal,
   voteOnReferendum,
   submitProposal, voteForCongress,
-  delegateDemocracy, undelegateDemocracy, proposeAmendLegislation,
+  delegateDemocracy, undelegateDemocracy, proposeAmendLegislation, getScheduledCalls,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors } from '../selectors';
@@ -17,17 +17,12 @@ import { blockchainActions, democracyActions } from '../actions';
 // WORKERS
 
 function* getDemocracyWorker() {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    // TODO use user wallet address once chain is in good state
-    // walletAddress = '5GGgzku3kHSnAjxk7HBNeYzghSLsQQQGGznZA7u3h6wZUseo';
-    const directDemocracyInfo = yield call(getDemocracyReferendums, walletAddress);
-    const currentCongressMembers = yield call(getCongressMembersWithIdentity, walletAddress);
-    const democracy = { ...directDemocracyInfo, ...currentCongressMembers };
-    yield put(democracyActions.getDemocracy.success({ democracy }));
-  } catch (e) {
-    yield put(democracyActions.getDemocracy.failure(e));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const directDemocracyInfo = yield call(getDemocracyReferendums, walletAddress);
+  const currentCongressMembers = yield call(getCongressMembersWithIdentity, walletAddress);
+  const scheduledCalls = yield call(getScheduledCalls);
+  const democracy = { ...directDemocracyInfo, ...currentCongressMembers, scheduledCalls };
+  yield put(democracyActions.getDemocracy.success({ democracy }));
 }
 
 function* secondProposalWorker(action) {
@@ -159,11 +154,7 @@ function* proposeAmendLegislationWorker(action) {
 // WATCHERS
 
 function* getDemocracyWatcher() {
-  try {
-    yield takeLatest(democracyActions.getDemocracy.call, getDemocracyWorker);
-  } catch (e) {
-    yield put(democracyActions.getDemocracy.failure(e));
-  }
+  yield* blockchainWatcher(democracyActions.getDemocracy, getDemocracyWorker);
 }
 
 function* secondProposalWatcher() {

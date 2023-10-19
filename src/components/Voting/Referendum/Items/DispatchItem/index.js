@@ -1,74 +1,64 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
+import { Proposal } from '../../../../Proposal';
+import { blockchainSelectors } from '../../../../../redux/selectors';
 
 function DispatchItem({
-  name, createdBy, externalLink, description, yayVotes, nayVotes, hash, timeLeftUntilImplemented,
+  item,
 }) {
-  const progressBarRatio = yayVotes.gt(BN_ZERO) ? `${yayVotes.mul(new BN("100")).div(yayVotes.add(nayVotes)).toString()}%` : '0%';
+  const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
+
+  const hash = item.call.call.asLookup.hash_;
+  const blocksRemaining = item.blockNumber.toNumber() - currentBlockNumber;
+  const daysRemaining = ((blocksRemaining * 6) / 3600 / 24).toFixed(2);
+  const timeLeftUntilImplemented = `${daysRemaining} days`;
+
   return (
     <Card
-      title={name}
+      title={`#${item.blockNumber.toNumber()}/${item.idx}`}
       className={styles.referendumItemContainer}
     >
       <div>
         <div className={styles.metaInfoLine}>
           <div>
-            <div className={styles.metaTextInfo}>
-              By:
-              {' '}
-              {createdBy}
-            </div>
             <div className={styles.hashText}>
-              {hash}
-            </div>
-          </div>
-          <div className={styles.votesInfo}>
-            <div className={styles.votesCount}>
-              <div>
-                <span className={styles.yayText}>Yay</span>
-                /
-                <span className={styles.nayText}>Nay</span>
-              </div>
-              <div>
-                <span className={styles.yayText}>{yayVotes}</span>
-                /
-                <span className={styles.nayText}>{nayVotes}</span>
-              </div>
-            </div>
-            <div className={styles.progressBar}>
-              <div className={styles.yayProgressBar} style={{ width: progressBarRatio }} />
+              {hash.toHex()}
             </div>
           </div>
         </div>
         <div className={styles.discussionMetaLine}>
-          <div>
-            <a href={externalLink}>Read discussion</a>
-          </div>
           <div>
             <span className={styles.votingTimeText}>Implements in:</span>
             {' '}
             <b>{timeLeftUntilImplemented}</b>
           </div>
         </div>
-        <div className={styles.description}>
-          <p>{description}</p>
+        <div>
+          Details:
+          <Proposal proposal={item.preimage} />
         </div>
       </div>
     </Card>
   );
 }
 
+/* eslint-disable react/forbid-prop-types */
 DispatchItem.propTypes = {
-  name: PropTypes.string.isRequired,
-  createdBy: PropTypes.string.isRequired,
-  externalLink: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  yayVotes: PropTypes.number.isRequired,
-  nayVotes: PropTypes.number.isRequired,
-  hash: PropTypes.string.isRequired,
-  timeLeftUntilImplemented: PropTypes.string.isRequired,
+  item: PropTypes.shape({
+    blockNumber: PropTypes.object.isRequired,
+    idx: PropTypes.number.isRequired,
+    preimage: PropTypes.object.isRequired,
+    call: PropTypes.shape({
+      call: PropTypes.shape({
+        asLookup: PropTypes.shape({
+          hash_: PropTypes.object.isRequired,
+        }),
+      }),
+    }),
+  }).isRequired,
 };
 
 export default DispatchItem;

@@ -9,6 +9,7 @@ const initialState = {
     userVotes: [],
     candidates: [],
     currentCongressMembers: [],
+    scheduledCalls: [],
   },
   gettingDemocracyInfo: false,
 };

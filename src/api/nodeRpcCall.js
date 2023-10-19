@@ -1915,6 +1915,48 @@ const decodeCall = async (bytes) => {
   return api.createType('Call', bytes);
 }
 
+const getScheduledCalls = async () => {
+  const api = await getApi();
+  const agendaEntries = await api.query.scheduler.agenda.entries();
+  const agendaItems = agendaEntries
+    .flatMap(([key, calls]) => 
+      calls
+        .map((call, idx) => ({
+          blockNumber: key.args[0],
+          idx,
+          call,
+        }))
+        .filter(item => item.call.isSome)
+        .map(item => ({
+          ...item,
+          call: item.call.unwrap()
+        }))
+    )
+    .filter(item => 
+      item.call.call.isLookup && // our FE only does lookups now
+      item.call.maybePeriodic.isNone // we're interested only in referendum results, so nonperiodic
+    );
+  
+  // we only want do download small preimages. fetching multi-megabyte setCode could be painful.
+  const bigAgendaItems = agendaItems.filter(item => item.call.call.asLookup.len > 10240);
+  const smallAgendaItems = agendaItems.filter(item => item.call.call.asLookup.len <= 10240);
+  
+  const preimageIds = smallAgendaItems.map(item => ([item.call.call.asLookup.hash_, item.call.call.asLookup.len]));
+  const preimagesRaw = await api.query.preimage.preimageFor.multi(preimageIds)
+  const preimages = preimagesRaw.map((raw) => raw.isSome ? api.createType('Call', raw.unwrap()) : null)
+
+  return [
+    ...bigAgendaItems.map(item => ({
+      ...item,
+      preimage: null
+    })),
+    ...smallAgendaItems.map((item, idx) => ({
+      ...item,
+      preimage: preimages[idx],
+    })),
+  ];
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -2006,4 +2048,5 @@ export {
   congressAmendLegislationViaReferendum,
   fetchPreimage,
   decodeCall,
+  getScheduledCalls,
 };
