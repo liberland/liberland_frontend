@@ -23,7 +23,7 @@ import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
 import router from '../../../router';
 import Tabs from '../../Tabs';
-import { parseDollars } from '../../../utils/walletHelpers';
+import { parseDollars, parseMerits } from '../../../utils/walletHelpers';
 
 function WalletAddressesLine({ walletAddress }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,23 +81,31 @@ function WalletAddressesLine({ walletAddress }) {
     }
   };
 
-  const handleSubmitFormLLM = (values) => {
+  const handleSubmitFormLLM = ({recipient, amount}) => {
     const isAddressValid = isValidAddressPolkadotAddress(sendAddress);
 
     if (isAddressValid) {
-      dispatch(walletActions.sendTransferLLM.call(values));
+      dispatch(walletActions.sendTransferLLM.call({
+        amount: parseMerits(amount),
+        recipient,
+      }));
       handleModalLLMOpen();
     } else {
       notificationRef.current.addError({ text: 'Invalid address.' });
     }
   };
 
-  const handleSubmitStakePolka = (values) => {
-    dispatch(walletActions.stakeToPolka.call({ values, isUserHavePolkaStake, walletAddress }));
+  const handleSubmitStakePolka = ({amount}) => {
+    dispatch(walletActions.stakeToPolka.call({
+      amount: parseDollars(amount),
+      isUserHavePolkaStake
+    }));
     handleModalOpenStake();
   };
-  const handleSubmitStakeLiberland = (values) => {
-    dispatch(walletActions.stakeToLiberland.call({ values, walletAddress }));
+  const handleSubmitStakeLiberland = ({amount}) => {
+    dispatch(walletActions.stakeToLiberland.call({ 
+      amount: parseMerits(amount)
+    }));
     handleModalOpenStake();
   };
   const handleSubmitUnpool = () => {

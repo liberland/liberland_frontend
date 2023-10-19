@@ -21,7 +21,7 @@ function SendLLMModal({
     defaultValues: {
       amount: '10',
       account_from: addressFrom,
-      account_to: '',
+      recipient: '',
     },
   });
 
@@ -43,7 +43,7 @@ function SendLLMModal({
       <div className={styles.title}>Send to address</div>
       <TextInput
         register={register}
-        name="account_to"
+        name="recipient"
         placeholder="Send to address"
         setSendAddress={setSendAddress}
         required

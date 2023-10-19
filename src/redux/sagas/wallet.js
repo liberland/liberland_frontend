@@ -13,6 +13,7 @@ import {
   unpool,
 } from '../../api/nodeRpcCall';
 // import api from '../../api';
+import { blockchainWatcher } from "./base";
 
 import { blockchainActions, walletActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
@@ -30,24 +31,11 @@ function* getWalletWorker() {
 }
 
 function* stakeToPolkaWorker(action) {
-  try {
-    const { blockHash, errorData } = yield cps(stakeToPolkaBondAndExtra, action.payload);
-    console.log('errorData')
-    console.log(errorData)
-    if (errorData.isError) {
-      console.log('is error')
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(walletActions.stakeToPolka.failure())
-    } else {
-      yield put(walletActions.stakeToPolka.success());
-      yield put(walletActions.getWallet.call());
-    }
-  } catch (errorData) {
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(walletActions.stakeToPolka.failure(errorData));
-  }
+  const { amount, isUserHavePolkaStake } = action.payload;
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(stakeToPolkaBondAndExtra, amount, isUserHavePolkaStake, walletAddress);
+  yield put(walletActions.stakeToPolka.success());
+  yield put(walletActions.getWallet.call());
 }
 
 function* unpoolWorker(action) {
@@ -69,21 +57,10 @@ function* unpoolWorker(action) {
 }
 
 function* stakeToLiberlandWorker(action) {
-  try {
-    const { blockHash, errorData } = yield cps(politiPool, action.payload);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(walletActions.stakeToLiberland.failure())
-    } else {
-      yield put(walletActions.stakeToLiberland.success());
-      yield put(walletActions.getWallet.call());
-    }
-  } catch (errorData) {
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(walletActions.stakeToLiberland.failure(errorData));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(politiPool, action.payload.amount, walletAddress);
+  yield put(walletActions.stakeToLiberland.success());
+  yield put(walletActions.getWallet.call());
 }
 
 function* sendTransferWorker(action) {
@@ -107,23 +84,11 @@ function* sendTransferWorker(action) {
 }
 
 function* sendTransferLLMWorker(action) {
-  try {
-    const { blockHash, errorData } = yield cps(sendTransferLLM, action.payload);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(walletActions.sendTransferLLM.failure(errorData));
-    } else {
-      yield put(walletActions.sendTransferLLM.success());
-      yield put(walletActions.getWallet.call());
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.error(errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(walletActions.sendTransferLLM.failure(errorData));
-  }
+  const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const { recipient, amount } = action.payload;
+  yield call(sendTransferLLM, recipient, amount, userWalletAddress)
+  yield put(walletActions.sendTransferLLM.success());
+  yield put(walletActions.getWallet.call());
 }
 
 function* getValidatorsWorker() {
@@ -189,19 +154,11 @@ function* sendTransferWatcher() {
 }
 
 function* sendTransferLLMWatcher() {
-  try {
-    yield takeLatest(walletActions.sendTransferLLM.call, sendTransferLLMWorker);
-  } catch (e) {
-    yield put(walletActions.sendTransferLLM.failure(e));
-  }
+  yield* blockchainWatcher(walletActions.sendTransferLLM, sendTransferLLMWorker)
 }
 
 function* stakeToPolkaWatcher() {
-  try {
-    yield takeLatest(walletActions.stakeToPolka.call, stakeToPolkaWorker);
-  } catch (e) {
-    yield put(walletActions.stakeToPolka.failure(e));
-  }
+  yield* blockchainWatcher(walletActions.stakeToPolka, stakeToPolkaWorker);
 }
 
 function* unpoolWatcher() {
@@ -213,11 +170,7 @@ function* unpoolWatcher() {
 }
 
 function* stakeToLiberlandWatcher() {
-  try {
-    yield takeLatest(walletActions.stakeToLiberland.call, stakeToLiberlandWorker);
-  } catch (e) {
-    yield put(walletActions.stakeToLiberland.failure(e));
-  }
+  yield* blockchainWatcher(walletActions.stakeToLiberland, stakeToLiberlandWorker)
 }
 
 function* getValidatorsWatcher() {

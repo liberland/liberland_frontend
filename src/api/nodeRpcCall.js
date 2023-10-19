@@ -1,18 +1,15 @@
 import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
-import { blake2AsHex } from '@polkadot/util-crypto';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import {handleMyDispatchErrors} from "../utils/therapist";
 import {newCompanyDataObject} from "../utils/defaultData";
 import * as centralizedBackend from './backend';
-import { BN_TWO } from '@polkadot/util';
-import { parseDollars, parseMerits } from '../utils/walletHelpers';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 let __apiCache = null;
-const getApi = () => {
-  if (__apiCache === null) __apiCache = ApiPromise.create({ provider });
+const getApi = async () => {
+  if (__apiCache === null) __apiCache = await ApiPromise.create({ provider });
   return __apiCache;
 };
 
@@ -406,53 +403,18 @@ const sendTransfer = async (payload, callback) => {
   });
 };
 
-const sendTransferLLM = async (payload, callback) => {
-  const { account_to, amount, account_from } = payload;
+const sendTransferLLM = async (recipient, amount, userWalletAddress) => {
   const api = await getApi();
-  const transferExtrinsic = api.tx.llm.sendLlm(account_to, (parseMerits(amount)));
-
-  const injector = await web3FromSource('polkadot-js');
-  transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  const transferExtrinsic = api.tx.llm.sendLlm(recipient, amount);
+  return await submitExtrinsic(transferExtrinsic, userWalletAddress);
 };
 
-const stakeToPolkaBondAndExtra = async (payload, callback) => {
-  const { values: { amount }, isUserHavePolkaStake, walletAddress } = payload;
+const stakeToPolkaBondAndExtra = async (amount, isUserHavePolkaStake, walletAddress) => {
   const api = await getApi();
   const transferExtrinsic = isUserHavePolkaStake
-    ? await api.tx.staking.bondExtra(parseDollars(amount))
-    : await api.tx.staking.bond(parseDollars(amount), 'Staked');
-
-  const injector = await web3FromSource('polkadot-js');
-  // eslint-disable-next-line max-len
-  await transferExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+    ? await api.tx.staking.bondExtra(amount)
+    : await api.tx.staking.bond(amount, 'Staked');
+  return submitExtrinsic(transferExtrinsic, walletAddress);
 };
 
 const unpool = async (walletAddress, callback) => {
@@ -477,27 +439,10 @@ const unpool = async (walletAddress, callback) => {
   });
 };
 
-const politiPool = async (payload, callback) => {
-  const { values: { amount }, walletAddress } = payload;
+const politiPool = async (amount, walletAddress) => {
   const api = await getApi();
-  const politiPoolExtrinsic = api.tx.llm.politicsLock(parseMerits(amount));
-
-  const injector = await web3FromSource('polkadot-js');
-  politiPoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  const politiPoolExtrinsic = api.tx.llm.politicsLock(amount);
+  return await submitExtrinsic(politiPoolExtrinsic, walletAddress);
 };
 
 const getUserRoleRpc = async (walletAddress) => {
