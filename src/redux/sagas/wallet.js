@@ -38,9 +38,10 @@ function* stakeToPolkaWorker(action) {
   yield put(walletActions.getWallet.call());
 }
 
-function* unpoolWorker(action) {
+function* unpoolWorker() {
   try {
-    const { blockHash, errorData } = yield cps(unpool, action.payload);
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const { blockHash, errorData } = yield cps(unpool, walletAddress);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
@@ -57,30 +58,19 @@ function* unpoolWorker(action) {
 }
 
 function* stakeToLiberlandWorker(action) {
+  const { amount } = action.payload;
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  yield call(politiPool, action.payload.amount, walletAddress);
+  yield call(politiPool, amount, walletAddress);
   yield put(walletActions.stakeToLiberland.success());
   yield put(walletActions.getWallet.call());
 }
 
 function* sendTransferWorker(action) {
-  try {
-    const { blockHash, errorData } = yield cps(sendTransfer, action.payload);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(walletActions.sendTransfer.failure(errorData));
-    } else {
-      yield put(walletActions.sendTransfer.success());
-      yield put(walletActions.getWallet.call());
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.error(errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(walletActions.sendTransfer.failure(errorData));
-  }
+  const { recipient, amount } = action.payload;
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(sendTransfer, recipient, amount, walletAddress);
+  yield put(walletActions.sendTransfer.success());
+  yield put(walletActions.getWallet.call());
 }
 
 function* sendTransferLLMWorker(action) {
@@ -146,11 +136,7 @@ function* getWalletWatcher() {
 }
 
 function* sendTransferWatcher() {
-  try {
-    yield takeLatest(walletActions.sendTransfer.call, sendTransferWorker);
-  } catch (e) {
-    yield put(walletActions.sendTransfer.failure(e));
-  }
+  yield* blockchainWatcher(walletActions.sendTransfer, sendTransferWorker);
 }
 
 function* sendTransferLLMWatcher() {
@@ -170,7 +156,7 @@ function* unpoolWatcher() {
 }
 
 function* stakeToLiberlandWatcher() {
-  yield* blockchainWatcher(walletActions.stakeToLiberland, stakeToLiberlandWorker)
+  yield* blockchainWatcher(walletActions.stakeToLiberland, stakeToLiberlandWorker);
 }
 
 function* getValidatorsWatcher() {

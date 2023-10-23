@@ -381,26 +381,10 @@ const getBalanceByAddress = async (address) => {
   }
 };
 
-const sendTransfer = async (payload, callback) => {
-  const { account_to, amount, account_from } = payload;
+const sendTransfer = async (recipient, amount, walletAddress) => {
   const api = await getApi();
-  const transferExtrinsic = api.tx.balances.transfer(account_to, (amount));
-  const injector = await web3FromSource('polkadot-js');
-  transferExtrinsic.signAndSend(account_from, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  const transferExtrinsic = api.tx.balances.transfer(recipient, amount);
+  return await submitExtrinsic(transferExtrinsic, walletAddress);
 };
 
 const sendTransferLLM = async (recipient, amount, userWalletAddress) => {

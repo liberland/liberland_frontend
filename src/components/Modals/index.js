@@ -1,7 +1,6 @@
 import GetCitizenshipModal from './GetCitizenshipModal';
 import SendLLDModal from './SendLLDModal';
 import SendLLMModal from './SendLLMModal';
-import ChoseStakeModal from './ChoseStakeModal';
 import VoteOnReferendumModal from './VoteOnReferendumModal';
 import OnchainIdentityModal from './OnchainIdentityModal';
 import DelegateModal from './DelegateModal';
@@ -11,12 +10,13 @@ import CreateValidatorModal from './CreateValidatorModal';
 import StakeLLDModal from './StakeLLDModal';
 import StartValidatorModal from './StartValidatorModal';
 import UnbondModal from './UnbondModal';
+import PayoutStakingModal from './PayoutStakingModal';
+import UnpoolModal from './UnpoolModal';
 
 export {
   GetCitizenshipModal,
   SendLLDModal,
   SendLLMModal,
-  ChoseStakeModal,
   VoteOnReferendumModal,
   OnchainIdentityModal,
   DelegateModal,
@@ -26,4 +26,6 @@ export {
   StakeLLDModal,
   StartValidatorModal,
   UnbondModal,
+  PayoutStakingModal,
+  UnpoolModal,
 };
