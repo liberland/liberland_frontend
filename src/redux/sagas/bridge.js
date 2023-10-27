@@ -11,7 +11,7 @@ import {
   getBlockEvents,
 } from '../../api/nodeRpcCall';
 
-import { bridgeActions, blockchainActions } from '../actions';
+import { bridgeActions, blockchainActions, walletActions } from '../actions';
 import { ethToSubReceiptId, ethToSubReceiptIdFromEvent, subToEthReceiptId } from '../../utils/bridge';
 import { getSubstrateOutgoingReceipts } from '../../api/explorer';
 import { blockchainSelectors, bridgeSelectors } from '../selectors';
@@ -25,7 +25,7 @@ function* withdrawWorker(action) {
       ...action.payload.values,
       withdrawTx: true,
     }));
-    const { blockHash, errorData } = yield cps(bridgeWithdraw, action.payload.values, action.payload.userWalletAddress);
+    const { errorData } = yield cps(bridgeWithdraw, action.payload.values, action.payload.userWalletAddress);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
@@ -34,11 +34,11 @@ function* withdrawWorker(action) {
         ...action.payload.values,
         withdrawTx: false,
       }));
-    }
-    else {
+    } else {
       yield put(bridgeActions.withdraw.success());
     }
   } catch (errorData) {
+    // eslint-disable-next-line no-console
     console.log('Error in bridge withdraw worker', errorData);
     yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
     yield put(blockchainActions.setError.success(errorData));
@@ -52,21 +52,26 @@ function* withdrawWorker(action) {
 
 function* depositWorker(action) {
   try {
-    const { blockHash, status, events, errorData } = yield cps(bridgeDeposit, action.payload.values, action.payload.userWalletAddress);
+    const { blockHash, events, errorData } = yield cps(
+      bridgeDeposit,
+      action.payload.values,
+      action.payload.userWalletAddress,
+    );
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
       yield put(bridgeActions.deposit.failure(errorData));
-    }
-    else {
+    } else {
       const blockEvents = yield call(getBlockEvents, blockHash);
       const extrinsicIndex = events[0].phase.asApplyExtrinsic;
-      const receiptEventIndex = blockEvents.findIndex(({ phase, event }) =>
-        phase.isApplyExtrinsic && phase.asApplyExtrinsic.eq(extrinsicIndex) &&
-        event.method == "OutgoingReceipt"
+      const receiptEventIndex = blockEvents.findIndex(
+        ({ phase, event }) => phase.isApplyExtrinsic
+        && phase.asApplyExtrinsic.eq(extrinsicIndex)
+        && event.method === 'OutgoingReceipt',
       );
       const { amount, ethRecipient } = blockEvents[receiptEventIndex].event.data;
-      let receipt_id = subToEthReceiptId(blockHash, receiptEventIndex, amount, ethRecipient);
+      const receipt_id = subToEthReceiptId(blockHash, receiptEventIndex, amount, ethRecipient);
+
       yield put(bridgeActions.deposit.success({
         receipt_id,
         asset: action.payload.values.asset,
@@ -75,8 +80,10 @@ function* depositWorker(action) {
         blockHash,
         date: Date.now(),
       }));
+      yield put(walletActions.getWallet.call());
     }
   } catch (errorData) {
+    // eslint-disable-next-line no-console
     console.log('Error in bridge deposit worker', errorData);
     yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
     yield put(blockchainActions.setError.success(errorData));
@@ -98,10 +105,11 @@ function* burnWorker(action) {
       blockHash: null,
       status: null,
       withdrawTx: false,
-    }
+    };
     yield put(bridgeActions.burn.success(transfer));
     yield put(bridgeActions.monitorBurn.call(transfer));
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
     throw e;
   }
@@ -112,8 +120,11 @@ function* monitorBurnWorker(action) {
     const ethers_receipt = yield call(getTxReceipt, action.payload);
     const receipt_id = ethToSubReceiptId(ethers_receipt);
     const { txHash, asset } = action.payload;
-    yield put(bridgeActions.monitorBurn.success({ txHash, asset, receipt_id, blockHash: ethers_receipt.blockHash }));
+    yield put(bridgeActions.monitorBurn.success({
+      txHash, asset, receipt_id, blockHash: ethers_receipt.blockHash,
+    }));
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
     throw e;
   }
@@ -123,15 +134,18 @@ function* getTransfersToEthereumWorker() {
   try {
     const preload = yield select(bridgeSelectors.toEthereumPreload);
     if (!preload) {
-      console.log("No preload to eth");
+      // eslint-disable-next-line no-console
+      console.log('No preload to eth');
       const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
       const res = yield call(getSubstrateOutgoingReceipts, walletAddress);
       yield put(bridgeActions.getTransfersToEthereum.success(res));
     } else {
-      console.log("Preload to eth");
+      // eslint-disable-next-line no-console
+      console.log('Preload to eth');
       yield put(bridgeActions.getTransfersToEthereum.success({}));
     }
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
     throw e;
   }
@@ -141,12 +155,13 @@ function* getTransfersToSubstrateWorker({ payload: address }) {
   try {
     const preload = yield select(bridgeSelectors.toSubstratePreload);
     if (!preload) {
-      console.log("No preload to substrate");
+      // eslint-disable-next-line no-console
+      console.log('No preload to substrate');
       const events = yield call(getEthereumOutgoingReceipts, address);
-      const _reducer = asset => (transfers, event) => {
-        const txHash = event.transactionHash;
-        transfers[txHash] = {
-          txHash,
+      const _reducer = (asset) => (transfers, event) => ({
+        ...transfers,
+        [event.transactionHash]: {
+          txHash: event.transactionHash,
           asset,
           amount: ethers.utils.formatUnits(event.args.amount, 0),
           substrateRecipient: event.args.substrateRecipient,
@@ -155,22 +170,24 @@ function* getTransfersToSubstrateWorker({ payload: address }) {
           blockHash: event.blockHash,
           status: null,
           withdrawTx: false,
-        };
-        return transfers;
-      };
+        },
+      });
+
       let transfers = events.LLD.reduce(_reducer('LLD'), {});
       transfers = events.LLM.reduce(_reducer('LLM'), transfers);
       yield put(bridgeActions.getTransfersToSubstrate.success(transfers));
     } else {
-      console.log("Preload to substrate");
+      // eslint-disable-next-line no-console
+      console.log('Preload to substrate');
       const transfers = yield select(bridgeSelectors.toSubstrateTransfers);
-      const pending = Object.values(transfers).filter(t => t.receipt_id === null);
+      const pending = Object.values(transfers).filter((t) => t.receipt_id === null);
       for (const transfer of pending) {
         yield put(bridgeActions.monitorBurn.call(transfer));
       }
       yield put(bridgeActions.getTransfersToSubstrate.success({}));
     }
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
     throw e;
   }
@@ -182,6 +199,7 @@ function* getBridgesConstantsWorker() {
     const LLD = yield call(bridgeConstants, 'LLD');
     yield put(bridgeActions.getBridgesConstants.success({ LLM, LLD }));
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
     throw e;
   }
