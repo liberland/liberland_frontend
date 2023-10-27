@@ -34,9 +34,6 @@ const RegistriesCompanies = () => {
       dataObject: dataObject
     }))
   }
-  const handleNewCompanySubmit = (values) => {
-    console.log(values)
-  }
 
   return (
     <div>

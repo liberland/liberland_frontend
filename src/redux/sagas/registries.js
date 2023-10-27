@@ -1,13 +1,14 @@
 import {
-  put, takeLatest, call, select, cps,
+  put, takeLatest, call, select,
 } from 'redux-saga/effects';
 
 import {
   getOfficialUserRegistryEntries, requestCompanyRegistration,
 } from '../../api/nodeRpcCall';
 
-import {blockchainActions, registriesActions} from '../actions';
+import {registriesActions} from '../actions';
 import {blockchainSelectors} from "../selectors";
+import {blockchainWatcher} from "./base";
 
 // WORKERS
 
@@ -35,24 +36,14 @@ function* setRegistryCRUDActionWorker(action) {
 }
 
 function* requestCompanyRegistrationWorker(action) {
-  try {
-    console.log('action.payload')
-    console.log(action.payload)
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const {blockHash, errorData} = yield cps(requestCompanyRegistration, walletAddress, action.payload)
-    yield put(registriesActions.requestCompanyRegistrationAction.success())
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.error('Error in requestCompanyRegistrationWorker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(registriesActions.requestCompanyRegistrationAction.failure)
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(requestCompanyRegistration, action.payload, walletAddress);
+  yield put(registriesActions.requestCompanyRegistrationAction.success())
 }
 
 // WATCHERS
 
-function* getOfficialUserRegistryEntriesWatcher() {
+export function* getOfficialUserRegistryEntriesWatcher() {
   try {
     yield takeLatest(registriesActions.getOfficialUserRegistryEntries.call, getOfficialUserRegistryEntriesWorker);
   } catch (e) {
@@ -60,7 +51,7 @@ function* getOfficialUserRegistryEntriesWatcher() {
   }
 }
 
-function* setRegistryCRUDActionWatcher() {
+export function* setRegistryCRUDActionWatcher() {
   try {
     yield takeLatest(registriesActions.setRegistryCRUDAction.call, setRegistryCRUDActionWorker);
   } catch (e) {
@@ -68,16 +59,6 @@ function* setRegistryCRUDActionWatcher() {
   }
 }
 
-function* requestCompanyRegistrationWatcher() {
-  try {
-    yield takeLatest(registriesActions.requestCompanyRegistrationAction.call, requestCompanyRegistrationWorker)
-  } catch (e) {
-    yield put(registriesActions.requestAssetRegistrationAction.failure(e))
-  }
+export function* requestCompanyRegistrationWatcher() {
+  yield* blockchainWatcher(registriesActions.requestCompanyRegistrationAction, requestCompanyRegistrationWorker)
 }
-
-export {
-  getOfficialUserRegistryEntriesWatcher,
-  setRegistryCRUDActionWatcher,
-  requestCompanyRegistrationWatcher
-};

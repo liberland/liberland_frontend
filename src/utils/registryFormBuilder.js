@@ -1,9 +1,16 @@
-import React, { useEffect } from 'react';
-import {useForm, useFieldArray, Controller} from "react-hook-form";
+import React from 'react';
+import {useForm, useFieldArray} from "react-hook-form";
 import {TextInput} from "../components/InputComponents";
 import Button from "../components/Button/Button";
 import Card from "../components/Card";
 import "./utils.scss"
+
+const buildFieldName = (formKey, index, dynamicField, suffix) => {
+  return dynamicField.encryptable ?
+    `${formKey}.${index}.${dynamicField.key}.${suffix}`
+    :
+    `${formKey}.${index}.${dynamicField.key}`;
+}
 
 export const getFieldsForm = (formKey, displayName, register, control, dynamicFieldData) => {
   const { fields, append, remove } = useFieldArray({
@@ -31,11 +38,26 @@ export const getFieldsForm = (formKey, displayName, register, control, dynamicFi
                               <label>{dynamicField.display}: </label>
                             </td>
                             <td style={{width:'65%'}}>
-                              {dynamicField.type === 'text' ? <TextInput name={`${formKey}.${index}.${dynamicField.key}`} register={register} style={{width:'95%'}} /> : <input type={dynamicField.type} {...register(`${formKey}.${index}.${dynamicField.key}`)} style={{width: '95%'}} />}
+                              {dynamicField.type === 'text' ?
+                                <TextInput
+                                  name={buildFieldName(formKey, index, dynamicField, 'value')}
+                                  register={register}
+                                  style={{width:'95%'}}
+                                />
+                                :
+                                <input
+                                  type={dynamicField.type}
+                                  {...register(buildFieldName(formKey, index, dynamicField, 'value'))}
+                                  style={{width: '95%'}}
+                                />}
                             </td>
                             <td style={{width:'15%'}}>
                               {dynamicField.encryptable ? <label>Encrypt Field? </label> : null }
-                              {dynamicField.encryptable ? <input {...register(`${formKey}.${index}.${dynamicField.key}IsEncrypted`)} type="checkbox" /> : null }
+                              {dynamicField.encryptable ?
+                                <input
+                                  {...register(buildFieldName(formKey, index, dynamicField, 'isEncrypted'))}
+                                  type="checkbox"
+                                /> : null }
                             </td>
                           </tr>
                       )})}
@@ -59,12 +81,16 @@ export const getDefaultValuesFromDataObject = (dataObject) => {
   dataObject?.dynamicFields?.forEach(dynamicField => {
     let defaultValuesForField = []
     dynamicField?.data?.forEach((fieldValues, index) => {
-      console.log('dynamicField data')
-      console.log(fieldValues)
       defaultValuesForField[index] = {}
       fieldValues?.forEach(field => {
-        defaultValuesForField[index][field.key] = field.display
-        if(field.isEncrypted){defaultValuesForField[index][`${field.key}IsEncrypted`] = true}
+        const encryptable = dynamicField.fields.find(v => v.key == field.key)?.encryptable;
+        defaultValuesForField[index][field.key] = encryptable ?
+          {
+            value: field.display,
+            isEncrypted: field.isEncrypted,
+          }
+          :
+          field.display;
       })
     })
     defaultValues[dynamicField.key] = defaultValuesForField
@@ -73,23 +99,19 @@ export const getDefaultValuesFromDataObject = (dataObject) => {
 }
 export const buildRegistryForm = (dataObject, buttonMessage, companyId, callback) => {
   const defaultValues = getDefaultValuesFromDataObject(dataObject)
-  console.log('defaultValues')
-  console.log(defaultValues)
   const { handleSubmit, register, control } = useForm({
     defaultValues: defaultValues
   });
 
   return (
     <form onSubmit={handleSubmit((result)=>{
-      console.log(result)
-      console.log('should be calling callback now')
       callback(result)
     })}>
       <div id="static">
         <Card>
           {dataObject.staticFields.map(staticField => {
-            const staticFieldName = staticField.key
-            const staticFieldEncryptedName = staticField.key + 'IsEncrypted'
+            const staticFieldName = staticField.encryptable ? `${staticField.key}.value` : staticField.key;
+            const staticFieldEncryptedName = `${staticField.key}.isEncrypted`
             return (
               <div style={{marginBottom: '0.5rem'}}>
                 <label style={{fontWeight: 'bold', fontSize:'1.05rem'}}>{staticField.display}</label>
@@ -131,14 +153,11 @@ export const renderRegistryItemDetails = (dataObject, showAll = false) => {
               <b>{dynamicField?.name}</b>
               <ul>
                 {dynamicField?.data?.map((dataObjects, index) => {
-                  console.log('dataObjects')
-                  console.log(dataObjects)
                   return (
                     <div>
                       <li>{dynamicField?.name} {index + 1}</li>
                       <ul>
                         {dataObjects.map(dataObject => {
-                          console.log('doin the mappin')
                           return(
                             <li>{dataObject?.display} {dataObject?.isEncrypted ? "(Encrypted)" : ''}</li>
                           )
