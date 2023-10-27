@@ -1,12 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import {blockchainSelectors, registriesSelectors} from "../../../../redux/selectors";
+import {registriesSelectors} from "../../../../redux/selectors";
 import {newCompanyDataObject} from "../../../../utils/defaultData";
 import {buildRegistryForm} from "../../../../utils/registryFormBuilder";
 import {registriesActions} from "../../../../redux/actions";
 
 const CompanyCRUD = () => {
-  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const registryCRUDAction = useSelector(registriesSelectors.registryCRUDAction);
 
   const dispatch = useDispatch();

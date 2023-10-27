@@ -51,11 +51,9 @@ function MissingRequest() {
 function CompanyRegistration({ registration }) {
   if (registration === null) return null;
   let data = registration.registration;
-  if (data === null) return null;
-  if (data.isNone) return <div>Company not registered yet</div>;
-  data = data.unwrap();
+  if (data === null) return <div>Company not registered yet</div>;
   return <div>
-      Company data: <pre>{data.data.toUtf8()}</pre>
+      Company data: <pre>{JSON.stringify(data.data.toJSON(), null, 2)}</pre>
       Data editable by registrar: {data.editableByRegistrar.toString()}
   </div>;
 }
@@ -66,11 +64,9 @@ function CompanyRequest({ request }) {
   if (request === null) return null;
   const { entity_id } = request;
   let data = request.request;
-  if (data === null) return null;
-  if (data.isNone) return <MissingRequest />;
+  if (data === null) return <MissingRequest />;
 
-  data = data.unwrap();
-  const { hash } = data.data;
+  const { hash } = data;
 
   const onClick = () => {
     dispatch(officesActions.registerCompany.call({
@@ -82,7 +78,7 @@ function CompanyRequest({ request }) {
 
   return (
     <>
-      Company data: <pre>{data.data.toUtf8()}</pre>
+      Company data: <pre>{JSON.stringify(data.data.toJSON(), null, 2)}</pre>
       Data editable by registrar: {data.editableByRegistrar.toString()}
 
       <div className={styles.buttonWrapper}>

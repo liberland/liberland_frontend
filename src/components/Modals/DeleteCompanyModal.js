@@ -1,13 +1,10 @@
 import React from 'react';
 import ModalRoot from "./ModalRoot";
-import styles from './styles.module.scss';
 import Button from "../Button/Button";
 import PropTypes from "prop-types";
-import {buildRegistryForm} from "../../utils/registryFormBuilder";
-import {newCompanyDataObject, newCompanyExampleDataObject} from "../../utils/defaultData";
 
 function DeleteCompanyModal({
-  handleSubmit, closeModal, register, onSubmit
+  closeModal
 }){
   return (
     <div>

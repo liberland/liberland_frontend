@@ -3,13 +3,100 @@ import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import {handleMyDispatchErrors} from "../utils/therapist";
 import {newCompanyDataObject} from "../utils/defaultData";
 import * as centralizedBackend from './backend';
+import { BN_TWO } from '@polkadot/util';
+import { parseDollars, parseMerits } from '../utils/walletHelpers';
+import pako from 'pako';
+import { u8aToHex } from '@polkadot/util';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 let __apiCache = null;
 const getApi = async () => {
-  if (__apiCache === null) __apiCache = await ApiPromise.create({ provider });
+  if (__apiCache === null) __apiCache = await ApiPromise.create({
+    provider,
+    types: {
+      "Coords": {
+        "lat": "u64",
+        "long": "u64",
+      },
+      "LandMetadata": {
+        "demarcation": "BoundedVec<Coords, u32>",
+        "type": "Text",
+        "status": "Text",
+      },
+      "Encryptable": {
+        "value": "Text",
+        "isEncrypted": "bool",
+      },
+      "BrandName": {
+        "name": "Encryptable",
+      },
+      "OnlineAddress": {
+        "description": "Encryptable",
+        "url": "Encryptable",
+      },
+      "PhysicalAddress": {
+        "description": "Encryptable",
+        "street": "Encryptable",
+        "city": "Encryptable",
+        // Subdivision - state/province/emirate/oblast/etc
+        "subdivision": "Encryptable",
+        "postalCode": "Encryptable",
+        "country": "Encryptable", // FIXME enum?
+      },
+      "Person": {
+        "walletAddress": "Encryptable",
+        "name": "Encryptable",
+        "dob": "Encryptable",
+        "passportNumber": "Encryptable",
+      },
+      "Principal": {
+        "walletAddress": "Encryptable",
+        "name": "Encryptable",
+        "dob": "Encryptable",
+        "passportNumber": "Encryptable",
+        "signingAbility": "Encryptable", // FIXME enum
+        "signingAbilityConditions": "Encryptable",
+        "shares": "Encryptable", // FIXME integer?
+      },
+      "Shareholder": {
+        "walletAddress": "Encryptable",
+        "name": "Encryptable",
+        "dob": "Encryptable",
+        "passportNumber": "Text",
+        "shares": "Encryptable", // FIXME integer?
+      },
+      "UBO": {
+        "walletAddress": "Encryptable",
+        "name": "Encryptable",
+        "dob": "Encryptable",
+        "passportNumber": "Encryptable",
+        "signingAbility": "Encryptable", // FIXME enum
+        "signingAbilityConditions": "Encryptable",
+      },
+      "CompanyData": {
+        "name": "Text",
+        // Truthful scope of business
+        "purpose": "Text",
+        "logoURL": "Text",
+        "charterURL": "Text",
+        "totalCapitalAmount": "Text", // FIXME integer instead? Will have issues with decimals though.
+        "totalCapitalCurrency": "Text", // FIXME maybe some enum?
+        "numberOfShares": "Text", // FIXME integer instead? Are fractional shares supported
+        "valuePerShare": "Text", // FIXME same as totalCapitalAmount probably
+        // History of transfer of shares
+        "history": "Text", // FIXME array of well defined structs?
+        "brandNames": "Vec<BrandName>",
+        "onlineAddresses": "Vec<OnlineAddress>",
+        "physicalAddresses": "Vec<PhysicalAddress>",
+        "statutoryOrganMembers": "Vec<Person>",
+        "principals": "Vec<Principal>",
+        "shareholders": "Vec<Shareholder>",
+        "UBOs": "Vec<UBO>",
+      },
+    }
+  });
   return __apiCache;
 };
 
@@ -289,8 +376,14 @@ const setIdentity = async (values, walletAddress, callback) => {
 const getCompanyRequest = async (entity_id) => {
   try {
     const api = await getApi();
-    const request = await api.query.companyRegistry.requests(0, entity_id);
-    return request;
+    const maybeRequest = await api.query.companyRegistry.requests(0, entity_id);
+    if (maybeRequest.isNone) return null;
+    const request = maybeRequest.unwrap();
+    return {
+      hash: request.data.hash,
+      editableByRegistrar: request.editableByRegistrar,
+      data: api.createType('CompanyData', pako.inflate(request.data))
+    };
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -301,8 +394,14 @@ const getCompanyRequest = async (entity_id) => {
 const getCompanyRegistration = async (entity_id) => {
   try {
     const api = await getApi();
-    const registration = await api.query.companyRegistry.registries(0, entity_id);
-    return registration;
+    const maybeRegistration = await api.query.companyRegistry.registries(0, entity_id);
+    if (maybeRegistration.isNone) return null;
+    const registration = maybeRegistration.unwrap();
+    return {
+      hash: registration.data.hash,
+      editableByRegistrar: registration.editableByRegistrar,
+      data: api.createType('CompanyData', pako.inflate(registration.data))
+    };
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -913,52 +1012,60 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
   let registeredCompaniesByWallet = []
   let supportedObject = JSON.parse(JSON.stringify(newCompanyDataObject))
   companyRegistryRawData.forEach((companyRegistryEntity, index) => {
-    const dataToHuman = companyRegistryEntity.toHuman()
-    if(dataToHuman){
-      let companyData = JSON.parse(dataToHuman.data)
-      const staticFields = []
-      const dynamicFields = []
-      dataToHuman.data = companyData
-      supportedObject.staticFields.forEach(staticField => {
-        if (staticField.key in companyData){
-          let fieldObject = staticField
-          fieldObject.display = companyData[staticField.key]
-          staticFields.push(fieldObject)
-        }
-      })
-      supportedObject.dynamicFields.forEach(dynamicField => {
-        if(dynamicField.key in companyData){
-          let fieldObject = dynamicField
-          let fieldObjectData = []
-          companyData[dynamicField.key].forEach(dynamicFieldDataArray => {
-            //Format using fields data
-            let crossReferencedFieldDataArray = []
-            for(const key in dynamicFieldDataArray){
-              if(!key.includes('IsEncrypted')){
-                let pushObject = {}
-                let keyIsEncrypted = key + 'IsEncrypted'
-                pushObject['key'] = key
-                pushObject['display'] = dynamicFieldDataArray[key]
-                pushObject['isEncrypted'] = dynamicFieldDataArray[keyIsEncrypted]
-                crossReferencedFieldDataArray.push(JSON.parse(JSON.stringify(pushObject)))
-              }
-            }
-            fieldObjectData.push(crossReferencedFieldDataArray)
-          })
+    let companyData;
+    try {
+      const compressed = companyRegistryEntity.unwrap().data;
+      companyData = api.createType('CompanyData', pako.inflate(compressed)).toJSON();
+    } catch(e) {
+      console.error("Invalid company data", e); // FIXME actually display this to user somehow?
+      return;
+    }
 
-          fieldObject.data = JSON.parse(JSON.stringify(fieldObjectData))
-          dynamicFields.push(fieldObject)
-        }
-      })
-      dataToHuman.staticFields = JSON.parse(JSON.stringify(staticFields))
-      dataToHuman.dynamicFields = JSON.parse(JSON.stringify(dynamicFields))
-      if (index < ownsEntityIds.length){
-        let dataObject = {...dataToHuman, id: ownsEntityIds[index]}
-        companyRequestsByWallet.push(dataObject)
-      } else {
-        let dataObject = {...dataToHuman, id: ownsEntityIds[index - ownsEntityIds.length]}
-        registeredCompaniesByWallet.push(dataObject)
+    const staticFields = []
+    const dynamicFields = []
+
+    supportedObject.staticFields.forEach(staticField => {
+      if (staticField.key in companyData){
+        let fieldObject = staticField
+        fieldObject.display = companyData[staticField.key]
+        staticFields.push(fieldObject)
       }
+    })
+
+    supportedObject.dynamicFields.forEach(dynamicField => {
+      if(dynamicField.key in companyData){
+        let fieldObject = dynamicField
+        let fieldObjectData = []
+        companyData[dynamicField.key].forEach(dynamicFieldDataArray => {
+          //Format using fields data
+          let crossReferencedFieldDataArray = []
+          for(const key in dynamicFieldDataArray){
+            let pushObject = {}
+            pushObject['key'] = key
+            if (dynamicFieldDataArray[key].isEncrypted !== undefined) {
+              pushObject['display'] = dynamicFieldDataArray[key].value
+              pushObject['isEncrypted'] = dynamicFieldDataArray[key].isEncrypted
+            } else {
+              pushObject['display'] = dynamicFieldDataArray[key]
+              pushObject['isEncrypted'] = false
+            }
+            crossReferencedFieldDataArray.push(JSON.parse(JSON.stringify(pushObject)))
+          }
+          fieldObjectData.push(crossReferencedFieldDataArray)
+        })
+
+        fieldObject.data = JSON.parse(JSON.stringify(fieldObjectData))
+        dynamicFields.push(fieldObject)
+      }
+    })
+    companyData.staticFields = JSON.parse(JSON.stringify(staticFields))
+    companyData.dynamicFields = JSON.parse(JSON.stringify(dynamicFields))
+    if (index < ownsEntityIds.length){
+      let dataObject = {...companyData, id: ownsEntityIds[index]}
+      companyRequestsByWallet.push(dataObject)
+    } else {
+      let dataObject = {...companyData, id: ownsEntityIds[index - ownsEntityIds.length]}
+      registeredCompaniesByWallet.push(dataObject)
     }
   })
 
@@ -1021,29 +1128,15 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
   }
 }
 
-const requestCompanyRegistration = async (walletAddress, companyDataObject, callback)  => {
-
+const requestCompanyRegistration = async (companyData, walletAddress)  => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
 
+  const data = api.createType("CompanyData", companyData);
+  const compressed = pako.deflate(data.toU8a());
   //TODO read instead of hardcoded true for editablebyregistrar
-  const requestCompanyRegistrationExtrinsic = api.tx.companyRegistry.requestEntity(0, JSON.stringify(companyDataObject), true);
+  const extrinsic = api.tx.companyRegistry.requestEntity(0, u8aToHex(compressed), true);
 
-  requestCompanyRegistrationExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed REQUEST COMPANY REGISTRATION at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction REQUEST COMPANY REGISTRATION failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  return submitExtrinsic(extrinsic, walletAddress);
 }
 
 const getCitizenCount = async () => {
@@ -1059,20 +1152,7 @@ const getCitizenCount = async () => {
 }
 
 const getLandNFTMetadataJson = async (collection_id, nft_id) => {
-  const api = await ApiPromise.create({
-    provider,
-    types: {
-      "Coords": {
-        "lat": "u64",
-        "long": "u64",
-      },
-      "LandMetadata": {
-        "demarcation": "BoundedVec<Coords, u32>",
-        "type": "Text",
-        "status": "Text",
-      }
-    }
-  });
+  const api = await getApi();
 
   const result = await api.query.nfts.itemMetadataOf(collection_id, nft_id);
   const rawMetadata = result.unwrap().data; // unwrap will fail if there's no metadata for this item
@@ -1088,20 +1168,7 @@ const getLandNFTMetadataJson = async (collection_id, nft_id) => {
 }
 const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress) => {
   const injector = await web3FromAddress(walletAddress);
-  const api = await ApiPromise.create({
-    provider,
-    types: {
-      "Coords": {
-        "lat": "u64",
-        "long": "u64",
-      },
-      "LandMetadata": {
-        "demarcation": "BoundedVec<Coords, u32>",
-        "type": "Text",
-        "status": "Text",
-      }
-    }
-  });
+  const api = await getApi();
   /*let metadata = {
     type: "test",
     status: "test",
