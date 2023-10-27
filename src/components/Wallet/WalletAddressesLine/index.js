@@ -1,17 +1,13 @@
 import React, { useState, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { decodeAddress, encodeAddress } from '@polkadot/keyring';
-import { hexToU8a, isHex } from '@polkadot/util';
 import cx from 'classnames';
 import Button from '../../Button/Button';
 import NotificationPortal from '../../NotificationPortal';
 
-import { validatorActions, walletActions } from '../../../redux/actions';
-import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
+import { blockchainSelectors } from '../../../redux/selectors';
 
-import { ChoseStakeModal, SendLLDModal, SendLLMModal } from '../../Modals';
+import { SendLLDModal, SendLLMModal, UnpoolModal } from '../../Modals';
 
 import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
@@ -23,25 +19,19 @@ import styles from './styles.module.scss';
 import truncate from '../../../utils/truncate';
 import router from '../../../router';
 import Tabs from '../../Tabs';
-import { parseDollars } from '../../../utils/walletHelpers';
+import PolitipoolModal from '../../Modals/PolitipoolModal';
 
 function WalletAddressesLine({ walletAddress }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalOpenStake, setIsModalOpenStake] = useState(false);
+  const [isModalOpenPolitipool, setIsModalOpenPolitipool] = useState(false);
+  const [isModalOpenUnpool, setIsModalOpenUnpool] = useState(false);
   const [isModalOpenLLM, setIsModalOpenLLM] = useState(false);
-  const [modalShown, setModalShown] = useState(0);
-  const [sendAddress, setSendAddress] = useState('');
-  const { handleSubmit, formState: { errors }, register } = useForm({
-    mode: 'all',
-  });
-  const dispatch = useDispatch();
   const notificationRef = useRef();
   const addresses = {
     walletAddress,
     validatorAddress: '0x0A1B23Be38A1dbc2A833D051780698CBbd9911FB',
   };
 
-  const isUserHavePolkaStake = useSelector(walletSelectors.selectorIsUserHavePolkaStake);
   const userWalletAddressSelector = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   const handleCopyClick = () => {
@@ -51,63 +41,8 @@ function WalletAddressesLine({ walletAddress }) {
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
   const handleModalLLMOpen = () => setIsModalOpenLLM(!isModalOpenLLM);
-  const handleModalOpenStake = () => {
-    setIsModalOpenStake(!isModalOpenStake);
-    setModalShown(0);
-  };
-  const isValidAddressPolkadotAddress = (address) => {
-    try {
-      encodeAddress(
-        isHex(address)
-          ? hexToU8a(address)
-          : decodeAddress(address),
-      );
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-  const handleSubmitForm = (values) => {
-    const isAddressValid = isValidAddressPolkadotAddress(sendAddress);
-
-    const preparedValues = values;
-    preparedValues.amount = parseDollars(preparedValues.amount);
-
-    if (isAddressValid) {
-      dispatch(walletActions.sendTransfer.call(preparedValues));
-      handleModalOpen();
-    } else {
-      notificationRef.current.addError({ text: 'Invalid address.' });
-    }
-  };
-
-  const handleSubmitFormLLM = (values) => {
-    const isAddressValid = isValidAddressPolkadotAddress(sendAddress);
-
-    if (isAddressValid) {
-      dispatch(walletActions.sendTransferLLM.call(values));
-      handleModalLLMOpen();
-    } else {
-      notificationRef.current.addError({ text: 'Invalid address.' });
-    }
-  };
-
-  const handleSubmitStakePolka = (values) => {
-    dispatch(walletActions.stakeToPolka.call({ values, isUserHavePolkaStake, walletAddress }));
-    handleModalOpenStake();
-  };
-  const handleSubmitStakeLiberland = (values) => {
-    dispatch(walletActions.stakeToLiberland.call({ values, walletAddress }));
-    handleModalOpenStake();
-  };
-  const handleSubmitUnpool = () => {
-    dispatch(walletActions.unpool.call(walletAddress));
-    handleModalOpenStake();
-  };
-  const handleSubmitPayout = () => {
-    dispatch(validatorActions.payout.call());
-    handleModalOpenStake();
-  };
+  const handleModalOpenPolitipool = () => setIsModalOpenPolitipool(!isModalOpenPolitipool);
+  const handleModalOpenUnpool = () => setIsModalOpenUnpool(!isModalOpenUnpool);
 
   const navigationList = [
     {
@@ -147,9 +82,13 @@ function WalletAddressesLine({ walletAddress }) {
           </div>
         </div>
         <div className={cx(styles.buttonsWrapper)}>
-          <Button small secondary onClick={handleModalOpenStake}>
+          <Button small secondary onClick={handleModalOpenPolitipool}>
             <GraphIcon />
             Politipool
+          </Button>
+          <Button small secondary onClick={handleModalOpenUnpool}>
+            <GraphIcon />
+            Unpool
           </Button>
           <Button small primary onClick={handleModalLLMOpen}>
             <UploadIcon />
@@ -161,36 +100,14 @@ function WalletAddressesLine({ walletAddress }) {
           </Button>
         </div>
         {isModalOpen && (
-        <SendLLDModal
-          onSubmit={handleSubmitForm}
-          closeModal={handleModalOpen}
-          addressFrom={walletAddress}
-          setSendAddress={setSendAddress}
-          sendAddress={sendAddress}
-        />
-        )}
+          <SendLLDModal closeModal={handleModalOpen} />)}
         {isModalOpenLLM && (
-          <SendLLMModal
-            onSubmit={handleSubmitFormLLM}
-            closeModal={handleModalLLMOpen}
-            addressFrom={walletAddress}
-            setSendAddress={setSendAddress}
-            sendAddress={sendAddress}
-          />
+          <SendLLMModal closeModal={handleModalLLMOpen} />)}
+        {isModalOpenPolitipool && (
+          <PolitipoolModal closeModal={handleModalOpenPolitipool} />
         )}
-        {isModalOpenStake && (
-        <ChoseStakeModal
-          closeModal={handleModalOpenStake}
-          handleSubmit={handleSubmit}
-          register={register}
-          modalShown={modalShown}
-          setModalShown={setModalShown}
-          handleSubmitStakePolka={handleSubmitStakePolka}
-          handleSubmitStakeLiberland={handleSubmitStakeLiberland}
-          handleSubmitUnpool={handleSubmitUnpool}
-          handleSubmitPayout={handleSubmitPayout}
-          errors={errors}
-        />
+        {isModalOpenUnpool && (
+          <UnpoolModal closeModal={handleModalOpenUnpool} />
         )}
       </div>
     </>
