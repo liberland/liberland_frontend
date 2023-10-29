@@ -4,7 +4,8 @@ import {
 import { web3Enable } from '@polkadot/extension-dapp';
 import { eventChannel } from 'redux-saga';
 import { blockchainActions } from '../actions';
-import { subscribeActiveEra, subscribeBestBlockNumber, getAllWalletsRpc } from '../../api/nodeRpcCall';
+import { subscribeActiveEra, subscribeBestBlockNumber, getAllWalletsRpc, fetchPreimage } from '../../api/nodeRpcCall';
+import { blockchainWatcherEvery } from './base';
 
 const delay = (time) => new Promise((resolve) => { setTimeout(resolve, time); });
 
@@ -40,6 +41,13 @@ function* getAllWalletsWorker() {
 function* clearErrorsWorker(action) {
   yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(action.payload));
   yield put(blockchainActions.setError.success(''));
+}
+
+function* fetchPreimageWorker({ payload: { hash, len }}) {
+  const preimage = yield call(fetchPreimage, hash, len);
+  yield put(blockchainActions.fetchPreimage.success({
+    hash, preimage
+  }))
 }
 
 // WATCHERS
@@ -82,9 +90,14 @@ function* subscribeActiveEraSaga() {
   }
 }
 
+function* fetchPreimageWatcher() {
+  yield* blockchainWatcherEvery(blockchainActions.fetchPreimage, fetchPreimageWorker);
+}
+
 export {
   getAllWalletsWatcher,
   clearErrorsWatcher,
   subscribeBestBlockNumberSaga,
   subscribeActiveEraSaga,
+  fetchPreimageWatcher,
 };

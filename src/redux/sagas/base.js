@@ -1,4 +1,4 @@
-import { put, takeLatest } from 'redux-saga/effects';
+import { put, takeEvery, takeLatest } from 'redux-saga/effects';
 import { blockchainActions } from '../actions';
 
 function errorHandler(onFailure, worker) {
@@ -18,4 +18,8 @@ function errorHandler(onFailure, worker) {
 
 export function* blockchainWatcher({ call, failure }, worker) {
   yield takeLatest(call, errorHandler(failure, worker));
+}
+
+export function* blockchainWatcherEvery({ call, failure }, worker) {
+  yield takeEvery(call, errorHandler(failure, worker));
 }

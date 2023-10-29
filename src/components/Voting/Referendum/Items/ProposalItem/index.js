@@ -10,6 +10,7 @@ import { congressActions } from '../../../../../redux/actions';
 import {
   congressSelectors,
 } from '../../../../../redux/selectors';
+import { Preimage } from '../../../../Proposal';
 
 const endorseButton = (buttonEndorseCallback, userDidEndorse, referendumInfo) => (userDidEndorse ? (
   <Button medium gray>
@@ -77,6 +78,11 @@ function ProposalItem({
   buttonEndorseCallback,
   proposalIndex,
 }) {
+  let hash, len;
+  if ('Lookup' in boundedCall) {
+    hash = boundedCall.Lookup.hash_;
+    len = boundedCall.Lookup.len;
+  }
   return (
     <Card
       title={name}
@@ -113,6 +119,12 @@ function ProposalItem({
         <div className={styles.description}>
           <p>{description}</p>
         </div>
+        { hash && len && 
+          <div>
+            Details:
+            <Preimage {...{hash, len}} />
+          </div>
+        }
         <div className={styles.buttonContainer}>
           {endorseButton(buttonEndorseCallback, userDidEndorse, { name, proposalIndex })}
         </div>

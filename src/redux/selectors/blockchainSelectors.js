@@ -27,6 +27,11 @@ const activeEra = createSelector(
   (reducer) => reducer.activeEra,
 );
 
+const preimages = createSelector(
+  blockchainReducer,
+  (reducer) => reducer.preimages
+)
+
 export {
   allWalletsSelector,
   userWalletAddressSelector,
@@ -34,4 +39,5 @@ export {
   blockchainError,
   blockNumber,
   activeEra,
+  preimages,
 };
