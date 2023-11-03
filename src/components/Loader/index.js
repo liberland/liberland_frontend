@@ -13,7 +13,8 @@ import {
   legislationSelectors,
   bridgeSelectors,
   validatorSelectors,
-  congressSelectors
+  congressSelectors,
+  registriesSelectors
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
 
@@ -28,6 +29,7 @@ function Loader({ children }) {
   const isLoadingBridge = useSelector(bridgeSelectors.isLoading);
   const isLoadingValidator = useSelector(validatorSelectors.isLoading);
   const isLoadingCongress= useSelector(congressSelectors.isLoading);
+  const isGetRegistries= useSelector(registriesSelectors.isGetRegistries);
 
   const isLoading = [
     isSignInFetching,
@@ -38,7 +40,8 @@ function Loader({ children }) {
     isLoadingLegislation,
     isLoadingBridge,
     isLoadingValidator,
-    isLoadingCongress
+    isLoadingCongress,
+    isGetRegistries,
   ].some((isFetching) => isFetching);
 
   return (

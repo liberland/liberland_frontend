@@ -9,6 +9,7 @@ import {
 import {registriesActions} from '../actions';
 import {blockchainSelectors} from "../selectors";
 import {blockchainWatcher} from "./base";
+import router from "../../router";
 
 // WORKERS
 
@@ -37,8 +38,10 @@ function* setRegistryCRUDActionWorker(action) {
 
 function* requestCompanyRegistrationWorker(action) {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  yield call(requestCompanyRegistration, action.payload, walletAddress);
+  yield call(requestCompanyRegistration, action.payload.companyData, walletAddress);
+  yield put(registriesActions.getOfficialUserRegistryEntries.call())
   yield put(registriesActions.requestCompanyRegistrationAction.success())
+  action.payload.history.push(router.registries.companies);
 }
 
 // WATCHERS
