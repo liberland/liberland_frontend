@@ -409,9 +409,9 @@ const getCompanyRegistration = async (entity_id) => {
   }
 }
 
-const registerCompany = async ({company_id, hash, walletAddress}, callback) => {
+const registerCompany = async ({entity_id, hash, walletAddress}, callback) => {
   const api = await getApi();
-  const registerCall = api.tx.companyRegistry.registerEntity(0, company_id, hash);
+  const registerCall = api.tx.companyRegistry.registerEntity(0, entity_id, hash);
   const proxied = api.tx.companyRegistryOffice.execute(registerCall);
   const injector = await web3FromSource('polkadot-js');
   proxied.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {

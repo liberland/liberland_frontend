@@ -44,7 +44,7 @@ const RegistriesCompanies = () => {
       <Card title={"Registered Companies"} key={"registeredCompanies"}>
         {registries?.officialUserRegistryEntries?.companies?.registered.map(registeredCompany =>{
           return (
-            <Card title={registeredCompany?.staticFields[0]?.display} key={registeredCompany?.staticFields[0]?.display} className={styles.companyCardContainer}>
+            <Card title={`${registeredCompany?.staticFields[0]?.display} (ID: ${registeredCompany?.id})`} key={registeredCompany?.staticFields[0]?.display} className={styles.companyCardContainer}>
               <div className={styles.companyContentContainer}>
                 {renderRegistryItemDetails(registeredCompany, registeredCompany?.staticFields[0]?.display === expandedDetailsForCompany)}
                 <div className={styles.companyContentContainer}>
@@ -62,7 +62,7 @@ const RegistriesCompanies = () => {
       <Card title={"Requested Companies"} key={"requestedCompanies"}>
         {registries?.officialUserRegistryEntries?.companies?.requested.map(requestedCompany =>{
           return (
-            <Card title={requestedCompany?.staticFields[0]?.display} key={requestedCompany?.staticFields[0]?.display} className={styles.companyCardContainer}>
+            <Card title={`${requestedCompany?.staticFields[0]?.display} (ID: ${requestedCompany?.id})`} key={requestedCompany?.staticFields[0]?.display} className={styles.companyCardContainer}>
               <div className={styles.companyContentContainer}>
                 {renderRegistryItemDetails(requestedCompany, requestedCompany?.staticFields[0]?.display === expandedDetailsForCompany)}
                 <div className={styles.companyContentContainer}>
