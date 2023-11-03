@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -49,24 +50,45 @@ function MissingRequest() {
 }
 
 function CompanyRegistration({ registration }) {
-  if (registration === null) return null;
-  let data = registration.registration;
-  if (data === null) return <div>Company not registered yet</div>;
-  return <div>
-      Company data: <pre>{JSON.stringify(data.data.toJSON(), null, 2)}</pre>
-      Data editable by registrar: {data.editableByRegistrar.toString()}
-  </div>;
+  if (!registration) return null;
+  if (!registration.registration) return <div>Company not registered yet</div>;
+  return (
+    <div>
+      Company data:
+      <code>
+        <pre>
+          {JSON.stringify(
+            registration.registration.data.toJSON(),
+            null,
+            2,
+          )}
+        </pre>
+      </code>
+      Data editable by registrar:
+      {' '}
+      {registration.registration.editableByRegistrar.toString()}
+    </div>
+  );
 }
+
+CompanyRegistration.propTypes = {
+  registration: PropTypes.shape({
+    entity_id: PropTypes.string.isRequired,
+    registration: PropTypes.shape({
+      editableByRegistrar: PropTypes.bool.isRequired,
+      hash: PropTypes.arrayOf(PropTypes.number).isRequired,
+      data: PropTypes.instanceOf(Map).isRequired,
+    }),
+  }).isRequired,
+};
 
 function CompanyRequest({ request }) {
   const dispatch = useDispatch();
   const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
-  if (request === null) return null;
+  if (!request) return null;
   const { entity_id } = request;
-  let data = request.request;
-  if (data === null) return <MissingRequest />;
-
-  const { hash } = data;
+  if (!request.request) return <MissingRequest />;
+  const { hash, data, editableByRegistrar } = request.request;
 
   const onClick = () => {
     dispatch(officesActions.registerCompany.call({
@@ -78,9 +100,19 @@ function CompanyRequest({ request }) {
 
   return (
     <>
-      Company data: <pre>{JSON.stringify(data.data.toJSON(), null, 2)}</pre>
-      Data editable by registrar: {data.editableByRegistrar.toString()}
-
+      Company data:
+      <code>
+        <pre>
+          {JSON.stringify(
+            data.toJSON(),
+            null,
+            2,
+          )}
+        </pre>
+      </code>
+      Data editable by registrar:
+      {' '}
+      {editableByRegistrar.toString()}
       <div className={styles.buttonWrapper}>
         <Button
           primary
@@ -94,20 +126,35 @@ function CompanyRequest({ request }) {
   );
 }
 
+CompanyRequest.propTypes = {
+  request: PropTypes.shape({
+    entity_id: PropTypes.string.isRequired,
+    request: PropTypes.shape({
+      editableByRegistrar: PropTypes.bool.isRequired,
+      hash: PropTypes.arrayOf(PropTypes.number).isRequired,
+      data: PropTypes.instanceOf(Map).isRequired,
+    }),
+  }).isRequired,
+};
+
 function CompanyRegistry() {
   const request = useSelector(officesSelectors.selectorCompanyRequest);
   const registration = useSelector(officesSelectors.selectorCompanyRegistration);
   return (
     <>
       <CompanyForm />
-      { registration && <>
+      { registration && (
+      <>
         <div className={styles.h4}>Currently registered data:</div>
         <CompanyRegistration registration={registration} />
-      </>}
-      { request && <>
+      </>
+      )}
+      { request && (
+      <>
         <div className={styles.h4}>Request:</div>
         <CompanyRequest request={request} />
-      </>}
+      </>
+      )}
     </>
   );
 }
