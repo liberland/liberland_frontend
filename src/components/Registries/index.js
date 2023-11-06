@@ -1,18 +1,18 @@
 import React from 'react';
 import {
-  Switch, Route, Redirect,
+  Switch, Route,
 } from 'react-router-dom';
 import router from '../../router';
 
 import styles from './styles.module.scss';
 
-import RegistriesHeader from "./RegistriesHeader";
-import RegistriesOverview from "./RegistriesOverview";
-import RegistriesCompanies from "./RegistriesCompanies";
-import RegistriesLand from "./RegistriesLand";
-import RegistriesAssets from "./RegistriesAssets";
-import RegistriesOther from "./RegistriesOther";
-import CompanyCRUD from "./RegistriesCompanies/CompanyCRUD";
+import RegistriesHeader from './RegistriesHeader';
+import RegistriesOverview from './RegistriesOverview';
+import RegistriesCompanies from './RegistriesCompanies';
+import RegistriesLand from './RegistriesLand';
+import RegistriesAssets from './RegistriesAssets';
+import RegistriesOther from './RegistriesOther';
+import CompanyCRUD from './RegistriesCompanies/CompanyCRUD';
 
 function Registries() {
   return (
@@ -29,14 +29,16 @@ function Registries() {
           />
           <Route
             exact
-            path={router.registries.companies}
+            path={router.registries.companies.overview}
             component={RegistriesCompanies}
           />
           <Route
             exact
-            path={router.registries.companiesCRUD}
+            path={router.registries.companies.create}
             component={CompanyCRUD}
           />
+          /*
+
           <Route
             exact
             path={router.registries.land}
@@ -55,7 +57,7 @@ function Registries() {
         </Switch>
       </div>
     </div>
-  )
+  );
 }
 
 export default Registries;

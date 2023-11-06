@@ -9,7 +9,7 @@ const navigationList = [
     title: 'Overview',
   },
   {
-    route: `${router.registries.companies}`,
+    route: `${router.registries.companies.overview}`,
     title: 'Companies',
   },
   {
