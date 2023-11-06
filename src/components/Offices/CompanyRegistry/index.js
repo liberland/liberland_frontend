@@ -50,8 +50,14 @@ function MissingRequest() {
 }
 
 function CompanyRegistration({ registration }) {
+  const dispatch = useDispatch();
   if (!registration) return null;
   if (!registration.registration) return <div>Company not registered yet</div>;
+  const unregister = () => {
+    dispatch(officesActions.unregisterCompany.call({
+      companyId: registration.entity_id,
+    }));
+  }
   return (
     <div>
       Company data:
@@ -67,6 +73,11 @@ function CompanyRegistration({ registration }) {
       Data editable by registrar:
       {' '}
       {registration.registration.editableByRegistrar.toString()}
+      <div className={styles.buttonWrapper}>
+        <Button primary medium red onClick={unregister}>
+          Unregister company
+        </Button>
+      </div>
     </div>
   );
 }

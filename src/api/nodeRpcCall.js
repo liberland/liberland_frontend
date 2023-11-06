@@ -2088,6 +2088,13 @@ const getScheduledCalls = async () => {
   ];
 }
 
+const unregisterCompany = async (companyId, walletAddress) => {
+  const api = await getApi();
+  const unregister = api.tx.companyRegistry.unregister(0, companyId);
+  const extrinsic = api.tx.companyRegistryOffice.execute(unregister);
+  return await submitExtrinsic(extrinsic, walletAddress);
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -2182,4 +2189,5 @@ export {
   getScheduledCalls,
   citizenProposeRepealLegislation,
   requestEditCompanyRegistration,
+  unregisterCompany,
 };
