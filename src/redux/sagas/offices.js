@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, call, cps,
+  put, takeLatest, call, cps, select,
 } from 'redux-saga/effects';
 
 import {
@@ -11,10 +11,13 @@ import {
   getLlmBalances,
   getLldBalances,
   getPalletIds,
+  unregisterCompany,
 } from '../../api/nodeRpcCall';
 
 import { officesActions, blockchainActions } from '../actions';
 import * as backend from '../../api/backend';
+import { blockchainWatcher } from './base';
+import { blockchainSelectors } from '../selectors';
 
 // WORKERS
 
@@ -85,7 +88,7 @@ function* getCompanyRegistrationWorker(action) {
   }
 }
 
-function* registerCompanyworker(action) {
+function* registerCompanyWorker(action) {
   try {
     const { blockHash, errorData } = yield cps(registerCompany, action.payload);
     if (errorData.isError) {
@@ -124,6 +127,13 @@ function* getPalletIdsWorker(action) {
   }
 }
 
+function* unregisterCompanyWorker(action) {
+  const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(unregisterCompany, action.payload.companyId, userWalletAddress);
+  yield put(officesActions.unregisterCompany.success());
+  yield put(officesActions.getCompanyRegistration.call(action.payload.companyId));
+}
+
 // WATCHERS
 
 function* getIdentityWatcher() {
@@ -160,7 +170,7 @@ function* getCompanyRegistrationWatcher() {
 
 function* registerCompanyWatcher() {
   try {
-    yield takeLatest(officesActions.registerCompany.call, registerCompanyworker);
+    yield takeLatest(officesActions.registerCompany.call, registerCompanyWorker);
   } catch (e) {
     yield put(officesActions.registerCompany.failure(e));
   }
@@ -182,6 +192,10 @@ function* getPalletIdsWatcher() {
   }
 }
 
+function* unregisterCompanyWatcher() {
+  yield* blockchainWatcher(officesActions.unregisterCompany, unregisterCompanyWorker);
+}
+
 export {
   getIdentityWatcher,
   provideJudgementAndAssetsWatcher,
@@ -190,4 +204,5 @@ export {
   registerCompanyWatcher,
   getBalancesWatcher,
   getPalletIdsWatcher,
+  unregisterCompanyWatcher,
 };

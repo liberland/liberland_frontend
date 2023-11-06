@@ -29,6 +29,7 @@ const officesReducer = handleActions({
     officesActions.getBalances.call,
     officesActions.provideJudgementAndAssets.call,
     officesActions.getPalletIds.call,
+    officesActions.unregisterCompany.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -47,6 +48,7 @@ const officesReducer = handleActions({
     officesActions.getBalances.failure,
     officesActions.provideJudgementAndAssets.failure,
     officesActions.getPalletIds.failure,
+    officesActions.unregisterCompany.failure,
   )]: (state) => ({
     ...state,
     loading: false,
