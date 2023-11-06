@@ -20,30 +20,21 @@ function RegistriesCompanies() {
   }, [dispatch, registriesActions]);
   const registries = useSelector(registriesSelectors.registries);
 
-  const handleOpenNewCompanyRequestForm = () => {
-    dispatch(registriesActions.setRegistryCRUDAction.call({
-      registry: 'company',
-      action: 'create',
-    }));
-  };
-  const handleOpenEditCompanyForm = (dataObject) => {
-    dispatch(registriesActions.setRegistryCRUDAction.call({
-      registry: 'company',
-      action: 'edit',
-      dataObject,
-    }));
-  };
-
   return (
     <div>
       <NavLink
-        to={`${router.registries.companiesCRUD}`}
+        to={`${router.registries.companies.create}`}
         className={styles.newCompanyButton}
       >
-        <Button primary large onClick={handleOpenNewCompanyRequestForm}><h3>Register new company</h3></Button>
+        <Button
+          primary
+          large
+        >
+          <h3>Register new company</h3>
+        </Button>
       </NavLink>
       <Card title="Registered Companies" key="registeredCompanies">
-        {registries?.officialUserRegistryEntries?.companies?.registered.map((registeredCompany) => (
+        {registries?.officialUserRegistryEntries?.companies?.registered.map((registeredCompany, index) => (
           <Card
             title={registeredCompany?.staticFields[0]?.display}
             key={registeredCompany?.staticFields[0]?.display}
@@ -64,12 +55,11 @@ function RegistriesCompanies() {
                   View details
                 </Button>
                 <NavLink
-                  to={`${router.registries.companiesCRUD}`}
+                  to={`${router.registries.companies.edit}/${index}`}
                 >
                   <Button
                     primary
                     small
-                    onClick={() => handleOpenEditCompanyForm(registeredCompany)}
                     className={styles.buttonSeparation}
                   >
                     Request change

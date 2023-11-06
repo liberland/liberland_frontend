@@ -7,11 +7,6 @@ export const registries = createSelector(
   (reducer) => reducer.officialUserRegistryEntries,
 );
 
-export const registryCRUDAction = createSelector(
-  registriesReducer,
-  (reducer) => reducer.registryCRUDAction,
-);
-
 export const isGetRegistries = createSelector(
   registriesReducer,
   (reducer) => reducer.isGetRegistries,

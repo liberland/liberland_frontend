@@ -43,8 +43,11 @@ export default {
   },
   registries: {
     overview: '/home/registries/overview',
-    companies: '/home/registries/companies',
-    companiesCRUD: '/home/registries/companiesCRUD',
+    companies: {
+      overview: '/home/registries/companies/overview',
+      create: '/home/registries/companies/create',
+      edit: '/home/registries/companies/edit/:companyId',
+    },
     land: '/home/registries/land',
     assets: '/home/registries/assets',
     other: '/home/registries/other',

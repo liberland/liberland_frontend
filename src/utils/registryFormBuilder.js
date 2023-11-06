@@ -20,7 +20,6 @@ export function GetFieldsForm({
   return (
     <div id={`programmatic${formKey}`} style={{ marginBottom: '1rem' }}>
       <Card>
-        <h3>{formKey}</h3>
         {fields.map((_, index) => (
           <Card className="dynamicFieldsEntityCard">
             <div style={{ width: '100%', marginBottom: '0.25rem' }}>
@@ -97,9 +96,9 @@ GetFieldsForm.propTypes = {
   control: PropTypes.any.isRequired,
 };
 
-export const getDefaultValuesFromDataObject = (dataObject) => {
+export const getDefaultValuesFromDataObject = (formObject) => {
   const defaultValues = {};
-  dataObject?.dynamicFields?.forEach((dynamicField) => {
+  formObject?.dynamicFields?.forEach((dynamicField) => {
     const defaultValuesForField = [];
     dynamicField?.data?.forEach((fieldValues, index) => {
       defaultValuesForField[index] = {};
@@ -116,8 +115,10 @@ export const getDefaultValuesFromDataObject = (dataObject) => {
   });
   return defaultValues;
 };
-export const buildRegistryForm = (dataObject, buttonMessage, companyId, callback) => {
-  const defaultValues = getDefaultValuesFromDataObject(dataObject);
+export function BuildRegistryForm({
+  formObject, buttonMessage, companyId, callback,
+}) {
+  const defaultValues = getDefaultValuesFromDataObject(formObject);
   const { handleSubmit, register, control } = useForm({
     defaultValues,
   });
@@ -129,7 +130,7 @@ export const buildRegistryForm = (dataObject, buttonMessage, companyId, callback
     >
       <div id="static">
         <Card>
-          {dataObject.staticFields.map((staticField) => {
+          {formObject.staticFields.map((staticField) => {
             const staticFieldName = staticField.encryptable ? `${staticField.key}.value` : staticField.key;
             const staticFieldEncryptedName = `${staticField.key}.isEncrypted`;
             return (
@@ -160,7 +161,7 @@ export const buildRegistryForm = (dataObject, buttonMessage, companyId, callback
           })}
         </Card>
       </div>
-      {dataObject.dynamicFields.map((dynamicField) => (
+      {formObject.dynamicFields.map((dynamicField) => (
         <GetFieldsForm
           formKey={dynamicField.key}
           displayName={dynamicField.name}
@@ -180,6 +181,14 @@ export const buildRegistryForm = (dataObject, buttonMessage, companyId, callback
       </div>
     </form>
   );
+}
+
+BuildRegistryForm.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  formObject: PropTypes.any.isRequired,
+  buttonMessage: PropTypes.string.isRequired,
+  companyId: PropTypes.string.isRequired,
+  callback: PropTypes.func.isRequired,
 };
 
 export function RenderRegistryItemDetails({ mainDataObject, showAll = false }) {
@@ -199,7 +208,7 @@ export function RenderRegistryItemDetails({ mainDataObject, showAll = false }) {
             <div>
               <b>{dynamicField?.name}</b>
               <ul>
-                {dynamicField?.data?.map((dataObjects, index) => (
+                {dynamicField?.data?.map((formObjects, index) => (
                   <div>
                     <li>
                       {dynamicField?.name}
@@ -207,11 +216,11 @@ export function RenderRegistryItemDetails({ mainDataObject, showAll = false }) {
                       {index + 1}
                     </li>
                     <ul>
-                      {dataObjects.map((dataObject) => (
+                      {formObjects.map((formObject) => (
                         <li>
-                          {dataObject?.display}
+                          {formObject?.display}
                           {' '}
-                          {dataObject?.isEncrypted ? '(Encrypted)' : ''}
+                          {formObject?.isEncrypted ? '(Encrypted)' : ''}
                         </li>
 
                       ))}

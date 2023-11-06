@@ -2,7 +2,6 @@ import { createActions } from 'redux-actions';
 
 export const {
   getOfficialUserRegistryEntries,
-  setRegistryCRUDAction,
   requestCompanyRegistrationAction,
   requestCompanyEditAction,
   requestCompanyDeleteAction,
@@ -13,14 +12,9 @@ export const {
   requestAssetRegistrationAction,
   requestAssetEditAction,
   requestAssetDeleteAction,
-  registerAssetAction
+  registerAssetAction,
 } = createActions({
   GET_OFFICIAL_USER_REGISTRY_ENTRIES: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  SET_REGISTRY_C_R_U_D_ACTION: {
     call: undefined,
     success: undefined,
     failure: undefined,
@@ -79,5 +73,5 @@ export const {
     call: undefined,
     success: undefined,
     failure: undefined,
-  }
+  },
 });
