@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
+import { ReactComponent as CancelIcon } from '../../../assets/icons/cancel.svg';
+import { ReactComponent as OkIcon } from '../../../assets/icons/green-check.svg';
 
 import { TextInput } from '../../InputComponents';
 import Button from '../../Button/Button';
@@ -124,6 +126,7 @@ function CompanyRequest({ request }) {
       Data editable by registrar:
       {' '}
       {editableByRegistrar.toString()}
+      { data.editableByRegistrar.isTrue ?  <OkIcon /> : <CancelIcon /> }
       <div className={styles.buttonWrapper}>
         <Button
           primary
