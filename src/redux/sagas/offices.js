@@ -98,6 +98,7 @@ function* registerCompanyWorker(action) {
     } else {
       yield put(officesActions.registerCompany.success());
       yield put(officesActions.getCompanyRequest.call(action.payload.entity_id));
+      yield put(officesActions.getCompanyRegistration.call(action.payload.entity_id));
     }
   } catch (errorData) {
     yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
