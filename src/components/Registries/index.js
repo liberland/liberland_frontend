@@ -12,7 +12,8 @@ import RegistriesCompanies from './RegistriesCompanies';
 import RegistriesLand from './RegistriesLand';
 import RegistriesAssets from './RegistriesAssets';
 import RegistriesOther from './RegistriesOther';
-import CompanyCRUD from './RegistriesCompanies/CompanyCRUD';
+import CreateCompany from './RegistriesCompanies/CreateCompany';
+import EditCompany from './RegistriesCompanies/EditCompany';
 
 function Registries() {
   return (
@@ -35,10 +36,13 @@ function Registries() {
           <Route
             exact
             path={router.registries.companies.create}
-            component={CompanyCRUD}
+            component={CreateCompany}
           />
-          /*
-
+          <Route
+            exact
+            path={router.registries.companies.edit}
+            component={EditCompany}
+          />
           <Route
             exact
             path={router.registries.land}

@@ -34,9 +34,9 @@ function RegistriesCompanies() {
         </Button>
       </NavLink>
       <Card title="Registered Companies" key="registeredCompanies">
-        {registries?.officialUserRegistryEntries?.companies?.registered.map((registeredCompany, index) => (
+        {registries?.officialUserRegistryEntries?.companies?.registered.map((registeredCompany) => (
           <Card
-            title={registeredCompany?.staticFields[0]?.display}
+            title={`${registeredCompany?.staticFields[0]?.display} (ID: ${registeredCompany?.id})`}
             key={registeredCompany?.staticFields[0]?.display}
             className={styles.companyCardContainer}
           >
@@ -55,7 +55,7 @@ function RegistriesCompanies() {
                   View details
                 </Button>
                 <NavLink
-                  to={`${router.registries.companies.edit}/${index}`}
+                  to={`${router.registries.companies.home}/edit/${registeredCompany?.id}`}
                 >
                   <Button
                     primary
@@ -81,7 +81,7 @@ function RegistriesCompanies() {
       <Card title="Requested Companies" key="requestedCompanies">
         {registries?.officialUserRegistryEntries?.companies?.requested.map((requestedCompany) => (
           <Card
-            title={requestedCompany?.staticFields[0]?.display}
+            title={`${requestedCompany?.staticFields[0]?.display} (ID: ${requestedCompany.id})`}
             key={requestedCompany?.staticFields[0]?.display}
             className={styles.companyCardContainer}
           >
@@ -90,17 +90,28 @@ function RegistriesCompanies() {
                 mainDataObject={requestedCompany}
                 showAll={requestedCompany?.staticFields[0]?.display === expandedDetailsForCompany}
               />
-              <div className={styles.companyContentContainer}>
+            </div>
+            <div className={styles.companyContentEnd}>
+              <Button
+                green
+                small
+                onClick={() => setExpandedDetailsForCompany(requestedCompany?.staticFields[0]?.display)}
+                className={styles.buttonSeparation}
+              >
+                View details
+              </Button>
+              <NavLink
+                to={`${router.registries.companies.home}/edit/${requestedCompany.id}`}
+              >
                 <Button
-                  green
+                  secondary
                   small
-                  onClick={() => setExpandedDetailsForCompany(requestedCompany?.staticFields[0]?.display)}
                   className={styles.buttonSeparation}
                 >
-                  View details
+                  Edit request
                 </Button>
-                <Button red small onClick={() => {}} className={styles.buttonSeparation}>Delete request</Button>
-              </div>
+              </NavLink>
+              <Button red small onClick={() => {}} className={styles.buttonSeparation}>Delete request</Button>
             </div>
           </Card>
         ))}

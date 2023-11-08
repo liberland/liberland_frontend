@@ -44,6 +44,7 @@ export default {
   registries: {
     overview: '/home/registries/overview',
     companies: {
+      home: '/home/registries/companies',
       overview: '/home/registries/companies/overview',
       create: '/home/registries/companies/create',
       edit: '/home/registries/companies/edit/:companyId',

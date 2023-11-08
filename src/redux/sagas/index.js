@@ -72,6 +72,7 @@ export default function* rootSaga() {
     // REGISTRIES
     registriesSagas.getOfficialUserRegistryEntriesWatcher(),
     registriesSagas.requestCompanyRegistrationWatcher(),
+    registriesSagas.requestEditCompanyRegistrationWatcher(),
 
     // BRIDGE
     bridgeSagas.withdrawWatcher(),

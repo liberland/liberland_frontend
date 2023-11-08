@@ -13,6 +13,7 @@ export const {
   requestAssetEditAction,
   requestAssetDeleteAction,
   registerAssetAction,
+  requestEditCompanyRegistrationAction,
 } = createActions({
   GET_OFFICIAL_USER_REGISTRY_ENTRIES: {
     call: undefined,
@@ -70,6 +71,11 @@ export const {
     failure: undefined,
   },
   REGISTER_ASSET_ACTION: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  REQUEST_EDIT_COMPANY_REGISTRATION_ACTION: {
     call: undefined,
     success: undefined,
     failure: undefined,
