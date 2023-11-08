@@ -1086,7 +1086,7 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
   }));
   let ownsEntityIds = []
   ownerEntitesHuman.forEach(oe => {
-    ownsEntityIds.push(oe['key'][1])
+    ownsEntityIds.push(oe.key[1])
   })
   let requestQueries = []
   let registeredQueries = []
@@ -1222,14 +1222,23 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
   }
 }
 
-const requestCompanyRegistration = async (companyData, walletAddress)  => {
+const requestCompanyRegistration = async (companyData, registryAllowedToEdit, walletAddress)  => {
+  const api = await getApi();
+  
+  const data = api.createType("CompanyData", companyData);
+  const compressed = pako.deflate(data.toU8a());
+  
+  const extrinsic = api.tx.companyRegistry.requestEntity(0, u8aToHex(compressed), !!registryAllowedToEdit);
+  return submitExtrinsic(extrinsic, walletAddress);
+}
+
+const requestEditCompanyRegistration = async (companyData, companyId, walletAddress)  => {
   const api = await getApi();
 
   const data = api.createType("CompanyData", companyData);
   const compressed = pako.deflate(data.toU8a());
-  //TODO read instead of hardcoded true for editablebyregistrar
-  const extrinsic = api.tx.companyRegistry.requestEntity(0, u8aToHex(compressed), true);
 
+  const extrinsic = api.tx.companyRegistry.requestRegistration(0, companyId, u8aToHex(compressed), true);
   return submitExtrinsic(extrinsic, walletAddress);
 }
 
@@ -2172,4 +2181,5 @@ export {
   decodeCall,
   getScheduledCalls,
   citizenProposeRepealLegislation,
+  requestEditCompanyRegistration,
 };

@@ -3,13 +3,14 @@ import {
 } from 'redux-saga/effects';
 
 import {
-  getOfficialUserRegistryEntries, requestCompanyRegistration,
+  getOfficialUserRegistryEntries,
+  requestCompanyRegistration,
+  requestEditCompanyRegistration,
 } from '../../api/nodeRpcCall';
 
 import { registriesActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import { blockchainWatcher } from './base';
-import router from '../../router';
 
 // WORKERS
 
@@ -28,10 +29,26 @@ function* getOfficialUserRegistryEntriesWorker(action) {
 
 function* requestCompanyRegistrationWorker(action) {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  yield call(requestCompanyRegistration, action.payload.companyData, walletAddress);
+  yield call(
+    requestCompanyRegistration,
+    action.payload.companyData,
+    action.payload.registryAllowedToEdit,
+    walletAddress,
+  );
   yield put(registriesActions.getOfficialUserRegistryEntries.call());
   yield put(registriesActions.requestCompanyRegistrationAction.success());
-  action.payload.history.push(router.registries.companies.overview);
+}
+
+function* requestEditCompanyRegistrationWorker(action) {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(
+    requestEditCompanyRegistration,
+    action.payload.companyData,
+    action.payload.companyId,
+    walletAddress,
+  );
+  yield put(registriesActions.getOfficialUserRegistryEntries.call());
+  yield put(registriesActions.requestEditCompanyRegistrationAction.success());
 }
 
 // WATCHERS
@@ -45,5 +62,15 @@ export function* getOfficialUserRegistryEntriesWatcher() {
 }
 
 export function* requestCompanyRegistrationWatcher() {
-  yield* blockchainWatcher(registriesActions.requestCompanyRegistrationAction, requestCompanyRegistrationWorker);
+  yield* blockchainWatcher(
+    registriesActions.requestCompanyRegistrationAction,
+    requestCompanyRegistrationWorker,
+  );
+}
+
+export function* requestEditCompanyRegistrationWatcher() {
+  yield* blockchainWatcher(
+    registriesActions.requestEditCompanyRegistrationAction,
+    requestEditCompanyRegistrationWorker,
+  );
 }

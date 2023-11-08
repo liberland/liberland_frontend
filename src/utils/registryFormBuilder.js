@@ -96,19 +96,33 @@ GetFieldsForm.propTypes = {
   control: PropTypes.any.isRequired,
 };
 
-export const getDefaultValuesFromDataObject = (formObject) => {
+export const getDefaultValuesFromDataObject = (formObject, editMode = false) => {
   const defaultValues = {};
+  if (editMode) {
+    formObject?.staticFields?.forEach((staticField) => {
+      defaultValues[staticField.key] = staticField.display;
+    });
+  }
   formObject?.dynamicFields?.forEach((dynamicField) => {
     const defaultValuesForField = [];
     dynamicField?.data?.forEach((fieldValues, index) => {
       defaultValuesForField[index] = {};
       fieldValues?.forEach((field) => {
         const encryptable = dynamicField.fields.find((v) => v.key === field.key)?.encryptable;
-        defaultValuesForField[index][field.key] = encryptable
-          ? {
-            isEncrypted: field.isEncrypted,
-          }
-          : null;
+        if (editMode) {
+          defaultValuesForField[index][field.key] = encryptable
+            ? {
+              value: field.display,
+              isEncrypted: field.isEncrypted,
+            }
+            : field.display;
+        } else {
+          defaultValuesForField[index][field.key] = encryptable
+            ? {
+              isEncrypted: field.isEncrypted,
+            }
+            : null;
+        }
       });
     });
     defaultValues[dynamicField.key] = defaultValuesForField;
@@ -118,7 +132,7 @@ export const getDefaultValuesFromDataObject = (formObject) => {
 export function BuildRegistryForm({
   formObject, buttonMessage, companyId, callback,
 }) {
-  const defaultValues = getDefaultValuesFromDataObject(formObject);
+  const defaultValues = getDefaultValuesFromDataObject(formObject, !!companyId);
   const { handleSubmit, register, control } = useForm({
     defaultValues,
   });
@@ -135,7 +149,7 @@ export function BuildRegistryForm({
             const staticFieldEncryptedName = `${staticField.key}.isEncrypted`;
             return (
               <div style={{ marginBottom: '0.5rem' }}>
-                <label style={{ fontWeight: 'bold', fontSize: '1.05rem' }}>{staticField.display}</label>
+                <label style={{ fontWeight: 'bold', fontSize: '1.05rem' }}>{staticField.name}</label>
                 <br />
                 {staticField.type === 'text'
                   ? (
@@ -143,7 +157,7 @@ export function BuildRegistryForm({
                       name={staticField.key}
                       register={register}
                       style={{ width: '50%' }}
-                      placeholder={staticField.display}
+                      placeholder={staticField.name}
                     />
                   )
                   : (
