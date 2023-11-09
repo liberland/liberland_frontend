@@ -17,7 +17,7 @@ function RegistriesCompanies() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   useEffect(() => {
     dispatch(registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress));
-  }, [dispatch, registriesActions]);
+  }, [dispatch, userWalletAddress]);
   const registries = useSelector(registriesSelectors.registries);
 
   return (
