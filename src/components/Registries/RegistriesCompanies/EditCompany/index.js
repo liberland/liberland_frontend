@@ -11,7 +11,7 @@ export default function EditCompany() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   useEffect(() => {
     dispatch(registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress));
-  }, [dispatch, registriesActions]);
+  }, [dispatch, userWalletAddress]);
   const registries = useSelector(registriesSelectors.registries);
 
   const registeredCompanyData = registries?.officialUserRegistryEntries?.companies?.requested.find(
