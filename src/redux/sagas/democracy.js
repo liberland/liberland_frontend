@@ -13,6 +13,7 @@ import {
   undelegateDemocracy,
   proposeAmendLegislation,
   citizenProposeRepealLegislation,
+  getScheduledCalls,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors } from '../selectors';
