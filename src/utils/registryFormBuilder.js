@@ -11,7 +11,7 @@ const buildFieldName = (formKey, index, dynamicField, suffix) => (dynamicField.e
   : `${formKey}.${index}.${dynamicField.key}`);
 
 export function GetFieldsForm({
-  formKey, displayName, register, control, dynamicFieldData,
+  formKey, displayName, register, control, dynamicFieldData, errors,
 }) {
   const { fields, append, remove } = useFieldArray({
     control,
@@ -31,43 +31,55 @@ export function GetFieldsForm({
                 </h4>
               </div>
 
-              {dynamicFieldData.fields.map((dynamicField) => (
-                <div key={dynamicField.key} style={{ margin: '16px 0' }}>
-                  <div>
-                    {dynamicField.display}
-                    :
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <div style={{ flex: '1 1 0%', margin: '0 16px' }}>
-                      {dynamicField.type === 'text'
-                        ? (
-                          <TextInput
-                            name={buildFieldName(formKey, index, dynamicField, 'value')}
-                            register={register}
-                            placeholder={dynamicField.display}
-                          />
-                        )
-                        : (
-                          <input
-                            type={dynamicField.type}
-                            {...register(buildFieldName(formKey, index, dynamicField, 'value'))}
-                            placeholder={dynamicField.display}
-                          />
-                        )}
+              {dynamicFieldData.fields.map((dynamicField) => {
+                const fieldName = buildFieldName(formKey, index, dynamicField, 'value');
+
+                return (
+                  <div key={dynamicField.key} style={{ margin: '16px 0' }}>
+                    <div>
+                      {dynamicField.display}
+                      :
                     </div>
-                    <div style={{ margin: '0 16px' }}>
-                      {dynamicField.encryptable ? <span>Encrypt Field? </span> : null }
-                      {dynamicField.encryptable
-                        ? (
-                          <input
-                            {...register(buildFieldName(formKey, index, dynamicField, 'isEncrypted'))}
-                            type="checkbox"
-                          />
-                        ) : null }
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{ flex: '1 1 0%', margin: '0 16px' }}>
+                        {dynamicField.type === 'text'
+                          ? (
+                            <>
+                              <TextInput
+                                name={fieldName}
+                                register={register}
+                                placeholder={dynamicField.display}
+                                validate={(v) => v !== '' || `${dynamicField.name} cannot be empty`}
+                              />
+                              <div className="error">
+                                {dynamicField.encryptable
+                                  ? errors?.[formKey]?.[index]?.[dynamicField.key]?.value?.message
+                                  : errors?.[formKey]?.[index]?.[dynamicField.key]?.message}
+                              </div>
+                            </>
+                          )
+                          : (
+                            <input
+                              type={dynamicField.type}
+                              {...register(fieldName)}
+                              placeholder={dynamicField.display}
+                            />
+                          )}
+                      </div>
+                      <div style={{ margin: '0 16px' }}>
+                        {dynamicField.encryptable ? <span>Encrypt Field? </span> : null }
+                        {dynamicField.encryptable
+                          ? (
+                            <input
+                              {...register(fieldName)}
+                              type="checkbox"
+                            />
+                          ) : null }
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               <div style={{ display: 'flex', margin: '16px', justifyContent: 'flex-end' }}>
                 <Button medium red type="button" onClick={() => remove(index)}>Delete</Button>
               </div>
@@ -94,6 +106,8 @@ GetFieldsForm.propTypes = {
   dynamicFieldData: PropTypes.any.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   control: PropTypes.any.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  errors: PropTypes.any.isRequired,
 };
 
 export const getDefaultValuesFromDataObject = (formObject, editMode = false) => {
@@ -133,7 +147,9 @@ export function BuildRegistryForm({
   formObject, buttonMessage, companyId, callback,
 }) {
   const defaultValues = getDefaultValuesFromDataObject(formObject, !!companyId);
-  const { handleSubmit, register, control } = useForm({
+  const {
+    handleSubmit, register, control, formState: { errors },
+  } = useForm({
     defaultValues,
   });
 
@@ -153,12 +169,16 @@ export function BuildRegistryForm({
                 <br />
                 {staticField.type === 'text'
                   ? (
-                    <TextInput
-                      name={staticField.key}
-                      register={register}
-                      style={{ width: '50%' }}
-                      placeholder={staticField.name}
-                    />
+                    <>
+                      <TextInput
+                        name={staticField.key}
+                        register={register}
+                        style={{ width: '50%' }}
+                        placeholder={staticField.name}
+                        validate={(v) => v !== '' || `${staticField.name} cannot be empty`}
+                      />
+                      <div className="error">{errors?.[staticField.key]?.message}</div>
+                    </>
                   )
                   : (
                     <input
@@ -182,6 +202,7 @@ export function BuildRegistryForm({
           register={register}
           control={control}
           dynamicFieldData={dynamicField}
+          errors={errors}
         />
       ))}
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
