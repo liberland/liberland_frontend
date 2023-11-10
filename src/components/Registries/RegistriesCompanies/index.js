@@ -10,6 +10,14 @@ import { RenderRegistryItemDetails } from '../../../utils/registryFormBuilder';
 import DeleteCompanyModal from '../../Modals/DeleteCompanyModal';
 import router from '../../../router';
 
+function InvalidCompany({ id }) {
+  return ( <Card title={`ID: ${id}`} className={styles.companyCardContainer}>
+    <div className={styles.companyContentContainer}>
+      This company's registry data is corrupted. Please contact administration.
+    </div>
+  </Card>)
+}
+
 function RegistriesCompanies() {
   const [expandedDetailsForCompany, setExpandedDetailsForCompany] = useState(null);
   const [isDeleteCompanyModalOpen, setIsDeleteCompanyModalOpen] = useState(false);
@@ -35,6 +43,9 @@ function RegistriesCompanies() {
       </NavLink>
       <Card title="Registered Companies" key="registeredCompanies">
         {registries?.officialUserRegistryEntries?.companies?.registered.map((registeredCompany) => (
+          registeredCompany?.invalid ?
+          <InvalidCompany key={registeredCompany?.id} id={registeredCompany?.id} />
+          :
           <Card
             title={`${registeredCompany?.staticFields[0]?.display} (ID: ${registeredCompany?.id})`}
             key={registeredCompany?.staticFields[0]?.display}
@@ -80,6 +91,9 @@ function RegistriesCompanies() {
       </Card>
       <Card title="Requested Companies" key="requestedCompanies">
         {registries?.officialUserRegistryEntries?.companies?.requested.map((requestedCompany) => (
+          requestedCompany?.invalid ?
+          <InvalidCompany key={requestedCompany?.id} id={requestedCompany?.id} />
+          :
           <Card
             title={`${requestedCompany?.staticFields[0]?.display} (ID: ${requestedCompany.id})`}
             key={requestedCompany?.staticFields[0]?.display}

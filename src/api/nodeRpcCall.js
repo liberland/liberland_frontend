@@ -1106,12 +1106,20 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
   let registeredCompaniesByWallet = []
   let supportedObject = JSON.parse(JSON.stringify(newCompanyDataObject))
   companyRegistryRawData.forEach((companyRegistryEntity, index) => {
+    if (companyRegistryEntity.isNone) return;
     let companyData;
     try {
       const compressed = companyRegistryEntity.unwrap().data;
       companyData = api.createType('CompanyData', pako.inflate(compressed)).toJSON();
     } catch(e) {
-      console.error("Invalid company data", e); // FIXME actually display this to user somehow?
+      console.error("Invalid company data", e);
+      if (index < ownsEntityIds.length){
+        let dataObject = {invalid: true, id: ownsEntityIds[index]}
+        companyRequestsByWallet.push(dataObject)
+      } else {
+        let dataObject = {invalid: true, id: ownsEntityIds[index - ownsEntityIds.length]}
+        registeredCompaniesByWallet.push(dataObject)
+      }
       return;
     }
 

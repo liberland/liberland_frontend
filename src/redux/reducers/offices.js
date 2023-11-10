@@ -94,6 +94,9 @@ const officesReducer = handleActions({
   }),
   [officesActions.getCompanyRequest.failure]: (state) => ({
     ...state,
+    companyRequest: {
+      invalid: true,
+    },
     isGetCompanyRequest: false,
   }),
 
@@ -115,6 +118,9 @@ const officesReducer = handleActions({
   }),
   [officesActions.getCompanyRegistration.failure]: (state) => ({
     ...state,
+    companyRegistration: {
+      invalid: true,
+    },
     isGetCompanyRegistration: false,
   }),
 
