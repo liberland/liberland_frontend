@@ -59,7 +59,7 @@ function CompanyRegistration({ registration }) {
     dispatch(officesActions.unregisterCompany.call({
       companyId: registration.entity_id,
     }));
-  }
+  };
   return (
     <div>
       Company data:
@@ -126,7 +126,7 @@ function CompanyRequest({ request }) {
       Data editable by registrar:
       {' '}
       {editableByRegistrar.toString()}
-      { data.editableByRegistrar.isTrue ?  <OkIcon /> : <CancelIcon /> }
+      {editableByRegistrar.isTrue ? <OkIcon /> : <CancelIcon />}
       <div className={styles.buttonWrapper}>
         <Button
           primary
