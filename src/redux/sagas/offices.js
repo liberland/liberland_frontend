@@ -34,6 +34,7 @@ function* getIdentityWorker(action) {
     }
     yield put(officesActions.officeGetIdentity.success({ onchain, backend: backendUsers[0] }));
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
     yield put(officesActions.officeGetIdentity.failure(e));
   }
@@ -57,7 +58,7 @@ function* provideJudgementAndAssetsWorker(action) {
       try {
         yield call(backend.addMeritTransaction, action.payload.uid, action.payload.merits.mul(-1));
       } catch (e) {
-        throw { details: e.response.data.error.message };
+        throw new Error(e.response.data.error.message);
       }
     }
 
@@ -75,6 +76,7 @@ function* getCompanyRequestWorker(action) {
     const request = yield call(getCompanyRequest, action.payload);
     yield put(officesActions.getCompanyRequest.success(request));
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
     yield put(officesActions.getCompanyRequest.failure(e));
   }
@@ -85,6 +87,7 @@ function* getCompanyRegistrationWorker(action) {
     const registration = yield call(getCompanyRegistration, action.payload);
     yield put(officesActions.getCompanyRegistration.success(registration));
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
     yield put(officesActions.getCompanyRegistration.failure(e));
   }
@@ -92,7 +95,7 @@ function* getCompanyRegistrationWorker(action) {
 
 function* registerCompanyWorker(action) {
   try {
-    const { blockHash, errorData } = yield cps(registerCompany, action.payload);
+    const { errorData } = yield cps(registerCompany, action.payload);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
@@ -115,6 +118,7 @@ function* getBalancesWorker(action) {
     const llmBalances = yield call(getLlmBalances, action.payload);
     yield put(officesActions.getBalances.success({ LLD: lldBalances, LLM: llmBalances }));
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
     yield put(officesActions.getBalances.failure(e));
   }
@@ -125,16 +129,22 @@ function* getPalletIdsWorker(action) {
     const pallets = yield call(getPalletIds, action.payload);
     yield put(officesActions.getPalletIds.success(pallets));
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error(e);
     yield put(officesActions.getPalletIds.failure(e));
   }
 }
 
 function* unregisterCompanyWorker(action) {
-  const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  yield call(unregisterCompany, action.payload.companyId, userWalletAddress);
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(
+    unregisterCompany,
+    action.payload.entityId,
+    action.payload.soft,
+    walletAddress,
+  );
+  yield put(officesActions.getCompanyRequest.call(action.payload.entityId));
   yield put(officesActions.unregisterCompany.success());
-  yield put(officesActions.getCompanyRegistration.call(action.payload.companyId));
 }
 
 function* setRegisteredCompanyDataWorker(action) {

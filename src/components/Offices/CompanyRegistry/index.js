@@ -63,12 +63,15 @@ function InvalidRegistration() {
 
 function CompanyRegistration({ registration }) {
   const dispatch = useDispatch();
+
   if (!registration) return null;
   if (registration.invalid) return <InvalidRegistration />;
   if (!registration.registration) return <div>Company not registered yet</div>;
-  const unregister = () => {
+
+  const unregisterCompany = (entityId) => {
     dispatch(officesActions.unregisterCompany.call({
-      companyId: registration.entity_id,
+      entityId,
+      soft: false,
     }));
   };
   return (
@@ -100,7 +103,12 @@ function CompanyRegistration({ registration }) {
             </Button>
           </NavLink>
         }
-        <Button primary medium red onClick={unregister}>
+        <Button
+          primary
+          medium
+          red
+          onClick={() => unregisterCompany(registration.entity_id)}
+        >
           Unregister company
         </Button>
       </div>
@@ -119,14 +127,15 @@ CompanyRegistration.propTypes = {
   }).isRequired,
 };
 
-function CompanyRequest({ request }) {
+function CompanyRequest({ companyRequest }) {
   const dispatch = useDispatch();
   const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
-  if (!request) return null;
-  if (request.invalid) return <InvalidRequest />;
-  const { entity_id } = request;
-  if (!request.request) return <MissingRequest />;
-  const { hash, data, editableByRegistrar } = request.request;
+  if (!companyRequest) return null;
+  if (companyRequest.invalid) return <InvalidRequest />;
+  const { entity_id, request} = companyRequest;
+  if (request?.unregister) return <UnregisterCompany entityId={entity_id} />;
+  if (!request) return <MissingRequest />;
+  const { hash, data, editableByRegistrar } = request;
 
   const onClick = () => {
     dispatch(officesActions.registerCompany.call({
@@ -166,14 +175,44 @@ function CompanyRequest({ request }) {
 }
 
 CompanyRequest.propTypes = {
-  request: PropTypes.shape({
+  companyRequest: PropTypes.shape({
     entity_id: PropTypes.string.isRequired,
     request: PropTypes.shape({
       editableByRegistrar: PropTypes.bool.isRequired,
       hash: PropTypes.arrayOf(PropTypes.number).isRequired,
       data: PropTypes.instanceOf(Map).isRequired,
+      unregister: PropTypes.bool,
     }),
   }).isRequired,
+};
+
+function UnregisterCompany({ entityId }) {
+  const dispatch = useDispatch();
+  const unregisterCompany = () => {
+    dispatch(officesActions.unregisterCompany.call({
+      entityId,
+      soft: true,
+    }));
+  };
+  return (
+    <div>
+      <p>User requested company unregistration.</p>
+      <div className={styles.buttonWrapper}>
+        <Button
+          primary
+          medium
+          red
+          onClick={() => unregisterCompany()}
+        >
+          Approve request & Unregister company
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+UnregisterCompany.propTypes = {
+  entityId: PropTypes.string.isRequired,
 };
 
 function CompanyRegistry() {
@@ -191,7 +230,7 @@ function CompanyRegistry() {
       { request && (
       <>
         <div className={styles.h4}>Request:</div>
-        <CompanyRequest request={request} />
+        <CompanyRequest companyRequest={request} />
       </>
       )}
     </>
