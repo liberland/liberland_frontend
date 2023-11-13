@@ -12,12 +12,14 @@ import {
   getLldBalances,
   getPalletIds,
   unregisterCompany,
+  setRegisteredCompanyData,
 } from '../../api/nodeRpcCall';
 
 import { officesActions, blockchainActions } from '../actions';
 import * as backend from '../../api/backend';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors } from '../selectors';
+import router from '../../router';
 
 // WORKERS
 
@@ -135,6 +137,16 @@ function* unregisterCompanyWorker(action) {
   yield put(officesActions.getCompanyRegistration.call(action.payload.companyId));
 }
 
+function* setRegisteredCompanyDataWorker(action) {
+  const { companyId, companyData, history } = action.payload;
+  const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(setRegisteredCompanyData, companyId, companyData, userWalletAddress);
+  yield put(officesActions.setRegisteredCompanyData.success());
+  yield put(officesActions.getCompanyRequest.call(companyId));
+  yield put(officesActions.getCompanyRegistration.call(companyId));
+  history.push(router.offices.companyRegistry.home);
+}
+
 // WATCHERS
 
 function* getIdentityWatcher() {
@@ -197,6 +209,10 @@ function* unregisterCompanyWatcher() {
   yield* blockchainWatcher(officesActions.unregisterCompany, unregisterCompanyWorker);
 }
 
+function* setRegisteredCompanyDataWatcher() {
+  yield* blockchainWatcher(officesActions.setRegisteredCompanyData, setRegisteredCompanyDataWorker);
+}
+
 export {
   getIdentityWatcher,
   provideJudgementAndAssetsWatcher,
@@ -206,4 +222,5 @@ export {
   getBalancesWatcher,
   getPalletIdsWatcher,
   unregisterCompanyWatcher,
+  setRegisteredCompanyDataWatcher,
 };

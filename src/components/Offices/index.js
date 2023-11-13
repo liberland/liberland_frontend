@@ -6,6 +6,7 @@ import {
 import OfficesHeader from './OfficesHeader';
 import Identity from './Identity';
 import CompanyRegistry from './CompanyRegistry';
+import CompanyRegistryEdit from './CompanyRegistry/EditCompany';
 import LandRegistry from "./LandRegistry";
 import Finances from "./Finances";
 import router from '../../router';
@@ -28,8 +29,13 @@ function Offices() {
           />
           <Route
             exact
-            path={router.offices.companyRegistry}
+            path={router.offices.companyRegistry.home}
             component={CompanyRegistry}
+          />
+          <Route
+            exact
+            path={router.offices.companyRegistry.edit}
+            component={CompanyRegistryEdit}
           />
           <Route
             exact

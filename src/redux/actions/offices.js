@@ -9,6 +9,7 @@ export const {
   getBalances,
   getPalletIds,
   unregisterCompany,
+  setRegisteredCompanyData,
 } = createActions({
   OFFICE_GET_IDENTITY: {
     call: undefined,
@@ -46,6 +47,11 @@ export const {
     failure: undefined,
   },
   UNREGISTER_COMPANY: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SET_REGISTERED_COMPANY_DATA: {
     call: undefined,
     success: undefined,
     failure: undefined,

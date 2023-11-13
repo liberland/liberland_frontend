@@ -10,6 +10,8 @@ import Button from '../../Button/Button';
 import { officesActions } from '../../../redux/actions';
 import { officesSelectors, blockchainSelectors } from '../../../redux/selectors';
 import styles from './styles.module.scss';
+import { NavLink } from 'react-router-dom/cjs/react-router-dom.min';
+import router from '../../../router';
 
 function CompanyForm() {
   const dispatch = useDispatch();
@@ -85,6 +87,19 @@ function CompanyRegistration({ registration }) {
       {' '}
       {registration.registration.editableByRegistrar.toString()}
       <div className={styles.buttonWrapper}>
+        {registration.registration.editableByRegistrar.isTrue && 
+          <NavLink
+            to={`${router.offices.companyRegistry.home}/edit/${registration.entity_id}`}
+          >
+            <Button
+              primary
+              green
+              medium
+            >
+              <h3>Edit company data</h3>
+            </Button>
+          </NavLink>
+        }
         <Button primary medium red onClick={unregister}>
           Unregister company
         </Button>

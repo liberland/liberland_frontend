@@ -1,7 +1,7 @@
 import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import {handleMyDispatchErrors} from "../utils/therapist";
-import {newCompanyDataObject} from "../utils/defaultData";
+import {blockchainDataToFormObject} from "../utils/registryFormBuilder";
 import * as centralizedBackend from './backend';
 import { BN_TWO } from '@polkadot/util';
 import { parseDollars, parseMerits } from '../utils/walletHelpers';
@@ -1104,13 +1104,12 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
   }
   let companyRequestsByWallet = []
   let registeredCompaniesByWallet = []
-  let supportedObject = JSON.parse(JSON.stringify(newCompanyDataObject))
   companyRegistryRawData.forEach((companyRegistryEntity, index) => {
     if (companyRegistryEntity.isNone) return;
     let companyData;
     try {
       const compressed = companyRegistryEntity.unwrap().data;
-      companyData = api.createType('CompanyData', pako.inflate(compressed)).toJSON();
+      companyData = api.createType('CompanyData', pako.inflate(compressed));
     } catch(e) {
       console.error("Invalid company data", e);
       if (index < ownsEntityIds.length){
@@ -1123,50 +1122,14 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
       return;
     }
 
-    const staticFields = []
-    const dynamicFields = []
+    // FIXME this is component-specific logic, nodeRpcCall shouldn't do this
+    const formObject = blockchainDataToFormObject(companyData);
 
-    supportedObject.staticFields.forEach(staticField => {
-      if (staticField.key in companyData){
-        let fieldObject = staticField
-        fieldObject.display = companyData[staticField.key]
-        staticFields.push(fieldObject)
-      }
-    })
-
-    supportedObject.dynamicFields.forEach(dynamicField => {
-      if(dynamicField.key in companyData){
-        let fieldObject = dynamicField
-        let fieldObjectData = []
-        companyData[dynamicField.key].forEach(dynamicFieldDataArray => {
-          //Format using fields data
-          let crossReferencedFieldDataArray = []
-          for(const key in dynamicFieldDataArray){
-            let pushObject = {}
-            pushObject['key'] = key
-            if (dynamicFieldDataArray[key].isEncrypted !== undefined) {
-              pushObject['display'] = dynamicFieldDataArray[key].value
-              pushObject['isEncrypted'] = dynamicFieldDataArray[key].isEncrypted
-            } else {
-              pushObject['display'] = dynamicFieldDataArray[key]
-              pushObject['isEncrypted'] = false
-            }
-            crossReferencedFieldDataArray.push(JSON.parse(JSON.stringify(pushObject)))
-          }
-          fieldObjectData.push(crossReferencedFieldDataArray)
-        })
-
-        fieldObject.data = JSON.parse(JSON.stringify(fieldObjectData))
-        dynamicFields.push(fieldObject)
-      }
-    })
-    companyData.staticFields = JSON.parse(JSON.stringify(staticFields))
-    companyData.dynamicFields = JSON.parse(JSON.stringify(dynamicFields))
     if (index < ownsEntityIds.length){
-      let dataObject = {...companyData, id: ownsEntityIds[index]}
+      let dataObject = {...formObject, id: ownsEntityIds[index]}
       companyRequestsByWallet.push(dataObject)
     } else {
-      let dataObject = {...companyData, id: ownsEntityIds[index - ownsEntityIds.length]}
+      let dataObject = {...formObject, id: ownsEntityIds[index - ownsEntityIds.length]}
       registeredCompaniesByWallet.push(dataObject)
     }
   })
@@ -2109,6 +2072,15 @@ const cancelCompanyRequest = async (companyId, walletAddress) => {
   return await submitExtrinsic(extrinsic, walletAddress);
 }
 
+const setRegisteredCompanyData = async (companyId, companyData, walletAddress) => {
+  const api = await getApi();
+  const data = api.createType("CompanyData", companyData);
+  const compressed = pako.deflate(data.toU8a());
+  const setRegisteredEntity = api.tx.companyRegistry.setRegisteredEntity(0, companyId, u8aToHex(compressed));
+  const extrinsic = api.tx.companyRegistryOffice.execute(setRegisteredEntity);
+  return await submitExtrinsic(extrinsic, walletAddress);
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -2205,4 +2177,5 @@ export {
   requestEditCompanyRegistration,
   unregisterCompany,
   cancelCompanyRequest,
+  setRegisteredCompanyData,
 };
