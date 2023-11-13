@@ -71,7 +71,7 @@ export function GetFieldsForm({
                         {dynamicField.encryptable
                           ? (
                             <input
-                              {...register(fieldName)}
+                              {...register(buildFieldName(formKey, index, dynamicField, 'isEncrypted'))}
                               type="checkbox"
                             />
                           ) : null }
