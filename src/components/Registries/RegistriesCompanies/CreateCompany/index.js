@@ -1,11 +1,13 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { newCompanyDataObject } from '../../../../utils/defaultData';
 import { BuildRegistryForm } from '../../../../utils/registryFormBuilder';
 import { registriesActions } from '../../../../redux/actions';
 
 export default function CreateCompany() {
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const onSubmit = ((allCompanyData) => {
     const { registryAllowedToEdit, ...companyData } = allCompanyData;
@@ -14,6 +16,7 @@ export default function CreateCompany() {
       registriesActions.requestCompanyRegistrationAction.call({
         companyData,
         registryAllowedToEdit,
+        history,
       }),
     );
   });

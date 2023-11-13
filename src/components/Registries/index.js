@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Switch, Route,
+  Switch, Route, Redirect,
 } from 'react-router-dom';
 import router from '../../router';
 
@@ -27,6 +27,11 @@ function Registries() {
             exact
             path={router.registries.overview}
             component={RegistriesOverview}
+          />
+          <Route
+            exact
+            path={router.registries.companies.home}
+            render={() => <Redirect to={router.registries.companies.overview} />}
           />
           <Route
             exact

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { BuildRegistryForm } from '../../../../utils/registryFormBuilder';
 import { registriesActions } from '../../../../redux/actions';
 import { registriesSelectors, blockchainSelectors } from '../../../../redux/selectors';
@@ -8,6 +8,7 @@ import { registriesSelectors, blockchainSelectors } from '../../../../redux/sele
 export default function EditCompany() {
   const { companyId } = useParams();
   const dispatch = useDispatch();
+  const history = useHistory()
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   useEffect(() => {
     dispatch(registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress));
@@ -25,6 +26,7 @@ export default function EditCompany() {
       registriesActions.requestEditCompanyRegistrationAction.call({
         companyData,
         companyId,
+        history,
       }),
     );
   });

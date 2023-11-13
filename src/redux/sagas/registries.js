@@ -12,6 +12,7 @@ import {
 import { registriesActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import { blockchainWatcher } from './base';
+import router from "../../router";
 
 // WORKERS
 
@@ -38,6 +39,7 @@ function* requestCompanyRegistrationWorker(action) {
   );
   yield put(registriesActions.getOfficialUserRegistryEntries.call(walletAddress));
   yield put(registriesActions.requestCompanyRegistrationAction.success());
+  action.payload.history.push(router.registries.companies.home);
 }
 
 function* requestEditCompanyRegistrationWorker(action) {
@@ -50,6 +52,7 @@ function* requestEditCompanyRegistrationWorker(action) {
   );
   yield put(registriesActions.getOfficialUserRegistryEntries.call(walletAddress));
   yield put(registriesActions.requestEditCompanyRegistrationAction.success());
+  action.payload.history.push(router.registries.companies.home);
 }
 
 function* cancelCompanyRequestWorker(action) {
