@@ -20,6 +20,7 @@ const registriesReducer = handleActions({
     registriesActions.requestAssetEditAction.call,
     registriesActions.requestAssetDeleteAction.call,
     registriesActions.registerAssetAction.call,
+    registriesActions.cancelCompanyRequest.call,
   )]: (state) => ({
     ...state,
     isGetRegistries: true,
@@ -38,6 +39,7 @@ const registriesReducer = handleActions({
     registriesActions.requestAssetEditAction.failure,
     registriesActions.requestAssetDeleteAction.failure,
     registriesActions.registerAssetAction.failure,
+    registriesActions.cancelCompanyRequest.failure,
   )]: (state) => ({
     ...state,
     isGetRegistries: false,

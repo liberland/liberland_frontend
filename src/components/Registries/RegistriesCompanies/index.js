@@ -111,7 +111,16 @@ function RegistriesCompanies() {
                   Edit request
                 </Button>
               </NavLink>
-              <Button red small onClick={() => {}} className={styles.buttonSeparation}>Delete request</Button>
+              <Button
+                red
+                small
+                onClick={() => dispatch(registriesActions.cancelCompanyRequest.call({
+                  companyId: requestedCompany.id
+                }))}
+                className={styles.buttonSeparation}
+              >
+                Delete request
+              </Button>
             </div>
           </Card>
         ))}
