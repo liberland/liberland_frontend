@@ -29,6 +29,8 @@ const initialState = {
   transfersTxHistory: {
     LLM: [],
     LLD: [],
+    LLMFailed: false,
+    LLDFailed: false,
   },
   countAllRows: 0,
   currentPageNumber: 0,
@@ -54,6 +56,20 @@ const walletReducer = handleActions(
       ...state,
       gettingWalletInfo: true,
     }),
+    [walletActions.getLlmTransfers.call]: (state) => ({
+      ...state,
+      transfersTxHistory: {
+        ...state.transfersTxHistory,
+        LLMFailed: false,
+      },
+    }),
+    [walletActions.getLldTransfers.call]: (state) => ({
+      ...state,
+      transfersTxHistory: {
+        ...state.transfersTxHistory,
+        LLDFailed: false,
+      },
+    }),
     [walletActions.getLlmTransfers.success]: (state, action) => ({
       ...state,
       transfersTxHistory: {
@@ -66,6 +82,20 @@ const walletReducer = handleActions(
       transfersTxHistory: {
         ...state.transfersTxHistory,
         LLD: action.payload,
+      },
+    }),
+    [walletActions.getLlmTransfers.failure]: (state) => ({
+      ...state,
+      transfersTxHistory: {
+        ...state.transfersTxHistory,
+        LLMFailed: true,
+      },
+    }),
+    [walletActions.getLldTransfers.failure]: (state) => ({
+      ...state,
+      transfersTxHistory: {
+        ...state.transfersTxHistory,
+        LLDFailed: true,
       },
     }),
     [walletActions.getWallet.success]: (state, action) => ({

@@ -56,6 +56,11 @@ const selectorCurrentPageNumber = createSelector(
   (reducer) => reducer.currentPageNumber,
 );
 
+const selectorTxHistoryFailed = createSelector(
+  walletReducer,
+  (reducer) => (reducer.transfersTxHistory.LLMFailed || reducer.transfersTxHistory.LLDFailed),
+);
+
 const selectorAllHistoryTx = createSelector(
   walletReducer,
   (reducer) => [
@@ -88,4 +93,5 @@ export {
   selectorAllHistoryTx,
   selectorValidators,
   selectorNominatorTargets,
+  selectorTxHistoryFailed,
 };

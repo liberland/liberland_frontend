@@ -113,18 +113,28 @@ function* getLlmTransfersWorker() {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const transfers = yield call(getMeritsTransfers, walletAddress);
-
-  yield put(walletActions.getLlmTransfers.success(transfers));
+  try {
+    const transfers = yield call(getMeritsTransfers, walletAddress);
+    yield put(walletActions.getLlmTransfers.success(transfers));
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    yield put(walletActions.getLlmTransfers.failure());
+  }
 }
 
 function* getLldTransfersWorker() {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const transfers = yield call(getDollarsTransfers, walletAddress);
-
-  yield put(walletActions.getLldTransfers.success(transfers));
+  try {
+    const transfers = yield call(getDollarsTransfers, walletAddress);
+    yield put(walletActions.getLldTransfers.success(transfers));
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    yield put(walletActions.getLldTransfers.failure());
+  }
 }
 
 // WATCHERS
@@ -174,11 +184,11 @@ function* setNominatorTargetsWatcher() {
 }
 
 export function* getLlmTransfersWatcher() {
-  yield* blockchainWatcher(walletActions.getLlmTransfers, getLlmTransfersWorker);
+  yield takeLatest(walletActions.getLlmTransfers.call, getLlmTransfersWorker);
 }
 
 export function* getLldTransfersWatcher() {
-  yield* blockchainWatcher(walletActions.getLldTransfers, getLldTransfersWorker);
+  yield takeLatest(walletActions.getLldTransfers.call, getLldTransfersWorker);
 }
 
 export {

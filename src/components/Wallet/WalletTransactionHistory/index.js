@@ -21,7 +21,7 @@ const paymentTypeIcons = {
   refund: <RefundIcon />,
 };
 
-function WalletTransactionHistory({ transactionHistory, bottomButtonOnclick }) {
+function WalletTransactionHistory({ failure, transactionHistory, bottomButtonOnclick }) {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector).toString();
 
   transactionHistory.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
@@ -33,60 +33,62 @@ function WalletTransactionHistory({ transactionHistory, bottomButtonOnclick }) {
           <span>AMOUNT</span>
           <span>STATUS</span>
         </div>
+        {
+          failure ? 'Failed to fetch transaction history'
+            : transactionHistory.map((transactionHistoryInfo) => {
+              const value = transactionHistoryInfo.fromId === walletAddress
+                ? `-${transactionHistoryInfo.value}`
+                : transactionHistoryInfo.value;
+              const isAmountPositive = new BN(value).gt(BN_ZERO);
 
-        {transactionHistory.map((transactionHistoryInfo) => {
-          const value = transactionHistoryInfo.fromId === walletAddress
-            ? `-${transactionHistoryInfo.value}`
-            : transactionHistoryInfo.value;
-          const isAmountPositive = new BN(value).gt(BN_ZERO);
+              return (
+                <div className={styles.transactionHistoryCardMain} key={transactionHistoryInfo.id}>
+                  <div className={styles.paymentNumber}>
+                    <div className={styles.paymentNumberIcon}>
+                      {paymentTypeIcons.success}
+                    </div>
+                    <div className={styles.paymentFrom}>
+                      {
+                      isAmountPositive
+                        ? (
+                          <p>
+                            Payment from
+                            {' '}
+                            <span>
+                              {transactionHistoryInfo.fromId}
+                            </span>
+                          </p>
+                        )
+                        : (
+                          <p>
+                            Payment to
+                            {' '}
+                            <span>
+                              {transactionHistoryInfo.toId}
+                            </span>
+                          </p>
 
-          return (
-            <div className={styles.transactionHistoryCardMain} key={transactionHistoryInfo.id}>
-              <div className={styles.paymentNumber}>
-                <div className={styles.paymentNumberIcon}>
-                  {paymentTypeIcons.success}
+                        )
+                    }
+                      <p className={styles.paymentFromDate}>{transactionHistoryInfo.block.timestamp}</p>
+                    </div>
+                  </div>
+                  <div className={styles.transactionHistoryAmount}>
+                    {transactionHistoryInfo.asset === 'LLM'
+                      ? formatMeritTransaction(value)
+                      : formatDollarTransaction(value)}
+                  </div>
+                  <div>
+                    <Status
+                      status="success"
+                      completed
+                      declined={false}
+                    />
+                  </div>
                 </div>
-                <div className={styles.paymentFrom}>
-                  {
-                    isAmountPositive
-                      ? (
-                        <p>
-                          Payment from
-                          {' '}
-                          <span>
-                            {transactionHistoryInfo.fromId}
-                          </span>
-                        </p>
-                      )
-                      : (
-                        <p>
-                          Payment to
-                          {' '}
-                          <span>
-                            {transactionHistoryInfo.toId}
-                          </span>
-                        </p>
-
-                      )
-                  }
-                  <p className={styles.paymentFromDate}>{transactionHistoryInfo.block.timestamp}</p>
-                </div>
-              </div>
-              <div className={styles.transactionHistoryAmount}>
-                {transactionHistoryInfo.asset === 'LLM'
-                  ? formatMeritTransaction(value)
-                  : formatDollarTransaction(value)}
-              </div>
-              <div>
-                <Status
-                  status="success"
-                  completed
-                  declined={false}
-                />
-              </div>
-            </div>
-          );
-        })}
+              );
+            })
+        }
       </div>
     </Card>
   );
