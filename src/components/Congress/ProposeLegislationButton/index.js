@@ -1,14 +1,18 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import Button from '../../Button/Button';
 import router from '../../../router';
+import styles from './styles.module.scss';
 
 export default function ProposeLegislationButton() {
   return (
-    <Link to={router.congress.addLegislation}>
+    <NavLink
+      className={styles.linkButton}
+      to={router.congress.addLegislation}
+    >
       <Button medium primary>
         Propose International Treaty
       </Button>
-    </Link>
+    </NavLink>
   );
 }

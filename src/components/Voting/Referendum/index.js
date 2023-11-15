@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { blockchainSelectors, democracySelectors } from '../../../redux/selectors';
@@ -78,7 +78,12 @@ function Referendum() {
               )
               : null
           }
-          <Link to={router.voting.addLegislation}><Button small primary>Propose</Button></Link>
+          <NavLink
+            className={styles.linkButton}
+            to={router.voting.addLegislation}
+          >
+            <Button small primary>Propose</Button>
+          </NavLink>
         </div>
         <Card title="Referendums" className={styles.referendumsCard}>
           <div>
