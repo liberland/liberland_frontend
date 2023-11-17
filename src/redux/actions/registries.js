@@ -14,6 +14,7 @@ export const {
   requestAssetDeleteAction,
   registerAssetAction,
   requestEditCompanyRegistrationAction,
+  cancelCompanyRequest,
 } = createActions({
   GET_OFFICIAL_USER_REGISTRY_ENTRIES: {
     call: undefined,
@@ -80,4 +81,9 @@ export const {
     success: undefined,
     failure: undefined,
   },
+  CANCEL_COMPANY_REQUEST: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  }
 });

@@ -3,6 +3,7 @@ import {
 } from 'redux-saga/effects';
 
 import {
+  cancelCompanyRequest,
   getOfficialUserRegistryEntries,
   requestCompanyRegistration,
   requestEditCompanyRegistration,
@@ -35,7 +36,7 @@ function* requestCompanyRegistrationWorker(action) {
     action.payload.registryAllowedToEdit,
     walletAddress,
   );
-  yield put(registriesActions.getOfficialUserRegistryEntries.call());
+  yield put(registriesActions.getOfficialUserRegistryEntries.call(walletAddress));
   yield put(registriesActions.requestCompanyRegistrationAction.success());
 }
 
@@ -47,8 +48,19 @@ function* requestEditCompanyRegistrationWorker(action) {
     action.payload.companyId,
     walletAddress,
   );
-  yield put(registriesActions.getOfficialUserRegistryEntries.call());
+  yield put(registriesActions.getOfficialUserRegistryEntries.call(walletAddress));
   yield put(registriesActions.requestEditCompanyRegistrationAction.success());
+}
+
+function* cancelCompanyRequestWorker(action) {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(
+    cancelCompanyRequest,
+    action.payload.companyId,
+    walletAddress,
+  );
+  yield put(registriesActions.getOfficialUserRegistryEntries.call(walletAddress));
+  yield put(registriesActions.cancelCompanyRequest.success());
 }
 
 // WATCHERS
@@ -72,5 +84,12 @@ export function* requestEditCompanyRegistrationWatcher() {
   yield* blockchainWatcher(
     registriesActions.requestEditCompanyRegistrationAction,
     requestEditCompanyRegistrationWorker,
+  );
+}
+
+export function* cancelCompanyRequestWatcher() {
+  yield* blockchainWatcher(
+    registriesActions.cancelCompanyRequest,
+    cancelCompanyRequestWorker,
   );
 }

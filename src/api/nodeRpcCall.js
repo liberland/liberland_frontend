@@ -2103,6 +2103,12 @@ const unregisterCompany = async (companyId, walletAddress) => {
   return await submitExtrinsic(extrinsic, walletAddress);
 }
 
+const cancelCompanyRequest = async (companyId, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.companyRegistry.cancelRequest(0, companyId);
+  return await submitExtrinsic(extrinsic, walletAddress);
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -2198,4 +2204,5 @@ export {
   citizenProposeRepealLegislation,
   requestEditCompanyRegistration,
   unregisterCompany,
+  cancelCompanyRequest,
 };
