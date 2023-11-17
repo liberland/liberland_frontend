@@ -12,7 +12,6 @@ import { SendLLDModal, SendLLMModal, UnpoolModal } from '../../Modals';
 import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
 import { ReactComponent as WalletActiveIcon } from '../../../assets/icons/active-wallet.svg';
-import { ReactComponent as ValidatorIcon } from '../../../assets/icons/validator.svg';
 import { ReactComponent as CopyIcon } from '../../../assets/icons/copy.svg';
 
 import styles from './styles.module.scss';
@@ -29,7 +28,6 @@ function WalletAddressesLine({ walletAddress }) {
   const notificationRef = useRef();
   const addresses = {
     walletAddress,
-    validatorAddress: '0x0A1B23Be38A1dbc2A833D051780698CBbd9911FB',
   };
 
   const userWalletAddressSelector = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -70,14 +68,6 @@ function WalletAddressesLine({ walletAddress }) {
               <WalletActiveIcon />
               {addresses.walletAddress ? truncate(addresses.walletAddress, 13) : ''}
               <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={(e) => handleCopyClick(e)} />
-            </p>
-          </div>
-          <div className={styles.singleAddressWrapper}>
-            <p className={styles.addressTitle}>Validator address:</p>
-            <p className={styles.address}>
-              <ValidatorIcon />
-              {truncate(addresses.validatorAddress, 13)}
-              <CopyIcon className={styles.copyIcon} name="validatorAddress" onClick={(e) => handleCopyClick(e)} />
             </p>
           </div>
         </div>
