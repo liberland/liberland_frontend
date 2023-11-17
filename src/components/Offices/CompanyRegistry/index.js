@@ -51,9 +51,18 @@ function MissingRequest() {
   return 'This company doesn\'t exist or has no pending registration requests.';
 }
 
+function InvalidRequest() {
+  return 'Failed to fetch pending registration requests for this company. Maybe it contains invalid data?';
+}
+
+function InvalidRegistration() {
+  return 'Failed to fetch registered data for this company. Maybe it contains invalid data?';
+}
+
 function CompanyRegistration({ registration }) {
   const dispatch = useDispatch();
   if (!registration) return null;
+  if (registration.invalid) return <InvalidRegistration />;
   if (!registration.registration) return <div>Company not registered yet</div>;
   const unregister = () => {
     dispatch(officesActions.unregisterCompany.call({
@@ -99,6 +108,7 @@ function CompanyRequest({ request }) {
   const dispatch = useDispatch();
   const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
   if (!request) return null;
+  if (request.invalid) return <InvalidRequest />;
   const { entity_id } = request;
   if (!request.request) return <MissingRequest />;
   const { hash, data, editableByRegistrar } = request.request;
