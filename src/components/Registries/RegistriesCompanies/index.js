@@ -47,10 +47,14 @@ function RegistriesCompanies() {
           <InvalidCompany key={registeredCompany?.id} id={registeredCompany?.id} />
           :
           <Card
-            title={`${registeredCompany?.staticFields[0]?.display} (ID: ${registeredCompany?.id})`}
-            key={registeredCompany?.staticFields[0]?.display}
+            title={`${registeredCompany?.staticFields[0]?.display}`}
+            key={registeredCompany?.id}
             className={styles.companyCardContainer}
           >
+            <small>
+              Company ID:
+              <b>{registeredCompany.id}</b>
+            </small>
             <div className={styles.companyContentContainer}>
               <RenderRegistryItemDetails
                 mainDataObject={registeredCompany}
@@ -66,10 +70,10 @@ function RegistriesCompanies() {
                   View details
                 </Button>
                 <NavLink
-                  to={`${router.registries.companies.home}/edit/${registeredCompany?.id}`}
+                  to={`${router.registries.companies.home}/edit/${registeredCompany?.id}#registered`}
                 >
                   <Button
-                    primary
+                    secondary
                     small
                     className={styles.buttonSeparation}
                   >
@@ -86,6 +90,14 @@ function RegistriesCompanies() {
                 </Button>
               </div>
             </div>
+            {
+              isDeleteCompanyModalOpen && (
+                <DeleteCompanyModal
+                  closeModal={() => { setIsDeleteCompanyModalOpen(false); }}
+                  companyId={registeredCompany?.id}
+                />
+              )
+            }
           </Card>
         ))}
       </Card>
@@ -95,10 +107,14 @@ function RegistriesCompanies() {
           <InvalidCompany key={requestedCompany?.id} id={requestedCompany?.id} />
           :
           <Card
-            title={`${requestedCompany?.staticFields[0]?.display} (ID: ${requestedCompany.id})`}
-            key={requestedCompany?.staticFields[0]?.display}
+            title={`${requestedCompany?.staticFields[0]?.display ?? (requestedCompany.unregister && 'Delete request')}`}
+            key={requestedCompany.id}
             className={styles.companyCardContainer}
           >
+            <small>
+              Company request ID:
+              <b>{requestedCompany.id}</b>
+            </small>
             <div className={styles.companyContentContainer}>
               <RenderRegistryItemDetails
                 mainDataObject={requestedCompany}
@@ -106,31 +122,38 @@ function RegistriesCompanies() {
               />
             </div>
             <div className={styles.companyContentEnd}>
-              <Button
-                green
-                small
-                onClick={() => setExpandedDetailsForCompany(requestedCompany?.staticFields[0]?.display)}
-                className={styles.buttonSeparation}
-              >
-                View details
-              </Button>
-              <NavLink
-                to={`${router.registries.companies.home}/edit/${requestedCompany.id}`}
-              >
+              {!requestedCompany.unregister
+                && (
                 <Button
-                  secondary
+                  green
                   small
+                  onClick={() => setExpandedDetailsForCompany(requestedCompany?.staticFields[0]?.display)}
                   className={styles.buttonSeparation}
                 >
-                  Edit request
+                  View details
                 </Button>
-              </NavLink>
+              )}
+              {!requestedCompany.unregister && (
+                <NavLink
+                  to={`${router.registries.companies.home}/edit/${requestedCompany.id}#requested`}
+                >
+                  <Button
+                    secondary
+                    small
+                    className={styles.buttonSeparation}
+                  >
+                    Edit request
+                  </Button>
+                </NavLink>
+              )}
               <Button
                 red
                 small
-                onClick={() => dispatch(registriesActions.cancelCompanyRequest.call({
-                  companyId: requestedCompany.id
-                }))}
+                onClick={() => dispatch(
+                  registriesActions.cancelCompanyRequest.call({
+                    companyId: requestedCompany.id,
+                  }),
+                )}
                 className={styles.buttonSeparation}
               >
                 Delete request
@@ -139,14 +162,6 @@ function RegistriesCompanies() {
           </Card>
         ))}
       </Card>
-
-      {
-      isDeleteCompanyModalOpen && (
-        <DeleteCompanyModal
-          closeModal={() => { setIsDeleteCompanyModalOpen(false); }}
-        />
-      )
-}
     </div>
 
   );

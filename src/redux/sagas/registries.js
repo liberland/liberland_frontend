@@ -7,6 +7,7 @@ import {
   getOfficialUserRegistryEntries,
   requestCompanyRegistration,
   requestEditCompanyRegistration,
+  requestUnregisterCompanyRegistration,
 } from '../../api/nodeRpcCall';
 
 import { registriesActions } from '../actions';
@@ -66,6 +67,17 @@ function* cancelCompanyRequestWorker(action) {
   yield put(registriesActions.cancelCompanyRequest.success());
 }
 
+function* requestUnregisterCompanyRegistrationWorker(action) {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(
+    requestUnregisterCompanyRegistration,
+    action.payload.companyId,
+    walletAddress,
+  );
+  yield put(registriesActions.getOfficialUserRegistryEntries.call());
+  yield put(registriesActions.requestUnregisterCompanyRegistrationAction.success());
+}
+
 // WATCHERS
 
 export function* getOfficialUserRegistryEntriesWatcher() {
@@ -94,5 +106,12 @@ export function* cancelCompanyRequestWatcher() {
   yield* blockchainWatcher(
     registriesActions.cancelCompanyRequest,
     cancelCompanyRequestWorker,
+  );
+}
+
+export function* requestUnregisterCompanyRegistrationWatcher() {
+  yield* blockchainWatcher(
+    registriesActions.requestUnregisterCompanyRegistrationAction,
+    requestUnregisterCompanyRegistrationWorker,
   );
 }

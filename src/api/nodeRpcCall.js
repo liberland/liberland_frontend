@@ -387,7 +387,11 @@ const getCompanyRequest = async (entity_id) => {
     const api = await getApi();
     const maybeRequest = await api.query.companyRegistry.requests(0, entity_id);
     if (maybeRequest.isNone) return null;
-    const request = maybeRequest.unwrap();
+    const optRequest = maybeRequest.unwrap();
+    if (optRequest.isNone) return {
+      unregister: true
+    };
+    const request = optRequest.unwrap();
     return {
       hash: request.data.hash,
       editableByRegistrar: request.editableByRegistrar,
@@ -1108,8 +1112,13 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
     if (companyRegistryEntity.isNone) return;
     let companyData;
     try {
-      const compressed = companyRegistryEntity.unwrap().data;
-      companyData = api.createType('CompanyData', pako.inflate(compressed));
+      if (companyRegistryEntity.isNone) return;
+      const optCompanyRegistryEntity = companyRegistryEntity.unwrap()
+      if (optCompanyRegistryEntity.isNone) companyData = { unregister: true };
+      else {
+        const compressed = optCompanyRegistryEntity?.isSome ? optCompanyRegistryEntity.unwrap().data : optCompanyRegistryEntity.data;
+        companyData = api.createType('CompanyData', pako.inflate(compressed));
+      }
     } catch(e) {
       console.error("Invalid company data", e);
       if (index < ownsEntityIds.length){
@@ -2059,11 +2068,21 @@ const getScheduledCalls = async () => {
   ];
 }
 
-const unregisterCompany = async (companyId, walletAddress) => {
+const requestUnregisterCompanyRegistration = async (companyId, walletAddress)  => {
   const api = await getApi();
-  const unregister = api.tx.companyRegistry.unregister(0, companyId);
-  const extrinsic = api.tx.companyRegistryOffice.execute(unregister);
-  return await submitExtrinsic(extrinsic, walletAddress);
+
+  const extrinsic = api.tx.companyRegistry.requestEntityUnregister(0, companyId);
+  return submitExtrinsic(extrinsic, walletAddress);
+}
+
+const unregisterCompany = async (companyId, isSoft, walletAddress)  => {
+  const api = await getApi();
+
+  const extrinsic = api.tx.companyRegistryOffice.execute(
+    api.tx.companyRegistry.unregister(0, companyId, isSoft)
+  );
+    
+  return submitExtrinsic(extrinsic, walletAddress);
 }
 
 const cancelCompanyRequest = async (companyId, walletAddress) => {
@@ -2178,4 +2197,5 @@ export {
   unregisterCompany,
   cancelCompanyRequest,
   setRegisteredCompanyData,
+  requestUnregisterCompanyRegistration,
 };
