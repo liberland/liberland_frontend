@@ -69,6 +69,7 @@ export default function* rootSaga() {
     officesSagas.getBalancesWatcher(),
     officesSagas.getPalletIdsWatcher(),
     officesSagas.unregisterCompanyWatcher(),
+    officesSagas.setRegisteredCompanyDataWatcher(),
 
     // REGISTRIES
     registriesSagas.getOfficialUserRegistryEntriesWatcher(),

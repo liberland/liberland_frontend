@@ -16,7 +16,10 @@ export default {
   },
   offices: {
     identity: '/home/offices/identity',
-    companyRegistry: '/home/offices/company_registry',
+    companyRegistry: {
+      home: '/home/offices/company_registry',
+      edit: '/home/offices/company_registry/edit/:companyId'
+    },
     landRegistry: '/home/offices/land_registry',
     finances: '/home/offices/finances',
   },

@@ -9,7 +9,7 @@ const navigationList = [
     title: 'Citizenship (Identity)',
   },
   {
-    route: `${router.offices.companyRegistry}`,
+    route: `${router.offices.companyRegistry.home}`,
     title: 'Company Registry',
   },
   {

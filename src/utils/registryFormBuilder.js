@@ -5,10 +5,56 @@ import { TextInput } from '../components/InputComponents';
 import Button from '../components/Button/Button';
 import Card from '../components/Card';
 import './utils.scss';
+import {newCompanyDataObject} from "./defaultData";
 
 const buildFieldName = (formKey, index, dynamicField, suffix) => (dynamicField.encryptable
   ? `${formKey}.${index}.${dynamicField.key}.${suffix}`
   : `${formKey}.${index}.${dynamicField.key}`);
+
+export function blockchainDataToFormObject(blockchainDataRaw) {
+  const blockchainData = blockchainDataRaw.toJSON();
+  let supportedObject = JSON.parse(JSON.stringify(newCompanyDataObject))
+  const staticFields = []
+  const dynamicFields = []
+
+  supportedObject.staticFields.forEach(staticField => {
+    if (staticField.key in blockchainData){
+      let fieldObject = staticField
+      fieldObject.display = blockchainData[staticField.key]
+      staticFields.push(fieldObject)
+    }
+  })
+
+  supportedObject.dynamicFields.forEach(dynamicField => {
+    if(dynamicField.key in blockchainData){
+      let fieldObject = dynamicField
+      let fieldObjectData = []
+      blockchainData[dynamicField.key].forEach(dynamicFieldDataArray => {
+        //Format using fields data
+        let crossReferencedFieldDataArray = []
+        for(const key in dynamicFieldDataArray){
+          let pushObject = {}
+          pushObject['key'] = key
+          if (dynamicFieldDataArray[key].isEncrypted !== undefined) {
+            pushObject['display'] = dynamicFieldDataArray[key].value
+            pushObject['isEncrypted'] = dynamicFieldDataArray[key].isEncrypted
+          } else {
+            pushObject['display'] = dynamicFieldDataArray[key]
+            pushObject['isEncrypted'] = false
+          }
+          crossReferencedFieldDataArray.push(JSON.parse(JSON.stringify(pushObject)))
+        }
+        fieldObjectData.push(crossReferencedFieldDataArray)
+      })
+
+      fieldObject.data = JSON.parse(JSON.stringify(fieldObjectData))
+      dynamicFields.push(fieldObject)
+    }
+  })
+  blockchainData.staticFields = JSON.parse(JSON.stringify(staticFields))
+  blockchainData.dynamicFields = JSON.parse(JSON.stringify(dynamicFields))
+  return blockchainData;
+}
 
 export function GetFieldsForm({
   formKey, displayName, register, control, dynamicFieldData, errors,
