@@ -23,6 +23,7 @@ function Wallet() {
   const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
   const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
+  const historyFetchFailed = useSelector(walletSelectors.selectorTxHistoryFailed);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -46,6 +47,7 @@ function Wallet() {
       />
 
       <WalletTransactionHistory
+        failure={historyFetchFailed}
         transactionHistory={transactionHistory}
         textForBtn="View All Transactions"
         bottomButtonOnclick={redirectToViewAllTx}
