@@ -4,26 +4,17 @@ import {
 import { web3Enable } from '@polkadot/extension-dapp';
 import { eventChannel } from 'redux-saga';
 import { blockchainActions } from '../actions';
-import { subscribeActiveEra, subscribeBestBlockNumber, getAllWalletsRpc, fetchPreimage } from '../../api/nodeRpcCall';
+import {
+  subscribeActiveEra, subscribeBestBlockNumber, getAllWalletsRpc, fetchPreimage,
+} from '../../api/nodeRpcCall';
 import { blockchainWatcherEvery } from './base';
-
-const delay = (time) => new Promise((resolve) => { setTimeout(resolve, time); });
+import { waitForInjectedWeb3 } from '../../utils/walletHelpers';
 
 // WORKERS
-
 function* getAllWalletsWorker() {
+  yield call(waitForInjectedWeb3);
+  const extensions = yield call(web3Enable, 'Liberland dapp');
   try {
-    let retryCounter = 0;
-    let extensions = yield call(web3Enable, 'Liberland dapp');
-    if (extensions.length === 0) {
-      // Hack, is caused by web3Enable needing a fully loaded page to work,
-      // but i am not sure how to do it other way without larger refactor
-      while (retryCounter < 30 && extensions.length === 0) {
-        retryCounter += 1;
-        yield call(delay, 1000);
-        extensions = yield call(web3Enable, 'Liberland dapp');
-      }
-    }
     if (extensions.length) {
       const allWallets = yield call(getAllWalletsRpc);
       yield put(blockchainActions.getAllWallets.success(allWallets));
@@ -43,11 +34,11 @@ function* clearErrorsWorker(action) {
   yield put(blockchainActions.setError.success(''));
 }
 
-function* fetchPreimageWorker({ payload: { hash, len }}) {
+function* fetchPreimageWorker({ payload: { hash, len } }) {
   const preimage = yield call(fetchPreimage, hash, len);
   yield put(blockchainActions.fetchPreimage.success({
-    hash, preimage
-  }))
+    hash, preimage,
+  }));
 }
 
 // WATCHERS
