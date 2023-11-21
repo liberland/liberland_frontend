@@ -147,7 +147,7 @@ function* getTransfersToEthereumWorker() {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
-    throw e;
+    yield put(bridgeActions.getTransfersToEthereum.failure());
   }
 }
 
@@ -240,11 +240,7 @@ function* monitorBurnWatcher() {
 }
 
 function* getTransfersToEthereumWatcher() {
-  try {
-    yield takeLatest(bridgeActions.getTransfersToEthereum.call, getTransfersToEthereumWorker);
-  } catch (e) {
-    yield put(bridgeActions.getTransfersToEthereum.failure(e));
-  }
+  yield takeLatest(bridgeActions.getTransfersToEthereum.call, getTransfersToEthereumWorker);
 }
 
 function* getTransfersToSubstrateWatcher() {

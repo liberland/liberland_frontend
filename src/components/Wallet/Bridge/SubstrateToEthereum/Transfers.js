@@ -10,6 +10,10 @@ export function Transfers() {
   const transfers = useSelector(bridgeSelectors.toEthereumTransfers);
   const ethBridges = useEthBridges();
   const blockNumber = useBlockNumber();
+
+  const toEthereumFailed = useSelector(bridgeSelectors.toEthereumTransfersFailed);
+  if (toEthereumFailed) return 'Failed to fetch transaction to Ethereum history';
+
   if (!ethBridges || !blockNumber) return 'Loading...'; // FIXME proper loader
   const allTransfers = Object.values(transfers).sort((a, b) => b.date - a.date);
 
