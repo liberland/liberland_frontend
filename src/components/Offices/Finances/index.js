@@ -49,7 +49,10 @@ export default function Finances() {
     if (pallets) {
       const palletIdsToFetchBalancesFor = [
         ...DEFAULT_ACCOUNTS,
-        ...DYNAMIC_ACCOUNTS.map((account) => pallets.find((e) => e.palletName === account.codeName)),
+        ...DYNAMIC_ACCOUNTS.map((account) => ({
+          ...account,
+          ...pallets.find((e) => e.palletName === account.codeName),
+        })),
       ];
 
       const palletsAndAddresses = palletIdsToFetchBalancesFor.map(
