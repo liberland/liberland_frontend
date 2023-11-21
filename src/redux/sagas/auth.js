@@ -12,21 +12,8 @@ import {
 } from '../actions';
 import routes from '../../router';
 import api from '../../api';
+import { waitForInjectedWeb3 } from '../../utils/walletHelpers';
 
-const delay = (time) => new Promise((resolve) => setTimeout(resolve, time));
-
-/*const fakeUser = {
-  email: 'fake eimail',
-  about: 'fake about',
-  gender: 'soviet Bukhanka ambulance truck',
-  id: 13,
-  languages: ['english'],
-  lastName: 'Utajinovic',
-  name: 'Porezije',
-  occupation: 'Theftstopper',
-  origin: 'schizo brain',
-  role: { non_citizen: 'non_citizen' },
-};*/
 function* signInWorker(action) {
   try {
     const { credentials, history, ssoAccessTokenHash } = action.payload;
@@ -37,10 +24,11 @@ function* signInWorker(action) {
     yield put(blockchainActions.setUserWallet.success(credentials.wallet_address));
     yield sessionStorage.setItem('userWalletAddress', credentials.wallet_address);
     yield sessionStorage.setItem('ssoAccessTokenHash', ssoAccessTokenHash);
+    yield call(waitForInjectedWeb3);
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc, credentials.wallet_address);
-      //const comboUser = { ...fakeUser, ...user };
+      // const comboUser = { ...fakeUser, ...user };
       const comboUser = { ...user };
       comboUser.ssoAccessTokenHash = ssoAccessTokenHash;
       comboUser.role = yield call(getUserRoleRpc, credentials.wallet_address);
@@ -60,23 +48,15 @@ function* verifySessionWorker() {
     const ssoAccessTokenHash = yield sessionStorage.getItem('ssoAccessTokenHash');
     api.defaults.headers.common['X-token'] = ssoAccessTokenHash;
     const { data: user } = yield call(api.get, '/users/me');
-    let extensions = yield web3Enable('Liberland dapp');
+    yield call(waitForInjectedWeb3);
+    const extensions = yield web3Enable('Liberland dapp');
     yield put(blockchainActions.setUserWallet.success(walletAddress));
-    if (extensions.length === 0) {
-      let retryCounter = 0;
-      // Hack, is caused by web3Enable needing a fully loaded page to work,
-      // but i am not sure how to do it other way without larger refactor
-      while (retryCounter < 30 && extensions.length === 0) {
-        ++retryCounter;
-        yield call(delay, 1000);
-        extensions = yield call(web3Enable, 'Liberland dapp');
-      }
-    }
     if (extensions.length) {
       user.role = yield call(getUserRoleRpc, walletAddress);
     }
     yield put(authActions.verifySession.success(user));
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(error);
     yield put(authActions.verifySession.failure());
   }
