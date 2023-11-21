@@ -10,6 +10,7 @@ export const initialState = {
     toEthereumPreload: null,
     toEthereumInitialized: false,
     toEthereum: {},
+    toEthereumFailed: false,
   },
   bridgesConstants: null,
 };
@@ -53,8 +54,8 @@ const bridgeReducer = handleActions(
         toEthereum: {
           ...state.transfers.toEthereum,
           [action.payload.receipt_id]: action.payload,
-        }
-      }
+        },
+      },
     }),
 
     [bridgeActions.burn.success]: (state, action) => ({
@@ -64,8 +65,8 @@ const bridgeReducer = handleActions(
         toSubstrate: {
           ...state.transfers.toSubstrate,
           [action.payload.txHash]: action.payload,
-        }
-      }
+        },
+      },
     }),
 
     [bridgeActions.getBridgesConstants.success]: (state, action) => ({
@@ -83,14 +84,14 @@ const bridgeReducer = handleActions(
             ...state.transfers.toSubstrate[action.payload.txHash],
             receipt_id: action.payload.receipt_id,
             blockHash: action.payload.blockHash,
-          }
-        }
-      }
+          },
+        },
+      },
     }),
 
     [bridgeActions.updateTransferWithdrawTx.set]: (state, action) => {
       const { txHash, withdrawTx } = action.payload;
-      let transfer = state.transfers.toSubstrate[txHash] ?? {};
+      const transfer = state.transfers.toSubstrate[txHash] ?? {};
       return {
         ...state,
         transfers: {
@@ -99,16 +100,16 @@ const bridgeReducer = handleActions(
             ...state.transfers.toSubstrate,
             [txHash]: {
               ...transfer,
-              withdrawTx
-            }
-          }
-        }
-      }
+              withdrawTx,
+            },
+          },
+        },
+      };
     },
 
     [bridgeActions.updateTransferStatus.set]: (state, action) => {
       const { txHash, status } = action.payload;
-      let transfer = state.transfers.toSubstrate[txHash] ?? {};
+      const transfer = state.transfers.toSubstrate[txHash] ?? {};
       return {
         ...state,
         transfers: {
@@ -117,11 +118,11 @@ const bridgeReducer = handleActions(
             ...state.transfers.toSubstrate,
             [txHash]: {
               ...transfer,
-              status
-            }
-          }
-        }
-      }
+              status,
+            },
+          },
+        },
+      };
     },
 
     [bridgeActions.getTransfersToEthereum.success]: (state, action) => ({
@@ -132,8 +133,8 @@ const bridgeReducer = handleActions(
         toEthereum: {
           ...state.transfers.toEthereum,
           ...action.payload,
-        }
-      }
+        },
+      },
     }),
 
     [bridgeActions.getTransfersToSubstrate.success]: (state, action) => ({
@@ -144,8 +145,24 @@ const bridgeReducer = handleActions(
         toSubstrate: {
           ...state.transfers.toSubstrate,
           ...action.payload,
-        }
-      }
+        },
+      },
+    }),
+
+    [bridgeActions.getTransfersToEthereum.failure]: (state) => ({
+      ...state,
+      transfers: {
+        ...state.transfers,
+        toEthereumFailed: true,
+      },
+    }),
+
+    [bridgeActions.getTransfersToEthereum.call]: (state) => ({
+      ...state,
+      transfers: {
+        ...state.transfers,
+        toEthereumFailed: false,
+      },
     }),
   },
   initialState,

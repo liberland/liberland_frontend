@@ -41,3 +41,8 @@ export const bridgesConstants = createSelector(
   bridgeReducer,
   (reducer) => reducer.bridgesConstants,
 );
+
+export const toEthereumTransfersFailed = createSelector(
+  bridgeReducer,
+  (reducer) => reducer.transfers.toEthereumFailed,
+);
