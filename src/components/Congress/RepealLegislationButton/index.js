@@ -15,7 +15,7 @@ export default function RepealLegislationButton({ tier, id, section }) {
 
   return (
     <>
-      <Button medium primary onClick={handleModalOpen}>
+      <Button small primary onClick={handleModalOpen}>
         Propose Congress motion to repeal
       </Button>
       {isModalOpen && (
