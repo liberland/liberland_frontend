@@ -4,11 +4,10 @@
 .profile {
   display: flex;
   justify-content: center;
-  width: 835px;
   font-family: $medium;
   font-size: 14px;
   color: $text4;
-  margin-left: 30px;
+  flex-wrap: wrap;
 
   h3 {
     font-weight: bold;
