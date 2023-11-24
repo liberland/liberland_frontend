@@ -18,7 +18,7 @@ export default function CitizenProposeRepealLegislationButton({ tier, id, sectio
 
   return (
     <>
-      <Button medium primary onClick={handleModalOpen}>
+      <Button small primary onClick={handleModalOpen}>
         Propose Citizen Referendum to repeal
       </Button>
       {isModalOpen && (

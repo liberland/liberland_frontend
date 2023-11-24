@@ -103,7 +103,7 @@ function ActionButtons({
     <div className={styles.rowEnd}>
       {vetos.map((v) => v.toString()).includes(userWalletAddress) ? (
         <Button
-          medium
+          small
           red
           onClick={() => dispatch(
             legislationActions.revertVeto.call({ tier, id, section }),
@@ -113,7 +113,7 @@ function ActionButtons({
         </Button>
       ) : (
         <Button
-          medium
+          small
           primary
           onClick={() => dispatch(
             legislationActions.castVeto.call({ tier, id, section }),

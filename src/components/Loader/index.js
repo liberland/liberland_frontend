@@ -14,9 +14,10 @@ import {
   bridgeSelectors,
   validatorSelectors,
   congressSelectors,
-  registriesSelectors
+  registriesSelectors,
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
+import BackgroundBlocker from '../BackgroundBlocker';
 
 // eslint-disable-next-line react/prop-types
 function Loader({ children }) {
@@ -28,8 +29,8 @@ function Loader({ children }) {
   const isLoadingLegislation = useSelector(legislationSelectors.gettingLegislation);
   const isLoadingBridge = useSelector(bridgeSelectors.isLoading);
   const isLoadingValidator = useSelector(validatorSelectors.isLoading);
-  const isLoadingCongress= useSelector(congressSelectors.isLoading);
-  const isGetRegistries= useSelector(registriesSelectors.isGetRegistries);
+  const isLoadingCongress = useSelector(congressSelectors.isLoading);
+  const isGetRegistries = useSelector(registriesSelectors.isGetRegistries);
 
   const isLoading = [
     isSignInFetching,
@@ -48,19 +49,7 @@ function Loader({ children }) {
     <div style={{ position: 'relative' }}>
       { isLoading
         && (
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              zIndex: 9999999,
-              background: 'rgba(211,211,211,0.6)',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
+          <BackgroundBlocker>
             <ScaleLoader
               loading={isLoading}
               css={{
@@ -73,7 +62,7 @@ function Loader({ children }) {
               margin={3}
               color="#8C64B5"
             />
-          </div>
+          </BackgroundBlocker>
         )}
       <ErrorModal>
         { children }

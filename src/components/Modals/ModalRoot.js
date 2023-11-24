@@ -23,8 +23,11 @@ const ModalRoot = ({ children }) => {
   });
 
   const content = (
+
     <div className={children.props.proposal?.proposalModalShown ? 'modal-wrapper modal-text-wrapper' : 'modal-wrapper'}>
-      { customChildren }
+      <div>
+        { customChildren }
+      </div>
     </div>
   );
 
