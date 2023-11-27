@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -99,6 +99,9 @@ function ActionButtons({
   const legislation = allLegislation[tier][id.year][id.index];
   const vetos = section !== null ? legislation.sections[section].vetos : legislation.vetos;
 
+  const [isProposeOpen, setProposeOpen] = useState(false);
+  const [isAmendOpen, setAmendOpen] = useState(false);
+
   return (
     <div className={styles.rowEnd}>
       {vetos.map((v) => v.toString()).includes(userWalletAddress) ? (
@@ -122,20 +125,59 @@ function ActionButtons({
           Cast Veto
         </Button>
       )}
-      {(tier === 'InternationalTreaty' && !repealMotion) && (
-        <RepealLegislationButton {...{ tier, id, section }} />
-      )}
-      {tier !== 'Constitution' && (
-        <ProposeRepealLegislationButton {...{ tier, id, section }} />
-      )}
-      {section !== null && (
-      <>
-        <AmendLegislationButton {...{ tier, id, section }} />
-        { tier === 'InternationalTreaty' && <CongressAmendLegislationButton {...{ tier, id, section }} /> }
-        <CongressAmendLegislationViaReferendumButton {...{ tier, id, section }} />
-      </>
-      )}
-      { (!repealReferendum && !repealProposal) && <CitizenProposeRepealLegislationButton {...{ tier, id, section }} />}
+
+      <div className={styles.dropdownWrapper}>
+        <Button
+          small
+          primary
+          onClick={() => {
+            setAmendOpen(false);
+            setProposeOpen(!isProposeOpen);
+          }}
+        >
+          Propose \/
+        </Button>
+        {isProposeOpen && (
+          <div className={styles.dropdown}>
+            {(tier === 'InternationalTreaty' && !repealMotion) && (
+              <RepealLegislationButton {...{ tier, id, section }} />
+            )}
+            {tier !== 'Constitution' && (
+              <ProposeRepealLegislationButton {...{ tier, id, section }} />
+            )}
+            { (!repealReferendum && !repealProposal)
+            && (
+            <CitizenProposeRepealLegislationButton
+              {...{ tier, id, section }}
+            />
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className={styles.dropdownWrapper}>
+        {section !== null && (
+          <Button
+            small
+            primary
+            onClick={() => {
+              setProposeOpen(false);
+              setAmendOpen(!isAmendOpen);
+            }}
+          >
+            Amend \/
+          </Button>
+        )}
+        {isAmendOpen && (
+          <div className={styles.dropdown}>
+
+            <AmendLegislationButton {...{ tier, id, section }} />
+              { tier === 'InternationalTreaty' && <CongressAmendLegislationButton {...{ tier, id, section }} /> }
+            <CongressAmendLegislationViaReferendumButton {...{ tier, id, section }} />
+
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -145,6 +187,7 @@ ActionButtons.propTypes = VetoStats.propTypes;
 const LegislationView = () => {
   const { tier } = useParams();
   const dispatch = useDispatch();
+  const [isAddOpen, setAddOpen] = useState(false);
 
   useEffect(() => {
     dispatch(legislationActions.getLegislation.call({ tier }));
@@ -216,10 +259,26 @@ const LegislationView = () => {
               />
             </Card>
           ))}
-        <AmendLegislationButton add {...{ tier, id, section: sections.length }} />
-        { tier === 'InternationalTreaty'
-          && <CongressAmendLegislationButton add {...{ tier, id, section: sections.length }} /> }
-        <CongressAmendLegislationViaReferendumButton add {...{ tier, id, section: sections.length }} />
+        <div className={styles.rowEnd}>
+          <div className={styles.dropdownWrapper}>
+            <Button
+              small
+              primary
+              onClick={() => setAddOpen(!isAddOpen)}
+            >
+              Add \/
+            </Button>
+            {isAddOpen
+              && (
+              <div className={styles.dropdown}>
+                <AmendLegislationButton add {...{ tier, id, section: sections.length }} />
+                { tier === 'InternationalTreaty'
+                  && <CongressAmendLegislationButton add {...{ tier, id, section: sections.length }} /> }
+                <CongressAmendLegislationViaReferendumButton add {...{ tier, id, section: sections.length }} />
+              </div>
+              )}
+          </div>
+        </div>
       </Card>
     ))));
 };
