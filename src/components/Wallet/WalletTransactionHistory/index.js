@@ -14,6 +14,7 @@ import Status from '../../Status';
 import { formatMeritTransaction, formatDollarTransaction } from '../../../utils/walletHelpers';
 
 import { blockchainSelectors } from '../../../redux/selectors';
+import truncate from '../../../utils/truncate';
 
 const paymentTypeIcons = {
   failure: <FailedIcon />,
@@ -55,7 +56,7 @@ function WalletTransactionHistory({ failure, transactionHistory, bottomButtonOnc
                             Payment from
                             {' '}
                             <span>
-                              {transactionHistoryInfo.fromId}
+                              {truncate(transactionHistoryInfo.fromId, 13)}
                             </span>
                           </p>
                         )
@@ -64,7 +65,7 @@ function WalletTransactionHistory({ failure, transactionHistory, bottomButtonOnc
                             Payment to
                             {' '}
                             <span>
-                              {transactionHistoryInfo.toId}
+                              {truncate(transactionHistoryInfo.toId, 13)}
                             </span>
                           </p>
 

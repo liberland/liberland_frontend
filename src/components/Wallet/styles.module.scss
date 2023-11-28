@@ -1,7 +1,13 @@
 @import '../../assets/base/variables';
 
 .walletWrapper {
-  padding: 8px 30px;
+  padding: 8px 12px;
+}
+
+@media (min-width: 640px) {
+  .walletWrapper {
+    padding: 8px 30px;
+  }
 }
 
 .haveNotExtension {

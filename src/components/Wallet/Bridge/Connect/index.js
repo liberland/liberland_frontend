@@ -1,13 +1,17 @@
 import React from 'react';
 import { useEthers } from '@usedapp/core';
 import Button from '../../../Button/Button';
+import truncate from '../../../../utils/truncate';
 
 function Connect() {
   const { account, activateBrowserWallet } = useEthers();
   if (account) {
     return (
       <>
-        Connected Ethereum wallet: {account}.
+        Connected Ethereum wallet:
+        {' '}
+        {truncate(account, 13)}
+        .
       </>
     );
   }

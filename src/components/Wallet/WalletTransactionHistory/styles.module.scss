@@ -7,10 +7,15 @@
 }
 
 .transactionHistoryCard{
-  padding: 28px;
   border-radius: 20px;
   background-color: #fff;
   margin-top: 35px;
+}
+
+@media (min-width: 640px) {
+  .transactionHistoryCard{
+    padding: 28px;
+  }
 }
 
 .transactionHistoryCardHeader{
@@ -23,7 +28,7 @@
   font-weight: 600;
 
   & > :first-child{
-    width: 300px;
+    width: 200px;
   }
   & > * {
     flex: 0 0 auto;
@@ -37,7 +42,7 @@
   margin: 32px 0;
   padding-right: 20px;
   & > :first-child{
-    width: 350px;
+    width: 240px;
   }
   & > * {
     flex: 0 0 auto;

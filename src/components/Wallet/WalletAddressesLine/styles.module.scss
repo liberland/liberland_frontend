@@ -4,6 +4,7 @@
 .walletAddressLineWrapper {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
   width: 100%;
 }
 
@@ -33,12 +34,13 @@
 
 .singleAddressWrapper {
   width: 213px;
-  margin-right: 60px;
+  margin-right: 24px;
 }
 
 .buttonsWrapper {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
 
   &>button {
     margin-left: 20px;
