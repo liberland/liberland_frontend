@@ -5,6 +5,7 @@ import { officesSelectors } from '../../../redux/selectors';
 import Table from '../../Table';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import { palletIdToAddress } from '../../../utils/pallet';
+import truncate from '../../../utils/truncate';
 
 const DEFAULT_ACCOUNTS = [
   {
@@ -94,6 +95,7 @@ export default function Finances() {
       ]}
       data={accountsAddresses.map((a) => ({
         ...a,
+        address: truncate(a.address, 13),
         llm: `${formatMerits(balances.LLM[a.address] ?? 0)} LLM`,
         lld: `${formatDollars(balances.LLD[a.address] ?? 0)} LLD`,
       }))}
