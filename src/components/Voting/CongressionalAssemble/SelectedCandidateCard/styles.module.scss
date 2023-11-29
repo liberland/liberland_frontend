@@ -12,7 +12,6 @@
   background-color: $secondary3;
   padding-top: 5px;
   padding-bottom: 5px;
-  //justify-content: center;
 }
 .politicianData {
   display: flex;
@@ -66,3 +65,7 @@
   color: $text2;
 }
 
+.maxContent {
+  width: max-content;
+  display: flex;
+}
