@@ -12,6 +12,7 @@ import {
   blockchainSelectors,
 } from '../../../redux/selectors';
 import { Proposal } from '../../Proposal';
+import truncate from '../../../utils/truncate';
 
 export default function Motions() {
   const dispatch = useDispatch();
@@ -55,7 +56,7 @@ function Motion({ proposal, proposalOf, voting }) {
 
           <p>
             Proposal id:
-            {proposal}
+            <b>{truncate(proposal, 13)}</b>
           </p>
           <span>
             <p>

@@ -10,7 +10,7 @@ export default function ProposeLegislationViaReferendumButton() {
       className={styles.linkButton}
       to={router.congress.addLegislationViaReferendum}
     >
-      <Button medium primary>
+      <Button small primary>
         Propose Referendum
       </Button>
     </NavLink>
