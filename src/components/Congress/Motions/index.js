@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import Card from '../../Card';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
+import truncate from '../../../utils/truncate';
 
 // REDUX
 import { congressActions } from '../../../redux/actions';
@@ -55,7 +56,7 @@ function Motion({ proposal, proposalOf, voting }) {
 
           <p>
             Proposal id:
-            {proposal}
+            <b>{truncate(proposal, 13)}</b>
           </p>
           <span>
             <p>

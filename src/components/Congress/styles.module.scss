@@ -19,15 +19,18 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 
   & > div {
     margin: 0;
+    flex-wrap: wrap;
+    display: flex;
   }
 }
 
 .rowEnd {
   display: flex;
-  justify-content: end;
+  justify-content: start;
   align-items: center;
 
   > * {

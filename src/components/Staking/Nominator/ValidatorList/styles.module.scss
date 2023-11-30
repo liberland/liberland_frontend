@@ -4,23 +4,23 @@
 .validatorsListHeader{
   display: flex;
   height: 50px;
-  width: 100%;
   font-size: 18px;
   align-items: flex-start;
   justify-content: center;
   border-radius: 20px;
   margin-top: 10px;
   flex-direction: row;
+  gap: 16px;
+  padding: 0 32px;
 }
 .listItem{
   display: flex;
-  flex:1;
   align-items: center;
   height:100%;
 }
 .listItemName{
   display: flex;
-  flex:5;
+  flex:1;
   align-items: center;
   height:100%;
   margin-left: 15px;

@@ -13,7 +13,7 @@ export default function Overview() {
     <div className={styles.validatorWrapper}>
       <h3>Validator status</h3>
       <div className={styles.flex}>
-        <div className={styles.internalWrapper}>
+        <div className={`${styles.internalWrapper} ${styles.startsChart}`}>
           <span className={styles.rowWrapper}>
             Status:
             <b><Status /></b>

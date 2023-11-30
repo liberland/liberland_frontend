@@ -66,7 +66,7 @@ function Nominator() {
           </Button>
         </div>
         <div>
-          <Button large primary onClick={() => updateNominations(selectedValidatorsAsTargets)}>
+          <Button small primary onClick={() => updateNominations(selectedValidatorsAsTargets)}>
             Update Nominations
           </Button>
         </div>

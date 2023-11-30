@@ -3,13 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { validatorSelectors } from '../../../../redux/selectors';
 import { validatorActions } from '../../../../redux/actions';
 import { parseLegal, parseIdentityData } from '../../../../utils/identityParser';
+import truncate from '../../../../utils/truncate';
 
 function formatNominator({ address, identity }) {
   const display = parseIdentityData(identity?.display);
-  if (display) return `${address} (${display})`;
+  if (display) return `${truncate(address, 13)} (${display})`;
   const legal = parseLegal(identity);
-  if (legal) return `${address} (${legal})`;
-  return address;
+  if (legal) return `${truncate(address, 13)} (${legal})`;
+  return truncate(address, 13);
 }
 
 export default function NominatorsList() {

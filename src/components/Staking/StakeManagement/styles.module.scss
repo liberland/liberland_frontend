@@ -1,6 +1,7 @@
 .stakingWrapper {
   padding: 8px 30px;
   margin: 0 auto;
+  display: flex;
 
   h3 {
     padding-bottom: 14px;
@@ -14,6 +15,8 @@
     display: flex;
     flex-direction: row;
     align-items: stretch;
+    width: 100%;
+    flex-wrap: wrap;
 
     > * {
       flex: 1;
@@ -39,6 +42,7 @@
   justify-content: end;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 
   > * {
     margin: 0 4px;
