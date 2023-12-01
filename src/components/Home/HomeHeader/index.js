@@ -1,18 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Avatar from 'react-avatar';
 import { useHistory, useLocation } from 'react-router-dom';
-import useDropdown from '../../../hooks/useDropdown';
 import { authActions } from '../../../redux/actions';
 import { userSelectors } from '../../../redux/selectors';
 import router from '../../../router';
+import LogoutModal from '../../Modals/LogoutModal';
 
 import styles from './styles.module.scss';
 
 function HomeHeader() {
   const name = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
-  const hiMsg = name && lastName ? `Hi, ${name} ${lastName}!` : "Hi!";
+  const hiMsg = name && lastName ? `Hi, ${name} ${lastName}!` : 'Hi!';
   const titles = {
     [router.home.profile]: 'My profile',
     [router.home.documents]: 'My documents',
@@ -37,14 +37,13 @@ function HomeHeader() {
   const dispatch = useDispatch();
   const history = useHistory();
   const location = useLocation();
-  const [
-    isOpen, toggleDropdown, dropdown, trigger,
-  ] = useDropdown();
 
   const handleLogout = () => {
     dispatch(authActions.signOut.call(history));
     window.location.replace(process.env.REACT_APP_SSO_API_LOGOUT_IMPLICIT_LINK);
   };
+
+  const [isLogoutModalOpen, setLogoutIsModalOpen] = useState(false);
 
   const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   return (
@@ -54,13 +53,20 @@ function HomeHeader() {
           <span className={styles.headerTitle}>{titles[location.pathname]}</span>
         </div>
         <div className={styles.avatarWrapper}>
-          <div ref={trigger} className={styles.avatar}>
-            <Avatar name={fullName} round onClick={toggleDropdown} size="47px" fgColor="#F1C823" color="#FDF4E0" />
+          <div className={styles.avatar}>
+            <Avatar
+              name={fullName}
+              round
+              onClick={
+              () => setLogoutIsModalOpen(true)
+              }
+              size="47px"
+              fgColor="#F1C823"
+              color="#FDF4E0"
+            />
           </div>
-          {isOpen && (
-            <div className={styles.dropdown} ref={dropdown}>
-              <button onClick={handleLogout}>Logout</button>
-            </div>
+          {isLogoutModalOpen && (
+            <LogoutModal handleLogout={handleLogout} closeModal={() => setLogoutIsModalOpen(false)} />
           )}
         </div>
       </div>

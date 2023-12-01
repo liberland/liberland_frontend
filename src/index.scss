@@ -20,6 +20,11 @@ code {
   top: 0;
   overflow-y: scroll;
   opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  
 
   &.active {
     width: 100%;
@@ -30,12 +35,20 @@ code {
   }
 
   & > .modal-wrapper {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #fff;
-    border-radius: 20px;
+    width: 100%;
+    height: fit-content;
+
+    & > div {
+      background: #fff;
+      border-radius: 20px;
+      margin: 24px;
+    }
+  }
+
+  @media (min-width: 640px) {
+    & > .modal-wrapper {
+      width: auto;
+    }
   }
 
   & > .modal-text-wrapper {
