@@ -61,6 +61,7 @@ function* getPendingRewardsWorker() {
     .flatten()
     .reduce((total, { value }) => total.add(value), BN_ZERO);
   yield put(validatorActions.getPendingRewards.success({ pendingRewards }));
+  yield put(walletActions.getWallet.call());
 }
 
 function* getStakerRewardsWorker() {

@@ -15,6 +15,7 @@ import Unbonding from './Unbonding';
 
 function CurrentlyStaked() {
   const balances = useSelector(walletSelectors.selectorBalances);
+
   return (
     <div className={styles.rowWrapper}>
       <span>Currently staked: </span>
