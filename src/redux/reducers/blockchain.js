@@ -24,6 +24,7 @@ const blockchainReducer = handleActions({
   [blockchainActions.bestBlockNumber.value]: (state, action) => ({
     ...state,
     currentBlockNumber: action.payload.bestNumber,
+    currentBlockTimestamp: action.payload.timestamp,
   }),
   [blockchainActions.getPeriodAndVotingDuration.success]: (state, action) => ({
     ...state,
@@ -58,8 +59,8 @@ const blockchainReducer = handleActions({
     preimages: {
       ...state.preimages,
       [payload.hash.toString()]: payload.preimage,
-    }
-  })
+    },
+  }),
 }, initialState);
 
 export default blockchainReducer;

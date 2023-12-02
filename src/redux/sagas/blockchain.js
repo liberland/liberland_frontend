@@ -65,7 +65,10 @@ function* subscribeBestBlockNumberSaga() {
 
   while (true) {
     const bestNumber = yield take(channel);
-    yield put(blockchainActions.bestBlockNumber.value({ bestNumber }));
+    yield put(blockchainActions.bestBlockNumber.value({
+      bestNumber,
+      timestamp: Date.now(),
+    }));
   }
 }
 
