@@ -223,6 +223,19 @@ function BatchAll({ proposal }) {
 }
 BatchAll.propTypes = { proposal: ProposalProp.isRequired };
 
+function Blacklist({ proposal }) {
+  const hash = proposal.args[0];
+  return (
+    <div>
+      Blacklist and cancel referendum proposal.
+      {' '}
+      { proposal.args[1].isSome && `Cancel ongoing referendum #${proposal.args[1].unwrap().toString()}.`}
+      <Preimage hash={hash} len={null} />
+    </div>
+  );
+}
+Blacklist.propTypes = { proposal: ProposalProp.isRequired };
+
 export function Proposal({ proposal }) {
   if (proposal.method === 'repealLegislation') {
     return <RepealLegislation {...{ proposal }} />;
@@ -236,6 +249,8 @@ export function Proposal({ proposal }) {
     return <BatchAll {...{ proposal }} />;
   } if (proposal.method === 'externalProposeMajority') {
     return <Referendum {...{ proposal }} />;
+  } if (proposal.method === 'blacklist' && proposal.section === 'democracy') {
+    return <Blacklist {...{ proposal }} />;
   }
 
   return <Raw {...{ proposal }} />;

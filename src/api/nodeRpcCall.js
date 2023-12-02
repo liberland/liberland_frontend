@@ -2019,9 +2019,17 @@ const congressAmendLegislationViaReferendum = async (
   return await congressProposeReferendum(amendLegislation, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
 }
 
+const fetchPreimageLen = async (hash) => {
+  const api = await getApi();
+  const keys = await api.query.preimage.preimageFor.keys()
+  const key = keys.find((key) => key.args[0][0].eq(hash));
+  return key?.args[0][1];
+}
+
 const fetchPreimage = async (hash, len) => {
   const api = await getApi();
-  return api.query.preimage.preimageFor([hash, len]);
+  const length = len ? len : await fetchPreimageLen(hash);
+  return api.query.preimage.preimageFor([hash, length]);
 }
 
 const decodeCall = async (bytes) => {
