@@ -106,9 +106,12 @@ const crossReference = (api, blockchainData, allCentralizedData, motions, isRefe
       parseInt(cItem.chainIndex) == parseInt(item.index)
     ))
 
-    const blacklistMotionHash = api.tx.democracy.blacklist(
+    const proposalHash = isReferendum ? item.imageHash : (
       item.boundedCall?.Lookup?.hash_ ?? 
-      item.boundedCall?.Legacy?.hash_, 
+      item.boundedCall?.Legacy?.hash_
+    )
+    const blacklistMotionHash = api.tx.democracy.blacklist(
+      proposalHash, 
       isReferendum ? item.index : null
     ).method.hash.toString()
 

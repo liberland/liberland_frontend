@@ -198,7 +198,7 @@ function ReferendumItem({
         </div>
         <div>
           Details:
-          <Proposal {...{proposal}} />
+          <Proposal {...{ proposal }} />
         </div>
         <div className={styles.buttonContainer}>
           {
@@ -224,6 +224,7 @@ ReferendumItem.propTypes = {
   referendumIndex: PropTypes.number.isRequired,
   delegating: PropTypes.bool.isRequired,
   blacklistMotion: PropTypes.string.isRequired,
+  proposal: PropTypes.instanceOf(Map).isRequired,
 };
 
 export default ReferendumItem;
