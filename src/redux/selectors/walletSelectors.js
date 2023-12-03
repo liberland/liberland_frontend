@@ -12,6 +12,8 @@ const selectorGettingWalletInfo = createSelector(
   walletReducer,
   (reducer) => reducer.gettingWalletInfo,
 );
+
+// FIXME delete or make functional
 const selectorWalletAddress = createSelector(
   selectorWalletInfo,
   (reducer) => reducer.address,
@@ -25,6 +27,11 @@ const selectorBalances = createSelector(
 const selectorLiquidMeritsBalance = createSelector(
   selectorBalances,
   (reducer) => (reducer.liquidMerits.amount),
+);
+
+const selectorLiquidDollarsBalance = createSelector(
+  selectorBalances,
+  (reducer) => (reducer.liquidAmount.amount),
 );
 
 const selectorTotalBalance = createSelector(
@@ -83,6 +90,7 @@ export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
   selectorLiquidMeritsBalance,
+  selectorLiquidDollarsBalance,
   selectorBalances,
   selectorTotalBalance,
   selectorTotalLLM,

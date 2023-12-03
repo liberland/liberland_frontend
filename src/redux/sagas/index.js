@@ -10,6 +10,7 @@ import * as identitySagas from './identity';
 import * as bridgeSagas from './bridge';
 import * as validatorSagas from './validator';
 import * as congressSagas from './congress';
+import * as onboardingSagas from './onboarding';
 
 export default function* rootSaga() {
   yield all([
@@ -127,5 +128,9 @@ export default function* rootSaga() {
     congressSagas.renounceCandidacyWatcher(),
     congressSagas.unapproveTreasurySpendWatcher(),
     congressSagas.voteAtMotionsWatcher(),
+
+    // ONBOARDING
+    onboardingSagas.claimComplimentaryLLDWatcher(),
+    onboardingSagas.getIsEligibleForComplimentaryLLDWatcher(),
   ]);
 }

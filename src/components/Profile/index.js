@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import Avatar from 'react-avatar';
 import cx from 'classnames';
 
 import Button from '../Button/Button';
-import { userSelectors, walletSelectors, blockchainSelectors, identitySelectors } from '../../redux/selectors';
-import { formatDollars, formatMerits } from '../../utils/walletHelpers';
+import {
+  userSelectors, walletSelectors, blockchainSelectors, identitySelectors, onboardingSelectors,
+} from '../../redux/selectors';
+import { formatDollars, formatMerits, parseDollars } from '../../utils/walletHelpers';
 
 import truncate from '../../utils/truncate';
 
@@ -21,13 +23,16 @@ import genderImage from '../../assets/icons/gender.svg';
 import startOfKyc from '../../assets/icons/startOfKyc.svg';
 import Card from '../Card';
 import { OnchainIdentityModal } from '../Modals';
-import { identityActions } from '../../redux/actions';
-import { parseLegal, parseIdentityData, parseDOB, parseAdditionalFlag, parseCitizenshipJudgement } from '../../utils/identityParser';
+import { congressActions, identityActions, onBoardingActions } from '../../redux/actions';
+import {
+  parseLegal, parseIdentityData, parseDOB, parseAdditionalFlag, parseCitizenshipJudgement,
+} from '../../utils/identityParser';
+import { getComplimentaryLLD, maybeGetApprovedEresidency } from '../../api/backend';
 
 function Profile({ className }) {
   const userName = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
-  const walletAddress = useSelector(walletSelectors.selectorWalletAddress);
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const userRole = useSelector(userSelectors.selectUserRole);
   const aboutUser = useSelector(userSelectors.selectUserAbout);
   const originFrom = useSelector(userSelectors.selectUserOrigin);
@@ -40,12 +45,19 @@ function Profile({ className }) {
   const walletInfo = useSelector(walletSelectors.selectorWalletInfo);
   const balances = useSelector(walletSelectors.selectorBalances);
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
+  const liquidDollars = useSelector(walletSelectors.selectorLiquidDollarsBalance);
+  const isUserEligibleForComplimentaryLLD = useSelector(onboardingSelectors.selectorEligibleForComplimentaryLLD);
+  const ineligibleForComplimentaryLLDReason = useSelector(onboardingSelectors.selectorIneligibleForComplimentaryLLDReason);
+
+  const dispatch = useDispatch();
   const lockBlocks = walletInfo?.balances?.electionLock - blockNumber;
   const lockDays = lockBlocks > 0 ? lockBlocks * 6 / 3600 / 24 : 0;
 
-  const dispatch = useDispatch();
-
   const [isModalOpenOnchainIdentity, setIsModalOpenOnchainIdentity] = useState(false);
+
+  useEffect(() => {
+    dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
+  }, [liquidDollars]);
 
   const toggleModalOnchainIdentity = () => {
     setIsModalOpenOnchainIdentity(!isModalOpenOnchainIdentity);
@@ -55,10 +67,10 @@ function Profile({ className }) {
     let eligible_on = null;
 
     if (values.older_than_15) {
-      eligible_on = new Date(0)
+      eligible_on = new Date(0);
     } else if (values.date_of_birth) {
       const dob = new Date(values.date_of_birth);
-      eligible_on = new Date(dob.getFullYear()+15, dob.getMonth(), dob.getDate());
+      eligible_on = new Date(dob.getFullYear() + 15, dob.getMonth(), dob.getDate());
     }
 
     const params = {
@@ -68,16 +80,16 @@ function Profile({ className }) {
       email: values.email,
       onChainIdentity: values.onChainIdentity,
       eligible_on,
-    }
+    };
 
     dispatch(identityActions.setIdentity.call({ userWalletAddress, values: params }));
     toggleModalOnchainIdentity();
   };
 
-  const {judgements, info} = identity?.isSome ? identity.unwrap() : {};
+  const { judgements, info } = identity?.isSome ? identity.unwrap() : {};
   const date_of_birth = parseDOB(info?.additional, blockNumber);
 
-  const displayName = userName && lastName ? `${userName} ${lastName}` : "";
+  const displayName = userName && lastName ? `${userName} ${lastName}` : '';
 
   return (
     <Card className={cx(styles.profile, className)}>
@@ -121,7 +133,7 @@ function Profile({ className }) {
           <div className={styles.userNameBalance}>
             <div className={styles.userNameRole}>
               <h3>
-                {displayName || "Account"}
+                {displayName || 'Account'}
               </h3>
               <div>
                 <img src={liberlandEmblemImage} alt="" />
@@ -138,25 +150,30 @@ function Profile({ className }) {
                 <span>
                   {`${formatMerits(liquidMerits)} LLM (liquid)`}
                 </span>
-              <div className={styles.balance}>
-                <span>
-                  {`${formatMerits(balances.liberstake.amount)} LLM (Politipooled)`}
-                </span>
-              </div>
-              <div className={styles.balance}>
-                <span>
-                  {`${formatDollars(balances.liquidAmount.amount)} LLD`}
-                </span>
-              </div>
+                <div className={styles.balance}>
+                  <span>
+                    {`${formatMerits(balances.liberstake.amount)} LLM (Politipooled)`}
+                  </span>
+                </div>
+                <div className={styles.balance}>
+                  <span>
+                    {`${formatDollars(balances.liquidAmount.amount)} LLD`}
+                  </span>
+                </div>
                 <span className={styles.walletAddress}>
                   {walletAddress ? truncate(walletAddress, 13) : ''}
                 </span>
               </div>
-              { lockDays <= 0 ? null :
-                <div>
-                  Unpooling in effect: {lockDays.toFixed(2)} days remaining.
-                </div>
-              }
+              { lockDays <= 0 ? null
+                : (
+                  <div>
+                    Unpooling in effect:
+                    {' '}
+                    {lockDays.toFixed(2)}
+                    {' '}
+                    days remaining.
+                  </div>
+                )}
             </div>
           </div>
         </div>
@@ -195,20 +212,59 @@ function Profile({ className }) {
             <h3>On-chain identity</h3>
             <div className={styles.itemFooterAbout}>
               <ul>
-                <li>Display: {parseIdentityData(info?.display) ?? <em>&lt;empty&gt;</em>}</li>
-                <li>Legal: {parseLegal(info) ?? <em>&lt;empty&gt;</em>}</li>
-                <li>Web: {parseIdentityData(info?.web) ?? <em>&lt;empty&gt;</em>}</li>
-                <li>Email: {parseIdentityData(info?.email) ?? <em>&lt;empty&gt;</em>}</li>
-                { date_of_birth === false ?
-                  <li>Date of birth: old enough to vote</li> :
-                  <li>Date of birth: {date_of_birth ?? <em>&lt;empty&gt;</em>}</li>
-                }
-                <li>Citizen: {parseAdditionalFlag(info?.additional, 'citizen') ? "YES" : "NO"}</li>
-                <li>E-resident: {parseAdditionalFlag(info?.additional, 'eresident') ? "YES" : "NO"}</li>
-                <li>Identity confirmed: {parseCitizenshipJudgement(judgements) ? "YES" : "NO"}</li>
+                <li>
+                  Display:
+                  {parseIdentityData(info?.display) ?? <em>&lt;empty&gt;</em>}
+                </li>
+                <li>
+                  Legal:
+                  {parseLegal(info) ?? <em>&lt;empty&gt;</em>}
+                </li>
+                <li>
+                  Web:
+                  {parseIdentityData(info?.web) ?? <em>&lt;empty&gt;</em>}
+                </li>
+                <li>
+                  Email:
+                  {parseIdentityData(info?.email) ?? <em>&lt;empty&gt;</em>}
+                </li>
+                { date_of_birth === false
+                  ? <li>Date of birth: old enough to vote</li>
+                  : (
+                    <li>
+                      Date of birth:
+                      {date_of_birth ?? <em>&lt;empty&gt;</em>}
+                    </li>
+                  )}
+                <li>
+                  Citizen:
+                  {parseAdditionalFlag(info?.additional, 'citizen') ? 'YES' : 'NO'}
+                </li>
+                <li>
+                  E-resident:
+                  {parseAdditionalFlag(info?.additional, 'eresident') ? 'YES' : 'NO'}
+                </li>
+                <li>
+                  Identity confirmed:
+                  {parseCitizenshipJudgement(judgements) ? 'YES' : 'NO'}
+                </li>
               </ul>
             </div>
             <Button medium primary onClick={toggleModalOnchainIdentity}>Update identity</Button>
+
+            <div>
+              <br />
+              <Button
+                medium
+                primary={isUserEligibleForComplimentaryLLD}
+                grey={!isUserEligibleForComplimentaryLLD}
+                onClick={() => {
+                  dispatch(onBoardingActions.claimComplimentaryLld.call());
+                }}
+              >
+                {isUserEligibleForComplimentaryLLD ? 'Claim complimentary LLD' : ineligibleForComplimentaryLLDReason}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
