@@ -18,7 +18,6 @@ import router from '../../../router';
 function Referendum() {
   const [isModalOpenVote, setIsModalOpenVote] = useState(false);
   const [isModalOpenUndelegate, setIsModalOpenUndelegate] = useState(false);
-  const [modalShown, setModalShown] = useState(1);
   const [selectedReferendumInfo, setSelectedReferendumInfo] = useState({ name: 'Referendum' });
   const [selectedVoteType, setSelectedVoteType] = useState('Nay');
   const { handleSubmit, register } = useForm();
@@ -34,19 +33,9 @@ function Referendum() {
     setIsModalOpenVote(!isModalOpenVote);
     setSelectedReferendumInfo(referendumInfo);
     setSelectedVoteType(voteType);
-    setModalShown(1);
   };
   const handleModalOpenUndelegate = () => {
     setIsModalOpenUndelegate(!isModalOpenUndelegate);
-  };
-  const handleModalOpenEndorse = (referendumInfo) => {
-    setIsModalOpenVote(!isModalOpenVote);
-    setSelectedReferendumInfo(referendumInfo);
-    setModalShown(2);
-  };
-  const handleSubmitSecondForm = (values) => {
-    dispatch(democracyActions.secondProposal.call(values));
-    handleModalOpenEndorse();
   };
   const handleSubmitVoteForm = (values) => {
     dispatch(democracyActions.voteOnReferendum.call({ ...values, voteType: selectedVoteType }));
@@ -93,7 +82,6 @@ function Referendum() {
                   key={referendum.index}
                   name={referendum?.centralizedData?.hash ? referendum.centralizedData.hash : 'Onchain referendum'}
                   createdBy={referendum?.centralizedData?.username ? referendum.centralizedData.username : 'Unknown'}
-                  currentEndorsement="??"
                   externalLink={referendum?.centralizedData?.link
                     ? referendum.centralizedData.link
                     : 'https://forum.liberland.org/'}
@@ -126,12 +114,9 @@ function Referendum() {
                   key={proposal.index}
                   name={proposal?.centralizedData?.hash ? proposal.centralizedData.hash : 'Onchain proposal'}
                   createdBy={proposal?.centralizedData?.username ? proposal.centralizedData.username : proposal.proposer}
-                  currentEndorsement={`${proposal.seconds.length} Citizens supported`}
                   externalLink={proposal?.centralizedData?.link ? proposal.centralizedData.link : 'https://forum.liberland.org/'}
                   description={proposal?.centralizedData?.description ? proposal.centralizedData.description : 'Onchain proposal with no description'}
-                  userDidEndorse={(proposal.seconds.includes(userWalletAddress) || proposal.proposer === userWalletAddress)}
                   boundedCall={proposal.boundedCall}
-                  buttonEndorseCallback={handleModalOpenEndorse}
                   proposalIndex={proposal.index}
                   blacklistMotion={proposal.blacklistMotion}
                 />
@@ -158,11 +143,8 @@ function Referendum() {
           closeModal={handleModalOpenVote}
           handleSubmit={handleSubmit}
           register={register}
-          modalShown={modalShown}
-          setModalShown={setModalShown}
           referendumInfo={selectedReferendumInfo}
           voteType={selectedVoteType}
-          onSubmitSecond={handleSubmitSecondForm}
           onSubmitVote={handleSubmitVoteForm}
         />
       )}

@@ -78,7 +78,7 @@ const alreadyVotedButton = (buttonVoteCallback, referendumInfo, alreadyVoted) =>
 );
 
 const voteButtonsContainer = (alreadyVoted, delegating, buttonVoteCallback, referendumData) => {
-  if (alreadyVoted) { return alreadyVotedButton(alreadyVoted); }
+  if (alreadyVoted) { return alreadyVotedButton(buttonVoteCallback, referendumData, alreadyVoted); }
   if (delegating) { return 'Undelegate to vote individually'; }
   return voteButtons(buttonVoteCallback, referendumData);
 };
