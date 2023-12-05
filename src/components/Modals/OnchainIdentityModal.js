@@ -1,19 +1,24 @@
 // LIBS
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
 // COMPONENTS
 import ModalRoot from './ModalRoot';
-import { TextInput, DateInput, CheckboxInput, SelectInput } from '../InputComponents';
+import {
+  TextInput, DateInput, CheckboxInput, SelectInput,
+} from '../InputComponents';
 import Button from '../Button/Button';
 
 // STYLES
 import styles from './styles.module.scss';
 
-import { parseIdentityData, parseDOB, parseAdditionalFlag, parseCitizenshipJudgement, parseLegal } from '../../utils/identityParser';
+import {
+  parseIdentityData, parseDOB, parseAdditionalFlag, parseCitizenshipJudgement, parseLegal,
+} from '../../utils/identityParser';
 
 function OnchainIdentityModal({
-  onSubmit, closeModal, identity, blockNumber, name
+  onSubmit, closeModal, identity, blockNumber, name,
 }) {
   let defaultValues = {};
   let isKnownGood = false;
@@ -22,14 +27,17 @@ function OnchainIdentityModal({
   let identityDOB = false;
 
   if (identity.isSome) {
-    const {judgements, info} = identity.unwrap();
+    const { judgements, info } = identity.unwrap();
     identityCitizen = parseAdditionalFlag(info.additional, 'citizen');
     eResident = parseAdditionalFlag(info.additional, 'eresident');
-    const onChainIdentity = identityCitizen && eResident ? 
-            "citizen" : 
-            !identityCitizen && eResident ? 
-              "eresident" : 
-              "neither"
+    let onChainIdentity;
+    if (identityCitizen && eResident) {
+      onChainIdentity = 'citizen';
+    } else if (!identityCitizen && eResident) {
+      onChainIdentity = 'eresident';
+    } else {
+      onChainIdentity = 'neither';
+    }
 
     identityDOB = parseDOB(info.additional, blockNumber);
 
@@ -40,7 +48,7 @@ function OnchainIdentityModal({
       email: parseIdentityData(info.email),
       date_of_birth: identityDOB ?? undefined,
       older_than_15: !identityDOB,
-      onChainIdentity
+      onChainIdentity,
     };
 
     isKnownGood = parseCitizenshipJudgement(judgements);
@@ -50,7 +58,7 @@ function OnchainIdentityModal({
     handleSubmit,
     register,
     watch,
-    formState: { errors }
+    formState: { errors },
   } = useForm({ mode: 'all', defaultValues });
 
   const isOlderThan15 = watch('older_than_15');
@@ -60,13 +68,18 @@ function OnchainIdentityModal({
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.h3}>Update on-chain identity</div>
       <div className={styles.description}>
-        You are going to update your identity stored on blockchain. This needs to be up-to-date for your citizenship or e-residency.
+        You are going to update your identity stored on blockchain.
+        {' '}
+        This needs to be up-to-date for your citizenship or e-residency.
       </div>
-      { !isKnownGood ? null :
-        <div className={styles.description}>
-          Warning! Your identity is currently confirmed by citizenship office as valid. Changing it will require reapproval - you'll temporarily lose citizenship or e-resident rights onchain.
-        </div>
-      }
+      { !isKnownGood ? null
+        : (
+          <div className={styles.description}>
+            Warning! Your identity is currently confirmed by citizenship office as valid.
+            {' '}
+            Changing it will require reapproval - you&apos;ll temporarily lose citizenship or e-resident rights onchain.
+          </div>
+        )}
 
       <div className={styles.title}>Display name</div>
       <TextInput
@@ -98,29 +111,31 @@ function OnchainIdentityModal({
         register={register}
         name="onChainIdentity"
         options={[
-          { value: "eresident", display: "E-resident"},
-          { value: "citizen", display: "Citizen"},
-          { value: "neither", display: "Neither"},
+          { value: 'eresident', display: 'E-resident' },
+          { value: 'citizen', display: 'Citizen' },
+          { value: 'neither', display: 'Neither' },
         ]}
       />
 
-      { !(onChainIdentity === "citizen") ? null :
-        <>
-          <div className={styles.title}>Date of birth</div>
-          <CheckboxInput
-            register={register}
-            name="older_than_15"
-            label="I'm 15 or older"
-          />
-          {isOlderThan13 ? null :
-            <DateInput
+      { !(onChainIdentity === 'citizen') ? null
+        : (
+          <>
+            <div className={styles.title}>Date of birth</div>
+            <CheckboxInput
               register={register}
-              name="date_of_birth"
-              placeholder="Date of birth"
-            />}
-        </>
-      }
-
+              name="older_than_15"
+              label="I'm 15 or older"
+            />
+            {isOlderThan15 ? null
+              : (
+                <DateInput
+                  register={register}
+                  name="date_of_birth"
+                  placeholder="Date of birth"
+                />
+              )}
+          </>
+        )}
 
       <div className={styles.error}>
         {errors?.e_resident?.message || errors?.citizen?.message}
@@ -144,6 +159,17 @@ function OnchainIdentityModal({
     </form>
   );
 }
+
+OnchainIdentityModal.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  closeModal: PropTypes.func.isRequired,
+  identity: PropTypes.shape({
+    isSome: PropTypes.bool.isRequired,
+    unwrap: PropTypes.func.isRequired,
+  }).isRequired,
+  blockNumber: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
+};
 
 function OnchainIdentityModalWrapper(props) {
   return (
