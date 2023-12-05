@@ -64,7 +64,8 @@ function ProposalItem({
   boundedCall,
   blacklistMotion,
 }) {
-  let hash, len;
+  let hash; let
+    len;
   if ('Lookup' in boundedCall) {
     hash = boundedCall.Lookup.hash_;
     len = boundedCall.Lookup.len;
@@ -110,12 +111,13 @@ function ProposalItem({
         <div className={styles.description}>
           <p>{description}</p>
         </div>
-        { hash && len && 
+        { hash && len
+          && (
           <div>
             Details:
-            <Preimage {...{hash, len}} />
+            <Preimage {...{ hash, len }} />
           </div>
-        }
+          )}
       </div>
     </Card>
   );
@@ -130,6 +132,7 @@ const call = PropTypes.oneOfType([
   PropTypes.shape({
     Lookup: PropTypes.shape({
       hash_: PropTypes.string.isRequired,
+      len: PropTypes.number.isRequired,
     }).isRequired,
   }),
   PropTypes.shape({

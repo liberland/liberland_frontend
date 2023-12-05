@@ -7,7 +7,9 @@ import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
-const renderVoteButton = (vote) => (vote === 'Aye' ? <Button green medium type="submit">Vote Aye</Button> : <Button red medium type="submit">Vote Nay</Button>);
+const renderVoteButton = (vote) => (vote === 'Aye'
+  ? <Button green medium type="submit">Vote Aye</Button>
+  : <Button red medium type="submit">Vote Nay</Button>);
 
 function VoteOnReferendumModal({
   closeModal, handleSubmit, register, onSubmitVote,
