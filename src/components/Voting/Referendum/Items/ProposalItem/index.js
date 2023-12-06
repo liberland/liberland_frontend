@@ -12,17 +12,6 @@ import {
 } from '../../../../../redux/selectors';
 import { Preimage } from '../../../../Proposal';
 
-const endorseButton = (buttonEndorseCallback, userDidEndorse, referendumInfo) => (userDidEndorse ? (
-  <Button medium gray>
-    Already endorsed
-  </Button>
-)
-  : (
-    <Button medium primary onClick={() => { buttonEndorseCallback(referendumInfo); }}>
-      Endorse
-    </Button>
-  ));
-
 function BlacklistButton({ hash }) {
   const dispatch = useDispatch();
   const userIsMember = useSelector(congressSelectors.userIsMember);
@@ -70,16 +59,13 @@ function BoundedCall({ call }) {
 function ProposalItem({
   name,
   createdBy,
-  currentEndorsement,
   externalLink,
   description,
-  userDidEndorse,
   boundedCall,
-  buttonEndorseCallback,
-  proposalIndex,
   blacklistMotion,
 }) {
-  let hash, len;
+  let hash; let
+    len;
   if ('Lookup' in boundedCall) {
     hash = boundedCall.Lookup.hash_;
     len = boundedCall.Lookup.len;
@@ -118,11 +104,6 @@ function ProposalItem({
               <BoundedCall call={boundedCall} />
             </div>
           </div>
-          <div>
-            Endorsement:
-            {' '}
-            {currentEndorsement}
-          </div>
         </div>
         <div>
           <a href={externalLink}>Read discussion</a>
@@ -130,15 +111,13 @@ function ProposalItem({
         <div className={styles.description}>
           <p>{description}</p>
         </div>
-        { hash && len && 
+        { hash && len
+          && (
           <div>
             Details:
-            <Preimage {...{hash, len}} />
+            <Preimage {...{ hash, len }} />
           </div>
-        }
-        <div className={styles.buttonContainer}>
-          {endorseButton(buttonEndorseCallback, userDidEndorse, { name, proposalIndex })}
-        </div>
+          )}
       </div>
     </Card>
   );
@@ -153,6 +132,7 @@ const call = PropTypes.oneOfType([
   PropTypes.shape({
     Lookup: PropTypes.shape({
       hash_: PropTypes.string.isRequired,
+      len: PropTypes.number.isRequired,
     }).isRequired,
   }),
   PropTypes.shape({
@@ -166,13 +146,9 @@ BoundedCall.propTypes = { call: call.isRequired };
 ProposalItem.propTypes = {
   name: PropTypes.string.isRequired,
   createdBy: PropTypes.string.isRequired,
-  currentEndorsement: PropTypes.string.isRequired,
   externalLink: PropTypes.string.isRequired,
   description: PropTypes.string.isRequired,
-  userDidEndorse: PropTypes.bool.isRequired,
   boundedCall: call.isRequired,
-  buttonEndorseCallback: PropTypes.func.isRequired,
-  proposalIndex: PropTypes.string.isRequired,
   blacklistMotion: PropTypes.string.isRequired,
 };
 
