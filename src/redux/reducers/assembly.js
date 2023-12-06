@@ -1,6 +1,7 @@
 import { combineActions, handleActions } from 'redux-actions';
 import { assemblyActions } from '../actions';
 
+// FIXME delete this and other assembly related files
 const initialState = {
   isDraftSend: false,
   proposals: [],

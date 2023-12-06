@@ -13,6 +13,7 @@ import identityReducer from './identity';
 import bridgeReducer from './bridge';
 import validatorReducer from './validator';
 import congressReducer from './congress';
+import onboardingReducer from './onboarding';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -28,7 +29,8 @@ const rootReducer = combineReducers({
   identity: identityReducer,
   bridge: bridgeReducer,
   validator: validatorReducer,
-  congress: congressReducer
+  congress: congressReducer,
+  onboarding: onboardingReducer,
 });
 
 export default rootReducer;
