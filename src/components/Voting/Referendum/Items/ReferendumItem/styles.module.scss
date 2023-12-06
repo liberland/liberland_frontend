@@ -5,6 +5,7 @@
   justify-content: space-between;
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   margin-bottom: 0.5rem;
   margin-top: 0px;
   height: 3.5rem;
@@ -24,9 +25,10 @@
   display: flex;
 }
 .metaTextInfo{
-  flex-direction: column;
+  flex-direction: row;
   display: flex;
   justify-content: space-between;
+  gap: 8px;
 }
 .votesCount{
   flex-direction: row;
@@ -36,7 +38,16 @@
   font-weight: bolder;
 }
 .votesInfo{
-  width: 50%;
+  flex: 1;
+  margin: 0 12px;
+}
+.proposeData {
+  flex: 1;
+  margin: 0 12px;
+}
+.endorsement {
+  flex: 1;
+  margin: 0 12px;
 }
 .yayText{
   color: $primary2;
@@ -62,11 +73,16 @@
   margin-left: 0.75rem;
 }
 .hashText{
-  font-size: 0.6rem;
+  font-size: 0.8rem;
 }
 .discussionMetaLine{
   display: flex;
   justify-content: space-between;
+  margin: 24px 0;
+
+  > div {
+    flex: 1
+  }
 }
 .votingTimeText{
   font-size: smaller;
@@ -80,4 +96,7 @@
   > * {
     margin: 0 4px;
   }
+}
+.copyIcon {
+  cursor: pointer;
 }

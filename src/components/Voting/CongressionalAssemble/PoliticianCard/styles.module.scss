@@ -13,8 +13,15 @@
   background-color: $secondary3;
   padding-top: 5px;
   padding-bottom: 5px;
-  //justify-content: center;
+  flex-direction: column;
 }
+
+@media (min-width: 640px) {
+  .politicianCardContainer {
+    flex-direction: row;
+  }
+}
+
 .politicianData {
   display: flex;
   flex: 3;
@@ -69,4 +76,12 @@
 }
 .buttonWrapper {
   margin-right: 10px;
+}
+.copyIcon{
+  cursor: pointer;
+}
+
+.maxContent {
+  width: max-content;
+  display: flex;
 }

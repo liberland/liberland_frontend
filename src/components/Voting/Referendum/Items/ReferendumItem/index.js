@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -6,6 +6,9 @@ import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
 import { formatMerits } from '../../../../../utils/walletHelpers';
+import truncate from '../../../../../utils/truncate';
+import NotificationPortal from '../../../../NotificationPortal';
+import { ReactComponent as CopyIcon } from '../../../../../assets/icons/copy.svg';
 
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
@@ -132,81 +135,92 @@ function ReferendumItem({
     ? `${yayVotes.mul(new BN('100'))
       .div(yayVotes.add(nayVotes)).toString()}%`
     : '0%';
+  const notificationRef = useRef();
+  const handleCopyClick = (dataToCoppy) => {
+    navigator.clipboard.writeText(dataToCoppy);
+    notificationRef.current.addSuccess({ text: 'Address was copied' });
+  };
+
   return (
-    <Card
-      title={name}
-      className={styles.referendumItemContainer}
-    >
-      <div>
-        <div className={styles.rowEnd}>
-          {blacklistMotion ? (
-            <small>
-              Blacklist motion:
-              <a href={`/home/congress/motions#${blacklistMotion}`}>
-                {blacklistMotion}
-              </a>
-            </small>
-          )
-            : (
-              <BlacklistButton
-                hash={hash}
-                referendumIndex={referendumIndex}
-              />
-            )}
-        </div>
-        <div className={styles.metaInfoLine}>
-          <div>
-            <div className={styles.metaTextInfo}>
-              By:
-              {' '}
-              {createdBy}
-            </div>
-            <div className={styles.hashText}>
-              {hash}
-            </div>
-          </div>
-          <div className={styles.votesInfo}>
-            <div className={styles.votesCount}>
-              <div>
-                <span className={styles.yayText}>Yay</span>
-                /
-                <span className={styles.nayText}>Nay</span>
-              </div>
-              <div>
-                <span className={styles.yayText}>{formatMerits(yayVotes)}</span>
-                /
-                <span className={styles.nayText}>{formatMerits(nayVotes)}</span>
-              </div>
-            </div>
-            <div className={styles.progressBar}>
-              <div className={styles.yayProgressBar} style={{ width: progressBarRatio }} />
-            </div>
-          </div>
-        </div>
-        <div className={styles.discussionMetaLine}>
-          <div>
-            <a href={externalLink}>Read discussion</a>
-          </div>
-          <div>
-            <span className={styles.votingTimeText}>Voting ends in:</span>
-            {' '}
-            <b>{votingTimeLeft}</b>
-          </div>
-        </div>
-        <div className={styles.description}>
-          <p>{description}</p>
-        </div>
+    <>
+      <NotificationPortal ref={notificationRef} />
+      <Card
+        title={name}
+        className={styles.referendumItemContainer}
+      >
         <div>
-          Details:
-          <Proposal {...{ proposal }} />
+          <div className={styles.rowEnd}>
+            {blacklistMotion ? (
+              <small>
+                Blacklist motion:
+                <a href={`/home/congress/motions#${blacklistMotion}`}>
+                  {truncate(blacklistMotion, 13)}
+                </a>
+              </small>
+            )
+              : (
+                <BlacklistButton
+                  hash={hash}
+                  referendumIndex={referendumIndex}
+                />
+              )}
+          </div>
+          <div className={styles.metaInfoLine}>
+            <div className={styles.proposeData}>
+              <div className={styles.metaTextInfo}>
+                By:
+                <b>{ createdBy && truncate(createdBy, 13) }</b>
+              </div>
+              <div className={styles.hashText}>
+                Referendum hash:
+                {' '}
+                <b>{ truncate(hash, 13) }</b>
+                <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={() => handleCopyClick(hash)} />
+              </div>
+            </div>
+            <div className={styles.votesInfo}>
+              <div className={styles.votesCount}>
+                <div>
+                  <span className={styles.yayText}>Yay</span>
+                  /
+                  <span className={styles.nayText}>Nay</span>
+                </div>
+                <div>
+                  <span className={styles.yayText}>{formatMerits(yayVotes)}</span>
+                  /
+                  <span className={styles.nayText}>{formatMerits(nayVotes)}</span>
+                </div>
+              </div>
+              <div className={styles.progressBar}>
+                <div className={styles.yayProgressBar} style={{ width: progressBarRatio }} />
+              </div>
+            </div>
+          </div>
+          <div className={styles.discussionMetaLine}>
+            <div>
+              <a href={externalLink}>Read discussion</a>
+            </div>
+            <div>
+              <span className={styles.votingTimeText}>Voting ends in:</span>
+              {' '}
+              <b>{votingTimeLeft}</b>
+            </div>
+          </div>
+          <div className={styles.description}>
+            <p>{description}</p>
+          </div>
+          <div>
+            Details:
+            <Proposal {...{ proposal }} />
+          </div>
+          <div className={styles.buttonContainer}>
+            {
+              voteButtonsContainer(alreadyVoted, delegating, buttonVoteCallback, { name, referendumIndex })
+            }
+          </div>
         </div>
-        <div className={styles.buttonContainer}>
-          {
-            voteButtonsContainer(alreadyVoted, delegating, buttonVoteCallback, { name, referendumIndex })
-          }
-        </div>
-      </div>
-    </Card>
+      </Card>
+    </>
   );
 }
 
