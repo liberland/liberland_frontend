@@ -59,8 +59,8 @@ function WalletAddressesLine({ walletAddress }) {
   return (
     <>
       <NotificationPortal ref={notificationRef} />
+      <Tabs navigationList={navigationList} />
       <div className={styles.walletAddressLineWrapper}>
-        <Tabs navigationList={navigationList} />
         <div className={styles.addressesWrapper}>
           <div className={styles.singleAddressWrapper}>
             <p className={styles.addressTitle}>Wallet address:</p>

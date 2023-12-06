@@ -3,10 +3,12 @@
 
 .overviewWrapper {
   margin-top: 21px;
+  word-break: break-all;
 }
 
 .overViewCard {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   margin-top: 39px;
 }
