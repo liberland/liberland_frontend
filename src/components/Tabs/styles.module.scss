@@ -5,10 +5,16 @@
   display: flex;
   margin-bottom: 40px;
   align-items: center;
+
+  flex-wrap: wrap;
+
+  > * {
+    margin: auto !important;
+  }
 }
 
 .link {
-  margin-right: 40px;
+  padding: 0 20px;
   font-size: 14px;
   font-weight: 600;
   color: $text4;

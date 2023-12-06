@@ -16,7 +16,7 @@
     align-items: flex-start;
     flex: 4;
     display: flex;
-    white-space: pre;
+    word-break: break-all;
 }
 .vetoContent {
     align-items: flex-end;
@@ -35,8 +35,37 @@
     display: flex;
     justify-content: end;
     align-items: center;
+    margin: 8px 0;
+    flex-wrap: wrap;
+    flex-direction: row;
+    
   
     > * {
       margin: 0 4px;
     }
   }
+
+.dropdownWrapper {
+    position: relative
+}
+
+.dropdown {
+    background: $secondary3;
+
+    border-width: 2px;
+    border-color: $primary;
+    border-style: solid;
+    
+    display: flex;
+    padding: 16px;
+    flex-direction: column;
+    border-radius: 15px;
+    position: absolute;
+    right:0px;
+    margin-top: 4px;
+    z-index: 5;
+
+    > * {
+        margin: 4px 0;
+    }
+}
