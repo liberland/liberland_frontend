@@ -13,6 +13,7 @@ import {
   blockchainSelectors,
 } from '../../../redux/selectors';
 import { Proposal } from '../../Proposal';
+import truncate from '../../../utils/truncate';
 
 export default function Motions() {
   const dispatch = useDispatch();

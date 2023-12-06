@@ -12,7 +12,7 @@ import styles from './styles.module.scss';
 const ProposalProp = PropTypes.object;
 
 function Raw({ proposal }) {
-  return <pre>{JSON.stringify(proposal.toHuman(), null, 2)}</pre>;
+  return <pre className={styles.legislationContent}>{JSON.stringify(proposal.toHuman(), null, 2)}</pre>;
 }
 
 Raw.propTypes = { proposal: ProposalProp.isRequired };

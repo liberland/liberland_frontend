@@ -57,7 +57,7 @@ export default function Overview() {
             <>
               <ProposeLegislationButton />
               <ProposeLegislationViaReferendumButton />
-              <Button medium primary onClick={handleSpendingModalOpen}>
+              <Button small primary onClick={handleSpendingModalOpen}>
                 Create new spending
               </Button>
             </>
@@ -67,7 +67,7 @@ export default function Overview() {
           )}
           {(userIsMember || userIsCandidate || userIsRunnersUp) && (
             <Button
-              medium
+              small
               secondary
               onClick={() => dispatch(congressActions.renounceCandidacy.call(userStatus))}
             >

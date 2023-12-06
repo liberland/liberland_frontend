@@ -10,7 +10,7 @@ export default function ProposeLegislationButton() {
       className={styles.linkButton}
       to={router.congress.addLegislation}
     >
-      <Button medium primary>
+      <Button small primary>
         Propose International Treaty
       </Button>
     </NavLink>
