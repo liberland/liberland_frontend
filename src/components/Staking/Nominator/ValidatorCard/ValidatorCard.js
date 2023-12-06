@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
+import truncate from '../../../../utils/truncate';
 
 function ValidatorCard({
   name,
@@ -20,7 +21,7 @@ function ValidatorCard({
     <div className={styles.nominatorCardWrapper}>
       <div className={styles.avatarProfile}>
         <div className={styles.avatarImage}><img src={liberlandEmblemImage} alt="" /></div>
-        <div className={styles.avatarName}>{name}</div>
+        <div className={styles.avatarName}>{truncate(name, 13)}</div>
       </div>
       <div className={styles.listItem}>{commission}</div>
       <div className={styles.listItem}>

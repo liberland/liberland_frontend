@@ -4,7 +4,6 @@
 .nominatorCardWrapper{
   display: flex;
   height: 50px;
-  width: 100%;
   font-size: 18px;
   align-items: flex-start;
   justify-content: center;
@@ -12,19 +11,20 @@
   background: $secondary3;
   margin-top: 10px;
   flex-direction: row;
+  gap: 16px;
+  padding: 0 32px;
 }
 .nominatorCardWrapper:hover{
   background: $primary;
 }
 .avatarProfile{
   display: flex;
-  flex:5;
+  flex:1;
   align-items: center;
   height:100%;
 }
 .listItem{
   display: flex;
-  flex:1;
   align-items: center;
   justify-content: center;
   height:100%;
