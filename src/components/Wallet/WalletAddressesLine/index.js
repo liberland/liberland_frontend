@@ -49,7 +49,7 @@ function WalletAddressesLine({ walletAddress }) {
     },
   ];
 
-  if (process.env.REACT_APP_BRIDGE_TAB_ENABLED === 'true' || true) {
+  if (process.env.REACT_APP_BRIDGE_TAB_ENABLED === 'true' || process.env.REACT_APP_BRIDGE_TAB_ENABLED === true) {
     navigationList.push({
       route: router.wallet.ethBridge,
       title: 'Ethereum bridge',

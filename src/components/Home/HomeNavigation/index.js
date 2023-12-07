@@ -203,7 +203,6 @@ function HomeNavigation() {
 
         </div>
         <div className={styles.navigationContent}>
-
           {
             navigationList.map(({
               route,
@@ -213,9 +212,8 @@ function HomeNavigation() {
               access,
               description,
             }) => (
-              <div onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                <RoleHOC key={route} roles={roles} access={access}>
-
+              <div key={route} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                <RoleHOC roles={roles} access={access}>
                   <NavigationLink
                     route={route}
                     title={title}
@@ -227,7 +225,6 @@ function HomeNavigation() {
                 </RoleHOC>
               </div>
             ))
-
           }
           <div onClick={
             () => {

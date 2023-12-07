@@ -13,6 +13,7 @@ import { DelegateModal } from '../../../Modals';
 import Button from '../../../Button/Button';
 import truncate from '../../../../utils/truncate';
 import NotificationPortal from '../../../NotificationPortal';
+import {useMediaQuery} from "usehooks-ts";
 
 function PoliticanCard({
   politician,
@@ -22,6 +23,7 @@ function PoliticanCard({
   const [isModalOpenDelegate, setIsModalOpenDelegate] = useState(false);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
+  const isMedium = useMediaQuery('(min-width: 48em)');
 
   const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
   const handleModalOpenDelegate = () => {
@@ -49,7 +51,7 @@ function PoliticanCard({
             <img src={libertarianTorch} style={{ height: '100%' }} alt="" />
           </div>
           <div className={`${styles.politicianDisplayName} ${styles.maxContent}`}>
-            {truncate(politician.name, 20)}
+            {isMedium ? politician.name : truncate(politician.name, 20)}
             <CopyIcon
               className={styles.copyIcon}
               name="walletAddress"
