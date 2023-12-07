@@ -174,7 +174,7 @@ function ReferendumItem({
               <div className={styles.hashText}>
                 Referendum hash:
                 {' '}
-                <b>{ truncate(hash, 13) }</b>
+                <b>{ truncate(hash, 20) }</b>
                 <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={() => handleCopyClick(hash)} />
               </div>
             </div>
