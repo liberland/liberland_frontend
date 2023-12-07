@@ -11,7 +11,10 @@
     }
 
     .internalWrapper {
-      padding: 0 32px;
+      padding: 0 5px;
+      @media (min-width: 48em) {
+        padding: 0 32px;
+      }
     }
 
     .flex {

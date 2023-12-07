@@ -11,24 +11,32 @@
   }
 
   .internalWrapper {
-    padding: 0 32px;
+    padding: 0 5px;
+    @media (min-width: 48em) {
+      padding: 0 32px;
+    }
   }
 
   .flex {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: stretch;
     width: 100%;
     flex-wrap: wrap;
 
-    > * {
-      flex: 1;
+    @media (min-width: 48em) {
+      flex-direction: row;
     }
   }
 
 
 }
-
+.stakingInfoWrapper {
+  flex: 2;
+}
+.stakingModeWrapper {
+  flex: 1;
+}
 .rowWrapper {
   display: flex;
   justify-content: space-between;
@@ -39,7 +47,17 @@
     margin: 0;
   }
 }
+.stakingActionButtonsWrapper {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 
+  > * {
+    margin:4px;
+  }
+}
 .rowEnd {
   display: flex;
   justify-content: end;

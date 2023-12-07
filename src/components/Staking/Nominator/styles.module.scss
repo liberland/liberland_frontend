@@ -13,7 +13,10 @@
   margin-top: 21px;
   margin-bottom: 21px;
   flex-direction: column;
-  padding: 30px;
+  padding: 3px;
+  @media (min-width: 48em) {
+    padding: 30px;
+  }
 }
 
 .nominatorsList{

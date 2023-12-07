@@ -43,7 +43,7 @@ export default function StakeManagement() {
   return (
     <div className={styles.stakingWrapper}>
       <div className={styles.flex}>
-        <div>
+        <div className={styles.stakingInfoWrapper}>
           <h3>LLD staking</h3>
           <div className={styles.internalWrapper}>
             <CurrentlyStaked />
@@ -52,7 +52,7 @@ export default function StakeManagement() {
                 <PendingRewardsData />
                 <RewardsConfig />
                 <Unbonding />
-                <div className={styles.rowEnd}>
+                <div className={styles.stakingActionButtonsWrapper}>
                   <Button small primary onClick={handleStakeModalOpen}>
                     Add stake
                   </Button>
@@ -67,7 +67,7 @@ export default function StakeManagement() {
             )}
           </div>
         </div>
-        <div>
+        <div className={styles.stakingModeWrapper}>
           <div>
             <h3>Staking mode</h3>
             <div className={styles.internalWrapper}>
