@@ -28,16 +28,16 @@ function SelectedCandidateCard({
             className={styles.unselectContainer}
             onClick={() => unselectCandidate(politician)}
           >
-            <img src={removeIcon} style={{ height: '2rem' }} alt="" />
+            <img src={removeIcon} style={{ height: '100%' }} alt="" />
           </div>
           <div className={styles.politicianImageContainer}>
-            <img src={liberlandEmblemImage} style={{ height: '2rem' }} alt="" />
+            <img src={liberlandEmblemImage} style={{ height: '100%' }} alt="" />
           </div>
           <div className={styles.politicianPartyImageContainer}>
-            <img src={libertarianTorch} style={{ height: '1.75rem' }} alt="" />
+            <img src={libertarianTorch} style={{ height: '100%' }} alt="" />
           </div>
           <div className={`${styles.politicianDisplayName} ${styles.maxContent}`}>
-            {truncate(politician.name, 13)}
+            {truncate(politician.name, 20)}
             <CopyIcon
               className={styles.copyIcon}
               name="walletAddress"
@@ -47,13 +47,11 @@ function SelectedCandidateCard({
         </div>
         <div className={styles.orderButtonsContainer}>
           <div className={styles.orderButtons}>
-            <div className={styles.orderButtonImageContainer}>
-              <div onClick={() => moveSelectedCandidate(politician, 'up')}>
-                <img src={upArrow} style={{ height: '1.25rem' }} alt="" />
-              </div>
-              <div onClick={() => moveSelectedCandidate(politician, 'down')}>
-                <img src={downArrow} style={{ height: '1.25rem' }} alt="" />
-              </div>
+            <div onClick={() => moveSelectedCandidate(politician, 'up')} className={styles.orderButtonImageContainer}>
+              <img src={upArrow} style={{ height: '100%' }} alt="" />
+            </div>
+            <div onClick={() => moveSelectedCandidate(politician, 'down')} className={styles.orderButtonImageContainer}>
+              <img src={downArrow} style={{ height: '100%' }} alt="" />
             </div>
           </div>
         </div>

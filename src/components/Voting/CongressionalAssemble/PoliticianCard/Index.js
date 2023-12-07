@@ -43,13 +43,13 @@ function PoliticanCard({
       <div className={styles.politicianCardContainer}>
         <div className={styles.politicianData}>
           <div className={styles.politicianImageContainer}>
-            <img src={liberlandEmblemImage} style={{ height: '3rem' }} alt="" />
+            <img src={liberlandEmblemImage} style={{ height: '100%' }} alt="" />
           </div>
           <div className={styles.politicianPartyImageContainer}>
-            <img src={libertarianTorch} style={{ height: '2.5rem' }} alt="" />
+            <img src={libertarianTorch} style={{ height: '100%' }} alt="" />
           </div>
           <div className={`${styles.politicianDisplayName} ${styles.maxContent}`}>
-            {truncate(politician.name, 13)}
+            {truncate(politician.name, 20)}
             <CopyIcon
               className={styles.copyIcon}
               name="walletAddress"
@@ -75,7 +75,7 @@ function PoliticanCard({
                 {' '}
               </div>
               <div className={styles.politicianVotingPowerImageContainer}>
-                <img src={lawIcon} style={{ height: '2.5rem' }} alt="" />
+                <img src={lawIcon} style={{ height: '100%' }} alt="" />
               </div>
             </div>
           </div>
