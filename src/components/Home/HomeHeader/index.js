@@ -34,16 +34,7 @@ function HomeHeader() {
     [router.wallet.ethBridgeDeposit]: 'Ethereum Bridge',
     [router.wallet.ethBridgeWithdraw]: 'Ethereum Bridge',
   };
-  const dispatch = useDispatch();
-  const history = useHistory();
   const location = useLocation();
-
-  const handleLogout = () => {
-    dispatch(authActions.signOut.call(history));
-    window.location.replace(process.env.REACT_APP_SSO_API_LOGOUT_IMPLICIT_LINK);
-  };
-
-  const [isLogoutModalOpen, setLogoutIsModalOpen] = useState(false);
 
   const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   return (
@@ -51,23 +42,6 @@ function HomeHeader() {
       <div className={styles.homeHeaderAccountWrapper}>
         <div className={styles.titleWrapper}>
           <span className={styles.headerTitle}>{titles[location.pathname]}</span>
-        </div>
-        <div className={styles.avatarWrapper}>
-          <div className={styles.avatar}>
-            <Avatar
-              name={fullName}
-              round
-              onClick={
-              () => setLogoutIsModalOpen(true)
-              }
-              size="47px"
-              fgColor="#F1C823"
-              color="#FDF4E0"
-            />
-          </div>
-          {isLogoutModalOpen && (
-            <LogoutModal handleLogout={handleLogout} closeModal={() => setLogoutIsModalOpen(false)} />
-          )}
         </div>
       </div>
     </div>
