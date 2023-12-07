@@ -10,6 +10,7 @@ import LogoutModal from '../../Modals/LogoutModal';
 import styles from './styles.module.scss';
 
 function HomeHeader() {
+  // TODO do we need this component at all ?
   const name = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
   const hiMsg = name && lastName ? `Hi, ${name} ${lastName}!` : 'Hi!';
@@ -37,7 +38,7 @@ function HomeHeader() {
   const location = useLocation();
 
   const fullName = name && lastName ? `${name} ${lastName}` : undefined;
-  return (
+  return (titles[location.pathname] ? (
     <div className={styles.homeHeaderWrapper}>
       <div className={styles.homeHeaderAccountWrapper}>
         <div className={styles.titleWrapper}>
@@ -45,6 +46,9 @@ function HomeHeader() {
         </div>
       </div>
     </div>
+  )
+    : <div />
+
   );
 }
 
