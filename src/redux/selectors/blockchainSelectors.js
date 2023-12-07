@@ -22,6 +22,10 @@ const blockNumber = createSelector(
   blockchainReducer,
   (reducer) => reducer.currentBlockNumber,
 );
+const blockTimestamp = createSelector(
+  blockchainReducer,
+  (reducer) => reducer.currentBlockTimestamp,
+);
 const activeEra = createSelector(
   blockchainReducer,
   (reducer) => reducer.activeEra,
@@ -29,8 +33,8 @@ const activeEra = createSelector(
 
 const preimages = createSelector(
   blockchainReducer,
-  (reducer) => reducer.preimages
-)
+  (reducer) => reducer.preimages,
+);
 
 export {
   allWalletsSelector,
@@ -40,4 +44,5 @@ export {
   blockNumber,
   activeEra,
   preimages,
+  blockTimestamp,
 };
