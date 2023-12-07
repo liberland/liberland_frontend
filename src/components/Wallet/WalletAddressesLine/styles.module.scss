@@ -10,7 +10,11 @@
 
 .addressesWrapper {
   display: flex;
-  margin-right: 60px;
+  width: 100%;
+  @media (min-width: 48em) {
+    margin-right: 60px;
+    width: 250px;
+  }
 }
 
 .addressTitle {
@@ -23,27 +27,35 @@
 }
 
 .address {
-  font-size: 22px;
+  font-size: 15px;
   color: $text1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   font-weight: 600;
-  margin: 0;
+
+
+  @media (min-width: 48em) {
+    font-size: 20px;
+  }
+
 }
 
 .singleAddressWrapper {
-  width: 213px;
-  margin-right: 24px;
+  display: flex;
+  flex-direction: row;
+  @media (min-width: 48em) {
+    flex-direction: column;
+  }
 }
 
 .buttonsWrapper {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  justify-content: space-around;
 
   &>button {
-    margin-left: 20px;
+    margin: 10px;
   }
 }
 

@@ -23,13 +23,13 @@ function CandidateCard({
       <div className={styles.politicianCardContainer}>
         <div className={styles.politicianData}>
           <div className={styles.politicianImageContainer}>
-            <img src={liberlandEmblemImage} style={{ height: '2rem' }} alt="" />
+            <img src={liberlandEmblemImage} style={{ height: '100%' }} alt="" />
           </div>
           <div className={styles.politicianPartyImageContainer}>
-            <img src={libertarianTorch} style={{ height: '1.75rem' }} alt="" />
+            <img src={libertarianTorch} style={{ height: '100%' }} alt="" />
           </div>
           <div className={`${styles.politicianDisplayName} ${styles.maxContent}`}>
-            {truncate(politician.name, 13)}
+            {truncate(politician.name, 22)}
             <CopyIcon
               className={styles.copyIcon}
               name="walletAddress"
@@ -40,7 +40,7 @@ function CandidateCard({
         <div className={styles.selectCandidateContainer} onClick={() => selectCandidate(politician)}>
           <div className={styles.selectCandidateItems}>
             <div className={styles.selectCandidateImageContainer}>
-              <img src={addIcon} style={{ height: '1.25rem' }} alt="" />
+              <img src={addIcon} style={{ height: '100%' }} alt="" />
             </div>
           </div>
         </div>

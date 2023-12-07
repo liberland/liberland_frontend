@@ -38,7 +38,10 @@
   display: flex;
   align-items: center;
   justify-items: center;
-  height:3rem;
+  height:1.5rem;
+  @media (min-width: 48em) {
+    height:2.25rem;
+  }
 }
 .politicianPartyImageContainer{
   margin-right: 5px;
@@ -46,7 +49,10 @@
   display: flex;
   align-items: center;
   justify-items: center;
-  height:3rem;
+  height:1.5rem;
+  @media (min-width: 48em) {
+    height:2.25rem;
+  }
 }
 .selectCandidateImageContainer{
   margin-right: 10px;
@@ -54,12 +60,18 @@
   display: flex;
   align-items: center;
   justify-items: center;
-  height:3rem;
+  height:1.1rem;
+  @media (min-width: 48em) {
+    height:1.75rem;
+  }
 }
 .politicianDisplayName{
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   color: $text2;
+  @media (min-width: 48em) {
+    font-size: 1.1rem;
+  }
 }
 .maxContent {
   width: max-content;

@@ -49,7 +49,7 @@ function WalletAddressesLine({ walletAddress }) {
     },
   ];
 
-  if (process.env.REACT_APP_BRIDGE_TAB_ENABLED === 'true') {
+  if (process.env.REACT_APP_BRIDGE_TAB_ENABLED === 'true' || process.env.REACT_APP_BRIDGE_TAB_ENABLED === true) {
     navigationList.push({
       route: router.wallet.ethBridge,
       title: 'Ethereum bridge',
@@ -59,15 +59,14 @@ function WalletAddressesLine({ walletAddress }) {
   return (
     <>
       <NotificationPortal ref={notificationRef} />
-      <Tabs navigationList={navigationList} />
       <div className={styles.walletAddressLineWrapper}>
+        <Tabs navigationList={navigationList} />
         <div className={styles.addressesWrapper}>
           <div className={styles.singleAddressWrapper}>
             <p className={styles.addressTitle}>Wallet address:</p>
             <p className={styles.address}>
-              <WalletActiveIcon />
-              {addresses.walletAddress ? truncate(addresses.walletAddress, 13) : ''}
               <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={(e) => handleCopyClick(e)} />
+              {addresses.walletAddress ? truncate(addresses.walletAddress, 16) : ''}
             </p>
           </div>
         </div>

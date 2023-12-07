@@ -1,21 +1,28 @@
 .validatorWrapper {
+  padding: 8px 10px;
+  min-height: 760px;
+  @media (min-width: 48em) {
     padding: 8px 30px;
+  }
     margin: 0 auto;
-  
+
     h3 {
       padding-bottom: 14px;
     }
-  
+
     .internalWrapper {
-      padding: 0 32px;
+      padding: 0 5px;
+      @media (min-width: 48em) {
+        padding: 0 32px;
+      }
     }
-  
+
     .flex {
       display: flex;
       flex-direction: row;
       align-items: stretch;
       flex-wrap: wrap;
-  
+
       > * {
         flex: 1;
       }
@@ -31,18 +38,18 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-  
+
     & > div {
       margin: 0;
     }
   }
-  
+
   .rowEnd {
     display: flex;
     justify-content: end;
     align-items: center;
     margin-bottom: 20px;
-  
+
     > * {
       margin: 0 4px;
     }

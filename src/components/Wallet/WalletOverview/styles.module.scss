@@ -9,7 +9,7 @@
 .overViewCard {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-around;
   margin-top: 39px;
 }
 
@@ -19,6 +19,7 @@
   border-radius: 15px;
   padding: 21px 25px;
   cursor: pointer;
+  margin: 10px;
 
   &:hover{
     box-shadow: 0px 23px 44px rgba(176, 183, 195, 0.14);
@@ -29,7 +30,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  
+
 
   & > p {
     line-height: 29px;
@@ -42,7 +43,7 @@
   color: $text2;
   font-size: 24px;
   margin-top: 20px;
-  
+
 
   & > span {
     font-size: 12px;

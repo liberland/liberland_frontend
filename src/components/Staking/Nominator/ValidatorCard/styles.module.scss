@@ -3,16 +3,29 @@
 
 .nominatorCardWrapper{
   display: flex;
-  height: 50px;
+  height: 125px;
   font-size: 18px;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   border-radius: 20px;
   background: $secondary3;
   margin-top: 10px;
-  flex-direction: row;
+  flex-direction: column;
   gap: 16px;
-  padding: 0 32px;
+  padding: 5px;
+  @media (min-width: 48em) {
+    padding: 0 32px;
+    height: 55px;
+    flex-direction: row;
+  }
+}
+.nominatorRightWrapper {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  flex: 1;
 }
 .nominatorCardWrapper:hover{
   background: $primary;
@@ -21,25 +34,35 @@
   display: flex;
   flex:1;
   align-items: center;
-  height:100%;
+  @media (min-width: 48em) {
+    flex:2;
+    height:100%;
+  }
 }
 .listItem{
   display: flex;
   align-items: center;
   justify-content: center;
-  height:100%;
+  @media (min-width: 48em) {
+    height:100%;
+  }
 }
 .avatarImage{
   margin-right: 5px;
   margin-left: 15px;
   display: flex;
   align-items: center;
-  height:100%;
+  @media (min-width: 48em) {
+    height:100%;
+  }
 }
 .avatarName{
   display: flex;
   align-items: center;
-  height:100%;
+  @media (min-width: 48em) {
+    height:100%;
+  }
+  word-break: break-word;
 }
 .checkBox{
   background-color: #fff;

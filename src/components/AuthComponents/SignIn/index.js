@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 
 // REDUX
+import axios from 'axios';
 import { authActions } from '../../../redux/actions';
 
 import { errorsSelectors, blockchainSelectors } from '../../../redux/selectors';
@@ -13,12 +14,11 @@ import { errorsSelectors, blockchainSelectors } from '../../../redux/selectors';
 import styles from './styles.module.scss';
 // COMPONENTS
 import { ReactComponent as Divider } from '../../../assets/icons/divider.svg';
-import { ReactComponent as Wallet } from '../../../assets/icons/wallet.svg';
+import { ReactComponent as WalletIcon } from '../../../assets/icons/wallet.svg';
 import Header from '../Header';
 import { CheckboxInput } from '../../InputComponents';
 import router from '../../../router';
 import Button from '../../Button/Button';
-import axios from "axios";
 
 function SignIn() {
   const {
@@ -45,7 +45,7 @@ function SignIn() {
         apiError.data.error,
       );
     }
-    if(ssoAccessTokenHash) {
+    if (ssoAccessTokenHash) {
       const api2 = axios.create({
         baseURL: process.env.REACT_APP_API2,
         withCredentials: true,
@@ -53,9 +53,9 @@ function SignIn() {
       api2.defaults.headers.common['X-token'] = ssoAccessTokenHash;
 
       api2.get('/users/me').then((result) => {
-        const walletAddress = allAccounts.find( account => account.address === result?.data?.blockchainAddress)
-        if(walletAddress) {
-          onSubmit({wallet_address: walletAddress.address, rememberMe: false})
+        const walletAddress = allAccounts.find((account) => account.address === result?.data?.blockchainAddress);
+        if (walletAddress) {
+          onSubmit({ wallet_address: walletAddress.address, rememberMe: false });
         }
       });
     }
@@ -71,7 +71,7 @@ function SignIn() {
 
   const goToLiberlandSignin = () => {
     window.location.replace(process.env.REACT_APP_SSO_API_IMPLICIT_LINK);
-  }
+  };
 
   return (
     <div>
@@ -82,7 +82,7 @@ function SignIn() {
         <h3>Sign In to Liberland</h3>
         <p>Welcome back, you’ve been missed!</p>
         <Button medium primary onClick={() => goToLiberlandSignin()}>
-          <Wallet />
+          <WalletIcon />
           Liberland Sign in
         </Button>
         <p className={styles.divider}>

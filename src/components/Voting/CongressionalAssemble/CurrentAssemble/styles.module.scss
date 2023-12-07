@@ -1,4 +1,9 @@
 .currentAssembleHeader{
-  font-size: 1.75rem;
+  font-size: 1.35rem;
   font-weight: bold;
+  text-align: center;
+  @media (min-width: 48em) {
+    font-size: 1.75rem;
+    text-align: left;
+  }
 }

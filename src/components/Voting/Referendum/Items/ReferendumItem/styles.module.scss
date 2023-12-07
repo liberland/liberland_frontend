@@ -1,14 +1,17 @@
 @import '../../../../../assets/base/variables';
 
 .metaInfoLine{
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
   display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 0.5rem;
+  //flex-wrap: wrap;
+  margin-bottom: 2rem;
   margin-top: 0px;
-  height: 3.5rem;
+  height: 4.5rem;
+  @media (min-width: 48em) {
+    flex-direction: row;
+  }
 }
 .description{
   margin-top: 0.75rem;
@@ -16,7 +19,10 @@
 }
 .referendumItemContainer{
   background-color: $transparent3;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
+  padding-top:1rem;
+  padding-bottom:1rem;
 }
 .buttonContainer{
   margin-top: 1rem;
@@ -38,8 +44,11 @@
   font-weight: bolder;
 }
 .votesInfo{
-  flex: 1;
-  margin: 0 12px;
+  width: 100%;
+  margin: 12px;
+  @media (min-width: 48em) {
+    flex: 1;
+  }
 }
 .proposeData {
   flex: 1;
