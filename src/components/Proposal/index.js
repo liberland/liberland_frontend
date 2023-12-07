@@ -27,6 +27,7 @@ function RepealLegislationSection({ proposal }) {
         {tier.toString()}
         {' '}
         -
+        {' '}
         {year.toNumber()}
         /
         {index.toNumber()}
@@ -51,6 +52,7 @@ function AddLegislation({ proposal }) {
         </Link>
         {' '}
         -
+        {' '}
         {year.toNumber()}
         /
         {index.toNumber()}
@@ -82,6 +84,7 @@ function AmendLegislation({ proposal }) {
           {tier.toString()}
           {' '}
           -
+          {' '}
           {year.toNumber()}
           /
           {index.toNumber()}
@@ -108,6 +111,7 @@ function RepealLegislation({ proposal }) {
         {tier.toString()}
         {' '}
         -
+        {' '}
         {year.toNumber()}
         /
         {index.toNumber()}

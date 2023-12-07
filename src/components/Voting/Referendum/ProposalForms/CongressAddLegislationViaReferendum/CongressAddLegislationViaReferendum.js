@@ -12,6 +12,7 @@ import { congressSelectors } from '../../../../../redux/selectors';
 import { AddLegislationFields } from '../AddLegislationFields/AddLegislationFields';
 import { congressActions } from '../../../../../redux/actions';
 import FastTrackForm, { FastTrackDefaults } from '../../../../Congress/FastTrackForm';
+import { ProposalDiscussionFields } from '../ProposalDiscussionFields';
 
 export function CongressAddLegislationViaReferendum() {
   const dispatch = useDispatch();
@@ -34,6 +35,9 @@ export function CongressAddLegislationViaReferendum() {
   if (!isLoading && shouldRedirect) return <Redirect to={router.congress.motions} />;
 
   const propose = ({
+    discussionName,
+    discussionDescription,
+    discussionLink,
     tier,
     year,
     index,
@@ -44,6 +48,9 @@ export function CongressAddLegislationViaReferendum() {
   }) => {
     const sections = sectionsRaw.map((v) => v.value);
     dispatch(congressActions.congressProposeLegislationViaReferendum.call({
+      discussionName,
+      discussionDescription,
+      discussionLink,
       tier,
       id: { year, index },
       sections,
@@ -96,6 +103,7 @@ export function CongressAddLegislationViaReferendum() {
       />
       { errors?.index?.message && <div className={styles.error}>{errors.index.message}</div> }
 
+      <ProposalDiscussionFields {...{ register, errors }} />
       <AddLegislationFields {...{
         register, control, errors, watch,
       }}

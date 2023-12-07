@@ -5,7 +5,6 @@ import {
 import {
   getCongressMembersWithIdentity,
   getDemocracyReferendums,
-  secondProposal,
   voteOnReferendum,
   submitProposal,
   voteForCongress,
@@ -30,27 +29,6 @@ function* getDemocracyWorker() {
   const scheduledCalls = yield call(getScheduledCalls);
   const democracy = { ...directDemocracyInfo, ...currentCongressMembers, scheduledCalls };
   yield put(democracyActions.getDemocracy.success({ democracy }));
-}
-
-function* secondProposalWorker(action) {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { errorData } = yield cps(secondProposal, walletAddress, action.payload.proposalIndex);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(democracyActions.secondProposal.failure());
-    } else {
-      yield put(democracyActions.secondProposal.success());
-      yield put(democracyActions.getDemocracy.call());
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.error('Error in secondProposalWorker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(democracyActions.secondProposal.failure(errorData));
-  }
 }
 
 function* voteReferendumWorker(action) {
@@ -78,10 +56,24 @@ function* voteReferendumWorker(action) {
 function* proposeWorker(action) {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const {
-    name, forumLink, tier, sections,
+    tier, index,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    sections,
   } = action.payload;
   const year = new Date().getFullYear();
-  yield call(submitProposal, name, forumLink, tier, year, sections, walletAddress);
+  yield call(
+    submitProposal,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    tier,
+    year,
+    index,
+    sections,
+    walletAddress,
+  );
   yield put(democracyActions.propose.success());
   yield put(democracyActions.getDemocracy.call());
 }
@@ -151,16 +143,37 @@ function* undelegateWorker(action) {
 function* proposeAmendLegislationWorker(action) {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const {
-    tier, id, section, content,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    tier,
+    id,
+    section,
+    content,
   } = action.payload;
-  yield call(proposeAmendLegislation, tier, id, section, content, walletAddress);
+  yield call(
+    proposeAmendLegislation,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    tier,
+    id,
+    section,
+    content,
+    walletAddress,
+  );
   yield put(democracyActions.proposeAmendLegislation.success());
   yield put(democracyActions.getDemocracy.call());
 }
 
 function* citizenProposeRepealLegislationWorker({
   payload: {
-    tier, id, section,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    tier,
+    id,
+    section,
   },
 }) {
   const walletAddress = yield select(
@@ -169,6 +182,9 @@ function* citizenProposeRepealLegislationWorker({
 
   yield call(
     citizenProposeRepealLegislation,
+    discussionName,
+    discussionDescription,
+    discussionLink,
     tier,
     id,
     section,
@@ -184,14 +200,6 @@ function* citizenProposeRepealLegislationWorker({
 
 function* getDemocracyWatcher() {
   yield* blockchainWatcher(democracyActions.getDemocracy, getDemocracyWorker);
-}
-
-function* secondProposalWatcher() {
-  try {
-    yield takeLatest(democracyActions.secondProposal.call, secondProposalWorker);
-  } catch (e) {
-    yield put(democracyActions.secondProposal.failure(e));
-  }
 }
 
 function* voteOnReferendumWatcher() {
@@ -246,7 +254,6 @@ export {
   getDemocracyWatcher,
   proposeAmendLegislationWatcher,
   proposeWatcher,
-  secondProposalWatcher,
   undelegateWatcher,
   voteForCongressWatcher,
   voteOnReferendumWatcher,

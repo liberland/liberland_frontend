@@ -80,14 +80,7 @@ function Referendum() {
               democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
                 <ReferendumItem
                   key={referendum.index}
-                  name={referendum?.centralizedData?.hash ? referendum.centralizedData.hash : 'Onchain referendum'}
-                  createdBy={referendum?.centralizedData?.username ? referendum.centralizedData.username : 'Unknown'}
-                  externalLink={referendum?.centralizedData?.link
-                    ? referendum.centralizedData.link
-                    : 'https://forum.liberland.org/'}
-                  description={referendum?.centralizedData?.description
-                    ? referendum.centralizedData.description
-                    : 'Onchain referendum with no description'}
+                  centralizedDatas={referendum.centralizedDatas}
                   yayVotes={referendum.votedAye}
                   nayVotes={referendum.votedNay}
                   hash={referendum.imageHash}
@@ -112,12 +105,9 @@ function Referendum() {
                 /* eslint-disable max-len */
                 <ProposalItem
                   key={proposal.index}
-                  name={proposal?.centralizedData?.hash ? proposal.centralizedData.hash : 'Onchain proposal'}
-                  createdBy={proposal?.centralizedData?.username ? proposal.centralizedData.username : proposal.proposer}
-                  externalLink={proposal?.centralizedData?.link ? proposal.centralizedData.link : 'https://forum.liberland.org/'}
-                  description={proposal?.centralizedData?.description ? proposal.centralizedData.description : 'Onchain proposal with no description'}
+                  proposer={proposal.proposer}
+                  centralizedDatas={proposal.centralizedDatas}
                   boundedCall={proposal.boundedCall}
-                  proposalIndex={proposal.index}
                   blacklistMotion={proposal.blacklistMotion}
                 />
                 /* eslint-enable max-len */

@@ -57,10 +57,10 @@ export const getReferenda = async () => {
 };
 
 export const addReferendum = async ({
-  link, chainIndex, name, description, hash, additionalMetadata, proposerAddress,
+  link, name, description, hash, additionalMetadata, proposerAddress,
 }) => {
   const api = getApi();
-  return await api.post('/referenda', {
-    link, chainIndex, name, description, hash, additionalMetadata, proposerAddress,
+  return api.post('/referenda', {
+    link, chainIndex: 0, name, description, hash, additionalMetadata, proposerAddress,
   });
 };

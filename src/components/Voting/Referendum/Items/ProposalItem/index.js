@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
+import { blake2AsHex } from '@polkadot/util-crypto';
+import { hexToU8a } from '@polkadot/util';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
@@ -38,77 +40,22 @@ function BlacklistButton({ hash }) {
 
 BlacklistButton.propTypes = { hash: PropTypes.string.isRequired };
 
-const LegacyHash = ({ hash }) => hash;
-
-const Inline = () => 'Inline call';
-
-const Lookup = ({ hash }) => hash;
-
-function BoundedCall({ call, handleCopyClick }) {
-  if ('Legacy' in call) {
-    return (
-      <>
-        <LegacyHash hash={truncate(call.Legacy.hash_, 13)} />
-        <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={() => handleCopyClick(call.Legacy.hash_)} />
-      </>
-    );
-  } if ('Inline' in call) {
-    // eslint-disable-next-line no-console
-    console.warn('Inline call details:', call);
-    return <Inline />;
-  } if ('Lookup' in call) {
-    return (
-      <>
-        <Lookup hash={truncate(call.Lookup.hash_, 13)} />
-        <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={() => handleCopyClick(call.Lookup.hash_)} />
-      </>
-    );
-  }
-  // eslint-disable-next-line no-console
-  console.warn('Unknown call details:', call);
-  return 'Unknown type of call.';
-}
-
-function EndorseButton({ buttonEndorseCallback, userDidEndorse, referendumInfo }) {
-  return userDidEndorse ? (
-    <Button medium gray>
-      Already endorsed
-    </Button>
-  )
-    : (
-      <Button medium primary onClick={() => { buttonEndorseCallback(referendumInfo); }}>
-        Endorse
-      </Button>
-    );
-}
-
-EndorseButton.propTypes = {
-  buttonEndorseCallback: PropTypes.func.isRequired,
-  userDidEndorse: PropTypes.bool.isRequired,
-  referendumInfo: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    proposalIndex: PropTypes.string.isRequired,
-  }).isRequired,
-
-};
-
 function ProposalItem({
-  name,
-  createdBy,
-  currentEndorsement,
-  externalLink,
-  description,
-  userDidEndorse,
+  proposer,
+  centralizedDatas,
   boundedCall,
-  buttonEndorseCallback,
-  proposalIndex,
   blacklistMotion,
 }) {
-  let hash; let
-    len;
+  let hash;
+  let len;
   if ('Lookup' in boundedCall) {
     hash = boundedCall.Lookup.hash_;
     len = boundedCall.Lookup.len;
+  } else if ('Legacy' in boundedCall) {
+    hash = boundedCall.Legacy.hash_;
+  } else {
+    // this sux but we have no other way until we refactor it to NOT use toJSON/toHuman
+    hash = blake2AsHex(hexToU8a(boundedCall.Inline));
   }
 
   const notificationRef = useRef();
@@ -121,7 +68,14 @@ function ProposalItem({
     <>
       <NotificationPortal ref={notificationRef} />
       <Card
-        title={name}
+        title={(
+          <>
+            ID:
+            {truncate(hash, 13)}
+            {' '}
+            <CopyIcon className={styles.copyIcon} name="proposalHash" onClick={() => handleCopyClick(hash)} />
+          </>
+)}
         className={styles.cardProposalsSection}
       >
         <div>
@@ -145,25 +99,11 @@ function ProposalItem({
           <div className={styles.metaInfoLine}>
             <div>
               <div className={styles.metaTextInfo}>
-                By:
-                <b>{ createdBy && truncate(createdBy, 13) }</b>
-                <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={() => handleCopyClick(createdBy)} />
-              </div>
-              <div className={styles.hashText}>
-                <b><BoundedCall call={boundedCall} handleCopyClick={handleCopyClick} /></b>
+                Proposed by:
+                <b>{ proposer && truncate(proposer, 13) }</b>
+                <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={() => handleCopyClick(proposer)} />
               </div>
             </div>
-            <div>
-              Endorsement:
-              {' '}
-              {currentEndorsement}
-            </div>
-          </div>
-          <div>
-            <a href={externalLink}>Read discussion</a>
-          </div>
-          <div className={styles.description}>
-            <p>{description}</p>
           </div>
           { hash && len
             && (
@@ -172,13 +112,33 @@ function ProposalItem({
               <Preimage {...{ hash, len }} />
             </div>
             )}
-          <div className={styles.buttonContainer}>
-            <EndorseButton
-              buttonEndorseCallback={buttonEndorseCallback}
-              userDidEndorse={userDidEndorse}
-              referendumInfo={{ name, proposalIndex }}
-            />
-          </div>
+          {centralizedDatas?.length > 0
+            && (
+            <div>
+              Discussions:
+              <ol>
+                {centralizedDatas.map((centralizedData) => (
+                  <li key={centralizedData.id}>
+                    <a href={centralizedData.link}>
+                      {centralizedData.name}
+                    </a>
+                    {' - '}
+                    {centralizedData.description}
+                    {' '}
+                    (Discussion added by
+                    {' '}
+                    <b>{ truncate(centralizedData.proposerAddress, 13) }</b>
+                    <CopyIcon
+                      className={styles.copyIcon}
+                      name="walletAddress"
+                      onClick={() => handleCopyClick(centralizedData.proposerAddress)}
+                    />
+                    )
+                  </li>
+                ))}
+              </ol>
+            </div>
+            )}
         </div>
       </Card>
     </>
@@ -203,18 +163,17 @@ const call = PropTypes.oneOfType([
   }),
 ]);
 
-BoundedCall.propTypes = { call: call.isRequired, handleCopyClick: PropTypes.func.isRequired };
-
 ProposalItem.propTypes = {
-  name: PropTypes.string.isRequired,
-  createdBy: PropTypes.string.isRequired,
-  currentEndorsement: PropTypes.string.isRequired,
-  externalLink: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  userDidEndorse: PropTypes.bool.isRequired,
+  proposer: PropTypes.string.isRequired,
+  centralizedDatas: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    link: PropTypes.string.isRequired,
+    proposerAddress: PropTypes.string.isRequired,
+    created: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
+  })).isRequired,
   boundedCall: call.isRequired,
-  buttonEndorseCallback: PropTypes.func.isRequired,
-  proposalIndex: PropTypes.string.isRequired,
   blacklistMotion: PropTypes.string.isRequired,
 };
 

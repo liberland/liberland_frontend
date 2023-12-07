@@ -6,6 +6,7 @@ import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
+import truncate from '../../utils/truncate';
 
 const renderVoteButton = (vote) => (vote === 'Aye'
   ? <Button green medium type="submit">Vote Aye</Button>
@@ -20,7 +21,7 @@ function VoteOnReferendumModal({
       className={styles.getCitizenshipModal}
       onSubmit={handleSubmit(onSubmitVote)}
     >
-      <div className={styles.h3}>{referendumInfo.name}</div>
+      <div className={styles.h3}>{truncate(referendumInfo.id, 13)}</div>
       <div className={styles.title}>Referendum Index</div>
       <TextInput
         register={register}
@@ -49,7 +50,7 @@ VoteOnReferendumModal.propTypes = {
   onSubmitVote: PropTypes.func.isRequired,
   voteType: PropTypes.string.isRequired,
   referendumInfo: PropTypes.shape({
-    name: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
     referendumIndex: PropTypes.number.isRequired,
     proposalIndex: PropTypes.number.isRequired,
   }).isRequired,

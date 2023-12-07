@@ -189,6 +189,9 @@ function* congressRepealLegislationWorker({ payload: { tier, id, section } }) {
 
 function* congressProposeRepealLegislationWorker({
   payload: {
+    discussionName,
+    discussionDescription,
+    discussionLink,
     tier, id, section, fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
   },
 }) {
@@ -198,6 +201,9 @@ function* congressProposeRepealLegislationWorker({
 
   yield call(
     congressProposeRepealLegislation,
+    discussionName,
+    discussionDescription,
+    discussionLink,
     tier,
     id,
     section,
@@ -252,6 +258,9 @@ function* closeMotionWorker({ payload: { proposal, index } }) {
 
 function* congressProposeLegislationViaReferendumWorker({
   payload: {
+    discussionName,
+    discussionDescription,
+    discussionLink,
     tier, id, sections,
     fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
   },
@@ -262,6 +271,9 @@ function* congressProposeLegislationViaReferendumWorker({
 
   yield call(
     congressProposeLegislationViaReferendum,
+    discussionName,
+    discussionDescription,
+    discussionLink,
     tier,
     id,
     sections,
@@ -319,6 +331,9 @@ function* congressAmendLegislationWorker({
 
 function* congressAmendLegislationViaReferendumWorker({
   payload: {
+    discussionName,
+    discussionDescription,
+    discussionLink,
     tier, id, section, content,
     fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
   },
@@ -329,6 +344,9 @@ function* congressAmendLegislationViaReferendumWorker({
 
   yield call(
     congressAmendLegislationViaReferendum,
+    discussionName,
+    discussionDescription,
+    discussionLink,
     tier,
     id,
     section,

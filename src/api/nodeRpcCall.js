@@ -102,14 +102,12 @@ const getApi = async () => {
 
 const crossReference = (api, blockchainData, allCentralizedData, motions, isReferendum) => 
   blockchainData.map((item) => {
-    const centralizedData = allCentralizedData.find((cItem) => (
-      parseInt(cItem.chainIndex) == parseInt(item.index)
-    ))
-
     const proposalHash = isReferendum ? item.imageHash : (
       item.boundedCall?.Lookup?.hash_ ?? 
       item.boundedCall?.Legacy?.hash_
     )
+
+    const centralizedDatas = allCentralizedData.filter((cItem) => ( cItem.hash === proposalHash))
     const blacklistMotionHash = api.tx.democracy.blacklist(
       proposalHash, 
       isReferendum ? item.index : null
@@ -117,7 +115,7 @@ const crossReference = (api, blockchainData, allCentralizedData, motions, isRefe
 
     return {
       ...item,
-      centralizedData,
+      centralizedDatas,
       blacklistMotion: motions.includes(blacklistMotionHash) ? blacklistMotionHash : null
     }
   }
@@ -750,27 +748,6 @@ const getDemocracyReferendums = async (address) => {
   }
 };
 
-const secondProposal = async (walletAddress, proposal, callback) => {
-  const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
-  const secondExtrinsic = api.tx.democracy.second(proposal);
-  secondExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
-};
-
 const voteOnReferendum = async (walletAddress, referendumIndex, voteType, callback) => {
   const api = await getApi();
   const injector = await web3FromAddress(walletAddress);
@@ -803,27 +780,32 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType, callba
   });
 };
 
-const submitProposal = async (name, forumLink, tier, year, sections, walletAddress) => {
+const submitProposal = async (
+  discussionName,
+  discussionDescription,
+  discussionLink,
+  tier,
+  year,
+  index,
+  sections,
+  walletAddress,
+) => {
   const api = await getApi();
-  const nextChainIndexQuery = await api.query.democracy.referendumCount();
-  const nextChainIndex = nextChainIndexQuery.toHuman();
 
-  const centralizedMetadata = await centralizedBackend.addReferendum({
-    link: forumLink,
-    chainIndex: nextChainIndex,
-    name,
-    description: sections.join("\n"),
-    hash: 'hash not needed',
-    additionalMetadata: {},
-    proposerAddress: walletAddress,
-  });
-  const legislationIndex = centralizedMetadata.data.id;
   const proposal = api.tx.liberlandLegislation.addLegislation(
     tier,
-    { year, index: legislationIndex },
+    { year, index },
     sections,
   ).method;
   const hash = proposal.hash;
+  await centralizedBackend.addReferendum({
+    link: discussionLink,
+    name: discussionName,
+    description: discussionDescription,
+    hash,
+    additionalMetadata: {},
+    proposerAddress: walletAddress,
+  });
   const minDeposit = api.consts.democracy.minimumDeposit;
   const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
   const proposeTx = proposeCall({ Lookup: {
@@ -1832,6 +1814,9 @@ const closeCongressMotion = async (proposalHash, index, walletAddress) => {
 }
 
 const congressProposeReferendum = async (
+  discussionName,
+  discussionDescription,
+  discussionLink,
   referendumProposal,
   fastTrack,
   votingPeriod,
@@ -1839,6 +1824,15 @@ const congressProposeReferendum = async (
   walletAddress,
 ) => {
   const api = await getApi();
+
+  await centralizedBackend.addReferendum({
+    link: discussionLink,
+    name: discussionName,
+    description: discussionDescription,
+    hash: referendumProposal.hash,
+    additionalMetadata: {},
+    proposerAddress: walletAddress,
+  });
 
   const lookup = {
     Lookup: { 
@@ -1873,6 +1867,9 @@ const congressProposeReferendum = async (
 }
 
 const congressProposeLegislationViaReferendum = async (
+  discussionName,
+  discussionDescription,
+  discussionLink,
   tier,
   id,
   sections,
@@ -1883,11 +1880,23 @@ const congressProposeLegislationViaReferendum = async (
 ) => {
   const api = await getApi();
   const addLegislation = api.tx.liberlandLegislation.addLegislation(tier, id, sections).method;
-  return await congressProposeReferendum(addLegislation, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
+  return await congressProposeReferendum(
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    addLegislation,
+    fastTrack,
+    votingPeriod,
+    enactmentPeriod,
+    walletAddress
+  );
 }
 
 
 const congressProposeRepealLegislation = async (
+  discussionName,
+  discussionDescription,
+  discussionLink,
   tier,
   id,
   section,
@@ -1901,10 +1910,22 @@ const congressProposeRepealLegislation = async (
   const repealLegislation = section !== null ?
     api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness).method
     : api.tx.liberlandLegislation.repealLegislation(tier, id, witness).method;
-  return await congressProposeReferendum(repealLegislation, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
+  return await congressProposeReferendum(
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    repealLegislation,
+    fastTrack,
+    votingPeriod,
+    enactmentPeriod,
+    walletAddress
+  );
 }
 
 const citizenProposeRepealLegislation = async (
+  discussionName,
+  discussionDescription,
+  discussionLink,
   tier,
   id,
   section,
@@ -1915,6 +1936,15 @@ const citizenProposeRepealLegislation = async (
   const repealLegislation = section !== null ?
     api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness).method
     : api.tx.liberlandLegislation.repealLegislation(tier, id, witness).method;
+
+  await centralizedBackend.addReferendum({
+    link: discussionLink,
+    name: discussionName,
+    description: discussionDescription,
+    hash: repealLegislation.hash,
+    additionalMetadata: {},
+    proposerAddress: walletAddress,
+  });
 
   const minDeposit = api.consts.democracy.minimumDeposit;
   const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
@@ -1963,7 +1993,16 @@ const congressDemocracyBlacklist = async (proposalHash, referendumIndex, walletA
   return await submitExtrinsic( extrinsic, walletAddress);
 }
 
-const proposeAmendLegislation = async (tier, id, section, content, walletAddress) => {
+const proposeAmendLegislation = async (
+  discussionName,
+  discussionDescription,
+  discussionLink,
+  tier,
+  id,
+  section,
+  content,
+  walletAddress,
+) => {
   const api = await getApi();
   const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
   const proposal = api.tx.liberlandLegislation.amendLegislation(
@@ -1973,6 +2012,14 @@ const proposeAmendLegislation = async (tier, id, section, content, walletAddress
     content,
     witness,
   ).method;
+  await centralizedBackend.addReferendum({
+    link: discussionLink,
+    name: discussionName,
+    description: discussionDescription,
+    hash: proposal.hash,
+    additionalMetadata: {},
+    proposerAddress: walletAddress,
+  });
   const notePreimageTx = api.tx.preimage.notePreimage(proposal.toHex());
   const minDeposit = api.consts.democracy.minimumDeposit;
   const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
@@ -1997,6 +2044,9 @@ const congressAmendLegislation = async (tier, id, section, content, walletAddres
 }
 
 const congressAmendLegislationViaReferendum = async (
+  discussionName,
+  discussionDescription,
+  discussionLink,
   tier,
   id,
   section,
@@ -2016,7 +2066,16 @@ const congressAmendLegislationViaReferendum = async (
     content,
     witness
   ).method;
-  return await congressProposeReferendum(amendLegislation, fastTrack, votingPeriod, enactmentPeriod, walletAddress);
+  return await congressProposeReferendum(
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    amendLegislation,
+    fastTrack,
+    votingPeriod,
+    enactmentPeriod,
+    walletAddress
+  );
 }
 
 const fetchPreimageLen = async (hash) => {
@@ -2124,7 +2183,6 @@ export {
   getNominatorTargets,
   setNominatorTargets,
   getDemocracyReferendums,
-  secondProposal,
   voteOnReferendum,
   submitProposal,
   getCongressMembersWithIdentity,

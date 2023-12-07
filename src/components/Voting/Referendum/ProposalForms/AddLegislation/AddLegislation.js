@@ -11,6 +11,7 @@ import { democracyActions } from '../../../../../redux/actions';
 import router from '../../../../../router';
 import { democracySelectors } from '../../../../../redux/selectors';
 import { AddLegislationFields } from '../AddLegislationFields/AddLegislationFields';
+import { ProposalDiscussionFields } from '../ProposalDiscussionFields';
 
 export function AddLegislation() {
   const dispatch = useDispatch();
@@ -32,11 +33,21 @@ export function AddLegislation() {
   if (!isLoading && shouldRedirect) return <Redirect to={router.voting.referendum} />;
 
   const propose = ({
-    name, forumLink, tier, sections: sectionsRaw,
+    tier,
+    index,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    sections: sectionsRaw,
   }) => {
     const sections = sectionsRaw.map((v) => v.value);
     dispatch(democracyActions.propose.call({
-      name, forumLink, tier, sections,
+      tier,
+      index,
+      discussionName,
+      discussionDescription,
+      discussionLink,
+      sections,
     }));
     setShouldRedirect(true);
   };
@@ -62,25 +73,20 @@ export function AddLegislation() {
         ]}
       />
 
-      <div className={styles.title}>Legislation Name</div>
+      <div className={styles.title}>Legislation Index</div>
       <TextInput
         required
-        errorTitle="Name"
+        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
+        errorTitle="Index"
         register={register}
-        name="name"
-        placeholder="legislationName"
+        name="index"
       />
-      {errors?.legislationName?.message ? <div className={styles.error}>{errors.legislationName.message}</div> : null}
+      {errors?.index?.message ? <div className={styles.error}>{errors.index.message}</div> : null}
 
-      <div className={styles.title}>Forum Link</div>
-      <TextInput
-        required
-        errorTitle="Forum link"
-        register={register}
-        name="forumLink"
-        placeholder="forumLink"
+      <ProposalDiscussionFields {...{
+        register, errors,
+      }}
       />
-      {errors?.forumLink?.message ? <div className={styles.error}>{errors.forumLink.message}</div> : null}
 
       <AddLegislationFields {...{
         register, control, errors, watch,
