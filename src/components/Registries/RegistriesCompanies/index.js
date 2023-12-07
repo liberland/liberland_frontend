@@ -36,7 +36,7 @@ function RegistriesCompanies() {
       >
         <Button
           primary
-          large
+          medium
         >
           <h3>Register new company</h3>
         </Button>

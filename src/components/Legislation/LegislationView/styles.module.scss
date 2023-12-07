@@ -2,6 +2,7 @@
 
 .legislationCard {
     margin-bottom: 15px;
+    padding:0.5rem
 }
 .legislationSectionCard {
     background-color: $bg4;
@@ -38,8 +39,8 @@
     margin: 8px 0;
     flex-wrap: wrap;
     flex-direction: row;
-    
-  
+
+
     > * {
       margin: 0 4px;
     }
@@ -55,7 +56,7 @@
     border-width: 2px;
     border-color: $primary;
     border-style: solid;
-    
+
     display: flex;
     padding: 16px;
     flex-direction: column;
