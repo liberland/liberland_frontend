@@ -100,12 +100,14 @@ function OnchainIdentityModal({
         name="web"
         placeholder="Web address"
       />
+      <div className={styles.error}>{errors?.web?.message || errors?.web?.message}</div>
       <div className={styles.title}>Email</div>
       <TextInput
         register={register}
         name="email"
         placeholder="Email"
       />
+      <div className={styles.error}>{errors?.email?.message || errors?.email?.message}</div>
       <div className={styles.title}>I am or want to become a</div>
       <SelectInput
         register={register}

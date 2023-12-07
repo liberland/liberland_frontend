@@ -4,21 +4,26 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
 // COMPONENTS
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { BN_ZERO } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
 
 // STYLES
 import styles from './styles.module.scss';
-import { parseMerits } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
 import { isValidSubstrateAddress } from '../../utils/bridge';
+import { parseMerits, valueToBN } from '../../utils/walletHelpers';
+import { walletSelectors } from '../../redux/selectors';
 
 function SendLLMModal({
   closeModal,
 }) {
   const dispatch = useDispatch();
+  const balances = useSelector(walletSelectors.selectorBalances);
+  const maxUnbond = valueToBN(balances?.liquidMerits?.amount ?? 0);
+
   const {
     handleSubmit,
     formState: { errors },
@@ -31,6 +36,16 @@ function SendLLMModal({
       amount: parseMerits(values.amount),
     }));
     closeModal();
+  };
+
+  const validateUnbondValue = (textUnbondValue) => {
+    try {
+      const unbondValue = parseMerits(textUnbondValue);
+      if (unbondValue.gt(maxUnbond) || unbondValue.lte(BN_ZERO)) return 'Invalid amount';
+      return true;
+    } catch (e) {
+      return 'Invalid amount';
+    }
   };
 
   return (
@@ -54,10 +69,13 @@ function SendLLMModal({
       <div className={styles.title}>Amount LLM</div>
       <TextInput
         register={register}
+        validate={validateUnbondValue}
         name="amount"
         placeholder="Amount LLM"
         required
       />
+      { errors?.amount?.message
+        && <div className={styles.error}>{errors.amount.message}</div> }
 
       <div className={styles.buttonWrapper}>
         <Button

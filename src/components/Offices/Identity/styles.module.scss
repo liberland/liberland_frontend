@@ -1,3 +1,5 @@
+@import "../../../assets/base/variables";
+
 .form {
     width: 60%;
 }
@@ -29,3 +31,9 @@
     justify-content: space-between;
     margin-top: 20px;
 }
+
+.error {
+    font-size: 16px;
+    color: $errorText;
+    font-weight: 500;
+  }
