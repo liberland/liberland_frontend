@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */ // remove after refactoring history back in
-import React from 'react';
+import React, {useRef} from 'react';
 import { useSelector } from 'react-redux';
 import { BN, BN_ZERO } from '@polkadot/util';
 import Button from '../../Button/Button';
@@ -15,6 +15,9 @@ import { formatMeritTransaction, formatDollarTransaction } from '../../../utils/
 
 import { blockchainSelectors } from '../../../redux/selectors';
 import truncate from '../../../utils/truncate';
+import {useMediaQuery} from "usehooks-ts";
+import {ReactComponent as CopyIcon} from "../../../assets/icons/copy.svg";
+import NotificationPortal from "../../NotificationPortal";
 
 const paymentTypeIcons = {
   failure: <FailedIcon />,
@@ -24,10 +27,19 @@ const paymentTypeIcons = {
 
 function WalletTransactionHistory({ failure, transactionHistory, bottomButtonOnclick }) {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector).toString();
+  const notificationRef = useRef();
+  const isLarge = useMediaQuery('(min-width: 62em)');
+
+  const handleCopyClick = (address) => {
+    console.log('copying')
+    navigator.clipboard.writeText(address);
+    notificationRef.current.addSuccess({ text: 'Address was copied' });
+  };
 
   transactionHistory.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
   return (
     <Card title="Transaction History" className={styles.cardWrapper}>
+      <NotificationPortal ref={notificationRef} />
       <div className={styles.transactionHistoryCard}>
         <div className={styles.transactionHistoryCardHeader}>
           <span>PAYMENT NUMBER</span>
@@ -53,19 +65,21 @@ function WalletTransactionHistory({ failure, transactionHistory, bottomButtonOnc
                       isAmountPositive
                         ? (
                           <p>
-                            Payment from
+                            From
                             {' '}
                             <span>
-                              {truncate(transactionHistoryInfo.fromId, 13)}
+                              <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={(e) => handleCopyClick(transactionHistoryInfo.fromId)} />
+                              {isLarge ? transactionHistoryInfo.fromId : truncate(transactionHistoryInfo.fromId, 13)}
                             </span>
                           </p>
                         )
                         : (
                           <p>
-                            Payment to
+                            To
                             {' '}
                             <span>
-                              {truncate(transactionHistoryInfo.toId, 13)}
+                              <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={(e) => handleCopyClick(transactionHistoryInfo.toId)} />
+                              {isLarge ? transactionHistoryInfo.toId : truncate(transactionHistoryInfo.toId, 13)}
                             </span>
                           </p>
 
