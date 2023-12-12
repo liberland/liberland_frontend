@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 // REDUX
 import axios from 'axios';
@@ -16,8 +16,6 @@ import styles from './styles.module.scss';
 import { ReactComponent as Divider } from '../../../assets/icons/divider.svg';
 import { ReactComponent as WalletIcon } from '../../../assets/icons/wallet.svg';
 import Header from '../Header';
-import { CheckboxInput } from '../../InputComponents';
-import router from '../../../router';
 import Button from '../../Button/Button';
 
 function SignIn() {
@@ -25,8 +23,6 @@ function SignIn() {
     handleSubmit,
     register,
     setError,
-    setValue,
-    watch,
   } = useForm();
   const dispatch = useDispatch();
   const history = useHistory();
@@ -37,6 +33,14 @@ function SignIn() {
   const beginToken = queryString.indexOf('=');
   const endToken = queryString.indexOf('&');
   const ssoAccessTokenHash = queryString.substring(beginToken + 1, endToken);
+
+  const onSubmit = (values) => {
+    dispatch(authActions.signIn.call({
+      credentials: values,
+      history,
+      ssoAccessTokenHash,
+    }));
+  };
 
   useEffect(() => {
     if (apiError) {
@@ -61,14 +65,6 @@ function SignIn() {
     }
   }, [apiError, setError, dispatch, ssoAccessTokenHash, allAccounts]);
 
-  const onSubmit = (values) => {
-    dispatch(authActions.signIn.call({
-      credentials: values,
-      history,
-      ssoAccessTokenHash,
-    }));
-  };
-
   const goToLiberlandSignin = () => {
     window.location.replace(process.env.REACT_APP_SSO_API_IMPLICIT_LINK);
   };
@@ -87,7 +83,7 @@ function SignIn() {
         </Button>
         <p className={styles.divider}>
           <Divider />
-          OR
+          <span>Wallets Available</span>
           <Divider />
         </p>
         <form className={styles.signInForm} onSubmit={handleSubmit(onSubmit)}>
@@ -98,19 +94,21 @@ function SignIn() {
               ))}
             </select>
           </div>
-          <div className={styles.additionalActions}>
-            <CheckboxInput
-              register={register}
-              name="rememberMe"
-              label="Remember me?"
-            />
-            <Link to={router.signIn}>Forgot password?</Link>
-          </div>
-          <Button type="submit">Wallet sign in (WIP)</Button>
         </form>
-        <p className={styles.signUpInfo}>
-          Don&apos;t have have account yet?
-          <Link to={router.signUp} className={styles.yellowLink}> Sign Up</Link>
+        <p className={styles.extraInfo}>
+          To access the Liberland app you need eresident
+          account as well as substrate/polkadot wallet that matches the address registered on liberland.org.
+          {' '}
+          A guide on how to get started with liberland can be found
+          {' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://liberland-1.gitbook.io/wiki/v/public-documents/blockchain/for-citizens/"
+          >
+            here
+          </a>
+          .
         </p>
       </div>
     </div>
