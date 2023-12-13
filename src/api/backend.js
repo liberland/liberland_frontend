@@ -60,6 +60,7 @@ export const addReferendum = async ({
   link, name, description, hash, additionalMetadata, proposerAddress,
 }) => {
   const api = getApi();
+  // TODO fix API not to use chainIndex
   return api.post('/referenda', {
     link, chainIndex: 0, name, description, hash, additionalMetadata, proposerAddress,
   });
