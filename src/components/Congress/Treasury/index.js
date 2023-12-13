@@ -163,6 +163,7 @@ export default function Treasury() {
         {isSpendingModalOpen && (
           <TreasurySpendingMotionModalWrapper
             closeModal={handleSpendingModalOpen}
+            budget={remainingBudget}
           />
         )}
 

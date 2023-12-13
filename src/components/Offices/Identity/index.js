@@ -16,10 +16,17 @@ import {
 import styles from './styles.module.scss';
 import Table from '../../Table';
 import { parseLegal } from '../../../utils/identityParser';
+import { isValidSubstrateAddress } from '../../../utils/bridge';
 
 function IdentityForm() {
   const dispatch = useDispatch();
-  const { handleSubmit, register } = useForm();
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm({
+    mode: 'all',
+  });
 
   const onSubmit = ({ account }) => {
     dispatch(officesActions.officeGetIdentity.call(account));
@@ -32,8 +39,11 @@ function IdentityForm() {
         register={register}
         name="account"
         placeholder="Candidate's wallet address"
+        validate={(v) => isValidSubstrateAddress(v) || 'Invalid Address'}
         required
       />
+      {errors?.account?.message
+        && <div className={styles.error}>{errors.account.message}</div>}
 
       <div className={styles.buttonWrapper}>
         <Button primary medium type="submit">

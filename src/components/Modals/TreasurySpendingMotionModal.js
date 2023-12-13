@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
 
 import { useDispatch } from 'react-redux';
+import { BN_ZERO, BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { TextInput } from '../InputComponents';
@@ -12,7 +13,7 @@ import { parseDollars } from '../../utils/walletHelpers';
 
 import styles from './styles.module.scss';
 
-function TreasurySpendingMotionModal({ closeModal }) {
+function TreasurySpendingMotionModal({ closeModal, budget }) {
   const dispatch = useDispatch();
 
   const {
@@ -31,6 +32,16 @@ function TreasurySpendingMotionModal({ closeModal }) {
       }),
     );
     closeModal();
+  };
+
+  const validateUnbondValue = (textUnbondValue) => {
+    try {
+      const unbondValue = parseDollars(textUnbondValue);
+      if (unbondValue.gt(budget) || unbondValue.lte(BN_ZERO)) return 'Invalid amount';
+      return true;
+    } catch (e) {
+      return 'Invalid amount';
+    }
   };
 
   return (
@@ -60,7 +71,7 @@ function TreasurySpendingMotionModal({ closeModal }) {
         name="transferAmount"
         required
         errorTitle="Amount not valid"
-        validate={(v) => !Number.isNaN(parseFloat(v)) || 'Not a valid number'}
+        validate={validateUnbondValue}
       />
       {errors?.transferAmount?.message && (
         <div className={styles.error}>{errors.transferAmount.message}</div>
@@ -80,6 +91,7 @@ function TreasurySpendingMotionModal({ closeModal }) {
 
 TreasurySpendingMotionModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
+  budget: PropTypes.instanceOf(BN).isRequired,
 };
 
 export default function TreasurySpendingMotionModalWrapper(props) {
