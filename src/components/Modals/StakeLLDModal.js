@@ -22,7 +22,7 @@ function StakeLLDModal({
   const maxBond = BN.max(
     BN_ZERO,
     (new BN(balances?.liquidAmount?.amount ?? 0))
-      .sub(parseDollars("10")), // leave at least 10 liquid LLD...
+      .sub(parseDollars("2")), // leave at least 2 liquid LLD...
   );
 
   const {
@@ -45,7 +45,11 @@ function StakeLLDModal({
   const validateBondValue = (textBondValue) => {
     try {
       const bondValue = parseDollars(textBondValue);
-      if (bondValue.gt(maxBond) || bondValue.lte(BN_ZERO)) return 'Invalid amount';
+      if (bondValue.gt(maxBond)) {
+        return 'Minimum of 2 LLD must remain after transaction';
+      } else if (bondValue.lte(BN_ZERO)) {
+        return 'Invalid amount';
+      }
       return true;
     } catch (e) {
       return 'Invalid amount';

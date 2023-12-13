@@ -20,11 +20,10 @@ import { walletSelectors } from '../../redux/selectors';
 function SendLLDModal({ closeModal }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
-  const senderWallet = useSelector(walletSelectors.selectorWalletAddress);
   const maxUnbond = BN.max(
     BN_ZERO,
     (new BN(balances?.liquidAmount?.amount ?? 0))
-      .sub(parseDollars('10')), // leave at least 10 liquid LLD...
+      .sub(parseDollars('2')), // leave at least 2 liquid LLD...
   );
 
   const {
@@ -46,7 +45,11 @@ function SendLLDModal({ closeModal }) {
   const validateUnbondValue = (textUnbondValue) => {
     try {
       const unbondValue = parseMerits(textUnbondValue);
-      if (unbondValue.gt(maxUnbond) || unbondValue.lte(BN_ZERO)) return 'Invalid amount';
+      if (unbondValue.gt(maxUnbond)){
+        return 'Minimum of 2 LLD must remain after transaction'
+      } else if (unbondValue.lte(BN_ZERO)) {
+        return 'Invalid amount'
+      }
       return true;
     } catch (e) {
       return 'Invalid amount';
@@ -68,7 +71,6 @@ function SendLLDModal({ closeModal }) {
         required
         validate={((v) => {
           if (!isValidSubstrateAddress(v)) return 'Invalid Address';
-          if (v.toLowerCase() === senderWallet.toLowerCase()) return 'Invalid Address';
           return true;
         })}
       />
