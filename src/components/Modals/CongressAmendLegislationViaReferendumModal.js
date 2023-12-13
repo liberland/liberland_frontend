@@ -11,6 +11,7 @@ import styles from './styles.module.scss';
 import { congressActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
+import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
 
 function CongressAmendLegislationViaReferendumModal({
   closeModal, tier, id, section,
@@ -33,9 +34,15 @@ function CongressAmendLegislationViaReferendumModal({
   });
 
   const onSubmit = ({
+    discussionName,
+    discussionDescription,
+    discussionLink,
     content, fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
   }) => {
     dispatch(congressActions.congressAmendLegislationViaReferendum.call({
+      discussionName,
+      discussionDescription,
+      discussionLink,
       tier,
       id,
       section,
@@ -113,6 +120,7 @@ function CongressAmendLegislationViaReferendumModal({
       {errors?.content?.message
         && <div className={styles.error}>{errors.content.message}</div>}
 
+      <ProposalDiscussionFields {...{ register, errors }} />
       <FastTrackForm {...{ register, errors, watch }} />
 
       <div className={styles.buttonWrapper}>

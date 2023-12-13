@@ -9,6 +9,7 @@ import { TextInput, SelectInput } from '../InputComponents';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { democracyActions } from '../../redux/actions';
+import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
 
 function CitizenRepealLegislationModal({
   closeModal, tier, id, section,
@@ -16,6 +17,7 @@ function CitizenRepealLegislationModal({
   const dispatch = useDispatch();
   const {
     handleSubmit, register,
+    formState: { errors },
   } = useForm({
     defaultValues: {
       tier,
@@ -25,8 +27,15 @@ function CitizenRepealLegislationModal({
     },
   });
 
-  const onSubmitRepeal = () => {
+  const onSubmitRepeal = ({
+    discussionName,
+    discussionDescription,
+    discussionLink,
+  }) => {
     dispatch(democracyActions.citizenProposeRepealLegislation.call({
+      discussionName,
+      discussionDescription,
+      discussionLink,
       tier,
       id,
       section,
@@ -90,6 +99,11 @@ function CitizenRepealLegislationModal({
         />
       </>
       )}
+
+      <ProposalDiscussionFields {...{
+        register, errors,
+      }}
+      />
 
       <div className={styles.buttonWrapper}>
         <Button

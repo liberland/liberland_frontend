@@ -58,7 +58,7 @@ export function AddLegislationFields({
 }
 
 AddLegislationFields.propTypes = {
-  control: PropTypes.func.isRequired,
+  control: PropTypes.shape({}).isRequired,
   register: PropTypes.func.isRequired,
   errors: PropTypes.shape({
     sections: PropTypes.shape({

@@ -10,6 +10,7 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { democracyActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
+import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
 
 function ProposeAmendLegislationModal({
   closeModal, tier, id, section,
@@ -28,9 +29,20 @@ function ProposeAmendLegislationModal({
     },
   });
 
-  const onSubmit = ({ content }) => {
+  const onSubmit = ({
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    content,
+  }) => {
     dispatch(democracyActions.proposeAmendLegislation.call({
-      tier, id, section, content,
+      discussionName,
+      discussionDescription,
+      discussionLink,
+      tier,
+      id,
+      section,
+      content,
     }));
     closeModal();
   };
@@ -100,6 +112,8 @@ function ProposeAmendLegislationModal({
       />
       {errors?.content?.message
         && <div className={styles.error}>{errors.content.message}</div>}
+
+      <ProposalDiscussionFields {...{ register, errors }} />
 
       <div className={styles.buttonWrapper}>
         <Button

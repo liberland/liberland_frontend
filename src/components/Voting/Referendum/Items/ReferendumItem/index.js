@@ -116,10 +116,7 @@ BlacklistButton.propTypes = {
 };
 
 function ReferendumItem({
-  name,
-  createdBy,
-  externalLink,
-  description,
+  centralizedDatas,
   yayVotes,
   nayVotes,
   hash,
@@ -145,7 +142,14 @@ function ReferendumItem({
     <>
       <NotificationPortal ref={notificationRef} />
       <Card
-        title={name}
+        title={(
+          <>
+            ID:
+            {truncate(hash, 20)}
+            {' '}
+            <CopyIcon className={styles.copyIcon} name="proposalHash" onClick={() => handleCopyClick(hash)} />
+          </>
+)}
         className={styles.referendumItemContainer}
       >
         <div>
@@ -166,18 +170,6 @@ function ReferendumItem({
               )}
           </div>
           <div className={styles.metaInfoLine}>
-            <div className={styles.proposeData}>
-              <div className={styles.metaTextInfo}>
-                By:
-                <b>{ createdBy && truncate(createdBy, 13) }</b>
-              </div>
-              <div className={styles.hashText}>
-                Referendum hash:
-                {' '}
-                <b>{ truncate(hash, 20) }</b>
-                <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={() => handleCopyClick(hash)} />
-              </div>
-            </div>
             <div className={styles.votesInfo}>
               <div className={styles.votesCount}>
                 <div>
@@ -196,26 +188,47 @@ function ReferendumItem({
               </div>
             </div>
           </div>
+          <div>
+            Details:
+            <Proposal {...{ proposal }} />
+          </div>
           <div className={styles.discussionMetaLine}>
-            <div>
-              <a href={externalLink}>Read discussion</a>
-            </div>
+            {centralizedDatas?.length > 0
+              && (
+              <div>
+                Discussions:
+                <ol>
+                  {centralizedDatas.map((centralizedData) => (
+                    <li key={centralizedData.id}>
+                      <a href={centralizedData.link}>
+                        {centralizedData.name}
+                      </a>
+                      {' - '}
+                      {centralizedData.description}
+                      {' '}
+                      (Discussion added by
+                      {' '}
+                      <b>{ truncate(centralizedData.proposerAddress, 13) }</b>
+                      <CopyIcon
+                        className={styles.copyIcon}
+                        name="walletAddress"
+                        onClick={() => handleCopyClick(centralizedData.proposerAddress)}
+                      />
+                      )
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              )}
             <div>
               <span className={styles.votingTimeText}>Voting ends in:</span>
               {' '}
               <b>{votingTimeLeft}</b>
             </div>
           </div>
-          <div className={styles.description}>
-            <p>{description}</p>
-          </div>
-          <div>
-            Details:
-            <Proposal {...{ proposal }} />
-          </div>
           <div className={styles.buttonContainer}>
             {
-              voteButtonsContainer(alreadyVoted, delegating, buttonVoteCallback, { name, referendumIndex })
+              voteButtonsContainer(alreadyVoted, delegating, buttonVoteCallback, { id: hash, referendumIndex })
             }
           </div>
         </div>
@@ -225,10 +238,14 @@ function ReferendumItem({
 }
 
 ReferendumItem.propTypes = {
-  name: PropTypes.string.isRequired,
-  createdBy: PropTypes.string.isRequired,
-  externalLink: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+  centralizedDatas: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    link: PropTypes.string.isRequired,
+    proposerAddress: PropTypes.string.isRequired,
+    created: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
+  })).isRequired,
   yayVotes: PropTypes.number.isRequired,
   nayVotes: PropTypes.number.isRequired,
   hash: PropTypes.string.isRequired,

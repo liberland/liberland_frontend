@@ -10,6 +10,7 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { congressActions } from '../../redux/actions';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
+import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
 
 function CongressRepealLegislationFastTrackModal({
   closeModal, tier, id, section,
@@ -27,8 +28,16 @@ function CongressRepealLegislationFastTrackModal({
     },
   });
 
-  const onSubmitRepeal = ({ fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod }) => {
+  const onSubmitRepeal = ({
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
+  }) => {
     dispatch(congressActions.congressProposeRepealLegislation.call({
+      discussionName,
+      discussionDescription,
+      discussionLink,
       tier,
       id,
       section,
@@ -95,6 +104,7 @@ function CongressRepealLegislationFastTrackModal({
       </>
       )}
 
+      <ProposalDiscussionFields {...{ register, errors }} />
       <FastTrackForm {...{ register, errors, watch }} />
 
       <div className={styles.buttonWrapper}>
