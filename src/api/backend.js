@@ -31,7 +31,7 @@ export const getUsersByAddress = async (blockchainAddress) => {
 export const maybeGetApprovedEresidency = async () => {
   const api = getApi();
   try {
-    const approvedEresidency = await api.get('/e-residents/approved/meghj');
+    const approvedEresidency = await api.get('/e-residents/approved/me');
     return approvedEresidency.data;
   } catch (e) {
     return { isError: true, errorResponse: e.response };

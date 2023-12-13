@@ -39,7 +39,7 @@ function* getIsEligibleForComplimentaryLLDWorker() {
   try {
     const liquidDollars = yield select(walletSelectors.selectorLiquidDollarsBalance);
     // Only eligible if no existing dollars
-    if (formatDollars(liquidDollars) === 0) {
+    if (formatDollars(liquidDollars) === 0 || formatDollars(liquidDollars) === '0') {
       // Only eligible if no existing dollars
       const maybeApprovedEresidency = yield call(maybeGetApprovedEresidency);
       if (maybeApprovedEresidency.isError) {
