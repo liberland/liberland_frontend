@@ -51,7 +51,7 @@ function SignIn() {
     }
     if (ssoAccessTokenHash) {
       const api2 = axios.create({
-        baseURL: process.env.REACT_APP_API2,
+        baseURL: process.env.REACT_APP_API,
         withCredentials: true,
       });
       api2.defaults.headers.common['X-token'] = ssoAccessTokenHash;
