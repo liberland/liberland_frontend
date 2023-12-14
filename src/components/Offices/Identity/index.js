@@ -17,6 +17,7 @@ import styles from './styles.module.scss';
 import Table from '../../Table';
 import { parseLegal } from '../../../utils/identityParser';
 import { isValidSubstrateAddress } from '../../../utils/bridge';
+import {fetchPendingIdentities} from "../../../api/nodeRpcCall";
 
 function IdentityForm() {
   const dispatch = useDispatch();
@@ -28,11 +29,27 @@ function IdentityForm() {
     mode: 'all',
   });
 
+  const [pendingIdentities, setPendingIdentities] = useState([]);
+
+  const doFetchPendingIdentities = async () => {
+    const pendingIdentities = await fetchPendingIdentities()
+    setPendingIdentities(pendingIdentities)
+  }
   const onSubmit = ({ account }) => {
     dispatch(officesActions.officeGetIdentity.call(account));
   };
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+
+      <div>
+        {pendingIdentities.map(pendingIdentity => {
+          return (<p>{pendingIdentity.address}</p>)
+        })}
+        <Button primary medium onClick={() => doFetchPendingIdentities()}>
+          Fetch pending identities
+        </Button>
+      </div>
+
       <div className={styles.h3}>Verify citizenship request</div>
 
       <TextInput

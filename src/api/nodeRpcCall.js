@@ -1,12 +1,10 @@
-import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
-import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
+import {web3Accounts, web3FromAddress, web3FromSource} from '@polkadot/extension-dapp';
+import {USER_ROLES, userRolesHelper} from '../utils/userRolesHelper';
 import {handleMyDispatchErrors} from "../utils/therapist";
 import {blockchainDataToFormObject} from "../utils/registryFormBuilder";
 import * as centralizedBackend from './backend';
-import { BN_TWO } from '@polkadot/util';
-import { parseDollars, parseMerits } from '../utils/walletHelpers';
+import {u8aToHex} from '@polkadot/util';
 import pako from 'pako';
-import { u8aToHex } from '@polkadot/util';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -100,16 +98,16 @@ const getApi = async () => {
   return __apiCache;
 };
 
-const crossReference = (api, blockchainData, allCentralizedData, motions, isReferendum) => 
+const crossReference = (api, blockchainData, allCentralizedData, motions, isReferendum) =>
   blockchainData.map((item) => {
     const proposalHash = isReferendum ? item.imageHash : (
-      item.boundedCall?.Lookup?.hash_ ?? 
+      item.boundedCall?.Lookup?.hash_ ??
       item.boundedCall?.Legacy?.hash_
     )
 
     const centralizedDatas = allCentralizedData.filter((cItem) => ( cItem.hash === proposalHash))
     const blacklistMotionHash = api.tx.democracy.blacklist(
-      proposalHash, 
+      proposalHash,
       isReferendum ? item.index : null
     ).method.hash.toString()
 
@@ -189,7 +187,7 @@ const bridgeSubscribe = async (asset, receipt_id, onChange) => {
   return {
     unsubscribe: await bridge.statusOf(receipt_id, onChange)
   }
-} 
+}
 
 const bridgeDeposit = async ({ asset, amount, ethereumRecipient }, walletAddress, callback) => {
   const api = await getApi();
@@ -363,7 +361,7 @@ const setIdentity = async (values, walletAddress, callback) => {
     image: asData(null),
     twitter: asData(null),
   };
-  
+
   const setCall = api.tx.identity.setIdentity(info);
   const injector = await web3FromSource('polkadot-js');
   setCall.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
@@ -1006,7 +1004,7 @@ const getLegislation = async (tier) => {
       if (proposal[1].isLegacy) return proposal[1].asLegacy.hash_.toString()
       if (proposal[1].isLookup) return proposal[1].asLookup.hash_.toString()
     }).filter((el) => el);
-  
+
   const referendums = await api.query.democracy.referendumInfoOf.entries();
   const referendumProposals = referendums
     .map(([_, referendum]) => {
@@ -1061,7 +1059,7 @@ const getLegislation = async (tier) => {
           })
       })
   })
-  
+
   return legislationById;
 };
 
@@ -1189,10 +1187,10 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
 
 const requestCompanyRegistration = async (companyData, registryAllowedToEdit, walletAddress)  => {
   const api = await getApi();
-  
+
   const data = api.createType("CompanyData", companyData);
   const compressed = pako.deflate(data.toU8a());
-  
+
   const extrinsic = api.tx.companyRegistry.requestEntity(0, u8aToHex(compressed), !!registryAllowedToEdit);
   return submitExtrinsic(extrinsic, walletAddress);
 }
@@ -1289,7 +1287,7 @@ const getBlockEvents = async (blockHash) => {
 const getMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.council.proposals()
-  
+
   return await Promise.all(
     proposals.map(async proposal => {
       const [proposalOf, voting] = await api.queryMulti([
@@ -1327,7 +1325,7 @@ const renounceCandidacy = async (walletAddress, userStatus, callback) => {
 
   if (userStatus === "None") return;
 
-  const renounce = {[userStatus]: userStatus === "Candidate" ? 
+  const renounce = {[userStatus]: userStatus === "Candidate" ?
     (await api.query.elections.candidates()).length : null
   }
   const renounceCandidacyTx = await api.tx.elections.renounceCandidacy(
@@ -1417,7 +1415,7 @@ const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmoun
   const injector = await web3FromAddress(walletAddress);
 
   const threshold = await congressMajorityThreshold();
-  
+
   const executeProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
   const proposal = api.tx.councilAccount.execute(executeProposal);
 
@@ -1835,7 +1833,7 @@ const congressProposeReferendum = async (
   });
 
   const lookup = {
-    Lookup: { 
+    Lookup: {
       hash_: referendumProposal.hash,
       len: referendumProposal.encodedLength,
     },
@@ -1955,7 +1953,7 @@ const citizenProposeRepealLegislation = async (
 
 
   const existingPreimage = await api.query.preimage.preimageFor([repealLegislation.hash, repealLegislation.encodedLength])
-  const extrinsic = 
+  const extrinsic =
     existingPreimage.isNone
     ? api.tx.utility.batchAll([
         api.tx.preimage.notePreimage(repealLegislation.toHex()),
@@ -1971,7 +1969,7 @@ const congressSendTreasuryLld = async (transferToAddress, transferAmount, wallet
 
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.treasury.spend(transferAmount, transferToAddress);
-  
+
   const extrinsics = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll(extrinsics)
   return await submitExtrinsic(extrinsic, walletAddress);
@@ -2100,7 +2098,7 @@ const getScheduledCalls = async () => {
   const api = await getApi();
   const agendaEntries = await api.query.scheduler.agenda.entries();
   const agendaItems = agendaEntries
-    .flatMap(([key, calls]) => 
+    .flatMap(([key, calls]) =>
       calls
         .map((call, idx) => ({
           blockNumber: key.args[0],
@@ -2113,15 +2111,15 @@ const getScheduledCalls = async () => {
           call: item.call.unwrap()
         }))
     )
-    .filter(item => 
+    .filter(item =>
       item.call.call.isLookup && // our FE only does lookups now
       item.call.maybePeriodic.isNone // we're interested only in referendum results, so nonperiodic
     );
-  
+
   // we only want do download small preimages. fetching multi-megabyte setCode could be painful.
   const bigAgendaItems = agendaItems.filter(item => item.call.call.asLookup.len > 10240);
   const smallAgendaItems = agendaItems.filter(item => item.call.call.asLookup.len <= 10240);
-  
+
   const preimageIds = smallAgendaItems.map(item => ([item.call.call.asLookup.hash_, item.call.call.asLookup.len]));
   const preimagesRaw = await api.query.preimage.preimageFor.multi(preimageIds)
   const preimages = preimagesRaw.map((raw) => raw.isSome ? api.createType('Call', raw.unwrap()) : null)
@@ -2151,7 +2149,7 @@ const unregisterCompany = async (companyId, isSoft, walletAddress)  => {
   const extrinsic = api.tx.companyRegistryOffice.execute(
     api.tx.companyRegistry.unregister(0, companyId, isSoft)
   );
-    
+
   return submitExtrinsic(extrinsic, walletAddress);
 }
 
@@ -2168,6 +2166,20 @@ const setRegisteredCompanyData = async (companyId, companyData, walletAddress) =
   const setRegisteredEntity = api.tx.companyRegistry.setRegisteredEntity(0, companyId, u8aToHex(compressed));
   const extrinsic = api.tx.companyRegistryOffice.execute(setRegisteredEntity);
   return await submitExtrinsic(extrinsic, walletAddress);
+}
+
+const fetchPendingIdentities = async () => {
+  const api = await getApi();
+  const raw = await api.query.identity.identityOf.entries();
+  let processed = raw.map(rawEntry => {
+    return {
+      address: rawEntry[0].toHuman()[0],
+      data: rawEntry[1].toJSON()
+    }
+  })
+  return processed.filter(entity => {
+    return entity.data.judgements.length === 0
+  })
 }
 
 export {
@@ -2267,4 +2279,5 @@ export {
   cancelCompanyRequest,
   setRegisteredCompanyData,
   requestUnregisterCompanyRegistration,
+  fetchPendingIdentities
 };
