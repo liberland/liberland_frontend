@@ -15,7 +15,7 @@ export function Instruction() {
       <ol>
         <li>
           Your LLD or LLM will be transferred to bridge and you'll receive a
-          Receipt. This only costs a small amount of Libelrand Transaction fee.
+          Receipt. This only costs a small amount of Liberland Transaction fee.
         </li>
         <li>After transaction is confirmed, Bridge network will transfer funds over to Ethereum. It takes ~1 minute.</li>
         <li>After transfer, there's a security freeze of 1h. Your funds are safely kept in Bridge during this period.</li>
