@@ -57,7 +57,7 @@ function CongressRepealLegislationFastTrackModal({
         fastTrack,
         fastTrackVotingPeriod,
         fastTrackEnactmentPeriod,
-      })
+      }),
     );
     closeModal();
   };
@@ -116,9 +116,7 @@ function CongressRepealLegislationFastTrackModal({
               <div className={styles.title}>Legislation Section</div>
               <TextInput
                 required
-                validate={(v) =>
-                  !Number.isNaN(parseInt(v)) || 'Not a valid number'
-                }
+                validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
                 errorTitle="Section"
                 register={register}
                 name="section"
@@ -139,9 +137,9 @@ function CongressRepealLegislationFastTrackModal({
             </Button>
           </div>
         </>
-      ) : dialogStep === 'agreePopup' ? (
+      ) : (
         <AgreeDisagreeModal onDisagree={closeModal} agreeButtonType="submit" />
-      ) : null}
+      )}
     </form>
   );
 }

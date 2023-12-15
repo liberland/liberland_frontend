@@ -14,7 +14,9 @@ import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/Pro
 import AgreeDisagreeModal from './AgreeDisagreeModal';
 import useAgreeDisagreeModal from '../../hooks/useAgreeDisagreeModal';
 
-function ProposeAmendLegislationModal({ closeModal, tier, id, section }) {
+function ProposeAmendLegislationModal({
+  closeModal, tier, id, section,
+}) {
   const dispatch = useDispatch();
   const allLegislation = useSelector(legislationSelectors.legislation);
   const legislation = allLegislation[tier][id.year][id.index];
@@ -50,7 +52,7 @@ function ProposeAmendLegislationModal({ closeModal, tier, id, section }) {
         id,
         section,
         content,
-      })
+      }),
     );
     closeModal();
   };
@@ -139,9 +141,9 @@ function ProposeAmendLegislationModal({ closeModal, tier, id, section }) {
             </Button>
           </div>
         </>
-      ) : dialogStep === 'agreePopup' ? (
+      ) : (
         <AgreeDisagreeModal onDisagree={closeModal} agreeButtonType="submit" />
-      ) : null}
+      )}
     </form>
   );
 }

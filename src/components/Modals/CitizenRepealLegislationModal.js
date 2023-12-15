@@ -13,7 +13,9 @@ import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/Pro
 import AgreeDisagreeModal from './AgreeDisagreeModal';
 import useAgreeDisagreeModal from '../../hooks/useAgreeDisagreeModal';
 
-function CitizenRepealLegislationModal({ closeModal, tier, id, section }) {
+function CitizenRepealLegislationModal({
+  closeModal, tier, id, section,
+}) {
   const dispatch = useDispatch();
   const {
     handleSubmit,
@@ -43,7 +45,7 @@ function CitizenRepealLegislationModal({ closeModal, tier, id, section }) {
         tier,
         id,
         section,
-      })
+      }),
     );
     closeModal();
   };
@@ -102,9 +104,7 @@ function CitizenRepealLegislationModal({ closeModal, tier, id, section }) {
               <div className={styles.title}>Legislation Section</div>
               <TextInput
                 required
-                validate={(v) =>
-                  !Number.isNaN(parseInt(v)) || 'Not a valid number'
-                }
+                validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
                 errorTitle="Section"
                 register={register}
                 name="section"
@@ -129,9 +129,9 @@ function CitizenRepealLegislationModal({ closeModal, tier, id, section }) {
             </Button>
           </div>
         </>
-      ) : dialogStep === 'agreePopup' ? (
+      ) : (
         <AgreeDisagreeModal onDisagree={closeModal} agreeButtonType="submit" />
-      ) : null}
+      ) }
     </form>
   );
 }

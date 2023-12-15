@@ -1,8 +1,8 @@
 import React from 'react';
-import Button from '../Button/Button';
 import PropTypes from 'prop-types';
-import styles from './styles.module.scss';
 import classNames from 'classnames';
+import Button from '../Button/Button';
+import styles from './styles.module.scss';
 
 function AgreeDisagreeModal({
   text = 'are you sure you want to proceed?',
@@ -15,7 +15,7 @@ function AgreeDisagreeModal({
   return (
     <div className={classNames(styles.agreeDisagree, style)}>
       <h3>{text}</h3>
-      {!!children ? children : <span>This opperation cost 100 LLD.</span>}
+      {children || <span>This opperation cost 100 LLD.</span>}
       <div className={styles.buttons}>
         <Button type="button" onClick={onDisagree} medium>
           No
@@ -30,6 +30,9 @@ function AgreeDisagreeModal({
 AgreeDisagreeModal.defaultProps = {
   text: 'Are you sure you want to proceed',
   agreeButtonType: 'button',
+  onAgree: () => {},
+  children: undefined,
+  style: undefined,
 };
 
 AgreeDisagreeModal.propTypes = {
