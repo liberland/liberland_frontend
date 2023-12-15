@@ -10,13 +10,14 @@ import {
   politiPool,
   getValidators, getNominatorTargets,
   setNominatorTargets,
-  unpool,
+  unpool, getAdditionalAssets, sendAssetTransfer,
 } from '../../api/nodeRpcCall';
 import { getDollarsTransfers, getMeritsTransfers } from '../../api/explorer';
 
 import { blockchainActions, walletActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import { blockchainWatcher } from './base';
+import {sendAssetsTransfer} from "../actions/wallet";
 
 // WORKERS
 
@@ -24,6 +25,12 @@ function* getWalletWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const balances = yield call(getBalanceByAddress, walletAddress);
   yield put(walletActions.getWallet.success({ ...walletAddress, balances }));
+}
+
+function* getAdditionalAssetsWorker() {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const additionalAssets = yield call(getAdditionalAssets, walletAddress)
+  yield put(walletActions.getAdditionalAssets.success(additionalAssets))
 }
 
 function* stakeToPolkaWorker(action) {
@@ -67,6 +74,14 @@ function* sendTransferWorker(action) {
   yield call(sendTransfer, recipient, amount, walletAddress);
   yield put(walletActions.sendTransfer.success());
   yield put(walletActions.getWallet.call());
+}
+
+function* sendAssetsWorker(action) {
+  const { recipient, amount, assetData } = action.payload;
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(sendAssetTransfer, recipient, amount, walletAddress, assetData)
+  yield put(walletActions.sendAssetsTransfer.success());
+  yield put(walletActions.getAdditionalAssets.call());
 }
 
 function* sendTransferLLMWorker(action) {
@@ -143,8 +158,16 @@ function* getWalletWatcher() {
   yield* blockchainWatcher(walletActions.getWallet, getWalletWorker);
 }
 
+function* getAdditionalAssetsWatcher() {
+  yield* blockchainWatcher(walletActions.getAdditionalAssets, getAdditionalAssetsWorker);
+}
+
 function* sendTransferWatcher() {
   yield* blockchainWatcher(walletActions.sendTransfer, sendTransferWorker);
+}
+
+function* sendAssetsWatcher() {
+  yield* blockchainWatcher(walletActions.sendAssetsTransfer, sendAssetsWorker);
 }
 
 function* sendTransferLLMWatcher() {
@@ -193,7 +216,9 @@ export function* getLldTransfersWatcher() {
 
 export {
   getWalletWatcher,
+  getAdditionalAssetsWatcher,
   sendTransferWatcher,
+  sendAssetsWatcher,
   sendTransferLLMWatcher,
   stakeToPolkaWatcher,
   stakeToLiberlandWatcher,
