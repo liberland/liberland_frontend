@@ -8,18 +8,18 @@ cp .env.dist .env
 In .env setup real values
 
 - Install polkadotjs browser extension [https://polkadot.js.org/extension/](https://polkadot.js.org/extension/) and add non citizen, citizen, and assemblyMember accounts from seeds
-- for local development, run `yarn run dev` and Open [http://localhost:8080](http://localhost:8080) to view it in the browser.
+- for local development, run `npm run dev` and Open [http://localhost:8080](http://localhost:8080) to view it in the browser.
 
 ### Linting
 
 To autolint, run
 ```console
-yarn run eslint --fix
+npm run eslint --fix
 ```
 
 ## Build for production
 ```console
-run yarn build
+npm run build
 ```
  
 ## Default wallets
@@ -36,28 +36,21 @@ Start api and auth servers.
 
 ### API 
 ```console
-nvm use 12
+nvm use 16
 PORT=8020 npm run start
 ```
 
 ### SSO 
 ```console
-nvm use 12
+nvm use 16
 npm run start
 ```
 
-### Web old 
-```console
-npm run start
-```
-
-### CDN
-```console
-PORT=8020 npm run start
-```
+### Middleware
+Needed for self onboarding process
+[https://github.com/liberland/liberland-blockchain-middleware](https://github.com/liberland/liberland-blockchain-middleware)
 
 ### Chain explorer
-
 [https://github.com/liberland/chain_explorer/](https://github.com/liberland/chain_explorer/)
 Setup the dev instance as described in README with graphql engine running on port 3000
 
@@ -66,12 +59,11 @@ Setup the dev instance as described in README with graphql engine running on por
 cargo run --release -- --dev
 ```
 
-### Liberland backend and frontend
+### Liberland frontend
 
 Run the following command from their respective directories
-```console
-nvm use 14.19.3 
-yarn run dev
+```console 
+npm run dev
 ```
 
 ### Polkadot explorer
