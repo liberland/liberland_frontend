@@ -86,6 +86,11 @@ const selectorNominatorTargets = createSelector(
   (reducer) => reducer.nominatorTargets,
 );
 
+const selectorAdditionalAssets = createSelector(
+  walletReducer,
+  (reducer) => reducer.additionalAssets,
+);
+
 export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
@@ -102,4 +107,5 @@ export {
   selectorValidators,
   selectorNominatorTargets,
   selectorTxHistoryFailed,
+  selectorAdditionalAssets
 };

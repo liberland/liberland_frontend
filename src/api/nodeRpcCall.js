@@ -178,6 +178,45 @@ const getLldBalances = async (addresses) => {
   }
 }
 
+const getAdditionalAssets = async (address) => {
+  try {
+    const api = await getApi();
+    const assetMetadatas = await api.query.assets.metadata.entries()
+    let processedMetadatas = assetMetadatas.map(rawEntry => {
+      return {
+        // TODO FIXME figure out the proper types
+        index: parseInt(rawEntry[0].toHuman()[0].replace(/,/g, '')),
+        metadata: rawEntry[1].toHuman()
+      }
+    })
+    let indexedFilteredAssets = []
+    let assetQueries = []
+    processedMetadatas.forEach(asset => {
+      // Disregard LLM, asset of ID 1 because it has special treatment already
+      if (!(asset.index === 1 || asset.index ==='1')){
+        assetQueries.push([api.query.assets.account, [asset.index, address]])
+        indexedFilteredAssets.push(asset)
+      }
+    })
+
+    if(assetQueries.length !== 0) {
+      let assetResults = await api.queryMulti([...assetQueries])
+
+      assetResults.forEach((assetResult, index) => {
+        indexedFilteredAssets[index].balance = assetResult.toJSON()
+      })
+      return indexedFilteredAssets
+    } else {
+      return []
+    }
+  }
+  catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+}
+
 const bridgeSubscribe = async (asset, receipt_id, onChange) => {
   const api = await getApi();
   let bridge;
@@ -495,6 +534,13 @@ const getBalanceByAddress = async (address) => {
 const sendTransfer = async (recipient, amount, walletAddress) => {
   const api = await getApi();
   const transferExtrinsic = api.tx.balances.transfer(recipient, amount);
+  return await submitExtrinsic(transferExtrinsic, walletAddress);
+};
+
+const sendAssetTransfer = async (recipient, amount, walletAddress, assetData) => {
+  const api = await getApi();
+  const transferExtrinsic = api.tx.assets.transfer(parseInt(assetData.index),recipient, amount);
+  return await submitExtrinsic(transferExtrinsic, walletAddress);
   return await submitExtrinsic(transferExtrinsic, walletAddress);
 };
 
@@ -2186,6 +2232,7 @@ export {
   getBalanceByAddress,
   sendTransfer,
   sendTransferLLM,
+  sendAssetTransfer,
   stakeToPolkaBondAndExtra,
   politiPool,
   getUserRoleRpc,
@@ -2222,6 +2269,7 @@ export {
   getBlockEvents,
   getLlmBalances,
   getLldBalances,
+  getAdditionalAssets,
   bridgeConstants,
   batchPayoutStakers,
   getStakersRewards,

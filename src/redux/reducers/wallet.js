@@ -25,6 +25,7 @@ const initialState = {
       electionLock: 0,
     },
   },
+  additionalAssets: [],
   gettingWalletInfo: false,
   transfersTxHistory: {
     LLM: [],
@@ -42,10 +43,12 @@ const walletReducer = handleActions(
   {
     [combineActions(
       walletActions.getWallet.call,
+      walletActions.getAdditionalAssets.call,
       walletActions.stakeToPolka.call,
       walletActions.stakeToLiberland.call,
       walletActions.sendTransfer.call,
       walletActions.sendTransferLLM.call,
+      walletActions.sendAssetsTransfer.call,
       walletActions.getValidators.call,
       walletActions.getNominatorTargets.call,
       walletActions.setNominatorTargets.call,
@@ -102,6 +105,10 @@ const walletReducer = handleActions(
       ...state,
       walletInfo: action.payload,
     }),
+    [walletActions.getAdditionalAssets.success]: (state, action) => ({
+      ...state,
+      additionalAssets: action.payload,
+    }),
     [walletActions.setCurrentPageNumber.success]: (state, action) => ({
       ...state,
       currentPageNumber: action.payload,
@@ -117,6 +124,8 @@ const walletReducer = handleActions(
     [combineActions(
       walletActions.getWallet.success,
       walletActions.getWallet.failure,
+      walletActions.getAdditionalAssets.failure,
+      walletActions.getAdditionalAssets.success,
       walletActions.stakeToPolka.success,
       walletActions.stakeToLiberland.success,
       walletActions.stakeToPolka.failure,
@@ -124,6 +133,8 @@ const walletReducer = handleActions(
       walletActions.sendTransfer.success,
       walletActions.sendTransferLLM.success,
       walletActions.sendTransfer.failure,
+      walletActions.sendAssetsTransfer.success,
+      walletActions.sendAssetsTransfer.failure,
       walletActions.sendTransferLLM.failure,
       walletActions.getValidators.success,
       walletActions.getValidators.failure,
