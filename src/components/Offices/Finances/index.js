@@ -95,7 +95,7 @@ export default function Finances() {
       ]}
       data={accountsAddresses.map((a) => ({
         ...a,
-        address: truncate(a.address, 13),
+        address: a.address,
         llm: `${formatMerits(balances.LLM[a.address] ?? 0)} LLM`,
         lld: `${formatDollars(balances.LLD[a.address] ?? 0)} LLD`,
       }))}

@@ -26,13 +26,14 @@ import router from '../../router';
 function* getIdentityWorker(action) {
   try {
     const onchain = yield call(getIdentity, action.payload);
-    const backendUsers = yield call(backend.getUsersByAddress, action.payload);
+    /*const backendUsers = yield call(backend.getUsersByAddress, action.payload);
     if (backendUsers.length > 1) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success({ details: 'More than one user has the same address?' }));
       return;
     }
-    yield put(officesActions.officeGetIdentity.success({ onchain, backend: backendUsers[0] }));
+    yield put(officesActions.officeGetIdentity.success({ onchain, backend: backendUsers[0] }));*/
+    yield put(officesActions.officeGetIdentity.success({ onchain, backend: {} }));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -42,10 +43,9 @@ function* getIdentityWorker(action) {
 
 function* provideJudgementAndAssetsWorker(action) {
   try {
-    if ((action.payload.merits || action.payload.dollars) && !action.payload.uid) {
+    /*if ((action.payload.merits || action.payload.dollars) && !action.payload.uid) {
       throw new Error('Tried to transfer LLD or LLM but we have no user id!');
-    }
-
+    }*/
     const { errorData } = yield cps(provideJudgementAndAssets, action.payload);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
@@ -53,14 +53,13 @@ function* provideJudgementAndAssetsWorker(action) {
       yield put(officesActions.provideJudgementAndAssets.failure());
       return;
     }
-
-    if (action.payload.merits?.gt(0)) {
+    /*if (action.payload.merits?.gt(0)) {
       try {
         yield call(backend.addMeritTransaction, action.payload.uid, action.payload.merits.mul(-1));
       } catch (e) {
         throw new Error(e.response.data.error.message);
       }
-    }
+    }*/
 
     yield put(officesActions.provideJudgementAndAssets.success());
     yield put(officesActions.officeGetIdentity.call(action.payload.address));

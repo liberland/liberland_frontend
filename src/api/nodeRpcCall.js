@@ -541,7 +541,6 @@ const sendAssetTransfer = async (recipient, amount, walletAddress, assetData) =>
   const api = await getApi();
   const transferExtrinsic = api.tx.assets.transfer(parseInt(assetData.index),recipient, amount);
   return await submitExtrinsic(transferExtrinsic, walletAddress);
-  return await submitExtrinsic(transferExtrinsic, walletAddress);
 };
 
 const sendTransferLLM = async (recipient, amount, userWalletAddress) => {

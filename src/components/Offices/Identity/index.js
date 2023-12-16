@@ -18,6 +18,7 @@ import Table from '../../Table';
 import { parseLegal } from '../../../utils/identityParser';
 import { isValidSubstrateAddress } from '../../../utils/bridge';
 import {fetchPendingIdentities} from "../../../api/nodeRpcCall";
+import {parseDollars} from "../../../utils/walletHelpers";
 
 function IdentityForm() {
   const dispatch = useDispatch();
@@ -208,14 +209,16 @@ function TokenTable({ backendMerits, backendDollars }) {
       ]}
       data={[
         {
-          desc: 'LLM balance',
-          res: backendMerits ? ethers.utils.formatUnits(backendMerits, 12) : 0,
+          //desc: 'LLM balance',
+          desc: 'Cannot read backend LLM balance',
+          //res: backendMerits ? ethers.utils.formatUnits(backendMerits, 12) : 0,
+          res: ethers.utils.formatUnits(0, 12),
         },
         {
-          desc: 'LLD balance',
-          res: backendDollars
-            ? ethers.utils.formatUnits(backendDollars, 12)
-            : 0,
+          //desc: 'LLD balance',
+          desc: 'Cannot read backend LLD balance',
+          //res: backendDollars ? ethers.utils.formatUnits(backendDollars, 12) : 0,
+          res: ethers.utils.formatUnits(0, 12),
         },
       ]}
     />
@@ -281,6 +284,13 @@ function IdentityInfo() {
   const dispatch = useDispatch();
   const identity = useSelector(officesSelectors.selectorIdentity);
   const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const {
+    handleSubmit,
+    formState: { errors },
+    register,
+  } = useForm({
+    mode: 'all',
+  });
 
   if (identity.onchain === null) return null;
   if (identity.onchain.isNone) return <MissingIdentity />;
@@ -288,18 +298,20 @@ function IdentityInfo() {
   const onchain = identity.onchain.unwrap();
   const { hash } = onchain.info;
 
-  const backendMerits = identity.backend?.merits ?? 0;
-  const backendDollars = backendMerits?.div(10);
+  //const backendMerits = identity.backend?.merits ?? 0;
+  const backendMerits = ethers.utils.parseUnits('0', 12);
+  //const backendDollars = backendMerits?.div(10);
+  const backendDollars = ethers.utils.parseUnits('0', 12);
 
-  const onClick = () => {
+  const provideJudgementAndSendTokens = (values) => {
     dispatch(
       officesActions.provideJudgementAndAssets.call({
         walletAddress: sender,
         address: identity.address,
         uid: identity.backend?.uid,
         hash,
-        merits: backendMerits,
-        dollars: backendDollars,
+        merits: parseDollars(values.amountLLM),
+        dollars: parseDollars(values.amountLLD),
       }),
     );
   };
@@ -322,12 +334,26 @@ function IdentityInfo() {
           {judgement}
         </div>
       </div>
+      <form onSubmit={handleSubmit(provideJudgementAndSendTokens)}>
+        <TextInput
+          register={register}
+          name="amountLLM"
+          placeholder="Amount LLM"
+          required
+        />
+        <TextInput
+          register={register}
+          name="amountLLD"
+          placeholder="Amount LLD"
+          required
+        />
+        <div className={styles.buttonWrapper}>
+          <Button primary medium type="submit">
+            Provide KnownGood judgement and transfer LLM and LLD
+          </Button>
+        </div>
+      </form>
 
-      <div className={styles.buttonWrapper}>
-        <Button primary medium onClick={onClick}>
-          Provide KnownGood judgement and transfer LLM and LLD
-        </Button>
-      </div>
     </>
   );
 }
