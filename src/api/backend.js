@@ -5,7 +5,7 @@ const getApi = () => {
   const ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
 
   const api = axios.create({
-    baseURL: process.env.REACT_APP_API2,
+    baseURL: process.env.REACT_APP_API,
     withCredentials: true,
   });
   api.defaults.headers.common['X-Token'] = ssoAccessTokenHash;

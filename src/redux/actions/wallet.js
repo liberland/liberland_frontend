@@ -13,6 +13,8 @@ export const {
   unpool,
   getLlmTransfers,
   getLldTransfers,
+  getAdditionalAssets,
+  sendAssetsTransfer,
 } = createActions({
   GET_WALLET: {
     call: undefined,
@@ -80,6 +82,16 @@ export const {
     failure: undefined,
   },
   GET_LLD_TRANSFERS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_ADDITIONAL_ASSETS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SEND_ASSETS_TRANSFER: {
     call: undefined,
     success: undefined,
     failure: undefined,

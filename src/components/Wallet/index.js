@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Redirect, Route, Switch, useHistory,
@@ -16,6 +16,8 @@ import Bridge from './Bridge';
 
 import Card from '../Card';
 import RoleHOC from '../../hocs/RoleHOC';
+import AssetOverview from "./AssetOverview";
+import SendAssetModal from "../Modals/SendAssetModal";
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -24,6 +26,7 @@ function Wallet() {
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
   const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
   const historyFetchFailed = useSelector(walletSelectors.selectorTxHistoryFailed);
+  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -34,6 +37,7 @@ function Wallet() {
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
+    dispatch(walletActions.getAdditionalAssets.call());
     dispatch(walletActions.getLlmTransfers.call());
     dispatch(walletActions.getLldTransfers.call());
   }, [dispatch]);
@@ -44,6 +48,10 @@ function Wallet() {
         totalBalance={totalBalance}
         balances={balances}
         liquidMerits={liquidMerits}
+      />
+
+      <AssetOverview
+        additionalAssets={additionalAssets}
       />
 
       <WalletTransactionHistory

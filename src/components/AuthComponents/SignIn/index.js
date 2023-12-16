@@ -51,7 +51,7 @@ function SignIn() {
     }
     if (ssoAccessTokenHash) {
       const api2 = axios.create({
-        baseURL: process.env.REACT_APP_API2,
+        baseURL: process.env.REACT_APP_API,
         withCredentials: true,
       });
       api2.defaults.headers.common['X-token'] = ssoAccessTokenHash;
@@ -67,6 +67,12 @@ function SignIn() {
 
   const goToLiberlandSignin = () => {
     window.location.replace(process.env.REACT_APP_SSO_API_IMPLICIT_LINK);
+  };
+  const goToLiberland2FASignin = () => {
+    window.location.replace(process.env.REACT_APP_SSO2FA_API_IMPLICIT_LINK);
+  };
+  const goToLiberland2FASignout = () => {
+    window.location.replace(process.env.REACT_APP_SSO2FA_API_LOGOUT_IMPLICIT_LINK);
   };
 
   return (
@@ -110,6 +116,16 @@ function SignIn() {
           </a>
           .
         </p>
+
+
+      </div>
+      <div className={styles.twoFAbuttons}>
+        <div onClick={() => {goToLiberland2FASignin()}}>
+          2fa login
+        </div>
+        <div onClick={() => {goToLiberland2FASignout()}}>
+          2fa logout
+        </div>
       </div>
     </div>
   );

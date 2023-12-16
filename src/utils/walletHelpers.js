@@ -2,6 +2,7 @@ import {
   BN, BN_ONE, BN_ZERO, formatBalance,
 } from '@polkadot/util';
 import { ethers } from 'ethers';
+import {parseInt} from "lodash";
 
 const meritDecimals = 12;
 const dollarDecimals = 12;
@@ -15,15 +16,17 @@ export const valueToBN = (i) => {
   return new BN(s);
 };
 
-const _format = (value, decimals) => formatBalance(
+const _format = ((value, decimals) => {
+  return formatBalance(
   valueToBN(value),
   {
     decimals,
     forceUnit: '-',
     withSi: false,
     locale: 'en',
+    withZero: false
   },
-);
+  )});
 
 const _parse = (value, decimals) => {
   const ethersBN = ethers.utils.parseUnits(value, decimals);
@@ -34,6 +37,8 @@ export const formatMerits = (grains) => _format(grains, meritDecimals);
 export const formatDollars = (grains) => _format(grains, dollarDecimals);
 export const parseMerits = (merits) => _parse(merits, meritDecimals);
 export const parseDollars = (dollars) => _parse(dollars, dollarDecimals);
+export const parseAssets = (assets, assetDecimals) => _parse(assets, assetDecimals);
+export const formatAssets = (assets, assetDecimals) => _format(assets, parseInt(assetDecimals))
 
 export const formatTransaction = (value_raw, bigSymbol, smallSymbol, decimals) => {
   const value = valueToBN(value_raw);
