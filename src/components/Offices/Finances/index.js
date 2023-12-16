@@ -36,6 +36,13 @@ const DYNAMIC_ACCOUNTS = [
   // FIXME 1 LLD faucet
 ];
 
+const STATIC_ACCOUNTS = [
+  {
+    name: 'Onboarder LLD faucet',
+    address: process.env.REACT_APP_ONBOARDER_LLD_FAUCET_ADDRESS
+  }
+]
+
 export default function Finances() {
   const dispatch = useDispatch();
   const balances = useSelector(officesSelectors.selectorBalances);
@@ -56,12 +63,14 @@ export default function Finances() {
         })),
       ];
 
-      const palletsAndAddresses = palletIdsToFetchBalancesFor.map(
+      let palletsAndAddresses = palletIdsToFetchBalancesFor.map(
         (palletData) => ({
           ...palletData,
           address: palletIdToAddress(palletData.palletId),
         }),
       );
+
+      palletsAndAddresses = palletsAndAddresses.concat(STATIC_ACCOUNTS)
       setAccountsAddresses(palletsAndAddresses);
 
       const addressesToFetchBalancesFor = palletsAndAddresses.map(
