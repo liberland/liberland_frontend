@@ -72,6 +72,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: () => <Avatar name={fullName} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
       description: `${formatMerits(totalBalance)} LLM`,
+      isDiscouraged: false,
     },
     {
       route: router.home.feed,
@@ -79,13 +80,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: FeedIcon,
       activeIcon: FeedIconActive,
-    },
-    {
-      route: router.home.documents,
-      title: 'Documents',
-      access: ['citizen', 'assemblyMember'],
-      icon: DocumentsIcon,
-      activeIcon: DocumentsIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_FEED_DISCOURAGED,
     },
     {
       route: router.home.wallet,
@@ -93,34 +88,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: WalletIcon,
       activeIcon: WalletIconActive,
-    },
-    {
-      route: router.home.voting,
-      title: 'Voting',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
-      icon: VotingIcon,
-      activeIcon: VotingIconActive,
-    },
-    {
-      route: router.home.legislation,
-      title: 'Legislation',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
-      icon: ConstitutionIcon,
-      activeIcon: ConstitutionIconActive,
-    },
-    {
-      route: router.home.offices,
-      title: 'Offices',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
-      icon: ConstitutionIcon,
-      activeIcon: ConstitutionIconActive,
-    },
-    {
-      route: router.home.registries,
-      title: 'Registries',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
-      icon: DocumentsIcon,
-      activeIcon: DocumentsIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
     },
     {
       route: router.home.staking,
@@ -128,6 +96,39 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       activeIcon: DocumentsIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
+    },
+    {
+      route: router.home.voting,
+      title: 'Voting',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: VotingIcon,
+      activeIcon: VotingIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED,
+    },
+    {
+      route: router.home.legislation,
+      title: 'Legislation',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: ConstitutionIcon,
+      activeIcon: ConstitutionIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED,
+    },
+    {
+      route: router.home.offices,
+      title: 'Offices',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: ConstitutionIcon,
+      activeIcon: ConstitutionIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED,
+    },
+    {
+      route: router.home.registries,
+      title: 'Registries',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: DocumentsIcon,
+      activeIcon: DocumentsIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED,
     },
     {
       route: router.home.congress,
@@ -135,6 +136,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       activeIcon: DocumentsIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
     },
   ];
 
@@ -152,6 +154,7 @@ function HomeNavigation() {
             title,
             access,
             description,
+            isDiscouraged,
           }) => (
             <RoleHOC key={route} roles={roles} access={access}>
               <NavigationLink
@@ -161,6 +164,7 @@ function HomeNavigation() {
                 activeIcon={activeIcon}
                 path={location.pathname}
                 description={description}
+                isDiscouraged={isDiscouraged}
               />
             </RoleHOC>
           ))

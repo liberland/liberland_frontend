@@ -13,9 +13,12 @@ function NavigationLink({
   activeIcon,
   path,
   description,
+  isDiscouraged
 }) {
   return (
-    <div className={cx(styles.navigationLink, { [styles.withMargin]: typeof icon === 'function' })}>
+    <div className={cx(styles.navigationLink, { [styles.withMargin]: typeof icon === 'function' })}
+      style={{opacity: (isDiscouraged === true || isDiscouraged === 'true') ? 0.2 : 1}}
+    >
       <NavLink
         to={route}
         activeClassName="active"
@@ -55,6 +58,7 @@ NavigationLink.propTypes = {
   path: PropTypes.string.isRequired,
   // eslint-disable-next-line react/require-default-props
   description: PropTypes.string,
+  isDiscouraged:PropTypes.bool,
 };
 
 export default NavigationLink;
