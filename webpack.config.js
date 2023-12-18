@@ -14,7 +14,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 // const postcssNormalize = require('postcss-flexbugs-fixes');
 // const postcssNormalize = require('postcss-preset-env');
 
-const getStyleLoaders = (cssOptions, preProcessor) => {
+const getStyleLoaders = (cssOptions) => {
   const loaders = [
     'style-loader',
     {
@@ -24,7 +24,6 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
     {
       loader: require.resolve('postcss-loader'),
       options: {
-        ident: 'postcss',
         postcssOptions: {
           plugins: () => [
             require('postcss-flexbugs-fixes'),
