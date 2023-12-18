@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { hexToU8a } from '@polkadot/util';
 import styles from './styles.module.scss';
@@ -9,12 +10,12 @@ import Button from '../../../../Button/Button';
 import truncate from '../../../../../utils/truncate';
 import NotificationPortal from '../../../../NotificationPortal';
 import { ReactComponent as CopyIcon } from '../../../../../assets/icons/copy.svg';
+import useUsersIdentity from '../../../../../hooks/useUsersIdentity';
+import { findNameOrId } from '../../../../../utils/getNameOrId';
 
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
-import {
-  congressSelectors,
-} from '../../../../../redux/selectors';
+import { congressSelectors } from '../../../../../redux/selectors';
 import { Preimage } from '../../../../Proposal';
 
 function BlacklistButton({ hash }) {
@@ -64,6 +65,9 @@ function ProposalItem({
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
 
+  const proposersList = centralizedDatas.map((item) => item.proposerAddress);
+  const { userOrId, usersList } = useUsersIdentity(proposer, proposersList);
+
   return (
     <>
       <NotificationPortal ref={notificationRef} />
@@ -100,7 +104,7 @@ function ProposalItem({
             <div>
               <div className={styles.metaTextInfo}>
                 Proposed by:
-                <b>{ proposer && truncate(proposer, 13) }</b>
+                <b>{ userOrId }</b>
                 <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={() => handleCopyClick(proposer)} />
               </div>
             </div>
@@ -117,25 +121,28 @@ function ProposalItem({
             <div>
               Discussions:
               <ol>
-                {centralizedDatas.map((centralizedData) => (
-                  <li key={centralizedData.id}>
-                    <a href={centralizedData.link}>
-                      {centralizedData.name}
-                    </a>
-                    {' - '}
-                    {centralizedData.description}
-                    {' '}
-                    (Discussion added by
-                    {' '}
-                    <b>{ truncate(centralizedData.proposerAddress, 13) }</b>
-                    <CopyIcon
-                      className={styles.copyIcon}
-                      name="walletAddress"
-                      onClick={() => handleCopyClick(centralizedData.proposerAddress)}
-                    />
-                    )
-                  </li>
-                ))}
+                {centralizedDatas.map((centralizedData) => {
+                  const proposedDiscussionName = findNameOrId(centralizedData.proposerAddress, usersList);
+                  return (
+                    <li key={centralizedData.id}>
+                      <a href={centralizedData.link}>
+                        {centralizedData.name}
+                      </a>
+                      {' - '}
+                      {centralizedData.description}
+                      {' '}
+                      (Discussion added by
+                      {' '}
+                      <b>{ proposedDiscussionName}</b>
+                      <CopyIcon
+                        className={styles.copyIcon}
+                        name="walletAddress"
+                        onClick={() => handleCopyClick(centralizedData.proposerAddress)}
+                      />
+                      )
+                    </li>
+                  );
+                })}
               </ol>
             </div>
             )}

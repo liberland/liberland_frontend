@@ -9,6 +9,8 @@ import { formatMerits } from '../../../../../utils/walletHelpers';
 import truncate from '../../../../../utils/truncate';
 import NotificationPortal from '../../../../NotificationPortal';
 import { ReactComponent as CopyIcon } from '../../../../../assets/icons/copy.svg';
+import useUsersIdentity from '../../../../../hooks/useUsersIdentity';
+import { findNameOrId } from '../../../../../utils/getNameOrId';
 
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
@@ -138,6 +140,8 @@ function ReferendumItem({
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
 
+  const proposersList = centralizedDatas.map((item) => item.proposerAddress);
+  const { usersList } = useUsersIdentity(null, proposersList);
   return (
     <>
       <NotificationPortal ref={notificationRef} />
@@ -198,25 +202,28 @@ function ReferendumItem({
               <div>
                 Discussions:
                 <ol>
-                  {centralizedDatas.map((centralizedData) => (
-                    <li key={centralizedData.id}>
-                      <a href={centralizedData.link}>
-                        {centralizedData.name}
-                      </a>
-                      {' - '}
-                      {centralizedData.description}
-                      {' '}
-                      (Discussion added by
-                      {' '}
-                      <b>{ truncate(centralizedData.proposerAddress, 13) }</b>
-                      <CopyIcon
-                        className={styles.copyIcon}
-                        name="walletAddress"
-                        onClick={() => handleCopyClick(centralizedData.proposerAddress)}
-                      />
-                      )
-                    </li>
-                  ))}
+                  {centralizedDatas.map((centralizedData) => {
+                    const proposedDiscussionName = findNameOrId(centralizedData.proposerAddress, usersList);
+                    return (
+                      <li key={centralizedData.id}>
+                        <a href={centralizedData.link}>
+                          {centralizedData.name}
+                        </a>
+                        {' - '}
+                        {centralizedData.description}
+                        {' '}
+                        (Discussion addede by
+                        {' '}
+                        <b>{ proposedDiscussionName }</b>
+                        <CopyIcon
+                          className={styles.copyIcon}
+                          name="walletAddress"
+                          onClick={() => handleCopyClick(centralizedData.proposerAddress)}
+                        />
+                        )
+                      </li>
+                    );
+                  })}
                 </ol>
               </div>
               )}

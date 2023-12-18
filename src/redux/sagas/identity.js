@@ -13,13 +13,12 @@ import { identityActions, blockchainActions } from '../actions';
 
 function* setIdentityWorker(action) {
   try {
-    const { blockHash, errorData } = yield cps(setIdentity, action.payload.values, action.payload.userWalletAddress);
+    const { errorData } = yield cps(setIdentity, action.payload.values, action.payload.userWalletAddress);
     if (errorData.isError) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success(errorData));
       yield put(identityActions.setIdentity.failure(errorData));
-    }
-    else {
+    } else {
       yield put(identityActions.setIdentity.success());
       yield put(identityActions.getIdentity.call(action.payload.userWalletAddress));
     }
@@ -37,6 +36,15 @@ function* getIdentityWorker(action) {
     yield put(identityActions.getIdentity.success(identity));
   } catch (e) {
     yield put(identityActions.getIdentity.failure(e));
+  }
+}
+
+function* getIdentitiesWorker(action) {
+  try {
+    const identity = yield call(getIdentity, action.payload);
+    yield put(identityActions.getIdentities.success({ identity, key: action.payload }));
+  } catch (e) {
+    yield put(identityActions.getIdentities.failure(e));
   }
 }
 
@@ -58,7 +66,16 @@ function* getIdentityWatcher() {
   }
 }
 
+function* getIdentitiesWatcher() {
+  try {
+    yield takeLatest(identityActions.getIdentities.call, getIdentitiesWorker);
+  } catch (e) {
+    yield put(identityActions.getIdentities.failure(e));
+  }
+}
+
 export {
   setIdentityWatcher,
   getIdentityWatcher,
+  getIdentitiesWatcher,
 };
