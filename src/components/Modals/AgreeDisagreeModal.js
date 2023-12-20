@@ -15,7 +15,7 @@ function AgreeDisagreeModal({
   return (
     <div className={classNames(styles.agreeDisagree, style)}>
       <h3>{text}</h3>
-      {children || <span>This opperation costs 100 LLD.</span>}
+      {children || <span>This operation costs 100 LLD.</span>}
       <div className={styles.buttons}>
         <Button type="button" onClick={onDisagree} medium>
           Cancel
