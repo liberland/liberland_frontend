@@ -1,123 +1,124 @@
-import {web3Accounts, web3FromAddress, web3FromSource} from '@polkadot/extension-dapp';
-import {USER_ROLES, userRolesHelper} from '../utils/userRolesHelper';
-import {handleMyDispatchErrors} from "../utils/therapist";
-import {blockchainDataToFormObject} from "../utils/registryFormBuilder";
-import * as centralizedBackend from './backend';
-import {u8aToHex} from '@polkadot/util';
+import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
 import pako from 'pako';
+import { u8aToHex } from '@polkadot/util';
+import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
+import { handleMyDispatchErrors } from '../utils/therapist';
+import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
+import * as centralizedBackend from './backend';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 let __apiCache = null;
 const getApi = async () => {
-  if (__apiCache === null) __apiCache = await ApiPromise.create({
-    provider,
-    types: {
-      "Coords": {
-        "lat": "u64",
-        "long": "u64",
+  if (__apiCache === null) {
+    __apiCache = await ApiPromise.create({
+      provider,
+      types: {
+        Coords: {
+          lat: 'u64',
+          long: 'u64',
+        },
+        LandMetadata: {
+          demarcation: 'BoundedVec<Coords, u32>',
+          type: 'Text',
+          status: 'Text',
+        },
+        Encryptable: {
+          value: 'Text',
+          isEncrypted: 'bool',
+        },
+        BrandName: {
+          name: 'Encryptable',
+        },
+        OnlineAddress: {
+          description: 'Encryptable',
+          url: 'Encryptable',
+        },
+        PhysicalAddress: {
+          description: 'Encryptable',
+          street: 'Encryptable',
+          city: 'Encryptable',
+          // Subdivision - state/province/emirate/oblast/etc
+          subdivision: 'Encryptable',
+          postalCode: 'Encryptable',
+          country: 'Encryptable', // FIXME enum?
+        },
+        Person: {
+          walletAddress: 'Encryptable',
+          name: 'Encryptable',
+          dob: 'Encryptable',
+          passportNumber: 'Encryptable',
+        },
+        Principal: {
+          walletAddress: 'Encryptable',
+          name: 'Encryptable',
+          dob: 'Encryptable',
+          passportNumber: 'Encryptable',
+          signingAbility: 'Encryptable', // FIXME enum
+          signingAbilityConditions: 'Encryptable',
+          shares: 'Encryptable', // FIXME integer?
+        },
+        Shareholder: {
+          walletAddress: 'Encryptable',
+          name: 'Encryptable',
+          dob: 'Encryptable',
+          passportNumber: 'Text',
+          shares: 'Encryptable', // FIXME integer?
+        },
+        UBO: {
+          walletAddress: 'Encryptable',
+          name: 'Encryptable',
+          dob: 'Encryptable',
+          passportNumber: 'Encryptable',
+          signingAbility: 'Encryptable', // FIXME enum
+          signingAbilityConditions: 'Encryptable',
+        },
+        CompanyData: {
+          name: 'Text',
+          // Truthful scope of business
+          purpose: 'Text',
+          logoURL: 'Text',
+          charterURL: 'Text',
+          totalCapitalAmount: 'Text', // FIXME integer instead? Will have issues with decimals though.
+          totalCapitalCurrency: 'Text', // FIXME maybe some enum?
+          numberOfShares: 'Text', // FIXME integer instead? Are fractional shares supported
+          valuePerShare: 'Text', // FIXME same as totalCapitalAmount probably
+          // History of transfer of shares
+          history: 'Text', // FIXME array of well defined structs?
+          brandNames: 'Vec<BrandName>',
+          onlineAddresses: 'Vec<OnlineAddress>',
+          physicalAddresses: 'ec<PhysicalAddress>',
+          statutoryOrganMembers: 'Vec<Person>',
+          principals: 'Vec<Principal>',
+          shareholders: 'Vec<Shareholder>',
+          UBOs: 'Vec<UBO>',
+        },
       },
-      "LandMetadata": {
-        "demarcation": "BoundedVec<Coords, u32>",
-        "type": "Text",
-        "status": "Text",
-      },
-      "Encryptable": {
-        "value": "Text",
-        "isEncrypted": "bool",
-      },
-      "BrandName": {
-        "name": "Encryptable",
-      },
-      "OnlineAddress": {
-        "description": "Encryptable",
-        "url": "Encryptable",
-      },
-      "PhysicalAddress": {
-        "description": "Encryptable",
-        "street": "Encryptable",
-        "city": "Encryptable",
-        // Subdivision - state/province/emirate/oblast/etc
-        "subdivision": "Encryptable",
-        "postalCode": "Encryptable",
-        "country": "Encryptable", // FIXME enum?
-      },
-      "Person": {
-        "walletAddress": "Encryptable",
-        "name": "Encryptable",
-        "dob": "Encryptable",
-        "passportNumber": "Encryptable",
-      },
-      "Principal": {
-        "walletAddress": "Encryptable",
-        "name": "Encryptable",
-        "dob": "Encryptable",
-        "passportNumber": "Encryptable",
-        "signingAbility": "Encryptable", // FIXME enum
-        "signingAbilityConditions": "Encryptable",
-        "shares": "Encryptable", // FIXME integer?
-      },
-      "Shareholder": {
-        "walletAddress": "Encryptable",
-        "name": "Encryptable",
-        "dob": "Encryptable",
-        "passportNumber": "Text",
-        "shares": "Encryptable", // FIXME integer?
-      },
-      "UBO": {
-        "walletAddress": "Encryptable",
-        "name": "Encryptable",
-        "dob": "Encryptable",
-        "passportNumber": "Encryptable",
-        "signingAbility": "Encryptable", // FIXME enum
-        "signingAbilityConditions": "Encryptable",
-      },
-      "CompanyData": {
-        "name": "Text",
-        // Truthful scope of business
-        "purpose": "Text",
-        "logoURL": "Text",
-        "charterURL": "Text",
-        "totalCapitalAmount": "Text", // FIXME integer instead? Will have issues with decimals though.
-        "totalCapitalCurrency": "Text", // FIXME maybe some enum?
-        "numberOfShares": "Text", // FIXME integer instead? Are fractional shares supported
-        "valuePerShare": "Text", // FIXME same as totalCapitalAmount probably
-        // History of transfer of shares
-        "history": "Text", // FIXME array of well defined structs?
-        "brandNames": "Vec<BrandName>",
-        "onlineAddresses": "Vec<OnlineAddress>",
-        "physicalAddresses": "Vec<PhysicalAddress>",
-        "statutoryOrganMembers": "Vec<Person>",
-        "principals": "Vec<Principal>",
-        "shareholders": "Vec<Shareholder>",
-        "UBOs": "Vec<UBO>",
-      },
-    }
-  });
+    });
+  }
   return __apiCache;
 };
 
-const crossReference = (api, blockchainData, allCentralizedData, motions, isReferendum) =>
-  blockchainData.map((item) => {
-    const proposalHash = isReferendum ? item.imageHash : (
-      item.boundedCall?.Lookup?.hash_ ??
-      item.boundedCall?.Legacy?.hash_
-    )
+// eslint-disable-next-line max-len
+const crossReference = (api, blockchainData, allCentralizedData, motions, isReferendum) => blockchainData.map((item) => {
+  const proposalHash = isReferendum ? item.imageHash : (
+    item.boundedCall?.Lookup?.hash_
+      ?? item.boundedCall?.Legacy?.hash_
+  );
 
-    const centralizedDatas = allCentralizedData.filter((cItem) => ( cItem.hash === proposalHash))
-    const blacklistMotionHash = api.tx.democracy.blacklist(
-      proposalHash,
-      isReferendum ? item.index : null
-    ).method.hash.toString()
+  const centralizedDatas = allCentralizedData.filter((cItem) => (cItem.hash === proposalHash));
+  const blacklistMotionHash = api.tx.democracy.blacklist(
+    proposalHash,
+    isReferendum ? item.index : null,
+  ).method.hash.toString();
 
-    return {
-      ...item,
-      centralizedDatas,
-      blacklistMotion: motions.includes(blacklistMotionHash) ? blacklistMotionHash : null
-    }
-  }
-);
+  return {
+    ...item,
+    centralizedDatas,
+    blacklistMotion: motions.includes(blacklistMotionHash) ? blacklistMotionHash : null,
+  };
+});
 
 const submitExtrinsic = async (extrinsic, walletAddress, api, signerFromAdress = true) => {
   const { signer } = signerFromAdress ? await web3FromAddress(walletAddress) : await web3FromSource('polkadot-js');
@@ -126,6 +127,7 @@ const submitExtrinsic = async (extrinsic, walletAddress, api, signerFromAdress =
       const errorData = handleMyDispatchErrors(dispatchError, api);
       if (status.isInBlock) {
         const blockHash = status.asInBlock.toString();
+        // eslint-disable-next-line no-console
         console.log(errorData, events);
         if (errorData.isError) {
           // eslint-disable-next-line prefer-promise-reject-errors
@@ -135,6 +137,7 @@ const submitExtrinsic = async (extrinsic, walletAddress, api, signerFromAdress =
         } else resolve({ blockHash, status, events });
       }
     }).catch((err) => {
+      // eslint-disable-next-line no-console
       console.log(err);
       reject(err);
     });
@@ -156,117 +159,116 @@ const getIdentity = async (address) => {
 const getLlmBalances = async (addresses) => {
   try {
     const api = await getApi();
-    const balances = await api.query.assets.account.multi(addresses.map(a => [1, a]));
+    const balances = await api.query.assets.account.multi(addresses.map((a) => [1, a]));
     return addresses.reduce((acc, addr, idx) => {
-      if (balances[idx].isSome)
-        return Object.assign(acc, { [addr]: balances[idx].unwrap().balance })
-      else
-        return Object.assign(acc, { [addr]: 0 })
+      if (balances[idx].isSome) return Object.assign(acc, { [addr]: balances[idx].unwrap().balance });
+      return Object.assign(acc, { [addr]: 0 });
     }, {});
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
     throw e;
   }
-}
+};
 
 const getLldBalances = async (addresses) => {
   try {
     const api = await getApi();
     const balances = await api.query.system.account.multi(addresses);
-    return addresses.reduce((acc, addr, idx) => {
-      return Object.assign(acc, { [addr]: balances[idx].data.free })
-    }, {});
+    return addresses.reduce((acc, addr, idx) => Object.assign(acc, { [addr]: balances[idx].data.free }), {});
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
     throw e;
   }
-}
+};
 
 const getAdditionalAssets = async (address) => {
   try {
     const api = await getApi();
-    const assetMetadatas = await api.query.assets.metadata.entries()
-    let processedMetadatas = assetMetadatas.map(rawEntry => {
-      return {
-        // TODO FIXME figure out the proper types
-        index: parseInt(rawEntry[0].toHuman()[0].replace(/,/g, '')),
-        metadata: rawEntry[1].toHuman()
-      }
-    })
-    let indexedFilteredAssets = []
-    let assetQueries = []
-    processedMetadatas.forEach(asset => {
+    const assetMetadatas = await api.query.assets.metadata.entries();
+    const processedMetadatas = assetMetadatas.map((rawEntry) => ({
+      // TODO FIXME figure out the proper types
+      index: parseInt(rawEntry[0].toHuman()[0].replace(/,/g, '')),
+      metadata: rawEntry[1].toHuman(),
+    }));
+    const indexedFilteredAssets = [];
+    const assetQueries = [];
+    processedMetadatas.forEach((asset) => {
       // Disregard LLM, asset of ID 1 because it has special treatment already
-      if (!(asset.index === 1 || asset.index ==='1')){
-        assetQueries.push([api.query.assets.account, [asset.index, address]])
-        indexedFilteredAssets.push(asset)
+      if (!(asset.index === 1 || asset.index === '1')) {
+        assetQueries.push([api.query.assets.account, [asset.index, address]]);
+        indexedFilteredAssets.push(asset);
       }
-    })
+    });
 
-    if(assetQueries.length !== 0) {
-      let assetResults = await api.queryMulti([...assetQueries])
+    if (assetQueries.length !== 0) {
+      const assetResults = await api.queryMulti([...assetQueries]);
 
       assetResults.forEach((assetResult, index) => {
-        indexedFilteredAssets[index].balance = assetResult.toJSON()
-      })
-      return indexedFilteredAssets
-    } else {
-      return []
+        indexedFilteredAssets[index].balance = assetResult.toJSON();
+      });
+      return indexedFilteredAssets;
     }
-  }
-  catch (e) {
+    return [];
+  } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
     throw e;
   }
-}
+};
 
 const bridgeSubscribe = async (asset, receipt_id, onChange) => {
   const api = await getApi();
   let bridge;
-  if (asset == "LLM") bridge = api.query.ethLLMBridge;
-  else if (asset == "LLD") bridge = api.query.ethLLDBridge;
+  /* eslint-disable eqeqeq */
+  if (asset == 'LLM') bridge = api.query.ethLLMBridge;
+  else if (asset == 'LLD') bridge = api.query.ethLLDBridge;
   // returns unsub func
   return {
-    unsubscribe: await bridge.statusOf(receipt_id, onChange)
-  }
-}
+    unsubscribe: await bridge.statusOf(receipt_id, onChange),
+  };
+};
 
 const bridgeDeposit = async ({ asset, amount, ethereumRecipient }, walletAddress) => {
   const api = await getApi();
   let bridge;
-  if (asset == "LLM") bridge = api.tx.ethLLMBridge;
-  else if (asset == "LLD") bridge = api.tx.ethLLDBridge;
-  else throw new Exception("Unknown asset");
+  if (asset == 'LLM') bridge = api.tx.ethLLMBridge;
+  else if (asset == 'LLD') bridge = api.tx.ethLLDBridge;
+  // eslint-disable-next-line no-undef
+  else throw new Exception('Unknown asset');
 
   const call = bridge.deposit(amount, ethereumRecipient);
   return submitExtrinsic(call, walletAddress, api, false);
-}
+};
 
 const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress) => {
   const api = await getApi();
   let bridge;
-  if (asset == "LLM") bridge = api.tx.ethLLMBridge;
-  else if (asset == "LLD") bridge = api.tx.ethLLDBridge;
-  else throw new Exception("Unknown asset");
+  if (asset == 'LLM') bridge = api.tx.ethLLMBridge;
+  else if (asset == 'LLD') bridge = api.tx.ethLLDBridge;
+  // eslint-disable-next-line no-undef
+  else throw new Exception('Unknown asset');
 
   const call = bridge.withdraw(receipt_id);
   return submitExtrinsic(call, walletAddress, api, false);
-}
+};
 
 const bridgeConstants = async (asset) => {
   const api = await getApi();
   let bridge;
-  if (asset == "LLM") bridge = api.consts.ethLLMBridge;
-  else if (asset == "LLD") bridge = api.consts.ethLLDBridge;
-  else throw new Exception("Unknown asset");
+  if (asset == 'LLM') bridge = api.consts.ethLLMBridge;
+  else if (asset == 'LLD') bridge = api.consts.ethLLDBridge;
+  /* eslint-enable eqeqeq */
+  // eslint-disable-next-line no-undef
+  else throw new Exception('Unknown asset');
 
   return bridge;
-}
+};
 
-const provideJudgementAndAssets = async ({ address, hash, walletAddress, merits, dollars }) => {
+const provideJudgementAndAssets = async ({
+  address, hash, walletAddress, merits, dollars,
+}) => {
   const api = await getApi();
   const calls = [];
 
@@ -294,15 +296,15 @@ const getLegalAdditionals = (legal) => {
   const chunks = [];
   for (let i = 0; i < legal.length; i += 32) {
     chunks.push([
-      {"Raw": "legal"},
-      {"Raw": legal.substr(i, 32)}
+      { Raw: 'legal' },
+      { Raw: legal.substr(i, 32) },
     ]);
   }
   return chunks;
-}
+};
 
 const getCitizenAdditionals = (blockNumber, eligible_on_date) => {
-  if(!eligible_on_date) return [];
+  if (!eligible_on_date) return [];
 
   const now = Date.now();
   const seconds_till_eligible = eligible_on_date.getTime() - now;
@@ -315,39 +317,37 @@ const getCitizenAdditionals = (blockNumber, eligible_on_date) => {
   const eligible_on_bytes = new Uint8Array(eligible_on_buf);
 
   return [
-    [{"Raw": "citizen"}, {"Raw": "1"}],
-    [{"Raw": "eligible_on"}, {"Raw": [...eligible_on_bytes]}],
+    [{ Raw: 'citizen' }, { Raw: '1' }],
+    [{ Raw: 'eligible_on' }, { Raw: [...eligible_on_bytes] }],
   ];
-}
+};
 
-const getEResidentAdditionals = () => {
-  return [
-    [{"Raw": "eresident"}, {"Raw": "1"}],
-  ];
-}
+const getEResidentAdditionals = () => [
+  [{ Raw: 'eresident' }, { Raw: '1' }],
+];
 
 const buildAdditionals = (values, blockNumber) => {
-  const additionals = []
+  const additionals = [];
 
-  if (values.onChainIdentity === "citizen") {
+  if (values.onChainIdentity === 'citizen') {
     additionals.push(
-        ...getCitizenAdditionals(blockNumber, values.eligible_on),
-        ...getEResidentAdditionals()
-    )
-  } else if (values.onChainIdentity === "eresident") {
+      ...getCitizenAdditionals(blockNumber, values.eligible_on),
+      ...getEResidentAdditionals(),
+    );
+  } else if (values.onChainIdentity === 'eresident') {
     additionals.push(
-        ...getEResidentAdditionals()
-      )
+      ...getEResidentAdditionals(),
+    );
   }
 
   if (values.legal) {
     additionals.push(
-        ...getLegalAdditionals(values.legal)
-    )
+      ...getLegalAdditionals(values.legal),
+    );
   }
 
-  return additionals
-}
+  return additionals;
+};
 
 const setIdentity = async (values, walletAddress) => {
   const asData = (v) => (v ? { Raw: v } : null);
@@ -374,21 +374,23 @@ const getCompanyRequest = async (entity_id) => {
     const maybeRequest = await api.query.companyRegistry.requests(0, entity_id);
     if (maybeRequest.isNone) return null;
     const optRequest = maybeRequest.unwrap();
-    if (optRequest.isNone) return {
-      unregister: true
-    };
+    if (optRequest.isNone) {
+      return {
+        unregister: true,
+      };
+    }
     const request = optRequest.unwrap();
     return {
       hash: request.data.hash,
       editableByRegistrar: request.editableByRegistrar,
-      data: api.createType('CompanyData', pako.inflate(request.data))
+      data: api.createType('CompanyData', pako.inflate(request.data)),
     };
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
     throw e;
   }
-}
+};
 
 const getCompanyRegistration = async (entity_id) => {
   try {
@@ -399,14 +401,14 @@ const getCompanyRegistration = async (entity_id) => {
     return {
       hash: registration.data.hash,
       editableByRegistrar: registration.editableByRegistrar,
-      data: api.createType('CompanyData', pako.inflate(registration.data))
+      data: api.createType('CompanyData', pako.inflate(registration.data)),
     };
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
     throw e;
   }
-}
+};
 
 const registerCompany = async ({ entity_id, hash, walletAddress }) => {
   const api = await getApi();
@@ -554,6 +556,7 @@ const getValidators = async () => {
     const dataToAdd = {
       ...((validatorHumanData?.commission !== undefined) && { commission: validatorHumanData.commission }),
       ...((validatorHumanData?.blocked !== undefined) && { blocked: validatorHumanData.blocked }),
+      // eslint-disable-next-line max-len
       ...((validatorHumanData?.info?.display?.Raw !== undefined) && { displayName: validatorHumanData?.info?.display?.Raw }),
     };
     validators[index % numOfValidators] = {
@@ -627,7 +630,7 @@ const getDemocracyReferendums = async (address) => {
     ));
 
     const motions = (await api.query.council.proposals())
-      .map(propose => propose.toString())
+      .map((propose) => propose.toString());
 
     const centralizedReferendumsData = await centralizedBackend.getReferenda();
     const crossReferencedReferendumsData = crossReference(
@@ -635,15 +638,15 @@ const getDemocracyReferendums = async (address) => {
       apideriveReferendums,
       centralizedReferendumsData,
       motions,
-      true
-    )
+      true,
+    );
     const crossReferencedProposalsData = crossReference(
       api,
       proposalsWithDeposits,
       centralizedReferendumsData,
       motions,
-      false
-    )
+      false,
+    );
 
     return {
       proposalData,
@@ -713,7 +716,7 @@ const submitProposal = async (
     },
   }, minDeposit);
 
-  const existingPreimage = await api.query.preimage.preimageFor([proposal.hash, proposal.encodedLength])
+  const existingPreimage = await api.query.preimage.preimageFor([proposal.hash, proposal.encodedLength]);
   const extrinsic = existingPreimage.isNone
     ? api.tx.utility.batchAll([
       api.tx.preimage.notePreimage(proposal.toHex()),
@@ -729,6 +732,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
   let [
     councilMembers,
     candidates,
+    // eslint-disable-next-line prefer-const
     currentCandidateVotesByUserQuery,
   ] = await api.queryMulti([
     api.query.council.members,
@@ -741,8 +745,9 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     councilMembersIdentityQueries.push([api.query.identity.identityOf, councilMember]);
   });
 
-  const councilMemberIdentities = councilMembersIdentityQueries.length == 0 ? [] :
-    await api.queryMulti([
+  // eslint-disable-next-line eqeqeq
+  const councilMemberIdentities = councilMembersIdentityQueries.length == 0 ? []
+    : await api.queryMulti([
       ...councilMembersIdentityQueries,
     ]);
 
@@ -767,6 +772,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     candidatesIdentityQueries.push([api.query.identity.identityOf, candidate[0]]);
   });
 
+  // eslint-disable-next-line eqeqeq
   const candidateIdentities = candidatesIdentityQueries.length == 0 ? [] : await api.queryMulti([
     ...candidatesIdentityQueries,
   ]);
@@ -791,6 +797,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     currentCandidateVotesByUserIdentityQueries.push([api.query.identity.identityOf, currentCandidateVote]);
   });
 
+  // eslint-disable-next-line max-len, eqeqeq
   const currentCandidateVotesByUserIdentities = currentCandidateVotesByUserIdentityQueries.length == 0 ? [] : await api.queryMulti(
     [
       ...currentCandidateVotesByUserIdentityQueries,
@@ -816,6 +823,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
    const allVotes = useCall<Record<string, AccountId[]>>(api.derive.council.votes, undefined, transformVotes);
    */
 
+  // eslint-disable-next-line max-len
   return { currentCongressMembers: crossReferencedCouncilMemberIdentities, candidates: crossReferencedCandidateIdentities, currentCandidateVotesByUser: crossReferencedCurrentCandidateVotesByUser };
 };
 
@@ -846,32 +854,33 @@ const getLegislation = async (tier) => {
   const api = await getApi();
 
   const legislation = await api.query.liberlandLegislation.legislation.entries(
-    tier
+    tier,
   );
   const legislationById = legislation.reduce(
     (acc, [{ args: key }, content]) => {
       const { year, index } = key[1];
       if (!acc[year]) acc[year] = {};
-      if (!acc[year][index])
-        acc[year][index] = { id: { year, index }, vetos: [], sections: [] };
+      if (!acc[year][index]) { acc[year][index] = { id: { year, index }, vetos: [], sections: [] }; }
       acc[year][index].sections.push({ vetos: [], content });
       return acc;
     },
-    {}
+    {},
   );
 
   const vetos = await api.query.liberlandLegislation.vetos.entries(tier);
   vetos
     .filter(([_, isVeto]) => isVeto)
     .forEach(([key]) => {
+      // eslint-disable-next-line no-unused-vars
       const [_, { year, index }, section, accountId] = key.args;
       if (!legislationById[year]) legislationById[year] = {};
-      if (!legislationById[year][index])
+      if (!legislationById[year][index]) {
         legislationById[year][index] = {
           id: { year, index },
           vetos: [],
           sections: [],
         };
+      }
       if (section.isSome) {
         const sectionId = section.unwrap().toNumber();
         if (!legislationById[year][index].sections[sectionId]) return;
@@ -882,23 +891,23 @@ const getLegislation = async (tier) => {
       }
     });
 
-  const motions = (await api.query.council.proposals()).map((propose) =>
-    propose.toString()
-  );
+  const motions = (await api.query.council.proposals()).map((propose) => propose.toString());
   const publicProps = (await api.query.democracy.publicProps())
     .map((proposal) => {
-      if (proposal[1].isLegacy) return proposal[1].asLegacy.hash_.toString()
-      if (proposal[1].isLookup) return proposal[1].asLookup.hash_.toString()
+      if (proposal[1].isLegacy) return proposal[1].asLegacy.hash_.toString();
+      if (proposal[1].isLookup) return proposal[1].asLookup.hash_.toString();
+      return null;
     }).filter((el) => el);
 
   const referendums = await api.query.democracy.referendumInfoOf.entries();
   const referendumProposals = referendums
     .map(([_, referendum]) => {
       const unwrapedReferendum = referendum.unwrapOr(null);
-      if (!unwrapedReferendum?.isOngoing) return;
-      const proposal = unwrapedReferendum.asOngoing.proposal
-      if (proposal.isLookup) return proposal.asLookup.hash_.toString()
-      if (proposal.isLegacy) return proposal.asLegacy.hash_.toString()
+      if (!unwrapedReferendum?.isOngoing) return null;
+      const { proposal } = unwrapedReferendum.asOngoing;
+      if (proposal.isLookup) return proposal.asLookup.hash_.toString();
+      if (proposal.isLegacy) return proposal.asLegacy.hash_.toString();
+      return null;
     })
     .filter((el) => el);
 
@@ -927,75 +936,78 @@ const getLegislation = async (tier) => {
       });
       return acc;
     },
-    {}
+    {},
   );
 
   Object.entries(legislationById).forEach(([year, legislations]) => {
-      Object.entries(legislations).forEach( ([index, { sections }]) => {
-        const mainrepealLegislationHash = repealLegislationHashes[year][index].proposalContent
-        legislationById[year][index].repealMotion = motions.includes(mainrepealLegislationHash) ? mainrepealLegislationHash : null;
-        legislationById[year][index].repealReferendum = referendumProposals.includes(mainrepealLegislationHash) ? mainrepealLegislationHash : null;
-        legislationById[year][index].repealProposal = publicProps.includes(mainrepealLegislationHash) ? mainrepealLegislationHash : null;
-        sections.forEach((sectionData, section) => {
-            if (sectionData.content.isNone) return;
-            const repealLegislationHash = repealLegislationHashes[year][index].sections[section].proposalContent
-            legislationById[year][index].sections[section].repealMotion = motions.includes(repealLegislationHash) ? repealLegislationHash : null;
-            legislationById[year][index].sections[section].repealReferendum = referendumProposals.includes(repealLegislationHash) ? repealLegislationHash : null;
-            legislationById[year][index].sections[section].repealProposal = publicProps.includes(repealLegislationHash) ? repealLegislationHash : null;
-          })
-      })
-  })
+    Object.entries(legislations).forEach(([index, { sections }]) => {
+      /* eslint-disable max-len */
+      const mainrepealLegislationHash = repealLegislationHashes[year][index].proposalContent;
+      legislationById[year][index].repealMotion = motions.includes(mainrepealLegislationHash) ? mainrepealLegislationHash : null;
+      legislationById[year][index].repealReferendum = referendumProposals.includes(mainrepealLegislationHash) ? mainrepealLegislationHash : null;
+      legislationById[year][index].repealProposal = publicProps.includes(mainrepealLegislationHash) ? mainrepealLegislationHash : null;
+      sections.forEach((sectionData, section) => {
+        if (sectionData.content.isNone) return;
+        const repealLegislationHash = repealLegislationHashes[year][index].sections[section].proposalContent;
+        legislationById[year][index].sections[section].repealMotion = motions.includes(repealLegislationHash) ? repealLegislationHash : null;
+        legislationById[year][index].sections[section].repealReferendum = referendumProposals.includes(repealLegislationHash) ? repealLegislationHash : null;
+        legislationById[year][index].sections[section].repealProposal = publicProps.includes(repealLegislationHash) ? repealLegislationHash : null;
+      });
+      /* eslint-enable max-len */
+    });
+  });
 
   return legislationById;
 };
 
-
 const getOfficialUserRegistryEntries = async (walletAddress) => {
   const api = await getApi();
-  const ownerEntites = await api.query.companyRegistry.ownerEntities.entries(walletAddress)
+  const ownerEntites = await api.query.companyRegistry.ownerEntities.entries(walletAddress);
 
   const ownerEntitesHuman = ownerEntites.map((x) => ({
     key: x[0].toHuman(), value: x[1].toHuman(),
   }));
-  let ownsEntityIds = []
-  ownerEntitesHuman.forEach(oe => {
-    ownsEntityIds.push(oe.key[1])
-  })
-  let requestQueries = []
-  let registeredQueries = []
-  ownsEntityIds.forEach(entityId => {
-    requestQueries.push([api.query.companyRegistry.requests, [0, entityId]])
-    registeredQueries.push([api.query.companyRegistry.registries, [0, entityId]])
-  })
-  let companyRegistryRawData = []
+  const ownsEntityIds = [];
+  ownerEntitesHuman.forEach((oe) => {
+    ownsEntityIds.push(oe.key[1]);
+  });
+  const requestQueries = [];
+  const registeredQueries = [];
+  ownsEntityIds.forEach((entityId) => {
+    requestQueries.push([api.query.companyRegistry.requests, [0, entityId]]);
+    registeredQueries.push([api.query.companyRegistry.registries, [0, entityId]]);
+  });
+  let companyRegistryRawData = [];
   // Skip queryMulti if no companies, otherwise errors out
-  if(ownsEntityIds.length !== 0) {
+  if (ownsEntityIds.length !== 0) {
     companyRegistryRawData = await api.queryMulti([
       ...requestQueries,
-      ...registeredQueries
-    ])
+      ...registeredQueries,
+    ]);
   }
-  let companyRequestsByWallet = []
-  let registeredCompaniesByWallet = []
+  const companyRequestsByWallet = [];
+  const registeredCompaniesByWallet = [];
   companyRegistryRawData.forEach((companyRegistryEntity, index) => {
     if (companyRegistryEntity.isNone) return;
     let companyData;
     try {
       if (companyRegistryEntity.isNone) return;
-      const optCompanyRegistryEntity = companyRegistryEntity.unwrap()
+      const optCompanyRegistryEntity = companyRegistryEntity.unwrap();
       if (optCompanyRegistryEntity.isNone) companyData = { unregister: true };
       else {
+        // eslint-disable-next-line max-len
         const compressed = optCompanyRegistryEntity?.isSome ? optCompanyRegistryEntity.unwrap().data : optCompanyRegistryEntity.data;
         companyData = api.createType('CompanyData', pako.inflate(compressed));
       }
-    } catch(e) {
-      console.error("Invalid company data", e);
-      if (index < ownsEntityIds.length){
-        let dataObject = {invalid: true, id: ownsEntityIds[index]}
-        companyRequestsByWallet.push(dataObject)
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Invalid company data', e);
+      if (index < ownsEntityIds.length) {
+        const dataObject = { invalid: true, id: ownsEntityIds[index] };
+        companyRequestsByWallet.push(dataObject);
       } else {
-        let dataObject = {invalid: true, id: ownsEntityIds[index - ownsEntityIds.length]}
-        registeredCompaniesByWallet.push(dataObject)
+        const dataObject = { invalid: true, id: ownsEntityIds[index - ownsEntityIds.length] };
+        registeredCompaniesByWallet.push(dataObject);
       }
       return;
     }
@@ -1003,42 +1015,43 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
     // FIXME this is component-specific logic, nodeRpcCall shouldn't do this
     const formObject = blockchainDataToFormObject(companyData);
 
-    if (index < ownsEntityIds.length){
-      let dataObject = {...formObject, id: ownsEntityIds[index]}
-      companyRequestsByWallet.push(dataObject)
+    if (index < ownsEntityIds.length) {
+      const dataObject = { ...formObject, id: ownsEntityIds[index] };
+      companyRequestsByWallet.push(dataObject);
     } else {
-      let dataObject = {...formObject, id: ownsEntityIds[index - ownsEntityIds.length]}
-      registeredCompaniesByWallet.push(dataObject)
+      const dataObject = { ...formObject, id: ownsEntityIds[index - ownsEntityIds.length] };
+      registeredCompaniesByWallet.push(dataObject);
     }
-  })
-
-  const METAVERSTE_NFTs_ID = 1
-  const LAND_NFTs_ID = 0
-
-  let metaverseLandForOwner = []
-  let landForOwner = []
-
-  let ownerLand = await Promise.all([
-    api.query.nfts.account.entries(walletAddress, LAND_NFTs_ID),
-    api.query.nfts.account.entries(walletAddress, METAVERSTE_NFTs_ID)
-  ])
-
-  const landForOwnerIds = []
-  const landMetadataQueries =[]
-  const metaverseLandForOwnerIds = []
-  const metaverseLandMetadataQueries = []
-  const ownerLandHuman = ownerLand[0].map(x => {
-    const landObject = { ...x[0].toHuman() }
-    landForOwnerIds.push(landObject[2])
-    landMetadataQueries.push([api.query.nfts.itemMetadataOf, [LAND_NFTs_ID, parseInt(landObject[2])]])
-    return landObject
   });
-  const ownerMetaverseLandHuman = ownerLand[1].map(x => {
-    const metaverseLandObject = { ...x[0].toHuman() }
-    metaverseLandForOwnerIds.push(metaverseLandObject[2])
-    metaverseLandMetadataQueries.push([api.query.nfts.itemMetadataOf, [METAVERSTE_NFTs_ID, parseInt(metaverseLandObject[2])]]);
-    return metaverseLandObject;
-  });
+
+  // const METAVERSTE_NFTs_ID = 1;
+  // const LAND_NFTs_ID = 0;
+
+  const metaverseLandForOwner = [];
+  const landForOwner = [];
+
+  // const ownerLand = await Promise.all([
+  //   api.query.nfts.account.entries(walletAddress, LAND_NFTs_ID),
+  //   api.query.nfts.account.entries(walletAddress, METAVERSTE_NFTs_ID),
+  // ]);
+
+  const landForOwnerIds = [];
+  const landMetadataQueries = [];
+  const metaverseLandForOwnerIds = [];
+  const metaverseLandMetadataQueries = [];
+  // const ownerLandHuman = ownerLand[0].map((x) => {
+  //   const landObject = { ...x[0].toHuman() };
+  //   landForOwnerIds.push(landObject[2]);
+  //   landMetadataQueries.push([api.query.nfts.itemMetadataOf, [LAND_NFTs_ID, parseInt(landObject[2])]]);
+  //   return landObject;
+  // });
+  // const ownerMetaverseLandHuman = ownerLand[1].map((x) => {
+  //   const metaverseLandObject = { ...x[0].toHuman() };
+  //   metaverseLandForOwnerIds.push(metaverseLandObject[2]);
+  // eslint-disable-next-line max-len
+  //   metaverseLandMetadataQueries.push([api.query.nfts.itemMetadataOf, [METAVERSTE_NFTs_ID, parseInt(metaverseLandObject[2])]]);
+  //   return metaverseLandObject;
+  // });
 
   let landAttributes = [];
   // only query if something to query, otherwise never resolves
@@ -1051,11 +1064,12 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
 
   landAttributes.forEach((landAttribute, index) => {
     if (index < landForOwnerIds.length) {
-      landForOwner.push({ id: landForOwnerIds[index], data: landAttribute.toHuman() })
+      landForOwner.push({ id: landForOwnerIds[index], data: landAttribute.toHuman() });
     } else {
-      metaverseLandForOwner.push({id: metaverseLandForOwnerIds[index - landForOwnerIds.length], data: landAttribute.toHuman()})
+      const id = metaverseLandForOwnerIds[index - landForOwnerIds.length];
+      metaverseLandForOwner.push({ id, data: landAttribute.toHuman() });
     }
-  })
+  });
 
   return {
     companies: {
@@ -1122,7 +1136,7 @@ const getLandNFTMetadataJson = async (collection_id, nft_id) => {
 const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress) => {
   const injector = await web3FromAddress(walletAddress);
   const api = await getApi();
-  /*let metadata = {
+  /* let metadata = {
     type: "test",
     status: "test",
     demarcation: [
@@ -1130,25 +1144,25 @@ const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress
       { lat: 45.7721717, long: 18.8871917 },
       { lat: 45.7723330, long: 18.8877504 },
     ]
-  };*/
+  }; */
 
-// SCALE doesn't support floats, we need to convert coords to int
-  let metadataUint = {
+  // SCALE doesn't support floats, we need to convert coords to int
+  const metadataUint = {
     ...metadata,
-    demarcation: metadata.demarcation.map(c => ({
-      lat: parseInt(c.lat*10000000),
-      long: parseInt(c.long*10000000)
+    demarcation: metadata.demarcation.map((c) => ({
+      lat: parseInt(c.lat * 10000000),
+      long: parseInt(c.long * 10000000),
     })),
   };
-  let polkadotJsApiObject = api.createType('LandMetadata', metadataUint);
-  let scaleEncoded = polkadotJsApiObject.toHex();
+  const polkadotJsApiObject = api.createType('LandMetadata', metadataUint);
+  const scaleEncoded = polkadotJsApiObject.toHex();
 
   const metadataExtrinsic = api.tx.nfts.setMetadata(collection_id, nft_id, scaleEncoded);
   const officeExtrinsic = api.tx.metaverseLandRegistryOffice.execute(metadataExtrinsic);
-// scaleEncoded is ready to be used for setting metadata
-// this data will be validated and will be rejected if encoded incorrectly or data is nonsensical (not on liberland island, self-intersecting plot lines, less then 3 points)
-  officeExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
+  // scaleEncoded is ready to be used for setting metadata
+  // eslint-disable-next-line max-len
+  // this data will be validated and will be rejected if encoded incorrectly or data is nonsensical (not on liberland island, self-intersecting plot lines, less then 3 points)
+  officeExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed REQUEST COMPANY REGISTRATION at block hash #${status.asInBlock.toString()}`);
@@ -1156,8 +1170,8 @@ const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress
   }).catch((error) => {
     // eslint-disable-next-line no-console
     console.error(':( transaction EDIT METADATA failed', error);
-  })
-}
+  });
+};
 
 const getBlockEvents = async (blockHash) => {
   try {
@@ -1192,65 +1206,66 @@ const getMotions = async () => {
 
 const getCongressCandidates = async () => {
   const api = await getApi();
-  const electionsCandidates = await api.query.elections.candidates()
-  return electionsCandidates.toHuman()
-}
+  const electionsCandidates = await api.query.elections.candidates();
+  return electionsCandidates.toHuman();
+};
 
 const getCongressMembers = async () => {
   const api = await getApi();
-  return await api.query.council.members()
-}
+  return api.query.council.members();
+};
 
 const getRunnersUp = async () => {
   const api = await getApi();
-  return await api.query.elections.runnersUp()
-}
+  return api.query.elections.runnersUp();
+};
 
-const renounceCandidacy = async (walletAddress, userStatus, callback) => {
+const renounceCandidacy = async (walletAddress, userStatus) => {
   const api = await getApi();
 
-  if (userStatus === "None") return;
+  if (userStatus === 'None') return null;
 
-  const renounce = {[userStatus]: userStatus === "Candidate" ?
-    (await api.query.elections.candidates()).length : null
-  }
+  const renounce = {
+    [userStatus]: userStatus === 'Candidate'
+      ? (await api.query.elections.candidates()).length : null,
+  };
   const renounceCandidacyTx = await api.tx.elections.renounceCandidacy(
-    renounce
-  )
+    renounce,
+  );
 
   return submitExtrinsic(renounceCandidacyTx, walletAddress, api);
-}
+};
 
-const applyForCongress = async (walletAddress, callback) => {
+const applyForCongress = async (walletAddress) => {
   const api = await getApi();
-  const electionsCandidates = await api.query.elections.candidates()
+  const electionsCandidates = await api.query.elections.candidates();
   const extrinsic = api.tx.elections.submitCandidacy(electionsCandidates.length);
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
-const voteAtMotions = async (walletAddress, proposal, index, vote, callback) => {
+const voteAtMotions = async (walletAddress, proposal, index, vote) => {
   const api = await getApi();
   const extrinsic = api.tx.council.vote(proposal, index, vote);
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
 const congressMajorityThreshold = async () => {
   const api = await getApi();
-  const congressmen = await api.query.council.members()
-  return Math.trunc(congressmen.length/2) + 1;
-}
+  const congressmen = await api.query.council.members();
+  return Math.trunc(congressmen.length / 2) + 1;
+};
 
 const createProposalAndVote = async (threshold, proposalContent, vote) => {
   const api = await getApi();
   const proposal = api.tx.council.propose(threshold, proposalContent, proposalContent.length);
 
-  const nextProposalIndex = await api.query.council.proposalCount()
+  const nextProposalIndex = await api.query.council.proposalCount();
   const voteAye = api.tx.council.vote(proposalContent.method.hash, nextProposalIndex, vote);
 
-  return [proposal, voteAye]
-}
+  return [proposal, voteAye];
+};
 
-const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmount }, callback) => {
+const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmount }) => {
   const api = await getApi();
 
   const threshold = await congressMajorityThreshold();
@@ -1258,63 +1273,63 @@ const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmoun
   const executeProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
   const proposal = api.tx.councilAccount.execute(executeProposal);
 
-  const extrinsics = await createProposalAndVote(threshold, proposal, true)
-  const extrinsic = api.tx.utility.batchAll(extrinsics)
+  const extrinsics = await createProposalAndVote(threshold, proposal, true);
+  const extrinsic = api.tx.utility.batchAll(extrinsics);
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
-const congressSendLlmToPolitipool = async ({ walletAddress, transferToAddress, transferAmount }, callback) => {
+const congressSendLlmToPolitipool = async ({ walletAddress, transferToAddress, transferAmount }) => {
   const api = await getApi();
 
   const threshold = await congressMajorityThreshold();
 
   const executeProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
   const proposal = api.tx.councilAccount.execute(executeProposal);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true)
-  const extrinsic = api.tx.utility.batchAll(extrinsics)
+  const extrinsics = await createProposalAndVote(threshold, proposal, true);
+  const extrinsic = api.tx.utility.batchAll(extrinsics);
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
-const batchPayoutStakers = async (targets, walletAddress, callback) => {
+const batchPayoutStakers = async (targets, walletAddress) => {
   const api = await getApi();
-  const calls = targets.map(({validator, era}) => api.tx.staking.payoutStakers(validator, era))
+  const calls = targets.map(({ validator, era }) => api.tx.staking.payoutStakers(validator, era));
   const extrinsic = api.tx.utility.batch(calls);
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
 const getStakersRewards = async (accounts) => {
   const api = await getApi();
 
-  return await api.derive.staking.stakerRewardsMulti(accounts, false);
-}
+  return api.derive.staking.stakerRewardsMulti(accounts, false);
+};
 
 const getSessionValidators = async () => {
   const api = await getApi();
   const rawData = await api.query.session.validators();
-  return rawData.map(v => v.toString());
-}
+  return rawData.map((v) => v.toString());
+};
 
 const getNextSessionValidators = async () => {
   const api = await getApi();
   const data = await api.query.session.queuedKeys();
   return data.map(([validator]) => validator.toString());
-}
+};
 
 const getStakingValidators = async () => {
   const api = await getApi();
-  const rawData = await api.query.staking.validators.keys()
-  return rawData.map(v => v.args[0].toString());
-}
+  const rawData = await api.query.staking.validators.keys();
+  return rawData.map((v) => v.args[0].toString());
+};
 
 const getNominators = async () => {
   const api = await getApi();
-  return await api.query.staking.nominators.entries();
-}
+  return api.query.staking.nominators.entries();
+};
 
 const getStakingLedger = async (controller) => {
   const api = await getApi();
-  return await api.query.staking.ledger(controller);
-}
+  return api.query.staking.ledger(controller);
+};
 
 const getAppliedSlashes = async () => {
   const api = await getApi();
@@ -1322,33 +1337,32 @@ const getAppliedSlashes = async () => {
   return {
     validator: await api.query.staking.validatorSlashInEra.entries(),
     nominator: await api.query.staking.nominatorSlashInEra.entries(),
-  }
-}
+  };
+};
 
 const getUnappliedSlashes = async () => {
   const api = await getApi();
-  return await api.query.staking.unappliedSlashes.entries();
-}
+  return api.query.staking.unappliedSlashes.entries();
+};
 
-const setSessionKeys = async (keys, walletAddress, callback) => {
+const setSessionKeys = async (keys, walletAddress) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const EMPTY_PROOF = new Uint8Array();
   const extrinsic = api.tx.session.setKeys(keys, EMPTY_PROOF);
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
 const getStakingPayee = async (stash) => {
   const api = await getApi();
 
-  return await api.query.staking.payee(stash);
-}
+  return api.query.staking.payee(stash);
+};
 
-const setStakingPayee = async (destination, walletAddress, callback) => {
+const setStakingPayee = async (destination, walletAddress) => {
   const api = await getApi();
   const extrinsic = api.tx.staking.setPayee(destination);
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
 const getIdentities = async (addresses) => {
   const api = await getApi();
@@ -1357,24 +1371,24 @@ const getIdentities = async (addresses) => {
     address: addresses[idx],
     identity: identity.isSome ? identity.unwrap().info : null,
   }));
-}
+};
 
-const stakingChill = async (walletAddress, callback) => {
+const stakingChill = async (walletAddress) => {
   const api = await getApi();
   const extrinsic = api.tx.staking.chill();
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
-const stakingValidate = async (commission, blocked, keys, walletAddress, callback) => {
+const stakingValidate = async (commission, blocked, keys, walletAddress) => {
   const api = await getApi();
   const EMPTY_PROOF = new Uint8Array();
   const setKeys = api.tx.session.setKeys(keys, EMPTY_PROOF);
   const validate = api.tx.staking.validate({ commission, blocked });
   const extrinsic = api.tx.utility.batchAll([setKeys, validate]);
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
-const bondAndValidate = async (bondValue, payee, commission, blocked, keys, walletAddress, callback) => {
+const bondAndValidate = async (bondValue, payee, commission, blocked, keys, walletAddress) => {
   const api = await getApi();
   const bond = api.tx.staking.bond(bondValue, payee);
   const EMPTY_PROOF = new Uint8Array();
@@ -1382,24 +1396,24 @@ const bondAndValidate = async (bondValue, payee, commission, blocked, keys, wall
   const validate = api.tx.staking.validate({ commission, blocked });
   const extrinsic = api.tx.utility.batchAll([bond, setKeys, validate]);
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
-const stakingBond = async (value, walletAddress, callback) => {
+const stakingBond = async (value, walletAddress) => {
   const api = await getApi();
   const extrinsic = api.tx.staking.bond(value, 'Staked');
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
-const stakingBondExtra = async (value, walletAddress, callback) => {
+const stakingBondExtra = async (value, walletAddress) => {
   const api = await getApi();
   const extrinsic = api.tx.staking.bondExtra(value);
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
 const stakingUnbond = async (value, walletAddress) => {
   const api = await getApi();
   return submitExtrinsic(api.tx.staking.unbond(value), walletAddress, api);
-}
+};
 
 const stakingWithdrawUnbonded = async (walletAddress) => {
   const api = await getApi();
@@ -1409,8 +1423,8 @@ const stakingWithdrawUnbonded = async (walletAddress) => {
   const spans = await api.query.staking.slashingSpans(ledger.unwrap().stash);
   const spanCount = spans.isSome ? spans.unwrap().prior.length + 1 : 0;
 
-  return await submitExtrinsic(api.tx.staking.withdrawUnbonded(spanCount), walletAddress, api);
-}
+  return submitExtrinsic(api.tx.staking.withdrawUnbonded(spanCount), walletAddress, api);
+};
 
 const subscribeActiveEra = async (onNewEra) => {
   try {
@@ -1427,16 +1441,16 @@ const subscribeActiveEra = async (onNewEra) => {
 const getStakingBondingDuration = async () => {
   const api = await getApi();
   return api.consts.staking.bondingDuration;
-}
+};
 
 const congressProposeLegislation = async (tier, id, sections, walletAddress) => {
   const api = await getApi();
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.liberlandLegislation.addLegislation(tier, id, sections);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true)
-  const extrinsic = api.tx.utility.batchAll(extrinsics)
-  return await submitExtrinsic(extrinsic, walletAddress, api);
-}
+  const extrinsics = await createProposalAndVote(threshold, proposal, true);
+  const extrinsic = api.tx.utility.batchAll(extrinsics);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const congressRepealLegislation = async (tier, id, section, walletAddress) => {
   const api = await getApi();
@@ -1444,61 +1458,57 @@ const congressRepealLegislation = async (tier, id, section, walletAddress) => {
   const threshold = await congressMajorityThreshold();
 
   const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
-  const proposal = section !== null ?
-    api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness)
+  const proposal = section !== null
+    ? api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness)
     : api.tx.liberlandLegislation.repealLegislation(tier, id, witness);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true)
-  const extrinsic = api.tx.utility.batchAll(extrinsics)
+  const extrinsics = await createProposalAndVote(threshold, proposal, true);
+  const extrinsic = api.tx.utility.batchAll(extrinsics);
 
-  return await submitExtrinsic(extrinsic, walletAddress, api);
-}
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const getTreasurySpendProposals = async () => {
   const api = await getApi();
-  return await api.derive.treasury.proposals();
-}
+  return api.derive.treasury.proposals();
+};
 
 const getTreasurySpendPeriod = async () => {
   const api = await getApi();
   return api.consts.treasury.spendPeriod;
-}
+};
 
 const getTreasuryBudget = async () => {
   const api = await getApi();
-  const account = "5EYCAe5ijiYfyeZ2JJCGq56LmPyNRAKzpG4QkoQkkQNB5e6Z";
+  const account = '5EYCAe5ijiYfyeZ2JJCGq56LmPyNRAKzpG4QkoQkkQNB5e6Z';
   const balances = await api.derive.balances.account(account);
   return balances.freeBalance;
-}
+};
 
 const congressApproveTreasurySpend = async (proposalId, walletAddress) => {
   const api = await getApi();
-
   const threshold = await congressMajorityThreshold();
-
   const proposal = api.tx.treasury.approveProposal(proposalId);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true)
-  const extrinsic = api.tx.utility.batchAll(extrinsics)
-  return await submitExtrinsic(extrinsic, walletAddress, api);
-}
+  const extrinsics = await createProposalAndVote(threshold, proposal, true);
+  const extrinsic = api.tx.utility.batchAll(extrinsics);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const congressUnapproveTreasurySpend = async (proposalId, walletAddress) => {
   const api = await getApi();
-
   const threshold = await congressMajorityThreshold();
-
   const proposal = api.tx.treasury.removeApproval(proposalId);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true)
-  const extrinsic = api.tx.utility.batchAll(extrinsics)
-  return await submitExtrinsic(extrinsic, walletAddress, api);
-}
+  const extrinsics = await createProposalAndVote(threshold, proposal, true);
+  const extrinsic = api.tx.utility.batchAll(extrinsics);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const closeCongressMotion = async (proposalHash, index, walletAddress) => {
   const api = await getApi();
   const proposal = await api.query.council.proposalOf(proposalHash);
   const { weight: weightBound } = await api.tx(proposal.unwrap()).paymentInfo(walletAddress);
   const lengthBound = proposal.unwrap().toU8a().length;
-  return await submitExtrinsic(api.tx.council.close(proposalHash, index, weightBound, lengthBound), walletAddress, api);
-}
+  return submitExtrinsic(api.tx.council.close(proposalHash, index, weightBound, lengthBound), walletAddress, api);
+};
 
 const congressProposeReferendum = async (
   discussionName,
@@ -1527,31 +1537,32 @@ const congressProposeReferendum = async (
       len: referendumProposal.encodedLength,
     },
   };
-  const proposal = fastTrack ?
-    api.tx.utility.batchAll([
+  const proposal = fastTrack
+    ? api.tx.utility.batchAll([
       api.tx.democracy.externalPropose(lookup),
       api.tx.democracy.fastTrack(
         referendumProposal.hash,
         votingPeriod,
         enactmentPeriod,
-      )
+      ),
     ])
-    :
-    api.tx.democracy.externalProposeMajority(lookup);
+    : api.tx.democracy.externalProposeMajority(lookup);
 
   const threshold = await congressMajorityThreshold();
 
-  const proposeAndVote = await createProposalAndVote(threshold, proposal, true)
-  const existingPreimage = await api.query.preimage.preimageFor([referendumProposal.hash, referendumProposal.encodedLength])
+  const proposeAndVote = await createProposalAndVote(threshold, proposal, true);
+  // eslint-disable-next-line max-len
+  const existingPreimage = await api.query.preimage.preimageFor([referendumProposal.hash, referendumProposal.encodedLength]);
   const extrinsic = api.tx.utility.batchAll(
     existingPreimage.isNone
-    ? [
+      ? [
         api.tx.preimage.notePreimage(referendumProposal.toHex()),
         ...proposeAndVote,
       ]
-    : proposeAndVote)
-  return await submitExtrinsic(extrinsic, walletAddress, api);
-}
+      : proposeAndVote,
+  );
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const congressProposeLegislationViaReferendum = async (
   discussionName,
@@ -1567,7 +1578,7 @@ const congressProposeLegislationViaReferendum = async (
 ) => {
   const api = await getApi();
   const addLegislation = api.tx.liberlandLegislation.addLegislation(tier, id, sections).method;
-  return await congressProposeReferendum(
+  return congressProposeReferendum(
     discussionName,
     discussionDescription,
     discussionLink,
@@ -1575,10 +1586,9 @@ const congressProposeLegislationViaReferendum = async (
     fastTrack,
     votingPeriod,
     enactmentPeriod,
-    walletAddress
+    walletAddress,
   );
-}
-
+};
 
 const congressProposeRepealLegislation = async (
   discussionName,
@@ -1594,10 +1604,10 @@ const congressProposeRepealLegislation = async (
 ) => {
   const api = await getApi();
   const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
-  const repealLegislation = section !== null ?
-    api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness).method
+  const repealLegislation = section !== null
+    ? api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness).method
     : api.tx.liberlandLegislation.repealLegislation(tier, id, witness).method;
-  return await congressProposeReferendum(
+  return congressProposeReferendum(
     discussionName,
     discussionDescription,
     discussionLink,
@@ -1605,9 +1615,9 @@ const congressProposeRepealLegislation = async (
     fastTrack,
     votingPeriod,
     enactmentPeriod,
-    walletAddress
+    walletAddress,
   );
-}
+};
 
 const citizenProposeRepealLegislation = async (
   discussionName,
@@ -1620,8 +1630,8 @@ const citizenProposeRepealLegislation = async (
 ) => {
   const api = await getApi();
   const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
-  const repealLegislation = section !== null ?
-    api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness).method
+  const repealLegislation = section !== null
+    ? api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness).method
     : api.tx.liberlandLegislation.repealLegislation(tier, id, witness).method;
 
   await centralizedBackend.addReferendum({
@@ -1635,23 +1645,24 @@ const citizenProposeRepealLegislation = async (
 
   const minDeposit = api.consts.democracy.minimumDeposit;
   const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
-  const proposeTx = proposeCall({ Lookup: {
-    hash_: repealLegislation.hash,
-    len: repealLegislation.encodedLength,
-  }}, minDeposit);
+  const proposeTx = proposeCall({
+    Lookup: {
+      hash_: repealLegislation.hash,
+      len: repealLegislation.encodedLength,
+    },
+  }, minDeposit);
 
-
-  const existingPreimage = await api.query.preimage.preimageFor([repealLegislation.hash, repealLegislation.encodedLength])
-  const extrinsic =
-    existingPreimage.isNone
+  // eslint-disable-next-line max-len
+  const existingPreimage = await api.query.preimage.preimageFor([repealLegislation.hash, repealLegislation.encodedLength]);
+  const extrinsic = existingPreimage.isNone
     ? api.tx.utility.batchAll([
-        api.tx.preimage.notePreimage(repealLegislation.toHex()),
-        proposeTx,
-      ])
-    : proposeTx
+      api.tx.preimage.notePreimage(repealLegislation.toHex()),
+      proposeTx,
+    ])
+    : proposeTx;
 
-  return await submitExtrinsic(extrinsic, walletAddress, api);
-}
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const congressSendTreasuryLld = async (transferToAddress, transferAmount, walletAddress) => {
   const api = await getApi();
@@ -1659,16 +1670,17 @@ const congressSendTreasuryLld = async (transferToAddress, transferAmount, wallet
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.treasury.spend(transferAmount, transferToAddress);
 
-  const extrinsics = await createProposalAndVote(threshold, proposal, true)
-  const extrinsic = api.tx.utility.batchAll(extrinsics)
-  return await submitExtrinsic(extrinsic, walletAddress, api);
-}
+  const extrinsics = await createProposalAndVote(threshold, proposal, true);
+  const extrinsic = api.tx.utility.batchAll(extrinsics);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const getPalletIds = async () => {
   const api = await getApi();
-  const pallets = Object.entries(api.consts).map(([palletName, palletConsts]) => ({palletName, palletId: palletConsts.palletId}))
-  return pallets.filter(pallet => pallet.palletId)
-}
+  // eslint-disable-next-line max-len
+  const pallets = Object.entries(api.consts).map(([palletName, palletConsts]) => ({ palletName, palletId: palletConsts.palletId }));
+  return pallets.filter((pallet) => pallet.palletId);
+};
 
 const congressDemocracyBlacklist = async (proposalHash, referendumIndex, walletAddress) => {
   const api = await getApi();
@@ -1677,8 +1689,8 @@ const congressDemocracyBlacklist = async (proposalHash, referendumIndex, walletA
   const proposal = api.tx.democracy.blacklist(proposalHash, referendumIndex ?? null);
 
   const extrinsic = api.tx.utility.batchAll(await createProposalAndVote(threshold, proposal, true));
-  return submitExtrinsic( extrinsic, walletAddress, api);
-}
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const proposeAmendLegislation = async (
   discussionName,
@@ -1710,16 +1722,18 @@ const proposeAmendLegislation = async (
   const notePreimageTx = api.tx.preimage.notePreimage(proposal.toHex());
   const minDeposit = api.consts.democracy.minimumDeposit;
   const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
-  const proposeTx = proposeCall({ Lookup: {
-    hash: proposal.hash,
-    len: proposal.encodedLength,
-  }}, minDeposit);
-  const existingPreimage = await api.query.preimage.preimageFor([proposal.hash, proposal.encodedLength])
-  const extrinsic = existingPreimage.isNone ?
-    api.tx.utility.batchAll([notePreimageTx, proposeTx])
+  const proposeTx = proposeCall({
+    Lookup: {
+      hash: proposal.hash,
+      len: proposal.encodedLength,
+    },
+  }, minDeposit);
+  const existingPreimage = await api.query.preimage.preimageFor([proposal.hash, proposal.encodedLength]);
+  const extrinsic = existingPreimage.isNone
+    ? api.tx.utility.batchAll([notePreimageTx, proposeTx])
     : proposeTx;
-  return await submitExtrinsic(extrinsic, walletAddress, api);
-}
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const congressAmendLegislation = async (tier, id, section, content, walletAddress) => {
   const api = await getApi();
@@ -1727,8 +1741,8 @@ const congressAmendLegislation = async (tier, id, section, content, walletAddres
   const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
   const proposal = api.tx.liberlandLegislation.amendLegislation(tier, id, section, content, witness);
   const extrinsic = api.tx.utility.batchAll(await createProposalAndVote(threshold, proposal, true));
-  return await submitExtrinsic(extrinsic, walletAddress, api);
-}
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const congressAmendLegislationViaReferendum = async (
   discussionName,
@@ -1751,9 +1765,9 @@ const congressAmendLegislationViaReferendum = async (
     id,
     section,
     content,
-    witness
+    witness,
   ).method;
-  return await congressProposeReferendum(
+  return congressProposeReferendum(
     discussionName,
     discussionDescription,
     discussionLink,
@@ -1761,115 +1775,107 @@ const congressAmendLegislationViaReferendum = async (
     fastTrack,
     votingPeriod,
     enactmentPeriod,
-    walletAddress
+    walletAddress,
   );
-}
+};
 
 const fetchPreimageLen = async (hash) => {
   const api = await getApi();
-  const keys = await api.query.preimage.preimageFor.keys()
-  const key = keys.find((key) => key.args[0][0].eq(hash));
+  const keys = await api.query.preimage.preimageFor.keys();
+  const key = keys.find((keyElement) => keyElement.args[0][0].eq(hash));
   return key?.args[0][1];
-}
+};
 
 const fetchPreimage = async (hash, len) => {
   const api = await getApi();
-  const length = len ? len : await fetchPreimageLen(hash);
+  const length = len || await fetchPreimageLen(hash);
   return api.query.preimage.preimageFor([hash, length]);
-}
+};
 
 const decodeCall = async (bytes) => {
   const api = await getApi();
   return api.createType('Call', bytes);
-}
+};
 
 const getScheduledCalls = async () => {
   const api = await getApi();
   const agendaEntries = await api.query.scheduler.agenda.entries();
   const agendaItems = agendaEntries
-    .flatMap(([key, calls]) =>
-      calls
-        .map((call, idx) => ({
-          blockNumber: key.args[0],
-          idx,
-          call,
-        }))
-        .filter(item => item.call.isSome)
-        .map(item => ({
-          ...item,
-          call: item.call.unwrap()
-        }))
-    )
-    .filter(item =>
-      item.call.call.isLookup && // our FE only does lookups now
-      item.call.maybePeriodic.isNone // we're interested only in referendum results, so nonperiodic
-    );
+    .flatMap(([key, calls]) => calls
+      .map((call, idx) => ({
+        blockNumber: key.args[0],
+        idx,
+        call,
+      }))
+      .filter((item) => item.call.isSome)
+      .map((item) => ({
+        ...item,
+        call: item.call.unwrap(),
+      })))
+    .filter((item) => item.call.call.isLookup // our FE only does lookups now
+      && item.call.maybePeriodic.isNone); // we're interested only in referendum results, so nonperiodic
 
   // we only want do download small preimages. fetching multi-megabyte setCode could be painful.
-  const bigAgendaItems = agendaItems.filter(item => item.call.call.asLookup.len > 10240);
-  const smallAgendaItems = agendaItems.filter(item => item.call.call.asLookup.len <= 10240);
+  const bigAgendaItems = agendaItems.filter((item) => item.call.call.asLookup.len > 10240);
+  const smallAgendaItems = agendaItems.filter((item) => item.call.call.asLookup.len <= 10240);
 
-  const preimageIds = smallAgendaItems.map(item => ([item.call.call.asLookup.hash_, item.call.call.asLookup.len]));
-  const preimagesRaw = await api.query.preimage.preimageFor.multi(preimageIds)
-  const preimages = preimagesRaw.map((raw) => raw.isSome ? api.createType('Call', raw.unwrap()) : null)
+  const preimageIds = smallAgendaItems.map((item) => ([item.call.call.asLookup.hash_, item.call.call.asLookup.len]));
+  const preimagesRaw = await api.query.preimage.preimageFor.multi(preimageIds);
+  const preimages = preimagesRaw.map((raw) => (raw.isSome ? api.createType('Call', raw.unwrap()) : null));
 
   return [
-    ...bigAgendaItems.map(item => ({
+    ...bigAgendaItems.map((item) => ({
       ...item,
-      preimage: null
+      preimage: null,
     })),
     ...smallAgendaItems.map((item, idx) => ({
       ...item,
       preimage: preimages[idx],
     })),
   ];
-}
+};
 
-const requestUnregisterCompanyRegistration = async (companyId, walletAddress)  => {
+const requestUnregisterCompanyRegistration = async (companyId, walletAddress) => {
   const api = await getApi();
 
   const extrinsic = api.tx.companyRegistry.requestEntityUnregister(0, companyId);
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
-const unregisterCompany = async (companyId, isSoft, walletAddress)  => {
+const unregisterCompany = async (companyId, isSoft, walletAddress) => {
   const api = await getApi();
 
   const extrinsic = api.tx.companyRegistryOffice.execute(
-    api.tx.companyRegistry.unregister(0, companyId, isSoft)
+    api.tx.companyRegistry.unregister(0, companyId, isSoft),
   );
 
   return submitExtrinsic(extrinsic, walletAddress, api);
-}
+};
 
 const cancelCompanyRequest = async (companyId, walletAddress) => {
   const api = await getApi();
   const extrinsic = api.tx.companyRegistry.cancelRequest(0, companyId);
-  return await submitExtrinsic(extrinsic, walletAddress, api);
-}
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const setRegisteredCompanyData = async (companyId, companyData, walletAddress) => {
   const api = await getApi();
-  const data = api.createType("CompanyData", companyData);
+  const data = api.createType('CompanyData', companyData);
   const compressed = pako.deflate(data.toU8a());
   const setRegisteredEntity = api.tx.companyRegistry.setRegisteredEntity(0, companyId, u8aToHex(compressed));
   const extrinsic = api.tx.companyRegistryOffice.execute(setRegisteredEntity);
-  return await submitExtrinsic(extrinsic, walletAddress, api);
-}
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const fetchPendingIdentities = async () => {
   const api = await getApi();
   const raw = await api.query.identity.identityOf.entries();
-  let processed = raw.map(rawEntry => {
-    return {
-      address: rawEntry[0].toHuman()[0],
-      data: rawEntry[1].toJSON()
-    }
-  })
-  return processed.filter(entity => {
-    return entity.data.judgements.length === 0
-  })
-}
+  const processed = raw.map((rawEntry) => ({
+    address: rawEntry[0].toHuman()[0],
+    data: rawEntry[1].toJSON(),
+  }));
+  return processed.filter((entity) => entity.data.judgements.length === 0);
+};
 
 export {
   getBalanceByAddress,
@@ -1970,5 +1976,5 @@ export {
   cancelCompanyRequest,
   setRegisteredCompanyData,
   requestUnregisterCompanyRegistration,
-  fetchPendingIdentities
+  fetchPendingIdentities,
 };
