@@ -104,8 +104,8 @@ function BlacklistButton({ hash, referendumIndex }) {
   );
 
   return (
-    <Button small secondary onClick={() => { blacklistMotion(); }}>
-      Cancel
+    <Button small secondary onClick={blacklistMotion}>
+      Cancel as congress
     </Button>
   );
 }
