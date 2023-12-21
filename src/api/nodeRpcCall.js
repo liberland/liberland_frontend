@@ -119,21 +119,27 @@ const crossReference = (api, blockchainData, allCentralizedData, motions, isRefe
   }
 );
 
-const submitExtrinsic = async (extrinsic, walletAddress) => {
-  const api = await getApi();
-  const { signer } = await web3FromAddress(walletAddress);
-  return await new Promise((resolve, reject) => {
+const submitExtrinsic = async (extrinsic, walletAddress, api, signerFromAdress = true) => {
+  const { signer } = signerFromAdress ? await web3FromAddress(walletAddress) : await web3FromSource('polkadot-js');
+  return new Promise((resolve, reject) => {
     extrinsic.signAndSend(walletAddress, { signer }, ({ status, events, dispatchError }) => {
-      const errorData = handleMyDispatchErrors(dispatchError, api)
+      const errorData = handleMyDispatchErrors(dispatchError, api);
       if (status.isInBlock) {
         const blockHash = status.asInBlock.toString();
         console.log(errorData, events);
-        if(errorData.isError) reject({ blockHash, status, events, errorData });
-        else resolve({ blockHash, status, events });
+        if (errorData.isError) {
+          // eslint-disable-next-line prefer-promise-reject-errors
+          reject({
+            blockHash, status, events, errorData,
+          });
+        } else resolve({ blockHash, status, events });
       }
+    }).catch((err) => {
+      console.log(err);
+      reject(err);
     });
   });
-}
+};
 
 const getIdentity = async (address) => {
   try {
@@ -145,7 +151,7 @@ const getIdentity = async (address) => {
     console.error(e);
     throw e;
   }
-}
+};
 
 const getLlmBalances = async (addresses) => {
   try {
@@ -228,7 +234,7 @@ const bridgeSubscribe = async (asset, receipt_id, onChange) => {
   }
 }
 
-const bridgeDeposit = async ({ asset, amount, ethereumRecipient }, walletAddress, callback) => {
+const bridgeDeposit = async ({ asset, amount, ethereumRecipient }, walletAddress) => {
   const api = await getApi();
   let bridge;
   if (asset == "LLM") bridge = api.tx.ethLLMBridge;
@@ -236,25 +242,10 @@ const bridgeDeposit = async ({ asset, amount, ethereumRecipient }, walletAddress
   else throw new Exception("Unknown asset");
 
   const call = bridge.deposit(amount, ethereumRecipient);
-  const injector = await web3FromSource('polkadot-js');
-  call.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api);
-    if (status.isInBlock) {
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        status,
-        events,
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(call, walletAddress, api, false);
 }
 
-const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress, callback) => {
+const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress) => {
   const api = await getApi();
   let bridge;
   if (asset == "LLM") bridge = api.tx.ethLLMBridge;
@@ -262,20 +253,7 @@ const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress, callback) =>
   else throw new Exception("Unknown asset");
 
   const call = bridge.withdraw(receipt_id);
-  const injector = await web3FromSource('polkadot-js');
-  call.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api);
-    if (status.isInBlock) {
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(call, walletAddress, api, false);
 }
 
 const bridgeConstants = async (asset) => {
@@ -288,44 +266,29 @@ const bridgeConstants = async (asset) => {
   return bridge;
 }
 
-const provideJudgementAndAssets = async ({ address, hash, walletAddress, merits, dollars }, callback) => {
+const provideJudgementAndAssets = async ({ address, hash, walletAddress, merits, dollars }) => {
   const api = await getApi();
-  const calls = []
+  const calls = [];
 
-  const judgement = api.createType('IdentityJudgement', 'KnownGood')
+  const judgement = api.createType('IdentityJudgement', 'KnownGood');
   const judgementCall = api.tx.identity.provideJudgement(0, address, judgement, hash);
   const officeJudgementCall = api.tx.identityOffice.execute(judgementCall);
-  calls.push(officeJudgementCall)
+  calls.push(officeJudgementCall);
 
   if (dollars?.gt(0)) {
     const lldCall = api.tx.balances.transfer(address, dollars.toString());
     const officeLldCall = api.tx.identityOffice.execute(lldCall);
-    calls.push(officeLldCall)
+    calls.push(officeLldCall);
   }
   if (merits?.gt(0)) {
     const llmCall = api.tx.llm.sendLlmToPolitipool(address, merits.toString());
     const officeLlmCall = api.tx.identityOffice.execute(llmCall);
-    calls.push(officeLlmCall)
+    calls.push(officeLlmCall);
   }
 
   const finalCall = api.tx.utility.batchAll(calls);
-  const injector = await web3FromSource('polkadot-js');
-  finalCall.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
-}
+  return submitExtrinsic(finalCall, walletAddress, api, false);
+};
 
 const getLegalAdditionals = (legal) => {
   const chunks = [];
@@ -386,8 +349,8 @@ const buildAdditionals = (values, blockNumber) => {
   return additionals
 }
 
-const setIdentity = async (values, walletAddress, callback) => {
-  const asData = v => v ? { Raw: v } : null;
+const setIdentity = async (values, walletAddress) => {
+  const asData = (v) => (v ? { Raw: v } : null);
   const api = await getApi();
   const blockNumber = await api.derive.chain.bestNumber();
   const info = {
@@ -402,23 +365,8 @@ const setIdentity = async (values, walletAddress, callback) => {
   };
 
   const setCall = api.tx.identity.setIdentity(info);
-  const injector = await web3FromSource('polkadot-js');
-  setCall.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
-}
+  return submitExtrinsic(setCall, walletAddress, api, false);
+};
 
 const getCompanyRequest = async (entity_id) => {
   try {
@@ -460,27 +408,12 @@ const getCompanyRegistration = async (entity_id) => {
   }
 }
 
-const registerCompany = async ({entity_id, hash, walletAddress}, callback) => {
+const registerCompany = async ({ entity_id, hash, walletAddress }) => {
   const api = await getApi();
   const registerCall = api.tx.companyRegistry.registerEntity(0, entity_id, hash);
   const proxied = api.tx.companyRegistryOffice.execute(registerCall);
-  const injector = await web3FromSource('polkadot-js');
-  proxied.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
-}
+  return submitExtrinsic(proxied, walletAddress, api, false);
+};
 
 // TODO: Need refactor when blockchain node update
 const getBalanceByAddress = async (address) => {
@@ -534,19 +467,19 @@ const getBalanceByAddress = async (address) => {
 const sendTransfer = async (recipient, amount, walletAddress) => {
   const api = await getApi();
   const transferExtrinsic = api.tx.balances.transfer(recipient, amount);
-  return await submitExtrinsic(transferExtrinsic, walletAddress);
+  return submitExtrinsic(transferExtrinsic, walletAddress, api);
 };
 
 const sendAssetTransfer = async (recipient, amount, walletAddress, assetData) => {
   const api = await getApi();
-  const transferExtrinsic = api.tx.assets.transfer(parseInt(assetData.index),recipient, amount);
-  return await submitExtrinsic(transferExtrinsic, walletAddress);
+  const transferExtrinsic = api.tx.assets.transfer(parseInt(assetData.index), recipient, amount);
+  return submitExtrinsic(transferExtrinsic, walletAddress, api);
 };
 
 const sendTransferLLM = async (recipient, amount, userWalletAddress) => {
   const api = await getApi();
   const transferExtrinsic = api.tx.llm.sendLlm(recipient, amount);
-  return await submitExtrinsic(transferExtrinsic, userWalletAddress);
+  return submitExtrinsic(transferExtrinsic, userWalletAddress, api);
 };
 
 const stakeToPolkaBondAndExtra = async (amount, isUserHavePolkaStake, walletAddress) => {
@@ -554,35 +487,19 @@ const stakeToPolkaBondAndExtra = async (amount, isUserHavePolkaStake, walletAddr
   const transferExtrinsic = isUserHavePolkaStake
     ? await api.tx.staking.bondExtra(amount)
     : await api.tx.staking.bond(amount, 'Staked');
-  return submitExtrinsic(transferExtrinsic, walletAddress);
+  return submitExtrinsic(transferExtrinsic, walletAddress, api);
 };
 
-const unpool = async (walletAddress, callback) => {
+const unpool = async (walletAddress) => {
   const api = await getApi();
   const unpoolExtrinsic = api.tx.llm.politicsUnlock();
-
-  const injector = await web3FromSource('polkadot-js');
-  unpoolExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  return submitExtrinsic(unpoolExtrinsic, walletAddress, api, false);
 };
 
 const politiPool = async (amount, walletAddress) => {
   const api = await getApi();
   const politiPoolExtrinsic = api.tx.llm.politicsLock(amount);
-  return await submitExtrinsic(politiPoolExtrinsic, walletAddress);
+  return submitExtrinsic(politiPoolExtrinsic, walletAddress, api);
 };
 
 const getUserRoleRpc = async (walletAddress) => {
@@ -654,72 +571,25 @@ const getNominatorTargets = async (walletId) => {
   return nominations?.toHuman()?.targets ? nominations?.toHuman()?.targets : [];
 };
 
-const setNominatorTargets = async (payload, callback) => {
+const setNominatorTargets = async (payload) => {
   const { newNominatorTargets, walletAddress } = payload;
-  const injector = await web3FromAddress(walletAddress);
   const api = await getApi();
   const setNewTargets = await api.tx.staking.nominate(newNominatorTargets);
-  await setNewTargets.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`InBlock at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  return submitExtrinsic(setNewTargets, walletAddress, api);
 };
 
-const delegateDemocracy = async (delegateeAddress, walletAddress, callback) => {
+const delegateDemocracy = async (delegateeAddress, walletAddress) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
   const LLMPolitiPoolData = LLMPolitiPool.toJSON();
-  const delegateExtrinsic = api.tx.democracy.delegate(delegateeAddress, "None", LLMPolitiPoolData);
-
-  delegateExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed DELEGATE at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  const delegateExtrinsic = api.tx.democracy.delegate(delegateeAddress, 'None', LLMPolitiPoolData);
+  return submitExtrinsic(delegateExtrinsic, walletAddress, api);
 };
 
-const undelegateDemocracy = async (walletAddress, callback) => {
+const undelegateDemocracy = async (walletAddress) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const undelegateExtrinsic = api.tx.democracy.undelegate();
-
-  undelegateExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed UNDELEGATE at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  return submitExtrinsic(undelegateExtrinsic, walletAddress, api);
 };
 
 const getDemocracyReferendums = async (address) => {
@@ -791,9 +661,8 @@ const getDemocracyReferendums = async (address) => {
   }
 };
 
-const voteOnReferendum = async (walletAddress, referendumIndex, voteType, callback) => {
+const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
   const LLMPolitiPoolData = LLMPolitiPool.toJSON();
   const voteExtrinsic = api.tx.democracy.vote(referendumIndex, {
@@ -806,21 +675,7 @@ const voteOnReferendum = async (walletAddress, referendumIndex, voteType, callba
     },
   });
 
-  voteExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed VOTE at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  return submitExtrinsic(voteExtrinsic, walletAddress, api);
 };
 
 const submitProposal = async (
@@ -840,7 +695,7 @@ const submitProposal = async (
     { year, index },
     sections,
   ).method;
-  const hash = proposal.hash;
+  const { hash } = proposal;
   await centralizedBackend.addReferendum({
     link: discussionLink,
     name: discussionName,
@@ -851,20 +706,22 @@ const submitProposal = async (
   });
   const minDeposit = api.consts.democracy.minimumDeposit;
   const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
-  const proposeTx = proposeCall({ Lookup: {
-    hash,
-    len: proposal.encodedLength,
-  }}, minDeposit);
+  const proposeTx = proposeCall({
+    Lookup: {
+      hash,
+      len: proposal.encodedLength,
+    },
+  }, minDeposit);
 
   const existingPreimage = await api.query.preimage.preimageFor([proposal.hash, proposal.encodedLength])
   const extrinsic = existingPreimage.isNone
-  ? api.tx.utility.batchAll([
+    ? api.tx.utility.batchAll([
       api.tx.preimage.notePreimage(proposal.toHex()),
       proposeTx,
     ])
-  : proposeTx;
+    : proposeTx;
 
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
 const getCongressMembersWithIdentity = async (walletAddress) => {
@@ -962,43 +819,27 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
   return { currentCongressMembers: crossReferencedCouncilMemberIdentities, candidates: crossReferencedCandidateIdentities, currentCandidateVotesByUser: crossReferencedCurrentCandidateVotesByUser };
 };
 
-const voteForCongress = async (listofVotes, walletAddress, callback) => {
+const voteForCongress = async (listofVotes, walletAddress) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const votes = listofVotes.map((vote) => vote.rawIdentity);
 
   const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
   const LLMPolitiPoolData = LLMPolitiPool.toJSON();
 
   const voteExtrinsic = api.tx.elections.vote(votes, LLMPolitiPoolData);
-
-  voteExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed VOTE at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction VOTE failed', error);
-    callback({isError: true, details: error.toString()});
-  });
+  return submitExtrinsic(voteExtrinsic, walletAddress, api);
 };
 
 const castVetoForLegislation = async (tier, id, section, walletAddress) => {
   const api = await getApi();
   const vetoExtrinsic = api.tx.liberlandLegislation.submitVeto(tier, id, section);
-  return await submitExtrinsic(vetoExtrinsic, walletAddress);
+  return submitExtrinsic(vetoExtrinsic, walletAddress, api);
 };
 
 const revertVetoForLegislation = async (tier, id, section, walletAddress) => {
   const api = await getApi();
   const vetoExtrinsic = api.tx.liberlandLegislation.revertVeto(tier, id, section);
-  return await submitExtrinsic(vetoExtrinsic, walletAddress);
+  return submitExtrinsic(vetoExtrinsic, walletAddress, api);
 };
 
 const getLegislation = async (tier) => {
@@ -1061,27 +902,27 @@ const getLegislation = async (tier) => {
     })
     .filter((el) => el);
 
-  const legislationVersionEntries =
-    await api.query.liberlandLegislation.legislationVersion.entries(tier);
+  const legislationVersionEntries = await api.query.liberlandLegislation.legislationVersion.entries(tier);
   const repealLegislationHashes = legislationVersionEntries.reduce(
     (acc, [{ args: key }, witness]) => {
       const { year, index } = key[1];
       if (!acc[year]) acc[year] = {};
-      if (!acc[year][index])
+      if (!acc[year][index]) {
         acc[year][index] = {
           sections: [],
           proposalContent: api.tx.liberlandLegislation.repealLegislation(
             tier,
             { year, index },
-            witness
+            witness,
           ).method.hash.toString(),
         };
+      }
       acc[year][index].sections.push({
         proposalContent: api.tx.liberlandLegislation.repealLegislationSection(
           tier,
           { year, index },
           acc[year][index].sections.length,
-          witness
+          witness,
         ).method.hash.toString(),
       });
       return acc;
@@ -1195,22 +1036,22 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
   const ownerMetaverseLandHuman = ownerLand[1].map(x => {
     const metaverseLandObject = { ...x[0].toHuman() }
     metaverseLandForOwnerIds.push(metaverseLandObject[2])
-    metaverseLandMetadataQueries.push([api.query.nfts.itemMetadataOf, [METAVERSTE_NFTs_ID, parseInt(metaverseLandObject[2])]])
-    return metaverseLandObject
+    metaverseLandMetadataQueries.push([api.query.nfts.itemMetadataOf, [METAVERSTE_NFTs_ID, parseInt(metaverseLandObject[2])]]);
+    return metaverseLandObject;
   });
 
-  let landAttributes = []
+  let landAttributes = [];
   // only query if something to query, otherwise never resolves
-  if(landMetadataQueries.length !== 0 || metaverseLandMetadataQueries.length !== 0) {
+  if (landMetadataQueries.length !== 0 || metaverseLandMetadataQueries.length !== 0) {
     landAttributes = await api.queryMulti([
       ...landMetadataQueries,
-      ...metaverseLandMetadataQueries
-    ])
+      ...metaverseLandMetadataQueries,
+    ]);
   }
 
   landAttributes.forEach((landAttribute, index) => {
-    if(index < landForOwnerIds.length) {
-      landForOwner.push({id: landForOwnerIds[index], data: landAttribute.toHuman()})
+    if (index < landForOwnerIds.length) {
+      landForOwner.push({ id: landForOwnerIds[index], data: landAttribute.toHuman() })
     } else {
       metaverseLandForOwner.push({id: metaverseLandForOwnerIds[index - landForOwnerIds.length], data: landAttribute.toHuman()})
     }
@@ -1219,48 +1060,48 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
   return {
     companies: {
       registered: registeredCompaniesByWallet,
-      requested: companyRequestsByWallet
+      requested: companyRequestsByWallet,
     },
     land: {
       physical: landForOwner,
-      metaverse: metaverseLandForOwner
+      metaverse: metaverseLandForOwner,
     },
     assets: [],
-    other: []
-  }
-}
+    other: [],
+  };
+};
 
-const requestCompanyRegistration = async (companyData, registryAllowedToEdit, walletAddress)  => {
+const requestCompanyRegistration = async (companyData, registryAllowedToEdit, walletAddress) => {
   const api = await getApi();
 
-  const data = api.createType("CompanyData", companyData);
+  const data = api.createType('CompanyData', companyData);
   const compressed = pako.deflate(data.toU8a());
 
   const extrinsic = api.tx.companyRegistry.requestEntity(0, u8aToHex(compressed), !!registryAllowedToEdit);
-  return submitExtrinsic(extrinsic, walletAddress);
-}
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
-const requestEditCompanyRegistration = async (companyData, companyId, walletAddress)  => {
+const requestEditCompanyRegistration = async (companyData, companyId, walletAddress) => {
   const api = await getApi();
 
-  const data = api.createType("CompanyData", companyData);
+  const data = api.createType('CompanyData', companyData);
   const compressed = pako.deflate(data.toU8a());
 
   const extrinsic = api.tx.companyRegistry.requestRegistration(0, companyId, u8aToHex(compressed), true);
-  return submitExtrinsic(extrinsic, walletAddress);
-}
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
 
 const getCitizenCount = async () => {
   try {
     const api = await getApi();
-    const count = await api.query.llm.citizens()
+    const count = await api.query.llm.citizens();
     return count.toNumber();
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
     throw e;
   }
-}
+};
 
 const getLandNFTMetadataJson = async (collection_id, nft_id) => {
   const api = await getApi();
@@ -1270,13 +1111,14 @@ const getLandNFTMetadataJson = async (collection_id, nft_id) => {
   const metadataUint = api.createType('LandMetadata', rawMetadata).toJSON();
   const metadata = {
     ...metadataUint,
-    demarcation: metadataUint.demarcation.map(c => ({
-      lat: c.lat/10000000,
-      long: c.long/10000000,
-    }))
+    demarcation: metadataUint.demarcation.map((c) => ({
+      lat: c.lat / 10000000,
+      long: c.long / 10000000,
+    })),
   };
   return metadata;
-}
+};
+
 const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress) => {
   const injector = await web3FromAddress(walletAddress);
   const api = await getApi();
@@ -1327,26 +1169,26 @@ const getBlockEvents = async (blockHash) => {
     console.error(e);
     throw e;
   }
-}
+};
 
 const getMotions = async () => {
   const api = await getApi();
-  const proposals = await api.query.council.proposals()
+  const proposals = await api.query.council.proposals();
 
-  return await Promise.all(
-    proposals.map(async proposal => {
+  return Promise.all(
+    proposals.map(async (proposal) => {
       const [proposalOf, voting] = await api.queryMulti([
         [api.query.council.proposalOf, proposal],
-        [api.query.council.voting, proposal]
-      ])
+        [api.query.council.voting, proposal],
+      ]);
       return {
         proposal,
         proposalOf,
         voting,
-      }
-    })
-  )
-}
+      };
+    }),
+  );
+};
 
 const getCongressCandidates = async () => {
   const api = await getApi();
@@ -1366,7 +1208,6 @@ const getRunnersUp = async () => {
 
 const renounceCandidacy = async (walletAddress, userStatus, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
 
   if (userStatus === "None") return;
 
@@ -1377,66 +1218,20 @@ const renounceCandidacy = async (walletAddress, userStatus, callback) => {
     renounce
   )
 
-  renounceCandidacyTx.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed elections.submitCandidacy at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( elections.submitCandidacy transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(renounceCandidacyTx, walletAddress, api);
 }
 
 const applyForCongress = async (walletAddress, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const electionsCandidates = await api.query.elections.candidates()
   const extrinsic = api.tx.elections.submitCandidacy(electionsCandidates.length);
-
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed elections.submitCandidacy at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( elections.submitCandidacy transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const voteAtMotions = async (walletAddress, proposal, index, vote, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const extrinsic = api.tx.council.vote(proposal, index, vote);
-
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed council.vote at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( council.vote transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const congressMajorityThreshold = async () => {
@@ -1457,7 +1252,6 @@ const createProposalAndVote = async (threshold, proposalContent, vote) => {
 
 const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmount }, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
 
   const threshold = await congressMajorityThreshold();
 
@@ -1466,27 +1260,11 @@ const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmoun
 
   const extrinsics = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll(extrinsics)
-
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed congress.propose for councilAccount.execute for llm.sendLlm at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( congress.propose for councilAccount.execute for llm.sendLlm transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const congressSendLlmToPolitipool = async ({ walletAddress, transferToAddress, transferAmount }, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
 
   const threshold = await congressMajorityThreshold();
 
@@ -1494,44 +1272,14 @@ const congressSendLlmToPolitipool = async ({ walletAddress, transferToAddress, t
   const proposal = api.tx.councilAccount.execute(executeProposal);
   const extrinsics = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll(extrinsics)
-
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed congress.propose for councilAccount.execute for llm.sendLlmToPolitipool at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( congress.propose for councilAccount.execute for llm.sendLlmToPolitipool transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const batchPayoutStakers = async (targets, walletAddress, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const calls = targets.map(({validator, era}) => api.tx.staking.payoutStakers(validator, era))
   const extrinsic = api.tx.utility.batch(calls);
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed staking.payoutStakers batch at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( batched staking.payoutStakers transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const getStakersRewards = async (accounts) => {
@@ -1587,21 +1335,7 @@ const setSessionKeys = async (keys, walletAddress, callback) => {
   const injector = await web3FromAddress(walletAddress);
   const EMPTY_PROOF = new Uint8Array();
   const extrinsic = api.tx.session.setKeys(keys, EMPTY_PROOF);
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed session.setKeys at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( session.setKeys transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const getStakingPayee = async (stash) => {
@@ -1612,23 +1346,8 @@ const getStakingPayee = async (stash) => {
 
 const setStakingPayee = async (destination, walletAddress, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const extrinsic = api.tx.staking.setPayee(destination);
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed staking.setPayee at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( staking.setPayee transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const getIdentities = async (addresses) => {
@@ -1642,119 +1361,44 @@ const getIdentities = async (addresses) => {
 
 const stakingChill = async (walletAddress, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const extrinsic = api.tx.staking.chill();
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed staking.chill at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( staking.chill transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const stakingValidate = async (commission, blocked, keys, walletAddress, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const EMPTY_PROOF = new Uint8Array();
   const setKeys = api.tx.session.setKeys(keys, EMPTY_PROOF);
   const validate = api.tx.staking.validate({ commission, blocked });
   const extrinsic = api.tx.utility.batchAll([setKeys, validate]);
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed staking.validate at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( staking.validate transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const bondAndValidate = async (bondValue, payee, commission, blocked, keys, walletAddress, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const bond = api.tx.staking.bond(bondValue, payee);
   const EMPTY_PROOF = new Uint8Array();
   const setKeys = api.tx.session.setKeys(keys, EMPTY_PROOF);
   const validate = api.tx.staking.validate({ commission, blocked });
   const extrinsic = api.tx.utility.batchAll([bond, setKeys, validate]);
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed bond+setKeys+validate at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( bond+setKeys+validate transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const stakingBond = async (value, walletAddress, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const extrinsic = api.tx.staking.bond(value, 'Staked');
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed staking.bond at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( staking.bond transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const stakingBondExtra = async (value, walletAddress, callback) => {
   const api = await getApi();
-  const injector = await web3FromAddress(walletAddress);
   const extrinsic = api.tx.staking.bondExtra(value);
-  extrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status, events, dispatchError }) => {
-    let errorData = handleMyDispatchErrors(dispatchError, api)
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed staking.bondExtra at block hash #${status.asInBlock.toString()}`);
-      callback(null, {
-        blockHash: status.asInBlock.toString(),
-        errorData
-      });
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( staking.bondExtra transaction failed', error);
-    callback({ isError: true, details: error.toString() });
-  });
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const stakingUnbond = async (value, walletAddress) => {
   const api = await getApi();
-  return await submitExtrinsic(api.tx.staking.unbond(value), walletAddress);
+  return submitExtrinsic(api.tx.staking.unbond(value), walletAddress, api);
 }
 
 const stakingWithdrawUnbonded = async (walletAddress) => {
@@ -1765,7 +1409,7 @@ const stakingWithdrawUnbonded = async (walletAddress) => {
   const spans = await api.query.staking.slashingSpans(ledger.unwrap().stash);
   const spanCount = spans.isSome ? spans.unwrap().prior.length + 1 : 0;
 
-  return await submitExtrinsic(api.tx.staking.withdrawUnbonded(spanCount), walletAddress);
+  return await submitExtrinsic(api.tx.staking.withdrawUnbonded(spanCount), walletAddress, api);
 }
 
 const subscribeActiveEra = async (onNewEra) => {
@@ -1791,7 +1435,7 @@ const congressProposeLegislation = async (tier, id, sections, walletAddress) => 
   const proposal = api.tx.liberlandLegislation.addLegislation(tier, id, sections);
   const extrinsics = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll(extrinsics)
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const congressRepealLegislation = async (tier, id, section, walletAddress) => {
@@ -1806,7 +1450,7 @@ const congressRepealLegislation = async (tier, id, section, walletAddress) => {
   const extrinsics = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll(extrinsics)
 
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const getTreasurySpendProposals = async () => {
@@ -1834,7 +1478,7 @@ const congressApproveTreasurySpend = async (proposalId, walletAddress) => {
   const proposal = api.tx.treasury.approveProposal(proposalId);
   const extrinsics = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll(extrinsics)
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const congressUnapproveTreasurySpend = async (proposalId, walletAddress) => {
@@ -1845,7 +1489,7 @@ const congressUnapproveTreasurySpend = async (proposalId, walletAddress) => {
   const proposal = api.tx.treasury.removeApproval(proposalId);
   const extrinsics = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll(extrinsics)
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const closeCongressMotion = async (proposalHash, index, walletAddress) => {
@@ -1853,7 +1497,7 @@ const closeCongressMotion = async (proposalHash, index, walletAddress) => {
   const proposal = await api.query.council.proposalOf(proposalHash);
   const { weight: weightBound } = await api.tx(proposal.unwrap()).paymentInfo(walletAddress);
   const lengthBound = proposal.unwrap().toU8a().length;
-  return await submitExtrinsic(api.tx.council.close(proposalHash, index, weightBound, lengthBound), walletAddress);
+  return await submitExtrinsic(api.tx.council.close(proposalHash, index, weightBound, lengthBound), walletAddress, api);
 }
 
 const congressProposeReferendum = async (
@@ -1906,7 +1550,7 @@ const congressProposeReferendum = async (
         ...proposeAndVote,
       ]
     : proposeAndVote)
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const congressProposeLegislationViaReferendum = async (
@@ -2006,7 +1650,7 @@ const citizenProposeRepealLegislation = async (
       ])
     : proposeTx
 
-  return await submitExtrinsic(extrinsic, walletAddress)
+  return await submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const congressSendTreasuryLld = async (transferToAddress, transferAmount, walletAddress) => {
@@ -2017,7 +1661,7 @@ const congressSendTreasuryLld = async (transferToAddress, transferAmount, wallet
 
   const extrinsics = await createProposalAndVote(threshold, proposal, true)
   const extrinsic = api.tx.utility.batchAll(extrinsics)
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const getPalletIds = async () => {
@@ -2033,7 +1677,7 @@ const congressDemocracyBlacklist = async (proposalHash, referendumIndex, walletA
   const proposal = api.tx.democracy.blacklist(proposalHash, referendumIndex ?? null);
 
   const extrinsic = api.tx.utility.batchAll(await createProposalAndVote(threshold, proposal, true));
-  return await submitExtrinsic( extrinsic, walletAddress);
+  return submitExtrinsic( extrinsic, walletAddress, api);
 }
 
 const proposeAmendLegislation = async (
@@ -2074,7 +1718,7 @@ const proposeAmendLegislation = async (
   const extrinsic = existingPreimage.isNone ?
     api.tx.utility.batchAll([notePreimageTx, proposeTx])
     : proposeTx;
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const congressAmendLegislation = async (tier, id, section, content, walletAddress) => {
@@ -2083,7 +1727,7 @@ const congressAmendLegislation = async (tier, id, section, content, walletAddres
   const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
   const proposal = api.tx.liberlandLegislation.amendLegislation(tier, id, section, content, witness);
   const extrinsic = api.tx.utility.batchAll(await createProposalAndVote(threshold, proposal, true));
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const congressAmendLegislationViaReferendum = async (
@@ -2185,7 +1829,7 @@ const requestUnregisterCompanyRegistration = async (companyId, walletAddress)  =
   const api = await getApi();
 
   const extrinsic = api.tx.companyRegistry.requestEntityUnregister(0, companyId);
-  return submitExtrinsic(extrinsic, walletAddress);
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const unregisterCompany = async (companyId, isSoft, walletAddress)  => {
@@ -2195,13 +1839,13 @@ const unregisterCompany = async (companyId, isSoft, walletAddress)  => {
     api.tx.companyRegistry.unregister(0, companyId, isSoft)
   );
 
-  return submitExtrinsic(extrinsic, walletAddress);
+  return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const cancelCompanyRequest = async (companyId, walletAddress) => {
   const api = await getApi();
   const extrinsic = api.tx.companyRegistry.cancelRequest(0, companyId);
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const setRegisteredCompanyData = async (companyId, companyData, walletAddress) => {
@@ -2210,7 +1854,7 @@ const setRegisteredCompanyData = async (companyId, companyData, walletAddress) =
   const compressed = pako.deflate(data.toU8a());
   const setRegisteredEntity = api.tx.companyRegistry.setRegisteredEntity(0, companyId, u8aToHex(compressed));
   const extrinsic = api.tx.companyRegistryOffice.execute(setRegisteredEntity);
-  return await submitExtrinsic(extrinsic, walletAddress);
+  return await submitExtrinsic(extrinsic, walletAddress, api);
 }
 
 const fetchPendingIdentities = async () => {

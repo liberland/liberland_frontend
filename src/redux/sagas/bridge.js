@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, cps, call, select,
+  put, takeLatest, call, select,
 } from 'redux-saga/effects';
 
 import { ethers } from 'ethers';
@@ -11,84 +11,50 @@ import {
   getBlockEvents,
 } from '../../api/nodeRpcCall';
 
-import { bridgeActions, blockchainActions, walletActions } from '../actions';
+import { bridgeActions, walletActions } from '../actions';
 import { ethToSubReceiptId, ethToSubReceiptIdFromEvent, subToEthReceiptId } from '../../utils/bridge';
 import { getSubstrateOutgoingReceipts } from '../../api/explorer';
 import { blockchainSelectors, bridgeSelectors } from '../selectors';
 import { bridgeBurn, getEthereumOutgoingReceipts, getTxReceipt } from '../../api/eth';
 
+import { blockchainWatcher } from './base';
+
 // WORKERS
 
 function* withdrawWorker(action) {
-  try {
-    yield put(bridgeActions.updateTransferWithdrawTx.set({
-      ...action.payload.values,
-      withdrawTx: true,
-    }));
-    const { errorData } = yield cps(bridgeWithdraw, action.payload.values, action.payload.userWalletAddress);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(bridgeActions.withdraw.failure(errorData));
-      yield put(bridgeActions.updateTransferWithdrawTx.set({
-        ...action.payload.values,
-        withdrawTx: false,
-      }));
-    } else {
-      yield put(bridgeActions.withdraw.success());
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.log('Error in bridge withdraw worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(bridgeActions.withdraw.failure(errorData));
-    yield put(bridgeActions.updateTransferWithdrawTx.set({
-      ...action.payload.values,
-      withdrawTx: false,
-    }));
-  }
+  yield put(bridgeActions.updateTransferWithdrawTx.set({
+    ...action.payload.values,
+    withdrawTx: true,
+  }));
+  yield call(bridgeWithdraw, action.payload.values, action.payload.userWalletAddress);
+  yield put(bridgeActions.withdraw.success());
 }
 
 function* depositWorker(action) {
-  try {
-    const { blockHash, events, errorData } = yield cps(
-      bridgeDeposit,
-      action.payload.values,
-      action.payload.userWalletAddress,
-    );
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(bridgeActions.deposit.failure(errorData));
-    } else {
-      const blockEvents = yield call(getBlockEvents, blockHash);
-      const extrinsicIndex = events[0].phase.asApplyExtrinsic;
-      const receiptEventIndex = blockEvents.findIndex(
-        ({ phase, event }) => phase.isApplyExtrinsic
-        && phase.asApplyExtrinsic.eq(extrinsicIndex)
-        && event.method === 'OutgoingReceipt',
-      );
-      const { amount, ethRecipient } = blockEvents[receiptEventIndex].event.data;
-      const receipt_id = subToEthReceiptId(blockHash, receiptEventIndex, amount, ethRecipient);
+  const { blockHash, events } = yield call(
+    bridgeDeposit,
+    action.payload.values,
+    action.payload.userWalletAddress,
+  );
+  const blockEvents = yield call(getBlockEvents, blockHash);
+  const extrinsicIndex = events[0].phase.asApplyExtrinsic;
+  const receiptEventIndex = blockEvents.findIndex(
+    ({ phase, event }) => phase.isApplyExtrinsic
+    && phase.asApplyExtrinsic.eq(extrinsicIndex)
+    && event.method === 'OutgoingReceipt',
+  );
+  const { amount, ethRecipient } = blockEvents[receiptEventIndex].event.data;
+  const receipt_id = subToEthReceiptId(blockHash, receiptEventIndex, amount, ethRecipient);
 
-      yield put(bridgeActions.deposit.success({
-        receipt_id,
-        asset: action.payload.values.asset,
-        amount: amount.toHex(),
-        ethRecipient: ethRecipient.toHex(),
-        blockHash,
-        date: Date.now(),
-      }));
-      yield put(walletActions.getWallet.call());
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.log('Error in bridge deposit worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(bridgeActions.deposit.failure(errorData));
-  }
+  yield put(bridgeActions.deposit.success({
+    receipt_id,
+    asset: action.payload.values.asset,
+    amount: amount.toHex(),
+    ethRecipient: ethRecipient.toHex(),
+    blockHash,
+    date: Date.now(),
+  }));
+  yield put(walletActions.getWallet.call());
 }
 
 function* burnWorker(action) {
@@ -208,19 +174,11 @@ function* getBridgesConstantsWorker() {
 // WATCHERS
 
 function* withdrawWatcher() {
-  try {
-    yield takeLatest(bridgeActions.withdraw.call, withdrawWorker);
-  } catch (e) {
-    yield put(bridgeActions.withdraw.failure(e));
-  }
+  yield* blockchainWatcher(bridgeActions.withdraw, withdrawWorker);
 }
 
 function* depositWatcher() {
-  try {
-    yield takeLatest(bridgeActions.deposit.call, depositWorker);
-  } catch (e) {
-    yield put(bridgeActions.deposit.failure(e));
-  }
+  yield* blockchainWatcher(bridgeActions.deposit, depositWorker);
 }
 
 function* burnWatcher() {
