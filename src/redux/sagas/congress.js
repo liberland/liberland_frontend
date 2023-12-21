@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, call, cps, select,
+  put, takeLatest, call, select,
 } from 'redux-saga/effects';
 import {
   congressActions, democracyActions, legislationActions,
@@ -59,7 +59,7 @@ function* voteAtMotionsWorker(action) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  yield cps(
+  yield call(
     voteAtMotions,
     walletAddress,
     proposal,
