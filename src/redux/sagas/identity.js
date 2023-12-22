@@ -5,6 +5,7 @@ import {
 import {
   getIdentity,
   setIdentity,
+  getIdentities,
 } from '../../api/nodeRpcCall';
 
 import { identityActions, blockchainActions } from '../actions';
@@ -23,6 +24,7 @@ function* setIdentityWorker(action) {
       yield put(identityActions.getIdentity.call(action.payload.userWalletAddress));
     }
   } catch (errorData) {
+    // eslint-disable-next-line no-console
     console.log('Error in set identity worker', errorData);
     yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
     yield put(blockchainActions.setError.success(errorData));
@@ -41,8 +43,8 @@ function* getIdentityWorker(action) {
 
 function* getIdentitiesWorker(action) {
   try {
-    const identity = yield call(getIdentity, action.payload);
-    yield put(identityActions.getIdentities.success({ identity, key: action.payload }));
+    const identities = yield call(getIdentities, action.payload);
+    yield put(identityActions.getIdentities.success(identities));
   } catch (e) {
     yield put(identityActions.getIdentities.failure(e));
   }

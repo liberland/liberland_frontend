@@ -141,7 +141,8 @@ function ReferendumItem({
   };
 
   const proposersList = centralizedDatas.map((item) => item.proposerAddress);
-  const { usersList } = useUsersIdentity(null, proposersList);
+  const { usersList } = useUsersIdentity(proposersList);
+
   return (
     <>
       <NotificationPortal ref={notificationRef} />

@@ -66,7 +66,7 @@ function ProposalItem({
   };
 
   const proposersList = centralizedDatas.map((item) => item.proposerAddress);
-  const { userOrId, usersList } = useUsersIdentity(proposer, proposersList);
+  const { usersList } = useUsersIdentity([proposer, ...proposersList]);
 
   return (
     <>
@@ -104,7 +104,7 @@ function ProposalItem({
             <div>
               <div className={styles.metaTextInfo}>
                 Proposed by:
-                <b>{ userOrId }</b>
+                <b>{ findNameOrId(proposer, usersList) }</b>
                 <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={() => handleCopyClick(proposer)} />
               </div>
             </div>
