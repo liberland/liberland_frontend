@@ -26,8 +26,16 @@ function* withdrawWorker(action) {
     ...action.payload.values,
     withdrawTx: true,
   }));
-  yield call(bridgeWithdraw, action.payload.values, action.payload.userWalletAddress);
-  yield put(bridgeActions.withdraw.success());
+  try {
+    yield call(bridgeWithdraw, action.payload.values, action.payload.userWalletAddress);
+    yield put(bridgeActions.withdraw.success());
+  } catch (error) {
+    yield put(bridgeActions.updateTransferWithdrawTx.set({
+      ...action.payload.values,
+      withdrawTx: false,
+    }));
+    throw error;
+  }
 }
 
 function* depositWorker(action) {
