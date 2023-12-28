@@ -102,6 +102,10 @@ function ActionButtons({
   const [isProposeOpen, setProposeOpen] = useState(false);
   const [isAmendOpen, setAmendOpen] = useState(false);
 
+  const isRepealOption = (tier === 'InternationalTreaty' && !repealMotion);
+  const isCitizenProposeRepealOption = (!repealReferendum && !repealProposal);
+  const isProposeButtonHasOpption = isRepealOption || tier !== 'Constitution' || isCitizenProposeRepealOption;
+
   return (
     <div className={styles.rowEnd}>
       {vetos.map((v) => v.toString()).includes(userWalletAddress) ? (
@@ -126,6 +130,7 @@ function ActionButtons({
         </Button>
       )}
 
+      {isProposeButtonHasOpption && (
       <div className={styles.dropdownWrapper}>
         <Button
           small
@@ -138,22 +143,23 @@ function ActionButtons({
           Propose \/
         </Button>
         {isProposeOpen && (
-          <div className={styles.dropdown}>
-            {(tier === 'InternationalTreaty' && !repealMotion) && (
-              <RepealLegislationButton {...{ tier, id, section }} />
-            )}
-            {tier !== 'Constitution' && (
-              <ProposeRepealLegislationButton {...{ tier, id, section }} />
-            )}
-            { (!repealReferendum && !repealProposal)
+        <div className={styles.dropdown}>
+          {isRepealOption && (
+          <RepealLegislationButton {...{ tier, id, section }} />
+          )}
+          {tier !== 'Constitution' && (
+          <ProposeRepealLegislationButton {...{ tier, id, section }} />
+          )}
+          {isCitizenProposeRepealOption
             && (
             <CitizenProposeRepealLegislationButton
               {...{ tier, id, section }}
             />
             )}
-          </div>
+        </div>
         )}
       </div>
+      )}
 
       <div className={styles.dropdownWrapper}>
         {section !== null && (
