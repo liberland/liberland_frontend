@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { blake2AsHex } from '@polkadot/util-crypto';
+import jsxss from 'xss';
 import { hexToU8a } from '@polkadot/util';
 import styles from './styles.module.scss';
 import Card from '../../../../Card';
@@ -117,25 +119,27 @@ function ProposalItem({
             <div>
               Discussions:
               <ol>
-                {centralizedDatas.map((centralizedData) => (
-                  <li key={centralizedData.id}>
-                    <a href={centralizedData.link}>
-                      {centralizedData.name}
-                    </a>
-                    {' - '}
-                    {centralizedData.description}
-                    {' '}
-                    (Discussion added by
-                    {' '}
-                    <b>{ truncate(centralizedData.proposerAddress, 13) }</b>
-                    <CopyIcon
-                      className={styles.copyIcon}
-                      name="walletAddress"
-                      onClick={() => handleCopyClick(centralizedData.proposerAddress)}
-                    />
-                    )
-                  </li>
-                ))}
+                {centralizedDatas.map((centralizedData) => {
+                  const html = jsxss(`<a href="${centralizedData.link}}">${centralizedData.name}</a>`);
+                  return (
+                    <li key={centralizedData.id}>
+                      {/* eslint-disable-next-line react/no-danger */}
+                      <div dangerouslySetInnerHTML={{ __html: html }} />
+                      {' - '}
+                      {centralizedData.description}
+                      {' '}
+                      (Discussion added by
+                      {' '}
+                      <b>{ truncate(centralizedData.proposerAddress, 13) }</b>
+                      <CopyIcon
+                        className={styles.copyIcon}
+                        name="walletAddress"
+                        onClick={() => handleCopyClick(centralizedData.proposerAddress)}
+                      />
+                      )
+                    </li>
+                  );
+                })}
               </ol>
             </div>
             )}
