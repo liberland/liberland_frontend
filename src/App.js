@@ -1,5 +1,5 @@
 // LIBS
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   BrowserRouter as Router,
@@ -18,13 +18,14 @@ import SignIn from './components/AuthComponents/SignIn';
 import SignUp from './components/AuthComponents/SingUp';
 import Home from './components/Home';
 import Loader from './components/Loader';
+import ModalRoot from './components/Modals/ModalRoot';
+import DefaultModal from './components/Modals/DefaultModal';
 
 // REDUX
 import { userSelectors } from './redux/selectors';
 import {
   authActions,
   blockchainActions,
-  validatorActions,
 } from './redux/actions';
 
 const override = css`
@@ -36,6 +37,7 @@ function App() {
   const dispatch = useDispatch();
   const isSessionVerified = useSelector(userSelectors.selectIsSessionVerified);
   const user = useSelector(userSelectors.selectUser);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(authActions.verifySession.call());
@@ -63,21 +65,50 @@ function App() {
 
   const appRouter = user ? loggedInRoutes : loggedOutRoutes;
 
-  return isSessionVerified ? (
-    <Loader>
-      {appRouter}
-    </Loader>
-  ) : (
-    <div
-      style={{
-        display: 'flex',
-        height: '100vh',
-        alignItems: 'center',
-        background: 'rgb(170,170,170,0.1)',
-      }}
-    >
-      <MoonLoader loading css={override} size={150} color="#F1C823" />
-    </div>
+  useEffect(() => {
+    const checkBrowser = async () => {
+      const isBraveBrowserSaved = sessionStorage.getItem('braveBrowser');
+      if (isBraveBrowserSaved === 'true') return;
+
+      const isBrave = ((navigator.brave && await navigator.brave.isBrave()) || false);
+      const isChrome = navigator.userAgent.includes('Chrome');
+      const isFirefox = navigator.userAgent.includes('Firefox');
+
+      if (isBrave || !(isChrome || isFirefox)) {
+        setIsModalOpen(true);
+        sessionStorage.setItem('braveBrowser', 'true');
+      }
+    };
+    checkBrowser();
+  }, []);
+
+  return (
+    <>
+      {isModalOpen
+          && (
+          <ModalRoot>
+            <DefaultModal onClickButton={() => setIsModalOpen(false)} text="We are not support brave browser">
+              <span>If you want all functions to work properly, change your browser</span>
+            </DefaultModal>
+          </ModalRoot>
+          )}
+      {isSessionVerified ? (
+        <Loader>
+          {appRouter}
+        </Loader>
+      ) : (
+        <div
+          style={{
+            display: 'flex',
+            height: '100vh',
+            alignItems: 'center',
+            background: 'rgb(170,170,170,0.1)',
+          }}
+        >
+          <MoonLoader loading css={override} size={150} color="#F1C823" />
+        </div>
+      )}
+    </>
   );
 }
 
