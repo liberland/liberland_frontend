@@ -17,13 +17,12 @@ import { waitForInjectedWeb3 } from '../../utils/walletHelpers';
 function* signInWorker(action) {
   try {
     const { credentials, history, ssoAccessTokenHash } = action.payload;
-    api.defaults.headers.common['X-token'] = ssoAccessTokenHash;
+    yield sessionStorage.setItem('ssoAccessTokenHash', ssoAccessTokenHash);
     const { data: user } = yield call(api.get, '/users/me');
 
     user.ssoAccessTokenHash = ssoAccessTokenHash;
     yield put(blockchainActions.setUserWallet.success(credentials.wallet_address));
     yield sessionStorage.setItem('userWalletAddress', credentials.wallet_address);
-    yield sessionStorage.setItem('ssoAccessTokenHash', ssoAccessTokenHash);
     yield call(waitForInjectedWeb3);
     const extensions = yield web3Enable('Liberland dapp');
     if (extensions.length) {
@@ -45,8 +44,6 @@ function* signInWorker(action) {
 function* verifySessionWorker() {
   try {
     const walletAddress = yield sessionStorage.getItem('userWalletAddress');
-    const ssoAccessTokenHash = yield sessionStorage.getItem('ssoAccessTokenHash');
-    api.defaults.headers.common['X-token'] = ssoAccessTokenHash;
     const { data: user } = yield call(api.get, '/users/me');
     yield call(waitForInjectedWeb3);
     const extensions = yield web3Enable('Liberland dapp');

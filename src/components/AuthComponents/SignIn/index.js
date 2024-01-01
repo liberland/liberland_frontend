@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 // REDUX
-import axios from 'axios';
 import { authActions } from '../../../redux/actions';
 
 import { errorsSelectors, blockchainSelectors } from '../../../redux/selectors';
@@ -17,6 +16,8 @@ import { ReactComponent as Divider } from '../../../assets/icons/divider.svg';
 import { ReactComponent as WalletIcon } from '../../../assets/icons/wallet.svg';
 import Header from '../Header';
 import Button from '../../Button/Button';
+
+import api from '../../../api';
 
 function SignIn() {
   const {
@@ -50,13 +51,7 @@ function SignIn() {
       );
     }
     if (ssoAccessTokenHash) {
-      const api2 = axios.create({
-        baseURL: process.env.REACT_APP_API,
-        withCredentials: true,
-      });
-      api2.defaults.headers.common['X-token'] = ssoAccessTokenHash;
-
-      api2.get('/users/me').then((result) => {
+      api.get('/users/me', { headers: { 'X-token': ssoAccessTokenHash } }).then((result) => {
         const walletAddress = allAccounts.find((account) => account.address === result?.data?.blockchainAddress);
         if (walletAddress) {
           onSubmit({ wallet_address: walletAddress.address, rememberMe: false });
@@ -117,13 +112,12 @@ function SignIn() {
           .
         </p>
 
-
       </div>
       <div className={styles.twoFAbuttons}>
-        <div onClick={() => {goToLiberland2FASignin()}}>
+        <div onClick={goToLiberland2FASignin}>
           2fa login
         </div>
-        <div onClick={() => {goToLiberland2FASignout()}}>
+        <div onClick={goToLiberland2FASignout}>
           2fa logout
         </div>
       </div>
