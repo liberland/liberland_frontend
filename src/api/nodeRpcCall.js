@@ -289,7 +289,7 @@ const provideJudgementAndAssets = async ({
   }
 
   const finalCall = api.tx.utility.batchAll(calls);
-  return submitExtrinsic(finalCall, walletAddress, api, false);
+  return submitExtrinsic(finalCall, walletAddress, api);
 };
 
 const getLegalAdditionals = (legal) => {
@@ -365,7 +365,7 @@ const setIdentity = async (values, walletAddress) => {
   };
 
   const setCall = api.tx.identity.setIdentity(info);
-  return submitExtrinsic(setCall, walletAddress, api, false);
+  return submitExtrinsic(setCall, walletAddress, api);
 };
 
 const getCompanyRequest = async (entity_id) => {
@@ -414,7 +414,7 @@ const registerCompany = async ({ entity_id, hash, walletAddress }) => {
   const api = await getApi();
   const registerCall = api.tx.companyRegistry.registerEntity(0, entity_id, hash);
   const proxied = api.tx.companyRegistryOffice.execute(registerCall);
-  return submitExtrinsic(proxied, walletAddress, api, false);
+  return submitExtrinsic(proxied, walletAddress, api);
 };
 
 // TODO: Need refactor when blockchain node update
@@ -495,7 +495,7 @@ const stakeToPolkaBondAndExtra = async (amount, isUserHavePolkaStake, walletAddr
 const unpool = async (walletAddress) => {
   const api = await getApi();
   const unpoolExtrinsic = api.tx.llm.politicsUnlock();
-  return submitExtrinsic(unpoolExtrinsic, walletAddress, api, false);
+  return submitExtrinsic(unpoolExtrinsic, walletAddress, api);
 };
 
 const politiPool = async (amount, walletAddress) => {
