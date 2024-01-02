@@ -9,7 +9,7 @@ import { formatMerits } from '../../../../../utils/walletHelpers';
 import truncate from '../../../../../utils/truncate';
 import NotificationPortal from '../../../../NotificationPortal';
 import { ReactComponent as CopyIcon } from '../../../../../assets/icons/copy.svg';
-
+import sanitizeUrlHelper from '../../../../../utils/sanitizeUrlHelper';
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
 import {
@@ -198,25 +198,26 @@ function ReferendumItem({
               <div>
                 Discussions:
                 <ol>
-                  {centralizedDatas.map((centralizedData) => (
-                    <li key={centralizedData.id}>
-                      <a href={centralizedData.link}>
-                        {centralizedData.name}
-                      </a>
-                      {' - '}
-                      {centralizedData.description}
-                      {' '}
-                      (Discussion added by
-                      {' '}
-                      <b>{ truncate(centralizedData.proposerAddress, 13) }</b>
-                      <CopyIcon
-                        className={styles.copyIcon}
-                        name="walletAddress"
-                        onClick={() => handleCopyClick(centralizedData.proposerAddress)}
-                      />
-                      )
-                    </li>
-                  ))}
+                  {centralizedDatas.map((centralizedData) => {
+                    const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
+                    return (
+                      <li key={centralizedData.id}>
+                        <a href={sanitizeUrl} target="_blank" rel="noreferrer">{centralizedData.name}</a>
+                        {' - '}
+                        {centralizedData.description}
+                        {' '}
+                        (Discussion added by
+                        {' '}
+                        <b>{ truncate(centralizedData.proposerAddress, 13) }</b>
+                        <CopyIcon
+                          className={styles.copyIcon}
+                          name="walletAddress"
+                          onClick={() => handleCopyClick(centralizedData.proposerAddress)}
+                        />
+                        )
+                      </li>
+                    );
+                  })}
                 </ol>
               </div>
               )}
