@@ -239,7 +239,7 @@ const bridgeDeposit = async ({ asset, amount, ethereumRecipient }, walletAddress
   else throw new Exception('Unknown asset');
 
   const call = bridge.deposit(amount, ethereumRecipient);
-  return submitExtrinsic(call, walletAddress, api, false);
+  return submitExtrinsic(call, walletAddress, api);
 };
 
 const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress) => {
@@ -251,7 +251,7 @@ const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress) => {
   else throw new Exception('Unknown asset');
 
   const call = bridge.withdraw(receipt_id);
-  return submitExtrinsic(call, walletAddress, api, false);
+  return submitExtrinsic(call, walletAddress, api);
 };
 
 const bridgeConstants = async (asset) => {
