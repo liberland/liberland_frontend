@@ -1,4 +1,4 @@
-import { web3Accounts, web3FromAddress, web3FromSource } from '@polkadot/extension-dapp';
+import { web3Accounts, web3FromAddress } from '@polkadot/extension-dapp';
 import pako from 'pako';
 import { u8aToHex } from '@polkadot/util';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
@@ -120,8 +120,8 @@ const crossReference = (api, blockchainData, allCentralizedData, motions, isRefe
   };
 });
 
-const submitExtrinsic = async (extrinsic, walletAddress, api, signerFromAdress = true) => {
-  const { signer } = signerFromAdress ? await web3FromAddress(walletAddress) : await web3FromSource('polkadot-js');
+const submitExtrinsic = async (extrinsic, walletAddress, api) => {
+  const { signer } = await web3FromAddress(walletAddress);
   return new Promise((resolve, reject) => {
     extrinsic.signAndSend(walletAddress, { signer }, ({ status, events, dispatchError }) => {
       const errorData = handleMyDispatchErrors(dispatchError, api);
