@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, call, cps, select,
+  put, takeLatest, call, select,
 } from 'redux-saga/effects';
 
 import { BN_ZERO } from '@polkadot/util';
@@ -16,40 +16,31 @@ import {
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 
-import { blockchainActions, validatorActions, walletActions } from '../actions';
+import { validatorActions, walletActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 
 // WORKERS
 
 function* payoutWorker() {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const rewardsPerAccount = yield call(getStakersRewards, [walletAddress]);
-    const rewards = rewardsPerAccount
-      .flatten()
-      .map(({ era, validators }) => Object.keys(validators).map((validator) => ({ era, validator })))
-      .flatten();
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const rewardsPerAccount = yield call(getStakersRewards, [walletAddress]);
+  const rewards = rewardsPerAccount
+    .flatten()
+    .map(({ era, validators }) => Object.keys(validators).map((validator) => ({ era, validator })))
+    .flatten();
 
-    if (rewards.length === 0) {
-      const e = new Error('No unpaid staking rewards pending');
-      e.details = e.message;
-      throw e;
-    }
-
-    const chunkSize = 10;
-    for (let i = 0; i < rewards.length; i += chunkSize) {
-      const { errorData } = yield cps(batchPayoutStakers, rewards.slice(i, i + chunkSize), walletAddress);
-      if (errorData.isError) throw errorData;
-    }
-    yield put(validatorActions.payout.success());
-    yield put(validatorActions.getPendingRewards.call());
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.log('Error payoutStakers worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(validatorActions.payout.failure(errorData));
+  if (rewards.length === 0) {
+    const e = new Error('No unpaid staking rewards pending');
+    e.details = e.message;
+    throw e;
   }
+
+  const chunkSize = 10;
+  for (let i = 0; i < rewards.length; i += chunkSize) {
+    yield call(batchPayoutStakers, rewards.slice(i, i + chunkSize), walletAddress);
+  }
+  yield put(validatorActions.payout.success());
+  yield put(validatorActions.getPendingRewards.call());
 }
 
 function* getPendingRewardsWorker() {
@@ -143,34 +134,16 @@ function* getSlashesWorker() {
 }
 
 function* setSessionKeysWorker({ payload: { keys } }) {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { errorData } = yield cps(setSessionKeys, keys, walletAddress);
-    if (errorData.isError) throw errorData;
-    yield put(validatorActions.setSessionKeys.success());
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.log('Error setSessionKeys worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(validatorActions.setSessionKeys.failure(errorData));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(setSessionKeys, keys, walletAddress);
+  yield put(validatorActions.setSessionKeys.success());
 }
 
 function* setPayeeWorker(action) {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { errorData } = yield cps(setStakingPayee, action.payload.payee, walletAddress);
-    if (errorData.isError) throw errorData;
-    yield put(validatorActions.setPayee.success());
-    yield put(validatorActions.getPayee.call());
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.log('Error setPayee worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(validatorActions.setPayee.failure(errorData));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(setStakingPayee, action.payload.payee, walletAddress);
+  yield put(validatorActions.setPayee.success());
+  yield put(validatorActions.getPayee.call());
 }
 
 function* getPayeeWorker() {
@@ -196,35 +169,17 @@ function* getNominatorsWorker() {
 }
 
 function* validateWorker({ payload: { commission, blocked, keys } }) {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { errorData } = yield cps(stakingValidate, commission, blocked, keys, walletAddress);
-    if (errorData.isError) throw errorData;
-    yield put(validatorActions.validate.success());
-    yield put(validatorActions.getInfo.call());
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.error('Error validate worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(validatorActions.validate.failure(errorData));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(stakingValidate, commission, blocked, keys, walletAddress);
+  yield put(validatorActions.validate.success());
+  yield put(validatorActions.getInfo.call());
 }
 
 function* chillWorker() {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { errorData } = yield cps(stakingChill, walletAddress);
-    if (errorData.isError) throw errorData;
-    yield put(validatorActions.chill.success());
-    yield put(validatorActions.getInfo.call());
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.error('Error validate worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(validatorActions.chill.failure(errorData));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(stakingChill, walletAddress);
+  yield put(validatorActions.chill.success());
+  yield put(validatorActions.getInfo.call());
 }
 
 function* createValidatorWorker({
@@ -232,44 +187,26 @@ function* createValidatorWorker({
     bondValue, commission, payee, blocked, keys,
   },
 }) {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { errorData } = yield cps(bondAndValidate, bondValue, payee, commission, blocked, keys, walletAddress);
-    if (errorData.isError) throw errorData;
-    yield put(validatorActions.createValidator.success());
-    yield put(validatorActions.getInfo.call());
-    yield put(walletActions.getWallet.call());
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.log('Error createValidator worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(validatorActions.createValidator.failure(errorData));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(bondAndValidate, bondValue, payee, commission, blocked, keys, walletAddress);
+  yield put(validatorActions.createValidator.success());
+  yield put(validatorActions.getInfo.call());
+  yield put(walletActions.getWallet.call());
 }
 
 function* stakeLldWorker(action) {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const ledgerRaw = yield call(getStakingLedger, walletAddress);
-    const { errorData } = yield cps(
-      ledgerRaw.isSome
-        ? stakingBondExtra
-        : stakingBond,
-      action.payload.bondValue,
-      walletAddress,
-    );
-    if (errorData.isError) throw errorData;
-    yield put(validatorActions.stakeLld.success());
-    yield put(walletActions.getWallet.call());
-    yield put(validatorActions.getInfo.call());
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.error('Error validate worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(validatorActions.stakeLld.failure(errorData));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const ledgerRaw = yield call(getStakingLedger, walletAddress);
+  yield call(
+    ledgerRaw.isSome
+      ? stakingBondExtra
+      : stakingBond,
+    action.payload.bondValue,
+    walletAddress,
+  );
+  yield put(validatorActions.stakeLld.success());
+  yield put(walletActions.getWallet.call());
+  yield put(validatorActions.getInfo.call());
 }
 
 function* getBondingDurationWorker() {
@@ -296,11 +233,7 @@ function* withdrawUnbondedWorker() {
 // WATCHERS
 
 function* payoutWatcher() {
-  try {
-    yield takeLatest(validatorActions.payout.call, payoutWorker);
-  } catch (e) {
-    yield put(validatorActions.payout.failure(e));
-  }
+  yield* blockchainWatcher(validatorActions.payout, payoutWorker);
 }
 
 function* getPendingRewardsWatcher() {
@@ -328,19 +261,11 @@ function* getSlashesWatcher() {
 }
 
 function* setSessionKeysWatcher() {
-  try {
-    yield takeLatest(validatorActions.setSessionKeys.call, setSessionKeysWorker);
-  } catch (e) {
-    yield put(validatorActions.setSessionKeys.failure(e));
-  }
+  yield* blockchainWatcher(validatorActions.setSessionKeys, setSessionKeysWorker);
 }
 
 function* setPayeeWatcher() {
-  try {
-    yield takeLatest(validatorActions.setPayee.call, setPayeeWorker);
-  } catch (e) {
-    yield put(validatorActions.setPayee.failure(e));
-  }
+  yield* blockchainWatcher(validatorActions.setPayee, setPayeeWorker);
 }
 
 function* getPayeeWatcher() {
@@ -368,35 +293,19 @@ function* getStakerRewardsWatcher() {
 }
 
 function* validateWatcher() {
-  try {
-    yield takeLatest(validatorActions.validate.call, validateWorker);
-  } catch (e) {
-    yield put(validatorActions.validate.failure(e));
-  }
+  yield* blockchainWatcher(validatorActions.validate, validateWorker);
 }
 
 function* chillWatcher() {
-  try {
-    yield takeLatest(validatorActions.chill.call, chillWorker);
-  } catch (e) {
-    yield put(validatorActions.chill.failure(e));
-  }
+  yield* blockchainWatcher(validatorActions.chill, chillWorker);
 }
 
 function* createValidatorWatcher() {
-  try {
-    yield takeLatest(validatorActions.createValidator.call, createValidatorWorker);
-  } catch (e) {
-    yield put(validatorActions.createValidator.failure(e));
-  }
+  yield* blockchainWatcher(validatorActions.createValidator, createValidatorWorker);
 }
 
 function* stakeLldWatcher() {
-  try {
-    yield takeLatest(validatorActions.stakeLld.call, stakeLldWorker);
-  } catch (e) {
-    yield put(validatorActions.stakeLld.failure(e));
-  }
+  yield* blockchainWatcher(validatorActions.stakeLld, stakeLldWorker);
 }
 
 function* getBondingDurationWatcher() {
