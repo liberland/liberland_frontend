@@ -14,6 +14,12 @@ export const getUsersByAddress = async (blockchainAddress) => {
   }));
 };
 
+export const setCentralizedBackendBlockchainAddress = async (blockchainAddress, userId, ssoAccessTokenHash) => {
+  return await api.patch('users/' + userId , {
+    blockchainAddress: blockchainAddress
+  })
+}
+
 export const maybeGetApprovedEresidency = async () => {
   try {
     const approvedEresidency = await api.get('/e-residents/approved/me');

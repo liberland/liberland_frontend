@@ -4,9 +4,6 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-// REDUX
-import { authActions } from '../../../redux/actions';
-
 import { errorsSelectors, blockchainSelectors } from '../../../redux/selectors';
 
 // STYLES
@@ -17,11 +14,8 @@ import { ReactComponent as WalletIcon } from '../../../assets/icons/wallet.svg';
 import Header from '../Header';
 import Button from '../../Button/Button';
 
-import api from '../../../api';
-
 function SignIn() {
   const {
-    handleSubmit,
     register,
     setError,
   } = useForm();
@@ -29,19 +23,11 @@ function SignIn() {
   const history = useHistory();
   const apiError = useSelector(errorsSelectors.selectSignIn);
   const allAccounts = useSelector(blockchainSelectors.allWalletsSelector);
-  const queryString = window.location.hash;
   // TODO REFACTOR
+  const queryString = window.location.hash;
   const beginToken = queryString.indexOf('=');
   const endToken = queryString.indexOf('&');
   const ssoAccessTokenHash = queryString.substring(beginToken + 1, endToken);
-
-  const onSubmit = (values) => {
-    dispatch(authActions.signIn.call({
-      credentials: values,
-      history,
-      ssoAccessTokenHash,
-    }));
-  };
 
   useEffect(() => {
     if (apiError) {
@@ -51,12 +37,8 @@ function SignIn() {
       );
     }
     if (ssoAccessTokenHash) {
-      api.get('/users/me', { headers: { 'X-token': ssoAccessTokenHash } }).then((result) => {
-        const walletAddress = allAccounts.find((account) => account.address === result?.data?.blockchainAddress);
-        if (walletAddress) {
-          onSubmit({ wallet_address: walletAddress.address, rememberMe: false });
-        }
-      });
+      sessionStorage.setItem('ssoAccessTokenHash', ssoAccessTokenHash);
+      history.push('/guided-setup')
     }
   }, [apiError, setError, dispatch, ssoAccessTokenHash, allAccounts]);
 
@@ -87,7 +69,7 @@ function SignIn() {
           <span>Wallets Available</span>
           <Divider />
         </p>
-        <form className={styles.signInForm} onSubmit={handleSubmit(onSubmit)}>
+        <form className={styles.signInForm}>
           <div className={styles.inputWrapper}>
             <select className={styles.addressSwitcher} {...register('wallet_address')} required>
               { allAccounts.map((el) => (
