@@ -1,6 +1,6 @@
 @import '../../../assets/base/variables';
 @import '../../../assets/base/fonts';
-
+@import '../../../assets/main.scss';
 .homeHeaderWrapper {
   display: flex;
   justify-content: flex-start;
@@ -10,16 +10,27 @@
 .homeHeaderAccountWrapper{
   display: flex;
   align-items: center;
-  height: 42px;
   justify-content: space-between;
   width: 100%;
-  padding: 30px 35px;
+  padding: 15px 3% ;
+  background: $lightGrey;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    background: $bg4;
+    padding: 20px 45px;
+    color: $black;
+  }
 
   .headerTitle {
     margin: 0;
-    font-family: $regular;
-    font-weight: bold;
+    
+    font-weight: 500;
     font-size: 24px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      font-weight: 500;
+      font-size: 35px;
+    }
   }
 
   .titleWrapper {

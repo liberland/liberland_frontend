@@ -1,9 +1,37 @@
 @import '../../assets/base/variables';
+@import '../../assets/main.scss';
+
+.walletOverviewWrapper{
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    min-height: calc(100vh - 150px);
+    background-color: $lightGrey;
+    padding: 35px 37px;
+  }
+
+  .boxWrapper{
+    margin-top: 21px;
+    padding: 15px;
+  
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      padding: 22px 30px;
+      background-color: $bg4;
+      border-radius: 10px;
+    }
+  }
+}
 
 .walletWrapper {
-  padding: 8px 10px;
-  @media (min-width: 48em) {
-    padding: 8px 30px;
+  background: $lightGrey;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    background: none;
+  }
+  .walletAdressWrapper{
+    padding: 12px 4%;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      padding: 15px 50px 0 37px;
+    }
   }
 }
 

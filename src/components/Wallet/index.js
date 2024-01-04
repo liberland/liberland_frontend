@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Redirect, Route, Switch, useHistory,
@@ -16,8 +16,7 @@ import Bridge from './Bridge';
 
 import Card from '../Card';
 import RoleHOC from '../../hocs/RoleHOC';
-import AssetOverview from "./AssetOverview";
-import SendAssetModal from "../Modals/SendAssetModal";
+import AssetOverview from './AssetOverview';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -43,7 +42,8 @@ function Wallet() {
   }, [dispatch]);
 
   const overView = () => (
-    <div>
+    <div className={styles.walletOverviewWrapper}>
+
       <WalletOverview
         totalBalance={totalBalance}
         balances={balances}
@@ -66,7 +66,10 @@ function Wallet() {
   return (
     (userWalletAddress !== undefined) ? (
       <div className={styles.walletWrapper}>
-        <WalletAddressesLine walletAddress={userWalletAddress} />
+        <div className={styles.walletAdressWrapper}>
+          <WalletAddressesLine walletAddress={userWalletAddress} />
+        </div>
+
         <div>
           <Switch>
             <Route

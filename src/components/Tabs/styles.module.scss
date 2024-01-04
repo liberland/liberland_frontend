@@ -1,11 +1,10 @@
 @import '../../assets/base/variables';
 @import '../../assets/base/fonts';
+@import '../../assets/main.scss';
 
 .tabsWrapper {
   display: flex;
-  margin-bottom: 40px;
   align-items: center;
-
   flex-wrap: wrap;
 
   > * {
@@ -14,26 +13,35 @@
 }
 
 .link {
-  padding: 0 20px;
+  padding: 0 18px;
   font-size: 14px;
-  font-weight: 600;
-  color: $text4;
-  padding-bottom: 14px;
+  font-weight: 700;
+  color: $clearBlack;
   line-height: 29px;
   text-decoration: none;
 
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    padding: 0 45px;
+    font-size: 17px;
+  }
+
   &:hover {
-    border-bottom: 1px solid $text4;
-    padding-bottom: 13px;
+    border-bottom: 2px solid $text4;
   }
 }
 
-.activeLink {
-  color: $primary;
-  border-bottom: 1px solid $primary;
-  padding-bottom: 13px;
+.activeLink, 
+.link, 
+.link:hover{
+  padding-top: 8px;
+  padding-bottom: 12px;
 
-  &:hover{
-    border-bottom: 1px solid $primary;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    padding-top: 10px;
+    padding-bottom: 30px;
   }
+}
+
+.activeLink:hover, .activeLink{
+  border-bottom: 2px solid $primary;
 }
