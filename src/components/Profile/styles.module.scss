@@ -14,11 +14,9 @@
 
 .profile {
   display: flex;
-  
   font-size: 14px;
   color: $text4;
   flex-wrap: wrap;
-
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
     gap: 25px;
@@ -31,6 +29,7 @@
 
   .column{
     width: 100%;
+
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
       flex: 1 1 300px;
       display: flex;
@@ -43,6 +42,7 @@
     font-size: 24px;
     font-weight: 500;
     color: $black;
+
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
       font-size: 35px;
       margin: 0;

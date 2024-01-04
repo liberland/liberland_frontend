@@ -64,7 +64,7 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
 
               const dateTransacionHistory = formatDate(new Date(transactionHistoryInfo.block.timestamp), true);
               const userId = isAmountPositive ? transactionHistoryInfo.fromId : transactionHistoryInfo.toId;
-              const typeTekst = isAmountPositive ? 'from' : 'to';
+              const typeText = isAmountPositive ? 'from' : 'to';
               const iconType = isAmountPositive ? reciveIcon : paymentIcon;
               return (
                 <div className={cx(styles.transactionHistoryCardMain, styles.gridList)} key={transactionHistoryInfo.id}>
@@ -78,7 +78,7 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
                         dateTransacionHistory={dateTransacionHistory}
                         userId={userId}
                         imgAlt={imgAlt}
-                        typeTekst={typeTekst}
+                        typeText={typeText}
                         iconType={iconType}
                       />
                     )
@@ -91,7 +91,7 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
                         dateTransacionHistory={dateTransacionHistory}
                         userId={userId}
                         imgAlt={imgAlt}
-                        typeTekst={typeTekst}
+                        typeText={typeText}
                         iconType={iconType}
                       />
                     )}
@@ -107,7 +107,7 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
 function TransacionHistoryDesktop({
   iconType,
   imgAlt,
-  typeTekst,
+  typeText,
   userId,
   handleCopyClick,
   isBigScreen,
@@ -121,7 +121,7 @@ function TransacionHistoryDesktop({
         <div className={styles.paymentNumberIcon}>
           <img src={iconType} alt={imgAlt} />
           <span className={styles.desktopTekst}>
-            {typeTekst}
+            {typeText}
           </span>
         </div>
       </div>
@@ -154,7 +154,7 @@ function TransacionHistoryDesktop({
 }
 
 function TransacionHistoryMobile({
-  typeTekst,
+  typeText,
   handleCopyClick,
   transactionHistoryInfo,
   value,
@@ -172,7 +172,7 @@ function TransacionHistoryMobile({
         </div>
         <div className={styles.paymentFrom}>
           <p>
-            {typeTekst}
+            {typeText}
             {' '}
             <span>
               <CopyIcon

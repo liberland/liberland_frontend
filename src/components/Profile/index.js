@@ -268,12 +268,9 @@ function Profile({ className }) {
                 <ul>
                   {onChainIdenityList.map((onChainIdenitityElement) => {
                     const { isDataToShow, title, dataFunction } = onChainIdenitityElement;
-                    let htmlElement = null;
-                    if (isDataToShow) {
-                      htmlElement = dataFunction();
-                    } else {
-                      htmlElement = dataFunction() ? 'YES' : 'NO';
-                    }
+                    const dataFromFunction = dataFunction();
+                    const yesOrNo = dataFromFunction ? 'YES' : 'NO';
+                    const htmlElement = isDataToShow ? dataFromFunction : yesOrNo;
                     return (
                       <li>
                         <span>
@@ -295,9 +292,7 @@ function Profile({ className }) {
                   medium
                   primary={isUserEligibleForComplimentaryLLD}
                   grey={!isUserEligibleForComplimentaryLLD}
-                  onClick={() => {
-                    dispatch(onBoardingActions.claimComplimentaryLld.call());
-                  }}
+                  onClick={() => dispatch(onBoardingActions.claimComplimentaryLld.call())}
                 >
                   {isUserEligibleForComplimentaryLLD ? 'Claim complimentary LLD' : ineligibleForComplimentaryLLDReason}
                 </Button>
