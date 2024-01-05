@@ -40,7 +40,7 @@ const blockchainReducer = handleActions({
   }),
   [blockchainActions.setUserWallet.success]: (state, action) => ({
     ...state,
-    userWalletAddress: "5FEaknBkiCR2C436Nz213MwkymeXVJEKE5T7SmUoUSg5rX7X",
+    userWalletAddress: action.payload,
   }),
   [blockchainActions.setErrorExistsAndUnacknowledgedByUser.success]: (state, action) => ({
     ...state,

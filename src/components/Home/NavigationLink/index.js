@@ -10,7 +10,6 @@ function NavigationLink({
   route,
   title,
   icon,
-  activeIcon,
   path,
   description,
   isDiscouraged
