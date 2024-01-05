@@ -26,6 +26,7 @@ import {
   blockchainActions,
   validatorActions,
 } from './redux/actions';
+import GuidedSetup from "./components/GuidedSetup";
 
 const override = css`
   display: block;
@@ -47,6 +48,7 @@ function App() {
       <Switch>
         <Route path={routes.signIn} component={SignIn} />
         <Route path={routes.signUp} component={SignUp} />
+        <Route path={routes.guidedSetup} component={GuidedSetup} />
         <Route path="*" render={() => <Redirect to={routes.signIn} />} />
       </Switch>
     </Router>
@@ -56,6 +58,7 @@ function App() {
     <Router>
       <Switch>
         <Route path={routes.home.index} component={Home} />
+        <Route path={routes.guidedSetup} component={GuidedSetup} />
         <Route path="*" render={() => <Redirect to={routes.home.index} />} />
       </Switch>
     </Router>
