@@ -17,7 +17,7 @@
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
     background: $bg4;
-    padding: 20px 45px;
+    padding: 13px 35px 20px 35px;
     color: $black;
   }
 
@@ -29,7 +29,7 @@
 
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
       font-weight: 500;
-      font-size: 35px;
+      font-size: 30px;
     }
   }
 

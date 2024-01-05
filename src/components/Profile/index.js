@@ -16,8 +16,6 @@ import styles from './styles.module.scss';
 
 // import eCardImage from '../../assets/images/e_card_image.svg';
 import liberlandEmblemImage from '../../assets/images/liberlandEmblem.svg';
-// import locationImage from '../../assets/icons/location.svg';
-// import languagesImage from '../../assets/icons/languages.svg';
 // import occupationImage from '../../assets/icons/occuoation.svg';
 // import genderImage from '../../assets/icons/gender.svg';
 // import startOfKyc from '../../assets/icons/startOfKyc.svg';
@@ -147,7 +145,7 @@ function Profile({ className }) {
               <div className={styles.avatarComponent}>
                 <Avatar name={displayName} size="100%" round color="#F6F6F6" />
               </div>
-              <Button className={styles.button} medium>Edit Your Profile</Button>
+              <Button className={styles.button} medium>EDIT YOUR PROFILE</Button>
             </div>
           </div>
           {/* {(userRole !== 'non-citizen')
@@ -269,7 +267,7 @@ function Profile({ className }) {
                   {onChainIdenityList.map((onChainIdenitityElement) => {
                     const { isDataToShow, title, dataFunction } = onChainIdenitityElement;
                     const dataFromFunction = dataFunction();
-                    const yesOrNo = dataFromFunction ? 'YES' : 'NO';
+                    const yesOrNo = dataFromFunction ? 'Yes' : 'No';
                     const htmlElement = isDataToShow ? dataFromFunction : yesOrNo;
                     return (
                       <li>

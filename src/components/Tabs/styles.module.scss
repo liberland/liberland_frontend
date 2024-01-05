@@ -7,6 +7,10 @@
   align-items: center;
   flex-wrap: wrap;
 
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    gap:15px;
+  }
+
   > * {
     margin: auto !important;
   }
@@ -21,8 +25,9 @@
   text-decoration: none;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
-    padding: 0 45px;
-    font-size: 17px;
+    letter-spacing: 1px;
+    padding: 0 15px;
+    font-size: 13px;
   }
 
   &:hover {
@@ -37,8 +42,8 @@
   padding-bottom: 12px;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
-    padding-top: 10px;
-    padding-bottom: 30px;
+    padding-top: 12px;
+    padding-bottom: 20px;
   }
 }
 

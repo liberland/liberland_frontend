@@ -19,6 +19,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap:20px;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
     flex-direction: column;
@@ -31,7 +32,7 @@
   gap: 21px;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
-    gap: 0;
+    gap: 30px;
   }
 }
 
@@ -39,7 +40,11 @@
   font-size: 14px;
   color: $clearBlack;
   font-weight: 500;
-  line-height: 29px;
+  line-height: 19px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    font-size: 12px;
+  }
 }
 
 .address {
@@ -50,7 +55,8 @@
   font-weight: 700;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
-    font-size: 17px;
+    font-size: 13px;
+    letter-spacing: 1px;
   }
 
   .icon{
@@ -69,6 +75,7 @@
   gap: 7px;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    margin-top: 5px;
     gap: unset;
     flex-direction: column;
   }
@@ -91,11 +98,12 @@
     font-weight: 700;
     color: $clearBlack;
     flex: 1;
-    padding: 17px 0;
+    padding: 15px 0;
+    letter-spacing: 0.7px;
 
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      padding: 18px 26px;
-      font-size: 17px;
+      padding: 5px 16px;
+      font-size: 14px;
       flex: unset;
     }
   }

@@ -126,7 +126,7 @@ function TransacionHistoryDesktop({
         </div>
       </div>
       <p className={styles.bold}>
-        <span>
+        <span className={styles.icon}>
           <CopyIcon
             className={styles.copyIcon}
             name="walletAddress"

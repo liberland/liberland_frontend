@@ -19,9 +19,9 @@
   flex-wrap: wrap;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
-    gap: 25px;
+    gap: 20px;
     flex-wrap: wrap;
-    padding: 32px 40px;
+    padding: 32px 30px;
     max-width: 100%;
     justify-content: center;
     margin: auto;
@@ -44,7 +44,7 @@
     color: $black;
 
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      font-size: 35px;
+      font-size: 27px;
       margin: 0;
     }
   }
@@ -55,7 +55,7 @@
     border-radius: 10px;
 
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      padding: 22px 30px;
+      padding: 10px 25px;
       height: 100%;
     }
 
@@ -76,8 +76,8 @@
       width: 250px;
 
       @media screen and (min-width: map-get($breakpoints, 'tablet')){
-        height: 320px;
-        width: 320px;
+        height: 260px;
+        width: 270px;
       }
     }
 
@@ -91,7 +91,7 @@
       margin-top: 20px;
 
       @media screen and (min-width: map-get($breakpoints, 'tablet')){
-        margin-top: 30px;
+        margin-top: 20px;
       }
     }
 
@@ -153,7 +153,8 @@
       color: $clearBlack;
 
       @media screen and (min-width: map-get($breakpoints, 'tablet')){
-        font-size: 17px;
+        font-size: 13px;
+        line-height: 20px;
       }
 
       span {
@@ -168,7 +169,7 @@
         gap: 5px;
 
         @media screen and (min-width: map-get($breakpoints, 'tablet')){
-          margin-top: 25px;
+          margin-top: 15px;
         }
 
       }
@@ -186,11 +187,11 @@
 
       @media screen and (min-width: map-get($breakpoints, 'tablet')){
         padding-bottom: 0;
-        gap: 15px;
       }
 
       .textColor{
-        height: 61px;
+        min-height: 50px;
+        padding: 5px 20px;
         border-radius: 6px;
         color: $black;
       }
@@ -202,7 +203,7 @@
 
       @media screen and (min-width: map-get($breakpoints, 'tablet')){
         padding-top: 0;
-        margin-bottom: 4px;
+        margin-bottom: 1px;
       }
     }
 
@@ -211,8 +212,8 @@
       font-size: 14px;
       
       @media screen and (min-width: map-get($breakpoints, 'tablet')){
-        line-height: 23.15px;
-        font-size: 17px;
+        line-height: 21px;
+        font-size: 13px;
       }
 
     }
@@ -228,7 +229,7 @@
       margin-bottom: 18px;
 
       @media screen and (min-width: map-get($breakpoints, 'tablet')){
-        margin-bottom: 60px;
+        margin-bottom: 30px;
       }
 
       ul{

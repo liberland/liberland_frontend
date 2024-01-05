@@ -8,8 +8,8 @@
   background-color: $bg4;
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    margin-top: 40px;
-    padding: 22px 30px;
+    margin-top: px;
+    padding: 15px 30px 25px 30px;
     background-color: $bg4;
     border-radius: 10px;
   }
@@ -20,19 +20,15 @@
   margin-top: 20px;
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    margin-top: 30px;
-  }
-}
-
-@media (min-width: 640px) {
-  .transactionHistoryCard{
-    padding: 28px;
+    margin-top: 15px;
+    padding: 12px 8px;
   }
 }
 
 .transactionHistoryCardHeader{
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 2px;
   padding: 14px 15px;
   border-radius: 10px;
@@ -42,7 +38,7 @@
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')){
     padding: 24px 25px;
-    font-size: 17px;
+    font-size: 14px;
     gap: 2px;
   }
 }
@@ -65,9 +61,9 @@
   margin: 30px 0;
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    margin: 40px 0;
-    padding: 0 24px;
-    font-size: 17px;
+    margin: 20px 0;
+    padding: 0 12px;
+    font-size: 14px;
   }
 
   & .paymentNumber{
@@ -80,9 +76,13 @@
       display: flex;
       align-items: center;
 
+      & > img {
+        width: 40px;
+      }
+
 
       @media screen and (min-width: map-get($breakpoints, 'desktop')){
-        gap:10px;
+        gap: 10px;
         margin-right: 0;
         width: 100%;
       }
@@ -91,6 +91,7 @@
         display: flex;
         justify-content: center;
         width: 100%;
+        font-size: 14px;
       }
     }
 
@@ -143,7 +144,7 @@
       grid-template-columns: 4fr 7fr 4fr 4fr 2.5fr;
   
       @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
-        grid-template-columns: 3fr 10fr 4fr 4fr 2.5fr;
+        grid-template-columns: 2fr 10fr 4fr 4fr 2.5fr;
       }
     }
 
@@ -163,7 +164,13 @@
     text-align: center;
   }
 
+  .icon{
+    display: flex;
+    align-items: center;
+  }
+
   .bold{
     font-weight: 700;
+    font-size: 13px;
   }
 }
