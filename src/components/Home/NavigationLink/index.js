@@ -10,7 +10,6 @@ function NavigationLink({
   route,
   title,
   icon,
-  activeIcon,
   path,
   description,
   isDiscouraged
@@ -22,7 +21,7 @@ function NavigationLink({
       <NavLink
         to={route}
         activeClassName="active"
-        className={cx({ [styles.activeBg]: path === route || path.includes(route) })}
+        className={cx({ [styles.activeBg]: path === route || path.includes(route) }, route === 'logout' && styles.logoutBg)}
       >
         {typeof icon === 'function'
           ? (
@@ -33,12 +32,12 @@ function NavigationLink({
           : (
             <>
               <img src={icon} alt="" />
-              <img src={activeIcon} alt="" className={styles.activeIcon} />
+              <img src={icon} alt="" className={styles.activeIcon} />
             </>
           )}
         <div className={cx({ [styles.titleWrapper]: typeof icon === 'function' })}>
           <span>{title}</span>
-          {description && <span>{description}</span>}
+          {description && <span className={cx((typeof icon === 'function') && styles.amount)}>{description}</span>}
         </div>
         {
         (path === route) && <div />

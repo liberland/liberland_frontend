@@ -1,14 +1,25 @@
 @import "../../assets/base/variables";
 @import "../../assets/base/fonts";
+@import '../../assets/main.scss';
+@import '../../index.scss';
 
 .getCitizenshipModal {
-  padding: 33px 35px 40px 35px;
+  padding: 15px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    padding: 33px 35px 40px 35px;
+  }
 
   & .h3 {
-    color: $text1;
+    color: $black;
     font-weight: 600;
     font-size: 24px;
     margin-bottom: 20px;
+    font-family: $playfairDisplay;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      font-size: 35px;
+    }
   }
 
   & .h4 {
@@ -19,9 +30,13 @@
   }
 
   & .description {
-    font-size: 16px;
-    color: $text4;
+    font-size: 14px;
+    color: $text5;
     font-weight: 500;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      font-size: 17px;
+    }
   }
 
   & .error {
@@ -34,18 +49,32 @@
     font-size: 14px;
     font-weight: 600;
     color: $text4;
-    margin: 30px 0 5px 0;
+    margin: 20px 0 5px 0;
     line-height: 29px;
     word-break: break-word;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      font-size: 17px;
+    }
   }
 
   & .buttonWrapper {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 40px;
+    margin-top: 50px;
     flex-wrap: wrap;
     gap: 8px;
+    width: 100%;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      gap: 15px;
+    }
+
+    .button{
+      flex: 1;
+      color: $clearBlack;
+    }
   }
 
   & .lawText {
@@ -55,7 +84,7 @@
 
 @media (min-width: 640px) {
   .getCitizenshipModal {
-    width: 525px;
+    max-width: 765px;
   }
 }
 
@@ -90,7 +119,7 @@
   }
 
   span {
-    font-family: $medium;
+    
     font-size: 16px;
     color: $text4;
     margin-bottom: 8px;
@@ -139,5 +168,15 @@
   .buttons{
     display: flex;
     margin-top: 20px;
+  }
+}
+
+.onChainIdentity{
+  .margin{
+    margin-top: 30px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      margin-top: 50px;
+    }
   }
 }

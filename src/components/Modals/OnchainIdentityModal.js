@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
 // COMPONENTS
+import cx from 'classnames';
 import ModalRoot from './ModalRoot';
 import {
   TextInput, DateInput, CheckboxInput, SelectInput,
@@ -65,13 +66,14 @@ function OnchainIdentityModal({
   const onChainIdentity = watch('onChainIdentity');
 
   return (
-    <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
+    <form className={cx(styles.getCitizenshipModal, styles.onChainIdentity)} onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.h3}>Update on-chain identity</div>
       <div className={styles.description}>
         You are going to update your identity stored on blockchain.
         {' '}
         This needs to be up-to-date for your citizenship or e-residency.
       </div>
+      <br />
       { !isKnownGood ? null
         : (
           <div className={styles.description}>
@@ -81,7 +83,7 @@ function OnchainIdentityModal({
           </div>
         )}
 
-      <div className={styles.title}>Display name</div>
+      <div className={cx(styles.title, styles.margin)}>Display name</div>
       <TextInput
         register={register}
         name="display"
@@ -145,12 +147,15 @@ function OnchainIdentityModal({
 
       <div className={styles.buttonWrapper}>
         <Button
+          className={styles.button}
           medium
+          grey
           onClick={closeModal}
         >
           Cancel
         </Button>
         <Button
+          className={styles.button}
           primary
           medium
           type="submit"

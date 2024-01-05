@@ -48,7 +48,7 @@ function HomeNavigation() {
   const history = useHistory();
   const isMedium = useMediaQuery('(min-width: 48em)');
 
-  const homeTitle = name && lastName ? `${name} ${lastName}` : 'Profile';
+  const homeTitle = name && lastName ? `${name} ${lastName}` : 'PROFILE';
   const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   const [isLogoutModalOpen, setLogoutIsModalOpen] = useState(false);
 
@@ -76,7 +76,7 @@ function HomeNavigation() {
     },
     {
       route: router.home.feed,
-      title: 'Feed',
+      title: 'FEED',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: FeedIcon,
       activeIcon: FeedIconActive,
@@ -84,23 +84,15 @@ function HomeNavigation() {
     },
     {
       route: router.home.wallet,
-      title: 'Wallet',
+      title: 'WALLET',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: WalletIcon,
       activeIcon: WalletIconActive,
       isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
     },
     {
-      route: router.home.staking,
-      title: 'Staking',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
-      icon: DocumentsIcon,
-      activeIcon: DocumentsIconActive,
-      isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
-    },
-    {
       route: router.home.voting,
-      title: 'Voting',
+      title: 'VOTING',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: VotingIcon,
       activeIcon: VotingIconActive,
@@ -108,7 +100,7 @@ function HomeNavigation() {
     },
     {
       route: router.home.legislation,
-      title: 'Legislation',
+      title: 'LEGISLATION',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
       activeIcon: ConstitutionIconActive,
@@ -116,7 +108,7 @@ function HomeNavigation() {
     },
     {
       route: router.home.offices,
-      title: 'Offices',
+      title: 'OFFICES',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
       activeIcon: ConstitutionIconActive,
@@ -124,15 +116,23 @@ function HomeNavigation() {
     },
     {
       route: router.home.registries,
-      title: 'Registries',
+      title: 'REGISTRIES',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       activeIcon: DocumentsIconActive,
       isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED,
     },
     {
+      route: router.home.staking,
+      title: 'STAKING',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: DocumentsIcon,
+      activeIcon: DocumentsIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
+    },
+    {
       route: router.home.congress,
-      title: 'Congress',
+      title: 'CONGRESS',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       activeIcon: DocumentsIconActive,
@@ -175,7 +175,7 @@ function HomeNavigation() {
         >
           <NavigationLink
             route="logout"
-            title="Logout"
+            title="LOGOUT"
             icon={DocumentsIcon}
             activeIcon={DocumentsIcon}
             path="logout"
