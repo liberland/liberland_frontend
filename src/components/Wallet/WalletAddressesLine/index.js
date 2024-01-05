@@ -11,7 +11,6 @@ import { SendLLDModal, SendLLMModal, UnpoolModal } from '../../Modals';
 
 import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
-// import { ReactComponent as WalletActiveIcon } from '../../../assets/icons/active-wallet.svg';
 import { ReactComponent as CopyIcon } from '../../../assets/icons/copy.svg';
 
 import styles from './styles.module.scss';
