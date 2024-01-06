@@ -9,8 +9,6 @@ import { formatMerits } from '../../../../../utils/walletHelpers';
 import truncate from '../../../../../utils/truncate';
 import NotificationPortal from '../../../../NotificationPortal';
 import { ReactComponent as CopyIcon } from '../../../../../assets/icons/copy.svg';
-import useUsersIdentity from '../../../../../hooks/useUsersIdentity';
-import { findNameOrId } from '../../../../../utils/getNameOrId';
 
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
@@ -118,6 +116,7 @@ BlacklistButton.propTypes = {
 };
 
 function ReferendumItem({
+  usersList,
   centralizedDatas,
   yayVotes,
   nayVotes,
@@ -139,9 +138,6 @@ function ReferendumItem({
     navigator.clipboard.writeText(dataToCoppy);
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
-
-  const proposersList = centralizedDatas.map((item) => item.proposerAddress);
-  const { usersList } = useUsersIdentity(proposersList);
 
   return (
     <>
@@ -204,7 +200,8 @@ function ReferendumItem({
                 Discussions:
                 <ol>
                   {centralizedDatas.map((centralizedData) => {
-                    const proposedDiscussionName = findNameOrId(centralizedData.proposerAddress, usersList);
+                    // console.log(usersList)
+                    const nameOrId = usersList[centralizedData.proposerAddress] || centralizedData.proposerAddress;
                     return (
                       <li key={centralizedData.id}>
                         <a href={centralizedData.link}>
@@ -215,7 +212,7 @@ function ReferendumItem({
                         {' '}
                         (Discussion addede by
                         {' '}
-                        <b>{ proposedDiscussionName }</b>
+                        <b>{ nameOrId }</b>
                         <CopyIcon
                           className={styles.copyIcon}
                           name="walletAddress"
@@ -246,6 +243,8 @@ function ReferendumItem({
 }
 
 ReferendumItem.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  usersList: PropTypes.object.isRequired,
   centralizedDatas: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,

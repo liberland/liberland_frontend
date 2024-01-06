@@ -10,8 +10,6 @@ import Button from '../../../../Button/Button';
 import truncate from '../../../../../utils/truncate';
 import NotificationPortal from '../../../../NotificationPortal';
 import { ReactComponent as CopyIcon } from '../../../../../assets/icons/copy.svg';
-import useUsersIdentity from '../../../../../hooks/useUsersIdentity';
-import { findNameOrId } from '../../../../../utils/getNameOrId';
 
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
@@ -42,6 +40,7 @@ function BlacklistButton({ hash }) {
 BlacklistButton.propTypes = { hash: PropTypes.string.isRequired };
 
 function ProposalItem({
+  usersList,
   proposer,
   centralizedDatas,
   boundedCall,
@@ -65,8 +64,7 @@ function ProposalItem({
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
 
-  const proposersList = centralizedDatas.map((item) => item.proposerAddress);
-  const { usersList } = useUsersIdentity([proposer, ...proposersList]);
+  const nameOrIdProposer = usersList[proposer] || proposer;
 
   return (
     <>
@@ -104,7 +102,7 @@ function ProposalItem({
             <div>
               <div className={styles.metaTextInfo}>
                 Proposed by:
-                <b>{ findNameOrId(proposer, usersList) }</b>
+                <b>{ nameOrIdProposer }</b>
                 <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={() => handleCopyClick(proposer)} />
               </div>
             </div>
@@ -122,7 +120,7 @@ function ProposalItem({
               Discussions:
               <ol>
                 {centralizedDatas.map((centralizedData) => {
-                  const proposedDiscussionName = findNameOrId(centralizedData.proposerAddress, usersList);
+                  const nameOrId = usersList[centralizedData.proposerAddress] || centralizedData.proposerAddress;
                   return (
                     <li key={centralizedData.id}>
                       <a href={centralizedData.link}>
@@ -133,7 +131,7 @@ function ProposalItem({
                       {' '}
                       (Discussion added by
                       {' '}
-                      <b>{ proposedDiscussionName}</b>
+                      <b>{ nameOrId}</b>
                       <CopyIcon
                         className={styles.copyIcon}
                         name="walletAddress"
@@ -171,6 +169,8 @@ const call = PropTypes.oneOfType([
 ]);
 
 ProposalItem.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  usersList: PropTypes.object.isRequired,
   proposer: PropTypes.string.isRequired,
   centralizedDatas: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,

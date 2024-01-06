@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
@@ -14,6 +14,8 @@ import {
 import { democracyActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import router from '../../../router';
+import useUsersIdentity from '../../../hooks/usersIdentity/useUsersIdentity';
+import useProposerList from '../../../hooks/usersIdentity/useProposersList';
 
 function Referendum() {
   const [isModalOpenVote, setIsModalOpenVote] = useState(false);
@@ -51,6 +53,14 @@ function Referendum() {
     if (referendum.allNay.map((v) => v.accountId.toString()).includes(userWalletAddress)) return 'Nay';
     return false;
   };
+
+  const crossReferencedProposalsData = democracy.democracy?.crossReferencedProposalsData || [];
+  const crossReferencedReferendumsData = democracy.democracy?.crossReferencedReferendumsData || [];
+  const proposersList = useProposerList(crossReferencedReferendumsData);
+  const proposersList2 = useProposerList(crossReferencedProposalsData);
+  const mergedProposersList = useMemo(() => [...proposersList, ...proposersList2], [proposersList, proposersList2]);
+  const { usersList } = useUsersIdentity(mergedProposersList);
+
   return (
     <div>
       <div className={styles.referendumsSection}>
@@ -77,8 +87,9 @@ function Referendum() {
         <Card title="Referendums" className={styles.referendumsCard}>
           <div>
             {
-              democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
+              crossReferencedReferendumsData.map((referendum) => (
                 <ReferendumItem
+                  usersList={usersList}
                   key={referendum.index}
                   centralizedDatas={referendum.centralizedDatas}
                   yayVotes={referendum.votedAye}
@@ -101,16 +112,15 @@ function Referendum() {
         <Card title="Proposals">
           <div>
             {
-              democracy.democracy?.crossReferencedProposalsData.map((proposal) => (
-                /* eslint-disable max-len */
+              crossReferencedProposalsData.map((proposal) => (
                 <ProposalItem
+                  usersList={usersList}
                   key={proposal.index}
                   proposer={proposal.proposer}
                   centralizedDatas={proposal.centralizedDatas}
                   boundedCall={proposal.boundedCall}
                   blacklistMotion={proposal.blacklistMotion}
                 />
-                /* eslint-enable max-len */
               ))
             }
           </div>

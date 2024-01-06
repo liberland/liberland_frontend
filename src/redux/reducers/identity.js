@@ -4,7 +4,7 @@ import { identityActions } from '../actions';
 const initialState = {
   loading: false,
   identity: null,
-  identities: null,
+  identities: {},
 };
 
 const identityReducer = handleActions(
@@ -41,22 +41,23 @@ const identityReducer = handleActions(
     }),
     [identityActions.getIdentities.call]: (state) => ({
       ...state,
-      identities: null,
+      identities: {},
     }),
     [identityActions.getIdentities.success]: (state, action) => {
-      const newList = action.payload.map((item) => {
-        const name = new TextDecoder().decode(item.identity.display.asRaw);
-        const objectKeyName = { key: item.address, name };
-        const checkIfStateExist = state.identities && state.identities.length > 0;
-        if (checkIfStateExist && state.identities.some((identity) => identity.key === objectKeyName.key)) {
-          return null;
+      const identitiesMap = {};
+      for (const item of action.payload) {
+        const nameHashed = item.identity.display.asRaw;
+        const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
+        if (!name) {
+          // eslint-disable-next-line no-continue
+          continue;
         }
-        return { key: item.address, name };
-      });
+        identitiesMap[item.address] = name;
+      }
 
       return {
         ...state,
-        identities: newList.filter((item) => item),
+        identities: identitiesMap,
       };
     },
   },
