@@ -9,6 +9,8 @@ import styles from './styles.module.scss';
 import truncate from "../../utils/truncate";
 import Button from "../Button/Button";
 import {useMediaQuery} from "usehooks-ts";
+import subwalletBrowserHighlightImage from "../../assets/images/subwallet-browser-highlight.png";
+import subwalletSearchHighlightImage from "../../assets/images/subwallet-search-highlight.png";
 
 const WalletListComponent = ({walletList, buttonCallback, userId}) => {
   return (
@@ -94,6 +96,14 @@ const NoWalletsDetectedInBrowser = ({isMedium}) => {
         :(<p>You need to visit this site inside a dApp explorer like <a href={'https://www.subwallet.app/download.html'}> <b>Subwallet</b></a></p>)}
       <br />
       <p><a href={'https://liberland-1.gitbook.io/wiki/v/public-documents/blockchain/for-citizens/onboarding'}> Read the guide for details</a></p>
+      <br />
+      {isMedium ? (<div />) :
+        (<div>
+          <img src={subwalletBrowserHighlightImage} style={{ width: '100%' }} alt="" />
+          <br />
+          <img src={subwalletSearchHighlightImage} style={{ width: '100%' }} alt="" />
+        </div>)
+      }
     </div>
     )
 }
