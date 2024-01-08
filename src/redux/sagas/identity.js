@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, cps, call,
+  put, takeLatest, call,
 } from 'redux-saga/effects';
 
 import {
@@ -8,28 +8,15 @@ import {
   getIdentities,
 } from '../../api/nodeRpcCall';
 
-import { identityActions, blockchainActions } from '../actions';
+import { identityActions } from '../actions';
+import { blockchainWatcher } from './base';
 
 // WORKERS
 
 function* setIdentityWorker(action) {
-  try {
-    const { errorData } = yield cps(setIdentity, action.payload.values, action.payload.userWalletAddress);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(identityActions.setIdentity.failure(errorData));
-    } else {
-      yield put(identityActions.setIdentity.success());
-      yield put(identityActions.getIdentity.call(action.payload.userWalletAddress));
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.log('Error in set identity worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(identityActions.setIdentity.failure(errorData));
-  }
+  yield call(setIdentity, action.payload.values, action.payload.userWalletAddress);
+  yield put(identityActions.setIdentity.success());
+  yield put(identityActions.getIdentity.call(action.payload.userWalletAddress));
 }
 
 function* getIdentityWorker(action) {
@@ -53,11 +40,7 @@ function* getIdentitiesWorker(action) {
 // WATCHERS
 
 function* setIdentityWatcher() {
-  try {
-    yield takeLatest(identityActions.setIdentity.call, setIdentityWorker);
-  } catch (e) {
-    yield put(identityActions.setIdentity.failure(e));
-  }
+  yield* blockchainWatcher(identityActions.setIdentity, setIdentityWorker);
 }
 
 function* getIdentityWatcher() {

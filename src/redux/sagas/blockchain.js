@@ -19,8 +19,7 @@ function* getAllWalletsWorker() {
       const allWallets = yield call(getAllWalletsRpc);
       yield put(blockchainActions.getAllWallets.success(allWallets));
     } else {
-      alert('You need a wallet manager like polkadot{js} browser extension to use this page');
-      yield put(blockchainActions.getAllWallets.failure('No enable Extensione'));
+      yield put(blockchainActions.getAllWallets.failure('No enabled Extensions'));
     }
   } catch (e) {
     // eslint-disable-next-line no-console

@@ -1,12 +1,15 @@
 @import '../../assets/base/variables';
 @import '../../assets/base/fonts';
+@import '../../assets/main.scss';
 
 .tabsWrapper {
   display: flex;
-  margin-bottom: 40px;
   align-items: center;
-
   flex-wrap: wrap;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    gap:15px;
+  }
 
   > * {
     margin: auto !important;
@@ -14,26 +17,36 @@
 }
 
 .link {
-  padding: 0 20px;
+  padding: 0 18px;
   font-size: 14px;
-  font-weight: 600;
-  color: $text4;
-  padding-bottom: 14px;
+  font-weight: 700;
+  color: $clearBlack;
   line-height: 29px;
   text-decoration: none;
 
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    letter-spacing: 1px;
+    padding: 0 15px;
+    font-size: 13px;
+  }
+
   &:hover {
-    border-bottom: 1px solid $text4;
-    padding-bottom: 13px;
+    border-bottom: 2px solid $text4;
   }
 }
 
-.activeLink {
-  color: $primary;
-  border-bottom: 1px solid $primary;
-  padding-bottom: 13px;
+.activeLink, 
+.link, 
+.link:hover{
+  padding-top: 8px;
+  padding-bottom: 12px;
 
-  &:hover{
-    border-bottom: 1px solid $primary;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    padding-top: 12px;
+    padding-bottom: 20px;
   }
+}
+
+.activeLink:hover, .activeLink{
+  border-bottom: 2px solid $primary;
 }

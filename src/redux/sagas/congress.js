@@ -1,8 +1,8 @@
 import {
-  put, takeLatest, call, cps, select,
+  put, takeLatest, call, select,
 } from 'redux-saga/effects';
 import {
-  congressActions, blockchainActions, democracyActions, legislationActions,
+  congressActions, democracyActions, legislationActions,
 } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import {
@@ -39,18 +39,9 @@ function* applyForCongressWorker() {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-
-  const { errorData } = yield cps(applyForCongress, walletAddress);
-  if (errorData.isError) {
-    yield put(
-      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
-    );
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(congressActions.applyForCongress.failure(errorData));
-  } else {
-    yield put(congressActions.getCandidates.call());
-    yield put(congressActions.applyForCongress.success());
-  }
+  yield call(applyForCongress, walletAddress);
+  yield put(congressActions.getCandidates.call());
+  yield put(congressActions.applyForCongress.success());
 }
 
 function* getCandidatesWorker() {
@@ -68,24 +59,15 @@ function* voteAtMotionsWorker(action) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-
-  const { errorData } = yield cps(
+  yield call(
     voteAtMotions,
     walletAddress,
     proposal,
     index,
     vote,
   );
-  if (errorData.isError) {
-    yield put(
-      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
-    );
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(congressActions.voteAtMotions.failure(errorData));
-  } else {
-    yield put(congressActions.getMotions.call());
-    yield put(congressActions.voteAtMotions.success());
-  }
+  yield put(congressActions.getMotions.call());
+  yield put(congressActions.voteAtMotions.success());
 }
 
 function* congressSendLlmWorker({
@@ -96,18 +78,10 @@ function* congressSendLlmWorker({
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const { errorData } = yield cps(congressSendLlm, {
+  yield call(congressSendLlm, {
     walletAddress, transferToAddress, transferAmount,
   });
-  if (errorData.isError) {
-    yield put(
-      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
-    );
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(congressActions.congressSendLlm.failure(errorData));
-  } else {
-    yield put(congressActions.congressSendLlm.success());
-  }
+  yield put(congressActions.congressSendLlm.success());
 }
 
 function* congressSendLlmToPolitipoolWorker({
@@ -118,18 +92,10 @@ function* congressSendLlmToPolitipoolWorker({
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const { errorData } = yield cps(congressSendLlmToPolitipool, {
+  yield call(congressSendLlmToPolitipool, {
     walletAddress, transferToAddress, transferAmount,
   });
-  if (errorData.isError) {
-    yield put(
-      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
-    );
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(congressActions.congressSendLlmToPolitipool.failure(errorData));
-  } else {
-    yield put(congressActions.congressSendLlmToPolitipool.success());
-  }
+  yield put(congressActions.congressSendLlmToPolitipool.success());
 }
 
 function* getMembersWorker() {
@@ -146,23 +112,14 @@ function* renounceCandidacyWorker(action) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-
-  const { errorData } = yield cps(
+  yield call(
     renounceCandidacy,
     walletAddress,
     action.payload,
   );
-  if (errorData.isError) {
-    yield put(
-      blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true),
-    );
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(congressActions.renounceCandidacy.failure(errorData));
-  } else {
-    yield put(congressActions.getMembers.call());
-    yield put(congressActions.getCandidates.call());
-    yield put(congressActions.renounceCandidacy.success());
-  }
+  yield put(congressActions.getMembers.call());
+  yield put(congressActions.getCandidates.call());
+  yield put(congressActions.renounceCandidacy.success());
 }
 
 function* congressProposeLegislationWorker({ payload: { tier, id, sections } }) {
@@ -364,14 +321,7 @@ function* congressAmendLegislationViaReferendumWorker({
 // WATCHERS
 
 export function* applyForCongressWatcher() {
-  try {
-    yield takeLatest(
-      congressActions.applyForCongress.call,
-      applyForCongressWorker,
-    );
-  } catch (e) {
-    yield put(congressActions.applyForCongress.failure(e));
-  }
+  yield* blockchainWatcher(congressActions.applyForCongress, applyForCongressWorker);
 }
 
 export function* getCandidatesWatcher() {
@@ -394,33 +344,15 @@ export function* getMotionsWatcher() {
 }
 
 export function* voteAtMotionsWatcher() {
-  try {
-    yield takeLatest(congressActions.voteAtMotions.call, voteAtMotionsWorker);
-  } catch (e) {
-    yield put(congressActions.voteAtMotions.failure(e));
-  }
+  yield* blockchainWatcher(congressActions.voteAtMotions, voteAtMotionsWorker);
 }
 
 export function* congressSendLlmWatcher() {
-  try {
-    yield takeLatest(
-      congressActions.congressSendLlm.call,
-      congressSendLlmWorker,
-    );
-  } catch (e) {
-    yield put(congressActions.congressSendLlm.failure(e));
-  }
+  yield* blockchainWatcher(congressActions.congressSendLlm, congressSendLlmWorker);
 }
 
 export function* congressSendLlmToPolitipoolWatcher() {
-  try {
-    yield takeLatest(
-      congressActions.congressSendLlmToPolitipool.call,
-      congressSendLlmToPolitipoolWorker,
-    );
-  } catch (e) {
-    yield put(congressActions.congressSendLlmToPolitipool.failure(e));
-  }
+  yield* blockchainWatcher(congressActions.congressSendLlmToPolitipool, congressSendLlmToPolitipoolWorker);
 }
 
 export function* getMembersWatcher() {
@@ -435,14 +367,7 @@ export function* getMembersWatcher() {
 }
 
 export function* renounceCandidacyWatcher() {
-  try {
-    yield takeLatest(
-      congressActions.renounceCandidacy.call,
-      renounceCandidacyWorker,
-    );
-  } catch (e) {
-    yield put(congressActions.renounceCandidacy.failure(e));
-  }
+  yield* blockchainWatcher(congressActions.renounceCandidacy, renounceCandidacyWorker);
 }
 
 export function* getRunnersUpWatcher() {

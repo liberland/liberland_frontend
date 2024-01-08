@@ -4,10 +4,6 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-// REDUX
-import axios from 'axios';
-import { authActions } from '../../../redux/actions';
-
 import { errorsSelectors, blockchainSelectors } from '../../../redux/selectors';
 
 // STYLES
@@ -20,7 +16,6 @@ import Button from '../../Button/Button';
 
 function SignIn() {
   const {
-    handleSubmit,
     register,
     setError,
   } = useForm();
@@ -28,19 +23,11 @@ function SignIn() {
   const history = useHistory();
   const apiError = useSelector(errorsSelectors.selectSignIn);
   const allAccounts = useSelector(blockchainSelectors.allWalletsSelector);
-  const queryString = window.location.hash;
   // TODO REFACTOR
+  const queryString = window.location.hash;
   const beginToken = queryString.indexOf('=');
   const endToken = queryString.indexOf('&');
   const ssoAccessTokenHash = queryString.substring(beginToken + 1, endToken);
-
-  const onSubmit = (values) => {
-    dispatch(authActions.signIn.call({
-      credentials: values,
-      history,
-      ssoAccessTokenHash,
-    }));
-  };
 
   useEffect(() => {
     if (apiError) {
@@ -50,23 +37,19 @@ function SignIn() {
       );
     }
     if (ssoAccessTokenHash) {
-      const api2 = axios.create({
-        baseURL: process.env.REACT_APP_API2,
-        withCredentials: true,
-      });
-      api2.defaults.headers.common['X-token'] = ssoAccessTokenHash;
-
-      api2.get('/users/me').then((result) => {
-        const walletAddress = allAccounts.find((account) => account.address === result?.data?.blockchainAddress);
-        if (walletAddress) {
-          onSubmit({ wallet_address: walletAddress.address, rememberMe: false });
-        }
-      });
+      sessionStorage.setItem('ssoAccessTokenHash', ssoAccessTokenHash);
+      history.push('/guided-setup')
     }
   }, [apiError, setError, dispatch, ssoAccessTokenHash, allAccounts]);
 
   const goToLiberlandSignin = () => {
     window.location.replace(process.env.REACT_APP_SSO_API_IMPLICIT_LINK);
+  };
+  const goToLiberland2FASignin = () => {
+    window.location.replace(process.env.REACT_APP_SSO2FA_API_IMPLICIT_LINK);
+  };
+  const goToLiberland2FASignout = () => {
+    window.location.replace(process.env.REACT_APP_SSO2FA_API_LOGOUT_IMPLICIT_LINK);
   };
 
   return (
@@ -86,7 +69,7 @@ function SignIn() {
           <span>Wallets Available</span>
           <Divider />
         </p>
-        <form className={styles.signInForm} onSubmit={handleSubmit(onSubmit)}>
+        <form className={styles.signInForm}>
           <div className={styles.inputWrapper}>
             <select className={styles.addressSwitcher} {...register('wallet_address')} required>
               { allAccounts.map((el) => (
@@ -110,6 +93,15 @@ function SignIn() {
           </a>
           .
         </p>
+
+      </div>
+      <div className={styles.twoFAbuttons}>
+        <div onClick={goToLiberland2FASignin}>
+          2fa login
+        </div>
+        <div onClick={goToLiberland2FASignout}>
+          2fa logout
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,47 @@
+@import "../../assets/base/variables";
+
+.guidedSetupWrapper {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.componentWrapper {
+  width: 400px;
+  min-height: 300px;
+  max-height: 800px;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  background-color: $transparent3;
+  border-radius: 10px;
+  padding: 20px;
+  overflow: scroll;
+}
+.connectWalletContainer {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 80px;
+}
+.connectWalletAddressText{
+  flex: 3;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.connectWalletAddressButtonContainer{
+  display: flex;
+  flex: 1;
+  justify-content: flex-start;
+  align-items: center;
+}
+.connectWalletAddressButton{
+  height: 50px;
+}
+.blockchainAddressContainer {
+  word-break: break-word;
+}

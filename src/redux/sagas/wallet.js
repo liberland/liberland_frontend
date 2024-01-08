@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, call, cps, select,
+  put, takeLatest, call, select,
 } from 'redux-saga/effects';
 
 import {
@@ -10,11 +10,11 @@ import {
   politiPool,
   getValidators, getNominatorTargets,
   setNominatorTargets,
-  unpool,
+  unpool, getAdditionalAssets, sendAssetTransfer,
 } from '../../api/nodeRpcCall';
 import { getDollarsTransfers, getMeritsTransfers } from '../../api/explorer';
 
-import { blockchainActions, walletActions } from '../actions';
+import { walletActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import { blockchainWatcher } from './base';
 
@@ -26,6 +26,12 @@ function* getWalletWorker() {
   yield put(walletActions.getWallet.success({ ...walletAddress, balances }));
 }
 
+function* getAdditionalAssetsWorker() {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const additionalAssets = yield call(getAdditionalAssets, walletAddress);
+  yield put(walletActions.getAdditionalAssets.success(additionalAssets));
+}
+
 function* stakeToPolkaWorker(action) {
   const { amount, isUserHavePolkaStake } = action.payload;
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
@@ -35,22 +41,10 @@ function* stakeToPolkaWorker(action) {
 }
 
 function* unpoolWorker() {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { errorData } = yield cps(unpool, walletAddress);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(walletActions.unpool.failure());
-    } else {
-      yield put(walletActions.unpool.success());
-      yield put(walletActions.getWallet.call());
-    }
-  } catch (errorData) {
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(walletActions.unpool.failure(errorData));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(unpool, walletAddress);
+  yield put(walletActions.unpool.success());
+  yield put(walletActions.getWallet.call());
 }
 
 function* stakeToLiberlandWorker(action) {
@@ -67,6 +61,14 @@ function* sendTransferWorker(action) {
   yield call(sendTransfer, recipient, amount, walletAddress);
   yield put(walletActions.sendTransfer.success());
   yield put(walletActions.getWallet.call());
+}
+
+function* sendAssetsWorker(action) {
+  const { recipient, amount, assetData } = action.payload;
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(sendAssetTransfer, recipient, amount, walletAddress, assetData);
+  yield put(walletActions.sendAssetsTransfer.success());
+  yield put(walletActions.getAdditionalAssets.call());
 }
 
 function* sendTransferLLMWorker(action) {
@@ -89,24 +91,10 @@ function* getNominatorTargetsWorker() {
 }
 
 function* setNominatorTargetsWorker(action) {
-  try {
-    const { errorData } = yield cps(setNominatorTargets, action.payload);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(walletActions.setNominatorTargets.failure());
-    } else {
-      yield put(walletActions.setNominatorTargets.success());
-      yield put(walletActions.getWallet.call());
-      yield put(walletActions.getNominatorTargets.call());
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.error(errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(walletActions.setNominatorTargets.failure(errorData));
-  }
+  yield call(setNominatorTargets, action.payload);
+  yield put(walletActions.setNominatorTargets.success());
+  yield put(walletActions.getWallet.call());
+  yield put(walletActions.getNominatorTargets.call());
 }
 
 function* getLlmTransfersWorker() {
@@ -143,8 +131,16 @@ function* getWalletWatcher() {
   yield* blockchainWatcher(walletActions.getWallet, getWalletWorker);
 }
 
+function* getAdditionalAssetsWatcher() {
+  yield* blockchainWatcher(walletActions.getAdditionalAssets, getAdditionalAssetsWorker);
+}
+
 function* sendTransferWatcher() {
   yield* blockchainWatcher(walletActions.sendTransfer, sendTransferWorker);
+}
+
+function* sendAssetsWatcher() {
+  yield* blockchainWatcher(walletActions.sendAssetsTransfer, sendAssetsWorker);
 }
 
 function* sendTransferLLMWatcher() {
@@ -156,11 +152,7 @@ function* stakeToPolkaWatcher() {
 }
 
 function* unpoolWatcher() {
-  try {
-    yield takeLatest(walletActions.unpool.call, unpoolWorker);
-  } catch (e) {
-    yield put(walletActions.unpool.failure(e));
-  }
+  yield* blockchainWatcher(walletActions.unpool, unpoolWorker);
 }
 
 function* stakeToLiberlandWatcher() {
@@ -176,11 +168,7 @@ function* getNominatorTargetsWatcher() {
 }
 
 function* setNominatorTargetsWatcher() {
-  try {
-    yield takeLatest(walletActions.setNominatorTargets.call, setNominatorTargetsWorker);
-  } catch (e) {
-    yield put(walletActions.setNominatorTargets.failure(e));
-  }
+  yield* blockchainWatcher(walletActions.setNominatorTargets, setNominatorTargetsWorker);
 }
 
 export function* getLlmTransfersWatcher() {
@@ -193,7 +181,9 @@ export function* getLldTransfersWatcher() {
 
 export {
   getWalletWatcher,
+  getAdditionalAssetsWatcher,
   sendTransferWatcher,
+  sendAssetsWatcher,
   sendTransferLLMWatcher,
   stakeToPolkaWatcher,
   stakeToLiberlandWatcher,

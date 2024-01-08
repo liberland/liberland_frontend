@@ -11,6 +11,8 @@ import styles from './styles.module.scss';
 import { democracyActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
+import AgreeDisagreeModal from './AgreeDisagreeModal';
+import useAgreeDisagreeModal from '../../hooks/useAgreeDisagreeModal';
 
 function ProposeAmendLegislationModal({
   closeModal, tier, id, section,
@@ -19,7 +21,13 @@ function ProposeAmendLegislationModal({
   const allLegislation = useSelector(legislationSelectors.legislation);
   const legislation = allLegislation[tier][id.year][id.index];
   const sectionContent = legislation.sections[section]?.content.toHuman() ?? '';
-  const { handleSubmit, register, formState: { errors } } = useForm({
+  const {
+    handleSubmit,
+    register,
+    trigger,
+    formState: { errors, isValid },
+  } = useForm({
+    mode: 'onChange',
     defaultValues: {
       tier,
       year: id.year,
@@ -35,101 +43,107 @@ function ProposeAmendLegislationModal({
     discussionLink,
     content,
   }) => {
-    dispatch(democracyActions.proposeAmendLegislation.call({
-      discussionName,
-      discussionDescription,
-      discussionLink,
-      tier,
-      id,
-      section,
-      content,
-    }));
+    dispatch(
+      democracyActions.proposeAmendLegislation.call({
+        discussionName,
+        discussionDescription,
+        discussionLink,
+        tier,
+        id,
+        section,
+        content,
+      }),
+    );
     closeModal();
   };
+
+  const { dialogStep, handleClick } = useAgreeDisagreeModal(isValid, trigger);
 
   return (
     <form
       className={styles.getCitizenshipModal}
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className={styles.h3}>
-        Propose a Referendum -
-        {legislation.sections[section] ? 'amend legislation' : 'add legislation section'}
-      </div>
+      {dialogStep === 'form' ? (
+        <>
+          <div className={styles.h3}>
+            Propose a Referendum -
+            {legislation.sections[section]
+              ? 'amend legislation'
+              : 'add legislation section'}
+          </div>
 
-      <div className={styles.title}>Legislation Tier</div>
-      <SelectInput
-        register={register}
-        name="tier"
-        disabled
-        options={[
-          { value: 'Constitution', display: 'Constitution' },
-          { value: 'InternationalTreaty', display: 'International Treaty' },
-          { value: 'Law', display: 'Law' },
-          { value: 'Tier3', display: 'Tier3' }, // FIXME proper names
-          { value: 'Tier4', display: 'Tier4' },
-          { value: 'Tier5', display: 'Tier5' },
-          { value: 'Decision', display: 'Decision' },
-        ]}
-      />
+          <div className={styles.title}>Legislation Tier</div>
+          <SelectInput
+            register={register}
+            name="tier"
+            disabled
+            options={[
+              { value: 'Constitution', display: 'Constitution' },
+              { value: 'InternationalTreaty', display: 'International Treaty' },
+              { value: 'Law', display: 'Law' },
+              { value: 'Tier3', display: 'Tier3' }, // FIXME proper names
+              { value: 'Tier4', display: 'Tier4' },
+              { value: 'Tier5', display: 'Tier5' },
+              { value: 'Decision', display: 'Decision' },
+            ]}
+          />
 
-      <div className={styles.title}>Legislation Year</div>
-      <TextInput
-        required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-        errorTitle="Year"
-        register={register}
-        name="year"
-        disabled
-      />
+          <div className={styles.title}>Legislation Year</div>
+          <TextInput
+            required
+            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
+            errorTitle="Year"
+            register={register}
+            name="year"
+            disabled
+          />
 
-      <div className={styles.title}>Legislation Index</div>
-      <TextInput
-        required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-        errorTitle="Index"
-        register={register}
-        name="index"
-        disabled
-      />
+          <div className={styles.title}>Legislation Index</div>
+          <TextInput
+            required
+            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
+            errorTitle="Index"
+            register={register}
+            name="index"
+            disabled
+          />
 
-      <div className={styles.title}>Legislation Section</div>
-      <TextInput
-        required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-        errorTitle="Section"
-        register={register}
-        name="section"
-        disabled
-      />
+          <div className={styles.title}>Legislation Section</div>
+          <TextInput
+            required
+            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
+            errorTitle="Section"
+            register={register}
+            name="section"
+            disabled
+          />
 
-      <div className={styles.title}>Legislation Content</div>
-      <TextInput
-        required
-        errorTitle="Content"
-        register={register}
-        name="content"
-      />
-      {errors?.content?.message
-        && <div className={styles.error}>{errors.content.message}</div>}
+          <div className={styles.title}>Legislation Content</div>
+          <TextInput
+            required
+            errorTitle="Content"
+            register={register}
+            name="content"
+          />
+          {errors?.content?.message && (
+            <div className={styles.error}>{errors.content.message}</div>
+          )}
 
-      <ProposalDiscussionFields {...{ register, errors }} />
+          <ProposalDiscussionFields {...{ register, errors }} />
 
-      <div className={styles.buttonWrapper}>
-        <Button
-          medium
-          onClick={closeModal}
-        >
-          Cancel
-        </Button>
-        <Button
-          primary
-          medium
-          type="submit"
-        >
-          Submit
-        </Button>
-      </div>
+          <div className={styles.buttonWrapper}>
+            <Button medium onClick={closeModal}>
+              Cancel
+            </Button>
+            <Button primary medium onClick={handleClick}>
+              Submit
+            </Button>
+          </div>
+        </>
+      ) : (
+        <AgreeDisagreeModal onDisagree={closeModal} agreeButtonType="submit" />
+      )}
     </form>
   );
 }

@@ -10,6 +10,7 @@ import Button from '../../../../Button/Button';
 import truncate from '../../../../../utils/truncate';
 import NotificationPortal from '../../../../NotificationPortal';
 import { ReactComponent as CopyIcon } from '../../../../../assets/icons/copy.svg';
+import sanitizeUrlHelper from '../../../../../utils/sanitizeUrlHelper';
 
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
@@ -120,10 +121,12 @@ function ProposalItem({
               Discussions:
               <ol>
                 {centralizedDatas.map((centralizedData) => {
-                  const nameOrId = usersList[centralizedData.proposerAddress] || centralizedData.proposerAddress;
+                  const nameOrId = usersList[centralizedData.proposerAddress]
+                   || truncate(centralizedData.proposerAddress, 13);
+                  const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
                   return (
                     <li key={centralizedData.id}>
-                      <a href={centralizedData.link}>
+                      <a href={sanitizeUrl} target="_blank" rel="noreferrer">
                         {centralizedData.name}
                       </a>
                       {' - '}

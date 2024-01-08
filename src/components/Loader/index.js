@@ -47,7 +47,7 @@ function Loader({ children }) {
   ].some((isFetching) => isFetching);
 
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative', backgroundColor:'#fefefe', minHeight: '100vh'}}>
       { isLoading
         && (
           <BackgroundBlocker>

@@ -7,11 +7,11 @@ import Logo from '../../../assets/images/logo.png';
 function Header() {
   return (
     <div className={styles.logoContainer}>
-      <img src={Logo} alt="logo" />
+      <img className={styles.logo} src={Logo} alt="logo" />
       <p>
-        Free republic of
+        Free Republic of
         <br />
-        <span>Liberland</span>
+        <span>LIBERLAND</span>
       </p>
     </div>
   );

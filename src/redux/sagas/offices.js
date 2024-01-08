@@ -1,5 +1,5 @@
 import {
-  put, takeLatest, call, cps, select,
+  put, takeLatest, call, select,
 } from 'redux-saga/effects';
 
 import {
@@ -15,8 +15,7 @@ import {
   setRegisteredCompanyData,
 } from '../../api/nodeRpcCall';
 
-import { officesActions, blockchainActions } from '../actions';
-import * as backend from '../../api/backend';
+import { officesActions } from '../actions';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors } from '../selectors';
 import router from '../../router';
@@ -26,13 +25,14 @@ import router from '../../router';
 function* getIdentityWorker(action) {
   try {
     const onchain = yield call(getIdentity, action.payload);
-    const backendUsers = yield call(backend.getUsersByAddress, action.payload);
+    /* const backendUsers = yield call(backend.getUsersByAddress, action.payload);
     if (backendUsers.length > 1) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success({ details: 'More than one user has the same address?' }));
       return;
     }
-    yield put(officesActions.officeGetIdentity.success({ onchain, backend: backendUsers[0] }));
+    yield put(officesActions.officeGetIdentity.success({ onchain, backend: backendUsers[0] })); */
+    yield put(officesActions.officeGetIdentity.success({ onchain, backend: {} }));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -41,34 +41,9 @@ function* getIdentityWorker(action) {
 }
 
 function* provideJudgementAndAssetsWorker(action) {
-  try {
-    if ((action.payload.merits || action.payload.dollars) && !action.payload.uid) {
-      throw new Error('Tried to transfer LLD or LLM but we have no user id!');
-    }
-
-    const { errorData } = yield cps(provideJudgementAndAssets, action.payload);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(officesActions.provideJudgementAndAssets.failure());
-      return;
-    }
-
-    if (action.payload.merits?.gt(0)) {
-      try {
-        yield call(backend.addMeritTransaction, action.payload.uid, action.payload.merits.mul(-1));
-      } catch (e) {
-        throw new Error(e.response.data.error.message);
-      }
-    }
-
-    yield put(officesActions.provideJudgementAndAssets.success());
-    yield put(officesActions.officeGetIdentity.call(action.payload.address));
-  } catch (errorData) {
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(officesActions.provideJudgementAndAssets.failure());
-  }
+  yield call(provideJudgementAndAssets, action.payload);
+  yield put(officesActions.provideJudgementAndAssets.success());
+  yield put(officesActions.officeGetIdentity.call(action.payload.address));
 }
 
 function* getCompanyRequestWorker(action) {
@@ -94,22 +69,10 @@ function* getCompanyRegistrationWorker(action) {
 }
 
 function* registerCompanyWorker(action) {
-  try {
-    const { errorData } = yield cps(registerCompany, action.payload);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(officesActions.registerCompany.failure());
-    } else {
-      yield put(officesActions.registerCompany.success());
-      yield put(officesActions.getCompanyRequest.call(action.payload.entity_id));
-      yield put(officesActions.getCompanyRegistration.call(action.payload.entity_id));
-    }
-  } catch (errorData) {
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(officesActions.registerCompany.failure());
-  }
+  yield call(registerCompany, action.payload);
+  yield put(officesActions.registerCompany.success());
+  yield put(officesActions.getCompanyRequest.call(action.payload.entity_id));
+  yield put(officesActions.getCompanyRegistration.call(action.payload.entity_id));
 }
 
 function* getBalancesWorker(action) {
@@ -168,11 +131,7 @@ function* getIdentityWatcher() {
 }
 
 function* provideJudgementAndAssetsWatcher() {
-  try {
-    yield takeLatest(officesActions.provideJudgementAndAssets.call, provideJudgementAndAssetsWorker);
-  } catch (e) {
-    yield put(officesActions.provideJudgementAndAssets.failure(e));
-  }
+  yield* blockchainWatcher(officesActions.provideJudgementAndAssets, provideJudgementAndAssetsWorker);
 }
 
 function* getCompanyRequestWatcher() {
@@ -192,11 +151,7 @@ function* getCompanyRegistrationWatcher() {
 }
 
 function* registerCompanyWatcher() {
-  try {
-    yield takeLatest(officesActions.registerCompany.call, registerCompanyWorker);
-  } catch (e) {
-    yield put(officesActions.registerCompany.failure(e));
-  }
+  yield* blockchainWatcher(officesActions.registerCompany, registerCompanyWorker);
 }
 
 function* getBalancesWatcher() {

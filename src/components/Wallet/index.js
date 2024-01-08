@@ -16,6 +16,7 @@ import Bridge from './Bridge';
 
 import Card from '../Card';
 import RoleHOC from '../../hocs/RoleHOC';
+import AssetOverview from './AssetOverview';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -24,6 +25,7 @@ function Wallet() {
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
   const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
   const historyFetchFailed = useSelector(walletSelectors.selectorTxHistoryFailed);
+  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -34,16 +36,22 @@ function Wallet() {
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
+    dispatch(walletActions.getAdditionalAssets.call());
     dispatch(walletActions.getLlmTransfers.call());
     dispatch(walletActions.getLldTransfers.call());
   }, [dispatch]);
 
   const overView = () => (
-    <div>
+    <div className={styles.walletOverviewWrapper}>
+
       <WalletOverview
         totalBalance={totalBalance}
         balances={balances}
         liquidMerits={liquidMerits}
+      />
+
+      <AssetOverview
+        additionalAssets={additionalAssets}
       />
 
       <WalletTransactionHistory
@@ -58,7 +66,10 @@ function Wallet() {
   return (
     (userWalletAddress !== undefined) ? (
       <div className={styles.walletWrapper}>
-        <WalletAddressesLine walletAddress={userWalletAddress} />
+        <div className={styles.walletAdressWrapper}>
+          <WalletAddressesLine walletAddress={userWalletAddress} />
+        </div>
+
         <div>
           <Switch>
             <Route

@@ -9,7 +9,7 @@ import { formatMerits } from '../../../../../utils/walletHelpers';
 import truncate from '../../../../../utils/truncate';
 import NotificationPortal from '../../../../NotificationPortal';
 import { ReactComponent as CopyIcon } from '../../../../../assets/icons/copy.svg';
-
+import sanitizeUrlHelper from '../../../../../utils/sanitizeUrlHelper';
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
 import {
@@ -104,8 +104,8 @@ function BlacklistButton({ hash, referendumIndex }) {
   );
 
   return (
-    <Button small secondary onClick={() => { blacklistMotion(); }}>
-      Cancel
+    <Button small secondary onClick={blacklistMotion}>
+      Cancel as congress
     </Button>
   );
 }
@@ -200,11 +200,12 @@ function ReferendumItem({
                 Discussions:
                 <ol>
                   {centralizedDatas.map((centralizedData) => {
-                    // console.log(usersList)
-                    const nameOrId = usersList[centralizedData.proposerAddress] || centralizedData.proposerAddress;
+                    const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
+                    const nameOrId = usersList[centralizedData.proposerAddress]
+                    || truncate(centralizedData.proposerAddress, 13);
                     return (
                       <li key={centralizedData.id}>
-                        <a href={centralizedData.link}>
+                        <a href={sanitizeUrl} target="_blank" rel="noreferrer">
                           {centralizedData.name}
                         </a>
                         {' - '}

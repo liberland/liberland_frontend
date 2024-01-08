@@ -1,21 +1,7 @@
-import axios from 'axios';
 import { ethers } from 'ethers';
-
-const getApi = () => {
-  const ssoAccessTokenHash = sessionStorage.getItem('ssoAccessTokenHash');
-
-  const api = axios.create({
-    baseURL: process.env.REACT_APP_API2,
-    withCredentials: true,
-  });
-  api.defaults.headers.common['X-Token'] = ssoAccessTokenHash;
-
-  return api;
-};
+import api from './index';
 
 export const getUsersByAddress = async (blockchainAddress) => {
-  const api = getApi();
-
   const { data } = await api.get('/users', {
     params: {
       blockchainAddress,
@@ -28,10 +14,15 @@ export const getUsersByAddress = async (blockchainAddress) => {
   }));
 };
 
+export const setCentralizedBackendBlockchainAddress = async (blockchainAddress, userId, ssoAccessTokenHash) => {
+  return await api.patch('users/' + userId , {
+    blockchainAddress: blockchainAddress
+  })
+}
+
 export const maybeGetApprovedEresidency = async () => {
-  const api = getApi();
   try {
-    const approvedEresidency = await api.get('/e-residents/approved/meghj');
+    const approvedEresidency = await api.get('/e-residents/approved/me');
     return approvedEresidency.data;
   } catch (e) {
     return { isError: true, errorResponse: e.response };
@@ -39,8 +30,6 @@ export const maybeGetApprovedEresidency = async () => {
 };
 
 export const addMeritTransaction = async (userId, amount) => {
-  const api = getApi();
-
   const formattedAmount = ethers.utils.formatUnits(amount, 12);
   await api.post('/merit-transactions', {
     userId,
@@ -51,17 +40,12 @@ export const addMeritTransaction = async (userId, amount) => {
 };
 
 export const getReferenda = async () => {
-  const api = getApi();
   const { data } = await api.get('/referenda');
   return data;
 };
 
 export const addReferendum = async ({
   link, name, description, hash, additionalMetadata, proposerAddress,
-}) => {
-  const api = getApi();
-  // TODO fix API not to use chainIndex
-  return api.post('/referenda', {
-    link, chainIndex: 0, name, description, hash, additionalMetadata, proposerAddress,
-  });
-};
+}) => api.post('/referenda', { // TODO fix API not to use chainIndex
+  link, chainIndex: 0, name, description, hash, additionalMetadata, proposerAddress,
+});

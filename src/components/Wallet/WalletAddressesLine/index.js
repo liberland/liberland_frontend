@@ -11,7 +11,6 @@ import { SendLLDModal, SendLLMModal, UnpoolModal } from '../../Modals';
 
 import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
-import { ReactComponent as WalletActiveIcon } from '../../../assets/icons/active-wallet.svg';
 import { ReactComponent as CopyIcon } from '../../../assets/icons/copy.svg';
 
 import styles from './styles.module.scss';
@@ -45,14 +44,14 @@ function WalletAddressesLine({ walletAddress }) {
   const navigationList = [
     {
       route: router.wallet.overView,
-      title: 'Wallet',
+      title: 'WALLET',
     },
   ];
 
   if (process.env.REACT_APP_BRIDGE_TAB_ENABLED === 'true' || process.env.REACT_APP_BRIDGE_TAB_ENABLED === true) {
     navigationList.push({
       route: router.wallet.ethBridge,
-      title: 'Ethereum bridge',
+      title: 'ETHEREUM BRIDGE',
     });
   }
 
@@ -60,32 +59,35 @@ function WalletAddressesLine({ walletAddress }) {
     <>
       <NotificationPortal ref={notificationRef} />
       <div className={styles.walletAddressLineWrapper}>
-        <Tabs navigationList={navigationList} />
-        <div className={styles.addressesWrapper}>
-          <div className={styles.singleAddressWrapper}>
-            <p className={styles.addressTitle}>Wallet address:</p>
-            <p className={styles.address}>
-              <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={(e) => handleCopyClick(e)} />
-              {addresses.walletAddress ? truncate(addresses.walletAddress, 16) : ''}
-            </p>
+        <div className={styles.navWallet}>
+          <Tabs navigationList={navigationList} />
+          <div className={styles.addressesWrapper}>
+            <div className={styles.singleAddressWrapper}>
+              <span className={styles.addressTitle}>Wallet address </span>
+              <span className={styles.address}>
+                <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={(e) => handleCopyClick(e)} />
+                {addresses.walletAddress ? truncate(addresses.walletAddress, 16) : ''}
+              </span>
+            </div>
           </div>
         </div>
+
         <div className={cx(styles.buttonsWrapper)}>
-          <Button small secondary onClick={handleModalOpenPolitipool}>
+          <Button small secondary className={styles.button} onClick={handleModalOpenPolitipool}>
             <GraphIcon />
-            Politipool
+            POLITIPOOL
           </Button>
-          <Button small secondary onClick={handleModalOpenUnpool}>
+          <Button small secondary className={styles.button} onClick={handleModalOpenUnpool}>
             <GraphIcon />
-            Unpool
+            UNPOOL
           </Button>
-          <Button small primary onClick={handleModalLLMOpen}>
+          <Button small primary className={styles.button} onClick={handleModalLLMOpen}>
             <UploadIcon />
-            Send LLM
+            SEND LLM
           </Button>
-          <Button small primary onClick={handleModalOpen}>
+          <Button small primary className={styles.button} onClick={handleModalOpen}>
             <UploadIcon />
-            Send LLD
+            SEND LLD
           </Button>
         </div>
         {isModalOpen && (

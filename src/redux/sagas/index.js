@@ -30,6 +30,7 @@ export default function* rootSaga() {
     // WALLET
     walletSagas.getWalletWatcher(),
     walletSagas.sendTransferWatcher(),
+    walletSagas.sendAssetsWatcher(),
     walletSagas.sendTransferLLMWatcher(),
     walletSagas.stakeToPolkaWatcher(),
     walletSagas.stakeToLiberlandWatcher(),
@@ -39,6 +40,7 @@ export default function* rootSaga() {
     walletSagas.unpoolWatcher(),
     walletSagas.getLlmTransfersWatcher(),
     walletSagas.getLldTransfersWatcher(),
+    walletSagas.getAdditionalAssetsWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),

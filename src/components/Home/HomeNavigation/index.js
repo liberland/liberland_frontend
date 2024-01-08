@@ -48,7 +48,7 @@ function HomeNavigation() {
   const history = useHistory();
   const isMedium = useMediaQuery('(min-width: 48em)');
 
-  const homeTitle = name && lastName ? `${name} ${lastName}` : 'Profile';
+  const homeTitle = name && lastName ? `${name} ${lastName}` : 'PROFILE';
   const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   const [isLogoutModalOpen, setLogoutIsModalOpen] = useState(false);
 
@@ -72,69 +72,71 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: () => <Avatar name={fullName} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
       description: `${formatMerits(totalBalance)} LLM`,
+      isDiscouraged: false,
     },
     {
       route: router.home.feed,
-      title: 'Feed',
+      title: 'FEED',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: FeedIcon,
       activeIcon: FeedIconActive,
-    },
-    {
-      route: router.home.documents,
-      title: 'Documents',
-      access: ['citizen', 'assemblyMember'],
-      icon: DocumentsIcon,
-      activeIcon: DocumentsIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_FEED_DISCOURAGED,
     },
     {
       route: router.home.wallet,
-      title: 'Wallet',
+      title: 'WALLET',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: WalletIcon,
       activeIcon: WalletIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
     },
     {
       route: router.home.voting,
-      title: 'Voting',
+      title: 'VOTING',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: VotingIcon,
       activeIcon: VotingIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED,
     },
     {
       route: router.home.legislation,
-      title: 'Legislation',
+      title: 'LEGISLATION',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
       activeIcon: ConstitutionIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED,
     },
     {
       route: router.home.offices,
-      title: 'Offices',
+      title: 'OFFICES',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
       activeIcon: ConstitutionIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED,
     },
     {
       route: router.home.registries,
-      title: 'Registries',
+      title: 'REGISTRIES',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       activeIcon: DocumentsIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED,
     },
     {
       route: router.home.staking,
-      title: 'Staking',
+      title: 'STAKING',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       activeIcon: DocumentsIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
     },
     {
       route: router.home.congress,
-      title: 'Congress',
+      title: 'CONGRESS',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       activeIcon: DocumentsIconActive,
+      isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
     },
   ];
 
@@ -152,6 +154,7 @@ function HomeNavigation() {
             title,
             access,
             description,
+            isDiscouraged,
           }) => (
             <RoleHOC key={route} roles={roles} access={access}>
               <NavigationLink
@@ -161,6 +164,7 @@ function HomeNavigation() {
                 activeIcon={activeIcon}
                 path={location.pathname}
                 description={description}
+                isDiscouraged={isDiscouraged}
               />
             </RoleHOC>
           ))
@@ -171,7 +175,7 @@ function HomeNavigation() {
         >
           <NavigationLink
             route="logout"
-            title="Logout"
+            title="LOGOUT"
             icon={DocumentsIcon}
             activeIcon={DocumentsIcon}
             path="logout"

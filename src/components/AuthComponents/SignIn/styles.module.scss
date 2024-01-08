@@ -17,7 +17,7 @@
   margin: auto;
 
   & > h3 {
-    font-family: $regular;
+    
     font-size: 26px;
     font-weight: 700;
     margin: 0;
@@ -25,7 +25,7 @@
   }
 
   p {
-    font-family: $medium;
+    
     font-size: 18px;
     margin: 20px 0 30px 0;
     color: $text3;
@@ -73,7 +73,7 @@
 .error {
   font-size: 12px;
   line-height: 16px;
-  font-family: $medium;
+  
   color: $errorText;
 };
 
@@ -92,4 +92,11 @@
   position: relative;
   font-weight: 500;
   color: #4E5D78;
+}
+
+.twoFAbuttons{
+  color: #8A94A6;
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
 }

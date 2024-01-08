@@ -1,38 +1,106 @@
 @import '../../assets/base/variables';
 @import '../../assets/base/fonts';
+@import '../../assets/main.scss';
+@import '../../index.scss';
+
+.cardCustom{
+  background: none;
+}
+
+.wrapper{
+  min-height: calc(100vh - 80px);
+  background-color: $lightGrey;
+}
 
 .profile {
   display: flex;
-  justify-content: center;
-  font-family: $medium;
   font-size: 14px;
-  max-width: 835px;
   color: $text4;
   flex-wrap: wrap;
 
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 32px 30px;
+    max-width: 100%;
+    justify-content: center;
+    margin: auto;
+  }
+
+  .column{
+    width: 100%;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      flex: 1 1 300px;
+      display: flex;
+      flex-direction: column;
+    }
+  }
+
   h3 {
     font-weight: bold;
-    font-size: 16px;
-    color: $text2;
+    font-size: 24px;
+    font-weight: 500;
+    color: $black;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      font-size: 27px;
+      margin: 0;
+    }
   }
 
   .wrapperBlock {
     background-color: $bg4;
-    border-radius: 15px;
-    margin: 10px;
-    padding: 20px;
+    padding: 0 3%;
+    border-radius: 10px;
 
-    .avatarImage {
-      margin-bottom: 20px;
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      padding: 10px 25px;
+      height: 100%;
     }
+
   }
 
   .avatar {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-bottom: 15px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      padding-bottom: 0;
+    }
+
+    .avatarComponent{
+      height: 250px;
+      width: 250px;
+
+      @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        height: 260px;
+        width: 270px;
+      }
+    }
+
     span {
       color: $primary;
+    }
+
+    .button{
+      color: #BFBFBF;
+      width: 100%;
+      margin-top: 20px;
+
+      @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        margin-top: 20px;
+      }
+    }
+
+    .avatarTitle{
+      align-self: flex-start;
+
+      @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        margin-bottom: 20px;
+      }
     }
   }
 
@@ -49,49 +117,105 @@
   .userNameBalance {
     display: flex;
     flex-direction: column;
+    margin-top: 25px;
+    padding-bottom: 23px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      margin-top: 0;
+    }
 
     .userNameRole {
       display: flex;
       justify-content: space-between;
       align-items: center;
-
-      h3 {
-        font-size: 20px;
-        margin-bottom: 13px;
-      }
+      margin-bottom: 20px;
 
       span {
         text-transform: capitalize;
+      }
+
+      .liberlandLogo{
+        height: 33px;
+        width: 43px;
+        display: none;
+
+        @media screen and (min-width: map-get($breakpoints, 'tablet')){
+          display: block;
+        }
       }
     }
 
     .balance {
       text-transform: capitalize;
-      font-family: $medium;
-      font-weight: 500;
-      font-size: 12px;
+      
+      font-weight: 700;
+      font-size: 14px;
+      color: $clearBlack;
+
+      @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        font-size: 13px;
+        line-height: 20px;
+      }
 
       span {
-        font-family: $medium;
+        
         font-weight: 700;
       }
 
-      .walletAddress {
-        color: $primary;
-        font-weight: 500;
-        margin-left: 7px;
+      .iconAdress{
+        margin-top: 21px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        @media screen and (min-width: map-get($breakpoints, 'tablet')){
+          margin-top: 15px;
+        }
+
       }
+
     }
   }
 
   .aboutUser {
+
+    .buttons{
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: 25px;
+
+      @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        padding-bottom: 0;
+      }
+
+      .textColor{
+        min-height: 50px;
+        padding: 5px 20px;
+        border-radius: 6px;
+        color: $black;
+      }
+    }
+
     h3 {
-      margin-bottom: 23px;
+      padding-top: 15px;
+      margin-bottom: 14px;
+
+      @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        padding-top: 0;
+        margin-bottom: 1px;
+      }
     }
 
     span {
       line-height: 28px;
       font-size: 14px;
+      
+      @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        line-height: 21px;
+        font-size: 13px;
+      }
+
     }
 
     .aboutUserFooter {
@@ -103,6 +227,26 @@
       flex-direction: row;
       align-items: flex-start;
       margin-bottom: 18px;
+
+      @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        margin-bottom: 30px;
+      }
+
+      ul{
+        list-style-type: none;
+        padding: 0;
+        color: $black;
+        line-height: 19.07px;
+        font-weight: 500;
+        
+        .bold{
+          font-weight: 700;
+        }
+
+        li{
+          margin: 1.5px 0;
+        }
+      }
 
       img {
         margin-right: 17px;
@@ -138,5 +282,9 @@
       margin: 10px 0 25px 0;
     }
   }
+}
+
+.font{
+  font-family: $playfairDisplay;
 }
 
