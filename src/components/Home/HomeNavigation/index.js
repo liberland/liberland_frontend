@@ -70,6 +70,7 @@ function HomeNavigation() {
       route: router.home.profile,
       title: homeTitle,
       access: ['citizen', 'assemblyMember', 'non_citizen'],
+      // eslint-disable-next-line react/no-unstable-nested-components
       icon: () => <Avatar name={fullName} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
       description: `${formatMerits(totalBalance)} LLM`,
       isDiscouraged: false,
@@ -215,6 +216,7 @@ function HomeNavigation() {
               title,
               access,
               description,
+              isDiscouraged,
             }) => (
               <div key={route} onClick={() => setIsMenuOpen(!isMenuOpen)}>
                 <RoleHOC roles={roles} access={access}>
@@ -225,6 +227,7 @@ function HomeNavigation() {
                     activeIcon={activeIcon}
                     path={location.pathname}
                     description={description}
+                    isDiscouraged={isDiscouraged}
                   />
                 </RoleHOC>
               </div>
