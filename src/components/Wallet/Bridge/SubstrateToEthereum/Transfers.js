@@ -12,6 +12,7 @@ export function Transfers() {
   const blockNumber = useBlockNumber();
 
   const toEthereumFailed = useSelector(bridgeSelectors.toEthereumTransfersFailed);
+
   if (toEthereumFailed) return 'Failed to fetch transaction to Ethereum history';
 
   if (!ethBridges || !blockNumber) return 'Loading...'; // FIXME proper loader

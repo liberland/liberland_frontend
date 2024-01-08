@@ -106,18 +106,9 @@ function* monitorBurnWorker(action) {
 
 function* getTransfersToEthereumWorker() {
   try {
-    const preload = yield select(bridgeSelectors.toEthereumPreload);
-    if (!preload) {
-      // eslint-disable-next-line no-console
-      console.log('No preload to eth');
-      const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-      const res = yield call(getSubstrateOutgoingReceipts, walletAddress);
-      yield put(bridgeActions.getTransfersToEthereum.success(res));
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('Preload to eth');
-      yield put(bridgeActions.getTransfersToEthereum.success({}));
-    }
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+    const res = yield call(getSubstrateOutgoingReceipts, walletAddress);
+    yield put(bridgeActions.getTransfersToEthereum.success(res));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -127,39 +118,36 @@ function* getTransfersToEthereumWorker() {
 
 function* getTransfersToSubstrateWorker({ payload: address }) {
   try {
-    const preload = yield select(bridgeSelectors.toSubstratePreload);
-    if (!preload) {
-      // eslint-disable-next-line no-console
-      console.log('No preload to substrate');
-      const events = yield call(getEthereumOutgoingReceipts, address);
-      const _reducer = (asset) => (transfers, event) => ({
-        ...transfers,
-        [event.transactionHash]: {
-          txHash: event.transactionHash,
-          asset,
-          amount: ethers.utils.formatUnits(event.args.amount, 0),
-          substrateRecipient: event.args.substrateRecipient,
-          date: 1000 * event.blockTimestamp,
-          receipt_id: ethToSubReceiptIdFromEvent(event),
-          blockHash: event.blockHash,
-          status: null,
-          withdrawTx: false,
-        },
-      });
+    let transfersGlobal = {};
+    // eslint-disable-next-line no-console
+    console.log('No preload to substrate');
+    const events = yield call(getEthereumOutgoingReceipts, address);
+    const _reducer = (asset) => (transfers, event) => ({
+      ...transfers,
+      [event.transactionHash]: {
+        txHash: event.transactionHash,
+        asset,
+        amount: ethers.utils.formatUnits(event.args.amount, 0),
+        substrateRecipient: event.args.substrateRecipient,
+        date: 1000 * event.blockTimestamp,
+        receipt_id: ethToSubReceiptIdFromEvent(event),
+        blockHash: event.blockHash,
+        status: null,
+        withdrawTx: false,
+      },
+    });
 
-      let transfers = events.LLD.reduce(_reducer('LLD'), {});
-      transfers = events.LLM.reduce(_reducer('LLM'), transfers);
-      yield put(bridgeActions.getTransfersToSubstrate.success(transfers));
-    } else {
-      // eslint-disable-next-line no-console
-      console.log('Preload to substrate');
-      const transfers = yield select(bridgeSelectors.toSubstrateTransfers);
-      const pending = Object.values(transfers).filter((t) => t.receipt_id === null);
-      for (const transfer of pending) {
-        yield put(bridgeActions.monitorBurn.call(transfer));
-      }
-      yield put(bridgeActions.getTransfersToSubstrate.success({}));
+    transfersGlobal = events.LLD.reduce(_reducer('LLD'), {});
+    transfersGlobal = events.LLM.reduce(_reducer('LLM'), transfersGlobal);
+    // eslint-disable-next-line no-console
+    console.log('Preload to substrate');
+    const transfers = yield select(bridgeSelectors.toSubstrateTransfers);
+    const pending = Object.values(transfers).filter((t) => t.receipt_id === null);
+    for (const transfer of pending) {
+      yield put(bridgeActions.monitorBurn.call(transfer));
     }
+
+    yield put(bridgeActions.getTransfersToSubstrate.success(transfersGlobal));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
