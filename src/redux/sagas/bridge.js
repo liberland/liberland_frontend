@@ -118,9 +118,6 @@ function* getTransfersToEthereumWorker() {
 
 function* getTransfersToSubstrateWorker({ payload: address }) {
   try {
-    let transfersGlobal = {};
-    // eslint-disable-next-line no-console
-    console.log('No preload to substrate');
     const events = yield call(getEthereumOutgoingReceipts, address);
     const _reducer = (asset) => (transfers, event) => ({
       ...transfers,
@@ -137,10 +134,10 @@ function* getTransfersToSubstrateWorker({ payload: address }) {
       },
     });
 
+    let transfersGlobal = {};
     transfersGlobal = events.LLD.reduce(_reducer('LLD'), {});
     transfersGlobal = events.LLM.reduce(_reducer('LLM'), transfersGlobal);
-    // eslint-disable-next-line no-console
-    console.log('Preload to substrate');
+
     const transfers = yield select(bridgeSelectors.toSubstrateTransfers);
     const pending = Object.values(transfers).filter((t) => t.receipt_id === null);
     for (const transfer of pending) {
