@@ -57,7 +57,7 @@ function Referendum() {
   const crossReferencedProposalsData = democracy.democracy?.crossReferencedProposalsData || [];
   const crossReferencedReferendumsData = democracy.democracy?.crossReferencedReferendumsData || [];
   const proposersList = useProposerList(crossReferencedReferendumsData);
-  const proposersList2 = useProposerList(crossReferencedProposalsData);
+  const proposersList2 = useProposerList(crossReferencedProposalsData, true);
   const mergedProposersList = useMemo(() => [...proposersList, ...proposersList2], [proposersList, proposersList2]);
   const { usersList } = useUsersIdentity(mergedProposersList);
 
