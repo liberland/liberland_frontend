@@ -211,7 +211,7 @@ function ReferendumItem({
                         {' - '}
                         {centralizedData.description}
                         {' '}
-                        (Discussion addede by
+                        (Discussion added by
                         {' '}
                         <b>{ nameOrId }</b>
                         <CopyIcon

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { hexToU8a } from '@polkadot/util';
 import styles from './styles.module.scss';
