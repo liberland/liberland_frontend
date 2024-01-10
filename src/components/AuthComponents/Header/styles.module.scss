@@ -9,37 +9,11 @@
 
   .logo{
     height: 45px;
-    width: 35px;
+    width: 150px;
 
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      height: 70px;
-      width: 51px;
+      height: 68px;
+      width: 229px;
     }
   }
-
-  & > p{
-    margin: 5px 0 0 10px;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 20px;
-
-    @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      letter-spacing: 0.4px;
-      font-size: 16px;
-      margin: 10px 0 0 10px;
-    }
-
-    & > span {
-      color: $blueLogo;
-      font-size: 17px;
-      font-family: $playfairDisplay;
-      letter-spacing: 1px;
-
-      @media screen and (min-width: map-get($breakpoints, 'tablet')){
-        letter-spacing: 1.5px;
-        font-size: 21px;
-      }
-    }
-  }
-
 }
