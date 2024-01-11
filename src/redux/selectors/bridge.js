@@ -7,16 +7,6 @@ export const isLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
-export const toEthereumPreload = createSelector(
-  bridgeReducer,
-  (reducer) => reducer.transfers.toEthereumPreload,
-);
-
-export const toSubstratePreload = createSelector(
-  bridgeReducer,
-  (reducer) => reducer.transfers.toSubstratePreload,
-);
-
 export const toEthereumInitialized = createSelector(
   bridgeReducer,
   (reducer) => reducer.transfers.toEthereumInitialized,
