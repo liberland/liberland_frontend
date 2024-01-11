@@ -14,15 +14,10 @@ import GetCitizenshipCard from '../Cards/GetCitizenshipCard';
 // ASSETS
 import styles from './styles.module.scss';
 import DocumentsIcon from '../../../assets/icons/documents.svg';
-import DocumentsIconActive from '../../../assets/icons/active-documents.svg';
 import FeedIcon from '../../../assets/icons/feed.svg';
-import FeedIconActive from '../../../assets/icons/active-feed.svg';
 import WalletIcon from '../../../assets/icons/wallet.svg';
-import WalletIconActive from '../../../assets/icons/active-wallet.svg';
 import VotingIcon from '../../../assets/icons/voting.svg';
-import VotingIconActive from '../../../assets/icons/active-voting.svg';
 import ConstitutionIcon from '../../../assets/icons/constitution.svg';
-import ConstitutionIconActive from '../../../assets/icons/active-constitution.svg';
 import OpenMenuIcon from '../../../assets/icons/menu.svg';
 import CloseMenuIcon from '../../../assets/icons/close.svg';
 
@@ -80,7 +75,6 @@ function HomeNavigation() {
       title: 'FEED',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: FeedIcon,
-      activeIcon: FeedIconActive,
       isDiscouraged: process.env.REACT_APP_IS_FEED_DISCOURAGED,
     },
     {
@@ -88,7 +82,6 @@ function HomeNavigation() {
       title: 'WALLET',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: WalletIcon,
-      activeIcon: WalletIconActive,
       isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
     },
     {
@@ -96,7 +89,6 @@ function HomeNavigation() {
       title: 'VOTING',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: VotingIcon,
-      activeIcon: VotingIconActive,
       isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED,
     },
     {
@@ -104,7 +96,6 @@ function HomeNavigation() {
       title: 'LEGISLATION',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
-      activeIcon: ConstitutionIconActive,
       isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED,
     },
     {
@@ -112,7 +103,6 @@ function HomeNavigation() {
       title: 'OFFICES',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
-      activeIcon: ConstitutionIconActive,
       isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED,
     },
     {
@@ -120,7 +110,6 @@ function HomeNavigation() {
       title: 'REGISTRIES',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
-      activeIcon: DocumentsIconActive,
       isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED,
     },
     {
@@ -128,7 +117,6 @@ function HomeNavigation() {
       title: 'STAKING',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
-      activeIcon: DocumentsIconActive,
       isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
     },
     {
@@ -136,7 +124,6 @@ function HomeNavigation() {
       title: 'CONGRESS',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
-      activeIcon: DocumentsIconActive,
       isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
     },
   ];
@@ -151,7 +138,6 @@ function HomeNavigation() {
           navigationList.map(({
             route,
             icon,
-            activeIcon,
             title,
             access,
             description,
@@ -162,7 +148,6 @@ function HomeNavigation() {
                 route={route}
                 title={title}
                 icon={icon}
-                activeIcon={activeIcon}
                 path={location.pathname}
                 description={description}
                 isDiscouraged={isDiscouraged}
@@ -178,7 +163,6 @@ function HomeNavigation() {
             route="logout"
             title="LOGOUT"
             icon={DocumentsIcon}
-            activeIcon={DocumentsIcon}
             path="logout"
           />
         </div>
@@ -212,7 +196,6 @@ function HomeNavigation() {
             navigationList.map(({
               route,
               icon,
-              activeIcon,
               title,
               access,
               description,
@@ -224,7 +207,6 @@ function HomeNavigation() {
                     route={route}
                     title={title}
                     icon={icon}
-                    activeIcon={activeIcon}
                     path={location.pathname}
                     description={description}
                     isDiscouraged={isDiscouraged}
@@ -244,7 +226,6 @@ function HomeNavigation() {
               route={router.home.feed}
               title="Logout"
               icon={DocumentsIcon}
-              activeIcon={DocumentsIcon}
               path="logout"
             />
           </div>

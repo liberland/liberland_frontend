@@ -74,19 +74,28 @@ function WalletAddressesLine({ walletAddress }) {
 
         <div className={cx(styles.buttonsWrapper)}>
           <Button small secondary className={styles.button} onClick={handleModalOpenPolitipool}>
-            <GraphIcon />
+            <div className={styles.icon}>
+              <GraphIcon />
+            </div>
             POLITIPOOL
           </Button>
           <Button small secondary className={styles.button} onClick={handleModalOpenUnpool}>
-            <GraphIcon />
+            <div className={styles.icon}>
+              <GraphIcon />
+            </div>
             UNPOOL
           </Button>
           <Button small primary className={styles.button} onClick={handleModalLLMOpen}>
-            <UploadIcon />
+            <div className={styles.icon}>
+              <UploadIcon />
+            </div>
+
             SEND LLM
           </Button>
           <Button small primary className={styles.button} onClick={handleModalOpen}>
-            <UploadIcon />
+            <div className={styles.icon}>
+              <UploadIcon />
+            </div>
             SEND LLD
           </Button>
         </div>

@@ -38,7 +38,7 @@ function SignIn() {
     }
     if (ssoAccessTokenHash) {
       sessionStorage.setItem('ssoAccessTokenHash', ssoAccessTokenHash);
-      history.push('/guided-setup')
+      history.push('/guided-setup');
     }
   }, [apiError, setError, dispatch, ssoAccessTokenHash, allAccounts]);
 
@@ -61,7 +61,10 @@ function SignIn() {
         <h3>Sign In to Liberland</h3>
         <p>Welcome back, you’ve been missed!</p>
         <Button medium primary onClick={() => goToLiberlandSignin()}>
-          <WalletIcon />
+          <div className={styles.icon}>
+            <WalletIcon />
+          </div>
+
           Liberland Sign in
         </Button>
         <p className={styles.divider}>

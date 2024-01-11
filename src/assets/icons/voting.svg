@@ -1,4 +1,10 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M9 10V19L10.1526 19.3842C11.3762 19.7921 12.6575 20 13.9473 20H17.5406C18.9706 20 20.2019 18.9906 20.4823 17.5883L21.2315 13.8424C21.6189 11.9054 20.0611 10.1293 18.0902 10.2607L14.5 10.5L14.821 6.9694C14.9171 5.91183 14.0844 5 13.0225 5C12.3881 5 11.8003 5.33282 11.4739 5.87677L9 10Z" fill="#B0B7C3"/>
-<rect x="2" y="9" width="5" height="11" rx="1" fill="#B0B7C3"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 20 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-2,-5)">
+        <g>
+            <path d="M9,10L9,19L10.153,19.384C11.376,19.792 12.658,20 13.947,20L17.541,20C18.971,20 20.202,18.991 20.482,17.588L21.232,13.842C21.619,11.905 20.061,10.129 18.09,10.261L14.5,10.5L14.821,6.969C14.917,5.912 14.084,5 13.023,5C12.388,5 11.8,5.333 11.474,5.877L9,10Z" style="fill:rgb(154,163,178);"/>
+            <path d="M7,10C7,9.448 6.552,9 6,9L3,9C2.448,9 2,9.448 2,10L2,19C2,19.552 2.448,20 3,20L6,20C6.552,20 7,19.552 7,19L7,10Z" style="fill:rgb(154,163,178);"/>
+        </g>
+    </g>
 </svg>
