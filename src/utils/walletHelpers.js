@@ -71,6 +71,14 @@ export const formatDollarTransaction = (dollars_raw, isSymbolFirst = false) => f
   isSymbolFirst,
 );
 
+export const formatAssetTransaction = (dollars_raw, asset, isSymbolFirst = false) => formatTransaction(
+  dollars_raw,
+  asset,
+  asset,
+  dollarDecimals,
+  isSymbolFirst,
+);
+
 export const waitForInjectedWeb3 = async () => {
   const delay = (time) => new Promise((resolve) => { setTimeout(resolve, time); });
   const timeout = 5000;

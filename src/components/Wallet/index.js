@@ -37,8 +37,7 @@ function Wallet() {
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
     dispatch(walletActions.getAdditionalAssets.call());
-    dispatch(walletActions.getLlmTransfers.call());
-    dispatch(walletActions.getLldTransfers.call());
+    dispatch(walletActions.getTxTransfers.call());
   }, [dispatch]);
 
   const overView = () => (

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { BN } from '@polkadot/util';
 
 const receiptsQuery = `
     query BridgeReceipts($orderBy: [BridgeReceiptsOrderBy!], $filter: BridgeReceiptFilter) {
@@ -22,48 +23,64 @@ const receiptsQuery = `
     }
 `;
 
-const getDollarsTransfersQuery = `
-  query Transfers($orderBy: [TransfersOrderBy!], $filter: TransferFilter) {
-    query {
-      transfers(orderBy: $orderBy, filter: $filter) {
-        nodes {
-          id
-          fromId
-          toId
-          value
-          extrinsicIndex
-          eventIndex
-          block {
-            id
-            number
-            timestamp
-          }
-        }
-      }
-    }
-  } 
-`;
-
-const getMeritsTransfersQuery = `
-  query Merits($orderBy: [MeritsOrderBy!], $filter: MeritFilter) {
-    query {
-      merits(orderBy: $orderBy, filter: $filter) {
-        nodes {
-          id
-          fromId
-          toId
-          value
-          extrinsicIndex
-          eventIndex
-          block {
-            id
-            number
-            timestamp
-          }
-        }
+const historyTransferQuery = `
+query CombinedQuery(
+  $orderByTransfers: [TransfersOrderBy!],
+  $filterTransfers: TransferFilter,
+  $orderByMerits: [MeritsOrderBy!],
+  $filterMerits: MeritFilter,
+  $orderByAssetTransfers: [AssetTransfersOrderBy!],
+  $filterAssetTransfers: AssetTransferFilter
+) {
+  transfers: transfers(orderBy: $orderByTransfers, filter: $filterTransfers) {
+    nodes {
+      type: __typename
+      id
+      fromId
+      toId
+      value
+      extrinsicIndex
+      eventIndex
+      block {
+        id
+        number
+        timestamp
       }
     }
   }
+
+  merits: merits(orderBy: $orderByMerits, filter: $filterMerits) {
+    nodes {
+      type: __typename
+      id
+      fromId
+      toId
+      value
+      extrinsicIndex
+      eventIndex
+      block {
+        id
+        number
+        timestamp
+      }
+    }
+  }
+
+  assetTransfers: assetTransfers(orderBy: $orderByAssetTransfers, filter: $filterAssetTransfers) {
+    nodes {
+      type: __typename
+      toId
+      fromId
+      asset
+      value
+      block {
+        id
+        number
+        timestamp
+      }
+    }
+  }
+}
 `;
 
 const getApi = () => axios.create({
@@ -104,9 +121,9 @@ export const getSubstrateOutgoingReceipts = async (substrate_address) => {
   return receipts.reduce((o, r) => ({ ...o, [r.receipt_id]: r }), {});
 };
 
-export const getDollarsTransfers = async (substrate_address) => {
+export const getHistoryTransfers = async (substrate_address) => {
   const result = await getApi().post('/graphql', {
-    query: getDollarsTransfersQuery,
+    query: historyTransferQuery,
     variables: {
       orderBy: ['BLOCK_NUMBER_DESC', 'EVENT_INDEX_DESC'],
       filter: {
@@ -125,37 +142,13 @@ export const getDollarsTransfers = async (substrate_address) => {
       },
     },
   });
+  const transfersAssets = result.data?.data?.assetTransfers?.nodes || [];
+  const transfersLLD = result.data?.data?.transfers?.nodes;
+  const transfersLLM = result.data?.data?.merits?.nodes;
+  const llm = transfersLLM ? transfersLLM.map((n) => ({ asset: 'LLM', ...n })) : [];
+  const lld = transfersLLD ? transfersLLD.map((n) => ({ asset: 'LLD', ...n })) : [];
+  const transfers = [...transfersAssets, ...llm, ...lld];
+  transfers.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
 
-  const transfers = result.data?.data?.query?.transfers?.nodes;
-  if (!transfers) return [];
-
-  return transfers.map((n) => ({ asset: 'LLD', ...n }));
-};
-
-export const getMeritsTransfers = async (substrate_address) => {
-  const result = await getApi().post('/graphql', {
-    query: getMeritsTransfersQuery,
-    variables: {
-      orderBy: ['BLOCK_NUMBER_DESC', 'EVENT_INDEX_DESC'],
-      filter: {
-        or: [
-          {
-            fromId: {
-              equalTo: substrate_address,
-            },
-          },
-          {
-            toId: {
-              equalTo: substrate_address,
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  const transfers = result.data?.data?.query?.merits?.nodes;
-  if (!transfers) return [];
-
-  return transfers.map((n) => ({ asset: 'LLM', ...n }));
+  return transfers;
 };

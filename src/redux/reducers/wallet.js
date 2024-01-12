@@ -28,10 +28,8 @@ const initialState = {
   additionalAssets: [],
   gettingWalletInfo: false,
   transfersTxHistory: {
-    LLM: [],
-    LLD: [],
-    LLMFailed: false,
-    LLDFailed: false,
+    transfersTxHistory: [],
+    transfersTxHistoryFailed: false,
   },
   countAllRows: 0,
   currentPageNumber: 0,
@@ -53,52 +51,30 @@ const walletReducer = handleActions(
       walletActions.getNominatorTargets.call,
       walletActions.setNominatorTargets.call,
       walletActions.unpool.call,
-      walletActions.getLlmTransfers.call,
-      walletActions.getLldTransfers.call,
+      walletActions.getTxTransfers.call,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
     }),
-    [walletActions.getLlmTransfers.call]: (state) => ({
+    [walletActions.getTxTransfers.call]: (state) => ({
       ...state,
       transfersTxHistory: {
         ...state.transfersTxHistory,
-        LLMFailed: false,
+        transfersTxHistoryFailed: false,
       },
     }),
-    [walletActions.getLldTransfers.call]: (state) => ({
+    [walletActions.getTxTransfers.success]: (state, action) => ({
       ...state,
       transfersTxHistory: {
         ...state.transfersTxHistory,
-        LLDFailed: false,
+        transfersTxHistory: action.payload,
       },
     }),
-    [walletActions.getLlmTransfers.success]: (state, action) => ({
+    [walletActions.getTxTransfers.failure]: (state) => ({
       ...state,
       transfersTxHistory: {
         ...state.transfersTxHistory,
-        LLM: action.payload,
-      },
-    }),
-    [walletActions.getLldTransfers.success]: (state, action) => ({
-      ...state,
-      transfersTxHistory: {
-        ...state.transfersTxHistory,
-        LLD: action.payload,
-      },
-    }),
-    [walletActions.getLlmTransfers.failure]: (state) => ({
-      ...state,
-      transfersTxHistory: {
-        ...state.transfersTxHistory,
-        LLMFailed: true,
-      },
-    }),
-    [walletActions.getLldTransfers.failure]: (state) => ({
-      ...state,
-      transfersTxHistory: {
-        ...state.transfersTxHistory,
-        LLDFailed: true,
+        transfersTxHistoryFailed: true,
       },
     }),
     [walletActions.getWallet.success]: (state, action) => ({
@@ -143,10 +119,8 @@ const walletReducer = handleActions(
       walletActions.setNominatorTargets.failure,
       walletActions.unpool.success,
       walletActions.unpool.failure,
-      walletActions.getLlmTransfers.success,
-      walletActions.getLlmTransfers.failure,
-      walletActions.getLldTransfers.success,
-      walletActions.getLldTransfers.failure,
+      walletActions.getTxTransfers.success,
+      walletActions.getTxTransfers.failure,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,

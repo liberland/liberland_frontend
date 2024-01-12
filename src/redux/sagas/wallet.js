@@ -12,7 +12,7 @@ import {
   setNominatorTargets,
   unpool, getAdditionalAssets, sendAssetTransfer,
 } from '../../api/nodeRpcCall';
-import { getDollarsTransfers, getMeritsTransfers } from '../../api/explorer';
+import { getHistoryTransfers } from '../../api/explorer';
 
 import { walletActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
@@ -97,31 +97,17 @@ function* setNominatorTargetsWorker(action) {
   yield put(walletActions.getNominatorTargets.call());
 }
 
-function* getLlmTransfersWorker() {
+function* getTransfersTxWorker() {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
   try {
-    const transfers = yield call(getMeritsTransfers, walletAddress);
-    yield put(walletActions.getLlmTransfers.success(transfers));
+    const transfers = yield call(getHistoryTransfers, walletAddress);
+    yield put(walletActions.getTxTransfers.success(transfers));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
-    yield put(walletActions.getLlmTransfers.failure());
-  }
-}
-
-function* getLldTransfersWorker() {
-  const walletAddress = yield select(
-    blockchainSelectors.userWalletAddressSelector,
-  );
-  try {
-    const transfers = yield call(getDollarsTransfers, walletAddress);
-    yield put(walletActions.getLldTransfers.success(transfers));
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    yield put(walletActions.getLldTransfers.failure());
+    yield put(walletActions.getTxTransfers.failure());
   }
 }
 
@@ -171,12 +157,8 @@ function* setNominatorTargetsWatcher() {
   yield* blockchainWatcher(walletActions.setNominatorTargets, setNominatorTargetsWorker);
 }
 
-export function* getLlmTransfersWatcher() {
-  yield takeLatest(walletActions.getLlmTransfers.call, getLlmTransfersWorker);
-}
-
-export function* getLldTransfersWatcher() {
-  yield takeLatest(walletActions.getLldTransfers.call, getLldTransfersWorker);
+export function* getTransfersTxWatcher() {
+  yield takeLatest(walletActions.getTxTransfers.call, getTransfersTxWorker);
 }
 
 export {

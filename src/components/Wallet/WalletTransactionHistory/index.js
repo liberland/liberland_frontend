@@ -12,7 +12,7 @@ import reciveIcon from '../../../assets/icons/GreenArrowCircle.svg';
 
 import styles from './styles.module.scss';
 import Status from '../../Status';
-import { formatMeritTransaction, formatDollarTransaction } from '../../../utils/walletHelpers';
+import { formatMeritTransaction, formatDollarTransaction, formatAssetTransaction } from '../../../utils/walletHelpers';
 
 import { blockchainSelectors } from '../../../redux/selectors';
 import truncate from '../../../utils/truncate';
@@ -30,8 +30,6 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
     navigator.clipboard.writeText(address);
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
-
-  transactionHistory.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
 
   return (
     <Card title="Transaction History" className={styles.cardWrapper}>
@@ -115,6 +113,12 @@ function TransacionHistoryDesktop({
   dateTransacionHistory,
   value,
 }) {
+  const assetLldLLm = transactionHistoryInfo.asset === 'LLM'
+    ? formatMeritTransaction(value, true)
+    : formatDollarTransaction(value, true);
+  const asset = (transactionHistoryInfo.asset === 'LLM'
+  || transactionHistoryInfo.asset === 'LLD') ? assetLldLLm
+    : formatAssetTransaction(value, transactionHistoryInfo.asset, true);
   return (
     <>
       <div className={styles.paymentNumber}>
@@ -137,9 +141,7 @@ function TransacionHistoryDesktop({
       </p>
       <p className={styles.paymentFromDate}>{dateTransacionHistory}</p>
       <span className={styles.bold}>
-        {transactionHistoryInfo.asset === 'LLM'
-          ? formatMeritTransaction(value, true)
-          : formatDollarTransaction(value, true)}
+        {asset}
       </span>
       <div className={styles.status}>
         <Status
