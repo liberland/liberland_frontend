@@ -24,63 +24,63 @@ const receiptsQuery = `
 `;
 
 const historyTransferQuery = `
-query CombinedQuery(
-  $orderByTransfers: [TransfersOrderBy!],
-  $filterTransfers: TransferFilter,
-  $orderByMerits: [MeritsOrderBy!],
-  $filterMerits: MeritFilter,
-  $orderByAssetTransfers: [AssetTransfersOrderBy!],
-  $filterAssetTransfers: AssetTransferFilter
-) {
-  transfers: transfers(orderBy: $orderByTransfers, filter: $filterTransfers) {
-    nodes {
-      type: __typename
-      id
-      fromId
-      toId
-      value
-      extrinsicIndex
-      eventIndex
-      block {
+  query CombinedQuery(
+    $orderByTransfers: [TransfersOrderBy!],
+    $filterTransfers: TransferFilter,
+    $orderByMerits: [MeritsOrderBy!],
+    $filterMerits: MeritFilter,
+    $orderByAssetTransfers: [AssetTransfersOrderBy!],
+    $filterAssetTransfers: AssetTransferFilter
+  ) {
+    transfers(orderBy: $orderByTransfers, filter: $filterTransfers) {
+      nodes {
+        type: __typename
         id
-        number
-        timestamp
+        fromId
+        toId
+        value
+        extrinsicIndex
+        eventIndex
+        block {
+          id
+          number
+          timestamp
+        }
       }
     }
-  }
 
-  merits: merits(orderBy: $orderByMerits, filter: $filterMerits) {
-    nodes {
-      type: __typename
-      id
-      fromId
-      toId
-      value
-      extrinsicIndex
-      eventIndex
-      block {
+    merits(orderBy: $orderByMerits, filter: $filterMerits) {
+      nodes {
+        type: __typename
         id
-        number
-        timestamp
+        fromId
+        toId
+        value
+        extrinsicIndex
+        eventIndex
+        block {
+          id
+          number
+          timestamp
+        }
       }
     }
-  }
 
-  assetTransfers: assetTransfers(orderBy: $orderByAssetTransfers, filter: $filterAssetTransfers) {
-    nodes {
-      type: __typename
-      toId
-      fromId
-      asset
-      value
-      block {
-        id
-        number
-        timestamp
+    assetTransfers(orderBy: $orderByAssetTransfers, filter: $filterAssetTransfers) {
+      nodes {
+        type: __typename
+        toId
+        fromId
+        asset
+        value
+        block {
+          id
+          number
+          timestamp
+        }
       }
     }
   }
-}
 `;
 
 const getApi = () => axios.create({
@@ -121,27 +121,36 @@ export const getSubstrateOutgoingReceipts = async (substrate_address) => {
   return receipts.reduce((o, r) => ({ ...o, [r.receipt_id]: r }), {});
 };
 
+const getFilterVariable = (substrate_address) => ({
+  or: [
+    {
+      fromId: {
+        equalTo: substrate_address,
+      },
+    },
+    {
+      toId: {
+        equalTo: substrate_address,
+      },
+    },
+  ],
+});
+
 export const getHistoryTransfers = async (substrate_address) => {
+  const filterVariable = getFilterVariable(substrate_address);
+  const orderByVariable = ['BLOCK_NUMBER_DESC', 'EVENT_INDEX_DESC'];
   const result = await getApi().post('/graphql', {
     query: historyTransferQuery,
     variables: {
-      orderBy: ['BLOCK_NUMBER_DESC', 'EVENT_INDEX_DESC'],
-      filter: {
-        or: [
-          {
-            fromId: {
-              equalTo: substrate_address,
-            },
-          },
-          {
-            toId: {
-              equalTo: substrate_address,
-            },
-          },
-        ],
-      },
+      orderByTransfers: orderByVariable,
+      filterTransfers: filterVariable,
+      orderByMerits: orderByVariable,
+      filterMerits: filterVariable,
+      orderByAssetTransfers: orderByVariable,
+      filterAssetTransfers: filterVariable,
     },
   });
+
   const transfersAssets = result.data?.data?.assetTransfers?.nodes || [];
   const transfersLLD = result.data?.data?.transfers?.nodes;
   const transfersLLM = result.data?.data?.merits?.nodes;
