@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { BN } from '@polkadot/util';
+import { getAdditionalAssets } from './nodeRpcCall';
 
 const receiptsQuery = `
     query BridgeReceipts($orderBy: [BridgeReceiptsOrderBy!], $filter: BridgeReceiptFilter) {
@@ -151,12 +152,20 @@ export const getHistoryTransfers = async (substrate_address) => {
     },
   });
 
-  const transfersAssets = result.data?.data?.assetTransfers?.nodes || [];
+  const assetsData = await getAdditionalAssets(substrate_address, true);
+  const transfersAssets = result.data?.data?.assetTransfers?.nodes;
+  const filteredTransferAssets = transfersAssets.filter((item) => item.asset !== '1' && item.asset !== 1);
   const transfersLLD = result.data?.data?.transfers?.nodes;
   const transfersLLM = result.data?.data?.merits?.nodes;
+  const assets = filteredTransferAssets
+    ? filteredTransferAssets.map((n) => {
+      const newItem = { ...n, asset: assetsData[n.asset].metadata.symbol };
+      return newItem;
+    }) : [];
   const llm = transfersLLM ? transfersLLM.map((n) => ({ asset: 'LLM', ...n })) : [];
   const lld = transfersLLD ? transfersLLD.map((n) => ({ asset: 'LLD', ...n })) : [];
-  const transfers = [...transfersAssets, ...llm, ...lld];
+  const transfers = [...assets, ...llm, ...lld];
+
   transfers.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
 
   return transfers;

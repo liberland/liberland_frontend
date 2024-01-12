@@ -26,7 +26,6 @@ function Wallet() {
   const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
   const historyFetchFailed = useSelector(walletSelectors.selectorTxHistoryFailed);
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
-
   const dispatch = useDispatch();
   const history = useHistory();
 
