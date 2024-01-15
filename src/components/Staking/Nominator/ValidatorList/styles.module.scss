@@ -1,21 +1,21 @@
 @import '../../../../assets/base/variables';
 @import '../../../../assets/base/fonts';
+@import '../../../../assets/main.scss';
 
 .validatorsListHeader{
   display: flex;
-  height: 50px;
-  font-size: 18px;
-  align-items: flex-start;
-  justify-content: center;
-  border-radius: 20px;
-  margin-top: 10px;
-  flex-direction: row;
-  gap: 16px;
-  padding: 0 5px;
-  @media (min-width: 48em) {
-    padding: 0 32px;
+
+  .nameCommisionAllowed{
+    flex: 2.5;
+  }
+
+  .nominated{
+    min-width: 83px;
+    text-align: right;
+    flex: 1;
   }
 }
+
 .listItem{
   display: flex;
   align-items: center;
@@ -31,4 +31,44 @@
 .arrowsUpDown{
   height: 15px;
   width: 15px;
+}
+
+.validatorsList{
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+  font-size: 14px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    margin-top: 39px;
+    padding: 0 2%;
+    font-size: 16px;
+  }
+}
+
+.gridList{
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    display: grid;
+    text-align: left;
+    grid-template-columns: 7fr 3fr 3fr 4fr;
+
+    @media screen and (min-width: map-get($breakpoints, 'widescreen')){
+      grid-template-columns: 10fr 3fr 3fr 4fr;
+
+      @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+        grid-template-columns: 13fr 3fr 3fr 4fr;
+      }
+    }
+
+    & > *{
+      text-align: left;
+
+      &:nth-child(2), &:nth-child(3), &:nth-child(4){
+        text-align: right;
+        justify-self: flex-end;
+      }
+    }
+
+  }
 }

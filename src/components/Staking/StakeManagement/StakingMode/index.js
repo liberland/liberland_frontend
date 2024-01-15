@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import cx from 'classnames';
 import { validatorSelectors } from '../../../../redux/selectors';
 import Button from '../../../Button/Button';
 import { validatorActions } from '../../../../redux/actions';
@@ -11,14 +12,14 @@ function SwitchToValidator() {
   const handleValidatorModalOpen = () => setIsValidatorModalOpen(!isValidatorModalOpen);
   return (
     <div>
-      <div className={styles.rowWrapper}>
+      <div className={cx(styles.rowWrapper, styles.currentlyStaked)}>
         <span>Current staking mode: </span>
-        <span><b>Nominator</b></span>
+        <span>Nominator</span>
       </div>
       <div>
         <div className={styles.rowEnd}>
-          <Button small primary onClick={handleValidatorModalOpen}>
-            Switch to Validator
+          <Button small whiteRed onClick={handleValidatorModalOpen}>
+            SWITCH TO VALIDATOR
           </Button>
         </div>
         {isValidatorModalOpen && <StartValidatorModal closeModal={handleValidatorModalOpen} />}
@@ -34,7 +35,7 @@ function SwitchToNominator() {
   };
   return (
     <div>
-      <div className={styles.rowWrapper}>
+      <div className={cx(styles.rowWrapper, styles.currentlyStaked)}>
         <span>Current staking mode: </span>
         <span><b>Validator</b></span>
       </div>

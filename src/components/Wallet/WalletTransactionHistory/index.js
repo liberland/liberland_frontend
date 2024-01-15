@@ -11,6 +11,7 @@ import paymentIcon from '../../../assets/icons/RedArrowCicrle.svg';
 import reciveIcon from '../../../assets/icons/GreenArrowCircle.svg';
 
 import styles from './styles.module.scss';
+import stylesPage from '../../../utils/pagesBase.module.scss';
 import Status from '../../Status';
 import { formatMeritTransaction, formatDollarTransaction } from '../../../utils/walletHelpers';
 
@@ -36,14 +37,14 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
   return (
     <Card title="Transaction History" className={styles.cardWrapper}>
       <NotificationPortal ref={notificationRef} />
-      <div className={styles.transactionHistoryCard}>
-        <div className={cx(styles.transactionHistoryCardHeaderMobile, styles.transactionHistoryCardHeader)}>
+      <div className={stylesPage.transactionHistoryCard}>
+        <div className={cx(stylesPage.transactionHistoryCardHeaderMobile, stylesPage.transactionHistoryCardHeader)}>
           <span>ADRESS / TIME</span>
           <span>AMOUNT / STATUS</span>
         </div>
         <div className={cx(
-          styles.transactionHistoryCardHeaderDesktop,
-          styles.transactionHistoryCardHeader,
+          stylesPage.transactionHistoryCardHeaderDesktop,
+          stylesPage.transactionHistoryCardHeader,
           styles.gridList,
         )}
         >
@@ -67,7 +68,12 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
               const typeText = isAmountPositive ? 'from' : 'to';
               const iconType = isAmountPositive ? reciveIcon : paymentIcon;
               return (
-                <div className={cx(styles.transactionHistoryCardMain, styles.gridList)} key={transactionHistoryInfo.id}>
+                <div
+                  className={
+                  cx(stylesPage.transactionHistoryCardMain, styles.transactionHistoryCardMain, styles.gridList)
+                }
+                  key={transactionHistoryInfo.id}
+                >
                   {isTabletHigher
                     ? (
                       <TransacionHistoryDesktop
