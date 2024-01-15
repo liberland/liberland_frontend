@@ -11,8 +11,7 @@ export const {
   getNominatorTargets,
   setNominatorTargets,
   unpool,
-  getLlmTransfers,
-  getLldTransfers,
+  getTxTransfers,
   getAdditionalAssets,
   sendAssetsTransfer,
 } = createActions({
@@ -76,12 +75,7 @@ export const {
     success: undefined,
     failure: undefined,
   },
-  GET_LLM_TRANSFERS: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  GET_LLD_TRANSFERS: {
+  GET_TX_TRANSFERS: {
     call: undefined,
     success: undefined,
     failure: undefined,

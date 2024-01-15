@@ -13,7 +13,7 @@ import reciveIcon from '../../../assets/icons/GreenArrowCircle.svg';
 import styles from './styles.module.scss';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import Status from '../../Status';
-import { formatMeritTransaction, formatDollarTransaction } from '../../../utils/walletHelpers';
+import { formatMeritTransaction, formatDollarTransaction, formatAssetTransaction } from '../../../utils/walletHelpers';
 
 import { blockchainSelectors } from '../../../redux/selectors';
 import truncate from '../../../utils/truncate';
@@ -31,8 +31,6 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
     navigator.clipboard.writeText(address);
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
-
-  transactionHistory.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
 
   return (
     <Card title="Transaction History" className={styles.cardWrapper}>
@@ -67,6 +65,23 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
               const userId = isAmountPositive ? transactionHistoryInfo.fromId : transactionHistoryInfo.toId;
               const typeText = isAmountPositive ? 'from' : 'to';
               const iconType = isAmountPositive ? reciveIcon : paymentIcon;
+              const configFormat = {
+                isSymbolFirst: true,
+              };
+              const assetLldLLm = transactionHistoryInfo.asset === 'LLM'
+                ? formatMeritTransaction(value, configFormat)
+                : formatDollarTransaction(value, configFormat);
+              const asset = (transactionHistoryInfo.asset === 'LLM'
+            || transactionHistoryInfo.asset === 'LLD') ? assetLldLLm
+                : formatAssetTransaction(
+                  value,
+                  transactionHistoryInfo.asset,
+                  transactionHistoryInfo.decimals,
+                  {
+                    isSymbolFirst: true,
+                    isAsset: true,
+                  },
+                );
               return (
                 <div
                   className={
@@ -78,8 +93,7 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
                     ? (
                       <TransacionHistoryDesktop
                         handleCopyClick={handleCopyClick}
-                        transactionHistoryInfo={transactionHistoryInfo}
-                        value={value}
+                        value={asset}
                         isBigScreen={isBigScreen}
                         dateTransacionHistory={dateTransacionHistory}
                         userId={userId}
@@ -91,8 +105,7 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
                     : (
                       <TransacionHistoryMobile
                         handleCopyClick={handleCopyClick}
-                        transactionHistoryInfo={transactionHistoryInfo}
-                        value={value}
+                        value={asset}
                         isLarge={isLarge}
                         dateTransacionHistory={dateTransacionHistory}
                         userId={userId}
@@ -117,7 +130,6 @@ function TransacionHistoryDesktop({
   userId,
   handleCopyClick,
   isBigScreen,
-  transactionHistoryInfo,
   dateTransacionHistory,
   value,
 }) {
@@ -143,9 +155,7 @@ function TransacionHistoryDesktop({
       </p>
       <p className={styles.paymentFromDate}>{dateTransacionHistory}</p>
       <span className={styles.bold}>
-        {transactionHistoryInfo.asset === 'LLM'
-          ? formatMeritTransaction(value, true)
-          : formatDollarTransaction(value, true)}
+        {value}
       </span>
       <div className={styles.status}>
         <Status
@@ -162,7 +172,6 @@ function TransacionHistoryDesktop({
 function TransacionHistoryMobile({
   typeText,
   handleCopyClick,
-  transactionHistoryInfo,
   value,
   isLarge,
   dateTransacionHistory,
@@ -195,9 +204,7 @@ function TransacionHistoryMobile({
       </div>
       <div className={styles.transactionHistoryAmount}>
         <span>
-          {transactionHistoryInfo.asset === 'LLM'
-            ? formatMeritTransaction(value, true)
-            : formatDollarTransaction(value, true)}
+          {value}
         </span>
         <Status
           status="success"

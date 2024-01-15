@@ -27,7 +27,6 @@ function Wallet() {
   const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
   const historyFetchFailed = useSelector(walletSelectors.selectorTxHistoryFailed);
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
-
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -38,8 +37,7 @@ function Wallet() {
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
     dispatch(walletActions.getAdditionalAssets.call());
-    dispatch(walletActions.getLlmTransfers.call());
-    dispatch(walletActions.getLldTransfers.call());
+    dispatch(walletActions.getTxTransfers.call());
   }, [dispatch]);
 
   const overView = () => (

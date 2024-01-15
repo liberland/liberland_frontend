@@ -39,36 +39,50 @@ export const parseDollars = (dollars) => _parse(dollars, dollarDecimals);
 export const parseAssets = (assets, assetDecimals) => _parse(assets, assetDecimals);
 export const formatAssets = (assets, assetDecimals) => _format(assets, parseInt(assetDecimals));
 
-export const formatTransaction = (value_raw, bigSymbol, smallSymbol, decimals, isSymbolFirst = false) => {
+const configDefault = {
+  isSymbolFirst: false,
+  isAsset: false,
+};
+
+export const formatTransaction = (value_raw, bigSymbol, smallSymbol, decimals, config = configDefault) => {
   const value = valueToBN(value_raw);
   const prefix = value.gt(BN_ZERO) ? '+' : '-';
   const absIntvalue = value.abs();
 
   if (_parse(absIntvalue.toString(), decimals).gt(BN_ONE)) {
-    return isSymbolFirst
-      ? `${bigSymbol} ${prefix}${_format(absIntvalue, decimals)}`
-      : `${prefix} ${_format(absIntvalue, decimals)} ${bigSymbol}`;
+    const formatValue = _format(absIntvalue, config.isAsset ? parseInt(decimals) : decimals);
+    return config.isSymbolFirst
+      ? `${bigSymbol} ${prefix}${formatValue}`
+      : `${prefix} ${formatValue} ${bigSymbol}`;
   }
 
-  return isSymbolFirst
+  return config.isSymbolFirst
     ? `${smallSymbol} ${prefix}${_format(absIntvalue, 0)}`
     : `${prefix} ${_format(absIntvalue, 0)} ${smallSymbol}`;
 };
 
-export const formatMeritTransaction = (merits_raw, isSymbolFirst = false) => formatTransaction(
+export const formatMeritTransaction = (merits_raw, config = configDefault) => formatTransaction(
   merits_raw,
   'LLM',
   'grains',
   meritDecimals,
-  isSymbolFirst,
+  config,
 );
 
-export const formatDollarTransaction = (dollars_raw, isSymbolFirst = false) => formatTransaction(
+export const formatDollarTransaction = (dollars_raw, config = configDefault) => formatTransaction(
   dollars_raw,
   'LLD',
   'picoLLD',
   dollarDecimals,
-  isSymbolFirst,
+  config,
+);
+
+export const formatAssetTransaction = (dollars_raw, asset, decimals, config = configDefault) => formatTransaction(
+  dollars_raw,
+  asset,
+  asset,
+  decimals,
+  config,
 );
 
 export const waitForInjectedWeb3 = async () => {

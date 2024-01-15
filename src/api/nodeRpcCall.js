@@ -183,7 +183,7 @@ const getLldBalances = async (addresses) => {
   }
 };
 
-const getAdditionalAssets = async (address) => {
+const getAdditionalAssets = async (address, isIndexNeed = false) => {
   try {
     const api = await getApi();
     const assetMetadatas = await api.query.assets.metadata.entries();
@@ -198,9 +198,16 @@ const getAdditionalAssets = async (address) => {
       // Disregard LLM, asset of ID 1 because it has special treatment already
       if (!(asset.index === 1 || asset.index === '1')) {
         assetQueries.push([api.query.assets.account, [asset.index, address]]);
-        indexedFilteredAssets.push(asset);
+        if (isIndexNeed) {
+          indexedFilteredAssets[asset.index] = asset;
+        } else {
+          indexedFilteredAssets.push(asset);
+        }
       }
     });
+    if (isIndexNeed) {
+      return indexedFilteredAssets;
+    }
 
     if (assetQueries.length !== 0) {
       const assetResults = await api.queryMulti([...assetQueries]);
