@@ -64,13 +64,23 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
               const userId = isAmountPositive ? transactionHistoryInfo.fromId : transactionHistoryInfo.toId;
               const typeText = isAmountPositive ? 'from' : 'to';
               const iconType = isAmountPositive ? reciveIcon : paymentIcon;
-
+              const configFormat = {
+                isSymbolFirst: true,
+              };
               const assetLldLLm = transactionHistoryInfo.asset === 'LLM'
-                ? formatMeritTransaction(value, true)
-                : formatDollarTransaction(value, true);
+                ? formatMeritTransaction(value, configFormat)
+                : formatDollarTransaction(value, configFormat);
               const asset = (transactionHistoryInfo.asset === 'LLM'
             || transactionHistoryInfo.asset === 'LLD') ? assetLldLLm
-                : formatAssetTransaction(value, transactionHistoryInfo.asset, transactionHistoryInfo.decimals, true);
+                : formatAssetTransaction(
+                  value,
+                  transactionHistoryInfo.asset,
+                  transactionHistoryInfo.decimals,
+                  {
+                    isSymbolFirst: true,
+                    isAsset: true,
+                  },
+                );
               return (
                 <div className={cx(styles.transactionHistoryCardMain, styles.gridList)} key={transactionHistoryInfo.id}>
                   {isTabletHigher
