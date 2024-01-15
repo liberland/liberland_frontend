@@ -71,11 +71,11 @@ export const formatDollarTransaction = (dollars_raw, isSymbolFirst = false) => f
   isSymbolFirst,
 );
 
-export const formatAssetTransaction = (dollars_raw, asset, isSymbolFirst = false) => formatTransaction(
+export const formatAssetTransaction = (dollars_raw, asset, decimals, isSymbolFirst = false) => formatTransaction(
   dollars_raw,
   asset,
   asset,
-  dollarDecimals,
+  decimals,
   isSymbolFirst,
 );
 

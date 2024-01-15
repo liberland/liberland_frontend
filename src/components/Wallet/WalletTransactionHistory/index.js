@@ -64,14 +64,20 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
               const userId = isAmountPositive ? transactionHistoryInfo.fromId : transactionHistoryInfo.toId;
               const typeText = isAmountPositive ? 'from' : 'to';
               const iconType = isAmountPositive ? reciveIcon : paymentIcon;
+
+              const assetLldLLm = transactionHistoryInfo.asset === 'LLM'
+                ? formatMeritTransaction(value, true)
+                : formatDollarTransaction(value, true);
+              const asset = (transactionHistoryInfo.asset === 'LLM'
+            || transactionHistoryInfo.asset === 'LLD') ? assetLldLLm
+                : formatAssetTransaction(value, transactionHistoryInfo.asset, transactionHistoryInfo.decimals, true);
               return (
                 <div className={cx(styles.transactionHistoryCardMain, styles.gridList)} key={transactionHistoryInfo.id}>
                   {isTabletHigher
                     ? (
                       <TransacionHistoryDesktop
                         handleCopyClick={handleCopyClick}
-                        transactionHistoryInfo={transactionHistoryInfo}
-                        value={value}
+                        value={asset}
                         isBigScreen={isBigScreen}
                         dateTransacionHistory={dateTransacionHistory}
                         userId={userId}
@@ -83,8 +89,7 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
                     : (
                       <TransacionHistoryMobile
                         handleCopyClick={handleCopyClick}
-                        transactionHistoryInfo={transactionHistoryInfo}
-                        value={value}
+                        value={asset}
                         isLarge={isLarge}
                         dateTransacionHistory={dateTransacionHistory}
                         userId={userId}
@@ -109,16 +114,9 @@ function TransacionHistoryDesktop({
   userId,
   handleCopyClick,
   isBigScreen,
-  transactionHistoryInfo,
   dateTransacionHistory,
   value,
 }) {
-  const assetLldLLm = transactionHistoryInfo.asset === 'LLM'
-    ? formatMeritTransaction(value, true)
-    : formatDollarTransaction(value, true);
-  const asset = (transactionHistoryInfo.asset === 'LLM'
-  || transactionHistoryInfo.asset === 'LLD') ? assetLldLLm
-    : formatAssetTransaction(value, transactionHistoryInfo.asset, true);
   return (
     <>
       <div className={styles.paymentNumber}>
@@ -141,7 +139,7 @@ function TransacionHistoryDesktop({
       </p>
       <p className={styles.paymentFromDate}>{dateTransacionHistory}</p>
       <span className={styles.bold}>
-        {asset}
+        {value}
       </span>
       <div className={styles.status}>
         <Status
@@ -158,7 +156,6 @@ function TransacionHistoryDesktop({
 function TransacionHistoryMobile({
   typeText,
   handleCopyClick,
-  transactionHistoryInfo,
   value,
   isLarge,
   dateTransacionHistory,
@@ -191,9 +188,7 @@ function TransacionHistoryMobile({
       </div>
       <div className={styles.transactionHistoryAmount}>
         <span>
-          {transactionHistoryInfo.asset === 'LLM'
-            ? formatMeritTransaction(value, true)
-            : formatDollarTransaction(value, true)}
+          {value}
         </span>
         <Status
           status="success"

@@ -159,7 +159,11 @@ export const getHistoryTransfers = async (substrate_address) => {
   const transfersLLM = result.data?.data?.merits?.nodes;
   const assets = filteredTransferAssets
     ? filteredTransferAssets.map((n) => {
-      const newItem = { ...n, asset: assetsData[n.asset].metadata.symbol };
+      const newItem = {
+        ...n,
+        asset: assetsData[n.asset].metadata.symbol,
+        decimals: assetsData[n.asset].metadata.decimals,
+      };
       return newItem;
     }) : [];
   const llm = transfersLLM ? transfersLLM.map((n) => ({ asset: 'LLM', ...n })) : [];
