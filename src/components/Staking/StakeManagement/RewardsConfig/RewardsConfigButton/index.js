@@ -9,7 +9,7 @@ export default function RewardsConfigButton() {
   return (
     <>
       <Button small secondary onClick={handleModalOpen}>
-        Change destination
+        CHANGE DESTINATION
       </Button>
       {isModalOpen && <StakingRewardsDestinationModal closeModal={handleModalOpen} />}
     </>

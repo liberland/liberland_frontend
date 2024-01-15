@@ -1,21 +1,11 @@
 @import '../../../assets/base/variables';
 @import '../../../assets/base/fonts';
+@import '../../../assets/main.scss';
 
 .nominatorWrapper{
-  display: flex;
-  //height: 20vh;
-  font-size: 18px;
-  align-items: flex-start;
-  justify-content: center;
-  border-radius: 20px;
-  //background: $bg3;
-  //background: $transparent3;
-  margin-top: 21px;
-  margin-bottom: 21px;
-  flex-direction: column;
-  padding: 3px;
-  @media (min-width: 48em) {
-    padding: 30px;
+  margin-top: 25px;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    margin-top: 30px;
   }
 }
 
@@ -24,10 +14,23 @@
 }
 
 .updateNominationsContainer{
-  width: 100%;
   flex-direction: row;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 10px
+  margin-top: 25px;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  & > button{
+    width: 100%;
+    @media screen and (min-width: map-get($breakpoints, 'phone')){
+      width: unset;
+    }
+  }
+
+  .button{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 }

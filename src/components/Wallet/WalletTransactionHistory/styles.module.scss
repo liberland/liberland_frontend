@@ -9,67 +9,17 @@
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')){
     margin-top: px;
-    padding: 15px 30px 25px 30px;
+    padding: 22px 30px 25px 30px;
     background-color: $bg4;
     border-radius: 10px;
   }
 }
 
-.transactionHistoryCard{
-  border-radius: 20px;
-  margin-top: 20px;
-
-  @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    margin-top: 15px;
-    padding: 12px 8px;
-  }
-}
-
-.transactionHistoryCardHeader{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2px;
-  padding: 14px 15px;
-  border-radius: 10px;
-  background-color: $lightGrey;
-  font-size: 14px;
-  font-weight: 700;
-
-  @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    padding: 24px 25px;
-    font-size: 14px;
-    gap: 2px;
-  }
-}
-
-.transactionHistoryCardHeaderDesktop{
-  display: none;
-}
-
-.transactionHistoryCardHeaderMobile{
-
-  @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    display: none;
-  }
-}
-
 .transactionHistoryCardMain{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 30px 0;
-
-  @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    margin: 20px 0;
-    padding: 0 12px;
-    font-size: 14px;
-  }
 
   & .paymentNumber{
     display: flex;
     align-items: center;
-
 
     & .paymentNumberIcon{
       margin-right: 15px;
@@ -79,7 +29,6 @@
       & > img {
         width: 40px;
       }
-
 
       @media screen and (min-width: map-get($breakpoints, 'desktop')){
         gap: 10px;

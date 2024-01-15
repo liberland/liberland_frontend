@@ -1,5 +1,6 @@
 @import '../../assets/base/variables';
 @import '../../assets/base/fonts';
+@import '../../assets/main.scss';
 
 .button {
   background: $bg3;
@@ -42,11 +43,11 @@
   cursor: pointer;
   &.primary {
     background: $primary;
-    color: white;
+    color: $clearBlack;
   }
   &.secondary {
     background: $secondary3;
-    color: $primary;
+    color: $clearBlack;
   }
   &.green{
     background: $secondary;
@@ -59,5 +60,9 @@
   &.grey{
     background: $bg2;
     color: $text4;
+  }
+  &.whiteRed{
+    border: 2px solid $red;
+    color: $red;
   }
 }

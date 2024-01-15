@@ -10,6 +10,7 @@ import { walletActions } from '../../redux/actions';
 
 import WalletAddressesLine from './WalletAddressesLine';
 import styles from './styles.module.scss';
+import stylesPage from '../../utils/pagesBase.module.scss';
 import WalletOverview from './WalletOverview';
 import WalletTransactionHistory from './WalletTransactionHistory';
 import Bridge from './Bridge';
@@ -42,7 +43,7 @@ function Wallet() {
   }, [dispatch]);
 
   const overView = () => (
-    <div className={styles.walletOverviewWrapper}>
+    <div className={stylesPage.contentWrapper}>
 
       <WalletOverview
         totalBalance={totalBalance}
@@ -65,8 +66,8 @@ function Wallet() {
 
   return (
     (userWalletAddress !== undefined) ? (
-      <div className={styles.walletWrapper}>
-        <div className={styles.walletAdressWrapper}>
+      <div className={stylesPage.sectionWrapper}>
+        <div className={stylesPage.menuAdressWrapper}>
           <WalletAddressesLine walletAddress={userWalletAddress} />
         </div>
 

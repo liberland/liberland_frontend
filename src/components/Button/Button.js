@@ -19,6 +19,7 @@ function Button({
   green,
   grey,
   red,
+  whiteRed,
 }) {
   return (
     <button
@@ -36,6 +37,7 @@ function Button({
         [styles.green]: green,
         [styles.grey]: grey,
         [styles.red]: red,
+        [styles.whiteRed]: whiteRed,
       })
     }
     >
@@ -58,6 +60,7 @@ Button.defaultProps = {
   green: false,
   grey: false,
   red: false,
+  whiteRed: false,
 };
 
 Button.propTypes = {
@@ -75,6 +78,7 @@ Button.propTypes = {
   green: PropTypes.bool,
   grey: PropTypes.bool,
   red: PropTypes.bool,
+  whiteRed: PropTypes.bool,
 };
 
 export default Button;

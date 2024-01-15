@@ -5,7 +5,7 @@
 
 .card {
   background: $bg3;
-  border-radius: 20px;
+  border-radius: 10px;
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
     border-radius: 0;
   }

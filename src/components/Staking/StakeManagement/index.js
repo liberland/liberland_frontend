@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import cx from 'classnames';
 import { validatorSelectors, walletSelectors } from '../../../redux/selectors';
 import { formatDollars } from '../../../utils/walletHelpers';
 import Button from '../../Button/Button';
@@ -12,19 +13,19 @@ import RewardsConfigButton from './RewardsConfig/RewardsConfigButton';
 import WithdrawUnbondedButton from './WithdrawUnbondedButton';
 import PayoutRewards from './PayoutRewards';
 import Unbonding from './Unbonding';
+import stylesPage from '../../../utils/pagesBase.module.scss';
+import Card from '../../Card';
 
 function CurrentlyStaked() {
   const balances = useSelector(walletSelectors.selectorBalances);
 
   return (
-    <div className={styles.rowWrapper}>
+    <div className={cx(styles.rowWrapper, styles.currentlyStaked)}>
       <span>Currently staked: </span>
       <span>
-        <b>
-          {formatDollars(balances.polkastake.amount)}
-          {' '}
-          LLD
-        </b>
+        {formatDollars(balances.polkastake.amount)}
+        {' '}
+        LLD
       </span>
     </div>
   );
@@ -43,40 +44,34 @@ export default function StakeManagement() {
 
   return (
     <div className={styles.stakingWrapper}>
-      <div className={styles.flex}>
-        <div className={styles.stakingInfoWrapper}>
-          <h3>LLD staking</h3>
-          <div className={styles.internalWrapper}>
-            <CurrentlyStaked />
-            {info?.stash && (
-              <>
-                <PendingRewardsData />
-                <RewardsConfig />
-                <Unbonding />
-                <div className={styles.stakingActionButtonsWrapper}>
-                  <Button small primary onClick={handleStakeModalOpen}>
-                    Add stake
-                  </Button>
-                  <WithdrawUnbondedButton />
-                  <Button small secondary onClick={handleUnbondModalOpen}>
-                    Unstake
-                  </Button>
-                  <RewardsConfigButton />
-                  <PayoutRewards />
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-        <div className={styles.stakingModeWrapper}>
-          <div>
-            <h3>Staking mode</h3>
-            <div className={styles.internalWrapper}>
-              <StakingMode />
+      <Card className={cx(stylesPage.overviewWrapper, styles.customCard)} title="LLD staking">
+        <div>
+          <CurrentlyStaked />
+          {info?.stash && (
+          <>
+            <PendingRewardsData />
+            <RewardsConfig />
+            <Unbonding />
+            <div className={styles.stakingActionButtonsWrapper}>
+              <Button small primary onClick={handleStakeModalOpen}>
+                ADD STAKE
+              </Button>
+              <WithdrawUnbondedButton />
+              <Button small secondary onClick={handleUnbondModalOpen}>
+                UNSTAKE
+              </Button>
+              <RewardsConfigButton />
+              <PayoutRewards />
             </div>
-          </div>
+          </>
+          )}
         </div>
-      </div>
+      </Card>
+      <Card className={cx(stylesPage.overviewWrapper, styles.customCard, styles.stakingCard)} title="Staking mode">
+        <div className={styles.internalWrapper}>
+          <StakingMode />
+        </div>
+      </Card>
       {isStakeModalOpen && <StakeLLDModal closeModal={handleStakeModalOpen} />}
       {isUnbondModalOpen && <UnbondModal closeModal={handleUnbondModalOpen} />}
     </div>

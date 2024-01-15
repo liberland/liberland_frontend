@@ -1,10 +1,13 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import cx from 'classnames';
 import { validatorSelectors } from '../../redux/selectors';
 import { validatorActions } from '../../redux/actions';
 import StakeManagement from './StakeManagement';
 import Validator from './Validator';
 import Nominator from './Nominator';
+import styles from '../../utils/pagesBase.module.scss';
+import stylesStacking from './styles.module.scss';
 
 export default function Staking() {
   const dispatch = useDispatch();
@@ -24,9 +27,11 @@ export default function Staking() {
   }
 
   return (
-    <div>
-      <StakeManagement />
-      {render}
+    <div className={styles.sectionWrapper}>
+      <div className={cx(styles.contentWrapper, stylesStacking.contentWrapper)}>
+        <StakeManagement />
+        {render}
+      </div>
     </div>
   );
 }
