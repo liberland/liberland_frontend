@@ -1,26 +1,18 @@
 import {
   put, call, takeLatest, take,
 } from 'redux-saga/effects';
-import { web3Enable } from '@polkadot/extension-dapp';
 import { eventChannel } from 'redux-saga';
 import { blockchainActions } from '../actions';
 import {
   subscribeActiveEra, subscribeBestBlockNumber, getAllWalletsRpc, fetchPreimage,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcherEvery } from './base';
-import { waitForInjectedWeb3 } from '../../utils/walletHelpers';
 
 // WORKERS
 function* getAllWalletsWorker() {
-  yield call(waitForInjectedWeb3);
-  const extensions = yield call(web3Enable, 'Liberland dapp');
   try {
-    if (extensions.length) {
-      const allWallets = yield call(getAllWalletsRpc);
-      yield put(blockchainActions.getAllWallets.success(allWallets));
-    } else {
-      yield put(blockchainActions.getAllWallets.failure('No enabled Extensions'));
-    }
+    const allWallets = yield call(getAllWalletsRpc);
+    yield put(blockchainActions.getAllWallets.success(allWallets));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);

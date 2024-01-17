@@ -44,23 +44,23 @@ const selectUserFamilyName = createSelector(
     return user.familyName;
   },
 );
+
+const selectGuidedStep = createSelector(
+  userReducer,
+  (reducer) => reducer.guidedStep,
+);
 const selectIsSessionVerified = createSelector(
   userReducer,
   (reducer) => reducer.isSessionVerified,
 );
 
-const selectIsSignInFetching = createSelector(
-  userReducer,
-  (reducer) => reducer.isSignInFetching,
-);
-
 export {
+  selectGuidedStep,
   selectUser,
   selectIsSessionVerified,
   selectUserRole,
   selectUserEmail,
   selectUserId,
-  selectIsSignInFetching,
   selectUserGivenName,
   selectUserFamilyName,
 };

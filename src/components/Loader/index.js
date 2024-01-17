@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux';
 
 // REDUX
 import {
-  userSelectors,
   walletSelectors,
   democracySelectors,
   officesSelectors,
@@ -22,7 +21,6 @@ import NextBlockCountdown from './NextBlockCountdown';
 
 // eslint-disable-next-line react/prop-types
 function Loader({ children }) {
-  const isSignInFetching = useSelector(userSelectors.selectIsSignInFetching);
   const isGettingWalletInfo = useSelector(walletSelectors.selectorGettingWalletInfo);
   const isGettingDemocracyInfo = useSelector(democracySelectors.selectorGettingDemocracyInfo);
   const isLoadingOffices = useSelector(officesSelectors.selectorIsLoading);
@@ -34,7 +32,6 @@ function Loader({ children }) {
   const isGetRegistries = useSelector(registriesSelectors.isGetRegistries);
 
   const isLoading = [
-    isSignInFetching,
     isGettingWalletInfo,
     isGettingDemocracyInfo,
     isLoadingOffices,
@@ -47,7 +44,7 @@ function Loader({ children }) {
   ].some((isFetching) => isFetching);
 
   return (
-    <div style={{ position: 'relative', backgroundColor:'#fefefe', minHeight: '100vh'}}>
+    <div style={{ position: 'relative', backgroundColor: '#fefefe', minHeight: '100vh' }}>
       { isLoading
         && (
           <BackgroundBlocker>

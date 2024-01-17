@@ -75,7 +75,7 @@ export const waitForInjectedWeb3 = async () => {
   const delay = (time) => new Promise((resolve) => { setTimeout(resolve, time); });
   const timeout = 5000;
   const start = Date.now();
-  const interval = 500;
+  const interval = 2000;
 
   // wait up to 5s for first extension
   // eslint-disable-next-line no-constant-condition

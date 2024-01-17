@@ -1,4 +1,6 @@
-import { put, takeEvery, takeLatest } from 'redux-saga/effects';
+import {
+  put, takeEvery, takeLatest,
+} from 'redux-saga/effects';
 import { blockchainActions } from '../actions';
 
 function errorHandler(onFailure, worker) {

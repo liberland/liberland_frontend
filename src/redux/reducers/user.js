@@ -5,19 +5,11 @@ import {
 
 const initialState = {
   user: null,
-  isSignInFetching: false,
   isSessionVerified: false,
 };
 
 const userReducer = handleActions(
   {
-    [combineActions(
-      authActions.signIn.success,
-      authActions.signUp.success,
-    )]: (state, action) => ({
-      ...state,
-      user: action.payload || state.user,
-    }),
     [combineActions(
       authActions.signOut.success,
     )]: (state) => ({
@@ -29,20 +21,20 @@ const userReducer = handleActions(
       isSessionVerified: true,
       user: action.payload,
     }),
-    [authActions.verifySession.failure]: (state) => ({
+    [authActions.verifySession.failure]: (state, action) => ({
       ...state,
       isSessionVerified: true,
+      url: action.payload,
     }),
-    [authActions.signIn.call]: (state) => ({
+    [authActions.guidedStep.success]: (state, action) => ({
       ...state,
-      isSignInFetching: true,
+      isSessionVerified: true,
+      guidedStep: action.payload,
     }),
-    [combineActions(
-      authActions.signIn.success,
-      authActions.signIn.failure,
-    )]: (state) => ({
+    [authActions.guidedStep.failure]: (state, action) => ({
       ...state,
-      isSignInFetching: false,
+      isSessionVerified: true,
+      url: action.payload,
     }),
   },
   initialState,

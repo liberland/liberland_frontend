@@ -2,7 +2,6 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 
 import { errorsSelectors, blockchainSelectors } from '../../../redux/selectors';
 
@@ -20,7 +19,6 @@ function SignIn() {
     setError,
   } = useForm();
   const dispatch = useDispatch();
-  const history = useHistory();
   const apiError = useSelector(errorsSelectors.selectSignIn);
   const allAccounts = useSelector(blockchainSelectors.allWalletsSelector);
   // TODO REFACTOR
@@ -38,7 +36,6 @@ function SignIn() {
     }
     if (ssoAccessTokenHash) {
       sessionStorage.setItem('ssoAccessTokenHash', ssoAccessTokenHash);
-      history.push('/guided-setup');
     }
   }, [apiError, setError, dispatch, ssoAccessTokenHash, allAccounts]);
 

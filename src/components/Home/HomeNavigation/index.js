@@ -54,7 +54,6 @@ function HomeNavigation() {
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
-
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -135,7 +134,7 @@ function HomeNavigation() {
           <Header />
         </div>
         {
-          navigationList.map(({
+          roles && navigationList.map(({
             route,
             icon,
             title,
