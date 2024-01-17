@@ -2,7 +2,7 @@ import React from 'react';
 
 function UnsupportedBrowserNoticeComponent() {
   const onClick = () => {
-    localStorage.setItem('acceptUnnsuportedBrowser', true);
+    sessionStorage.setItem('isUnsupportedBrowser', true);
   };
   return (
     <div>
@@ -22,7 +22,7 @@ function UnsupportedBrowserNoticeComponent() {
       <p>
         Alternatively, if you understand that the app might not work correctly in your browser,
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <i><a onClick={onClick}>click here to proceed</a></i>
+        <i><button onClick={onClick}>click here to proceed</button></i>
         .
       </p>
     </div>

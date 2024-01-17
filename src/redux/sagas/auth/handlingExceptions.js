@@ -14,11 +14,6 @@ export function* handleError(err) {
   yield put(authActions.verifySession.failure(err));
   yield guidedStepSuccess();
 }
-export function* handleUnsupportedBrowser() {
-  yield put(authActions.guidedStep.success({
-    component: GuidedStepEnum.UNSUPPORTED_BROWSER, data: '', isUnsupportedBrowser: true,
-  }));
-}
 
 function* noHandle(wallets) {
   yield put(blockchainActions.getAllWallets.success(wallets));
@@ -52,7 +47,6 @@ function* handleSignInWithToken(ssoTokenUrl, wallets, config) {
   const { data: user } = yield call(api.get, '/users/me');
   const walletAddress = ssoTokenUrl ? user?.blockchainAddress : yield sessionStorage.getItem('userWalletAddress');
   const userId = user?.id;
-
   yield put(blockchainActions.setUserWallet.success(walletAddress));
   if (checkIfWalletAddressIsProper(wallets, walletAddress)) {
     const isLogIn = ssoTokenUrl || config.isTokenPushToLocalStorage;
@@ -74,7 +68,6 @@ function* handleWalletsExist(wallets, config) {
   const newConfig = { ...config };
   const ssoTokenUrl = hashToSsoAccessToken(window.location.hash);
   const ssoAccessTokenHashStorage = yield sessionStorage.getItem('ssoAccessTokenHash');
-
   if (ssoTokenUrl) {
     sessionStorage.setItem('ssoAccessTokenHash', ssoTokenUrl);
     window.location.hash = '';
@@ -84,7 +77,7 @@ function* handleWalletsExist(wallets, config) {
   if (!ssoAccessTokenHashStorage && window.location.pathname.includes(routes.signIn) && !ssoTokenUrl) {
     yield noHandle(wallets);
     newConfig.shouldExitLoop = true;
-    return config;
+    return newConfig;
   }
   return yield handleSignInWithToken(
     ssoTokenUrl,
@@ -96,7 +89,6 @@ function* handleWalletsExist(wallets, config) {
 export function* handleExtensionsExist(config) {
   const wallets = yield call(getAllWalletsRpc);
   const walletsLength = lengthOfObject(wallets);
-
   if (walletsLength > 0) {
     return yield handleWalletsExist(wallets, config);
   }

@@ -10,7 +10,7 @@ import {
 } from '../../actions';
 import { GuidedStepEnum } from '../../../utils/enums';
 import {
-  handleExtensionsExist, handleUnsupportedBrowser, guidedStepSuccess,
+  handleExtensionsExist, guidedStepSuccess,
   handleError,
 } from './handlingExceptions';
 import {
@@ -22,8 +22,10 @@ function* verifySessionWorker() {
     let config = { shouldExitLoop: false, isTokenPushToLocalStorage: false };
     const isUnsupportedBrowser = yield checkUnsupportedBrowser();
     if (isUnsupportedBrowser) {
-      yield handleUnsupportedBrowser();
-      return;
+      const checkIfExist = sessionStorage.getItem('isUnsupportedBrowser');
+      if (!checkIfExist) {
+        sessionStorage.setItem('isUnsupportedBrowser', false);
+      }
     }
     const enteredTime = Date.now();
     const delay = (time) => new Promise((resolve) => { setTimeout(resolve, time); });
@@ -31,9 +33,11 @@ function* verifySessionWorker() {
       yield call(delay, intervalTime);
       const extensions = yield call(web3Enable, 'Liberland dapp');
       const extensionsLength = lengthOfObject(extensions);
-
+      const isUnsupportedBrowserStorage = sessionStorage.getItem('isUnsupportedBrowser');
       if (extensionsLength > 0) {
         config = yield handleExtensionsExist(config);
+      } else if (isUnsupportedBrowser && isUnsupportedBrowserStorage === 'false') {
+        yield guidedStepSuccess({ component: GuidedStepEnum.UNSUPPORTED_BROWSER, data: '' });
       } else {
         yield guidedStepSuccess({ component: GuidedStepEnum.NO_WALLETS_AVAILABLE, data: '' });
       }
