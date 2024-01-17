@@ -6,6 +6,7 @@ export const {
   signUp,
   verifySession,
   initGetDataFromNode,
+  guidedStep,
 } = createActions({
   SIGN_OUT: {
     call: undefined,
@@ -28,6 +29,11 @@ export const {
     failure: undefined,
   },
   INIT_GET_DATA_FROM_NODE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GUIDED_STEP: {
     call: undefined,
     success: undefined,
     failure: undefined,

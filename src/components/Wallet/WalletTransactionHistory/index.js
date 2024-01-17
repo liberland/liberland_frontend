@@ -37,7 +37,7 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
       <NotificationPortal ref={notificationRef} />
       <div className={stylesPage.transactionHistoryCard}>
         <div className={cx(stylesPage.transactionHistoryCardHeaderMobile, stylesPage.transactionHistoryCardHeader)}>
-          <span>ADRESS / TIME</span>
+          <span>ADDRESS / TIME</span>
           <span>AMOUNT / STATUS</span>
         </div>
         <div className={cx(

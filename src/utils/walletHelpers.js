@@ -84,28 +84,3 @@ export const formatAssetTransaction = (dollars_raw, asset, decimals, config = co
   decimals,
   config,
 );
-
-export const waitForInjectedWeb3 = async () => {
-  const delay = (time) => new Promise((resolve) => { setTimeout(resolve, time); });
-  const timeout = 5000;
-  const start = Date.now();
-  const interval = 500;
-
-  // wait up to 5s for first extension
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    await delay(interval);
-    if (Date.now() - start > timeout) break;
-    if (window.injectedWeb3) break;
-  }
-
-  // after first extension, debounce new ones
-  let extensions = Object.keys(window.injectedWeb3).length;
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    await delay(interval);
-    const newCount = Object.keys(window.injectedWeb3).length;
-    if (extensions === newCount) break;
-    extensions = newCount;
-  }
-};

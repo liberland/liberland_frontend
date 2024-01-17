@@ -5,7 +5,6 @@ export const {
   addCandidacyToElectoralSheet,
   sendElectoralSheet,
   setIsVotingInProgress,
-  getAssembliesList,
   getLiberStakeAmount,
 } = createActions({
   ADD_MY_CANDIDACY: {
@@ -24,11 +23,6 @@ export const {
     failure: undefined,
   },
   SET_IS_VOTING_IN_PROGRESS: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  GET_ASSEMBLIES_LIST: {
     call: undefined,
     success: undefined,
     failure: undefined,
