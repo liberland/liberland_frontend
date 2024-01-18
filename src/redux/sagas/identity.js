@@ -5,7 +5,6 @@ import {
 import {
   getIdentity,
   setIdentity,
-  getIdentities,
 } from '../../api/nodeRpcCall';
 
 import { identityActions } from '../actions';
@@ -28,15 +27,6 @@ function* getIdentityWorker(action) {
   }
 }
 
-function* getIdentitiesWorker(action) {
-  try {
-    const identities = yield call(getIdentities, action.payload);
-    yield put(identityActions.getIdentities.success(identities));
-  } catch (e) {
-    yield put(identityActions.getIdentities.failure(e));
-  }
-}
-
 // WATCHERS
 
 function* setIdentityWatcher() {
@@ -51,16 +41,7 @@ function* getIdentityWatcher() {
   }
 }
 
-function* getIdentitiesWatcher() {
-  try {
-    yield takeLatest(identityActions.getIdentities.call, getIdentitiesWorker);
-  } catch (e) {
-    yield put(identityActions.getIdentities.failure(e));
-  }
-}
-
 export {
   setIdentityWatcher,
   getIdentityWatcher,
-  getIdentitiesWatcher,
 };

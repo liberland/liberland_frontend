@@ -201,7 +201,7 @@ function ReferendumItem({
                 <ol>
                   {centralizedDatas.map((centralizedData) => {
                     const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
-                    const nameOrId = usersList[centralizedData.proposerAddress]
+                    const nameOrId = usersList[centralizedData.proposerAddress].identity
                     || truncate(centralizedData.proposerAddress, 13);
                     return (
                       <li key={centralizedData.id}>

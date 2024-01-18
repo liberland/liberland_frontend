@@ -4,7 +4,6 @@ import { identityActions } from '../actions';
 const initialState = {
   loading: false,
   identity: null,
-  identities: {},
 };
 
 const identityReducer = handleActions(
@@ -12,7 +11,6 @@ const identityReducer = handleActions(
     [combineActions(
       identityActions.getIdentity.call,
       identityActions.setIdentity.call,
-      identityActions.getIdentities.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -21,8 +19,6 @@ const identityReducer = handleActions(
     [combineActions(
       identityActions.getIdentity.success,
       identityActions.getIdentity.failure,
-      identityActions.getIdentities.success,
-      identityActions.getIdentities.failure,
       identityActions.setIdentity.success,
       identityActions.setIdentity.failure,
     )]: (state) => ({
@@ -39,27 +35,6 @@ const identityReducer = handleActions(
       ...state,
       identity: action.payload,
     }),
-    [identityActions.getIdentities.call]: (state) => ({
-      ...state,
-      identities: {},
-    }),
-    [identityActions.getIdentities.success]: (state, action) => {
-      const identitiesMap = {};
-      for (const item of action.payload) {
-        const nameHashed = item.identity.display.asRaw;
-        const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
-        if (!name) {
-          // eslint-disable-next-line no-continue
-          continue;
-        }
-        identitiesMap[item.address] = name;
-      }
-
-      return {
-        ...state,
-        identities: identitiesMap,
-      };
-    },
   },
   initialState,
 );

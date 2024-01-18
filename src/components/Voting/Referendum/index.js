@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
@@ -14,8 +14,6 @@ import {
 import { democracyActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import router from '../../../router';
-import useUsersIdentity from '../../../hooks/usersIdentity/useUsersIdentity';
-import useProposerList from '../../../hooks/usersIdentity/useProposersList';
 
 function Referendum() {
   const [isModalOpenVote, setIsModalOpenVote] = useState(false);
@@ -26,7 +24,6 @@ function Referendum() {
   const dispatch = useDispatch();
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call(userWalletAddress));
   }, [dispatch, userWalletAddress]);
@@ -54,13 +51,6 @@ function Referendum() {
     return false;
   };
 
-  const crossReferencedProposalsData = democracy.democracy?.crossReferencedProposalsData || [];
-  const crossReferencedReferendumsData = democracy.democracy?.crossReferencedReferendumsData || [];
-  const proposersList = useProposerList(crossReferencedReferendumsData);
-  const proposersList2 = useProposerList(crossReferencedProposalsData, true);
-  const mergedProposersList = useMemo(() => [...proposersList, ...proposersList2], [proposersList, proposersList2]);
-  const { usersList } = useUsersIdentity(mergedProposersList);
-
   return (
     <div>
       <div className={styles.referendumsSection}>
@@ -87,9 +77,9 @@ function Referendum() {
         <Card title="Referendums" className={styles.referendumsCard}>
           <div>
             {
-              crossReferencedReferendumsData.map((referendum) => (
+              democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
                 <ReferendumItem
-                  usersList={usersList}
+                  usersList={democracy?.democracy?.identitiesName}
                   key={referendum.index}
                   centralizedDatas={referendum.centralizedDatas}
                   yayVotes={referendum.votedAye}
@@ -112,9 +102,9 @@ function Referendum() {
         <Card title="Proposals">
           <div>
             {
-              crossReferencedProposalsData.map((proposal) => (
+              democracy.democracy?.crossReferencedProposalsData.map((proposal) => (
                 <ProposalItem
-                  usersList={usersList}
+                  usersList={democracy?.democracy?.identitiesName}
                   key={proposal.index}
                   proposer={proposal.proposer}
                   centralizedDatas={proposal.centralizedDatas}

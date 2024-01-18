@@ -64,7 +64,7 @@ function ProposalItem({
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
 
-  const nameOrIdProposer = usersList[proposer] || proposer;
+  const nameOrIdProposer = usersList[proposer].identity || proposer;
 
   return (
     <>
@@ -120,7 +120,7 @@ function ProposalItem({
               Discussions:
               <ol>
                 {centralizedDatas.map((centralizedData) => {
-                  const nameOrId = usersList[centralizedData.proposerAddress]
+                  const nameOrId = usersList[centralizedData.proposerAddress].identity
                    || truncate(centralizedData.proposerAddress, 13);
                   const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
                   return (
