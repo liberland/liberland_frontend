@@ -1,12 +1,14 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
+import { useMediaQuery } from 'usehooks-ts';
+import cx from 'classnames';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 import libertarianTorch from '../../../../assets/images/libertariantorch.png';
-import addIcon from '../../../../assets/images/arrow-double-right-green.png';
 import truncate from '../../../../utils/truncate';
 import NotificationPortal from '../../../NotificationPortal';
 import { ReactComponent as CopyIcon } from '../../../../assets/icons/copy.svg';
+import stylesVotes from '../SelectedCandidateCard/styles.module.scss';
 
 function CandidateCard({
   politician, selectCandidate,
@@ -16,34 +18,35 @@ function CandidateCard({
     navigator.clipboard.writeText(dataToCoppy);
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
+  const isBigScreen = useMediaQuery('(min-width: 1200px)');
 
   return (
     <>
       <NotificationPortal ref={notificationRef} />
-      <div className={styles.politicianCardContainer}>
-        <div className={styles.politicianData}>
-          <div className={styles.politicianImageContainer}>
-            <img src={liberlandEmblemImage} style={{ height: '100%' }} alt="" />
+      <div className={stylesVotes.politicianCardContainer}>
+        <div className={stylesVotes.leftColumn}>
+          <div className={stylesVotes.politicianImageContainer}>
+            <img src={liberlandEmblemImage} style={{ height: '100%' }} alt="liberlandEmblemImage" />
+            <img src={libertarianTorch} style={{ height: '100%' }} alt="libertarianTorch" />
           </div>
-          <div className={styles.politicianPartyImageContainer}>
-            <img src={libertarianTorch} style={{ height: '100%' }} alt="" />
-          </div>
-          <div className={`${styles.politicianDisplayName} ${styles.maxContent}`}>
-            {truncate(politician.name, 22)}
+          <div className={`${stylesVotes.politicianDisplayName} ${styles.maxContent}`}>
             <CopyIcon
-              className={styles.copyIcon}
+              className={stylesVotes.copyIcon}
               name="walletAddress"
               onClick={() => handleCopyClick(politician.name)}
             />
+            <span>{truncate(politician.name, isBigScreen ? 20 : 12)}</span>
           </div>
         </div>
-        <div className={styles.selectCandidateContainer} onClick={() => selectCandidate(politician)}>
-          <div className={styles.selectCandidateItems}>
-            <div className={styles.selectCandidateImageContainer}>
-              <img src={addIcon} style={{ height: '100%' }} alt="" />
-            </div>
-          </div>
-        </div>
+        <button
+          className={cx(
+            stylesVotes.unselectContainer,
+            styles.background,
+          )}
+          onClick={() => selectCandidate(politician)}
+        >
+          <span className={styles.doubleChevron}>&#xbb;</span>
+        </button>
       </div>
     </>
   );

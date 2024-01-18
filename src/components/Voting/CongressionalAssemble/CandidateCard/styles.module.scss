@@ -1,79 +1,15 @@
 @import "../../../../assets/base/variables";
-.politicianCardContainer {
-  flex-direction: row;
-  display: flex;
-  height: 2rem;
-  align-items: center;
-  justify-items: center;
-  margin: 10px;
-  border-width: 2px;
-  border-color: $primary;
-  border-style: solid;
-  background-color: $secondary3;
-  padding-top: 5px;
-  padding-bottom: 5px;
-}
-.politicianData {
-  display: flex;
-  flex: 3;
-  align-items: center;
-  justify-items: center;
-}
-.selectCandidateContainer {
-  display: grid;
-  flex: 1;
-  align-items: flex-end;
-  justify-items: flex-end;
-  flex-direction: row;
-}
-.selectCandidateItems {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-items: center;
-}
-.politicianImageContainer{
-  margin-right: 5px;
-  margin-left: 5px;
-  display: flex;
-  align-items: center;
-  justify-items: center;
-  height:1.5rem;
-  @media (min-width: 48em) {
-    height:2.25rem;
+@import '../../../../assets/main.scss';
+
+.doubleChevron{
+  color: $clearBlack;
+  margin-bottom: 4px;
+  font-size: 24px;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    font-size: 32px;
   }
 }
-.politicianPartyImageContainer{
-  margin-right: 5px;
-  margin-left: 5px;
-  display: flex;
-  align-items: center;
-  justify-items: center;
-  height:1.5rem;
-  @media (min-width: 48em) {
-    height:2.25rem;
-  }
-}
-.selectCandidateImageContainer{
-  margin-right: 10px;
-  margin-left: 10px;
-  display: flex;
-  align-items: center;
-  justify-items: center;
-  height:1.1rem;
-  @media (min-width: 48em) {
-    height:1.75rem;
-  }
-}
-.politicianDisplayName{
-  font-weight: bold;
-  font-size: 0.9rem;
-  color: $text2;
-  @media (min-width: 48em) {
-    font-size: 1.1rem;
-  }
-}
-.maxContent {
-  width: max-content;
-  display: flex;
+
+.background{
+  background: $primary;
 }

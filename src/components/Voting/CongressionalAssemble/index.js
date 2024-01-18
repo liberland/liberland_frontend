@@ -1,8 +1,10 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import cx from 'classnames';
 import { democracySelectors } from '../../../redux/selectors';
-
+import stylesPage from '../../../utils/pagesBase.module.scss';
+import styles from './styles.module.scss';
 import CurrentAssemble from './CurrentAssemble';
 import CandidateVoting from './CandidateVoting';
 
@@ -38,6 +40,14 @@ function CongressionalAssemble() {
     setDidChangeSelectedCandidates(true);
   };
 
+  const findPoliticianIndex = (ar, el) => {
+    let indexOfPolitician = false;
+    for (let i = 0; i < ar.length; i += 1) {
+      if (ar[i].rawIdentity === el.rawIdentity) { indexOfPolitician = i; }
+    }
+    return indexOfPolitician;
+  };
+
   const moveSelectedCandidate = (politician, direction) => {
     const newSelectedCandidates = selectedCandidates.slice();
     const selectedPoliticianArrayIndex = findPoliticianIndex(selectedCandidates, politician);
@@ -50,19 +60,14 @@ function CongressionalAssemble() {
     newSelectedCandidates[selectedPoliticianArrayIndex] = swapWithPolitician;
     setSelectedCandidates(newSelectedCandidates);
     setDidChangeSelectedCandidates(true);
-  };
-
-  const findPoliticianIndex = (ar, el) => {
-    let indexOfPolitician = false;
-    for (let i = 0; i < ar.length; i++) {
-      if (ar[i].rawIdentity === el.rawIdentity) { indexOfPolitician = i; }
-    }
-    return indexOfPolitician;
+    return false;
   };
 
   useEffect(() => {
     setSelectedCandidates(democracy?.democracy?.currentCandidateVotesByUser);
-    let filteredEligibleUnselectedCandidates = democracy?.democracy?.currentCongressMembers?.concat(democracy?.democracy?.candidates);
+    let filteredEligibleUnselectedCandidates = democracy?.democracy?.currentCongressMembers?.concat(
+      democracy?.democracy?.candidates,
+    );
     filteredEligibleUnselectedCandidates = filteredEligibleUnselectedCandidates?.filter((candidate) => {
       let shouldKeep = true;
       democracy?.democracy?.currentCandidateVotesByUser?.forEach((votedForCandidate) => {
@@ -76,9 +81,8 @@ function CongressionalAssemble() {
   }, [democracy]);
 
   return (
-    <div>
+    <div className={cx(stylesPage.contentWrapper, styles.contentWrapper)}>
       <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />
-      <div style={{ height: '15px' }} />
       <CandidateVoting
         eligibleUnselectedCandidates={eligibleUnselectedCandidates}
         selectedCandidates={selectedCandidates}
@@ -87,7 +91,6 @@ function CongressionalAssemble() {
         moveSelectedCandidate={moveSelectedCandidate}
         didChangeSelectedCandidates={didChangeSelectedCandidates}
       />
-
     </div>
   );
 }

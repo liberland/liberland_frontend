@@ -5,11 +5,11 @@ import router from '../../../router';
 const navigationList = [
   {
     route: router.voting.congressionalAssemble,
-    title: 'Congress',
+    title: 'CONGRESS',
   },
   {
     route: router.voting.referendum,
-    title: 'Referenda',
+    title: 'REFERENDA',
   },
 ];
 
