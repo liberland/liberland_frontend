@@ -1380,6 +1380,21 @@ const getIdentities = async (addresses) => {
   }));
 };
 
+const getIdentitiesNames = async (addresses) => {
+  const api = await getApi();
+  const raw = await api.query.identity.identityOf.multi(addresses);
+  const identities = {};
+  raw.map((identity, idx) => {
+    identities[addresses[idx]] = {};
+    const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
+    const nameHashed = unwrapIdentity.display.asRaw;
+    const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
+    identities[addresses[idx]].identity = name;
+    return null;
+  });
+  return identities;
+};
+
 const stakingChill = async (walletAddress) => {
   const api = await getApi();
   const extrinsic = api.tx.staking.chill();
@@ -1984,4 +1999,5 @@ export {
   setRegisteredCompanyData,
   requestUnregisterCompanyRegistration,
   fetchPendingIdentities,
+  getIdentitiesNames,
 };

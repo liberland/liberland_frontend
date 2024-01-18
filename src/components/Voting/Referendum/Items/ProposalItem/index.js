@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { hexToU8a } from '@polkadot/util';
 import styles from './styles.module.scss';
@@ -14,9 +13,7 @@ import sanitizeUrlHelper from '../../../../../utils/sanitizeUrlHelper';
 
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
-import {
-  congressSelectors,
-} from '../../../../../redux/selectors';
+import { congressSelectors } from '../../../../../redux/selectors';
 import { Preimage } from '../../../../Proposal';
 
 function BlacklistButton({ hash }) {
@@ -43,6 +40,7 @@ function BlacklistButton({ hash }) {
 BlacklistButton.propTypes = { hash: PropTypes.string.isRequired };
 
 function ProposalItem({
+  usersList,
   proposer,
   centralizedDatas,
   boundedCall,
@@ -65,6 +63,8 @@ function ProposalItem({
     navigator.clipboard.writeText(dataToCoppy);
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
+
+  const nameOrIdProposer = usersList[proposer].identity || proposer;
 
   return (
     <>
@@ -102,7 +102,7 @@ function ProposalItem({
             <div>
               <div className={styles.metaTextInfo}>
                 Proposed by:
-                <b>{ proposer && truncate(proposer, 13) }</b>
+                <b>{ nameOrIdProposer }</b>
                 <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={() => handleCopyClick(proposer)} />
               </div>
             </div>
@@ -120,16 +120,20 @@ function ProposalItem({
               Discussions:
               <ol>
                 {centralizedDatas.map((centralizedData) => {
+                  const nameOrId = usersList[centralizedData.proposerAddress].identity
+                   || truncate(centralizedData.proposerAddress, 13);
                   const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
                   return (
                     <li key={centralizedData.id}>
-                      <a href={sanitizeUrl} target="_blank" rel="noreferrer">{centralizedData.name}</a>
+                      <a href={sanitizeUrl} target="_blank" rel="noreferrer">
+                        {centralizedData.name}
+                      </a>
                       {' - '}
                       {centralizedData.description}
                       {' '}
                       (Discussion added by
                       {' '}
-                      <b>{ truncate(centralizedData.proposerAddress, 13) }</b>
+                      <b>{ nameOrId}</b>
                       <CopyIcon
                         className={styles.copyIcon}
                         name="walletAddress"
@@ -167,6 +171,8 @@ const call = PropTypes.oneOfType([
 ]);
 
 ProposalItem.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  usersList: PropTypes.object.isRequired,
   proposer: PropTypes.string.isRequired,
   centralizedDatas: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,

@@ -13,19 +13,43 @@ import {
   proposeAmendLegislation,
   citizenProposeRepealLegislation,
   getScheduledCalls,
+  getIdentitiesNames,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors } from '../selectors';
-import { democracyActions, congressActions, legislationActions } from '../actions';
+import {
+  democracyActions, congressActions, legislationActions,
+} from '../actions';
 
 // WORKERS
+
+function getProposers(crossReferencedList, isProposer = false) {
+  const newMapedList = crossReferencedList.map((proposal) => {
+    const list = proposal.centralizedDatas.map((item) => item.proposerAddress);
+    return isProposer ? [proposal.proposer, ...list] : [...list];
+  });
+  return newMapedList.flat();
+}
+
+function* addNameForProposers(referendumsData, proposalData) {
+  const proposersFromReferendum = getProposers(proposalData, true);
+  const proposersFromProposal = getProposers(referendumsData);
+  const proposerList = Array.from(new Set([...proposersFromReferendum, ...proposersFromProposal]));
+  const identitiesNames = yield call(getIdentitiesNames, proposerList);
+  return identitiesNames;
+}
 
 function* getDemocracyWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const directDemocracyInfo = yield call(getDemocracyReferendums, walletAddress);
   const currentCongressMembers = yield call(getCongressMembersWithIdentity, walletAddress);
   const scheduledCalls = yield call(getScheduledCalls);
-  const democracy = { ...directDemocracyInfo, ...currentCongressMembers, scheduledCalls };
+  const democracyHelper = { ...directDemocracyInfo, ...currentCongressMembers, scheduledCalls };
+  const identitiesName = yield addNameForProposers(
+    democracyHelper.crossReferencedReferendumsData,
+    democracyHelper.crossReferencedProposalsData,
+  );
+  const democracy = { ...democracyHelper, identitiesName };
   yield put(democracyActions.getDemocracy.success({ democracy }));
 }
 

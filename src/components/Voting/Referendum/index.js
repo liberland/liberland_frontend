@@ -24,7 +24,6 @@ function Referendum() {
   const dispatch = useDispatch();
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call(userWalletAddress));
   }, [dispatch, userWalletAddress]);
@@ -51,6 +50,7 @@ function Referendum() {
     if (referendum.allNay.map((v) => v.accountId.toString()).includes(userWalletAddress)) return 'Nay';
     return false;
   };
+
   return (
     <div>
       <div className={styles.referendumsSection}>
@@ -79,6 +79,7 @@ function Referendum() {
             {
               democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
                 <ReferendumItem
+                  usersList={democracy?.democracy?.identitiesName}
                   key={referendum.index}
                   centralizedDatas={referendum.centralizedDatas}
                   yayVotes={referendum.votedAye}
@@ -102,15 +103,14 @@ function Referendum() {
           <div>
             {
               democracy.democracy?.crossReferencedProposalsData.map((proposal) => (
-                /* eslint-disable max-len */
                 <ProposalItem
+                  usersList={democracy?.democracy?.identitiesName}
                   key={proposal.index}
                   proposer={proposal.proposer}
                   centralizedDatas={proposal.centralizedDatas}
                   boundedCall={proposal.boundedCall}
                   blacklistMotion={proposal.blacklistMotion}
                 />
-                /* eslint-enable max-len */
               ))
             }
           </div>

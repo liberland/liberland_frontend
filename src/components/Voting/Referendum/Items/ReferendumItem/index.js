@@ -116,6 +116,7 @@ BlacklistButton.propTypes = {
 };
 
 function ReferendumItem({
+  usersList,
   centralizedDatas,
   yayVotes,
   nayVotes,
@@ -200,15 +201,19 @@ function ReferendumItem({
                 <ol>
                   {centralizedDatas.map((centralizedData) => {
                     const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
+                    const nameOrId = usersList[centralizedData.proposerAddress].identity
+                    || truncate(centralizedData.proposerAddress, 13);
                     return (
                       <li key={centralizedData.id}>
-                        <a href={sanitizeUrl} target="_blank" rel="noreferrer">{centralizedData.name}</a>
+                        <a href={sanitizeUrl} target="_blank" rel="noreferrer">
+                          {centralizedData.name}
+                        </a>
                         {' - '}
                         {centralizedData.description}
                         {' '}
                         (Discussion added by
                         {' '}
-                        <b>{ truncate(centralizedData.proposerAddress, 13) }</b>
+                        <b>{ nameOrId }</b>
                         <CopyIcon
                           className={styles.copyIcon}
                           name="walletAddress"
@@ -239,6 +244,8 @@ function ReferendumItem({
 }
 
 ReferendumItem.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  usersList: PropTypes.object.isRequired,
   centralizedDatas: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
