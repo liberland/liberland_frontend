@@ -1,4 +1,6 @@
 @import '../../../../../assets/base/variables';
+@import '../../../../../assets/main.scss';
+@import '../../../../../index.scss';
 
 .metaInfoLine{
   flex-direction: column;
@@ -7,29 +9,13 @@
   display: flex;
   //flex-wrap: wrap;
   margin-bottom: 2rem;
-  margin-top: 0px;
-  height: 4.5rem;
-  @media (min-width: 48em) {
-    flex-direction: row;
+  margin-top: 25px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    margin-top: 30px;
   }
 }
-.description{
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-.referendumItemContainer{
-  background-color: $transparent3;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
-  padding-top:1rem;
-  padding-bottom:1rem;
-}
-.buttonContainer{
-  margin-top: 1rem;
-  flex-direction: row;
-  justify-content: center;
-  display: flex;
-}
+
 .metaTextInfo{
   flex-direction: row;
   display: flex;
@@ -41,42 +27,35 @@
   justify-content: space-between;
   align-items: center;
   display: flex;
-  font-weight: bolder;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 .votesInfo{
   width: 100%;
-  margin: 12px;
-  @media (min-width: 48em) {
-    flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    flex: 1
   }
 }
-.proposeData {
-  flex: 1;
-  margin: 0 12px;
-}
-.yayText{
-  color: $primary2;
-}
-.nayText{
-  color: $primary4;
-}
-.progressBar{
-  background-color: $primary4;
-  border-radius: 10px;
-  width: 100%;
-  height: 0.75rem;
-}
+
+.progressBar,
 .yayProgressBar{
-  background-color: $primary2;
-  border-radius: 10px;
-  height: 0.75rem;
+  height: 8px;
+  border-radius: 20px;
 }
-.yayButton{
-  margin-right: 0.75rem;
+
+.progressBar{
+  background-color: $red;
+  width: 100%;
 }
-.nayButton{
-  margin-left: 0.75rem;
+
+.yayProgressBar{
+  background-color: $succes;
 }
+
 .hashText{
   font-size: 0.8rem;
 }
@@ -102,6 +81,31 @@
     margin: 0 4px;
   }
 }
-.copyIcon {
-  cursor: pointer;
+
+.counterItem{
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  font-size: 14px;
+  gap: 5px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    font-size: 17px;
+  }
+
+  .circle{
+    display: inline-flex;
+    height: 19px;
+    width: 19px;
+    border-radius: 50%;
+  }
+  
+  .circleAye{
+    background: $succes;
+  }
+  
+  .circleNay{
+    background: $red;
+  }
 }
+
