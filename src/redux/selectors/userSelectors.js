@@ -49,18 +49,24 @@ const selectGuidedStep = createSelector(
   userReducer,
   (reducer) => reducer.guidedStep,
 );
-const selectIsSessionVerified = createSelector(
+const selectIsSessionReady = createSelector(
   userReducer,
-  (reducer) => reducer.isSessionVerified,
+  (reducer) => reducer.isSessionReady,
+);
+
+const selectWalletAddress = createSelector(
+  selectUser,
+  (user) => user?.blockchainAddress,
 );
 
 export {
   selectGuidedStep,
   selectUser,
-  selectIsSessionVerified,
+  selectIsSessionReady,
   selectUserRole,
   selectUserEmail,
   selectUserId,
   selectUserGivenName,
   selectUserFamilyName,
+  selectWalletAddress,
 };

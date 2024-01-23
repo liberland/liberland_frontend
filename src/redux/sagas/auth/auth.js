@@ -3,73 +3,53 @@ import {
   put,
   call,
 } from 'redux-saga/effects';
-import { web3Enable } from '@polkadot/extension-dapp';
 import {
-  authActions, votingActions, walletActions, blockchainActions, democracyActions,
-  identityActions,
+  authActions, blockchainActions,
 } from '../../actions';
-import { GuidedStepEnum } from '../../../utils/enums';
-import {
-  handleExtensionsExist, guidedStepSuccess,
-  handleError,
-} from './handlingExceptions';
-import {
-  checkUnsupportedBrowser, intervalTime, lengthOfObject, timeoutInterval,
-} from './helpers';
+import { getMe } from '../../../api/backend';
+import { hashToSsoAccessToken } from './helpers';
+import { getUserRoleRpc } from '../../../api/nodeRpcCall';
 
 function* verifySessionWorker() {
-  try {
-    let config = { shouldExitLoop: false, isTokenPushToLocalStorage: false };
-    const isUnsupportedBrowser = yield checkUnsupportedBrowser();
-    if (isUnsupportedBrowser) {
-      const checkIfExist = sessionStorage.getItem('isUnsupportedBrowser');
-      if (!checkIfExist) {
-        sessionStorage.setItem('isUnsupportedBrowser', false);
-      }
-    }
-    const enteredTime = Date.now();
-    const delay = (time) => new Promise((resolve) => { setTimeout(resolve, time); });
-    while (!config.shouldExitLoop) {
-      yield call(delay, intervalTime);
-      const extensions = yield call(web3Enable, 'Liberland dapp');
-      const extensionsLength = lengthOfObject(extensions);
-      const isUnsupportedBrowserStorage = sessionStorage.getItem('isUnsupportedBrowser');
-      if (extensionsLength > 0) {
-        config = yield handleExtensionsExist(config);
-      } else if (isUnsupportedBrowser && isUnsupportedBrowserStorage === 'false') {
-        yield guidedStepSuccess({ component: GuidedStepEnum.UNSUPPORTED_BROWSER, data: '' });
-      } else {
-        yield guidedStepSuccess({ component: GuidedStepEnum.NO_WALLETS_AVAILABLE, data: '' });
-      }
-
-      if (Date.now() - enteredTime > timeoutInterval) {
-        config.shouldExitLoop = true;
-      }
-    }
-  } catch (err) {
-    yield handleError(err);
+  // check if we have token in URL - used right after user gets redirected from SSO
+  const ssoTokenUrl = hashToSsoAccessToken(window.location.hash);
+  if (ssoTokenUrl) {
+    // we've got a fresh token from SSO
+    localStorage.setItem('ssoAccessTokenHash', ssoTokenUrl);
+    // clear it to prevent accidential leak of token by user copying URL
+    window.location.hash = '';
   }
+
+  // check if we have some older token and if it's valid
+  const ssoAccessTokenHashStorage = yield localStorage.getItem('ssoAccessTokenHash');
+  if (ssoAccessTokenHashStorage) {
+    try {
+      const { data: user } = yield call(getMe);
+      // stored token is valid
+      // FIXME we should have to do it here, refactor stuff to fetch it separately
+      user.role = yield call(getUserRoleRpc, user.blockchainAddress);
+      yield put(authActions.verifySession.success(user));
+      return;
+    } catch (e) {
+      // stored token is no longer valid, clear it
+      localStorage.removeItem('ssoAccessTokenHash');
+      // eslint-disable-next-line no-console
+      console.error(e);
+    }
+  }
+
+  // no tokens or they're not valid
+  yield put(authActions.verifySession.failure());
 }
 
 function* signOutWorker() {
   try {
     yield put(authActions.signOut.success());
     yield put(blockchainActions.setUserWallet.success(''));
-    yield sessionStorage.clear();
+    localStorage.clear();
   } catch (error) {
     yield put(authActions.signOut.failure);
   }
-}
-
-function* initGetDataFromNodeWorker() {
-  yield put(walletActions.getWallet.call());
-  yield put(walletActions.getValidators.call());
-  const walletAddress = yield sessionStorage.getItem('userWalletAddress');
-  yield put(walletActions.getNominatorTargets.call(walletAddress));
-  yield put(blockchainActions.getPeriodAndVotingDuration.call());
-  yield put(votingActions.getAssembliesList.call());
-  yield put(democracyActions.getDemocracy.call(walletAddress));
-  yield put(identityActions.getIdentity.call(walletAddress));
 }
 
 function* verifySessionWatcher() {
@@ -80,15 +60,7 @@ function* signOutWatcher() {
   yield takeLatest(authActions.signOut.call, signOutWorker);
 }
 
-function* initGetDataFromNodeWatcher() {
-  yield takeLatest([
-    authActions.signIn.success,
-    authActions.verifySession.success,
-  ], initGetDataFromNodeWorker);
-}
-
 export {
   verifySessionWatcher,
   signOutWatcher,
-  initGetDataFromNodeWatcher,
 };

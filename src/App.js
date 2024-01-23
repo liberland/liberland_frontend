@@ -7,8 +7,6 @@ import {
   Route,
   Redirect,
 } from 'react-router-dom';
-import MoonLoader from 'react-spinners/MoonLoader';
-import { css } from '@emotion/core';
 
 // ROUTER
 import routes from './router';
@@ -24,14 +22,14 @@ import { userSelectors } from './redux/selectors';
 import { authActions } from './redux/actions';
 import GuidedSetup from './components/GuidedSetup';
 
-const override = css`
-  display: block;
-  margin: 0 auto;
-`;
-
 function App() {
-  const isSessionVerified = useSelector(userSelectors.selectIsSessionVerified);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(authActions.verifySession.call());
+  }, [dispatch]);
+
   const user = useSelector(userSelectors.selectUser);
+
   const loggedOutRoutes = (
     <Switch>
       <Route path={routes.signIn} component={SignIn} />
@@ -47,44 +45,14 @@ function App() {
     </Switch>
   );
 
-  const guidedStep = useSelector(userSelectors.selectGuidedStep);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(authActions.guidedStep.call());
-    dispatch(authActions.verifySession.call());
-  }, [dispatch]);
-
   const appRouter = user ? loggedInRoutes : loggedOutRoutes;
   return (
     <Router>
-      {guidedStep?.status === 'loaded'
-        ? (
-          <Loader>
-            {
-              guidedStep?.component ? <GuidedSetup /> : appRouter
-            }
-
-          </Loader>
-        )
-        : !isSessionVerified && (
-        <div
-          style={{
-            position: 'fixed',
-            display: 'flex',
-            height: '100vh',
-            width: '100vw',
-            top: 0,
-            left: 0,
-            alignItems: 'center',
-            background: 'rgb(170,170,170,0.1)',
-            zIndex: 1000,
-          }}
-        >
-          <MoonLoader loading css={override} size={150} color="#F1C823" />
-        </div>
-        )}
-
+      <Loader>
+        <GuidedSetup>
+          {appRouter}
+        </GuidedSetup>
+      </Loader>
     </Router>
   );
 }

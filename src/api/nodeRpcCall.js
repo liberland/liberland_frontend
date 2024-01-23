@@ -1,4 +1,4 @@
-import { web3Accounts, web3FromAddress } from '@polkadot/extension-dapp';
+import { web3FromAddress } from '@polkadot/extension-dapp';
 import pako from 'pako';
 import { u8aToHex } from '@polkadot/util';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
@@ -531,8 +531,6 @@ const subscribeBestBlockNumber = async (onNewBlockNumber) => {
   }
   return null;
 };
-
-const getAllWalletsRpc = async () => web3Accounts();
 
 const getValidators = async () => {
   const api = await getApi();
@@ -1886,7 +1884,6 @@ export {
   politiPool,
   getUserRoleRpc,
   subscribeBestBlockNumber,
-  getAllWalletsRpc,
   getValidators,
   getNominatorTargets,
   setNominatorTargets,

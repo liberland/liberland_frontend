@@ -1,5 +1,23 @@
 import { ethers } from 'ethers';
-import api from './index';
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API,
+  withCredentials: true,
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('ssoAccessTokenHash');
+    // eslint-disable-next-line no-param-reassign
+    if (token) config.headers['X-token'] = token;
+
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
+
+export const getMe = async () => api.get('/users/me');
 
 export const getUsersByAddress = async (blockchainAddress) => {
   const { data } = await api.get('/users', {
@@ -14,11 +32,10 @@ export const getUsersByAddress = async (blockchainAddress) => {
   }));
 };
 
-export const setCentralizedBackendBlockchainAddress = async (blockchainAddress, userId, ssoAccessTokenHash) => {
-  return await api.patch('users/' + userId , {
-    blockchainAddress: blockchainAddress
-  })
-}
+// eslint-disable-next-line max-len
+export const setCentralizedBackendBlockchainAddress = async (blockchainAddress, userId) => api.patch(`users/${userId}`, {
+  blockchainAddress,
+});
 
 export const maybeGetApprovedEresidency = async () => {
   try {

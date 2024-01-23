@@ -1,9 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-function UnsupportedBrowserNoticeComponent() {
-  const onClick = () => {
-    sessionStorage.setItem('isUnsupportedBrowser', true);
-  };
+function UnsupportedBrowserNoticeComponent({ onAccept }) {
   return (
     <div>
       <h2>Unsupported browser</h2>
@@ -15,6 +13,7 @@ function UnsupportedBrowserNoticeComponent() {
       <br />
       <p>
         Please use another browser like
+        {' '}
         <b>Firefox, Chrome, or Subwallet app</b>
         .
       </p>
@@ -22,11 +21,15 @@ function UnsupportedBrowserNoticeComponent() {
       <p>
         Alternatively, if you understand that the app might not work correctly in your browser,
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <i><button onClick={onClick}>click here to proceed</button></i>
+        <i><button onClick={onAccept}>click here to proceed</button></i>
         .
       </p>
     </div>
   );
 }
+
+UnsupportedBrowserNoticeComponent.propTypes = {
+  onAccept: PropTypes.func.isRequired,
+};
 
 export default UnsupportedBrowserNoticeComponent;

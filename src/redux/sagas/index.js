@@ -17,14 +17,13 @@ export default function* rootSaga() {
     // AUTH
     authSagas.verifySessionWatcher(),
     authSagas.signOutWatcher(),
-    authSagas.initGetDataFromNodeWatcher(),
 
     // // BLOCKCHAIN
     blockchainSagas.subscribeBestBlockNumberSaga(),
-    blockchainSagas.getAllWalletsWatcher(),
     blockchainSagas.clearErrorsWatcher(),
     blockchainSagas.subscribeActiveEraSaga(),
     blockchainSagas.fetchPreimageWatcher(),
+    blockchainSagas.subscribeWalletsSaga(),
 
     // WALLET
     walletSagas.getWalletWatcher(),

@@ -1,10 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Switch, Route, Redirect,
 } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-
-import { votingActions } from '../../redux/actions';
 
 import VotingHeader from './VotingHeader';
 import RoleHOC from '../../hocs/RoleHOC';
@@ -16,17 +13,6 @@ import Referendum from './Referendum';
 import { AddLegislation } from './Referendum/ProposalForms/AddLegislation/AddLegislation';
 
 function Voting() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const timerId = setInterval(() => {
-      dispatch(votingActions.getAssembliesList.call());
-    }, 6000);
-    return (() => {
-      clearInterval(timerId);
-    });
-  }, [dispatch]);
-
   return (
     <div className={styles.votingWrapper}>
       <div className={styles.navWrapper}>

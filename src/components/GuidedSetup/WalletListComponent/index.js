@@ -1,13 +1,17 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import React from 'react';
 import truncate from '../../../utils/truncate';
 import { setCentralizedBackendAddress } from '../../../utils/setCentralizedBackendAdress';
 import Button from '../../Button/Button';
 import styles from '../styles.module.scss';
 import { proposWalletListUserID } from '../propsTypes/propTypes';
+import { blockchainSelectors, userSelectors } from '../../../redux/selectors';
 
-function WalletListComponent({ walletList, userId }) {
+function WalletListComponent() {
   const dispatch = useDispatch();
+  const walletList = useSelector(blockchainSelectors.allWalletsSelector);
+  const userId = useSelector(userSelectors.selectUserId);
+
   return (
     <div style={{ width: '100%' }}>
       {walletList.map((walletObject, index) => (

@@ -2,10 +2,10 @@ import { createActions } from 'redux-actions';
 
 export const {
   bestBlockNumber,
-  getPeriodAndVotingDuration,
   setElectionsBlock,
   updateDateElections,
-  getAllWallets,
+  setWallets,
+  setExtensions,
   setUserWallet,
   setErrorExistsAndUnacknowledgedByUser,
   getErrorExistsAndUnacknowledgedByUser,
@@ -31,10 +31,11 @@ export const {
     success: undefined,
     failure: undefined,
   },
-  GET_All_WALLETS: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
+  SET_WALLETS: {
+    value: undefined,
+  },
+  SET_EXTENSIONS: {
+    value: undefined,
   },
   SET_USER_WALLET: {
     call: undefined,

@@ -29,7 +29,7 @@ import { userSelectors, walletSelectors } from '../../../redux/selectors';
 
 // UTILS
 import { formatMerits } from '../../../utils/walletHelpers';
-import { authActions } from '../../../redux/actions';
+import { authActions, walletActions } from '../../../redux/actions';
 import LogoutModal from '../../Modals/LogoutModal';
 
 function HomeNavigation() {
@@ -42,10 +42,15 @@ function HomeNavigation() {
   const dispatch = useDispatch();
   const history = useHistory();
   const isMedium = useMediaQuery('(min-width: 48em)');
+  const walletAddress = useSelector(userSelectors.selectWalletAddress);
 
   const homeTitle = name && lastName ? `${name} ${lastName}` : 'PROFILE';
   const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   const [isLogoutModalOpen, setLogoutIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    dispatch(walletActions.getWallet.call());
+  }, [dispatch, walletAddress]);
 
   const handleLogout = () => {
     dispatch(authActions.signOut.call(history));

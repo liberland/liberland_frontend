@@ -4,8 +4,10 @@ import {
 } from '../actions';
 
 const initialState = {
+  // null if not logged in, user data if logged in
   user: null,
-  isSessionVerified: false,
+  // false if we don't know if we're logged in yet
+  isSessionReady: false,
 };
 
 const userReducer = handleActions(
@@ -18,23 +20,12 @@ const userReducer = handleActions(
     }),
     [authActions.verifySession.success]: (state, action) => ({
       ...state,
-      isSessionVerified: true,
+      isSessionReady: true,
       user: action.payload,
     }),
-    [authActions.verifySession.failure]: (state, action) => ({
+    [authActions.verifySession.failure]: (state) => ({
       ...state,
-      isSessionVerified: true,
-      url: action.payload,
-    }),
-    [authActions.guidedStep.success]: (state, action) => ({
-      ...state,
-      isSessionVerified: true,
-      guidedStep: action.payload,
-    }),
-    [authActions.guidedStep.failure]: (state, action) => ({
-      ...state,
-      isSessionVerified: true,
-      url: action.payload,
+      isSessionReady: true,
     }),
   },
   initialState,

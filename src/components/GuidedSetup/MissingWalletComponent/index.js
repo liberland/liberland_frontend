@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import WalletListComponent from '../WalletListComponent';
-import { proposMissingWallet } from '../propsTypes/propTypes';
 import styles from '../styles.module.scss';
+import { userSelectors } from '../../../redux/selectors';
 
-function MissingWalletComponent({
-  walletList, registeredAddress, userId,
-}) {
+function MissingWalletComponent() {
+  const registeredAddress = useSelector(userSelectors.selectWalletAddress);
   const [showWallets, setShowWallets] = useState(false);
   return (
     <div>
@@ -33,13 +33,11 @@ function MissingWalletComponent({
       <br />
       {showWallets && (
       <div style={{ width: '100%' }}>
-        <WalletListComponent walletList={walletList} userId={userId} />
+        <WalletListComponent />
       </div>
       )}
     </div>
   );
 }
-
-MissingWalletComponent.propTypes = proposMissingWallet;
 
 export default MissingWalletComponent;
