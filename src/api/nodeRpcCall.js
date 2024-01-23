@@ -88,7 +88,7 @@ const getApi = async () => {
           history: 'Text', // FIXME array of well defined structs?
           brandNames: 'Vec<BrandName>',
           onlineAddresses: 'Vec<OnlineAddress>',
-          physicalAddresses: 'ec<PhysicalAddress>',
+          physicalAddresses: 'Vec<PhysicalAddress>',
           statutoryOrganMembers: 'Vec<Person>',
           principals: 'Vec<Principal>',
           shareholders: 'Vec<Shareholder>',
