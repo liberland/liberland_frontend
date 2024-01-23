@@ -12,7 +12,7 @@ export default function AmendLegislationButton({
   };
   return (
     <>
-      <Button small primary onClick={toggle}>{ add ? 'Add Section' : 'Amend Legislation'}</Button>
+      <Button small primary onClick={toggle}>{ add ? 'ADD SECTION' : 'AMEND'}</Button>
       {isOpen && <ProposeAmendLegislationModal closeModal={toggle} {...{ tier, id, section }} />}
     </>
   );

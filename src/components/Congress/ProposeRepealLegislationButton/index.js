@@ -19,7 +19,7 @@ export default function ProposeRepealLegislationButton({ tier, id, section }) {
   return (
     <>
       <Button small primary onClick={handleModalOpen}>
-        Propose Referendum to repeal
+        PROPOSE REFERENDUM TO REPEAL
       </Button>
       {isModalOpen && (
         <CongressRepealLegislationFastTrackModal

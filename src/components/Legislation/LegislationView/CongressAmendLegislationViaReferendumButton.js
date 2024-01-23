@@ -20,8 +20,8 @@ export default function CongressAmendLegislationViaReferendumButton({
     <>
       <Button small primary onClick={toggle}>
         { add
-          ? 'Propose Add Section Referendum as Congress'
-          : 'Propose Amend Referendum as Congress'}
+          ? 'PROPOSE ADD SECTION REFERENDUM AS CONGRESS'
+          : 'PROPOSE AMEND REFERENDUM AS CONGRESS'}
       </Button>
       {isOpen
         && (
