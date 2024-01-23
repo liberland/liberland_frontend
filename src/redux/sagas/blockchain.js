@@ -68,7 +68,7 @@ export function* subscribeWalletsSaga() {
     };
     updateWallets();
     const interval = setInterval(updateWallets, 5000);
-    setTimeout(() => clearInterval(interval), 60000);
+    setTimeout(() => clearInterval(interval), 120000);
     return () => clearInterval(interval);
   });
 
