@@ -12,6 +12,7 @@ import router from '../../router';
 
 import CongressionalAssemble from './CongressionalAssemble';
 import styles from './styles.module.scss';
+import stylesPage from '../../utils/pagesBase.module.scss';
 import Referendum from './Referendum';
 import { AddLegislation } from './Referendum/ProposalForms/AddLegislation/AddLegislation';
 
@@ -28,9 +29,12 @@ function Voting() {
   }, [dispatch]);
 
   return (
-    <div className={styles.votingWrapper}>
-      <div className={styles.navWrapper}>
-        <VotingHeader />
+
+    <div className={stylesPage.sectionWrapper}>
+      <div className={stylesPage.menuAdressWrapper}>
+        <div className={styles.votingHeaderWrapper}>
+          <VotingHeader />
+        </div>
       </div>
 
       <div>

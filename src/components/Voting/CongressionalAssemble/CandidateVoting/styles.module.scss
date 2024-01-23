@@ -1,38 +1,80 @@
 @import "../../../../assets/base/variables";
-.candidateVotingContainer {
+@import '../../../../assets/main.scss';
+@import '../../../../index.scss';
+
+.candidateVotingContainer{
   display: flex;
-  flex-direction: row;
-  //width: 100%;
-  border-color: $primary;
-  border-style: solid;
-  background-color: $secondary3;
-  margin-top: 15px;
-  flex-wrap: wrap;
+  padding-top: 30px;
+  flex-direction: column;
+  gap: 27px;
+
+  @media screen and (min-width: map-get($breakpoints, 'widescreen')){
+    flex-direction: row;
+  }
 }
-.eligibleCandidatesContainer {
-  flex: 1;
-}
-.selectedCandidatesContainer {
-  flex: 1;
-}
-.candidateVotingHeader {
-  font-weight: bolder;
-  font-size: 1.75rem;
-}
+
 .candidatesHeader{
-  font-size: 1.5rem;
-  font-weight: bolder;
-  align-items: center;
-  justify-items: center;
-  display: grid;
-  margin: 15px;
-  margin-bottom: 5px;
+  font-size: 18px;
+  font-family: $playfairDisplay;
+  color: $black;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    font-size: 22px;
+  }
 }
-.candidatesSubtext{
-  font-size: 1.25rem;
-  align-items: center;
-  justify-items: center;
-  display: grid;
-  margin: 7px;
-  height: 55px;
+
+.headerWithButton{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px; 
+  min-height: 50px;
+
+  & > button{
+    flex:1;
+    min-height: 40px;
+    max-height: 40px;
+    min-width: 120px;
+    font-size: 14px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      min-height: 50px;
+      max-height: 50px;
+      font-size: 17px;
+    }
+
+    @media screen and (min-width: map-get($breakpoints, 'phone')){
+      max-width: 130px;
+
+      @media screen and (min-width: map-get($breakpoints, 'widescreen')){
+        max-width: unset;
+
+        @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+          max-width: 193px;
+        }
+      }
+    }
+  }
+}
+
+.eligibleCandidatesContainer,
+.selectedCandidatesContainer{
+  font-size: 14px;
+  flex: 1;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    font-size: 17px;
+  }
+}
+
+.currentlySelectedCandidatesList,
+.candidatesList{
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    gap: 15px;
+  }
 }

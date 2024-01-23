@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import Avatar from 'react-avatar';
-import { useHistory, useLocation } from 'react-router-dom';
-import { authActions } from '../../../redux/actions';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { userSelectors } from '../../../redux/selectors';
 import router from '../../../router';
-import LogoutModal from '../../Modals/LogoutModal';
 
 import styles from './styles.module.scss';
 
@@ -28,8 +25,6 @@ function HomeHeader() {
     [router.home.staking]: 'Staking',
     [router.home.congress]: 'Congress',
     [router.home.voting]: 'Voting',
-    [router.voting.congressionalAssemble]: 'Voting',
-    [router.voting.referendum]: 'Voting',
     [router.home.wallet]: 'Wallet',
     [router.wallet.ethBridge]: 'Ethereum Bridge',
     [router.wallet.ethBridgeDeposit]: 'Ethereum Bridge',
@@ -37,7 +32,7 @@ function HomeHeader() {
   };
   const location = useLocation();
 
-  const fullName = name && lastName ? `${name} ${lastName}` : undefined;
+  // const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   return (titles[location.pathname] ? (
     <div className={styles.homeHeaderWrapper}>
       <div className={styles.homeHeaderAccountWrapper}>

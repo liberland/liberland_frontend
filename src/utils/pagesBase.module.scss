@@ -5,7 +5,7 @@
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
     min-height: calc(100vh - 150px);
     background-color: $lightGrey;
-    padding: 25px 20px;
+    padding: 35px 2.5%
   }
 
   .boxWrapper{
@@ -30,17 +30,17 @@
     padding: 12px 4%;
 
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      padding: 10px 2.5% 0 25px;
+      padding: 10px 2.5% 0 2.5%;
     }
   }
 }
 
 .overviewWrapper {
-  margin-top: 30px;
   word-break: break-word;
   padding: 15px;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    margin-top: 0;
     padding: 22px 30px 25px 30px;
     background-color: $bg4;
     border-radius: 10px;
