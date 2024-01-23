@@ -16,11 +16,6 @@ export const {
   BEST_BLOCK_NUMBER: {
     value: undefined,
   },
-  GET_PERIOD_AND_VOTING_DURATION: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
   SET_ELECTIONS_BLOCK: {
     call: undefined,
     success: undefined,
