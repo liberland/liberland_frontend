@@ -45,10 +45,6 @@ const selectUserFamilyName = createSelector(
   },
 );
 
-const selectGuidedStep = createSelector(
-  userReducer,
-  (reducer) => reducer.guidedStep,
-);
 const selectIsSessionReady = createSelector(
   userReducer,
   (reducer) => reducer.isSessionReady,
@@ -60,7 +56,6 @@ const selectWalletAddress = createSelector(
 );
 
 export {
-  selectGuidedStep,
   selectUser,
   selectIsSessionReady,
   selectUserRole,
