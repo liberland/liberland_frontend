@@ -214,7 +214,7 @@ const checkTextToShow = (text, isHidden, isBigScreen, isText) => {
 
   if (isHidden) {
     const maxLength = isBigScreen ? 60 : 40;
-    return text.slice(0, maxLength) + (text.length > maxLength ? '...' : '');
+    return text ? text.slice(0, maxLength) + (text.length > maxLength ? '...' : '') : '';
   }
 
   return text;
