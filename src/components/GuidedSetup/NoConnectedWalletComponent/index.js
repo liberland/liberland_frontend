@@ -8,6 +8,7 @@ function NoConnectedWalletComponent({ walletList, userId }) {
       <h2>Register wallet</h2>
       <p>
         You do not yet have a connected wallet address on
+        {' '}
         <a href={process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}>liberland.org</a>
         .
       </p>

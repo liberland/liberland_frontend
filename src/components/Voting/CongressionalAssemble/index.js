@@ -16,7 +16,7 @@ function CongressionalAssemble() {
 
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call());
-  }, []);
+  }, [dispatch]);
 
   const selectCandidate = (politician) => {
     const newSelectedCandidates = selectedCandidates;

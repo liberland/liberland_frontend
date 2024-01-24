@@ -62,7 +62,7 @@ function GuidedSetup({ children }) {
 
   if (!userId) return children;
 
-  if (extensions.length === 0) {
+  if (extensions.length === 0 || wallets.length === 0) {
     return (
       <GuidedSetupWrapper>
         <NoWalletsDetectedInBrowser />
@@ -70,7 +70,7 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if (wallets.length === 0) {
+  if (!userWalletAddress) {
     return (
       <GuidedSetupWrapper>
         <NoConnectedWalletComponent />
