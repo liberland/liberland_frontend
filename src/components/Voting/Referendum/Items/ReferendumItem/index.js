@@ -133,7 +133,7 @@ function BlacklistButton({ hash, referendumIndex }) {
   );
 
   return (
-    <Button small secondary onClick={blacklistMotion}>
+    <Button small primary onClick={blacklistMotion}>
       CANCEL AS CONGRESS
     </Button>
   );
@@ -217,12 +217,10 @@ function ReferendumItem({
           )}
           {!blacklistMotion && userIsMember
             && (
-            <div className={styles.rowEnd}>
               <BlacklistButton
                 hash={hash}
                 referendumIndex={referendumIndex}
               />
-            </div>
             )}
         </Header>
         <div className={styles.metaInfoLine}>
