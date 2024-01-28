@@ -14,12 +14,13 @@ function AssetOverview({
   const handleModalOpenAssets = (symbol) => setWhichModalOpen(symbol);
   const handleModalCloseAssets = () => setWhichModalOpen(null);
   if (additionalAssets.length === 0) { return <div />; }
-
+  // Show only assets that the user owns
+  let filteredAssets = additionalAssets.filter(asset => asset?.balance?.balance > 0)
   return (
     <Card className={styles.assetOverviewWrapper} title="Additional assets">
       <div className={styles.assetOverViewCard}>
         {
-          additionalAssets.map((assetInfo) => (
+          filteredAssets.map((assetInfo) => (
             <div
               className={styles.assetCardInfo}
               key={assetInfo.metadata.symbol}
