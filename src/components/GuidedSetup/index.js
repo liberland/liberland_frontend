@@ -50,7 +50,11 @@ function GuidedSetup({ children }) {
     setAcceptedBrowser(true);
   };
 
-  if (isLoading) return <LoadingComponent />;
+  if (isLoading) return (
+    <GuidedSetupWrapper>
+      <LoadingComponent />
+    </GuidedSetupWrapper>
+  );
 
   if (!acceptedBrowser && isUnsupportedBrowser) {
     return (

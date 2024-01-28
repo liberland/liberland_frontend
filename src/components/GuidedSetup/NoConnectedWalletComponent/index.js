@@ -1,6 +1,6 @@
 import React from 'react';
 import WalletListComponent from '../WalletListComponent';
-import { proposWalletListUserID } from '../propsTypes/propTypes';
+import { propsWalletListUserID } from '../propsTypes/propTypes';
 
 function NoConnectedWalletComponent({ walletList, userId }) {
   return (
@@ -20,6 +20,6 @@ function NoConnectedWalletComponent({ walletList, userId }) {
   );
 }
 
-NoConnectedWalletComponent.propTypes = proposWalletListUserID;
+NoConnectedWalletComponent.propTypes = propsWalletListUserID;
 
 export default NoConnectedWalletComponent;

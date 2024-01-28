@@ -4,7 +4,7 @@ import truncate from '../../../utils/truncate';
 import { setCentralizedBackendAddress } from '../../../utils/setCentralizedBackendAddress';
 import Button from '../../Button/Button';
 import styles from '../styles.module.scss';
-import { proposWalletListUserID } from '../propsTypes/propTypes';
+import { propsWalletListUserID } from '../propsTypes/propTypes';
 import { blockchainSelectors, userSelectors } from '../../../redux/selectors';
 
 function WalletListComponent() {
@@ -41,6 +41,6 @@ function WalletListComponent() {
   );
 }
 
-WalletListComponent.propTypes = proposWalletListUserID;
+WalletListComponent.propTypes = propsWalletListUserID;
 
 export default WalletListComponent;
