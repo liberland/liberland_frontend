@@ -19,10 +19,10 @@ function NoWalletsDetectedInBrowser() {
       )
         : (
           <p>
-            You need to visit this site inside a dApp explorer like
-            <a href="https://www.subwallet.app/download.html">
+            You need to visit this site inside a dApp explorer
+            <a href={process.env.REACT_APP_SUBWALLET_LINK}>
               {' '}
-              <b>Subwallet</b>
+              <b>Open in Subwallet</b>
             </a>
           </p>
         )}
