@@ -1,5 +1,5 @@
 import { all } from 'redux-saga/effects';
-import * as authSagas from './auth';
+import * as authSagas from './auth/auth';
 import * as walletSagas from './wallet';
 import * as blockchainSagas from './blockchain';
 import * as democracySagas from './democracy';
@@ -15,17 +15,15 @@ import * as onboardingSagas from './onboarding';
 export default function* rootSaga() {
   yield all([
     // AUTH
-    authSagas.signInWatcher(),
     authSagas.verifySessionWatcher(),
     authSagas.signOutWatcher(),
-    authSagas.initGetDataFromNodeWatcher(),
 
     // // BLOCKCHAIN
     blockchainSagas.subscribeBestBlockNumberSaga(),
-    blockchainSagas.getAllWalletsWatcher(),
     blockchainSagas.clearErrorsWatcher(),
     blockchainSagas.subscribeActiveEraSaga(),
     blockchainSagas.fetchPreimageWatcher(),
+    blockchainSagas.subscribeWalletsSaga(),
 
     // WALLET
     walletSagas.getWalletWatcher(),

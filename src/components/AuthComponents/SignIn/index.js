@@ -1,10 +1,9 @@
 // LIBS
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-import { errorsSelectors, blockchainSelectors } from '../../../redux/selectors';
+import { blockchainSelectors } from '../../../redux/selectors';
 
 // STYLES
 import styles from './styles.module.scss';
@@ -17,30 +16,8 @@ import Button from '../../Button/Button';
 function SignIn() {
   const {
     register,
-    setError,
   } = useForm();
-  const dispatch = useDispatch();
-  const history = useHistory();
-  const apiError = useSelector(errorsSelectors.selectSignIn);
   const allAccounts = useSelector(blockchainSelectors.allWalletsSelector);
-  // TODO REFACTOR
-  const queryString = window.location.hash;
-  const beginToken = queryString.indexOf('=');
-  const endToken = queryString.indexOf('&');
-  const ssoAccessTokenHash = queryString.substring(beginToken + 1, endToken);
-
-  useEffect(() => {
-    if (apiError) {
-      setError(
-        'email',
-        apiError.data.error,
-      );
-    }
-    if (ssoAccessTokenHash) {
-      sessionStorage.setItem('ssoAccessTokenHash', ssoAccessTokenHash);
-      history.push('/guided-setup');
-    }
-  }, [apiError, setError, dispatch, ssoAccessTokenHash, allAccounts]);
 
   const goToLiberlandSignin = () => {
     window.location.replace(process.env.REACT_APP_SSO_API_IMPLICIT_LINK);

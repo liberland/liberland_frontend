@@ -65,7 +65,7 @@ function Wallet() {
   return (
     (userWalletAddress !== undefined) ? (
       <div className={stylesPage.sectionWrapper}>
-        <div className={stylesPage.menuAdressWrapper}>
+        <div className={stylesPage.menuAddressWrapper}>
           <WalletAddressesLine walletAddress={userWalletAddress} />
         </div>
 

@@ -1,6 +1,6 @@
 import truncate from './truncate';
 
-export const findNameOrId = (discussionAdress, listData) => {
-  const discussionName = listData && listData.find((item) => item.key === discussionAdress).name;
-  return discussionName || (discussionAdress && truncate(discussionAdress, 13));
+export const findNameOrId = (discussionAddress, listData) => {
+  const discussionName = listData && listData.find((item) => item.key === discussionAddress).name;
+  return discussionName || (discussionAddress && truncate(discussionAddress, 13));
 };

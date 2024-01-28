@@ -8,10 +8,6 @@ const initialState = {
 
 const errorsReducer = handleActions(
   {
-    [authActions.signIn.failure]: (state, action) => ({
-      ...state,
-      signIn: action.payload,
-    }),
     [authActions.signUp.failure]: (state, action) => ({
       ...state,
       signUp: action.payload,

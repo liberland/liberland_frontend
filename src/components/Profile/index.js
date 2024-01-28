@@ -45,6 +45,7 @@ function Profile({ className }) {
 
   useEffect(() => {
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
+    dispatch(identityActions.getIdentity.call(walletAddress));
   }, [liquidDollars]);
 
   const toggleModalOnchainIdentity = () => {
@@ -163,7 +164,7 @@ function Profile({ className }) {
                       {`${formatDollars(balances.liquidAmount.amount)} LLD`}
                     </span>
                   </div>
-                  <div className={styles.iconAdress}>
+                  <div className={styles.iconAddress}>
                     <GlobeIcon />
                     <span className={styles.walletAddress}>
                       {walletAddress ? truncate(walletAddress, 25) : ''}
@@ -191,13 +192,13 @@ function Profile({ className }) {
               <h3 className={styles.font}>On-chain identity</h3>
               <div className={styles.itemFooterAbout}>
                 <ul>
-                  {onChainIdenityList.map((onChainIdenitityElement) => {
-                    const { isDataToShow, title, dataFunction } = onChainIdenitityElement;
+                  {onChainIdenityList.map((onChainIdentityElement) => {
+                    const { isDataToShow, title, dataFunction } = onChainIdentityElement;
                     const dataFromFunction = dataFunction();
                     const yesOrNo = dataFromFunction ? 'Yes' : 'No';
                     const htmlElement = isDataToShow ? dataFromFunction : yesOrNo;
                     return (
-                      <li>
+                      <li key={title}>
                         <span>
                           {title}
                         </span>

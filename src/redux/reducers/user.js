@@ -4,20 +4,14 @@ import {
 } from '../actions';
 
 const initialState = {
+  // null if not logged in, user data if logged in
   user: null,
-  isSignInFetching: false,
-  isSessionVerified: false,
+  // false if we don't know if we're logged in yet
+  isSessionReady: false,
 };
 
 const userReducer = handleActions(
   {
-    [combineActions(
-      authActions.signIn.success,
-      authActions.signUp.success,
-    )]: (state, action) => ({
-      ...state,
-      user: action.payload || state.user,
-    }),
     [combineActions(
       authActions.signOut.success,
     )]: (state) => ({
@@ -26,23 +20,12 @@ const userReducer = handleActions(
     }),
     [authActions.verifySession.success]: (state, action) => ({
       ...state,
-      isSessionVerified: true,
+      isSessionReady: true,
       user: action.payload,
     }),
     [authActions.verifySession.failure]: (state) => ({
       ...state,
-      isSessionVerified: true,
-    }),
-    [authActions.signIn.call]: (state) => ({
-      ...state,
-      isSignInFetching: true,
-    }),
-    [combineActions(
-      authActions.signIn.success,
-      authActions.signIn.failure,
-    )]: (state) => ({
-      ...state,
-      isSignInFetching: false,
+      isSessionReady: true,
     }),
   },
   initialState,

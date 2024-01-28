@@ -3,7 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
 import cx from 'classnames';
-
 import styles from './styles.module.scss';
 
 function NavigationLink({
