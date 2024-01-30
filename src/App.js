@@ -29,7 +29,6 @@ function App() {
   }, [dispatch]);
 
   const user = useSelector(userSelectors.selectUser);
-
   const loggedOutRoutes = (
     <Switch>
       <Route path={routes.signIn} component={SignIn} />

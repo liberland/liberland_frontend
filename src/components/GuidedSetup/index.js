@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import styles from './styles.module.scss';
-import { blockchainSelectors, userSelectors } from '../../redux/selectors';
+import { blockchainSelectors, userSelectors, onboardingSelectors } from '../../redux/selectors';
 import UnsupportedBrowserNoticeComponent from './UnSupportedBrowserNoticeComponent';
 import LoadingComponent from './LoadingComponent';
 import NoWalletsDetectedInBrowser from './NoWalletsDetectedInBrowser';
 import NoConnectedWalletComponent from './NoConnectedWalletComponent';
 import MissingWalletComponent from './MissingWalletComponent';
+import OnBoarding from './OnBording';
+import { onBoardingActions } from '../../redux/actions';
 
 const useIsUnsupportedBrowser = () => {
   const [isBrave, setIsBrave] = useState(null);
@@ -32,13 +34,16 @@ function GuidedSetupWrapper({ children }) {
 }
 
 function GuidedSetup({ children }) {
+  const dispatch = useDispatch();
   const [acceptedBrowser, setAcceptedBrowser] = useState(localStorage.getItem('unsupportedBrowserAcceptedByUser'));
   const isSessionReady = useSelector(userSelectors.selectIsSessionReady);
   const extensions = useSelector(blockchainSelectors.extensionsSelector);
   const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const userWalletAddress = useSelector(userSelectors.selectWalletAddress);
   const userId = useSelector(userSelectors.selectUserId);
+  const isUserEligibleForComplimentaryLLD = useSelector(onboardingSelectors.selectorEligibleForComplimentaryLLD);
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
+  const roles = useSelector(userSelectors.selectUserRole);
 
   const isLoading = !isSessionReady
     || extensions === null
@@ -50,11 +55,19 @@ function GuidedSetup({ children }) {
     setAcceptedBrowser(true);
   };
 
-  if (isLoading) return (
-    <GuidedSetupWrapper>
-      <LoadingComponent />
-    </GuidedSetupWrapper>
-  );
+  const isSkippedOnBoardingGetLLD = sessionStorage.getItem('SkippedOnBoardingGetLLD');
+
+  useEffect(() => {
+    dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
+  }, [dispatch]);
+
+  if (isLoading) {
+    return (
+      <GuidedSetupWrapper>
+        <LoadingComponent />
+      </GuidedSetupWrapper>
+    );
+  }
 
   if (!acceptedBrowser && isUnsupportedBrowser) {
     return (
@@ -78,6 +91,20 @@ function GuidedSetup({ children }) {
     return (
       <GuidedSetupWrapper>
         <NoConnectedWalletComponent />
+      </GuidedSetupWrapper>
+    );
+  }
+
+  if (!roles?.non_citizen) {
+    // TODO where redirect
+    window.location.href = 'https://liberland.org';
+  }
+
+  if ((isUserEligibleForComplimentaryLLD && isSkippedOnBoardingGetLLD !== 'true')
+  || isSkippedOnBoardingGetLLD === 'secondStep') {
+    return (
+      <GuidedSetupWrapper>
+        <OnBoarding />
       </GuidedSetupWrapper>
     );
   }

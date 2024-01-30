@@ -15,7 +15,7 @@ import truncate from '../../utils/truncate';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../assets/images/liberlandEmblem.svg';
 import Card from '../Card';
-import { OnchainIdentityModal } from '../Modals';
+import UpdateProfile from './UpdateProfile';
 import { identityActions, onBoardingActions } from '../../redux/actions';
 import {
   parseLegal, parseIdentityData, parseDOB, parseAdditionalFlag, parseCitizenshipJudgement,
@@ -25,7 +25,6 @@ function Profile({ className }) {
   const userName = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const identity = useSelector(identitySelectors.selectorIdentity);
   const walletInfo = useSelector(walletSelectors.selectorWalletInfo);
@@ -45,34 +44,14 @@ function Profile({ className }) {
 
   useEffect(() => {
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
+  }, [dispatch]);
+
+  useEffect(() => {
     dispatch(identityActions.getIdentity.call(walletAddress));
   }, [liquidDollars]);
 
   const toggleModalOnchainIdentity = () => {
     setIsModalOpenOnchainIdentity(!isModalOpenOnchainIdentity);
-  };
-
-  const handleSubmitOnchainIdentity = (values) => {
-    let eligible_on = null;
-
-    if (values.older_than_15) {
-      eligible_on = new Date(0);
-    } else if (values.date_of_birth) {
-      const dob = new Date(values.date_of_birth);
-      eligible_on = new Date(dob.getFullYear() + 15, dob.getMonth(), dob.getDate());
-    }
-
-    const params = {
-      display: values.display,
-      legal: values.legal,
-      web: values.web,
-      email: values.email,
-      onChainIdentity: values.onChainIdentity,
-      eligible_on,
-    };
-
-    dispatch(identityActions.setIdentity.call({ userWalletAddress, values: params }));
-    toggleModalOnchainIdentity();
   };
 
   const { judgements, info } = identity?.isSome ? identity.unwrap() : {};
@@ -227,13 +206,14 @@ function Profile({ className }) {
           </div>
         </div>
         {isModalOpenOnchainIdentity && (
-        <OnchainIdentityModal
-          closeModal={toggleModalOnchainIdentity}
-          onSubmit={handleSubmitOnchainIdentity}
-          identity={identity}
-          blockNumber={blockNumber}
-          name={displayName}
-        />
+          <UpdateProfile
+            toggleModalOnchainIdentity={toggleModalOnchainIdentity}
+            blockNumber={blockNumber}
+            identity={identity}
+            lastName={lastName}
+            userName={userName}
+            walletAddress={walletAddress}
+          />
         )}
       </Card>
     </div>

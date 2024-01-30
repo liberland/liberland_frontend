@@ -1,8 +1,8 @@
 import {
-  put, takeLatest, call, select,
+  put, call, select,
 } from 'redux-saga/effects';
 
-import { blockchainActions, onBoardingActions } from '../actions';
+import { onBoardingActions } from '../actions';
 import { blockchainSelectors, walletSelectors } from '../selectors';
 import { getBalanceByAddress } from '../../api/nodeRpcCall';
 import { getComplimentaryLLD } from '../../api/middleware';
@@ -21,17 +21,17 @@ function* claimComplimentaryLLDWorker() {
       // FIXME eventually we need a notification modal, not just error modal
       errorData = { details: 'Complimentary LLDs claimed. Please refresh the page' };
       yield call(getBalanceByAddress, walletAddress);
-      throw { errorData };
+      throw new Error(errorData.details);
     } else {
       errorData = {
         details: typeof getComplimentaryLLDResponse?.data === 'string'
           ? getComplimentaryLLDResponse?.data
           : 'Technical error without description, please let the devs know',
       };
-      throw { errorData };
+      throw new Error(errorData.details);
     }
   } catch (e) {
-    throw { errorData };
+    throw new Error(errorData.details);
   }
 }
 
@@ -39,11 +39,13 @@ function* getIsEligibleForComplimentaryLLDWorker() {
   try {
     const liquidDollars = yield select(walletSelectors.selectorLiquidDollarsBalance);
     // Only eligible if no existing dollars
-    if (formatDollars(liquidDollars) === 0 || formatDollars(liquidDollars) === '0') {
+    const dolars = formatDollars(liquidDollars);
+    if (dolars === 0 || dolars === '0') {
       // Only eligible if no existing dollars
       const maybeApprovedEresidency = yield call(maybeGetApprovedEresidency);
       if (maybeApprovedEresidency.isError) {
-        if (maybeApprovedEresidency.errorResponse.status === 401 || maybeApprovedEresidency.errorResponse.status === 404) {
+        if (maybeApprovedEresidency.errorResponse.status === 401
+          || maybeApprovedEresidency.errorResponse.status === 404) {
           yield put(onBoardingActions.getEligibleForComplimentaryLld.success({
             isEligibleForComplimentaryLLD: false,
             ineligibleForComplimentaryLLDReason: 'Ineligible for gratis LLD ',
@@ -56,11 +58,13 @@ function* getIsEligibleForComplimentaryLLDWorker() {
         }
       } else {
         // only eligible if not already claimed
+        // eslint-disable-next-line no-lonely-if
         if (!maybeApprovedEresidency.claimedOnboardingLld) {
           yield put(onBoardingActions.getEligibleForComplimentaryLld.success({
             isEligibleForComplimentaryLLD: true,
             ineligibleForComplimentaryLLDReason: null,
           }));
+          sessionStorage.setItem('SkippedOnBoardingGetLLD', 'secondStep');
         } else {
           yield put(onBoardingActions.getEligibleForComplimentaryLld.success({
             isEligibleForComplimentaryLLD: false,
@@ -76,7 +80,7 @@ function* getIsEligibleForComplimentaryLLDWorker() {
     }
   } catch (e) {
     const errorData = { details: 'Error checking complimentary LLD eligibility, send screenshot to devs please' };
-    throw { errorData };
+    throw new Error(errorData.details);
   }
 }
 
