@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Avatar from 'react-avatar';
 import { useMediaQuery } from 'usehooks-ts';
 
 // COMPONENTS
+import { AuthContext } from 'react-oauth2-code-pkce';
 import NavigationLink from '../NavigationLink';
 import RoleHOC from '../../../hocs/RoleHOC';
 import router from '../../../router';
@@ -33,6 +34,7 @@ import { authActions, walletActions } from '../../../redux/actions';
 import LogoutModal from '../../Modals/LogoutModal';
 
 function HomeNavigation() {
+  const { logOut } = useContext(AuthContext);
   const location = useLocation();
   const roles = useSelector(userSelectors.selectUserRole);
   const name = useSelector(userSelectors.selectUserGivenName);
@@ -53,8 +55,8 @@ function HomeNavigation() {
   }, [dispatch, walletAddress]);
 
   const handleLogout = () => {
+    logOut();
     dispatch(authActions.signOut.call(history));
-    window.location.replace(process.env.REACT_APP_SSO_API_LOGOUT_IMPLICIT_LINK);
   };
 
   useEffect(() => {
