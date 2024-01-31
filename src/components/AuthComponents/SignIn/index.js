@@ -1,10 +1,10 @@
 // LIBS
-import React from 'react';
+import React, { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
+import { AuthContext } from 'react-oauth2-code-pkce';
 import { blockchainSelectors } from '../../../redux/selectors';
-
 // STYLES
 import styles from './styles.module.scss';
 // COMPONENTS
@@ -14,13 +14,14 @@ import Header from '../Header';
 import Button from '../../Button/Button';
 
 function SignIn() {
+  const { login } = useContext(AuthContext);
   const {
     register,
   } = useForm();
   const allAccounts = useSelector(blockchainSelectors.allWalletsSelector);
 
   const goToLiberlandSignin = () => {
-    window.location.replace(process.env.REACT_APP_SSO_API_IMPLICIT_LINK);
+    login();
   };
   const goToLiberland2FASignin = () => {
     window.location.replace(process.env.REACT_APP_SSO2FA_API_IMPLICIT_LINK);
