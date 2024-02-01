@@ -8,7 +8,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('ssoAccessTokenHash');
+    const token = JSON.parse(localStorage.getItem('ROCP_token'));
     // eslint-disable-next-line no-param-reassign
     if (token) config.headers['X-token'] = token;
 

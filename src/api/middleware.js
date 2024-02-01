@@ -5,7 +5,7 @@ const getMiddlewareApi = () => axios.create({
 });
 
 export const getComplimentaryLLD = async (usingWalletAddress) => {
-  const userToken = localStorage.getItem('ssoAccessTokenHash');
+  const userToken = JSON.parse(localStorage.getItem('ROCP_token'));
   const middlewareApi = getMiddlewareApi();
   return middlewareApi.post('/v1/onboarding', { usingWalletAddress, userToken }).catch((e) => e.response);
 };
