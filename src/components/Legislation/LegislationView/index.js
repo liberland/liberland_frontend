@@ -237,6 +237,7 @@ function SectionItem({
     isBigScreen,
     content.isSome,
   ), [isBigScreen, content, isHidden]);
+
   return (
     <Card
       className={cx(stylesPage.overviewWrapper, styles.legislationCard)}
@@ -262,36 +263,38 @@ function SectionItem({
       </Button>
       )}
       {!isHidden && (
-      <div className={styles.buttonsWrapper}>
-        <ExistingMotionsAndReferendums
-          motion={repealMotion}
-          referendum={repealReferendum}
-          proposal={repealProposal}
-        />
-        <ActionButtons {...{
-          tier,
-          id,
-          section,
-          repealMotion,
-          repealReferendum,
-          repealProposal,
-        }}
-        />
-        <div className={styles.buttonSectionInList}>
-          <Button
-            className={styles.button}
-            small
-            secondary={isHidden}
-            grey={!isHidden}
-            onClick={() => setIsHidden((prevState) => !prevState)}
-          >
-            {!isHidden ? 'HIDE' : 'SHOW'}
-            {' '}
-            {textButton}
-          </Button>
-        </div>
+        <>
+          <ExistingMotionsAndReferendums
+            motion={repealMotion}
+            referendum={repealReferendum}
+            proposal={repealProposal}
+          />
+          <div className={styles.buttonsWrapper}>
+            <ActionButtons {...{
+              tier,
+              id,
+              section,
+              repealMotion,
+              repealReferendum,
+              repealProposal,
+            }}
+            />
+            <div className={styles.buttonSectionInList}>
+              <Button
+                className={styles.button}
+                small
+                secondary={isHidden}
+                grey={!isHidden}
+                onClick={() => setIsHidden((prevState) => !prevState)}
+              >
+                {!isHidden ? 'HIDE' : 'SHOW'}
+                {' '}
+                {textButton}
+              </Button>
+            </div>
+          </div>
+        </>
 
-      </div>
       )}
     </Card>
   );
@@ -363,7 +366,6 @@ function LegislationItem({
                   referendum={mainRepealReferendum}
                   proposal={mainRepealProposal}
                 />
-
                 <ActionButtons {...{
                   tier,
                   id,
@@ -432,6 +434,7 @@ function LegislationView() {
   const legislation = useSelector(legislationSelectors.legislation);
 
   if (!legislation[tier]) return 'Loading...';
+
   return (
     <div className={cx(stylesPage.contentWrapper, styles.contentWrapper)}>
       {Object.entries(legislation[tier]).flatMap(([year, legislations]) => (

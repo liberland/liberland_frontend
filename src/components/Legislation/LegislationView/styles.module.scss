@@ -175,9 +175,17 @@
             display: flex;
             align-items: center;
 
+            @-moz-document url-prefix() {
+                gap: 5px;
+            }
+
             & > span {
                 align-self: flex-start;
                 font-size: 30px;
+
+                @-moz-document url-prefix() {
+                    margin-top: -5px;
+                }
             }
         }
 
