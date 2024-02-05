@@ -98,7 +98,7 @@ ExistingMotionsAndReferendums.propTypes = {
 };
 
 function ActionButtons({
-  tier, id, section, repealMotion, repealReferendum, repealProposal,
+  tier, id, section, repealMotion,
 }) {
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
@@ -117,8 +117,7 @@ function ActionButtons({
   useCalculateDropdownPosition(isProposeOpen, dropdownRefPropose);
 
   const isRepealOption = (tier === 'InternationalTreaty' && !repealMotion);
-  const isCitizenProposeRepealOption = (!repealReferendum && !repealProposal);
-  const isProposeButtonHasOpption = isRepealOption || tier !== 'Constitution' || isCitizenProposeRepealOption;
+  const isProposeButtonHasOpption = isRepealOption || tier !== 'Constitution';
 
   return (
     <>
@@ -168,12 +167,9 @@ function ActionButtons({
           {tier !== 'Constitution' && (
           <ProposeRepealLegislationButton {...{ tier, id, section }} />
           )}
-          {isCitizenProposeRepealOption
-            && (
-            <CitizenProposeRepealLegislationButton
-              {...{ tier, id, section }}
-            />
-            )}
+          <CitizenProposeRepealLegislationButton
+            {...{ tier, id, section }}
+          />
         </div>
         )}
         {isProposeOpen && <div className={styles.overlay} onClick={() => setProposeOpen((prevValue) => !prevValue)} />}
@@ -275,8 +271,6 @@ function SectionItem({
               id,
               section,
               repealMotion,
-              repealReferendum,
-              repealProposal,
             }}
             />
             <div className={styles.buttonSectionInList}>
@@ -371,8 +365,6 @@ function LegislationItem({
                   id,
                   section: null,
                   repealMotion: mainRepealMotion,
-                  repealReferendum: mainRepealReferendum,
-                  repealProposal: mainRepealProposal,
                 }}
                 />
                 <div className={styles.dropdownWrapper}>
