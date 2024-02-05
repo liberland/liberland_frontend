@@ -103,10 +103,9 @@ const getApi = async () => {
 // eslint-disable-next-line max-len
 const crossReference = (api, blockchainData, allCentralizedData, motions, isReferendum) => blockchainData.map((item) => {
   const proposalHash = isReferendum ? item.imageHash : (
-    item.boundedCall?.Lookup?.hash_
-      ?? item.boundedCall?.Legacy?.hash_
+    item.boundedCall?.lookup?.hash
+      ?? item.boundedCall?.legacy?.hash
   );
-
   const centralizedDatas = allCentralizedData.filter((cItem) => (cItem.hash === proposalHash));
   const blacklistMotionHash = api.tx.democracy.blacklist(
     proposalHash,
@@ -619,10 +618,10 @@ const getDemocracyReferendums = async (address) => {
       api.derive.democracy.referendumsActive(),
     ]);
 
-    const proposalData = proposals.toHuman().map((proposalItem) => ({
-      index: proposalItem[0],
-      boundedCall: proposalItem[1],
-      proposer: proposalItem[2],
+    const proposalData = proposals.map((proposalItem) => ({
+      index: proposalItem[0].toNumber(),
+      boundedCall: proposalItem[1].toJSON(),
+      proposer: proposalItem[2].toString(),
     }));
 
     const deposits = await api.query.democracy.depositOf.multi(proposalData.map(({ index }) => index));

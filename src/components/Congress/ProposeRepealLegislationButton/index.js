@@ -13,7 +13,6 @@ export default function ProposeRepealLegislationButton({ tier, id, section }) {
 
   // requires parent to dispatch getMembers action
   const userIsMember = useSelector(congressSelectors.userIsMember);
-
   if (!userIsMember) return null;
 
   return (

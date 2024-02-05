@@ -67,7 +67,7 @@ function AddLegislation({ proposal, isDetailsHidden }) {
               Section #
               {idx}
             </p>
-            <p className={styles.legislationContent}>{section.toHuman()}</p>
+            <p className={styles.legislationContent}>{new TextDecoder('utf-8').decode(section)}</p>
           </Fragment>
         ))}
       </div>

@@ -49,15 +49,16 @@ function ProposalItem({
 }) {
   let hash;
   let len;
-  if ('Lookup' in boundedCall) {
-    hash = boundedCall.Lookup.hash_;
-    len = boundedCall.Lookup.len;
-  } else if ('Legacy' in boundedCall) {
-    hash = boundedCall.Legacy.hash_;
+  if ('lookup' in boundedCall) {
+    hash = boundedCall.lookup.hash;
+    len = boundedCall.lookup.len;
+  } else if ('legacy' in boundedCall) {
+    hash = boundedCall.legacy.hash;
   } else {
     // this sux but we have no other way until we refactor it to NOT use toJSON/toHuman
-    hash = blake2AsHex(hexToU8a(boundedCall.Inline));
+    hash = blake2AsHex(hexToU8a(boundedCall.inline));
   }
+
   const [isProposalHidden, setIsProposalHidden] = useState(true);
   const notificationRef = useRef();
   const handleCopyClick = (dataToCoppy) => {
@@ -89,8 +90,8 @@ function ProposalItem({
             && (
               <div className={styles.rowEnd}>
                 <BlacklistButton hash={
-                boundedCall?.Lookup?.hash_
-                ?? boundedCall?.Legacy?.hash_
+                boundedCall?.lookup?.hash
+                ?? boundedCall?.legacy?.hash
               }
                 />
               </div>
@@ -109,19 +110,19 @@ function ProposalItem({
 
 const call = PropTypes.oneOfType([
   PropTypes.shape({
-    Legacy: PropTypes.shape({
-      hash_: PropTypes.string.isRequired,
+    legacy: PropTypes.shape({
+      hash: PropTypes.string.isRequired,
     }).isRequired,
   }),
   PropTypes.shape({
-    Lookup: PropTypes.shape({
-      hash_: PropTypes.string.isRequired,
+    lookup: PropTypes.shape({
+      hash: PropTypes.string.isRequired,
       len: PropTypes.number.isRequired,
     }).isRequired,
   }),
   PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
-    Inline: PropTypes.any.isRequired,
+    inline: PropTypes.any.isRequired,
   }),
 ]);
 

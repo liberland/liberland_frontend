@@ -98,7 +98,7 @@ ExistingMotionsAndReferendums.propTypes = {
 };
 
 function ActionButtons({
-  tier, id, section, repealMotion, repealReferendum, repealProposal,
+  tier, id, section, repealMotion,
 }) {
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
@@ -117,8 +117,7 @@ function ActionButtons({
   useCalculateDropdownPosition(isProposeOpen, dropdownRefPropose);
 
   const isRepealOption = (tier === 'InternationalTreaty' && !repealMotion);
-  const isCitizenProposeRepealOption = (!repealReferendum && !repealProposal);
-  const isProposeButtonHasOpption = isRepealOption || tier !== 'Constitution' || isCitizenProposeRepealOption;
+  const isProposeButtonHasOpption = isRepealOption || tier !== 'Constitution';
 
   return (
     <>
@@ -168,12 +167,9 @@ function ActionButtons({
           {tier !== 'Constitution' && (
           <ProposeRepealLegislationButton {...{ tier, id, section }} />
           )}
-          {isCitizenProposeRepealOption
-            && (
-            <CitizenProposeRepealLegislationButton
-              {...{ tier, id, section }}
-            />
-            )}
+          <CitizenProposeRepealLegislationButton
+            {...{ tier, id, section }}
+          />
         </div>
         )}
         {isProposeOpen && <div className={styles.overlay} onClick={() => setProposeOpen((prevValue) => !prevValue)} />}
@@ -237,6 +233,7 @@ function SectionItem({
     isBigScreen,
     content.isSome,
   ), [isBigScreen, content, isHidden]);
+
   return (
     <Card
       className={cx(stylesPage.overviewWrapper, styles.legislationCard)}
@@ -262,36 +259,36 @@ function SectionItem({
       </Button>
       )}
       {!isHidden && (
-      <div className={styles.buttonsWrapper}>
-        <ExistingMotionsAndReferendums
-          motion={repealMotion}
-          referendum={repealReferendum}
-          proposal={repealProposal}
-        />
-        <ActionButtons {...{
-          tier,
-          id,
-          section,
-          repealMotion,
-          repealReferendum,
-          repealProposal,
-        }}
-        />
-        <div className={styles.buttonSectionInList}>
-          <Button
-            className={styles.button}
-            small
-            secondary={isHidden}
-            grey={!isHidden}
-            onClick={() => setIsHidden((prevState) => !prevState)}
-          >
-            {!isHidden ? 'HIDE' : 'SHOW'}
-            {' '}
-            {textButton}
-          </Button>
-        </div>
+        <>
+          <ExistingMotionsAndReferendums
+            motion={repealMotion}
+            referendum={repealReferendum}
+            proposal={repealProposal}
+          />
+          <div className={styles.buttonsWrapper}>
+            <ActionButtons {...{
+              tier,
+              id,
+              section,
+              repealMotion,
+            }}
+            />
+            <div className={styles.buttonSectionInList}>
+              <Button
+                className={styles.button}
+                small
+                secondary={isHidden}
+                grey={!isHidden}
+                onClick={() => setIsHidden((prevState) => !prevState)}
+              >
+                {!isHidden ? 'HIDE' : 'SHOW'}
+                {' '}
+                {textButton}
+              </Button>
+            </div>
+          </div>
+        </>
 
-      </div>
       )}
     </Card>
   );
@@ -363,14 +360,11 @@ function LegislationItem({
                   referendum={mainRepealReferendum}
                   proposal={mainRepealProposal}
                 />
-
                 <ActionButtons {...{
                   tier,
                   id,
                   section: null,
                   repealMotion: mainRepealMotion,
-                  repealReferendum: mainRepealReferendum,
-                  repealProposal: mainRepealProposal,
                 }}
                 />
                 <div className={styles.dropdownWrapper}>
@@ -432,6 +426,7 @@ function LegislationView() {
   const legislation = useSelector(legislationSelectors.legislation);
 
   if (!legislation[tier]) return 'Loading...';
+
   return (
     <div className={cx(stylesPage.contentWrapper, styles.contentWrapper)}>
       {Object.entries(legislation[tier]).flatMap(([year, legislations]) => (
