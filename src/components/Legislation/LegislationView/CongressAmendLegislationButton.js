@@ -18,7 +18,7 @@ export default function CongressAmendLegislationButton({
   };
   return (
     <>
-      <Button small primary onClick={toggle}>{ add ? 'Add Section as Congress' : 'Amend as Congress' }</Button>
+      <Button small primary onClick={toggle}>{ add ? 'ADD SECTION AS CONGRESS' : 'AMEND AS CONGRESS' }</Button>
       {isOpen && <CongressAmendLegislationModal closeModal={toggle} {...{ tier, id, section }} />}
     </>
   );

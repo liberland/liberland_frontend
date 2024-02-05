@@ -13,13 +13,12 @@ export default function ProposeRepealLegislationButton({ tier, id, section }) {
 
   // requires parent to dispatch getMembers action
   const userIsMember = useSelector(congressSelectors.userIsMember);
-
   if (!userIsMember) return null;
 
   return (
     <>
       <Button small primary onClick={handleModalOpen}>
-        Propose Referendum to repeal
+        PROPOSE REFERENDUM TO REPEAL
       </Button>
       {isModalOpen && (
         <CongressRepealLegislationFastTrackModal

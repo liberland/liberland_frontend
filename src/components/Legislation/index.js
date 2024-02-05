@@ -7,12 +7,12 @@ import LegislationHeader from './LegislationHeader';
 import LegislationView from './LegislationView';
 import router from '../../router';
 
-import styles from './styles.module.scss';
+import stylesPage from '../../utils/pagesBase.module.scss';
 
 function Legislation() {
   return (
-    <div className={styles.legislationWrapper}>
-      <div className={styles.navWrapper}>
+    <div className={stylesPage.sectionWrapper}>
+      <div className={stylesPage.menuAdressWrapper}>
         <LegislationHeader />
       </div>
 
