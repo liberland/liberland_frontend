@@ -3,8 +3,6 @@ import cx from 'classnames';
 
 import Card from '../Card';
 import Status from '../Status';
-import { ReactComponent as StarIcon } from '../../assets/icons/star.svg';
-import { ReactComponent as DotsIcon } from '../../assets/icons/three-dots.svg';
 import styles from './styles.module.scss';
 import stylesPage from '../../utils/pagesBase.module.scss';
 
@@ -102,10 +100,6 @@ function Feed() {
                       pending={newsItem.type === 'liberland'}
                     />
                   ))}
-                </div>
-                <div>
-                  <StarIcon />
-                  <DotsIcon />
                 </div>
               </div>
             </Card>
