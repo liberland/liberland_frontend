@@ -1,5 +1,6 @@
 @import '../assets/base/variables';
 @import '../assets/main.scss';
+@import '../index.scss';
 
 .contentWrapper{
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
@@ -126,5 +127,16 @@
     margin: 20px 0;
     padding: 0 12px;
     font-size: 15px;
+  }
+}
+
+.cardTitle {
+  font-weight: 500;
+  font-family: $playfairDisplay;
+  font-size: 24px;
+  margin: 0;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    font-size: 28px;
   }
 }

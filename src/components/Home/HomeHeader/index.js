@@ -1,16 +1,11 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { userSelectors } from '../../../redux/selectors';
 import router from '../../../router';
 
 import styles from './styles.module.scss';
 
 function HomeHeader() {
   // TODO do we need this component at all ?
-  const name = useSelector(userSelectors.selectUserGivenName);
-  const lastName = useSelector(userSelectors.selectUserFamilyName);
-  const hiMsg = name && lastName ? `Hi, ${name} ${lastName}!` : 'Hi!';
   const titles = {
     [router.home.profile]: 'My profile',
     [router.home.documents]: 'My documents',
@@ -18,7 +13,7 @@ function HomeHeader() {
     [router.documents.citizenshipHistory]: 'My documents',
     [router.documents.courtCases]: 'My documents',
     [router.documents.landOwnership]: 'My documents',
-    [router.home.feed]: hiMsg,
+    [router.home.feed]: 'Your feed',
     [router.home.legislation]: 'Legislation',
     [router.home.offices]: 'Offices',
     [router.home.registries]: 'Registries',
