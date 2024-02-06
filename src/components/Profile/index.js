@@ -35,6 +35,7 @@ function Profile({ className }) {
   const isUserEligibleForComplimentaryLLD = useSelector(onboardingSelectors.selectorEligibleForComplimentaryLLD);
   // eslint-disable-next-line max-len
   const ineligibleForComplimentaryLLDReason = useSelector(onboardingSelectors.selectorIneligibleForComplimentaryLLDReason);
+  const isLoading = useSelector(onboardingSelectors.selectorIneligibleForComplimentaryLLDIsLoading);
 
   const dispatch = useDispatch();
   // eslint-disable-next-line no-unsafe-optional-chaining
@@ -46,7 +47,7 @@ function Profile({ className }) {
   useEffect(() => {
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
     dispatch(identityActions.getIdentity.call(walletAddress));
-  }, [liquidDollars]);
+  }, [liquidDollars, dispatch]);
 
   const toggleModalOnchainIdentity = () => {
     setIsModalOpenOnchainIdentity(!isModalOpenOnchainIdentity);
@@ -123,6 +124,11 @@ function Profile({ className }) {
       isDataToShow: false,
     },
   ];
+
+  const handleGetFreeLLD = () => {
+    if (isLoading) return;
+    dispatch(onBoardingActions.claimComplimentaryLld.call());
+  };
 
   return (
     <div className={styles.wrapper}>
@@ -218,7 +224,8 @@ function Profile({ className }) {
                   medium
                   primary={isUserEligibleForComplimentaryLLD}
                   grey={!isUserEligibleForComplimentaryLLD}
-                  onClick={() => dispatch(onBoardingActions.claimComplimentaryLld.call())}
+                  onClick={handleGetFreeLLD}
+                  disabled={isLoading}
                 >
                   {isUserEligibleForComplimentaryLLD ? 'Claim complimentary LLD' : ineligibleForComplimentaryLLDReason}
                 </Button>
