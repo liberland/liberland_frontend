@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import * as userSelectors from './userSelectors';
 
 export const blockchainReducer = (state) => state.blockchain;
 
@@ -11,8 +10,10 @@ const allWalletsSelector = createSelector(
   blockchainReducer,
   (reducer) => reducer.allWallets,
 );
-const userWalletAddressSelector = userSelectors.selectWalletAddress;
-
+const userWalletAddressSelector = createSelector(
+  blockchainReducer,
+  (reducer) => reducer.userWalletAddress,
+);
 const errorExistsAndUnacknowledgedByUser = createSelector(
   blockchainReducer,
   (reducer) => reducer.errorExistsAndUnacknowledgedByUser,

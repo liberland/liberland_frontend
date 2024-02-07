@@ -23,15 +23,16 @@ import OpenMenuIcon from '../../../assets/icons/menu.svg';
 import CloseMenuIcon from '../../../assets/icons/close.svg';
 
 // REDUX
-import { userSelectors, walletSelectors } from '../../../redux/selectors';
+import { userSelectors, walletSelectors, blockchainSelectors } from '../../../redux/selectors';
 
 // CONSTANTS
 // import roleEnums from '../../../constants/roleEnums';
 
 // UTILS
 import { formatMerits } from '../../../utils/walletHelpers';
-import { authActions, walletActions } from '../../../redux/actions';
+import { authActions, blockchainActions, walletActions } from '../../../redux/actions';
 import LogoutModal from '../../Modals/LogoutModal';
+import truncate from '../../../utils/truncate';
 
 function HomeNavigation() {
   const { logOut } = useContext(AuthContext);
@@ -45,10 +46,12 @@ function HomeNavigation() {
   const history = useHistory();
   const isMedium = useMediaQuery('(min-width: 48em)');
   const walletAddress = useSelector(userSelectors.selectWalletAddress);
-
+  const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const homeTitle = name && lastName ? `${name} ${lastName}` : 'PROFILE';
   const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   const [isLogoutModalOpen, setLogoutIsModalOpen] = useState(false);
+  const walletAdressSelector = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const isWalletAdressSame = walletAddress === walletAdressSelector;
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
@@ -66,6 +69,12 @@ function HomeNavigation() {
     };
   }, []);
 
+  const onWalletAdresssChange = (address) => {
+    if (!address) return;
+    dispatch(blockchainActions.setUserWallet.success(address));
+    localStorage.setItem('BlockchainAdress', address);
+  };
+
   const navigationList = [
     {
       route: router.home.profile,
@@ -75,6 +84,7 @@ function HomeNavigation() {
       icon: () => <Avatar name={fullName} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
       description: `${formatMerits(totalBalance)} LLM`,
       isDiscouraged: false,
+      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.feed,
@@ -82,6 +92,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: FeedIcon,
       isDiscouraged: process.env.REACT_APP_IS_FEED_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.wallet,
@@ -89,6 +100,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: WalletIcon,
       isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.voting,
@@ -96,6 +108,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: VotingIcon,
       isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: false,
     },
     {
       route: router.home.legislation,
@@ -103,6 +116,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
       isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: false,
     },
     {
       route: router.home.offices,
@@ -110,6 +124,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
       isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: false,
     },
     {
       route: router.home.registries,
@@ -117,6 +132,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: false,
     },
     {
       route: router.home.staking,
@@ -124,6 +140,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: false,
     },
     {
       route: router.home.congress,
@@ -131,6 +148,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: false,
     },
   ];
 
@@ -148,7 +166,8 @@ function HomeNavigation() {
             access,
             description,
             isDiscouraged,
-          }) => (
+            isAdressWalletDiffrentThanRegistered,
+          }) => (isWalletAdressSame || (!isWalletAdressSame && isAdressWalletDiffrentThanRegistered) ? (
             <RoleHOC key={route} roles={roles} access={access}>
               <NavigationLink
                 route={route}
@@ -159,7 +178,8 @@ function HomeNavigation() {
                 isDiscouraged={isDiscouraged}
               />
             </RoleHOC>
-          ))
+          )
+            : null))
         }
         <div onClick={
           () => setLogoutIsModalOpen(true)
@@ -172,6 +192,18 @@ function HomeNavigation() {
             path="logout"
           />
         </div>
+        {wallets && wallets.length > 1
+               && (
+               <div>
+                 <select className={styles.select} onChange={(e) => onWalletAdresssChange(e.target.value)}>
+                   {wallets.map((wallet) => (
+                     <option key={wallet.address} value={wallet.address}>
+                       {truncate(wallet.address, isMedium ? 24 : 16)}
+                     </option>
+                   ))}
+                 </select>
+               </div>
+               )}
         {roles['e-resident'] === 'e-resident' ? <GetCitizenshipCard /> : ''}
         {isLogoutModalOpen && (
           <LogoutModal handleLogout={handleLogout} closeModal={() => setLogoutIsModalOpen(false)} />
