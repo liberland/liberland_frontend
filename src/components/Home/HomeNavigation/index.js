@@ -11,6 +11,7 @@ import RoleHOC from '../../../hocs/RoleHOC';
 import router from '../../../router';
 import Header from '../../AuthComponents/Header';
 import GetCitizenshipCard from '../Cards/GetCitizenshipCard';
+import ChangeWallet from '../ChangeWallet';
 
 // ASSETS
 import styles from './styles.module.scss';
@@ -23,16 +24,18 @@ import OpenMenuIcon from '../../../assets/icons/menu.svg';
 import CloseMenuIcon from '../../../assets/icons/close.svg';
 
 // REDUX
-import { userSelectors, walletSelectors, blockchainSelectors } from '../../../redux/selectors';
-
+import {
+  userSelectors,
+  walletSelectors,
+  blockchainSelectors,
+} from '../../../redux/selectors';
 // CONSTANTS
 // import roleEnums from '../../../constants/roleEnums';
 
 // UTILS
 import { formatMerits } from '../../../utils/walletHelpers';
-import { authActions, blockchainActions, walletActions } from '../../../redux/actions';
+import { authActions, walletActions } from '../../../redux/actions';
 import LogoutModal from '../../Modals/LogoutModal';
-import truncate from '../../../utils/truncate';
 
 function HomeNavigation() {
   const { logOut } = useContext(AuthContext);
@@ -46,12 +49,12 @@ function HomeNavigation() {
   const history = useHistory();
   const isMedium = useMediaQuery('(min-width: 48em)');
   const walletAddress = useSelector(userSelectors.selectWalletAddress);
-  const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const homeTitle = name && lastName ? `${name} ${lastName}` : 'PROFILE';
   const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   const [isLogoutModalOpen, setLogoutIsModalOpen] = useState(false);
-  const walletAdressSelector = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const isWalletAdressSame = walletAddress === walletAdressSelector;
+  const isWalletAdressSame = useSelector(
+    blockchainSelectors.isUserWalletAddressSameAsUserAdress,
+  );
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
@@ -69,19 +72,21 @@ function HomeNavigation() {
     };
   }, []);
 
-  const onWalletAdresssChange = (address) => {
-    if (!address) return;
-    dispatch(blockchainActions.setUserWallet.success(address));
-    localStorage.setItem('BlockchainAdress', address);
-  };
-
   const navigationList = [
     {
       route: router.home.profile,
       title: homeTitle,
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       // eslint-disable-next-line react/no-unstable-nested-components
-      icon: () => <Avatar name={fullName} color="#FDF4E0" fgColor="#F1C823" round size="41px" />,
+      icon: () => (
+        <Avatar
+          name={fullName}
+          color="#FDF4E0"
+          fgColor="#F1C823"
+          round
+          size="41px"
+        />
+      ),
       description: `${formatMerits(totalBalance)} LLM`,
       isDiscouraged: false,
       isAdressWalletDiffrentThanRegistered: true,
@@ -158,33 +163,31 @@ function HomeNavigation() {
         <div className={styles.logoHeaderWrapper}>
           <Header />
         </div>
-        {
-          roles && navigationList.map(({
-            route,
-            icon,
-            title,
-            access,
-            description,
-            isDiscouraged,
-            isAdressWalletDiffrentThanRegistered,
-          }) => (isWalletAdressSame || (!isWalletAdressSame && isAdressWalletDiffrentThanRegistered) ? (
-            <RoleHOC key={route} roles={roles} access={access}>
-              <NavigationLink
-                route={route}
-                title={title}
-                icon={icon}
-                path={location.pathname}
-                description={description}
-                isDiscouraged={isDiscouraged}
-              />
-            </RoleHOC>
-          )
-            : null))
-        }
-        <div onClick={
-          () => setLogoutIsModalOpen(true)
-        }
-        >
+        {roles
+          && navigationList.map(
+            ({
+              route,
+              icon,
+              title,
+              access,
+              description,
+              isDiscouraged,
+              isAdressWalletDiffrentThanRegistered,
+            }) => (isWalletAdressSame
+              || (!isWalletAdressSame && isAdressWalletDiffrentThanRegistered) ? (
+                <RoleHOC key={route} roles={roles} access={access}>
+                  <NavigationLink
+                    route={route}
+                    title={title}
+                    icon={icon}
+                    path={location.pathname}
+                    description={description}
+                    isDiscouraged={isDiscouraged}
+                  />
+                </RoleHOC>
+              ) : null),
+          )}
+        <div onClick={() => setLogoutIsModalOpen(true)}>
           <NavigationLink
             route="logout"
             title="LOGOUT"
@@ -192,21 +195,13 @@ function HomeNavigation() {
             path="logout"
           />
         </div>
-        {wallets && wallets.length > 1
-               && (
-               <div>
-                 <select className={styles.select} onChange={(e) => onWalletAdresssChange(e.target.value)}>
-                   {wallets.map((wallet) => (
-                     <option key={wallet.address} value={wallet.address}>
-                       {truncate(wallet.address, isMedium ? 24 : 16)}
-                     </option>
-                   ))}
-                 </select>
-               </div>
-               )}
+        <ChangeWallet isMedium={isMedium} />
         {roles['e-resident'] === 'e-resident' ? <GetCitizenshipCard /> : ''}
         {isLogoutModalOpen && (
-          <LogoutModal handleLogout={handleLogout} closeModal={() => setLogoutIsModalOpen(false)} />
+          <LogoutModal
+            handleLogout={handleLogout}
+            closeModal={() => setLogoutIsModalOpen(false)}
+          />
         )}
         {/* roles.citizen === 'citizen' ? <NextAssemblyCard /> : '' */}
       </div>
@@ -215,8 +210,15 @@ function HomeNavigation() {
 
   const mobileNavbar = (
     <div>
-      <div className={`${styles.mobileNavigationWrapper} ${isMenuOpen && styles.mobileNavigationWrapperOpen}`}>
-        <div className={styles.navbarNavigationWrapper} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+      <div
+        className={`${styles.mobileNavigationWrapper} ${
+          isMenuOpen && styles.mobileNavigationWrapperOpen
+        }`}
+      >
+        <div
+          className={styles.navbarNavigationWrapper}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
           <div className={styles.logoHeaderWrapper}>
             <Header />
           </div>
@@ -227,38 +229,47 @@ function HomeNavigation() {
               alt={isMenuOpen ? 'Close menu icon' : 'Open menu icon'}
             />
           </div>
-
         </div>
         <div className={styles.navigationContent}>
-          {
-            navigationList.map(({
-              route,
-              icon,
-              title,
-              access,
-              description,
-              isDiscouraged,
-            }) => (
-              <div key={route} onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                <RoleHOC roles={roles} access={access}>
-                  <NavigationLink
-                    route={route}
-                    title={title}
-                    icon={icon}
-                    path={location.pathname}
-                    description={description}
-                    isDiscouraged={isDiscouraged}
-                  />
-                </RoleHOC>
-              </div>
-            ))
-          }
-          <div onClick={
-            () => {
+          {navigationList.map(
+            (
+              {
+                route,
+                icon,
+                title,
+                access,
+                description,
+                isDiscouraged,
+                isAdressWalletDiffrentThanRegistered,
+              },
+              index,
+            ) => (
+              <>
+                {isWalletAdressSame
+                || (!isWalletAdressSame
+                  && isAdressWalletDiffrentThanRegistered) ? (
+                    <div key={route} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                      <RoleHOC roles={roles} access={access}>
+                        <NavigationLink
+                          route={route}
+                          title={title}
+                          icon={icon}
+                          path={location.pathname}
+                          description={description}
+                          isDiscouraged={isDiscouraged}
+                        />
+                      </RoleHOC>
+                    </div>
+                  ) : null}
+                {index === 0 && <ChangeWallet isMedium={isMedium} />}
+              </>
+            ),
+          )}
+          <div
+            onClick={() => {
               setLogoutIsModalOpen(true);
               setIsMenuOpen(!isMenuOpen);
-            }
-          }
+            }}
           >
             <NavigationLink
               route={router.home.feed}
@@ -269,14 +280,16 @@ function HomeNavigation() {
           </div>
           {roles['e-resident'] === 'e-resident' ? <GetCitizenshipCard /> : ''}
           {isLogoutModalOpen && (
-            <LogoutModal handleLogout={handleLogout} closeModal={() => setLogoutIsModalOpen(false)} />
+            <LogoutModal
+              handleLogout={handleLogout}
+              closeModal={() => setLogoutIsModalOpen(false)}
+            />
           )}
           {/* roles.citizen === 'citizen' ? <NextAssemblyCard /> : '' */}
         </div>
       </div>
       <div className={styles.mobileNavigationSpacer} />
     </div>
-
   );
 
   return isMedium ? desktopNavbar : mobileNavbar;

@@ -76,14 +76,3 @@
     padding: 0;
   }
 }
-
-.select{
-  width: 100%;
-  margin-top: 12px;
-  border-radius: 6px;
-  padding: 11px 13px;
-  
-  @media screen and (min-width: map-get($breakpoints, 'tablet')){
-    padding: 12px 16px;
-  }
-}
