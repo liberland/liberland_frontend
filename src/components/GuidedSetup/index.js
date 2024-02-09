@@ -10,6 +10,7 @@ import NoConnectedWalletComponent from './NoConnectedWalletComponent';
 import MissingWalletComponent from './MissingWalletComponent';
 import OnBoarding from './OnBording';
 import { onBoardingActions } from '../../redux/actions';
+import InstructionOnBoard from './OnBording/InstructionOnBoard';
 
 const useIsUnsupportedBrowser = () => {
   const [isBrave, setIsBrave] = useState(null);
@@ -56,6 +57,7 @@ function GuidedSetup({ children }) {
   };
 
   const isSkippedOnBoardingGetLLD = sessionStorage.getItem('SkippedOnBoardingGetLLD');
+  const notResidentAcceptedByUser = sessionStorage.getItem('notResidentAcceptedByUser');
 
   useEffect(() => {
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
@@ -95,9 +97,12 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if (!roles?.non_citizen) {
-    // TODO where redirect
-    window.location.href = 'https://liberland.org';
+  if (true && !notResidentAcceptedByUser && (roles['e-resident'] !== 'e-resident')) {
+    return (
+      <GuidedSetupWrapper>
+        <InstructionOnBoard />
+      </GuidedSetupWrapper>
+    );
   }
 
   if ((isUserEligibleForComplimentaryLLD && isSkippedOnBoardingGetLLD !== 'true')
