@@ -43,7 +43,6 @@ function GuidedSetup({ children }) {
   const userId = useSelector(userSelectors.selectUserId);
   const isUserEligibleForComplimentaryLLD = useSelector(onboardingSelectors.selectorEligibleForComplimentaryLLD);
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
-  const roles = useSelector(userSelectors.selectUserRole);
 
   const isLoading = !isSessionReady
     || extensions === null
@@ -93,11 +92,6 @@ function GuidedSetup({ children }) {
         <NoConnectedWalletComponent />
       </GuidedSetupWrapper>
     );
-  }
-
-  if (!roles?.non_citizen) {
-    // TODO where redirect
-    window.location.href = 'https://liberland.org';
   }
 
   if ((isUserEligibleForComplimentaryLLD && isSkippedOnBoardingGetLLD !== 'true')
