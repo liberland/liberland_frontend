@@ -12,7 +12,4 @@ const selectorIsLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
-export {
-  selectorIdentity,
-  selectorIsLoading,
-};
+export { selectorIdentity, selectorIsLoading };

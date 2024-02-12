@@ -21,6 +21,7 @@ function* claimComplimentaryLLDWorker() {
       // FIXME eventually we need a notification modal, not just error modal
       errorData = { details: 'Complimentary LLDs claimed. Please refresh the page' };
       yield call(getBalanceByAddress, walletAddress);
+      yield put(onBoardingActions.getEligibleForComplimentaryLld.call());
       throw new Error(errorData.details);
     } else {
       errorData = {
@@ -64,7 +65,6 @@ function* getIsEligibleForComplimentaryLLDWorker() {
             isEligibleForComplimentaryLLD: true,
             ineligibleForComplimentaryLLDReason: null,
           }));
-          sessionStorage.setItem('SkippedOnBoardingGetLLD', 'secondStep');
         } else {
           yield put(onBoardingActions.getEligibleForComplimentaryLld.success({
             isEligibleForComplimentaryLLD: false,

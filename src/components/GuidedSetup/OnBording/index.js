@@ -2,22 +2,47 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import {
-  onboardingSelectors, blockchainSelectors, identitySelectors, userSelectors,
+  onboardingSelectors,
+  blockchainSelectors,
+  identitySelectors,
+  userSelectors,
+  walletSelectors,
 } from '../../../redux/selectors';
-import { onBoardingActions, identityActions } from '../../../redux/actions';
+import {
+  onBoardingActions,
+  identityActions,
+  walletActions,
+} from '../../../redux/actions';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
 import router from '../../../router';
 import UpdateProfile from '../../Profile/UpdateProfile';
+import { formatDollars } from '../../../utils/walletHelpers';
 
 function OnBoarding() {
   const dispatch = useDispatch();
   const history = useHistory();
-  const isUserEligibleForComplimentaryLLD = useSelector(onboardingSelectors.selectorEligibleForComplimentaryLLD);
-  const [isFirstStepSkipped, setIsFirstStepSkipped] = useState(!isUserEligibleForComplimentaryLLD);
+  const isSkippedOnBoardingGetLLD = sessionStorage.getItem(
+    'SkippedOnBoardingGetLLD',
+  );
+  const isUserEligibleForComplimentaryLLD = useSelector(
+    onboardingSelectors.selectorEligibleForComplimentaryLLD,
+  );
+  const liquidDollars = useSelector(
+    walletSelectors.selectorLiquidDollarsBalance,
+  );
+  const dolars = formatDollars(liquidDollars);
+  const hasSomeDolars = dolars === 0 || dolars === '0';
+  const [isFirstStepSkipped, setIsFirstStepSkipped] = useState(
+    !isUserEligibleForComplimentaryLLD
+      || isSkippedOnBoardingGetLLD === 'secondStep'
+    || hasSomeDolars,
+  );
   const userName = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
-  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const walletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const identity = useSelector(identitySelectors.selectorIdentity);
   const ineligibleForComplimentaryLLDReason = useSelector(
@@ -30,7 +55,11 @@ function OnBoarding() {
 
   useEffect(() => {
     dispatch(identityActions.getIdentity.call(walletAddress));
-  }, [dispatch]);
+  }, [dispatch, walletAddress]);
+
+  useEffect(() => {
+    dispatch(walletActions.getWallet.call());
+  }, [dispatch, liquidDollars]);
 
   if (!isFirstStepSkipped) {
     return (
@@ -44,7 +73,9 @@ function OnBoarding() {
               dispatch(onBoardingActions.claimComplimentaryLld.call());
             }}
           >
-            {ineligibleForComplimentaryLLDReason || 'Claim complimentary LLD'}
+            {isUserEligibleForComplimentaryLLD
+              ? 'Claim complimentary LLD'
+              : ineligibleForComplimentaryLLDReason}
           </Button>
           <Button medium secondary onClick={() => setIsFirstStepSkipped(true)}>
             Skip
@@ -59,7 +90,12 @@ function OnBoarding() {
       <div className={styles.wrapper}>
         <h3>Update your profile now.</h3>
         <div className={styles.buttons}>
-          <Button className={styles.textColor} medium primary onClick={toggleModalOnchainIdentity}>
+          <Button
+            className={styles.textColor}
+            medium
+            primary
+            onClick={toggleModalOnchainIdentity}
+          >
             Update identity
           </Button>
           <Button
@@ -76,17 +112,15 @@ function OnBoarding() {
       </div>
       {isModalOpenOnchainIdentity && (
         <UpdateProfile
+          isGuidedUpdate
           blockNumber={blockNumber}
           identity={identity}
-          redirectAfterSubmit={() => history.push(router.home)}
-          walletAddress={walletAddress}
           toggleModalOnchainIdentity={toggleModalOnchainIdentity}
           lastName={lastName}
           userName={userName}
         />
       )}
     </>
-
   );
 }
 
