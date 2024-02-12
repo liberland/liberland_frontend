@@ -64,7 +64,7 @@ function OnBoarding() {
   if (!isFirstStepSkipped) {
     return (
       <div className={styles.wrapper}>
-        <h3>You want to revice free LLD?</h3>
+        <h3>Claim 2 gratis LLD for e-residency</h3>
         <div className={styles.buttons}>
           <Button
             medium
@@ -77,7 +77,7 @@ function OnBoarding() {
               ? 'Claim complimentary LLD'
               : ineligibleForComplimentaryLLDReason}
           </Button>
-          <Button medium secondary onClick={() => setIsFirstStepSkipped(true)}>
+          <Button onClick={() => setIsFirstStepSkipped(true)}>
             Skip
           </Button>
         </div>
@@ -96,7 +96,7 @@ function OnBoarding() {
             primary
             onClick={toggleModalOnchainIdentity}
           >
-            Update identity
+            Update identity to claim tokens and e-residency or citizenship
           </Button>
           <Button
             medium
