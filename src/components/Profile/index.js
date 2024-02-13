@@ -225,7 +225,7 @@ function Profile({ className }) {
                   primary={isUserEligibleForComplimentaryLLD && !isLoading}
                   grey={!isUserEligibleForComplimentaryLLD || isLoading}
                   onClick={handleGetFreeLLD}
-                  disabled={true || isLoading}
+                  disabled={isLoading}
                 >
                   {isUserEligibleForComplimentaryLLD
                     ? 'Claim complimentary LLD'
