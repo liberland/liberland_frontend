@@ -50,6 +50,11 @@ const selectIsSessionReady = createSelector(
   (reducer) => reducer.isSessionReady,
 );
 
+const selectIsLoading = createSelector(
+  userReducer,
+  (reducer) => reducer.isLoading,
+);
+
 const selectWalletAddress = createSelector(
   selectUser,
   (user) => user?.blockchainAddress,
@@ -64,4 +69,5 @@ export {
   selectUserGivenName,
   selectUserFamilyName,
   selectWalletAddress,
+  selectIsLoading,
 };

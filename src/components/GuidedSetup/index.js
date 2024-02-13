@@ -56,7 +56,10 @@ function GuidedSetup({ children }) {
   );
   const identityData = useSelector(identitySelectors.selectorIdentity);
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
+  const isLoadingUser = useSelector(userSelectors.selectIsLoading);
+
   const isLoading = !isSessionReady
+    || isLoadingUser
     || extensions === null
     || wallets === null
     || isUnsupportedBrowser === null;

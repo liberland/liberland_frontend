@@ -1,30 +1,30 @@
 @import '../../assets/base/variables';
 @import '../../assets/base/fonts';
 @import '../../assets/main.scss';
+@import '../../index.scss';
 
 .status {
   text-transform: capitalize;
   border-radius: 42px;
-  padding: 5px 10px;
-  font-size: 11px;
-  font-weight: 700;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: $clearBlack;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
-    font-size: 11px;
-    padding: 8px 13px;
+    font-size: 14px;
+    padding: 5px 15px;
   }
   
   &.completed {
-    color: $bg4;
     background-color: $succes;
   }
 
   &.declined {
-    color: $primary4;
     background-color: $secondary4;
   }
+
   &.pending {
-    color: $primary;
     background-color: $secondary3;
   }
 }

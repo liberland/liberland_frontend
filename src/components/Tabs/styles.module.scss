@@ -6,14 +6,6 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-
-  @media screen and (min-width: map-get($breakpoints, 'tablet')){
-    gap:15px;
-  }
-
-  > * {
-    margin: auto !important;
-  }
 }
 
 .link {
@@ -23,10 +15,11 @@
   color: $clearBlack;
   line-height: 29px;
   text-decoration: none;
+  border-bottom: 2px solid transparent;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
     letter-spacing: 1px;
-    padding: 0 15px;
+    padding: 0 20px;
     font-size: 13px;
   }
 
@@ -40,7 +33,7 @@
 .link:hover{
   padding-top: 8px;
   padding-bottom: 12px;
-
+  
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
     padding-top: 12px;
     padding-bottom: 20px;

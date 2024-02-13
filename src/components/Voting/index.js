@@ -3,6 +3,8 @@ import {
   Switch, Route, Redirect,
 } from 'react-router-dom';
 
+import { NavLink, useLocation } from 'react-router-dom/cjs/react-router-dom.min';
+
 import VotingHeader from './VotingHeader';
 import RoleHOC from '../../hocs/RoleHOC';
 import router from '../../router';
@@ -12,14 +14,25 @@ import styles from './styles.module.scss';
 import stylesPage from '../../utils/pagesBase.module.scss';
 import Referendum from './Referendum';
 import { AddLegislation } from './Referendum/ProposalForms/AddLegislation/AddLegislation';
+import Button from '../Button/Button';
 
 function Voting() {
-  return (
+  const location = useLocation();
 
+  return (
     <div className={stylesPage.sectionWrapper}>
       <div className={stylesPage.menuAddressWrapper}>
         <div className={styles.votingHeaderWrapper}>
           <VotingHeader />
+          {location.pathname === router.voting.referendum && (
+          <NavLink
+            className={styles.linkButton}
+            to={router.voting.addLegislation}
+          >
+            <Button small primary>Propose</Button>
+          </NavLink>
+          )}
+
         </div>
       </div>
 

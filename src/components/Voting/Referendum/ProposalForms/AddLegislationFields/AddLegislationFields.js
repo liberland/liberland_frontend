@@ -25,10 +25,14 @@ export function AddLegislationFields({
   const sections = watch('sections');
 
   const handlePaste = (e) => {
-    if (sections.length > 1) return;
     const data = e.clipboardData.getData('text');
     const newSections = markdown2sections(data);
-    if (newSections.length > 0) replace(newSections.map((value) => ({ value })));
+    if (sections.length === 1) {
+      replace([...newSections.map((value) => ({ value }))]);
+    } else if (newSections.length > 1) {
+      // Process the paste event only if there are no existing sections or if there's more than one new section
+      replace([...sections, ...newSections.map((value) => ({ value }))]);
+    }
   };
 
   return (
