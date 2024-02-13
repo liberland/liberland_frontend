@@ -17,7 +17,7 @@ const etherConfig = {
 };
 
 const authConfig = {
-  clientId: '5',
+  clientId: `${process.env.REACT_APP_SSO_API_CLIENT_ID}`,
   authorizationEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/authorize`,
   tokenEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/token`,
   redirectUri: process.env.REACT_APP_FRONTEND_REDIRECT,
