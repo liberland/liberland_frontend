@@ -36,7 +36,6 @@ function Profile({ className }) {
   // eslint-disable-next-line max-len
   const ineligibleForComplimentaryLLDReason = useSelector(onboardingSelectors.selectorIneligibleForComplimentaryLLDReason);
   const isLoading = useSelector(onboardingSelectors.selectorIneligibleForComplimentaryLLDIsLoading);
-
   const dispatch = useDispatch();
   // eslint-disable-next-line no-unsafe-optional-chaining
   const lockBlocks = walletInfo?.balances?.electionLock - blockNumber;
@@ -222,8 +221,8 @@ function Profile({ className }) {
                 <Button
                   className={styles.textColor}
                   medium
-                  primary={isUserEligibleForComplimentaryLLD}
-                  grey={!isUserEligibleForComplimentaryLLD}
+                  primary={isUserEligibleForComplimentaryLLD && !isLoading}
+                  grey={!isUserEligibleForComplimentaryLLD || isLoading}
                   onClick={handleGetFreeLLD}
                   disabled={isLoading}
                 >
