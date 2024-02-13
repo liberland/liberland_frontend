@@ -4,6 +4,7 @@ import { onBoardingActions } from '../actions';
 const initialState = {
   isEligibleForComplimentaryLLD: false,
   ineligibleForComplimentaryLLDReason: null,
+  isSkipOnBoarding: true,
   isLoading: false,
 };
 
@@ -26,6 +27,7 @@ const onboardingReducer = handleActions({
     ...state,
     isEligibleForComplimentaryLLD: action.payload.isEligibleForComplimentaryLLD,
     ineligibleForComplimentaryLLDReason: action.payload.ineligibleForComplimentaryLLDReason,
+    isSkipOnBoarding: action.payload.isSkipOnBoarding,
     isLoading: false,
   }),
 

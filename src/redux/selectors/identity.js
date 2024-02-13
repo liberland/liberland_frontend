@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { parseIdentityData, parseLegal } from '../../utils/identityParser';
 
 const identityReducer = (state) => state.identity;
 
@@ -12,7 +13,23 @@ const selectorIsLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
-export {
-  selectorIdentity,
-  selectorIsLoading,
-};
+const selectIsIdentityEmpty = createSelector(
+  identityReducer,
+  (reducer) => {
+    const identityData = reducer.identity;
+    if (!identityData) return null;
+    if (identityData?.isSome) {
+      const identity = identityData.unwrap();
+      const { info } = identity;
+      return (
+        !parseIdentityData(info?.display)
+        && !parseLegal(info)
+        && !parseIdentityData(info?.web)
+        && !parseIdentityData(info?.email)
+      );
+    }
+    return true;
+  },
+);
+
+export { selectorIdentity, selectorIsLoading, selectIsIdentityEmpty };

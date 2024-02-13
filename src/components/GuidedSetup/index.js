@@ -1,20 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import styles from './styles.module.scss';
-import { blockchainSelectors, userSelectors } from '../../redux/selectors';
+import {
+  blockchainSelectors,
+  userSelectors,
+  onboardingSelectors,
+  walletSelectors,
+  identitySelectors,
+} from '../../redux/selectors';
 import UnsupportedBrowserNoticeComponent from './UnSupportedBrowserNoticeComponent';
 import LoadingComponent from './LoadingComponent';
 import NoWalletsDetectedInBrowser from './NoWalletsDetectedInBrowser';
 import NoConnectedWalletComponent from './NoConnectedWalletComponent';
 import MissingWalletComponent from './MissingWalletComponent';
+import OnBoarding from './OnBording';
+import { onBoardingActions } from '../../redux/actions';
 
 const useIsUnsupportedBrowser = () => {
   const [isBrave, setIsBrave] = useState(null);
 
   useEffect(() => {
     (async () => {
-      setIsBrave(!!(navigator.brave && await navigator.brave.isBrave()));
+      setIsBrave(!!(navigator.brave && (await navigator.brave.isBrave())));
     })();
   }, [setIsBrave]);
 
@@ -24,20 +32,27 @@ const useIsUnsupportedBrowser = () => {
 function GuidedSetupWrapper({ children }) {
   return (
     <div className={styles.guidedSetupWrapper}>
-      <div className={styles.componentWrapper}>
-        {children}
-      </div>
+      <div className={styles.componentWrapper}>{children}</div>
     </div>
   );
 }
 
 function GuidedSetup({ children }) {
-  const [acceptedBrowser, setAcceptedBrowser] = useState(localStorage.getItem('unsupportedBrowserAcceptedByUser'));
+  const dispatch = useDispatch();
+  const [acceptedBrowser, setAcceptedBrowser] = useState(
+    localStorage.getItem('unsupportedBrowserAcceptedByUser'),
+  );
   const isSessionReady = useSelector(userSelectors.selectIsSessionReady);
   const extensions = useSelector(blockchainSelectors.extensionsSelector);
+  const liquidDollars = useSelector(
+    walletSelectors.selectorLiquidDollarsBalance,
+  );
   const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const userWalletAddress = useSelector(userSelectors.selectWalletAddress);
   const userId = useSelector(userSelectors.selectUserId);
+  const isUserEligibleForComplimentaryLLD = useSelector(
+    onboardingSelectors.selectorEligibleForComplimentaryLLD,
+  );
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
   const isLoadingUser = useSelector(userSelectors.selectIsLoading);
 
@@ -52,20 +67,32 @@ function GuidedSetup({ children }) {
     setAcceptedBrowser(true);
   };
 
-  if (isLoading) return (
-    <GuidedSetupWrapper>
-      <LoadingComponent />
-    </GuidedSetupWrapper>
+  const isIdentityEmpty = useSelector(identitySelectors.selectIsIdentityEmpty);
+
+  const isSkippedOnBoardingGetLLD = sessionStorage.getItem(
+    'SkippedOnBoardingGetLLD',
   );
 
-  if (!acceptedBrowser && isUnsupportedBrowser) {
+  useEffect(() => {
+    dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
+  }, [dispatch, liquidDollars]);
+  if (isLoading) {
     return (
       <GuidedSetupWrapper>
-        <UnsupportedBrowserNoticeComponent onAccept={onUnsupportedBrowserAccept} />
+        <LoadingComponent />
       </GuidedSetupWrapper>
     );
   }
 
+  if (!acceptedBrowser && isUnsupportedBrowser) {
+    return (
+      <GuidedSetupWrapper>
+        <UnsupportedBrowserNoticeComponent
+          onAccept={onUnsupportedBrowserAccept}
+        />
+      </GuidedSetupWrapper>
+    );
+  }
   if (!userId) return children;
 
   if (extensions.length === 0 || wallets.length === 0) {
@@ -80,6 +107,19 @@ function GuidedSetup({ children }) {
     return (
       <GuidedSetupWrapper>
         <NoConnectedWalletComponent />
+      </GuidedSetupWrapper>
+    );
+  }
+
+  if (
+    (isUserEligibleForComplimentaryLLD
+      || isIdentityEmpty
+      || isSkippedOnBoardingGetLLD === 'secondStep')
+    && isSkippedOnBoardingGetLLD !== 'true'
+  ) {
+    return (
+      <GuidedSetupWrapper>
+        <OnBoarding />
       </GuidedSetupWrapper>
     );
   }

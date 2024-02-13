@@ -1,0 +1,11 @@
+.wrapper{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.buttons{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

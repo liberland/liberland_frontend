@@ -1,8 +1,6 @@
-import {
-  put, takeLatest, call, select,
-} from 'redux-saga/effects';
+import { put, call, select } from 'redux-saga/effects';
 
-import { blockchainActions, onBoardingActions } from '../actions';
+import { onBoardingActions } from '../actions';
 import { blockchainSelectors, walletSelectors } from '../selectors';
 import { getBalanceByAddress } from '../../api/nodeRpcCall';
 import { getComplimentaryLLD } from '../../api/middleware';
@@ -13,81 +11,102 @@ import { blockchainWatcher } from './base';
 // WORKERS
 
 function* claimComplimentaryLLDWorker() {
-  let errorData = { details: 'Error in claiming, send screenshot to devs please' };
+  let errorData = {
+    details: 'Error in claiming, send screenshot to devs please',
+  };
   try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const getComplimentaryLLDResponse = yield call(getComplimentaryLLD, walletAddress);
+    const walletAddress = yield select(
+      blockchainSelectors.userWalletAddressSelector,
+    );
+    const getComplimentaryLLDResponse = yield call(
+      getComplimentaryLLD,
+      walletAddress,
+    );
     if (getComplimentaryLLDResponse.status === 200) {
       // FIXME eventually we need a notification modal, not just error modal
-      errorData = { details: 'Complimentary LLDs claimed. Please refresh the page' };
+      errorData = {
+        details: 'Complimentary LLDs claimed.',
+      };
       yield call(getBalanceByAddress, walletAddress);
-      throw { errorData };
+      yield put(onBoardingActions.getEligibleForComplimentaryLld.call());
+      throw new Error(errorData.details);
     } else {
       errorData = {
-        details: typeof getComplimentaryLLDResponse?.data === 'string'
-          ? getComplimentaryLLDResponse?.data
-          : 'Technical error without description, please let the devs know',
+        details:
+          typeof getComplimentaryLLDResponse?.data === 'string'
+            ? getComplimentaryLLDResponse?.data
+            : 'Technical error without description, please let the devs know',
       };
-      throw { errorData };
+      throw new Error(errorData.details);
     }
   } catch (e) {
-    throw { errorData };
+    throw new Error(errorData.details);
   }
 }
 
 function* getIsEligibleForComplimentaryLLDWorker() {
   try {
-    const liquidDollars = yield select(walletSelectors.selectorLiquidDollarsBalance);
+    const liquidDollars = yield select(
+      walletSelectors.selectorLiquidDollarsBalance,
+    );
     // Only eligible if no existing dollars
-    if (formatDollars(liquidDollars) === 0 || formatDollars(liquidDollars) === '0') {
+    let isEligibleForComplimentaryLLD = false;
+    let ineligibleForComplimentaryLLDReason = null;
+    let isSkipOnBoarding = true;
+
+    const dolars = formatDollars(liquidDollars);
+    if (dolars === 0 || dolars === '0') {
       // Only eligible if no existing dollars
       const maybeApprovedEresidency = yield call(maybeGetApprovedEresidency);
       if (maybeApprovedEresidency.isError) {
-        if (maybeApprovedEresidency.errorResponse.status === 401 || maybeApprovedEresidency.errorResponse.status === 404) {
-          yield put(onBoardingActions.getEligibleForComplimentaryLld.success({
-            isEligibleForComplimentaryLLD: false,
-            ineligibleForComplimentaryLLDReason: 'Ineligible for gratis LLD ',
-          }));
-        } else {
-          yield put(onBoardingActions.getEligibleForComplimentaryLld.success({
-            isEligibleForComplimentaryLLD: false,
-            ineligibleForComplimentaryLLDReason: 'Error checking gratis LLD eligibility ',
-          }));
-        }
+        const is401or404Error = maybeApprovedEresidency.errorResponse.status === 401
+          || maybeApprovedEresidency.errorResponse.status === 404;
+        ineligibleForComplimentaryLLDReason = is401or404Error
+          ? 'Ineligible for gratis LLD '
+          : 'Error checking gratis LLD eligibility ';
       } else {
         // only eligible if not already claimed
+        // eslint-disable-next-line no-lonely-if
         if (!maybeApprovedEresidency.claimedOnboardingLld) {
-          yield put(onBoardingActions.getEligibleForComplimentaryLld.success({
-            isEligibleForComplimentaryLLD: true,
-            ineligibleForComplimentaryLLDReason: null,
-          }));
+          isEligibleForComplimentaryLLD = true;
+          isSkipOnBoarding = false;
         } else {
-          yield put(onBoardingActions.getEligibleForComplimentaryLld.success({
-            isEligibleForComplimentaryLLD: false,
-            ineligibleForComplimentaryLLDReason: 'Already claimed gratis LLD',
-          }));
+          ineligibleForComplimentaryLLDReason = 'Already claimed gratis LLD';
         }
       }
     } else {
-      yield put(onBoardingActions.getEligibleForComplimentaryLld.success({
-        isEligibleForComplimentaryLLD: false,
-        ineligibleForComplimentaryLLDReason: 'You have LLDs already ',
-      }));
+      ineligibleForComplimentaryLLDReason = 'You have LLDs already';
     }
+    yield put(
+      onBoardingActions.getEligibleForComplimentaryLld.success({
+        isEligibleForComplimentaryLLD,
+        ineligibleForComplimentaryLLDReason,
+        isSkipOnBoarding,
+      }),
+    );
   } catch (e) {
-    const errorData = { details: 'Error checking complimentary LLD eligibility, send screenshot to devs please' };
-    throw { errorData };
+    const errorData = {
+      details:
+        'Error checking complimentary LLD eligibility, send screenshot to devs please',
+    };
+    throw new Error(errorData.details);
   }
 }
 
 // WATCHERS
 
 function* claimComplimentaryLLDWatcher() {
-  yield blockchainWatcher(onBoardingActions.claimComplimentaryLld, claimComplimentaryLLDWorker);
+  yield blockchainWatcher(
+    onBoardingActions.claimComplimentaryLld,
+    claimComplimentaryLLDWorker,
+  );
 }
 
 function* getIsEligibleForComplimentaryLLDWatcher() {
-  yield blockchainWatcher(onBoardingActions.getEligibleForComplimentaryLld, getIsEligibleForComplimentaryLLDWorker);
+  yield blockchainWatcher(
+    onBoardingActions.getEligibleForComplimentaryLld,
+    getIsEligibleForComplimentaryLLDWorker,
+  );
 }
 
 export {

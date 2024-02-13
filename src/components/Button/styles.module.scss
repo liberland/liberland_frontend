@@ -65,4 +65,9 @@
     border: 2px solid $red;
     color: $red;
   }
+
+  &:disabled{
+    opacity: 20%;
+    border: 1px solid $grey;
+  }
 }
