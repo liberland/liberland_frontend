@@ -63,6 +63,7 @@ function GuidedSetup({ children }) {
     || extensions === null
     || wallets === null
     || isUnsupportedBrowser === null;
+
   const onUnsupportedBrowserAccept = () => {
     localStorage.setItem('unsupportedBrowserAcceptedByUser', true);
     setAcceptedBrowser(true);
@@ -75,9 +76,9 @@ function GuidedSetup({ children }) {
       const { info } = identity;
       return (
         !parseIdentityData(info?.display)
-        || !parseLegal(info)
-        || !parseIdentityData(info?.web)
-        || !parseIdentityData(info?.email)
+        && !parseLegal(info)
+        && !parseIdentityData(info?.web)
+        && !parseIdentityData(info?.email)
       );
     }
     return null;
@@ -108,7 +109,6 @@ function GuidedSetup({ children }) {
       </GuidedSetupWrapper>
     );
   }
-
   if (!userId) return children;
 
   if (extensions.length === 0 || wallets.length === 0) {
