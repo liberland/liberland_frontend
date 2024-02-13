@@ -10,7 +10,13 @@ const selectorIneligibleForComplimentaryLLDReason = createSelector(
   (reducer) => reducer.ineligibleForComplimentaryLLDReason,
 );
 
+const selectorIsSkipOnBoarding = createSelector(
+  onboardingReducer,
+  (reducer) => reducer.isSkipOnBoarding,
+);
+
 export {
   selectorEligibleForComplimentaryLLD,
   selectorIneligibleForComplimentaryLLDReason,
+  selectorIsSkipOnBoarding,
 };

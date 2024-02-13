@@ -17,7 +17,6 @@ import Button from '../../Button/Button';
 import styles from './styles.module.scss';
 import router from '../../../router';
 import UpdateProfile from '../../Profile/UpdateProfile';
-import { formatDollars } from '../../../utils/walletHelpers';
 
 function OnBoarding() {
   const dispatch = useDispatch();
@@ -31,12 +30,10 @@ function OnBoarding() {
   const liquidDollars = useSelector(
     walletSelectors.selectorLiquidDollarsBalance,
   );
-  const dolars = formatDollars(liquidDollars);
-  const hasSomeDolars = dolars === 0 || dolars === '0';
+  const isSkipOnBoarding = useSelector(onboardingSelectors.selectorIsSkipOnBoarding);
   const [isFirstStepSkipped, setIsFirstStepSkipped] = useState(
-    !isUserEligibleForComplimentaryLLD
-      || isSkippedOnBoardingGetLLD === 'secondStep'
-    || hasSomeDolars,
+    isSkipOnBoarding
+    || isSkippedOnBoardingGetLLD === 'secondStep',
   );
   const userName = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
@@ -52,6 +49,10 @@ function OnBoarding() {
   const toggleModalOnchainIdentity = () => {
     setIsModalOpenOnchainIdentity((prevState) => !prevState);
   };
+
+  useEffect(() => {
+    setIsFirstStepSkipped(isSkipOnBoarding);
+  }, [isSkipOnBoarding]);
 
   useEffect(() => {
     dispatch(identityActions.getIdentity.call(walletAddress));
@@ -77,9 +78,7 @@ function OnBoarding() {
               ? 'Claim complimentary LLD'
               : ineligibleForComplimentaryLLDReason}
           </Button>
-          <Button onClick={() => setIsFirstStepSkipped(true)}>
-            Skip
-          </Button>
+          <Button onClick={() => setIsFirstStepSkipped(true)}>Skip</Button>
         </div>
       </div>
     );
