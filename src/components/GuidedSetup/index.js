@@ -39,8 +39,10 @@ function GuidedSetup({ children }) {
   const userWalletAddress = useSelector(userSelectors.selectWalletAddress);
   const userId = useSelector(userSelectors.selectUserId);
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
+  const isLoadingUser = useSelector(userSelectors.selectIsLoading);
 
   const isLoading = !isSessionReady
+    || isLoadingUser
     || extensions === null
     || wallets === null
     || isUnsupportedBrowser === null;

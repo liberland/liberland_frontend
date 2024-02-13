@@ -44,7 +44,6 @@ function App() {
       <Route path="*" render={() => <Redirect to={routes.home.index} />} />
     </Switch>
   );
-
   const appRouter = user ? loggedInRoutes : loggedOutRoutes;
   return (
     <Router>
