@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import styles from './styles.module.scss';
@@ -16,7 +16,6 @@ import NoConnectedWalletComponent from './NoConnectedWalletComponent';
 import MissingWalletComponent from './MissingWalletComponent';
 import OnBoarding from './OnBording';
 import { onBoardingActions } from '../../redux/actions';
-import { parseIdentityData, parseLegal } from '../../utils/identityParser';
 
 const useIsUnsupportedBrowser = () => {
   const [isBrave, setIsBrave] = useState(null);
@@ -54,7 +53,6 @@ function GuidedSetup({ children }) {
   const isUserEligibleForComplimentaryLLD = useSelector(
     onboardingSelectors.selectorEligibleForComplimentaryLLD,
   );
-  const identityData = useSelector(identitySelectors.selectorIdentity);
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
   const isLoadingUser = useSelector(userSelectors.selectIsLoading);
 
@@ -69,20 +67,7 @@ function GuidedSetup({ children }) {
     setAcceptedBrowser(true);
   };
 
-  const isIdentityEmpty = useMemo(() => {
-    if (!identityData) return null;
-    if (identityData?.isSome) {
-      const identity = identityData.unwrap();
-      const { info } = identity;
-      return (
-        !parseIdentityData(info?.display)
-        && !parseLegal(info)
-        && !parseIdentityData(info?.web)
-        && !parseIdentityData(info?.email)
-      );
-    }
-    return null;
-  }, [identityData]);
+  const isIdentityEmpty = useSelector(identitySelectors.selectIsIdentityEmpty);
 
   const isSkippedOnBoardingGetLLD = sessionStorage.getItem(
     'SkippedOnBoardingGetLLD',
@@ -91,7 +76,6 @@ function GuidedSetup({ children }) {
   useEffect(() => {
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
   }, [dispatch, liquidDollars]);
-
   if (isLoading) {
     return (
       <GuidedSetupWrapper>
@@ -130,7 +114,8 @@ function GuidedSetup({ children }) {
   if (
     (isUserEligibleForComplimentaryLLD
       || isIdentityEmpty
-    || isSkippedOnBoardingGetLLD === 'secondStep') && isSkippedOnBoardingGetLLD !== 'true'
+      || isSkippedOnBoardingGetLLD === 'secondStep')
+    && isSkippedOnBoardingGetLLD !== 'true'
   ) {
     return (
       <GuidedSetupWrapper>

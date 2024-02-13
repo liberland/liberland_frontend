@@ -25,7 +25,7 @@ function* claimComplimentaryLLDWorker() {
     if (getComplimentaryLLDResponse.status === 200) {
       // FIXME eventually we need a notification modal, not just error modal
       errorData = {
-        details: 'Complimentary LLDs claimed. Please refresh the page',
+        details: 'Complimentary LLDs claimed.',
       };
       yield call(getBalanceByAddress, walletAddress);
       yield put(onBoardingActions.getEligibleForComplimentaryLld.call());
