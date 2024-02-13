@@ -23,7 +23,7 @@ function NavigationLink({
       style={{ opacity: (isDiscouraged === true || isDiscouraged === 'true') ? 0.2 : 1 }}
     >
       <NavLink
-        to={route}
+        to={route === 'logout' ? '#' : route}
         activeClassName="active"
         className={cx(
           { [styles.activeBg]: path === route || path.includes(route) },
@@ -54,16 +54,19 @@ function NavigationLink({
   );
 }
 
+NavigationLink.defaultProps = {
+  path: null,
+  description: null,
+  isDiscouraged: '',
+};
+
 NavigationLink.propTypes = {
   route: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   icon: PropTypes.any.isRequired,
-  // eslint-disable-next-line react/require-default-props
-  path: PropTypes.string.isRequired,
-  // eslint-disable-next-line react/require-default-props
+  path: PropTypes.string,
   description: PropTypes.string,
-  // eslint-disable-next-line react/require-default-props
   isDiscouraged: PropTypes.bool,
 };
 
