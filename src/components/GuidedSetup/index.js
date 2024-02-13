@@ -16,6 +16,7 @@ import NoConnectedWalletComponent from './NoConnectedWalletComponent';
 import MissingWalletComponent from './MissingWalletComponent';
 import OnBoarding from './OnBording';
 import { onBoardingActions } from '../../redux/actions';
+import {parseIdentityData, parseLegal} from "../../utils/identityParser";
 
 const useIsUnsupportedBrowser = () => {
   const [isBrave, setIsBrave] = useState(null);
@@ -67,11 +68,25 @@ function GuidedSetup({ children }) {
     setAcceptedBrowser(true);
   };
 
-  const isIdentityEmpty = useSelector(identitySelectors.selectIsIdentityEmpty);
+  const [isIdentityEmpty, setIsIdentityEmpty] = useState(true);
+  const identityData = useSelector(identitySelectors.selectorIdentity);
 
   const isSkippedOnBoardingGetLLD = sessionStorage.getItem(
     'SkippedOnBoardingGetLLD',
   );
+
+  useEffect(() => {
+    if (identityData?.isSome) {
+      const identity = identityData.unwrap();
+      const { info } = identity;
+      setIsIdentityEmpty(
+        !parseIdentityData(info?.display)
+        && !parseLegal(info)
+        && !parseIdentityData(info?.web)
+        && !parseIdentityData(info?.email)
+      );
+    }
+  }, [identityData]);
 
   useEffect(() => {
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
