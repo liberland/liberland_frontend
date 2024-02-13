@@ -66,7 +66,7 @@ function OnBoarding() {
   if (!isFirstStepSkipped) {
     return (
       <div className={styles.wrapper}>
-        <h3>Claim 2 gratis LLD for e-residency</h3>
+        <h3>Claim 2 gratis LLD for e-residency. This is needed to pay gas fees for onboarding</h3>
         <div className={styles.buttons}>
           <Button
             medium
@@ -90,7 +90,8 @@ function OnBoarding() {
   return (
     <>
       <div className={styles.wrapper}>
-        <h3>Update your profile now.</h3>
+        <h3>Update identity to claim tokens, e-residency and citizenship.</h3>
+        <h4>Once you do, it will take about a day for the Ministry of Interior to onboard you.</h4>
         <div className={styles.buttons}>
           <Button
             className={styles.textColor}
@@ -98,11 +99,11 @@ function OnBoarding() {
             primary
             onClick={toggleModalOnchainIdentity}
           >
-            Update identity to claim tokens and e-residency or citizenship
+            Update identity
           </Button>
           <Button
             medium
-            secondary
+            gray
             onClick={() => {
               sessionStorage.setItem('SkippedOnBoardingGetLLD', true);
               history.push(router.home);
