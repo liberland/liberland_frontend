@@ -49,6 +49,7 @@ function OnBoarding() {
   const toggleModalOnchainIdentity = () => {
     setIsModalOpenOnchainIdentity((prevState) => !prevState);
   };
+  const isLoading = useSelector(onboardingSelectors.selectorIneligibleForComplimentaryLLDIsLoading);
 
   useEffect(() => {
     setIsFirstStepSkipped(isSkipOnBoarding);
@@ -70,7 +71,9 @@ function OnBoarding() {
           <Button
             medium
             primary
+            disabled={isLoading}
             onClick={() => {
+              if (isLoading) return;
               dispatch(onBoardingActions.claimComplimentaryLld.call());
             }}
           >

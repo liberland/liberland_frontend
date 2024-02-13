@@ -47,10 +47,8 @@ function Profile({ className }) {
     onboardingSelectors.selectorEligibleForComplimentaryLLD,
   );
   // eslint-disable-next-line max-len
-  const ineligibleForComplimentaryLLDReason = useSelector(
-    onboardingSelectors.selectorIneligibleForComplimentaryLLDReason,
-  );
-
+  const ineligibleForComplimentaryLLDReason = useSelector(onboardingSelectors.selectorIneligibleForComplimentaryLLDReason);
+  const isLoading = useSelector(onboardingSelectors.selectorIneligibleForComplimentaryLLDIsLoading);
   const dispatch = useDispatch();
   // eslint-disable-next-line no-unsafe-optional-chaining
   const lockBlocks = walletInfo?.balances?.electionLock - blockNumber;
@@ -61,7 +59,7 @@ function Profile({ className }) {
   useEffect(() => {
     dispatch(identityActions.getIdentity.call(walletAddress));
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
-  }, [dispatch, liquidDollars]);
+  }, [liquidDollars, dispatch]);
 
   const toggleModalOnchainIdentity = () => {
     setIsModalOpenOnchainIdentity(!isModalOpenOnchainIdentity);
@@ -115,6 +113,11 @@ function Profile({ className }) {
       isDataToShow: false,
     },
   ];
+
+  const handleGetFreeLLD = () => {
+    if (isLoading) return;
+    dispatch(onBoardingActions.claimComplimentaryLld.call());
+  };
 
   return (
     <div className={styles.wrapper}>
@@ -219,9 +222,10 @@ function Profile({ className }) {
                 <Button
                   className={styles.textColor}
                   medium
-                  primary={isUserEligibleForComplimentaryLLD}
-                  grey={!isUserEligibleForComplimentaryLLD}
-                  onClick={() => dispatch(onBoardingActions.claimComplimentaryLld.call())}
+                  primary={isUserEligibleForComplimentaryLLD && !isLoading}
+                  grey={!isUserEligibleForComplimentaryLLD || isLoading}
+                  onClick={handleGetFreeLLD}
+                  disabled={true || isLoading}
                 >
                   {isUserEligibleForComplimentaryLLD
                     ? 'Claim complimentary LLD'
