@@ -49,6 +49,10 @@ function Nominator() {
   *
   * */
 
+  useEffect(() => {
+    setSelectedValidatorsAsTargets(nominatorTargets);
+  }, [nominatorTargets]);
+
   return (
     <Card title="Validators" className={cx(stylesPage.overviewWrapper, styles.nominatorWrapper)}>
       <div className={styles.nominatorsList}>
