@@ -111,6 +111,14 @@ function GuidedSetup({ children }) {
     );
   }
 
+  if (!wallets.map((w) => w.address).includes(userWalletAddress)) {
+    return (
+      <GuidedSetupWrapper>
+        <MissingWalletComponent />
+      </GuidedSetupWrapper>
+    );
+  }
+
   if (
     (isUserEligibleForComplimentaryLLD
       || isIdentityEmpty
@@ -120,14 +128,6 @@ function GuidedSetup({ children }) {
     return (
       <GuidedSetupWrapper>
         <OnBoarding />
-      </GuidedSetupWrapper>
-    );
-  }
-
-  if (!wallets.map((w) => w.address).includes(userWalletAddress)) {
-    return (
-      <GuidedSetupWrapper>
-        <MissingWalletComponent />
       </GuidedSetupWrapper>
     );
   }
