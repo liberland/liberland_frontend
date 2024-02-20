@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
 // COMPONENTS
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { BN_ZERO, BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
@@ -12,11 +13,19 @@ import Button from '../Button/Button';
 // STYLES
 import styles from './styles.module.scss';
 import { isValidSubstrateAddress } from '../../utils/bridge';
-import { parseDollars } from '../../utils/walletHelpers';
+import { parseDollars, parseMerits } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
+import { walletSelectors } from '../../redux/selectors';
 
 function SendLLDModal({ closeModal }) {
   const dispatch = useDispatch();
+  const balances = useSelector(walletSelectors.selectorBalances);
+  const maxUnbond = BN.max(
+    BN_ZERO,
+    (new BN(balances?.liquidAmount?.amount ?? 0))
+      .sub(parseDollars('2')), // leave at least 2 liquid LLD...
+  );
+
   const {
     handleSubmit,
     formState: { errors },
@@ -33,6 +42,20 @@ function SendLLDModal({ closeModal }) {
     closeModal();
   };
 
+  const validateUnbondValue = (textUnbondValue) => {
+    try {
+      const unbondValue = parseMerits(textUnbondValue);
+      if (unbondValue.gt(maxUnbond)){
+        return 'Minimum of 2 LLD must remain after transaction'
+      } else if (unbondValue.lte(BN_ZERO)) {
+        return 'Invalid amount'
+      }
+      return true;
+    } catch (e) {
+      return 'Invalid amount';
+    }
+  };
+
   return (
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(transfer)}>
       <div className={styles.h3}>Send LLD</div>
@@ -46,7 +69,10 @@ function SendLLDModal({ closeModal }) {
         name="recipient"
         placeholder="Send to address"
         required
-        validate={(v) => isValidSubstrateAddress(v) || 'Invalid Address'}
+        validate={((v) => {
+          if (!isValidSubstrateAddress(v)) return 'Invalid Address';
+          return true;
+        })}
       />
       {errors?.recipient?.message
         && <div className={styles.error}>{errors.recipient.message}</div>}
@@ -54,10 +80,13 @@ function SendLLDModal({ closeModal }) {
       <div className={styles.title}>Amount LLD</div>
       <TextInput
         register={register}
+        validate={validateUnbondValue}
         name="amount"
         placeholder="Amount LLD"
         required
       />
+      { errors?.amount?.message
+        && <div className={styles.error}>{errors.amount.message}</div> }
 
       <div className={styles.buttonWrapper}>
         <Button

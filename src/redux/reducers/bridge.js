@@ -4,10 +4,8 @@ import { bridgeActions } from '../actions';
 export const initialState = {
   loading: false,
   transfers: {
-    toSubstratePreload: null,
     toSubstrateInitialized: false,
     toSubstrate: {},
-    toEthereumPreload: null,
     toEthereumInitialized: false,
     toEthereum: {},
     toEthereumFailed: false,

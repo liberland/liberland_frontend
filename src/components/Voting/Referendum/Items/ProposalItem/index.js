@@ -1,27 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
+import { blake2AsHex } from '@polkadot/util-crypto';
+import { hexToU8a } from '@polkadot/util';
 import styles from './styles.module.scss';
-import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
+import truncate from '../../../../../utils/truncate';
+import NotificationPortal from '../../../../NotificationPortal';
+import Header from '../Header';
+import Discussions from '../Discussions';
+import stylesItem from '../item.module.scss';
 
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
 import {
   congressSelectors,
 } from '../../../../../redux/selectors';
-import { Preimage } from '../../../../Proposal';
-
-const endorseButton = (buttonEndorseCallback, userDidEndorse, referendumInfo) => (userDidEndorse ? (
-  <Button medium gray>
-    Already endorsed
-  </Button>
-)
-  : (
-    <Button medium primary onClick={() => { buttonEndorseCallback(referendumInfo); }}>
-      Endorse
-    </Button>
-  ));
+import Details from '../Details';
 
 function BlacklistButton({ hash }) {
   const dispatch = useDispatch();
@@ -46,134 +41,103 @@ function BlacklistButton({ hash }) {
 
 BlacklistButton.propTypes = { hash: PropTypes.string.isRequired };
 
-const LegacyHash = ({ hash }) => hash;
-
-const Inline = () => 'Inline call';
-
-const Lookup = ({ hash }) => hash;
-
-function BoundedCall({ call }) {
-  if ('Legacy' in call) {
-    return <LegacyHash hash={call.Legacy.hash_} />;
-  } if ('Inline' in call) {
-    // eslint-disable-next-line no-console
-    console.warn('Inline call details:', call);
-    return <Inline />;
-  } if ('Lookup' in call) {
-    return <Lookup hash={call.Lookup.hash_} />;
-  }
-  // eslint-disable-next-line no-console
-  console.warn('Unknown call details:', call);
-  return 'Unknown type of call.';
-}
-
 function ProposalItem({
-  name,
-  createdBy,
-  currentEndorsement,
-  externalLink,
-  description,
-  userDidEndorse,
+  centralizedDatas,
   boundedCall,
-  buttonEndorseCallback,
-  proposalIndex,
   blacklistMotion,
+  userIsMember,
 }) {
-  let hash, len;
-  if ('Lookup' in boundedCall) {
-    hash = boundedCall.Lookup.hash_;
-    len = boundedCall.Lookup.len;
+  let hash;
+  let len;
+  if ('lookup' in boundedCall) {
+    hash = boundedCall.lookup.hash;
+    len = boundedCall.lookup.len;
+  } else if ('legacy' in boundedCall) {
+    hash = boundedCall.legacy.hash;
+  } else {
+    // this sux but we have no other way until we refactor it to NOT use toJSON/toHuman
+    hash = blake2AsHex(hexToU8a(boundedCall.inline));
   }
+
+  const [isProposalHidden, setIsProposalHidden] = useState(true);
+  const notificationRef = useRef();
+  const handleCopyClick = (dataToCoppy) => {
+    navigator.clipboard.writeText(dataToCoppy);
+    notificationRef.current.addSuccess({ text: 'Address was copied' });
+  };
   return (
-    <Card
-      title={name}
-      className={styles.cardProposalsSection}
-    >
-      <div>
-        <div className={styles.rowEnd}>
-          {blacklistMotion ? (
-            <small>
-              Blacklist motion:
-              <a href={`/home/congress/motions#${blacklistMotion}`}>
-                {blacklistMotion}
-              </a>
-            </small>
-          )
-            : (
-              <BlacklistButton hash={
-              boundedCall?.Lookup?.hash_
-              ?? boundedCall?.Legacy?.hash_
-            }
-              />
+    <>
+      <NotificationPortal ref={notificationRef} />
+      <div className={stylesItem.itemWrapper}>
+        <Header
+          handleCopyClick={handleCopyClick}
+          hash={hash}
+          setIsHidden={setIsProposalHidden}
+          isHidden={isProposalHidden}
+          textButton="PROPOSAL"
+        >
+          {blacklistMotion && (
+            <div className={styles.rowEnd}>
+              <small>
+                Blacklist motion:
+                <a href={`/home/congress/motions#${blacklistMotion}`}>
+                  {truncate(blacklistMotion, 13)}
+                </a>
+              </small>
+            </div>
+          )}
+          {!blacklistMotion && userIsMember
+            && (
+              <div className={styles.rowEnd}>
+                <BlacklistButton hash={
+                boundedCall?.lookup?.hash
+                ?? boundedCall?.legacy?.hash
+              }
+                />
+              </div>
             )}
-        </div>
-        <div className={styles.metaInfoLine}>
-          <div>
-            <div className={styles.metaTextInfo}>
-              By:
-              {' '}
-              {createdBy}
-            </div>
-            <div className={styles.hashText}>
-              <BoundedCall call={boundedCall} />
-            </div>
-          </div>
-          <div>
-            Endorsement:
-            {' '}
-            {currentEndorsement}
-          </div>
-        </div>
-        <div>
-          <a href={externalLink}>Read discussion</a>
-        </div>
-        <div className={styles.description}>
-          <p>{description}</p>
-        </div>
-        { hash && len && 
-          <div>
-            Details:
-            <Preimage {...{hash, len}} />
-          </div>
-        }
-        <div className={styles.buttonContainer}>
-          {endorseButton(buttonEndorseCallback, userDidEndorse, { name, proposalIndex })}
-        </div>
+        </Header>
+        {!isProposalHidden && hash && len
+            && (
+            <Details proposal={{ hash, len }} isProposal />
+            )}
+        {!isProposalHidden && centralizedDatas?.length > 0
+          && <Discussions centralizedDatas={centralizedDatas} handleCopyClick={handleCopyClick} />}
       </div>
-    </Card>
+    </>
   );
 }
 
 const call = PropTypes.oneOfType([
   PropTypes.shape({
-    Legacy: PropTypes.shape({
-      hash_: PropTypes.string.isRequired,
+    legacy: PropTypes.shape({
+      hash: PropTypes.string.isRequired,
     }).isRequired,
   }),
   PropTypes.shape({
-    Lookup: PropTypes.shape({
-      hash_: PropTypes.string.isRequired,
+    lookup: PropTypes.shape({
+      hash: PropTypes.string.isRequired,
+      len: PropTypes.number.isRequired,
     }).isRequired,
   }),
   PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
-    Inline: PropTypes.any.isRequired,
+    inline: PropTypes.any.isRequired,
   }),
 ]);
 
-BoundedCall.propTypes = { call: call.isRequired };
-
 ProposalItem.propTypes = {
-  name: PropTypes.string.isRequired,
-  createdBy: PropTypes.string.isRequired,
-  currentEndorsement: PropTypes.string.isRequired,
-  externalLink: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  userDidEndorse: PropTypes.bool.isRequired,
+  centralizedDatas: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    link: PropTypes.string.isRequired,
+    proposerAddress: PropTypes.string.isRequired,
+    created: PropTypes.string.isRequired,
+    id: PropTypes.number.isRequired,
+  })).isRequired,
   boundedCall: call.isRequired,
-  buttonEndorseCallback: PropTypes.func.isRequired,
-  proposalIndex: PropTypes.string.isRequired,
   blacklistMotion: PropTypes.string.isRequired,
+  userIsMember: PropTypes.string.isRequired,
 };
 
 export default ProposalItem;

@@ -4,12 +4,9 @@ import { blockchainActions } from '../actions';
 
 const initialState = {
   currentBlockNumber: 0,
-  periodAndVotingDuration: {
-    assemblyVotingDuration: 0,
-    assemblyVotingPeriod: 0,
-  },
   electionsBlock: 0,
-  allWallets: [],
+  extensions: null,
+  allWallets: null,
   userWalletAddress: '',
   errorExistsAndUnacknowledgedByUser: false,
   error: '',
@@ -24,18 +21,19 @@ const blockchainReducer = handleActions({
   [blockchainActions.bestBlockNumber.value]: (state, action) => ({
     ...state,
     currentBlockNumber: action.payload.bestNumber,
-  }),
-  [blockchainActions.getPeriodAndVotingDuration.success]: (state, action) => ({
-    ...state,
-    periodAndVotingDuration: action.payload,
+    currentBlockTimestamp: action.payload.timestamp,
   }),
   [blockchainActions.setElectionsBlock.success]: (state, action) => ({
     ...state,
     electionsBlock: action.payload,
   }),
-  [blockchainActions.getAllWallets.success]: (state, action) => ({
+  [blockchainActions.setWallets.value]: (state, action) => ({
     ...state,
     allWallets: action.payload,
+  }),
+  [blockchainActions.setExtensions.value]: (state, action) => ({
+    ...state,
+    extensions: action.payload,
   }),
   [blockchainActions.setUserWallet.success]: (state, action) => ({
     ...state,
@@ -58,8 +56,8 @@ const blockchainReducer = handleActions({
     preimages: {
       ...state.preimages,
       [payload.hash.toString()]: payload.preimage,
-    }
-  })
+    },
+  }),
 }, initialState);
 
 export default blockchainReducer;

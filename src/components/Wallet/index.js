@@ -10,12 +10,14 @@ import { walletActions } from '../../redux/actions';
 
 import WalletAddressesLine from './WalletAddressesLine';
 import styles from './styles.module.scss';
+import stylesPage from '../../utils/pagesBase.module.scss';
 import WalletOverview from './WalletOverview';
 import WalletTransactionHistory from './WalletTransactionHistory';
 import Bridge from './Bridge';
 
 import Card from '../Card';
 import RoleHOC from '../../hocs/RoleHOC';
+import AssetOverview from './AssetOverview';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -24,7 +26,7 @@ function Wallet() {
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
   const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
   const historyFetchFailed = useSelector(walletSelectors.selectorTxHistoryFailed);
-
+  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -34,16 +36,21 @@ function Wallet() {
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
-    dispatch(walletActions.getLlmTransfers.call());
-    dispatch(walletActions.getLldTransfers.call());
+    dispatch(walletActions.getAdditionalAssets.call());
+    dispatch(walletActions.getTxTransfers.call());
   }, [dispatch]);
 
   const overView = () => (
-    <div>
+    <div className={stylesPage.contentWrapper}>
+
       <WalletOverview
         totalBalance={totalBalance}
         balances={balances}
         liquidMerits={liquidMerits}
+      />
+
+      <AssetOverview
+        additionalAssets={additionalAssets}
       />
 
       <WalletTransactionHistory
@@ -57,8 +64,11 @@ function Wallet() {
 
   return (
     (userWalletAddress !== undefined) ? (
-      <div className={styles.walletWrapper}>
-        <WalletAddressesLine walletAddress={userWalletAddress} />
+      <div className={stylesPage.sectionWrapper}>
+        <div className={stylesPage.menuAddressWrapper}>
+          <WalletAddressesLine walletAddress={userWalletAddress} />
+        </div>
+
         <div>
           <Switch>
             <Route

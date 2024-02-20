@@ -1,8 +1,7 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M19 2H7C5.2536 2 4 3.30584 4 5V19C4 20.6942 5.2536 22 7 22H19C19.6418 22 20 21.6269 20 21V20H8C7.44772 20 7 19.5523 7 19C7 18.4477 7.44772 18 8 18H20V3C20 2.3731 19.6418 2 19 2Z" fill="#B0B7C3"/>
-<mask id="mask0" mask-type="alpha" maskUnits="userSpaceOnUse" x="4" y="2" width="16" height="20">
-<path fill-rule="evenodd" clip-rule="evenodd" d="M19 2H7C5.2536 2 4 3.30584 4 5V19C4 20.6942 5.2536 22 7 22H19C19.6418 22 20 21.6269 20 21V20H8C7.44772 20 7 19.5523 7 19C7 18.4477 7.44772 18 8 18H20V3C20 2.3731 19.6418 2 19 2Z" fill="white"/>
-</mask>
-<g mask="url(#mask0)">
-</g>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 16 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-4,-2)">
+        <path d="M19,2L7,2C5.254,2 4,3.306 4,5L4,19C4,20.694 5.254,22 7,22L19,22C19.642,22 20,21.627 20,21L20,20L8,20C7.448,20 7,19.552 7,19C7,18.448 7.448,18 8,18L20,18L20,3C20,2.373 19.642,2 19,2Z" style="fill:rgb(154,163,178);"/>
+    </g>
 </svg>

@@ -11,11 +11,9 @@ export default function PendingRewardsData() {
     <div className={styles.rowWrapper}>
       <span>Rewards pending: </span>
       <span>
-        <b>
-          {formatDollars(pendingRewards ?? 0)}
-          {' '}
-          LLD
-        </b>
+        {formatDollars(pendingRewards ?? 0)}
+        {' '}
+        LLD
       </span>
     </div>
   );

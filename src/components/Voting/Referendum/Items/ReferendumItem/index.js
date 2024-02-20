@@ -1,97 +1,129 @@
-import React, { useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { BN, BN_ZERO } from '@polkadot/util';
+import cx from 'classnames';
 import styles from './styles.module.scss';
-import Card from '../../../../Card';
 import Button from '../../../../Button/Button';
 import { formatMerits } from '../../../../../utils/walletHelpers';
-
+import truncate from '../../../../../utils/truncate';
+import NotificationPortal from '../../../../NotificationPortal';
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
-import {
-  congressSelectors,
-} from '../../../../../redux/selectors';
-import { Proposal } from '../../../../Proposal';
+import Header from '../Header';
+import Details from '../Details';
+import { centralizedDatasType } from '../types';
+import Discussions from '../Discussions';
 
-const voteButtons = (buttonVoteCallback, referendumInfo) => (
-  <div className={styles.buttonContainer}>
-    <Button
-      small
-      primary
-      green
-      className={styles.yayButton}
-      onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}
-    >
-      Vote Aye
-    </Button>
-    <Button
-      small
-      primary
-      red
-      className={styles.nayButton}
-      onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}
-    >
-      Vote Nay
-    </Button>
-  </div>
-);
+const HashIndexType = {
+  hash: PropTypes.string.isRequired,
+  referendumIndex: PropTypes.number.isRequired,
+};
 
-const alreadyVotedButton = (buttonVoteCallback, referendumInfo, alreadyVoted) => (
-  <div className={styles.buttonContainer}>
-    {alreadyVoted === 'Aye'
-      ? (
-        <>
-          <Button primary medium green className={styles.yayButton}>
-            You voted: &nbsp;
-            {alreadyVoted}
-          </Button>
-          <Button
-            medium
-            secondary
-            red
-            className={styles.nayButton}
-            onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}
-          >
-            Change vote to Nay
-          </Button>
-        </>
-      )
-      : (
-        <>
-          <Button primary medium red className={styles.yayButton}>
-            You voted: &nbsp;
-            {alreadyVoted}
-          </Button>
-          <Button
-            medium
-            secondary
-            green
-            className={styles.nayButton}
-            onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}
-          >
-            Change vote to Aye
-          </Button>
-        </>
-      )}
-  </div>
-);
+function VoteButtons({ buttonVoteCallback, referendumInfo }) {
+  return (
+    <>
+      <Button
+        className={styles.button}
+        small
+        primary
+        green
+        onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}
+      >
+        VOTE AYE
+      </Button>
+      <Button
+        className={styles.button}
+        small
+        primary
+        red
+        onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}
+      >
+        VOTE NAY
+      </Button>
 
-const voteButtonsContainer = (alreadyVoted, delegating, buttonVoteCallback, referendumData) => {
-  if (alreadyVoted) { return alreadyVotedButton(alreadyVoted); }
-  if (delegating) { return 'Undelegate to vote individually'; }
-  return voteButtons(buttonVoteCallback, referendumData);
+    </>
+  );
+}
+
+VoteButtons.propTypes = {
+  buttonVoteCallback: PropTypes.func.isRequired,
+  referendumInfo: HashIndexType.isRequired,
+};
+
+function AlreadyVotedButton({ buttonVoteCallback, referendumInfo, alreadyVoted }) {
+  if (alreadyVoted === 'Aye') {
+    return (
+      <>
+        <Button primary small green className={styles.button}>
+          YOU VOTED: &nbsp;
+          {alreadyVoted.toUpperCase()}
+        </Button>
+        <Button
+          className={styles.button}
+          small
+          secondary
+          red
+          onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}
+        >
+          CHANGE VOTE TO NAY
+        </Button>
+      </>
+    );
+  }
+  return (
+    <>
+      <Button primary small red className={styles.button}>
+        YOU VOTED: &nbsp;
+        {alreadyVoted.toUpperCase()}
+      </Button>
+      <Button
+        className={styles.button}
+        small
+        secondary
+        green
+        onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}
+      >
+        CHANGE VOTE TO AYE
+      </Button>
+    </>
+  );
+}
+
+AlreadyVotedButton.propTypes = {
+  buttonVoteCallback: PropTypes.func.isRequired,
+  referendumInfo: HashIndexType.isRequired,
+  alreadyVoted: PropTypes.bool.isRequired,
+};
+
+function VoteButtonsContainer({
+  alreadyVoted, delegating, buttonVoteCallback, referendumData,
+}) {
+  if (alreadyVoted) {
+    return (
+      <AlreadyVotedButton
+        buttonVoteCallback={buttonVoteCallback}
+        referendumInfo={referendumData}
+        alreadyVoted={alreadyVoted}
+      />
+    );
+  }
+  if (delegating) { return <span>Undelegate to vote individually</span>; }
+
+  return (
+    <VoteButtons buttonVoteCallback={buttonVoteCallback} referendumInfo={referendumData} />
+  );
+}
+
+VoteButtonsContainer.propTypes = {
+  alreadyVoted: PropTypes.bool.isRequired,
+  buttonVoteCallback: PropTypes.func.isRequired,
+  delegating: PropTypes.bool.isRequired,
+  referendumData: HashIndexType.isRequired,
 };
 
 function BlacklistButton({ hash, referendumIndex }) {
   const dispatch = useDispatch();
-  const userIsMember = useSelector(congressSelectors.userIsMember);
-
-  useEffect(() => {
-    dispatch(congressActions.getMembers.call());
-  }, [dispatch]);
-
-  if (!userIsMember) return null;
 
   const blacklistMotion = () => dispatch(
     congressActions.congressDemocracyBlacklist.call({
@@ -101,130 +133,145 @@ function BlacklistButton({ hash, referendumIndex }) {
   );
 
   return (
-    <Button small secondary onClick={() => { blacklistMotion(); }}>
-      Cancel
+    <Button small secondary onClick={blacklistMotion}>
+      CANCEL AS CONGRESS
     </Button>
   );
 }
 
-BlacklistButton.propTypes = {
-  hash: PropTypes.string.isRequired,
-  referendumIndex: PropTypes.number.isRequired,
+BlacklistButton.propTypes = HashIndexType;
+
+function CounterItem({ votedTotal, votes, isNay }) {
+  const text = isNay ? 'Nay' : 'Aye';
+  return (
+    <div className={styles.counterItem}>
+      <div className={cx(styles.circle, styles[`circle${text}`])} />
+      <span>{text}</span>
+      {' - '}
+      <span>{formatMerits(votes)}</span>
+      /
+      <span>{formatMerits(votedTotal)}</span>
+    </div>
+  );
+}
+
+CounterItem.defaultProps = {
+  isNay: false,
+};
+
+CounterItem.propTypes = {
+  votedTotal: PropTypes.number.isRequired,
+  votes: PropTypes.number.isRequired,
+  isNay: PropTypes.bool,
 };
 
 function ReferendumItem({
-  name,
-  createdBy,
-  externalLink,
-  description,
-  yayVotes,
-  nayVotes,
+  centralizedDatas,
+  voted,
   hash,
   alreadyVoted,
   buttonVoteCallback,
-  votingTimeLeft,
   referendumIndex,
   delegating,
   proposal,
   blacklistMotion,
+  userIsMember,
 }) {
+  const [isReferendumHidden, setIsReferendumHidden] = useState(true);
+  const { yayVotes, nayVotes, votedTotal } = voted;
   const progressBarRatio = yayVotes.gt(BN_ZERO)
     ? `${yayVotes.mul(new BN('100'))
       .div(yayVotes.add(nayVotes)).toString()}%`
     : '0%';
+  const notificationRef = useRef();
+  const handleCopyClick = (dataToCoppy) => {
+    navigator.clipboard.writeText(dataToCoppy);
+    notificationRef.current.addSuccess({ text: 'Address was copied' });
+  };
+
   return (
-    <Card
-      title={name}
-      className={styles.referendumItemContainer}
-    >
-      <div>
-        <div className={styles.rowEnd}>
-          {blacklistMotion ? (
-            <small>
-              Blacklist motion:
-              <a href={`/home/congress/motions#${blacklistMotion}`}>
-                {blacklistMotion}
-              </a>
-            </small>
-          )
-            : (
+    <>
+      <NotificationPortal ref={notificationRef} />
+      <div className={styles.itemWrapper}>
+        <Header
+          handleCopyClick={handleCopyClick}
+          hash={hash}
+          setIsHidden={setIsReferendumHidden}
+          isHidden={isReferendumHidden}
+        >
+          <VoteButtonsContainer
+            alreadyVoted={alreadyVoted}
+            buttonVoteCallback={buttonVoteCallback}
+            delegating={delegating}
+            referendumData={{ id: hash, referendumIndex }}
+          />
+          {blacklistMotion && (
+            <div className={styles.rowEnd}>
+              <small>
+                Blacklist motion:
+                <a href={`/home/congress/motions#${blacklistMotion}`}>
+                  {truncate(blacklistMotion, 13)}
+                </a>
+              </small>
+            </div>
+          )}
+          {!blacklistMotion && userIsMember
+            && (
+            <div className={styles.rowEnd}>
               <BlacklistButton
                 hash={hash}
                 referendumIndex={referendumIndex}
               />
+            </div>
             )}
-        </div>
+        </Header>
         <div className={styles.metaInfoLine}>
-          <div>
-            <div className={styles.metaTextInfo}>
-              By:
-              {' '}
-              {createdBy}
-            </div>
-            <div className={styles.hashText}>
-              {hash}
-            </div>
-          </div>
           <div className={styles.votesInfo}>
-            <div className={styles.votesCount}>
-              <div>
-                <span className={styles.yayText}>Yay</span>
-                /
-                <span className={styles.nayText}>Nay</span>
-              </div>
-              <div>
-                <span className={styles.yayText}>{formatMerits(yayVotes)}</span>
-                /
-                <span className={styles.nayText}>{formatMerits(nayVotes)}</span>
-              </div>
-            </div>
             <div className={styles.progressBar}>
               <div className={styles.yayProgressBar} style={{ width: progressBarRatio }} />
             </div>
+            <div className={styles.votesCount}>
+              <CounterItem votedTotal={votedTotal} votes={yayVotes} />
+              <CounterItem votedTotal={votedTotal} votes={nayVotes} isNay />
+            </div>
           </div>
         </div>
-        <div className={styles.discussionMetaLine}>
-          <div>
-            <a href={externalLink}>Read discussion</a>
-          </div>
-          <div>
-            <span className={styles.votingTimeText}>Voting ends in:</span>
-            {' '}
-            <b>{votingTimeLeft}</b>
-          </div>
-        </div>
-        <div className={styles.description}>
-          <p>{description}</p>
-        </div>
-        <div>
-          Details:
-          <Proposal {...{ proposal }} />
-        </div>
-        <div className={styles.buttonContainer}>
-          {
-            voteButtonsContainer(alreadyVoted, delegating, buttonVoteCallback, { name, referendumIndex })
-          }
-        </div>
+        { !isReferendumHidden
+        && (
+          <>
+            <Details proposal={proposal} isReferendumHidden={isReferendumHidden} />
+            <div className={styles.discussionMetaLine}>
+              {centralizedDatas?.length > 0
+              && (
+                <Discussions centralizedDatas={centralizedDatas} handleCopyClick={handleCopyClick} />
+              )}
+            </div>
+
+          </>
+        )}
+
       </div>
-    </Card>
+    </>
   );
 }
 
-ReferendumItem.propTypes = {
-  name: PropTypes.string.isRequired,
-  createdBy: PropTypes.string.isRequired,
-  externalLink: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+const votesTypes = {
   yayVotes: PropTypes.number.isRequired,
   nayVotes: PropTypes.number.isRequired,
+  votedTotal: PropTypes.number.isRequired,
+};
+
+ReferendumItem.propTypes = {
+  centralizedDatas: PropTypes.arrayOf(centralizedDatasType).isRequired,
+  voted: votesTypes.isRequired,
   hash: PropTypes.string.isRequired,
   alreadyVoted: PropTypes.bool.isRequired,
   buttonVoteCallback: PropTypes.func.isRequired,
-  votingTimeLeft: PropTypes.string.isRequired,
   referendumIndex: PropTypes.number.isRequired,
   delegating: PropTypes.bool.isRequired,
   blacklistMotion: PropTypes.string.isRequired,
   proposal: PropTypes.instanceOf(Map).isRequired,
+  userIsMember: PropTypes.bool.isRequired,
 };
 
 export default ReferendumItem;

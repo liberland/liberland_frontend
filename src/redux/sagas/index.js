@@ -1,5 +1,5 @@
 import { all } from 'redux-saga/effects';
-import * as authSagas from './auth';
+import * as authSagas from './auth/auth';
 import * as walletSagas from './wallet';
 import * as blockchainSagas from './blockchain';
 import * as democracySagas from './democracy';
@@ -10,25 +10,25 @@ import * as identitySagas from './identity';
 import * as bridgeSagas from './bridge';
 import * as validatorSagas from './validator';
 import * as congressSagas from './congress';
+import * as onboardingSagas from './onboarding';
 
 export default function* rootSaga() {
   yield all([
     // AUTH
-    authSagas.signInWatcher(),
     authSagas.verifySessionWatcher(),
     authSagas.signOutWatcher(),
-    authSagas.initGetDataFromNodeWatcher(),
 
     // // BLOCKCHAIN
     blockchainSagas.subscribeBestBlockNumberSaga(),
-    blockchainSagas.getAllWalletsWatcher(),
     blockchainSagas.clearErrorsWatcher(),
     blockchainSagas.subscribeActiveEraSaga(),
     blockchainSagas.fetchPreimageWatcher(),
+    blockchainSagas.subscribeWalletsSaga(),
 
     // WALLET
     walletSagas.getWalletWatcher(),
     walletSagas.sendTransferWatcher(),
+    walletSagas.sendAssetsWatcher(),
     walletSagas.sendTransferLLMWatcher(),
     walletSagas.stakeToPolkaWatcher(),
     walletSagas.stakeToLiberlandWatcher(),
@@ -36,12 +36,11 @@ export default function* rootSaga() {
     walletSagas.getNominatorTargetsWatcher(),
     walletSagas.setNominatorTargetsWatcher(),
     walletSagas.unpoolWatcher(),
-    walletSagas.getLlmTransfersWatcher(),
-    walletSagas.getLldTransfersWatcher(),
+    walletSagas.getTransfersTxWatcher(),
+    walletSagas.getAdditionalAssetsWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),
-    democracySagas.secondProposalWatcher(),
     democracySagas.voteOnReferendumWatcher(),
     democracySagas.proposeWatcher(),
     democracySagas.voteForCongressWatcher(),
@@ -127,5 +126,9 @@ export default function* rootSaga() {
     congressSagas.renounceCandidacyWatcher(),
     congressSagas.unapproveTreasurySpendWatcher(),
     congressSagas.voteAtMotionsWatcher(),
+
+    // ONBOARDING
+    onboardingSagas.claimComplimentaryLLDWatcher(),
+    onboardingSagas.getIsEligibleForComplimentaryLLDWatcher(),
   ]);
 }

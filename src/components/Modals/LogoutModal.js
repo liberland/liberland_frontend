@@ -12,9 +12,11 @@ function LogoutModal({ closeModal, handleLogout }) {
       className={styles.getCitizenshipModal}
       style={{
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         maxWidth: '300px',
         margin: 'auto',
+        flexWrap: 'wrap',
+        gap: '8px',
       }}
     >
       <Button small red onClick={handleLogout}>

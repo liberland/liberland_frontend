@@ -17,7 +17,7 @@ export default function RewardsConfig() {
       <span>Staking rewards destination: </span>
       <span>
         {' '}
-        <b>{payee?.toString()}</b>
+        {payee?.toString()}
       </span>
     </div>
   );

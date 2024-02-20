@@ -4,45 +4,36 @@ import {
 } from '../actions';
 
 const initialState = {
+  // null if not logged in, user data if logged in
   user: null,
-  isSignInFetching: false,
-  isSessionVerified: false,
+  // false if we don't know if we're logged in yet
+  isSessionReady: false,
+  isLoading: false,
 };
 
 const userReducer = handleActions(
   {
-    [combineActions(
-      authActions.signIn.success,
-      authActions.signUp.success,
-    )]: (state, action) => ({
-      ...state,
-      user: action.payload || state.user,
-    }),
     [combineActions(
       authActions.signOut.success,
     )]: (state) => ({
       ...state,
       user: initialState.user,
     }),
+    [authActions.verifySession.call]: (state, action) => ({
+      ...state,
+      isLoading: true,
+      user: action.payload,
+    }),
     [authActions.verifySession.success]: (state, action) => ({
       ...state,
-      isSessionVerified: true,
+      isLoading: false,
+      isSessionReady: true,
       user: action.payload,
     }),
     [authActions.verifySession.failure]: (state) => ({
       ...state,
-      isSessionVerified: true,
-    }),
-    [authActions.signIn.call]: (state) => ({
-      ...state,
-      isSignInFetching: true,
-    }),
-    [combineActions(
-      authActions.signIn.success,
-      authActions.signIn.failure,
-    )]: (state) => ({
-      ...state,
-      isSignInFetching: false,
+      isLoading: false,
+      isSessionReady: true,
     }),
   },
   initialState,

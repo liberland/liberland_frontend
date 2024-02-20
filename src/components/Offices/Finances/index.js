@@ -5,6 +5,7 @@ import { officesSelectors } from '../../../redux/selectors';
 import Table from '../../Table';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import { palletIdToAddress } from '../../../utils/pallet';
+import truncate from '../../../utils/truncate';
 
 const DEFAULT_ACCOUNTS = [
   {
@@ -35,6 +36,13 @@ const DYNAMIC_ACCOUNTS = [
   // FIXME 1 LLD faucet
 ];
 
+const STATIC_ACCOUNTS = [
+  {
+    name: 'Onboarder LLD faucet',
+    address: process.env.REACT_APP_ONBOARDER_LLD_FAUCET_ADDRESS
+  }
+]
+
 export default function Finances() {
   const dispatch = useDispatch();
   const balances = useSelector(officesSelectors.selectorBalances);
@@ -55,12 +63,14 @@ export default function Finances() {
         })),
       ];
 
-      const palletsAndAddresses = palletIdsToFetchBalancesFor.map(
+      let palletsAndAddresses = palletIdsToFetchBalancesFor.map(
         (palletData) => ({
           ...palletData,
           address: palletIdToAddress(palletData.palletId),
         }),
       );
+
+      palletsAndAddresses = palletsAndAddresses.concat(STATIC_ACCOUNTS)
       setAccountsAddresses(palletsAndAddresses);
 
       const addressesToFetchBalancesFor = palletsAndAddresses.map(
@@ -94,6 +104,7 @@ export default function Finances() {
       ]}
       data={accountsAddresses.map((a) => ({
         ...a,
+        address: a.address,
         llm: `${formatMerits(balances.LLM[a.address] ?? 0)} LLM`,
         lld: `${formatDollars(balances.LLD[a.address] ?? 0)} LLD`,
       }))}

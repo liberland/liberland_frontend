@@ -1,14 +1,16 @@
 @import '../../assets/base/variables';
 @import '../../assets/base/fonts';
+@import '../../assets/main.scss';
+@import '../../index.scss';
 
 .card {
-  padding: 30px;
   background: $bg3;
-  border-radius: 20px;
+  border-radius: 10px;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    border-radius: 0;
+  }
 }
 
-.cardTitle {
-  font-weight: 600;
-  font-size: 18px;
-  margin: 0;
+.backgroundNone{
+  background: none;
 }

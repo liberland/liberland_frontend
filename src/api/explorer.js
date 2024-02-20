@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { BN } from '@polkadot/util';
+import { getAdditionalAssets } from './nodeRpcCall';
 
 const receiptsQuery = `
     query BridgeReceipts($orderBy: [BridgeReceiptsOrderBy!], $filter: BridgeReceiptFilter) {
@@ -22,44 +24,60 @@ const receiptsQuery = `
     }
 `;
 
-const getDollarsTransfersQuery = `
-  query Transfers($orderBy: [TransfersOrderBy!], $filter: TransferFilter) {
-    query {
-      transfers(orderBy: $orderBy, filter: $filter) {
-        nodes {
+const historyTransferQuery = `
+  query CombinedQuery(
+    $orderByTransfers: [TransfersOrderBy!],
+    $filterTransfers: TransferFilter,
+    $orderByMerits: [MeritsOrderBy!],
+    $filterMerits: MeritFilter,
+    $orderByAssetTransfers: [AssetTransfersOrderBy!],
+    $filterAssetTransfers: AssetTransferFilter
+  ) {
+    transfers(orderBy: $orderByTransfers, filter: $filterTransfers) {
+      nodes {
+        type: __typename
+        id
+        fromId
+        toId
+        value
+        extrinsicIndex
+        eventIndex
+        block {
           id
-          fromId
-          toId
-          value
-          extrinsicIndex
-          eventIndex
-          block {
-            id
-            number
-            timestamp
-          }
+          number
+          timestamp
         }
       }
     }
-  } 
-`;
 
-const getMeritsTransfersQuery = `
-  query Merits($orderBy: [MeritsOrderBy!], $filter: MeritFilter) {
-    query {
-      merits(orderBy: $orderBy, filter: $filter) {
-        nodes {
+    merits(orderBy: $orderByMerits, filter: $filterMerits) {
+      nodes {
+        type: __typename
+        id
+        fromId
+        toId
+        value
+        extrinsicIndex
+        eventIndex
+        block {
           id
-          fromId
-          toId
-          value
-          extrinsicIndex
-          eventIndex
-          block {
-            id
-            number
-            timestamp
-          }
+          number
+          timestamp
+        }
+      }
+    }
+
+    assetTransfers(orderBy: $orderByAssetTransfers, filter: $filterAssetTransfers) {
+      nodes {
+        type: __typename
+        toId
+        fromId
+        asset
+        value
+        block {
+          id
+          number
+          timestamp
         }
       }
     }
@@ -104,58 +122,55 @@ export const getSubstrateOutgoingReceipts = async (substrate_address) => {
   return receipts.reduce((o, r) => ({ ...o, [r.receipt_id]: r }), {});
 };
 
-export const getDollarsTransfers = async (substrate_address) => {
-  const result = await getApi().post('/graphql', {
-    query: getDollarsTransfersQuery,
-    variables: {
-      orderBy: ['BLOCK_NUMBER_DESC', 'EVENT_INDEX_DESC'],
-      filter: {
-        or: [
-          {
-            fromId: {
-              equalTo: substrate_address,
-            },
-          },
-          {
-            toId: {
-              equalTo: substrate_address,
-            },
-          },
-        ],
+const getFilterVariable = (substrate_address) => ({
+  or: [
+    {
+      fromId: {
+        equalTo: substrate_address,
       },
+    },
+    {
+      toId: {
+        equalTo: substrate_address,
+      },
+    },
+  ],
+});
+
+export const getHistoryTransfers = async (substrate_address) => {
+  const filterVariable = getFilterVariable(substrate_address);
+  const orderByVariable = ['BLOCK_NUMBER_DESC', 'EVENT_INDEX_DESC'];
+  const result = await getApi().post('/graphql', {
+    query: historyTransferQuery,
+    variables: {
+      orderByTransfers: orderByVariable,
+      filterTransfers: filterVariable,
+      orderByMerits: orderByVariable,
+      filterMerits: filterVariable,
+      orderByAssetTransfers: orderByVariable,
+      filterAssetTransfers: filterVariable,
     },
   });
 
-  const transfers = result.data?.data?.query?.transfers?.nodes;
-  if (!transfers) return [];
+  const assetsData = await getAdditionalAssets(substrate_address, true);
+  const transfersAssets = result.data?.data?.assetTransfers?.nodes;
+  const filteredTransferAssets = transfersAssets.filter((item) => item.asset !== '1' && item.asset !== 1);
+  const transfersLLD = result.data?.data?.transfers?.nodes;
+  const transfersLLM = result.data?.data?.merits?.nodes;
+  const assets = filteredTransferAssets
+    ? filteredTransferAssets.map((n) => {
+      const newItem = {
+        ...n,
+        asset: assetsData[n.asset].metadata.symbol,
+        decimals: assetsData[n.asset].metadata.decimals,
+      };
+      return newItem;
+    }) : [];
+  const llm = transfersLLM ? transfersLLM.map((n) => ({ asset: 'LLM', ...n })) : [];
+  const lld = transfersLLD ? transfersLLD.map((n) => ({ asset: 'LLD', ...n })) : [];
+  const transfers = [...assets, ...llm, ...lld];
 
-  return transfers.map((n) => ({ asset: 'LLD', ...n }));
-};
+  transfers.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
 
-export const getMeritsTransfers = async (substrate_address) => {
-  const result = await getApi().post('/graphql', {
-    query: getMeritsTransfersQuery,
-    variables: {
-      orderBy: ['BLOCK_NUMBER_DESC', 'EVENT_INDEX_DESC'],
-      filter: {
-        or: [
-          {
-            fromId: {
-              equalTo: substrate_address,
-            },
-          },
-          {
-            toId: {
-              equalTo: substrate_address,
-            },
-          },
-        ],
-      },
-    },
-  });
-
-  const transfers = result.data?.data?.query?.merits?.nodes;
-  if (!transfers) return [];
-
-  return transfers.map((n) => ({ asset: 'LLM', ...n }));
+  return transfers;
 };

@@ -1,17 +1,19 @@
 @import '../../../assets/base/variables';
 @import '../../../assets/base/fonts';
+@import '../../../assets/main.scss';
+@import '../../../index.scss';
 
 .logoContainer {
   display: flex;
   align-items: flex-start;
 
-  & > p{
-    font-family: $regular;
-    margin: 0 0 0 10px;
-    font-size: 12px;
-    font-weight: 700;
-    & > span {
-      font-size: 24px;
+  .logo{
+    height: 45px;
+    width: 150px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      height: 68px;
+      width: 229px;
     }
   }
 }

@@ -1,72 +1,69 @@
 @import "../../../../assets/base/variables";
-.politicianCardContainer {
-  flex-direction: row;
-  display: flex;
-  height: 3rem;
-  align-items: center;
-  justify-items: center;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  border-width: 2px;
-  border-color: $primary;
-  border-style: solid;
-  background-color: $secondary3;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  //justify-content: center;
-}
-.politicianData {
-  display: flex;
-  flex: 3;
-  align-items: center;
-  justify-items: center;
-}
-.politicianVotingPower {
-  display: grid;
-  flex: 1;
-  align-items: flex-end;
-  justify-items: flex-end;
-  flex-direction: row;
-}
-.politicianVotingPowerItems {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  justify-items: center;
-}
-.politicianVotingPowerNumber {
-  font-weight: bolder;
-  font-size: 1.25rem;
-}
-.politicianImageContainer{
-  margin-right: 10px;
-  margin-left: 10px;
+@import '../../../../assets/main.scss';
+
+.nameAndIcons{
   display: flex;
   align-items: center;
-  justify-items: center;
-  height:3rem;
+  gap: 8px;
+
+
+  .copyName{
+    display: flex;
+    flex-direction: column;
+
+    .copyWithName{
+      display: flex;
+      align-items: center;
+    }
+    .votesCounterMobile{
+      font-size: 13px;
+      display: block;
+      margin-top: 6px;
+      margin-left: 6px;
+      @media screen and (min-width: map-get($breakpoints, 'desktop')){
+        display: none;
+      }
+    }
+  }
 }
-.politicianPartyImageContainer{
-  margin-right: 10px;
-  margin-left: 10px;
-  display: flex;
-  align-items: center;
-  justify-items: center;
-  height:3rem;
+
+.copyIcon{
+  margin-right: 2px;
 }
+
+.buttonWrapper{
+   & > button {
+    padding: 0 10px;
+    min-height: 40px;
+    font-size: 14px;
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      min-width: 150px;
+      max-height: unset;
+      min-height: unset;
+      min-height: 50px;
+      font-size: 17px;
+    }
+   }
+}
+
+.votesCounterDesktop{
+  display: none;
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    display: block;
+  }
+}
+
+.politicianImageContainer,
+.politicianPartyImageContainer,
 .politicianVotingPowerImageContainer{
-  margin-right: 10px;
-  margin-left: 10px;
-  display: flex;
-  align-items: center;
-  justify-items: center;
-  height:3rem;
+  height: 40px;
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    height: 50px;
+  }
 }
-.politicianDisplayName{
-  font-weight: bolder;
-  font-size: 1.25rem;
-  color: $text2;
-}
-.buttonWrapper {
-  margin-right: 10px;
+
+.politicianPartyImageContainer{
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    margin-right: 3px;
+  }
 }

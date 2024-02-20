@@ -1,5 +1,5 @@
 import { createActions } from 'redux-actions';
-
+// FIXME delete this and other assembly related files
 export const {
   addMyDraft,
   submitProposal,

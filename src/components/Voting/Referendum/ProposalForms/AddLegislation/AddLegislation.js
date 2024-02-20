@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Redirect } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
@@ -11,40 +11,71 @@ import { democracyActions } from '../../../../../redux/actions';
 import router from '../../../../../router';
 import { democracySelectors } from '../../../../../redux/selectors';
 import { AddLegislationFields } from '../AddLegislationFields/AddLegislationFields';
+import { ProposalDiscussionFields } from '../ProposalDiscussionFields';
+import AgreeDisagreeModal from '../../../../Modals/AgreeDisagreeModal';
+import ModalRoot from '../../../../Modals/ModalRoot';
+import stylesModal from '../../../../Modals/styles.module.scss';
+import stylesPage from '../../../../../utils/pagesBase.module.scss';
 
 export function AddLegislation() {
   const dispatch = useDispatch();
-  const isLoading = useSelector(democracySelectors.selectorGettingDemocracyInfo);
+  const isLoading = useSelector(
+    democracySelectors.selectorGettingDemocracyInfo,
+  );
   const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const buttonRef = useRef();
+
+  const handleModalOpen = () => setIsModalOpen((prevState) => !prevState);
 
   const {
-    handleSubmit, formState: { errors }, register, control, watch,
+    handleSubmit,
+    formState: { errors, isValid },
+    register,
+    control,
+    watch,
+    trigger,
   } = useForm({
     mode: 'all',
     defaultValues: {
       tier: 'Law',
-      sections: [
-        { value: 'Paste markdown to autosplit sections' },
-      ],
+      sections: [{ value: 'Paste markdown to autosplit sections' }],
     },
   });
 
-  if (!isLoading && shouldRedirect) return <Redirect to={router.voting.referendum} />;
+  const handleClick = useCallback(() => {
+    trigger();
+    if (isValid) {
+      handleModalOpen();
+    }
+  }, [isValid, trigger]);
+
+  if (!isLoading && shouldRedirect) { return <Redirect to={router.voting.referendum} />; }
 
   const propose = ({
-    name, forumLink, tier, sections: sectionsRaw,
+    tier,
+    index,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    sections: sectionsRaw,
   }) => {
     const sections = sectionsRaw.map((v) => v.value);
-    dispatch(democracyActions.propose.call({
-      name, forumLink, tier, sections,
-    }));
+    dispatch(
+      democracyActions.propose.call({
+        tier,
+        index,
+        discussionName,
+        discussionDescription,
+        discussionLink,
+        sections,
+      }),
+    );
     setShouldRedirect(true);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(propose)}
-    >
+    <form onSubmit={handleSubmit(propose)} className={stylesPage.contentWrapper}>
       <div className={styles.h3}>Propose a new Referendum</div>
 
       <div className={styles.title}>Legislation Tier</div>
@@ -62,40 +93,53 @@ export function AddLegislation() {
         ]}
       />
 
-      <div className={styles.title}>Legislation Name</div>
+      <div className={styles.title}>Legislation Index</div>
       <TextInput
         required
-        errorTitle="Name"
+        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
+        errorTitle="Index"
         register={register}
-        name="name"
-        placeholder="legislationName"
+        name="index"
       />
-      {errors?.legislationName?.message ? <div className={styles.error}>{errors.legislationName.message}</div> : null}
+      {errors?.index?.message ? (
+        <div className={styles.error}>{errors.index.message}</div>
+      ) : null}
 
-      <div className={styles.title}>Forum Link</div>
-      <TextInput
-        required
-        errorTitle="Forum link"
-        register={register}
-        name="forumLink"
-        placeholder="forumLink"
+      <ProposalDiscussionFields
+        {...{
+          register,
+          errors,
+        }}
       />
-      {errors?.forumLink?.message ? <div className={styles.error}>{errors.forumLink.message}</div> : null}
 
-      <AddLegislationFields {...{
-        register, control, errors, watch,
-      }}
+      <AddLegislationFields
+        {...{
+          register,
+          control,
+          errors,
+          watch,
+        }}
       />
 
       <div className={styles.buttonWrapper}>
-        <Button
-          primary
-          medium
-          type="submit"
-        >
+        <Button primary medium onClick={handleClick}>
           Submit
         </Button>
       </div>
+      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+      <button type="submit" ref={buttonRef} style={{ display: 'none' }} />
+      {isModalOpen && (
+        <ModalRoot>
+          <AgreeDisagreeModal
+            onDisagree={handleModalOpen}
+            onAgree={() => {
+              handleModalOpen();
+              buttonRef.current.click();
+            }}
+            style={stylesModal.getCitizenshipModal}
+          />
+        </ModalRoot>
+      )}
     </form>
   );
 }

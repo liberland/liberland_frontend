@@ -11,6 +11,7 @@ import * as identityActions from './identity';
 import * as bridgeActions from './bridge';
 import * as validatorActions from './validator';
 import * as congressActions from './congress';
+import * as onBoardingActions from './onboarding';
 
 export {
   authActions,
@@ -26,4 +27,5 @@ export {
   bridgeActions,
   validatorActions,
   congressActions,
+  onBoardingActions,
 };

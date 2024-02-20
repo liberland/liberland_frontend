@@ -1,42 +1,244 @@
 @import '../../../assets/base/variables';
+@import '../../../assets/main.scss';
+@import '../../../index.scss';
+
+.contentWrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        gap: 40px;
+    }
+}
 
 .legislationCard {
-    margin-bottom: 15px;
-}
-.legislationSectionCard {
-    background-color: $bg4;
-    margin-bottom: 15px;
-}
-.legislationInfoContainer {
-    flex-direction: row;
-    display: flex;
-    margin-bottom: 15px;
-}
-.legislationContent {
-    align-items: flex-start;
-    flex: 4;
-    display: flex;
-    white-space: pre;
-}
-.vetoContent {
-    align-items: flex-end;
-    flex: 1;
-    display: flex;
-}
-.vetoInfo {
-    display: flex;
-    align-items: center;
-    justify-items: center;
-    flex-direction: column;
-    margin-right: 1rem;
+    margin-top: 25px;
+    background: $lightGrey;
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        margin-top: 29px;
+    }
+
+    .legislationContent{
+        margin-top: 20px;
+
+        @media screen and (min-width: map-get($breakpoints, 'tablet')){
+            margin-top: 18px;
+        }
+    }
+
+    .buttonSectionHeader{
+        display: block;
+        width: 100%;
+        margin-top: 25px;
+
+        @media screen and (min-width: map-get($breakpoints, 'tablet')){
+            display: none;
+        }
+    }
 }
 
-.rowEnd {
+.header{
     display: flex;
-    justify-content: end;
-    align-items: center;
-  
-    > * {
-      margin: 0 4px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex-direction: column;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        flex-direction: row;
+        align-items: center;
     }
-  }
+
+    .title{
+      margin: 0;
+      white-space: nowrap;
+      font-size: 24px;
+      font-family: $playfairDisplay;
+      font-weight: 500;
+
+      @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        font-size: 28px;
+      }
+    }
+
+    .titleh3{
+        font-size: 20px;
+  
+        @media screen and (min-width: map-get($breakpoints, 'tablet')){
+          font-size: 24px;
+        }
+    }
+
+    .rightColumn{
+        display: flex;
+        align-items: center;
+        gap: 15px; 
+        flex-direction: column;
+
+        @media screen and (min-width: map-get($breakpoints, 'tablet')){
+            gap: 25px; 
+            flex-direction: row;
+          }
+
+        & > button {
+            flex: 1;
+            width: 100%;
+            height: 50px;
+            padding: 0 30px;
+            font-size: 13px; 
+
+            @media screen and (min-width: map-get($breakpoints, 'tablet')){
+                flex: auto;
+                width: 100%;
+                white-space: nowrap;
+                font-size: 16px;
+            }
+        }
+
+        .buttonSection{
+            display: none;
+
+            @media screen and (min-width: map-get($breakpoints, 'tablet')){
+                display: block;
+            }
+        }
+    }
+}
+
+.headerSection{
+    flex-direction: row;
+    white-space: unset;
+}
+
+.vetoedWrapper{
+    display: flex;
+    gap: 5px;
+    width: 100%;
+    white-space: nowrap;
+    font-size: 14px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        gap: 15px;
+        font-size: 16px;
+    }
+
+    .vetoedTitle{
+        font-weight: 700;
+    }
+}
+
+.vetoedWrapperSection{
+    flex-direction: column;
+    align-items: flex-end;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        flex-direction: row;
+    }
+}
+
+.buttonsWrapper{
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        justify-content: flex-end;
+        gap: 16px;
+        margin-top: 20px;
+    }
+
+    & > * {
+        flex: 1;
+
+        @media screen and (min-width: map-get($breakpoints, 'tablet')){
+            flex: unset;
+        }
+    }
+
+    & > div > button {
+        width: 100%;
+    }
+
+    .dropdownWrapper{
+        font-size: 14px;
+        position: relative;
+
+
+        @media screen and (min-width: map-get($breakpoints, 'tablet')){
+            font-size: 16px;
+        }
+
+        & > button{
+            display: flex;
+            align-items: center;
+
+            @-moz-document url-prefix() {
+                gap: 5px;
+            }
+
+            & > span {
+                align-self: flex-start;
+                font-size: 30px;
+
+                @-moz-document url-prefix() {
+                    margin-top: -5px;
+                }
+            }
+        }
+
+        .dropdown{
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            position: absolute;
+            right: 0;
+            left: 0;
+            max-width: 100%;
+            margin: auto;
+            top: 110%;
+
+
+            padding: 15px;
+            z-index: 100;
+            background: $bg4;
+            border: 1px solid $grey;
+            border-radius: 6px;
+
+            & > button{
+                min-width: unset;
+                padding: 10px;
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            cursor: pointer;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: transparent;
+            z-index: 99;
+          }
+    }
+
+    .buttonSectionInList{
+        display: block;
+
+        @media screen and (min-width: map-get($breakpoints, 'tablet')){
+            display: none;
+        }
+    }
+}
+
+.buttonsSection{
+    margin-top: 25px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        margin-top: 20px;
+    }
+}

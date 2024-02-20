@@ -14,6 +14,7 @@ export default {
     staking: '/home/staking',
     congress: '/home/congress',
   },
+  guidedSetup: '/guided-setup',
   offices: {
     identity: '/home/offices/identity',
     companyRegistry: {

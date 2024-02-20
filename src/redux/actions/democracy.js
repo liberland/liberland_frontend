@@ -5,7 +5,6 @@ export const {
   getDemocracy,
   propose,
   proposeAmendLegislation,
-  secondProposal,
   undelegate,
   voteForCongress,
   voteOnReferendum,
@@ -27,11 +26,6 @@ export const {
     failure: undefined,
   },
   PROPOSE_AMEND_LEGISLATION: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  SECOND_PROPOSAL: {
     call: undefined,
     success: undefined,
     failure: undefined,

@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import {
   Switch, Route, Redirect,
 } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 
-import { votingActions } from '../../redux/actions';
+import { NavLink, useLocation } from 'react-router-dom/cjs/react-router-dom.min';
 
 import VotingHeader from './VotingHeader';
 import RoleHOC from '../../hocs/RoleHOC';
@@ -12,25 +11,29 @@ import router from '../../router';
 
 import CongressionalAssemble from './CongressionalAssemble';
 import styles from './styles.module.scss';
+import stylesPage from '../../utils/pagesBase.module.scss';
 import Referendum from './Referendum';
 import { AddLegislation } from './Referendum/ProposalForms/AddLegislation/AddLegislation';
+import Button from '../Button/Button';
 
 function Voting() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const timerId = setInterval(() => {
-      dispatch(votingActions.getAssembliesList.call());
-    }, 6000);
-    return (() => {
-      clearInterval(timerId);
-    });
-  }, [dispatch]);
+  const location = useLocation();
 
   return (
-    <div className={styles.votingWrapper}>
-      <div className={styles.navWrapper}>
-        <VotingHeader />
+    <div className={stylesPage.sectionWrapper}>
+      <div className={stylesPage.menuAddressWrapper}>
+        <div className={styles.votingHeaderWrapper}>
+          <VotingHeader />
+          {location.pathname === router.voting.referendum && (
+          <NavLink
+            className={styles.linkButton}
+            to={router.voting.addLegislation}
+          >
+            <Button small primary>Propose</Button>
+          </NavLink>
+          )}
+
+        </div>
       </div>
 
       <div>

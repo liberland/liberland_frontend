@@ -24,17 +24,20 @@
   font-size: 0.6rem;
 }
 .metaTextInfo{
-  flex-direction: column;
+  flex-direction: row;
   display: flex;
   justify-content: space-between;
+  gap: 8px;
 }
 .rowEnd {
   display: flex;
   justify-content: end;
   align-items: center;
-  margin-bottom: 20px;
 
   > * {
     margin: 0 4px;
   }
+}
+.copyIcon {
+  cursor: pointer;
 }

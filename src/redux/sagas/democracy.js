@@ -1,11 +1,10 @@
 import {
-  put, takeLatest, call, select, cps,
+  put, call, select,
 } from 'redux-saga/effects';
 
 import {
   getCongressMembersWithIdentity,
   getDemocracyReferendums,
-  secondProposal,
   voteOnReferendum,
   submitProposal,
   voteForCongress,
@@ -14,153 +13,133 @@ import {
   proposeAmendLegislation,
   citizenProposeRepealLegislation,
   getScheduledCalls,
+  getIdentitiesNames,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors } from '../selectors';
 import {
-  blockchainActions, democracyActions, congressActions, legislationActions,
+  democracyActions, congressActions, legislationActions,
 } from '../actions';
 
 // WORKERS
+
+function getProposers(crossReferencedList, isProposer = false) {
+  const newMapedList = crossReferencedList.map((proposal) => {
+    const list = proposal.centralizedDatas.map((item) => item.proposerAddress);
+    return isProposer ? [proposal.proposer, ...list] : [...list];
+  });
+  return newMapedList.flat();
+}
+
+function* addNameForProposers(referendumsData, proposalData) {
+  const proposersFromReferendum = getProposers(proposalData, true);
+  const proposersFromProposal = getProposers(referendumsData);
+  const proposerList = Array.from(new Set([...proposersFromReferendum, ...proposersFromProposal]));
+  const identitiesNames = yield call(getIdentitiesNames, proposerList);
+  return identitiesNames;
+}
 
 function* getDemocracyWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const directDemocracyInfo = yield call(getDemocracyReferendums, walletAddress);
   const currentCongressMembers = yield call(getCongressMembersWithIdentity, walletAddress);
   const scheduledCalls = yield call(getScheduledCalls);
-  const democracy = { ...directDemocracyInfo, ...currentCongressMembers, scheduledCalls };
+  const democracyHelper = { ...directDemocracyInfo, ...currentCongressMembers, scheduledCalls };
+  const identitiesName = yield addNameForProposers(
+    democracyHelper.crossReferencedReferendumsData,
+    democracyHelper.crossReferencedProposalsData,
+  );
+  const democracy = { ...democracyHelper, identitiesName };
   yield put(democracyActions.getDemocracy.success({ democracy }));
 }
 
-function* secondProposalWorker(action) {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { errorData } = yield cps(secondProposal, walletAddress, action.payload.proposalIndex);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(democracyActions.secondProposal.failure());
-    } else {
-      yield put(democracyActions.secondProposal.success());
-      yield put(democracyActions.getDemocracy.call());
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.error('Error in secondProposalWorker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(democracyActions.secondProposal.failure(errorData));
-  }
-}
-
 function* voteReferendumWorker(action) {
-  try {
-    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-    const { referendumIndex, voteType } = action.payload;
-    const { errorData } = yield cps(voteOnReferendum, walletAddress, referendumIndex, voteType);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(democracyActions.voteOnReferendum.failure());
-    } else {
-      yield put(democracyActions.voteOnReferendum.success());
-      yield put(democracyActions.getDemocracy.call());
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.error('Error in vote on referendum', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(democracyActions.voteOnReferendum.failure(errorData));
-  }
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const { referendumIndex, voteType } = action.payload;
+  yield call(voteOnReferendum, walletAddress, referendumIndex, voteType);
+  yield put(democracyActions.voteOnReferendum.success());
+  yield put(democracyActions.getDemocracy.call());
 }
 
 function* proposeWorker(action) {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const {
-    name, forumLink, tier, sections,
+    tier, index,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    sections,
   } = action.payload;
   const year = new Date().getFullYear();
-  yield call(submitProposal, name, forumLink, tier, year, sections, walletAddress);
+  yield call(
+    submitProposal,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    tier,
+    year,
+    index,
+    sections,
+    walletAddress,
+  );
   yield put(democracyActions.propose.success());
   yield put(democracyActions.getDemocracy.call());
 }
 
 function* voteForCongressWorker(action) {
-  try {
-    const { selectedCandidates, userWalletAddress } = action.payload;
-    const { errorData } = yield cps(voteForCongress, selectedCandidates, userWalletAddress);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(democracyActions.voteForCongress.failure(errorData));
-    } else {
-      yield put(democracyActions.voteForCongress.success());
-      yield put(democracyActions.getDemocracy.call());
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.log('Error in vote for congress worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(democracyActions.voteForCongress.failure(errorData));
-  }
+  const { selectedCandidates, userWalletAddress } = action.payload;
+  yield call(voteForCongress, selectedCandidates, userWalletAddress);
+  yield put(democracyActions.voteForCongress.success());
+  yield put(democracyActions.getDemocracy.call());
 }
 
 function* delegateWorker(action) {
-  try {
-    const { values, userWalletAddress } = action.payload;
-    const { errorData } = yield cps(delegateDemocracy, values.delegateAddress, userWalletAddress);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(democracyActions.delegate.failure(errorData));
-    } else {
-      yield put(democracyActions.delegate.success());
-      yield put(democracyActions.getDemocracy.call());
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.log('Error in delegate worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(democracyActions.delegate.failure(errorData));
-  }
+  const { values, userWalletAddress } = action.payload;
+  yield call(delegateDemocracy, values.delegateAddress, userWalletAddress);
+  yield put(democracyActions.delegate.success());
+  yield put(democracyActions.getDemocracy.call());
 }
 
 function* undelegateWorker(action) {
-  try {
-    const { errorData } = yield cps(undelegateDemocracy, action.payload.userWalletAddress);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(democracyActions.undelegate.failure(errorData));
-    } else {
-      yield put(democracyActions.undelegate.success());
-      yield put(democracyActions.getDemocracy.call());
-    }
-  } catch (errorData) {
-    // eslint-disable-next-line no-console
-    console.log('Error in undelegate worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(democracyActions.undelegate.failure(errorData));
-  }
+  yield call(undelegateDemocracy, action.payload.userWalletAddress);
+  yield put(democracyActions.undelegate.success());
+  yield put(democracyActions.getDemocracy.call());
 }
 
 function* proposeAmendLegislationWorker(action) {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const {
-    tier, id, section, content,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    tier,
+    id,
+    section,
+    content,
   } = action.payload;
-  yield call(proposeAmendLegislation, tier, id, section, content, walletAddress);
+  yield call(
+    proposeAmendLegislation,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    tier,
+    id,
+    section,
+    content,
+    walletAddress,
+  );
   yield put(democracyActions.proposeAmendLegislation.success());
   yield put(democracyActions.getDemocracy.call());
 }
 
 function* citizenProposeRepealLegislationWorker({
   payload: {
-    tier, id, section,
+    discussionName,
+    discussionDescription,
+    discussionLink,
+    tier,
+    id,
+    section,
   },
 }) {
   const walletAddress = yield select(
@@ -169,6 +148,9 @@ function* citizenProposeRepealLegislationWorker({
 
   yield call(
     citizenProposeRepealLegislation,
+    discussionName,
+    discussionDescription,
+    discussionLink,
     tier,
     id,
     section,
@@ -186,20 +168,8 @@ function* getDemocracyWatcher() {
   yield* blockchainWatcher(democracyActions.getDemocracy, getDemocracyWorker);
 }
 
-function* secondProposalWatcher() {
-  try {
-    yield takeLatest(democracyActions.secondProposal.call, secondProposalWorker);
-  } catch (e) {
-    yield put(democracyActions.secondProposal.failure(e));
-  }
-}
-
 function* voteOnReferendumWatcher() {
-  try {
-    yield takeLatest(democracyActions.voteOnReferendum.call, voteReferendumWorker);
-  } catch (e) {
-    yield put(democracyActions.voteOnReferendum.failure(e));
-  }
+  yield* blockchainWatcher(democracyActions.voteOnReferendum, voteReferendumWorker);
 }
 
 function* proposeWatcher() {
@@ -207,27 +177,15 @@ function* proposeWatcher() {
 }
 
 function* voteForCongressWatcher() {
-  try {
-    yield takeLatest(democracyActions.voteForCongress.call, voteForCongressWorker);
-  } catch (e) {
-    yield put(democracyActions.voteForCongress.failure(e));
-  }
+  yield* blockchainWatcher(democracyActions.voteForCongress, voteForCongressWorker);
 }
 
 function* delegateWatcher() {
-  try {
-    yield takeLatest(democracyActions.delegate.call, delegateWorker);
-  } catch (e) {
-    yield put(democracyActions.delegate.failure(e));
-  }
+  yield* blockchainWatcher(democracyActions.delegate, delegateWorker);
 }
 
 function* undelegateWatcher() {
-  try {
-    yield takeLatest(democracyActions.undelegate.call, undelegateWorker);
-  } catch (e) {
-    yield put(democracyActions.undelegate.failure(e));
-  }
+  yield* blockchainWatcher(democracyActions.undelegate, undelegateWorker);
 }
 
 function* proposeAmendLegislationWatcher() {
@@ -246,7 +204,6 @@ export {
   getDemocracyWatcher,
   proposeAmendLegislationWatcher,
   proposeWatcher,
-  secondProposalWatcher,
   undelegateWatcher,
   voteForCongressWatcher,
   voteOnReferendumWatcher,

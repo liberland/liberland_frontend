@@ -1,33 +1,22 @@
-import {
-  put, takeLatest, cps, call,
-} from 'redux-saga/effects';
+import { put, takeLatest, call } from 'redux-saga/effects';
 
-import {
-  getIdentity,
-  setIdentity,
-} from '../../api/nodeRpcCall';
+import { getIdentity, setIdentity } from '../../api/nodeRpcCall';
 
-import { identityActions, blockchainActions } from '../actions';
+import { identityActions } from '../actions';
+import { blockchainWatcher } from './base';
 
 // WORKERS
 
 function* setIdentityWorker(action) {
-  try {
-    const { blockHash, errorData } = yield cps(setIdentity, action.payload.values, action.payload.userWalletAddress);
-    if (errorData.isError) {
-      yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-      yield put(blockchainActions.setError.success(errorData));
-      yield put(identityActions.setIdentity.failure(errorData));
-    }
-    else {
-      yield put(identityActions.setIdentity.success());
-      yield put(identityActions.getIdentity.call(action.payload.userWalletAddress));
-    }
-  } catch (errorData) {
-    console.log('Error in set identity worker', errorData);
-    yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
-    yield put(blockchainActions.setError.success(errorData));
-    yield put(identityActions.setIdentity.failure(errorData));
+  yield call(
+    setIdentity,
+    action.payload.values,
+    action.payload.userWalletAddress,
+  );
+  yield put(identityActions.setIdentity.success());
+  yield put(identityActions.getIdentity.call(action.payload.userWalletAddress));
+  if (action.payload?.isGuidedUpdate) {
+    sessionStorage.setItem('SkippedOnBoardingGetLLD', true);
   }
 }
 
@@ -43,11 +32,7 @@ function* getIdentityWorker(action) {
 // WATCHERS
 
 function* setIdentityWatcher() {
-  try {
-    yield takeLatest(identityActions.setIdentity.call, setIdentityWorker);
-  } catch (e) {
-    yield put(identityActions.setIdentity.failure(e));
-  }
+  yield* blockchainWatcher(identityActions.setIdentity, setIdentityWorker);
 }
 
 function* getIdentityWatcher() {
@@ -58,7 +43,4 @@ function* getIdentityWatcher() {
   }
 }
 
-export {
-  setIdentityWatcher,
-  getIdentityWatcher,
-};
+export { setIdentityWatcher, getIdentityWatcher };

@@ -1,6 +1,11 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans|Playfair+Display&display=swap');
+
+$openSans: 'Open Sans', sans-serif;
+$playfairDisplay: 'Playfair Display', serif;
+
 body {
   margin: 0;
-  font-family: "Inter";
+  font-family: $openSans;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -9,10 +14,6 @@ p {
   margin: 0;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
-}
 
 #modal-root {
   position: fixed;
@@ -21,8 +22,8 @@ code {
   overflow-y: scroll;
   opacity: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: safe center;
+  justify-content: safe center;
   flex: none;
   
 
@@ -37,6 +38,10 @@ code {
   & > .modal-wrapper {
     width: 100%;
     height: fit-content;
+    padding-top: 50px;
+  @media (min-width: 768px) {
+    padding-top: 0;
+  }
 
     & > div {
       background: #fff;

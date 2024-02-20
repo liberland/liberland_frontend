@@ -34,7 +34,7 @@ function WalletOverview({
     },
     {
       amount: formatMerits(liquidMerits),
-      title: 'Liquid Merits',
+      title: 'Liquid',
       diff: -0.4,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (-0.4 > 0 ? <ArrowBlueUpIcon /> : <ArrowBlueDownIcon />),
@@ -42,7 +42,7 @@ function WalletOverview({
     },
     {
       amount: formatDollars(balances.liquidAmount.amount),
-      title: 'Liquid LLD',
+      title: 'Liquid',
       diff: -0.6,
       // eslint-disable-next-line no-constant-condition
       getIcon: () => (-0.6 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
@@ -54,21 +54,20 @@ function WalletOverview({
     <Card className={styles.overviewWrapper} title="Overview">
       <div className={styles.overViewCard}>
         {
-          overviewInfo.map((cardInfo) => (
+          overviewInfo.map((cardInfo, index) => (
             <div
               className={styles.cardInfo}
-              key={cardInfo.title}
+              // eslint-disable-next-line react/no-array-index-key
+              key={cardInfo + index}
             >
-              <div className={styles.cardInfoAmountWrapper}>
-                <p className={styles.cardInfoAmount}>
-                  {cardInfo.amount}
-                  <span>
-                    {' '}
-                    {cardInfo.currency}
-                  </span>
-                </p>
-              </div>
-              <p className={styles.cardInfoTitle}>{cardInfo.title}</p>
+              <p className={styles.cardInfoAmount}>
+                {cardInfo.amount}
+              </p>
+              <p className={styles.cardInfoTitle}>
+                {cardInfo.title}
+                {' '}
+                {cardInfo.currency}
+              </p>
             </div>
           ))
         }
@@ -83,6 +82,7 @@ WalletOverview.defaultProps = {
 };
 
 WalletOverview.propTypes = {
+  // eslint-disable-next-line
   totalBalance: PropTypes.string,
   balances: PropTypes.shape({
     free: PropTypes.shape({

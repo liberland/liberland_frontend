@@ -1,4 +1,6 @@
-import { put, takeEvery, takeLatest } from 'redux-saga/effects';
+import {
+  put, takeEvery, takeLatest,
+} from 'redux-saga/effects';
 import { blockchainActions } from '../actions';
 
 function errorHandler(onFailure, worker) {
@@ -9,7 +11,7 @@ function errorHandler(onFailure, worker) {
       // eslint-disable-next-line no-console
       console.error(e);
       yield put(onFailure(e));
-      yield put(blockchainActions.setError.success(e?.errorData || e.message));
+      yield put(blockchainActions.setError.success(e?.errorData || { details: e.message }));
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
     }
   }

@@ -1,69 +1,131 @@
 @import '../../../../assets/base/variables';
 @import '../../../../assets/base/fonts';
+@import '../../../../assets/main.scss';
 
-.nominatorCardWrapper{
-  display: flex;
-  height: 50px;
-  width: 100%;
-  font-size: 18px;
-  align-items: flex-start;
-  justify-content: center;
-  border-radius: 20px;
-  background: $secondary3;
-  margin-top: 10px;
-  flex-direction: row;
-}
-.nominatorCardWrapper:hover{
-  background: $primary;
-}
-.avatarProfile{
-  display: flex;
-  flex:5;
-  align-items: center;
-  height:100%;
-}
 .listItem{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  @media (min-width: 48em) {
+    height:100%;
+  }
+
+  .itemText{
+    margin-right: 10px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      margin-right: 15px;
+    }
+  }
+}
+
+.avatarProfile{
   display: flex;
   flex:1;
   align-items: center;
-  justify-content: center;
-  height:100%;
+
+  @media (min-width: 48em) {
+    flex:2;
+    height:100%;
+  }
 }
+
 .avatarImage{
   margin-right: 5px;
-  margin-left: 15px;
   display: flex;
   align-items: center;
-  height:100%;
+  height: 40px;
+  width: 40px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    height: 50px;
+    width: 50px;
+  }
+
+  & > img{
+    width: 100%;
+    height: 100%;
+  }
 }
+
 .avatarName{
   display: flex;
   align-items: center;
-  height:100%;
+  font-weight: 700;
+  @media (min-width: 48em) {
+    height:100%;
+  }
+  word-break: break-word;
 }
-.checkBox{
-  background-color: #fff;
-  border-width: 1px;
-  border-color: #323B4B;
-  border-style: solid;
-  padding: 5px;
-  height: 25px;
-  width: 25px;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  vertical-align: middle;
+
+.checkBoxWrapper{
+  position: relative;
+  height: 42px;
+  width: 42px;
+
+  .img{
+    position: absolute;
+    left: 0; 
+    right: 0; 
+    top: 0; 
+    bottom: 0; 
+    margin: auto; 
+  }
+
+  .checkBox{
+    appearance: none; 
+    color: $bg4;
+    border-width: 1px;
+    border-color: #323B4B;
+    border-radius: 5px;
+    border-style: solid;
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+  }
 }
+
 .available {
-  color: $primary2;
-  background-color: $secondary2;
-  border-radius: 15px;
-  padding: 5px;
+  color: $bg4;
+  background-color: $succes;
 }
 
 .blocked {
   color: $primary4;
   background-color: $secondary4;
-  border-radius: 15px;
-  padding: 5px;
+}
+
+.available, 
+.blocked{
+  border-radius: 42px;
+  padding: 6px 10px;
+  font-size: 11px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    padding: 5px 11px;
+    font-size: 14px;
+  }
+}
+
+.itemWrapper{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .nameAvaible{
+    display: flex;
+    gap: 7px;
+  }
+
+  .commisionNameAllowed{
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .leftColumn{
+    display: flex;
+    gap: 2%;
+  }
 }

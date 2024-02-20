@@ -1,18 +1,22 @@
 @import '../../assets/base/variables';
 @import '../../assets/base/fonts';
-.votingWrapper {
-  padding: 8px 30px;
-  min-height: 760px;
-}
+@import '../../assets/main.scss';
 
-.navWrapper {
+.votingHeaderWrapper {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;;
-  margin-bottom: 40px;
 
-  & > div {
-    margin: 0;
+  & > a{
+    text-decoration: none;
   }
 }
+
+.linkButton{
+  display: none;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    display: block;
+  }
+}
+
 

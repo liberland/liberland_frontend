@@ -16,8 +16,13 @@
   align-items: center;
   margin: auto;
 
+  .icon{
+    width: 10%;
+    margin-right: 10px;
+  }
+
   & > h3 {
-    font-family: $regular;
+    
     font-size: 26px;
     font-weight: 700;
     margin: 0;
@@ -25,7 +30,7 @@
   }
 
   p {
-    font-family: $medium;
+    
     font-size: 18px;
     margin: 20px 0 30px 0;
     color: $text3;
@@ -35,6 +40,7 @@
 .divider {
   display: flex;
   align-items: center;
+  text-align: center;
   color: $text4!important;
 
   & > svg {
@@ -56,22 +62,23 @@
   & > a {
     color: inherit;
     text-decoration: none;
-  } 
+  }
 }
 
 .yellowLink{
   color: $primary;
   text-decoration: none;
 }
-.signUpInfo {
+.extraInfo {
   margin-top: 36px!important;
   margin-bottom: 0!important;
+  text-align: center;
 }
 
 .error {
   font-size: 12px;
   line-height: 16px;
-  font-family: $medium;
+  
   color: $errorText;
 };
 
@@ -90,4 +97,11 @@
   position: relative;
   font-weight: 500;
   color: #4E5D78;
+}
+
+.twoFAbuttons{
+  color: #8A94A6;
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
 }

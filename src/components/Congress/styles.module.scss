@@ -1,6 +1,9 @@
 .congressWrapper {
-  padding: 8px 30px;
+  padding: 8px 10px;
   min-height: 760px;
+  @media (min-width: 48em) {
+    padding: 8px 30px;
+  }
 }
 
 .navWrapper {
@@ -19,16 +22,20 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 
   & > div {
     margin: 0;
+    flex-wrap: wrap;
+    display: flex;
   }
 }
 
 .rowEnd {
   display: flex;
-  justify-content: end;
+  justify-content: start;
   align-items: center;
+  flex-wrap: wrap;
 
   > * {
     margin: 0 4px;

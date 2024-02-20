@@ -44,63 +44,30 @@ const selectUserFamilyName = createSelector(
     return user.familyName;
   },
 );
-const selectUserOrigin = createSelector(
-  selectUser,
-  (user) => {
-    if (!user) return null;
-    return user.origin;
-  },
-);
-const selectUserAbout = createSelector(
-  selectUser,
-  (user) => {
-    if (!user) return null;
-    return user.about;
-  },
-);
-const selectUserOccupation = createSelector(
-  selectUser,
-  (user) => {
-    if (!user) return null;
-    return user.occupation;
-  },
-);
-const selectUserGender = createSelector(
-  selectUser,
-  (user) => {
-    if (!user) return null;
-    return user.gender;
-  },
-);
-const selectUserLanguages = createSelector(
-  selectUser,
-  (user) => {
-    if (!user) return null;
-    return user.languages;
-  },
-);
-const selectIsSessionVerified = createSelector(
+
+const selectIsSessionReady = createSelector(
   userReducer,
-  (reducer) => reducer.isSessionVerified,
+  (reducer) => reducer.isSessionReady,
 );
 
-const selectIsSignInFetching = createSelector(
+const selectIsLoading = createSelector(
   userReducer,
-  (reducer) => reducer.isSignInFetching,
+  (reducer) => reducer.isLoading,
+);
+
+const selectWalletAddress = createSelector(
+  selectUser,
+  (user) => user?.blockchainAddress,
 );
 
 export {
   selectUser,
-  selectIsSessionVerified,
+  selectIsSessionReady,
   selectUserRole,
   selectUserEmail,
   selectUserId,
-  selectIsSignInFetching,
-  selectUserAbout,
   selectUserGivenName,
   selectUserFamilyName,
-  selectUserOrigin,
-  selectUserOccupation,
-  selectUserGender,
-  selectUserLanguages,
+  selectWalletAddress,
+  selectIsLoading,
 };

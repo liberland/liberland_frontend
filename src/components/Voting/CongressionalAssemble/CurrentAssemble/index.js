@@ -1,25 +1,46 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from './styles.module.scss';
+import cx from 'classnames';
 import PoliticanCard from '../PoliticianCard/Index';
 import Card from '../../../Card';
+import stylesPage from '../../../../utils/pagesBase.module.scss';
+import styles from './styles.module.scss';
 
 function CurrentAssemble({
   currentCongressMembers,
 }) {
   return (
-    <div>
-      <Card title="">
-        <div className={styles.currentAssembleHeader}>
-          Acting Congressional Assembly
+    <Card className={stylesPage.overviewWrapper} title="Acting Congressional Assembly">
+
+      <div className={stylesPage.transactionHistoryCard}>
+        <div className={cx(
+          stylesPage.transactionHistoryCardHeaderDesktop,
+          stylesPage.transactionHistoryCardHeader,
+          styles.gridList,
+        )}
+        >
+          <span>NAME</span>
+          <span>DELEGATE MY VOTE</span>
+          <span>VOTING POWER</span>
         </div>
-        <div className={styles.congressMembersList}>
-          {
-            currentCongressMembers?.map((currentCongressMember) => <PoliticanCard politician={currentCongressMember} key={`current-congress-member${currentCongressMember.name}`} />)
+        <div className={cx(stylesPage.transactionHistoryCardHeaderMobile, stylesPage.transactionHistoryCardHeader)}>
+          <span>NAME / VOTING POWER</span>
+          <span>DELEGATE MY VOTE</span>
+        </div>
+
+        {
+            currentCongressMembers?.map((currentCongressMember) => (
+              <div className={cx(stylesPage.transactionHistoryCardMain, styles.gridList)}>
+                <PoliticanCard
+                  politician={currentCongressMember}
+                  key={`current-congress-member${currentCongressMember.name}`}
+                />
+              </div>
+            ))
           }
-        </div>
-      </Card>
-    </div>
+
+      </div>
+    </Card>
   );
 }
 

@@ -2,17 +2,12 @@ import React from 'react';
 
 // assets
 import styles from './styles.module.scss';
-import Logo from '../../../assets/images/logo.png';
+import LiberlandLettermark from '../../../assets/icons/Liberland_Lettermark.svg';
 
 function Header() {
   return (
     <div className={styles.logoContainer}>
-      <img src={Logo} alt="logo" />
-      <p>
-        Free republic of
-        <br />
-        <span>Liberland</span>
-      </p>
+      <img className={styles.logo} src={LiberlandLettermark} alt="logo" />
     </div>
   );
 }

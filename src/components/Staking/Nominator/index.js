@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import cx from 'classnames';
 import styles from './styles.module.scss';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList/ValidatorList';
 import Button from '../../Button/Button';
 import { walletActions } from '../../../redux/actions';
+import stylesPage from '../../../utils/pagesBase.module.scss';
+import Card from '../../Card';
 
 function Nominator() {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -46,8 +49,12 @@ function Nominator() {
   *
   * */
 
+  useEffect(() => {
+    setSelectedValidatorsAsTargets(nominatorTargets);
+  }, [nominatorTargets]);
+
   return (
-    <div className={styles.nominatorWrapper}>
+    <Card title="Validators" className={cx(stylesPage.overviewWrapper, styles.nominatorWrapper)}>
       <div className={styles.nominatorsList}>
         {/* <SearchBar
           setSearchTerm={setSearchTerm}
@@ -60,18 +67,19 @@ function Nominator() {
         />
       </div>
       <div className={styles.updateNominationsContainer}>
-        <div>
-          <Button small primary onClick={() => goToAdvancedPage()}>
-            Advanced
-          </Button>
-        </div>
-        <div>
-          <Button large primary onClick={() => updateNominations(selectedValidatorsAsTargets)}>
-            Update Nominations
-          </Button>
-        </div>
+        <Button small primary onClick={() => goToAdvancedPage()}>
+          ADVANCED
+        </Button>
+        <Button
+          className={styles.button}
+          small
+          primary
+          onClick={() => updateNominations(selectedValidatorsAsTargets)}
+        >
+          UPDATE NOMINATIONS
+        </Button>
       </div>
-    </div>
+    </Card>
   );
 }
 

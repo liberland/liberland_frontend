@@ -34,7 +34,7 @@ function DelegateModal({
           primary
           medium
           type="submit"
-          onClick={() => {onSubmitDelegate(delegateAddress)}}
+          onClick={() => onSubmitDelegate(delegateAddress)}
         >
           Delegate
         </Button>

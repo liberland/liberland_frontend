@@ -1,34 +1,15 @@
 import {
   put, call, takeLatest, take,
 } from 'redux-saga/effects';
-import { web3Enable } from '@polkadot/extension-dapp';
 import { eventChannel } from 'redux-saga';
+import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import { blockchainActions } from '../actions';
 import {
-  subscribeActiveEra, subscribeBestBlockNumber, getAllWalletsRpc, fetchPreimage,
+  subscribeActiveEra, subscribeBestBlockNumber, fetchPreimage,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcherEvery } from './base';
-import { waitForInjectedWeb3 } from '../../utils/walletHelpers';
 
 // WORKERS
-function* getAllWalletsWorker() {
-  yield call(waitForInjectedWeb3);
-  const extensions = yield call(web3Enable, 'Liberland dapp');
-  try {
-    if (extensions.length) {
-      const allWallets = yield call(getAllWalletsRpc);
-      yield put(blockchainActions.getAllWallets.success(allWallets));
-    } else {
-      alert('You need a wallet manager like polkadot{js} browser extension to use this page');
-      yield put(blockchainActions.getAllWallets.failure('No enable Extensione'));
-    }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    yield put(blockchainActions.getAllWallets.failure(e));
-  }
-}
-
 function* clearErrorsWorker(action) {
   yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(action.payload));
   yield put(blockchainActions.setError.success(''));
@@ -43,21 +24,11 @@ function* fetchPreimageWorker({ payload: { hash, len } }) {
 
 // WATCHERS
 
-function* getAllWalletsWatcher() {
-  try {
-    yield takeLatest(blockchainActions.getAllWallets.call, getAllWalletsWorker);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    yield put(blockchainActions.updateDateElections.failure(e));
-  }
-}
-
-function* clearErrorsWatcher() {
+export function* clearErrorsWatcher() {
   yield takeLatest(blockchainActions.setErrorExistsAndUnacknowledgedByUser.call, clearErrorsWorker);
 }
 
-function* subscribeBestBlockNumberSaga() {
+export function* subscribeBestBlockNumberSaga() {
   const channel = eventChannel((emitter) => {
     const unsubPromise = subscribeBestBlockNumber(emitter);
     return () => unsubPromise.then((unsub) => unsub());
@@ -65,11 +36,14 @@ function* subscribeBestBlockNumberSaga() {
 
   while (true) {
     const bestNumber = yield take(channel);
-    yield put(blockchainActions.bestBlockNumber.value({ bestNumber }));
+    yield put(blockchainActions.bestBlockNumber.value({
+      bestNumber,
+      timestamp: Date.now(),
+    }));
   }
 }
 
-function* subscribeActiveEraSaga() {
+export function* subscribeActiveEraSaga() {
   const channel = eventChannel((emitter) => {
     const unsubPromise = subscribeActiveEra(emitter);
     return () => unsubPromise.then((unsub) => unsub());
@@ -81,14 +55,26 @@ function* subscribeActiveEraSaga() {
   }
 }
 
-function* fetchPreimageWatcher() {
+export function* fetchPreimageWatcher() {
   yield* blockchainWatcherEvery(blockchainActions.fetchPreimage, fetchPreimageWorker);
 }
 
-export {
-  getAllWalletsWatcher,
-  clearErrorsWatcher,
-  subscribeBestBlockNumberSaga,
-  subscribeActiveEraSaga,
-  fetchPreimageWatcher,
-};
+export function* subscribeWalletsSaga() {
+  const channel = eventChannel((emitter) => {
+    const updateWallets = async () => {
+      const extensions = await web3Enable('Liberland dApp');
+      const wallets = await web3Accounts();
+      emitter({ extensions, wallets });
+    };
+    updateWallets();
+    const interval = setInterval(updateWallets, 5000);
+    setTimeout(() => clearInterval(interval), 120000);
+    return () => clearInterval(interval);
+  });
+
+  while (true) {
+    const { extensions, wallets } = yield take(channel);
+    yield put(blockchainActions.setExtensions.value(extensions));
+    yield put(blockchainActions.setWallets.value(wallets));
+  }
+}

@@ -6,31 +6,32 @@ import router from '../../../router';
 const navigationList = [
   {
     route: `${router.home.legislation}/Constitution`,
-    title: 'Constitution',
+    title: 'CONSTITUTION',
   },
   {
     route: `${router.home.legislation}/InternationalTreaty`,
-    title: 'International Treaties',
+    title: 'INTERNATIONAL TREATIES',
+    mobileTitle: 'INT. TREATIES',
   },
   {
     route: `${router.home.legislation}/Law`,
-    title: 'Law',
+    title: 'LAW',
   },
   {
     route: `${router.home.legislation}/Tier3`,
-    title: 'Tier 3',
+    title: 'TIER 3',
   },
   {
     route: `${router.home.legislation}/Tier4`,
-    title: 'Tier 4',
+    title: 'TIER 4',
   },
   {
     route: `${router.home.legislation}/Tier5`,
-    title: 'Tier 5',
+    title: 'TIER 5',
   },
   {
     route: `${router.home.legislation}/Decision`,
-    title: 'Decisions',
+    title: 'DECISIONS',
   },
 ];
 

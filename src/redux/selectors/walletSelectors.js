@@ -12,6 +12,8 @@ const selectorGettingWalletInfo = createSelector(
   walletReducer,
   (reducer) => reducer.gettingWalletInfo,
 );
+
+// FIXME delete or make functional
 const selectorWalletAddress = createSelector(
   selectorWalletInfo,
   (reducer) => reducer.address,
@@ -25,6 +27,11 @@ const selectorBalances = createSelector(
 const selectorLiquidMeritsBalance = createSelector(
   selectorBalances,
   (reducer) => (reducer.liquidMerits.amount),
+);
+
+const selectorLiquidDollarsBalance = createSelector(
+  selectorBalances,
+  (reducer) => (reducer.liquidAmount.amount),
 );
 
 const selectorTotalBalance = createSelector(
@@ -58,14 +65,13 @@ const selectorCurrentPageNumber = createSelector(
 
 const selectorTxHistoryFailed = createSelector(
   walletReducer,
-  (reducer) => (reducer.transfersTxHistory.LLMFailed || reducer.transfersTxHistory.LLDFailed),
+  (reducer) => (reducer.transfersTxHistoryFailed),
 );
 
 const selectorAllHistoryTx = createSelector(
   walletReducer,
   (reducer) => [
-    ...reducer.transfersTxHistory.LLM,
-    ...reducer.transfersTxHistory.LLD,
+    ...reducer.transfersTxHistory.transfersTxHistory,
   ],
 );
 
@@ -79,10 +85,16 @@ const selectorNominatorTargets = createSelector(
   (reducer) => reducer.nominatorTargets,
 );
 
+const selectorAdditionalAssets = createSelector(
+  walletReducer,
+  (reducer) => reducer.additionalAssets,
+);
+
 export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
   selectorLiquidMeritsBalance,
+  selectorLiquidDollarsBalance,
   selectorBalances,
   selectorTotalBalance,
   selectorTotalLLM,
@@ -94,4 +106,5 @@ export {
   selectorValidators,
   selectorNominatorTargets,
   selectorTxHistoryFailed,
+  selectorAdditionalAssets,
 };

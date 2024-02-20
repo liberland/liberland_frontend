@@ -17,22 +17,23 @@ function SelectInput({
     <div className={styles.inputWrapper}>
       {Icon && <Icon className={styles.inputIcon} />}
       <select
-        className={cx(styles.input, { [styles.withIcon]: Icon && withIcon })}
+        className={cx(styles.input, { [styles.withIcon]: Icon && withIcon }, styles.select)}
         name={name}
         width={width}
         disabled={disabled}
         {...register(name)}
       >
         {options.map(
-          (option) => 
-            <option 
+          (option) => (
+            <option
               key={option.value}
               value={option.value}
               selected={option.selected}
             >
               {option.display}
             </option>
-          )}
+          ),
+        )}
       </select>
     </div>
   );

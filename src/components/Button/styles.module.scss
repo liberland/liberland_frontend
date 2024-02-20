@@ -1,12 +1,13 @@
 @import '../../assets/base/variables';
 @import '../../assets/base/fonts';
+@import '../../assets/main.scss';
 
 .button {
   background: $bg3;
-  border-radius: 15px;
+  border-radius: 6px;
   min-height: 58px;
   border: none;
-  font-family: $medium;
+  
   font-size: 16px;
   display: flex;
   align-items: center;
@@ -42,22 +43,31 @@
   cursor: pointer;
   &.primary {
     background: $primary;
-    color: white;
+    color: $clearBlack;
   }
   &.secondary {
     background: $secondary3;
-    color: $primary;
+    color: $clearBlack;
   }
   &.green{
-    background: $secondary;
-    color: $primary2;
+    background: $succes;
+    color: $bg4;
   }
   &.red{
-    background: $secondary4;
-    color: $primary4;
+    background: $red;
+    color: $bg4;
   }
   &.grey{
-    background: $bg2;
-    color: $text4;
+    background: $grey;
+    color: $clearBlack;
+  }
+  &.whiteRed{
+    border: 2px solid $red;
+    color: $red;
+  }
+
+  &:disabled{
+    opacity: 20%;
+    border: 1px solid $grey;
   }
 }

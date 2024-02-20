@@ -1,16 +1,78 @@
-@import '../../../assets/base/variables';
+@import "../../../assets/base/variables";
+@import '../../../assets/main.scss';
 
 .navigationWrapper {
-  max-width: 249px;
   border-right: 1px solid $bg2;
   width: 100%;
   min-height: 100%;
   position: relative;
+  overflow: hidden;
+  transition: all 200ms ease-out;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    padding: 10px 10px;
+    font-size: 18px;
+    min-width: 237px;
+    max-width: 237px;
+  }
+  
+
+  .navigationContent {
+    padding-left: 60px;
+    transition: all 200ms ease-out;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      padding: 0;
+    }
+  }
+
+  .logoHeaderWrapper {
+    margin: 20px 10px;
+    max-width: 179px;
+    width: 100%;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      margin:10px 10px 10px 5px;
+    }
+  }
 }
 
-.logoHeaderWrapper {
-  padding: 30px 35px;
-  max-width: 179px;
+.navbarNavigationWrapper {
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 200ms ease-out;
+  background: $bg4;
+
+  .navbarNavigationIcon {
+    width: 42px;
+    margin: auto;
+    align-self: flex-end;
+    justify-self: flex-end;
+  }
+}
+
+
+.mobileNavigationWrapper {
   width: 100%;
-  flex: none;
+  height: 50px;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  z-index: 99999999;
+  box-shadow: 0px 15px 10px -15px $grey; 
+}
+
+.mobileNavigationSpacer {
+  height: 50px;
+}
+
+.mobileNavigationWrapperOpen {
+  height:100%;
+  background: #F4F8FF;
+  .navigationContent {
+    padding: 0;
+  }
 }
