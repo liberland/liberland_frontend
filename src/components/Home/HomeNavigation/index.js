@@ -34,8 +34,9 @@ import {
 
 // UTILS
 import { formatMerits } from '../../../utils/walletHelpers';
-import { authActions, walletActions } from '../../../redux/actions';
+import { authActions, walletActions, blockchainActions } from '../../../redux/actions';
 import LogoutModal from '../../Modals/LogoutModal';
+import Button from '../../Button/Button';
 
 function HomeNavigation() {
   const { logOut } = useContext(AuthContext);
@@ -145,7 +146,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: false,
+      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.congress,
@@ -195,7 +196,22 @@ function HomeNavigation() {
             path="logout"
           />
         </div>
-        <ChangeWallet isMedium={isMedium} />
+        {
+          !isWalletAdressSame
+          && (
+            <div className={styles.buttonSwtichWalletWrapper}>
+              <Button
+                className={styles.buttonSwtichWallet}
+                secondary
+                onClick={() => dispatch(blockchainActions.setUserWallet.success(walletAddress))}
+              >
+                Switch to registered wallet
+              </Button>
+            </div>
+          )
+        }
+
+        <ChangeWallet />
         {roles['e-resident'] === 'e-resident' ? <GetCitizenshipCard /> : ''}
         {isLogoutModalOpen && (
           <LogoutModal
@@ -261,7 +277,24 @@ function HomeNavigation() {
                       </RoleHOC>
                     </div>
                   ) : null}
-                {index === 0 && <ChangeWallet isMedium={isMedium} />}
+                {index === 0
+                  && (
+                  <>
+                    <ChangeWallet setIsMenuOpen={setIsMenuOpen} />
+                    { !isWalletAdressSame && (
+                    <div className={styles.buttonSwtichWalletWrapper}>
+                      <Button
+                        className={styles.buttonSwtichWallet}
+                        secondary
+                        onClick={() => dispatch(blockchainActions.setUserWallet.success(walletAddress))}
+                      >
+                        Switch to registered wallet
+                      </Button>
+
+                    </div>
+                    )}
+                  </>
+                  )}
               </>
             ),
           )}

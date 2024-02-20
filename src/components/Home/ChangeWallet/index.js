@@ -9,11 +9,12 @@ import { blockchainSelectors } from '../../../redux/selectors';
 import truncate from '../../../utils/truncate';
 import styles from './styles.module.scss';
 
-function ChangeWallet({ isMedium }) {
+function ChangeWallet({ setIsMenuOpen }) {
   const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const walletAdressSelector = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
+
   const history = useHistory();
   const dispatch = useDispatch();
   const onWalletAdresssChange = (address) => {
@@ -26,17 +27,25 @@ function ChangeWallet({ isMedium }) {
     }
     localStorage.setItem('BlockchainAdress', address);
   };
+
+  const onChangeSelect = (e) => {
+    onWalletAdresssChange(e.target.value);
+    if (setIsMenuOpen) {
+      setIsMenuOpen((prevValue) => !prevValue);
+    }
+  };
+
   if (!wallets || wallets.length < 2) return null;
   return (
     <div className={styles.selectWrapper}>
       <select
-        defaultValue={walletAdressSelector}
+        value={walletAdressSelector}
         className={styles.select}
-        onChange={(e) => onWalletAdresssChange(e.target.value)}
+        onChange={onChangeSelect}
       >
         {wallets.map((wallet) => (
           <option key={wallet.address} value={wallet.address}>
-            {truncate(wallet.address, isMedium ? 24 : 16)}
+            {truncate(wallet.address, 24)}
           </option>
         ))}
       </select>
@@ -44,8 +53,12 @@ function ChangeWallet({ isMedium }) {
   );
 }
 
+ChangeWallet.defaultProps = {
+  setIsMenuOpen: null,
+};
+
 ChangeWallet.propTypes = {
-  isMedium: PropTypes.bool.isRequired,
+  setIsMenuOpen: PropTypes.func,
 };
 
 export default ChangeWallet;

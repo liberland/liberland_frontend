@@ -34,7 +34,8 @@
     background: $lightGrey;
   }
 
-  & a {
+  & a, 
+  & .link{
     padding: 11px 13px;
     align-items: center;
     display: flex;
