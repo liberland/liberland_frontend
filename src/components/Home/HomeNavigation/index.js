@@ -272,7 +272,7 @@ function HomeNavigation() {
                           icon={icon}
                           path={location.pathname}
                           description={description}
-                          isDiscouraged={isDiscouraged}
+                          isDiscouraged={isDiscouraged === 'true'}
                         />
                       </RoleHOC>
                     </div>
@@ -305,7 +305,7 @@ function HomeNavigation() {
             }}
           >
             <NavigationLink
-              route={router.home.feed}
+              route="logout"
               title="Logout"
               icon={DocumentsIcon}
               path="logout"

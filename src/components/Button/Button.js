@@ -20,9 +20,11 @@ function Button({
   grey,
   red,
   whiteRed,
+  disabled,
 }) {
   return (
     <button
+      disabled={disabled}
       onClick={onClick}
       type={type}
       className={
@@ -61,6 +63,7 @@ Button.defaultProps = {
   grey: false,
   red: false,
   whiteRed: false,
+  disabled: false,
 };
 
 Button.propTypes = {
@@ -79,6 +82,7 @@ Button.propTypes = {
   grey: PropTypes.bool,
   red: PropTypes.bool,
   whiteRed: PropTypes.bool,
+  disabled: PropTypes.bool,
 };
 
 export default Button;

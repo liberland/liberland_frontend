@@ -29,7 +29,6 @@ function App() {
   }, [dispatch]);
 
   const user = useSelector(userSelectors.selectUser);
-
   const loggedOutRoutes = (
     <Switch>
       <Route path={routes.signIn} component={SignIn} />
@@ -44,7 +43,6 @@ function App() {
       <Route path="*" render={() => <Redirect to={routes.home.index} />} />
     </Switch>
   );
-
   const appRouter = user ? loggedInRoutes : loggedOutRoutes;
   return (
     <Router>

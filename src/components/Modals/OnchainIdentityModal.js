@@ -83,27 +83,27 @@ function OnchainIdentityModal({
           </div>
         )}
 
-      <div className={cx(styles.title, styles.margin)}>Display name</div>
+      <div className={cx(styles.title, styles.margin)}>Display name (mandatory)</div>
       <TextInput
         register={register}
         name="display"
         placeholder="Display name"
       />
 
-      <div className={styles.title}>Legal name</div>
+      <div className={styles.title}>Legal name (optional)</div>
       <TextInput
         register={register}
         name="legal"
         placeholder="Legal name"
       />
-      <div className={styles.title}>Web address</div>
+      <div className={styles.title}>Web address (optional)</div>
       <TextInput
         register={register}
         name="web"
         placeholder="Web address"
       />
       <div className={styles.error}>{errors?.web?.message || errors?.web?.message}</div>
-      <div className={styles.title}>Email</div>
+      <div className={styles.title}>Email (recommended, optional)</div>
       <TextInput
         register={register}
         name="email"
