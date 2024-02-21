@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { formatDollars } from '../../../../utils/walletHelpers';
 import { blockchainSelectors, validatorSelectors } from '../../../../redux/selectors';
+import { eraToDays } from '../../../../utils/staking';
 
 function UnbondingRow({ value, era }) {
   const activeEra = useSelector(blockchainSelectors.activeEra);
@@ -14,7 +15,7 @@ function UnbondingRow({ value, era }) {
       {' '}
       LLD
       {' '}
-      {ready ? 'ready to withdraw' : `will unlock on Era ${era.toString()}`}
+      {ready ? 'ready to withdraw' : `will unlock on ${eraToDays(era)} Days`}
     </li>
   );
 }
