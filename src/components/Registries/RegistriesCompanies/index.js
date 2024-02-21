@@ -47,19 +47,14 @@ function RegistriesCompanies() {
   const handleGenerateButton = async (companyId) => {
     const pathName = 'certificate';
     const blob = await generatePdf(userWalletAddress, companyId, pathName);
-    // const blob = new Blob([pdfContent], { type: 'application/pdf' });
-    // if (!blob ) {
-    //   throw new Error('Failed to generate PDF');
-    // }
-    const href = URL.createObjectURL(blob);
 
+    const href = URL.createObjectURL(blob);
     const file = `${pathName}.pdf`;
     const link = document.createElement('a');
     link.href = href;
     link.setAttribute('download', file);
     document.body.appendChild(link);
     link.click();
-
     document.body.removeChild(link);
     URL.revokeObjectURL(href);
   };
