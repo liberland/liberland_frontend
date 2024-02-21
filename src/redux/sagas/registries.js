@@ -13,7 +13,7 @@ import {
 import { registriesActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import { blockchainWatcher } from './base';
-import router from "../../router";
+import router from '../../router';
 
 // WORKERS
 
