@@ -34,7 +34,9 @@ import {
 
 // UTILS
 import { formatMerits } from '../../../utils/walletHelpers';
-import { authActions, walletActions, blockchainActions } from '../../../redux/actions';
+import {
+  authActions, walletActions, blockchainActions, validatorActions,
+} from '../../../redux/actions';
 import LogoutModal from '../../Modals/LogoutModal';
 import Button from '../../Button/Button';
 
@@ -72,6 +74,15 @@ function HomeNavigation() {
       document.body.style.overflow = 'unset';
     };
   }, []);
+
+  const switchToRegisteredWallet = (isMobile = false) => {
+    dispatch(blockchainActions.setUserWallet.success(walletAddress));
+    dispatch(validatorActions.getInfo.call());
+
+    if (isMobile) {
+      setIsMenuOpen(false);
+    }
+  };
 
   const navigationList = [
     {
@@ -203,7 +214,7 @@ function HomeNavigation() {
               <Button
                 className={styles.buttonSwtichWallet}
                 secondary
-                onClick={() => dispatch(blockchainActions.setUserWallet.success(walletAddress))}
+                onClick={() => switchToRegisteredWallet(true)}
               >
                 Switch to registered wallet
               </Button>
@@ -286,7 +297,7 @@ function HomeNavigation() {
                       <Button
                         className={styles.buttonSwtichWallet}
                         secondary
-                        onClick={() => dispatch(blockchainActions.setUserWallet.success(walletAddress))}
+                        onClick={() => switchToRegisteredWallet(true)}
                       >
                         Switch to registered wallet
                       </Button>
