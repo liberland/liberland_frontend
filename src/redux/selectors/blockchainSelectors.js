@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import * as userSelectors from './userSelectors';
 
 export const blockchainReducer = (state) => state.blockchain;
 
@@ -11,7 +10,16 @@ const allWalletsSelector = createSelector(
   blockchainReducer,
   (reducer) => reducer.allWallets,
 );
-const userWalletAddressSelector = userSelectors.selectWalletAddress;
+const userWalletAddressSelector = createSelector(
+  blockchainReducer,
+  (reducer) => reducer.userWalletAddress,
+);
+const isUserWalletAddressSameAsUserAdress = createSelector(
+  (state) => state,
+  (reducer) => reducer.user.user.blockchainAddress
+      === reducer.blockchain.userWalletAddress,
+
+);
 
 const errorExistsAndUnacknowledgedByUser = createSelector(
   blockchainReducer,
@@ -49,4 +57,5 @@ export {
   activeEra,
   preimages,
   blockTimestamp,
+  isUserWalletAddressSameAsUserAdress,
 };

@@ -29,7 +29,6 @@ function Wallet() {
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const dispatch = useDispatch();
   const history = useHistory();
-
   const redirectToViewAllTx = () => {
     history.push(router.wallet.allTransactions);
   };
@@ -38,7 +37,7 @@ function Wallet() {
     dispatch(walletActions.getWallet.call());
     dispatch(walletActions.getAdditionalAssets.call());
     dispatch(walletActions.getTxTransfers.call());
-  }, [dispatch]);
+  }, [dispatch, userWalletAddress]);
 
   const overView = () => (
     <div className={stylesPage.contentWrapper}>
