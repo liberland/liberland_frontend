@@ -71,6 +71,7 @@ export default function* rootSaga() {
     officesSagas.setRegisteredCompanyDataWatcher(),
 
     // REGISTRIES
+    registriesSagas.getOfficialRegistryEntriesWatcher(),
     registriesSagas.getOfficialUserRegistryEntriesWatcher(),
     registriesSagas.requestCompanyRegistrationWatcher(),
     registriesSagas.requestEditCompanyRegistrationWatcher(),

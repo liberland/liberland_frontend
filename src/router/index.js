@@ -19,7 +19,7 @@ export default {
     identity: '/home/offices/identity',
     companyRegistry: {
       home: '/home/offices/company_registry',
-      edit: '/home/offices/company_registry/edit/:companyId'
+      edit: '/home/offices/company_registry/edit/:companyId',
     },
     landRegistry: '/home/offices/land_registry',
     finances: '/home/offices/finances',
@@ -53,6 +53,7 @@ export default {
       create: '/home/registries/companies/create',
       edit: '/home/registries/companies/edit/:companyId',
     },
+    allCompanies: '/home/registries/allCompanies',
     land: '/home/registries/land',
     assets: '/home/registries/assets',
     other: '/home/registries/other',
@@ -65,6 +66,7 @@ export default {
     motions: '/home/congress/motions',
     treasury: '/home/congress/treasury',
     addLegislation: '/home/congress/add-legislation',
-    addLegislationViaReferendum: '/home/congress/add-legislation-via-referendum',
+    addLegislationViaReferendum:
+      '/home/congress/add-legislation-via-referendum',
   },
 };
