@@ -8,14 +8,28 @@ import {
   requestCompanyRegistration,
   requestEditCompanyRegistration,
   requestUnregisterCompanyRegistration,
+  getOfficialRegistryEntries,
 } from '../../api/nodeRpcCall';
 
 import { registriesActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import { blockchainWatcher } from './base';
-import router from "../../router";
+import router from '../../router';
 
 // WORKERS
+
+function* getOfficialRegistryEntriesWorker() {
+  try {
+    const officialRegistryEntries = yield call(getOfficialRegistryEntries);
+    yield put(registriesActions.getOfficialRegistryEntries.success({
+      officialRegistryEntries,
+    }));
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    yield put(registriesActions.getOfficialRegistryEntries.failure(e));
+  }
+}
 
 function* getOfficialUserRegistryEntriesWorker(action) {
   try {
@@ -79,6 +93,14 @@ function* requestUnregisterCompanyRegistrationWorker(action) {
 }
 
 // WATCHERS
+
+export function* getOfficialRegistryEntriesWatcher() {
+  try {
+    yield takeLatest(registriesActions.getOfficialRegistryEntries.call, getOfficialRegistryEntriesWorker);
+  } catch (e) {
+    yield put(registriesActions.getOfficialRegistryEntries.failure(e));
+  }
+}
 
 export function* getOfficialUserRegistryEntriesWatcher() {
   try {

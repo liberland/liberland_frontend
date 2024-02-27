@@ -964,6 +964,34 @@ const getLegislation = async (tier) => {
   return legislationById;
 };
 
+const getOfficialRegistryEntries = async () => {
+  const api = await getApi();
+  const allEntites = await api.query.companyRegistry.registries.entries(0);
+  const registeredCompanies = [];
+  allEntites.forEach((companyRegistry) => {
+    const [key, companyValue] = companyRegistry;
+    const entityId = key.toHuman();
+    let companyData;
+    try {
+      if (companyValue.isNone) companyData = { unregister: true };
+      else {
+        const compressed = companyValue?.isSome
+          ? companyValue.unwrap().data : companyValue.data;
+        companyData = api.createType('CompanyData', pako.inflate(compressed));
+      }
+
+      const formObject = blockchainDataToFormObject(companyData);
+
+      const dataObject = { ...formObject, id: entityId[1] };
+      registeredCompanies.push(dataObject);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  });
+  return registeredCompanies;
+};
+
 const getOfficialUserRegistryEntries = async (walletAddress) => {
   const api = await getApi();
   const ownerEntites = await api.query.companyRegistry.ownerEntities.entries(walletAddress);
@@ -1996,4 +2024,5 @@ export {
   requestUnregisterCompanyRegistration,
   fetchPendingIdentities,
   getIdentitiesNames,
+  getOfficialRegistryEntries,
 };

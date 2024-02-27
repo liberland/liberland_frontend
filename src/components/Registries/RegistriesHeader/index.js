@@ -10,6 +10,10 @@ const navigationList = [
   },
   {
     route: `${router.registries.companies.overview}`,
+    title: 'My Companies',
+  },
+  {
+    route: `${router.registries.allCompanies}`,
     title: 'Companies',
   },
   {
