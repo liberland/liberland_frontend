@@ -93,7 +93,7 @@ const historyTransferQuery = `
         blockId
         blockNumber
         extrinsicIndex
-        stakingActionText
+        method
         block {
           id
           number
@@ -141,6 +141,21 @@ export const getSubstrateOutgoingReceipts = async (substrate_address) => {
 
   return receipts.reduce((o, r) => ({ ...o, [r.receipt_id]: r }), {});
 };
+
+function getStakingActionText(method) {
+  switch (method) {
+    case 'Rewarded':
+      return 'staking reward';
+    case 'Withdrawn':
+      return 'staking payout';
+    case 'Bonded':
+      return 'staking payment';
+    case 'Slashed':
+      return 'staking slash';
+    default:
+      return 'staking action';
+  }
+}
 
 const getFilterVariable = (substrate_address) => ({
   or: [
@@ -197,7 +212,7 @@ export const getHistoryTransfers = async (substrate_address) => {
     }) : [];
   const llm = transfersLLM ? transfersLLM.map((n) => ({ asset: 'LLM', ...n })) : [];
   const lld = transfersLLD ? transfersLLD.map((n) => ({ asset: 'LLD', ...n })) : [];
-  const stakings = stakingsData.map((n) => ({ asset: 'LLD', ...n }));
+  const stakings = stakingsData.map((n) => ({ asset: 'LLD', stakingActionText: getStakingActionText(n.method), ...n }));
   const transfers = [...assets, ...llm, ...lld, ...stakings];
 
   transfers.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
