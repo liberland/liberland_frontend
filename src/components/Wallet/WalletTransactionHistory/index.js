@@ -58,12 +58,17 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
               const value = transactionHistoryInfo.fromId === walletAddress
                 ? `-${transactionHistoryInfo.value}`
                 : transactionHistoryInfo.value;
-              const isAmountPositive = new BN(value).gt(BN_ZERO);
+              const isStakingTransaction = 'userId' in transactionHistoryInfo;
+              const isAmountPositive = isStakingTransaction ? transactionHistoryInfo?.isPositive
+                : new BN(value).gt(BN_ZERO);
               const imgAlt = isAmountPositive ? 'reviceIcon' : 'paymentIcon';
-
               const dateTransacionHistory = formatDate(new Date(transactionHistoryInfo.block.timestamp), true);
-              const userId = isAmountPositive ? transactionHistoryInfo.fromId : transactionHistoryInfo.toId;
-              const typeText = isAmountPositive ? 'from' : 'to';
+
+              const fromToId = isAmountPositive ? transactionHistoryInfo.fromId : transactionHistoryInfo.toId;
+              const userId = isStakingTransaction ? transactionHistoryInfo.userId : fromToId;
+
+              const typeTextFromToId = isAmountPositive ? 'from' : 'to';
+              const typeText = isStakingTransaction ? transactionHistoryInfo.stakingActionText : typeTextFromToId;
               const iconType = isAmountPositive ? reciveIcon : paymentIcon;
               const configFormat = {
                 isSymbolFirst: true,
