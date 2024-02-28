@@ -141,7 +141,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: ConstitutionIcon,
       isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: false,
+      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.registries,
