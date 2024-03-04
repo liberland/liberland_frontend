@@ -1924,37 +1924,35 @@ const fetchPendingIdentities = async () => {
   return processed.filter((entity) => entity.data.judgements.length === 0);
 };
 
-const getSignaturesForGivenId = async (allSignatures, id) => allSignatures.find(
+const getSignaturesForGivenId = (allSignatures, id) => allSignatures.find(
   ([contractId]) => contractId.args[0].eq(id),
 )[1].unwrapOrDefault();
 
 const getAllContracts = async () => {
   const api = await getApi();
 
-  const [rawJudgesSignatures, rawPartiesSignatures] = await Promise.all([
+  const [rawJudgesSignatures, rawPartiesSignatures, rawContracts] = await Promise.all([
     api.query.contractsRegistry.judgesSignatures.entries(),
     api.query.contractsRegistry.partiesSignatures.entries(),
+    api.query.contractsRegistry.contracts.entries(),
   ]);
 
-  const rawContracts = await api.query.contractsRegistry.contracts.entries();
-  return Promise.all(rawContracts.map(async ([id, contract]) => {
+  return rawContracts.map(([id, maybeContract]) => {
     const contractId = id.args[0];
-    const [judgesSignatures, partiesSignatures] = await Promise.all([
-      getSignaturesForGivenId(rawJudgesSignatures, contractId),
-      getSignaturesForGivenId(rawPartiesSignatures, contractId),
-    ]);
+    const judgesSignatures = getSignaturesForGivenId(rawJudgesSignatures, contractId);
+    const partiesSignatures = getSignaturesForGivenId(rawPartiesSignatures, contractId);
 
-    const shouldBeData = contract.unwrapOr(null);
+    const contract = maybeContract.unwrapOr(null);
     return {
       contractId,
-      data: shouldBeData ? shouldBeData.data : null,
-      parties: shouldBeData ? shouldBeData.parties : null,
-      creator: shouldBeData ? shouldBeData.creator : null,
-      deposit: shouldBeData ? shouldBeData.deposit : null,
+      data: contract?.data,
+      parties: contract?.parties,
+      creator: contract?.creator,
+      deposit: contract?.deposit,
       judgesSignatures,
       partiesSignatures,
     };
-  }));
+  });
 };
 
 const signContractAsParty = async (contractId, walletAddress) => {
@@ -1978,7 +1976,7 @@ const removeContract = async (contractId, walletAddress) => {
 const getAllJudges = async () => {
   const api = await getApi();
   const rawJudges = await api.query.contractsRegistry.judges.entries();
-  return rawJudges.map(([address, isJudge]) => isJudge.isTrue && address.args[0]).filter((address) => address);
+  return rawJudges.filter(([, isJudge]) => isJudge.isTrue).map(([address]) => address.args[0]);
 };
 
 export {
