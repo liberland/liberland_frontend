@@ -84,6 +84,22 @@ const historyTransferQuery = `
   }
 `;
 
+const identitiesDataQuery = `
+query GetIdentities($name: String!) {
+  identities(first: 10, filter: { 
+    or: [{ name: { includesInsensitive: $name } }, 
+      { id: { includesInsensitive: $name } }
+    ] 
+  }) 
+  {
+    nodes {
+      id
+      name
+      isConfirmed
+    }
+  }
+}`;
+
 const getApi = () => axios.create({
   baseURL: process.env.REACT_APP_EXPLORER,
 });
@@ -173,4 +189,16 @@ export const getHistoryTransfers = async (substrate_address) => {
   transfers.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
 
   return transfers;
+};
+
+export const getUsersIdentityData = async (filterValue) => {
+  const api = getApi();
+  const result = await api.post('/graphql', {
+    query: identitiesDataQuery,
+    variables: {
+      name: filterValue,
+    },
+  });
+  const data = result?.data?.data?.identities.nodes;
+  return data || null;
 };

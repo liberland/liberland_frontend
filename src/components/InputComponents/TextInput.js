@@ -18,6 +18,7 @@ function TextInput({
   value,
   disabled = false,
   onPaste,
+  onChange,
 }) {
   return (
     <div className={styles.inputWrapper}>
@@ -30,11 +31,15 @@ function TextInput({
         value={value}
         disabled={disabled}
         onPaste={onPaste}
-        {...register(name, {
-          validate,
-          pattern,
-          required: required && `${errorTitle} is required`,
-        })}
+        {...register(
+          name,
+          {
+            validate,
+            pattern,
+            required: required && `${errorTitle} is required`,
+            onChange,
+          },
+        )}
       />
       <div />
     </div>

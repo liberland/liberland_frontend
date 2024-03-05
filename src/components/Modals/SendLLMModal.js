@@ -9,6 +9,7 @@ import { BN_ZERO } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
+import InputSearch from '../InputComponents/InputSearchAddressName';
 
 // STYLES
 import styles from './styles.module.scss';
@@ -28,6 +29,7 @@ function SendLLMModal({
     handleSubmit,
     formState: { errors },
     register,
+    setValue,
   } = useForm({ mode: 'all' });
 
   const transfer = (values) => {
@@ -56,12 +58,17 @@ function SendLLMModal({
       </div>
 
       <div className={styles.title}>Send to address</div>
-      <TextInput
+      <InputSearch
+        errorTitle="Recipient"
         register={register}
         name="recipient"
         placeholder="Send to address"
-        required
-        validate={(v) => (isValidSubstrateAddress(v) || 'Invalid Address')}
+        isRequired
+        setValue={setValue}
+        validate={(v) => {
+          if (!isValidSubstrateAddress(v)) return 'Invalid Address';
+          return true;
+        }}
       />
       {errors?.recipient?.message
         && <div className={styles.error}>{errors.recipient.message}</div>}
