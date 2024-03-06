@@ -1,25 +1,41 @@
 @import '../../../assets/base/variables';
-.referendumsSection {
-  margin-bottom: 1.5rem;
-  margin-top: 1.5rem;
-}
-.referendumsCard {
-  padding: 0.5rem;
-}
-
-.proposeReferendumLine {
-    height: 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    margin-top: 40px;
-    margin-bottom: 10px;
-}
+@import '../../../index.scss';
+@import '../../../assets/main.scss';
 
 .proposeReferendumLine * {
   margin-left: 10px;
 }
 
-.linkButton {
-  text-decoration: none;
+.wrapper{
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    gap: 40px;
+  }
+}
+
+.title{
+  font-weight: 400;
+  font-family: $playfairDisplay;
+  font-size: 24px;
+  margin: 0 0 30px;
+  padding: 0 15px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    padding: 0;
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+}
+
+.overViewCard{
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    gap: 30px;
+  }
 }

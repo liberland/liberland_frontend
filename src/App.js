@@ -13,7 +13,7 @@ import routes from './router';
 
 // COMPONENTS
 import SignIn from './components/AuthComponents/SignIn';
-import SignUp from './components/AuthComponents/SingUp';
+import SignUp from './components/AuthComponents/SignUp';
 import Home from './components/Home';
 import Loader from './components/Loader';
 
@@ -43,7 +43,6 @@ function App() {
       <Route path="*" render={() => <Redirect to={routes.home.index} />} />
     </Switch>
   );
-
   const appRouter = user ? loggedInRoutes : loggedOutRoutes;
   return (
     <Router>

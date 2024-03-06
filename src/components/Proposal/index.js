@@ -2,12 +2,13 @@ import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import cx from 'classnames';
 import router from '../../router';
 import { blockchainActions } from '../../redux/actions';
 import { blockchainSelectors } from '../../redux/selectors';
 import { decodeCall } from '../../api/nodeRpcCall';
 import styles from './styles.module.scss';
-
+import stylesAnim from '../Voting/Referendum/Items/item.module.scss';
 /* eslint-disable react/forbid-prop-types */
 const ProposalProp = PropTypes.object;
 
@@ -40,14 +41,14 @@ function RepealLegislationSection({ proposal }) {
 }
 RepealLegislationSection.propTypes = { proposal: ProposalProp.isRequired };
 
-function AddLegislation({ proposal }) {
+function AddLegislation({ proposal, isDetailsHidden }) {
   const { args: [tier, { year, index }, sections] } = proposal;
   return (
-    <div>
+    <div className={styles.text}>
       <p>
         Add new legislation
         {' '}
-        <Link to={`${router.home.legislation}/${tier.toString()}`}>
+        <Link to={`${router.home.legislation}/${tier.toString()}`} className={styles.blue}>
           {tier.toString()}
         </Link>
         {' '}
@@ -56,22 +57,33 @@ function AddLegislation({ proposal }) {
         {year.toNumber()}
         /
         {index.toNumber()}
-        .
+        {!isDetailsHidden ? '.' : '...'}
       </p>
-      {sections.map((section, idx) => (
+      <div className={cx(stylesAnim.anim, !isDetailsHidden ? stylesAnim.shown : stylesAnim.hidden)}>
+        {sections.map((section, idx) => (
         // eslint-disable-next-line react/no-array-index-key
-        <Fragment key={idx}>
-          <p>
-            Section #
-            {idx}
-          </p>
-          <p className={styles.legislationContent}>{section.toHuman()}</p>
-        </Fragment>
-      ))}
+          <Fragment key={idx}>
+            <p>
+              Section #
+              {idx}
+            </p>
+            <p className={styles.legislationContent}>{new TextDecoder('utf-8').decode(section)}</p>
+          </Fragment>
+        ))}
+      </div>
+
     </div>
   );
 }
-AddLegislation.propTypes = { proposal: ProposalProp.isRequired };
+
+AddLegislation.defaultProps = {
+  isDetailsHidden: false,
+};
+
+AddLegislation.propTypes = {
+  proposal: ProposalProp.isRequired,
+  isDetailsHidden: PropTypes.bool,
+};
 
 function AmendLegislation({ proposal }) {
   const { args: [tier, { year, index }, section, newContent] } = proposal;
@@ -121,7 +133,7 @@ function RepealLegislation({ proposal }) {
 }
 RepealLegislation.propTypes = { proposal: ProposalProp.isRequired };
 
-export function Preimage({ hash, len }) {
+export function Preimage({ hash, len, isDetailsHidden }) {
   const dispatch = useDispatch();
   const [call, setCall] = useState(null);
   const preimages = useSelector(blockchainSelectors.preimages);
@@ -155,11 +167,13 @@ export function Preimage({ hash, len }) {
   }
   if (call === null) return <div>Loading details...</div>;
 
-  return <Proposal proposal={call} />;
+  return <Proposal proposal={call} isDetailsHidden={isDetailsHidden} />;
 }
+
 Preimage.propTypes = {
   hash: PropTypes.object.isRequired,
   len: PropTypes.object.isRequired,
+  isDetailsHidden: PropTypes.bool.isRequired,
 };
 
 function FastTrackedReferendum({ proposal, fastTrack }) {
@@ -240,7 +254,7 @@ function Blacklist({ proposal }) {
 }
 Blacklist.propTypes = { proposal: ProposalProp.isRequired };
 
-export function Proposal({ proposal }) {
+export function Proposal({ proposal, isDetailsHidden }) {
   if (proposal.method === 'repealLegislation') {
     return <RepealLegislation {...{ proposal }} />;
   } if (proposal.method === 'repealLegislationSection') {
@@ -248,7 +262,7 @@ export function Proposal({ proposal }) {
   } if (proposal.method === 'amendLegislation') {
     return <AmendLegislation {...{ proposal }} />;
   } if (proposal.method === 'addLegislation') {
-    return <AddLegislation {...{ proposal }} />;
+    return <AddLegislation {...{ proposal }} isDetailsHidden={isDetailsHidden} />;
   } if (proposal.method === 'batchAll') {
     return <BatchAll {...{ proposal }} />;
   } if (proposal.method === 'externalProposeMajority') {
@@ -259,4 +273,7 @@ export function Proposal({ proposal }) {
 
   return <Raw {...{ proposal }} />;
 }
-Proposal.propTypes = { proposal: ProposalProp.isRequired };
+Proposal.propTypes = {
+  proposal: ProposalProp.isRequired,
+  isDetailsHidden: PropTypes.bool.isRequired,
+};

@@ -1,11 +1,6 @@
-import {
-  put, takeLatest, call,
-} from 'redux-saga/effects';
+import { put, takeLatest, call } from 'redux-saga/effects';
 
-import {
-  getIdentity,
-  setIdentity,
-} from '../../api/nodeRpcCall';
+import { getIdentity, setIdentity } from '../../api/nodeRpcCall';
 
 import { identityActions } from '../actions';
 import { blockchainWatcher } from './base';
@@ -13,9 +8,16 @@ import { blockchainWatcher } from './base';
 // WORKERS
 
 function* setIdentityWorker(action) {
-  yield call(setIdentity, action.payload.values, action.payload.userWalletAddress);
+  yield call(
+    setIdentity,
+    action.payload.values,
+    action.payload.userWalletAddress,
+  );
   yield put(identityActions.setIdentity.success());
   yield put(identityActions.getIdentity.call(action.payload.userWalletAddress));
+  if (action.payload?.isGuidedUpdate) {
+    sessionStorage.setItem('SkippedOnBoardingGetLLD', true);
+  }
 }
 
 function* getIdentityWorker(action) {
@@ -41,7 +43,4 @@ function* getIdentityWatcher() {
   }
 }
 
-export {
-  setIdentityWatcher,
-  getIdentityWatcher,
-};
+export { setIdentityWatcher, getIdentityWatcher };

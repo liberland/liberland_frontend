@@ -6,7 +6,11 @@ import cx from 'classnames';
 
 import Button from '../Button/Button';
 import {
-  userSelectors, walletSelectors, blockchainSelectors, identitySelectors, onboardingSelectors,
+  userSelectors,
+  walletSelectors,
+  blockchainSelectors,
+  identitySelectors,
+  onboardingSelectors,
 } from '../../redux/selectors';
 import { formatDollars, formatMerits } from '../../utils/walletHelpers';
 import { ReactComponent as GlobeIcon } from '../../assets/icons/globe.svg';
@@ -18,23 +22,33 @@ import Card from '../Card';
 import UpdateProfile from './UpdateProfile';
 import { identityActions, onBoardingActions } from '../../redux/actions';
 import {
-  parseLegal, parseIdentityData, parseDOB, parseAdditionalFlag, parseCitizenshipJudgement,
+  parseLegal,
+  parseIdentityData,
+  parseDOB,
+  parseAdditionalFlag,
+  parseCitizenshipJudgement,
 } from '../../utils/identityParser';
 
 function Profile({ className }) {
   const userName = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
-  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const walletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const identity = useSelector(identitySelectors.selectorIdentity);
   const walletInfo = useSelector(walletSelectors.selectorWalletInfo);
   const balances = useSelector(walletSelectors.selectorBalances);
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
-  const liquidDollars = useSelector(walletSelectors.selectorLiquidDollarsBalance);
-  const isUserEligibleForComplimentaryLLD = useSelector(onboardingSelectors.selectorEligibleForComplimentaryLLD);
+  const liquidDollars = useSelector(
+    walletSelectors.selectorLiquidDollarsBalance,
+  );
+  const isUserEligibleForComplimentaryLLD = useSelector(
+    onboardingSelectors.selectorEligibleForComplimentaryLLD,
+  );
   // eslint-disable-next-line max-len
   const ineligibleForComplimentaryLLDReason = useSelector(onboardingSelectors.selectorIneligibleForComplimentaryLLDReason);
-
+  const isLoading = useSelector(onboardingSelectors.selectorIneligibleForComplimentaryLLDIsLoading);
   const dispatch = useDispatch();
   // eslint-disable-next-line no-unsafe-optional-chaining
   const lockBlocks = walletInfo?.balances?.electionLock - blockNumber;
@@ -43,12 +57,9 @@ function Profile({ className }) {
   const [isModalOpenOnchainIdentity, setIsModalOpenOnchainIdentity] = useState(false);
 
   useEffect(() => {
-    dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
-  }, [dispatch]);
-
-  useEffect(() => {
     dispatch(identityActions.getIdentity.call(walletAddress));
-  }, [liquidDollars]);
+    dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
+  }, [liquidDollars, dispatch]);
 
   const toggleModalOnchainIdentity = () => {
     setIsModalOpenOnchainIdentity(!isModalOpenOnchainIdentity);
@@ -103,6 +114,11 @@ function Profile({ className }) {
     },
   ];
 
+  const handleGetFreeLLD = () => {
+    if (isLoading) return;
+    dispatch(onBoardingActions.claimComplimentaryLld.call());
+  };
+
   return (
     <div className={styles.wrapper}>
       <Card className={cx(styles.profile, className)} isNotBackground>
@@ -113,7 +129,9 @@ function Profile({ className }) {
               <div className={styles.avatarComponent}>
                 <Avatar name={displayName} size="100%" round color="#F6F6F6" />
               </div>
-              <Button className={styles.button} medium>EDIT YOUR PROFILE</Button>
+              <Button className={styles.button} medium>
+                EDIT YOUR PROFILE
+              </Button>
             </div>
           </div>
         </div>
@@ -121,21 +139,23 @@ function Profile({ className }) {
           <div className={styles.wrapperBlock}>
             <div className={styles.userNameBalance}>
               <div className={styles.userNameRole}>
-                <h3 className={styles.font}>
-                  {displayName || 'Account'}
-                </h3>
+                <h3 className={styles.font}>{displayName || 'Account'}</h3>
                 <div>
-                  <img className={styles.liberlandLogo} src={liberlandEmblemImage} alt="liberlandEmblem" />
+                  <img
+                    className={styles.liberlandLogo}
+                    src={liberlandEmblemImage}
+                    alt="liberlandEmblem"
+                  />
                 </div>
               </div>
               <div className="bottom-block">
                 <div className={styles.balance}>
-                  <span>
-                    {`${formatMerits(liquidMerits)} LLM (liquid)`}
-                  </span>
+                  <span>{`${formatMerits(liquidMerits)} LLM (liquid)`}</span>
                   <div className={styles.balance}>
                     <span>
-                      {`${formatMerits(balances.liberstake.amount)} LLM (Politipooled)`}
+                      {`${formatMerits(
+                        balances.liberstake.amount,
+                      )} LLM (Politipooled)`}
                     </span>
                   </div>
                   <div className={styles.balance}>
@@ -149,18 +169,16 @@ function Profile({ className }) {
                       {walletAddress ? truncate(walletAddress, 25) : ''}
                     </span>
                   </div>
-
                 </div>
-                { lockDays <= 0 ? null
-                  : (
-                    <div>
-                      Unpooling in effect:
-                      {' '}
-                      {lockDays.toFixed(2)}
-                      {' '}
-                      days remaining.
-                    </div>
-                  )}
+                {lockDays <= 0 ? null : (
+                  <div>
+                    Unpooling in effect:
+                    {' '}
+                    {lockDays.toFixed(2)}
+                    {' '}
+                    days remaining.
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -175,31 +193,43 @@ function Profile({ className }) {
                     const { isDataToShow, title, dataFunction } = onChainIdentityElement;
                     const dataFromFunction = dataFunction();
                     const yesOrNo = dataFromFunction ? 'Yes' : 'No';
-                    const htmlElement = isDataToShow ? dataFromFunction : yesOrNo;
+                    const htmlElement = isDataToShow
+                      ? dataFromFunction
+                      : yesOrNo;
                     return (
                       <li key={title}>
-                        <span>
-                          {title}
-                        </span>
+                        <span>{title}</span>
                         {': '}
-                        {htmlElement ? <span className={styles.bold}>{htmlElement}</span> : emptyElement}
+                        {htmlElement ? (
+                          <span className={styles.bold}>{htmlElement}</span>
+                        ) : (
+                          emptyElement
+                        )}
                       </li>
                     );
                   })}
                 </ul>
               </div>
               <div className={styles.buttons}>
-                <Button className={styles.textColor} medium primary onClick={toggleModalOnchainIdentity}>
+                <Button
+                  className={styles.textColor}
+                  medium
+                  primary
+                  onClick={toggleModalOnchainIdentity}
+                >
                   Update identity
                 </Button>
                 <Button
                   className={styles.textColor}
                   medium
-                  primary={isUserEligibleForComplimentaryLLD}
-                  grey={!isUserEligibleForComplimentaryLLD}
-                  onClick={() => dispatch(onBoardingActions.claimComplimentaryLld.call())}
+                  primary={isUserEligibleForComplimentaryLLD && !isLoading}
+                  grey={!isUserEligibleForComplimentaryLLD || isLoading}
+                  onClick={handleGetFreeLLD}
+                  disabled={isLoading}
                 >
-                  {isUserEligibleForComplimentaryLLD ? 'Claim complimentary LLD' : ineligibleForComplimentaryLLDReason}
+                  {isUserEligibleForComplimentaryLLD
+                    ? 'Claim complimentary LLD'
+                    : ineligibleForComplimentaryLLDReason}
                 </Button>
               </div>
             </div>
@@ -212,7 +242,6 @@ function Profile({ className }) {
             identity={identity}
             lastName={lastName}
             userName={userName}
-            walletAddress={walletAddress}
           />
         )}
       </Card>

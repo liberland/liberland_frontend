@@ -7,6 +7,7 @@ import { BN_ZERO } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
+import { eraToDays } from '../../utils/staking';
 
 import styles from './styles.module.scss';
 import { validatorActions } from '../../redux/actions';
@@ -64,9 +65,9 @@ function UnbondModal({
         {' '}
         LLD. Note that unstaking takes
         {' '}
-        {bondingDuration.toString()}
+        {eraToDays(bondingDuration)}
         {' '}
-        eras.
+        days.
       </div>
 
       <div className={styles.title}>Amount to unstake</div>

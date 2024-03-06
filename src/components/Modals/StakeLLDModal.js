@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
+import cx from 'classnames';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -22,7 +23,7 @@ function StakeLLDModal({
   const maxBond = BN.max(
     BN_ZERO,
     (new BN(balances?.liquidAmount?.amount ?? 0))
-      .sub(parseDollars("2")), // leave at least 2 liquid LLD...
+      .sub(parseDollars('2')), // leave at least 2 liquid LLD...
   );
 
   const {
@@ -32,7 +33,7 @@ function StakeLLDModal({
   } = useForm({
     mode: 'all',
     defaultValues: {
-      bondValue: formatDollars(maxBond).replaceAll(",", ""),
+      bondValue: formatDollars(maxBond).replaceAll(',', ''),
     },
   });
 
@@ -47,7 +48,7 @@ function StakeLLDModal({
       const bondValue = parseDollars(textBondValue);
       if (bondValue.gt(maxBond)) {
         return 'Minimum of 2 LLD must remain after transaction';
-      } else if (bondValue.lte(BN_ZERO)) {
+      } if (bondValue.lte(BN_ZERO)) {
         return 'Invalid amount';
       }
       return true;
@@ -68,6 +69,11 @@ function StakeLLDModal({
       </div>
 
       <div className={styles.title}>Amount to stake</div>
+
+      <div className={cx(styles.description, styles.modalDescription)}>
+        You will be able to earn staking rewards proportional to the LLD you stake.
+        Note that unstaking takes 1 month and for the duration of staking and unstaking your LLDs will not be tradeable.
+      </div>
       <TextInput
         register={register}
         name="bondValue"

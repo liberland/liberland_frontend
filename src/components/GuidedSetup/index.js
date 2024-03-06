@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import styles from './styles.module.scss';
-import { blockchainSelectors, userSelectors, onboardingSelectors } from '../../redux/selectors';
+import {
+  blockchainSelectors,
+  userSelectors,
+  onboardingSelectors,
+  walletSelectors,
+  identitySelectors,
+} from '../../redux/selectors';
 import UnsupportedBrowserNoticeComponent from './UnSupportedBrowserNoticeComponent';
 import LoadingComponent from './LoadingComponent';
 import NoWalletsDetectedInBrowser from './NoWalletsDetectedInBrowser';
@@ -11,13 +17,14 @@ import MissingWalletComponent from './MissingWalletComponent';
 import OnBoarding from './OnBording';
 import { onBoardingActions } from '../../redux/actions';
 import InstructionOnBoard from './OnBording/InstructionOnBoard';
+import { parseIdentityData, parseLegal } from '../../utils/identityParser';
 
 const useIsUnsupportedBrowser = () => {
   const [isBrave, setIsBrave] = useState(null);
 
   useEffect(() => {
     (async () => {
-      setIsBrave(!!(navigator.brave && await navigator.brave.isBrave()));
+      setIsBrave(!!(navigator.brave && (await navigator.brave.isBrave())));
     })();
   }, [setIsBrave]);
 
@@ -27,26 +34,32 @@ const useIsUnsupportedBrowser = () => {
 function GuidedSetupWrapper({ children }) {
   return (
     <div className={styles.guidedSetupWrapper}>
-      <div className={styles.componentWrapper}>
-        {children}
-      </div>
+      <div className={styles.componentWrapper}>{children}</div>
     </div>
   );
 }
 
 function GuidedSetup({ children }) {
   const dispatch = useDispatch();
-  const [acceptedBrowser, setAcceptedBrowser] = useState(localStorage.getItem('unsupportedBrowserAcceptedByUser'));
+  const [acceptedBrowser, setAcceptedBrowser] = useState(
+    localStorage.getItem('unsupportedBrowserAcceptedByUser'),
+  );
   const isSessionReady = useSelector(userSelectors.selectIsSessionReady);
   const extensions = useSelector(blockchainSelectors.extensionsSelector);
+  const liquidDollars = useSelector(
+    walletSelectors.selectorLiquidDollarsBalance,
+  );
   const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const userWalletAddress = useSelector(userSelectors.selectWalletAddress);
   const userId = useSelector(userSelectors.selectUserId);
-  const isUserEligibleForComplimentaryLLD = useSelector(onboardingSelectors.selectorEligibleForComplimentaryLLD);
+  const isUserEligibleForComplimentaryLLD = useSelector(
+    onboardingSelectors.selectorEligibleForComplimentaryLLD,
+  );
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
-  const roles = useSelector(userSelectors.selectUserRole);
+  const isLoadingUser = useSelector(userSelectors.selectIsLoading);
 
   const isLoading = !isSessionReady
+    || isLoadingUser
     || extensions === null
     || wallets === null
     || isUnsupportedBrowser === null;
@@ -58,11 +71,25 @@ function GuidedSetup({ children }) {
 
   const isSkippedOnBoardingGetLLD = sessionStorage.getItem('SkippedOnBoardingGetLLD');
   const notResidentAcceptedByUser = sessionStorage.getItem('notResidentAcceptedByUser');
+  const [isIdentityEmpty, setIsIdentityEmpty] = useState(true);
+  const identityData = useSelector(identitySelectors.selectorIdentity);
+
+  useEffect(() => {
+    if (identityData?.isSome) {
+      const identity = identityData.unwrap();
+      const { info } = identity;
+      setIsIdentityEmpty(
+        !parseIdentityData(info?.display)
+        && !parseLegal(info)
+        && !parseIdentityData(info?.web)
+        && !parseIdentityData(info?.email),
+      );
+    }
+  }, [identityData]);
 
   useEffect(() => {
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
-  }, [dispatch]);
-
+  }, [dispatch, liquidDollars]);
   if (isLoading) {
     return (
       <GuidedSetupWrapper>
@@ -74,11 +101,12 @@ function GuidedSetup({ children }) {
   if (!acceptedBrowser && isUnsupportedBrowser) {
     return (
       <GuidedSetupWrapper>
-        <UnsupportedBrowserNoticeComponent onAccept={onUnsupportedBrowserAccept} />
+        <UnsupportedBrowserNoticeComponent
+          onAccept={onUnsupportedBrowserAccept}
+        />
       </GuidedSetupWrapper>
     );
   }
-
   if (!userId) return children;
 
   if (extensions.length === 0 || wallets.length === 0) {
@@ -118,6 +146,19 @@ function GuidedSetup({ children }) {
     return (
       <GuidedSetupWrapper>
         <MissingWalletComponent />
+      </GuidedSetupWrapper>
+    );
+  }
+
+  if (
+    (isUserEligibleForComplimentaryLLD
+      || isIdentityEmpty
+      || isSkippedOnBoardingGetLLD === 'secondStep')
+    && isSkippedOnBoardingGetLLD !== 'true'
+  ) {
+    return (
+      <GuidedSetupWrapper>
+        <OnBoarding />
       </GuidedSetupWrapper>
     );
   }

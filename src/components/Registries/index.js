@@ -1,10 +1,7 @@
 import React from 'react';
-import {
-  Switch, Route, Redirect,
-} from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import router from '../../router';
-
-import styles from './styles.module.scss';
+import stylesPage from '../../utils/pagesBase.module.scss';
 
 import RegistriesHeader from './RegistriesHeader';
 import RegistriesOverview from './RegistriesOverview';
@@ -14,14 +11,13 @@ import RegistriesAssets from './RegistriesAssets';
 import RegistriesOther from './RegistriesOther';
 import CreateCompany from './RegistriesCompanies/CreateCompany';
 import EditCompany from './RegistriesCompanies/EditCompany';
+import RegistriesAllCompanies from './RegistriesAllCompanies';
 
 function Registries() {
   return (
-    <div className={styles.registriesWrapper}>
-      <div className={styles.navWrapper}>
-        <RegistriesHeader />
-      </div>
-      <div>
+    <div>
+      <RegistriesHeader />
+      <div className={stylesPage.contentWrapper}>
         <Switch>
           <Route
             exact
@@ -31,7 +27,16 @@ function Registries() {
           <Route
             exact
             path={router.registries.companies.home}
-            render={() => <Redirect to={router.registries.companies.overview} />}
+            render={() => (
+              <Redirect to={router.registries.companies.overview} />
+            )}
+          />
+          <Route
+            exact
+            path={router.home.registries}
+            render={() => (
+              <Redirect to={router.registries.overview} />
+            )}
           />
           <Route
             exact
@@ -42,6 +47,11 @@ function Registries() {
             exact
             path={router.registries.companies.create}
             component={CreateCompany}
+          />
+          <Route
+            exact
+            path={router.registries.allCompanies}
+            component={RegistriesAllCompanies}
           />
           <Route
             exact

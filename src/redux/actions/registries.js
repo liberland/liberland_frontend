@@ -1,6 +1,7 @@
 import { createActions } from 'redux-actions';
 
 export const {
+  getOfficialRegistryEntries,
   getOfficialUserRegistryEntries,
   requestCompanyRegistrationAction,
   requestCompanyEditAction,
@@ -17,6 +18,11 @@ export const {
   cancelCompanyRequest,
   requestUnregisterCompanyRegistrationAction,
 } = createActions({
+  GET_OFFICIAL_REGISTRY_ENTRIES: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
   GET_OFFICIAL_USER_REGISTRY_ENTRIES: {
     call: undefined,
     success: undefined,

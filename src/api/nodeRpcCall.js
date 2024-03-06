@@ -103,10 +103,9 @@ const getApi = async () => {
 // eslint-disable-next-line max-len
 const crossReference = (api, blockchainData, allCentralizedData, motions, isReferendum) => blockchainData.map((item) => {
   const proposalHash = isReferendum ? item.imageHash : (
-    item.boundedCall?.Lookup?.hash_
-      ?? item.boundedCall?.Legacy?.hash_
+    item.boundedCall?.lookup?.hash
+      ?? item.boundedCall?.legacy?.hash
   );
-
   const centralizedDatas = allCentralizedData.filter((cItem) => (cItem.hash === proposalHash));
   const blacklistMotionHash = api.tx.democracy.blacklist(
     proposalHash,
@@ -619,10 +618,10 @@ const getDemocracyReferendums = async (address) => {
       api.derive.democracy.referendumsActive(),
     ]);
 
-    const proposalData = proposals.toHuman().map((proposalItem) => ({
-      index: proposalItem[0],
-      boundedCall: proposalItem[1],
-      proposer: proposalItem[2],
+    const proposalData = proposals.map((proposalItem) => ({
+      index: proposalItem[0].toNumber(),
+      boundedCall: proposalItem[1].toJSON(),
+      proposer: proposalItem[2].toString(),
     }));
 
     const deposits = await api.query.democracy.depositOf.multi(proposalData.map(({ index }) => index));
@@ -963,6 +962,34 @@ const getLegislation = async (tier) => {
   });
 
   return legislationById;
+};
+
+const getOfficialRegistryEntries = async () => {
+  const api = await getApi();
+  const allEntites = await api.query.companyRegistry.registries.entries(0);
+  const registeredCompanies = [];
+  allEntites.forEach((companyRegistry) => {
+    const [key, companyValue] = companyRegistry;
+    const entityId = key.toHuman();
+    let companyData;
+    try {
+      if (companyValue.isNone) companyData = { unregister: true };
+      else {
+        const compressed = companyValue?.isSome
+          ? companyValue.unwrap().data : companyValue.data;
+        companyData = api.createType('CompanyData', pako.inflate(compressed));
+      }
+
+      const formObject = blockchainDataToFormObject(companyData);
+
+      const dataObject = { ...formObject, id: entityId[1] };
+      registeredCompanies.push(dataObject);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  });
+  return registeredCompanies;
 };
 
 const getOfficialUserRegistryEntries = async (walletAddress) => {
@@ -1897,6 +1924,61 @@ const fetchPendingIdentities = async () => {
   return processed.filter((entity) => entity.data.judgements.length === 0);
 };
 
+const getSignaturesForGivenId = (allSignatures, id) => allSignatures.find(
+  ([contractId]) => contractId.args[0].eq(id),
+)[1].unwrapOrDefault();
+
+const getAllContracts = async () => {
+  const api = await getApi();
+
+  const [rawJudgesSignatures, rawPartiesSignatures, rawContracts] = await Promise.all([
+    api.query.contractsRegistry.judgesSignatures.entries(),
+    api.query.contractsRegistry.partiesSignatures.entries(),
+    api.query.contractsRegistry.contracts.entries(),
+  ]);
+
+  return rawContracts.map(([id, maybeContract]) => {
+    const contractId = id.args[0];
+    const judgesSignatures = getSignaturesForGivenId(rawJudgesSignatures, contractId);
+    const partiesSignatures = getSignaturesForGivenId(rawPartiesSignatures, contractId);
+
+    const contract = maybeContract.unwrapOr(null);
+    return {
+      contractId,
+      data: contract?.data,
+      parties: contract?.parties,
+      creator: contract?.creator,
+      deposit: contract?.deposit,
+      judgesSignatures,
+      partiesSignatures,
+    };
+  });
+};
+
+const signContractAsParty = async (contractId, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.contractsRegistry.partySignContract(contractId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const signContractAsJudge = async (contractId, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.contractsRegistry.partySignContract(contractId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const removeContract = async (contractId, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.contractsRegistry.removeContract(contractId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getAllJudges = async () => {
+  const api = await getApi();
+  const rawJudges = await api.query.contractsRegistry.judges.entries();
+  return rawJudges.filter(([, isJudge]) => isJudge.isTrue).map(([address]) => address.args[0]);
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1997,4 +2079,10 @@ export {
   requestUnregisterCompanyRegistration,
   fetchPendingIdentities,
   getIdentitiesNames,
+  getOfficialRegistryEntries,
+  getAllContracts,
+  signContractAsParty,
+  signContractAsJudge,
+  removeContract,
+  getAllJudges,
 };

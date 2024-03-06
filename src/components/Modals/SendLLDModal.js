@@ -9,6 +9,7 @@ import { BN_ZERO, BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
+import InputSearch from '../InputComponents/InputSearchAddressName';
 
 // STYLES
 import styles from './styles.module.scss';
@@ -22,33 +23,36 @@ function SendLLDModal({ closeModal }) {
   const balances = useSelector(walletSelectors.selectorBalances);
   const maxUnbond = BN.max(
     BN_ZERO,
-    (new BN(balances?.liquidAmount?.amount ?? 0))
-      .sub(parseDollars('2')), // leave at least 2 liquid LLD...
+    new BN(balances?.liquidAmount?.amount ?? 0).sub(parseDollars('2')), // leave at least 2 liquid LLD...
   );
 
   const {
     handleSubmit,
     formState: { errors },
     register,
+    setValue,
   } = useForm({
     mode: 'all',
   });
 
   const transfer = (values) => {
-    dispatch(walletActions.sendTransfer.call({
-      recipient: values.recipient,
-      amount: parseDollars(values.amount),
-    }));
+    dispatch(
+      walletActions.sendTransfer.call({
+        recipient: values.recipient,
+        amount: parseDollars(values.amount),
+      }),
+    );
     closeModal();
   };
 
   const validateUnbondValue = (textUnbondValue) => {
     try {
       const unbondValue = parseMerits(textUnbondValue);
-      if (unbondValue.gt(maxUnbond)){
-        return 'Minimum of 2 LLD must remain after transaction'
-      } else if (unbondValue.lte(BN_ZERO)) {
-        return 'Invalid amount'
+      if (unbondValue.gt(maxUnbond)) {
+        return 'Minimum of 2 LLD must remain after transaction';
+      }
+      if (unbondValue.lte(BN_ZERO)) {
+        return 'Invalid amount';
       }
       return true;
     } catch (e) {
@@ -57,49 +61,50 @@ function SendLLDModal({ closeModal }) {
   };
 
   return (
-    <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(transfer)}>
+    <form
+      className={styles.getCitizenshipModal}
+      onSubmit={handleSubmit(transfer)}
+    >
       <div className={styles.h3}>Send LLD</div>
       <div className={styles.description}>
         You are going to send tokens from your wallet
       </div>
 
       <div className={styles.title}>Send to address</div>
-      <TextInput
+      <InputSearch
+        errorTitle="Recipient"
         register={register}
         name="recipient"
         placeholder="Send to address"
-        required
-        validate={((v) => {
+        isRequired
+        setValue={setValue}
+        validate={(v) => {
           if (!isValidSubstrateAddress(v)) return 'Invalid Address';
           return true;
-        })}
+        }}
       />
-      {errors?.recipient?.message
-        && <div className={styles.error}>{errors.recipient.message}</div>}
+      {errors?.recipient?.message && (
+        <div className={styles.error}>{errors.recipient.message}</div>
+      )}
 
       <div className={styles.title}>Amount LLD</div>
       <TextInput
+        errorTitle="Amount LLD"
         register={register}
         validate={validateUnbondValue}
         name="amount"
         placeholder="Amount LLD"
         required
       />
-      { errors?.amount?.message
-        && <div className={styles.error}>{errors.amount.message}</div> }
+      {errors?.amount?.message && (
+        <div className={styles.error}>{errors.amount.message}</div>
+      )}
 
       <div className={styles.buttonWrapper}>
-        <Button
-          medium
-          onClick={closeModal}
-        >
+        <Button medium onClick={closeModal}>
           Cancel
         </Button>
-        <Button
-          primary
-          medium
-          type="submit"
-        >
+        <Button primary medium type="submit">
           Make transfer
         </Button>
       </div>

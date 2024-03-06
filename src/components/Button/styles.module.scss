@@ -50,19 +50,24 @@
     color: $clearBlack;
   }
   &.green{
-    background: $secondary;
-    color: $primary2;
+    background: $succes;
+    color: $bg4;
   }
   &.red{
-    background: $secondary4;
-    color: $primary4;
+    background: $red;
+    color: $bg4;
   }
   &.grey{
-    background: $bg2;
-    color: $text4;
+    background: $grey;
+    color: $clearBlack;
   }
   &.whiteRed{
     border: 2px solid $red;
     color: $red;
+  }
+
+  &:disabled{
+    opacity: 20%;
+    border: 1px solid $grey;
   }
 }
