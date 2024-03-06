@@ -31,7 +31,9 @@ const historyTransferQuery = `
     $orderByMerits: [MeritsOrderBy!],
     $filterMerits: MeritFilter,
     $orderByAssetTransfers: [AssetTransfersOrderBy!],
-    $filterAssetTransfers: AssetTransferFilter
+    $filterAssetTransfers: AssetTransferFilter,
+    $orderByStakings: [StakingsOrderBy!],
+    $filterStakings: StakingFilter
   ) {
     transfers(orderBy: $orderByTransfers, filter: $filterTransfers) {
       nodes {
@@ -74,6 +76,24 @@ const historyTransferQuery = `
         fromId
         asset
         value
+        block {
+          id
+          number
+          timestamp
+        }
+      }
+    }
+
+    stakings(orderBy: $orderByStakings, filter: $filterStakings) {
+      nodes {
+        type: __typename
+        isPositive
+        userId
+        value
+        blockId
+        blockNumber
+        extrinsicIndex
+        method
         block {
           id
           number
@@ -138,6 +158,21 @@ export const getSubstrateOutgoingReceipts = async (substrate_address) => {
   return receipts.reduce((o, r) => ({ ...o, [r.receipt_id]: r }), {});
 };
 
+function getStakingActionText(method) {
+  switch (method) {
+    case 'Rewarded':
+      return 'staking reward';
+    case 'Withdrawn':
+      return 'staking payout';
+    case 'Bonded':
+      return 'staking payment';
+    case 'Slashed':
+      return 'staking slash';
+    default:
+      return 'staking action';
+  }
+}
+
 const getFilterVariable = (substrate_address) => ({
   or: [
     {
@@ -153,8 +188,15 @@ const getFilterVariable = (substrate_address) => ({
   ],
 });
 
+const getFilterForStaking = (substrate_address) => ({
+  userId: {
+    equalTo: substrate_address,
+  },
+});
+
 export const getHistoryTransfers = async (substrate_address) => {
   const filterVariable = getFilterVariable(substrate_address);
+  const stakingsFilter = getFilterForStaking(substrate_address);
   const orderByVariable = ['BLOCK_NUMBER_DESC', 'EVENT_INDEX_DESC'];
   const result = await getApi().post('/graphql', {
     query: historyTransferQuery,
@@ -165,10 +207,12 @@ export const getHistoryTransfers = async (substrate_address) => {
       filterMerits: filterVariable,
       orderByAssetTransfers: orderByVariable,
       filterAssetTransfers: filterVariable,
+      filterStakings: stakingsFilter,
+      orderByStakings: orderByVariable,
     },
   });
-
   const assetsData = await getAdditionalAssets(substrate_address, true);
+  const stakingsData = result.data?.data?.stakings?.nodes;
   const transfersAssets = result.data?.data?.assetTransfers?.nodes;
   const filteredTransferAssets = transfersAssets.filter((item) => item.asset !== '1' && item.asset !== 1);
   const transfersLLD = result.data?.data?.transfers?.nodes;
@@ -184,7 +228,8 @@ export const getHistoryTransfers = async (substrate_address) => {
     }) : [];
   const llm = transfersLLM ? transfersLLM.map((n) => ({ asset: 'LLM', ...n })) : [];
   const lld = transfersLLD ? transfersLLD.map((n) => ({ asset: 'LLD', ...n })) : [];
-  const transfers = [...assets, ...llm, ...lld];
+  const stakings = stakingsData.map((n) => ({ asset: 'LLD', stakingActionText: getStakingActionText(n.method), ...n }));
+  const transfers = [...assets, ...llm, ...lld, ...stakings];
 
   transfers.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
 
