@@ -1944,13 +1944,13 @@ const getAllContracts = async () => {
 
     const contract = maybeContract.unwrapOr(null);
     return {
-      contractId,
-      data: contract?.data,
-      parties: contract?.parties,
-      creator: contract?.creator,
-      deposit: contract?.deposit,
-      judgesSignatures,
-      partiesSignatures,
+      contractId: contractId.toString(),
+      data: Buffer.from(contract?.data, 'hex').toString('utf-8'),
+      parties: contract?.parties.map((party) => party.toString()),
+      creator: contract?.creator.toString(),
+      deposit: contract?.deposit.toString(),
+      judgesSignatures: judgesSignatures.map((signature) => signature.toString()),
+      partiesSignatures: partiesSignatures.map((signature) => signature.toString()),
     };
   });
 };
@@ -1963,7 +1963,7 @@ const signContractAsParty = async (contractId, walletAddress) => {
 
 const signContractAsJudge = async (contractId, walletAddress) => {
   const api = await getApi();
-  const extrinsic = api.tx.contractsRegistry.partySignContract(contractId);
+  const extrinsic = api.tx.contractsRegistry.judgeSignContract(contractId);
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
@@ -1977,6 +1977,12 @@ const getAllJudges = async () => {
   const api = await getApi();
   const rawJudges = await api.query.contractsRegistry.judges.entries();
   return rawJudges.filter(([, isJudge]) => isJudge.isTrue).map(([address]) => address.args[0]);
+};
+
+const getIsUserJudges = async (walletAddress) => {
+  const api = await getApi();
+  const rawIsJudge = await api.query.contractsRegistry.judges(walletAddress);
+  return rawIsJudge.isTrue;
 };
 
 export {
@@ -2085,4 +2091,5 @@ export {
   signContractAsJudge,
   removeContract,
   getAllJudges,
+  getIsUserJudges,
 };

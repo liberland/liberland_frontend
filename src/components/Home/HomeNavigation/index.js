@@ -128,6 +128,14 @@ function HomeNavigation() {
       isAdressWalletDiffrentThanRegistered: false,
     },
     {
+      route: router.home.contracts,
+      title: 'CONTRACTS',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: DocumentsIcon,
+      isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: true,
+    },
+    {
       route: router.home.legislation,
       title: 'LEGISLATION',
       access: ['citizen', 'assemblyMember', 'non_citizen'],

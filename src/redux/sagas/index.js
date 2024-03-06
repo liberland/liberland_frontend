@@ -11,6 +11,7 @@ import * as bridgeSagas from './bridge';
 import * as validatorSagas from './validator';
 import * as congressSagas from './congress';
 import * as onboardingSagas from './onboarding';
+import * as contractsSagas from './contracts';
 
 export default function* rootSaga() {
   yield all([
@@ -131,5 +132,11 @@ export default function* rootSaga() {
     // ONBOARDING
     onboardingSagas.claimComplimentaryLLDWatcher(),
     onboardingSagas.getIsEligibleForComplimentaryLLDWatcher(),
+
+    // CONTRACTS
+    contractsSagas.getContractsWorkerWatcher(),
+    contractsSagas.signContractAsPartyWatcher(),
+    contractsSagas.signContractAsJudgeWatcher(),
+    contractsSagas.removeContractWatcher(),
   ]);
 }

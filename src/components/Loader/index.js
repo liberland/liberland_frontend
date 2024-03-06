@@ -14,6 +14,7 @@ import {
   validatorSelectors,
   congressSelectors,
   registriesSelectors,
+  contractsSelectors,
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
 import BackgroundBlocker from '../BackgroundBlocker';
@@ -30,8 +31,10 @@ function Loader({ children }) {
   const isLoadingValidator = useSelector(validatorSelectors.isLoading);
   const isLoadingCongress = useSelector(congressSelectors.isLoading);
   const isGetRegistries = useSelector(registriesSelectors.isGetRegistries);
+  const isLoadingContracts = useSelector(contractsSelectors.selectorIsContractsLoading);
 
   const isLoading = [
+    isLoadingContracts,
     isGettingWalletInfo,
     isGettingDemocracyInfo,
     isLoadingOffices,

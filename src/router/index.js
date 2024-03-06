@@ -13,6 +13,7 @@ export default {
     offices: '/home/offices',
     staking: '/home/staking',
     congress: '/home/congress',
+    contracts: '/home/contracts',
   },
   guidedSetup: '/guided-setup',
   offices: {
@@ -68,5 +69,8 @@ export default {
     addLegislation: '/home/congress/add-legislation',
     addLegislationViaReferendum:
       '/home/congress/add-legislation-via-referendum',
+  },
+  contracts: {
+    overview: '/home/contracts/overview',
   },
 };

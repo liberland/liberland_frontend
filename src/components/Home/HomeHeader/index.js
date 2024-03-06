@@ -19,6 +19,7 @@ function HomeHeader() {
     [router.home.registries]: 'Registries',
     [router.home.staking]: 'Staking',
     [router.home.congress]: 'Congress',
+    [router.home.contracts]: 'Contracts',
     [router.home.voting]: 'Voting',
     [router.home.wallet]: 'Wallet',
     [router.wallet.ethBridge]: 'Ethereum Bridge',
@@ -28,17 +29,18 @@ function HomeHeader() {
   const location = useLocation();
 
   // const fullName = name && lastName ? `${name} ${lastName}` : undefined;
-  return (titles[location.pathname] ? (
+  return titles[location.pathname] ? (
     <div className={styles.homeHeaderWrapper}>
       <div className={styles.homeHeaderAccountWrapper}>
         <div className={styles.titleWrapper}>
-          <span className={styles.headerTitle}>{titles[location.pathname]}</span>
+          <span className={styles.headerTitle}>
+            {titles[location.pathname]}
+          </span>
         </div>
       </div>
     </div>
-  )
-    : <div />
-
+  ) : (
+    <div />
   );
 }
 
