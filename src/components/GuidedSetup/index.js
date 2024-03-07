@@ -57,6 +57,7 @@ function GuidedSetup({ children }) {
   );
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
   const isLoadingUser = useSelector(userSelectors.selectIsLoading);
+  const roles = useSelector(userSelectors.selectUserRole);
 
   const isLoading = !isSessionReady
     || isLoadingUser
@@ -90,6 +91,7 @@ function GuidedSetup({ children }) {
   useEffect(() => {
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
   }, [dispatch, liquidDollars]);
+
   if (isLoading) {
     return (
       <GuidedSetupWrapper>
@@ -124,8 +126,7 @@ function GuidedSetup({ children }) {
       </GuidedSetupWrapper>
     );
   }
-
-  if (true && !notResidentAcceptedByUser && (roles['e-resident'] !== 'e-resident')) {
+  if (!notResidentAcceptedByUser && (roles.e_resident !== 'eresident')) {
     return (
       <GuidedSetupWrapper>
         <InstructionOnBoard />
