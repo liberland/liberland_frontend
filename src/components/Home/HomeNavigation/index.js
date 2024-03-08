@@ -65,6 +65,7 @@ function HomeNavigation() {
 
   const handleLogout = () => {
     logOut();
+    localStorage.setItem('isAdminLogin', 'true')
     dispatch(authActions.signOut.call(history));
   };
 
