@@ -1,1 +1,1 @@
-export const eraToDays = (era) => Math.round(era.toNumber() / 6);
+export const eraToDays = (era) => Math.round(era.toNumber() / 4);
