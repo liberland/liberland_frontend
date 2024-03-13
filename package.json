@@ -66,7 +66,7 @@
     "eslint": "node_modules/.bin/eslint src/",
     "webpack-dev-server": "webpack-dev-server",
     "dev": "webpack-dev-server --mode=development",
-    "prod": "webpack --mode=production"
+    "prod": "rm -rf dist/* && webpack --mode=production"
   },
   "eslintConfig": {
     "extends": "react-app"

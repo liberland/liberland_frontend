@@ -10,7 +10,6 @@ const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
 const postcssNormalize = require('postcss-normalize');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 // const postcssNormalize = require('postcss-flexbugs-fixes');
 // const postcssNormalize = require('postcss-preset-env');
 
@@ -49,23 +48,37 @@ module.exports = (env, argv) => {
     entry: ['babel-polyfill', './src/index.js'],
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'main.js',
+      filename: '[name].[contenthash].js',
       publicPath: '/',
     },
     devServer: {
       historyApiFallback: true,
     },
+    optimization: {
+      moduleIds: 'deterministic',
+      runtimeChunk: 'single',
+      splitChunks: {
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      },
+    },
     module: {
       rules: [
         {
           test: /\.js$/,
+          exclude: /node_modules/,
           resolve: {
             fullySpecified: false,
           },
           use: {
             loader: 'babel-loader',
             options: {
-              include: [path.resolve(__dirname, "src")],
+              include: [path.resolve(__dirname, 'src')],
               plugins: [
                 [
                   require.resolve('babel-plugin-named-asset-import'),
@@ -101,7 +114,7 @@ module.exports = (env, argv) => {
             {
               importLoaders: 2,
             },
-            'sass-loader',
+            'sass-loader'
           ),
           // Don't consider CSS imports dead code even if the
           // containing package claims to have no side effects.
@@ -118,7 +131,7 @@ module.exports = (env, argv) => {
               importLoaders: 2,
               modules: true,
             },
-            'sass-loader',
+            'sass-loader'
           ),
         },
       ],
@@ -135,7 +148,7 @@ module.exports = (env, argv) => {
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),
-      new Dotenv()
+      new Dotenv(),
       // new InterpolateHtmlPlugin({PUBLIC_URL: 'static' }),
     ],
     resolve: {
