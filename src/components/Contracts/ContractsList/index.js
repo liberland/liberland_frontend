@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import { useMediaQuery } from 'usehooks-ts';
 import styles from './styles.module.scss';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import Card from '../../Card';
@@ -9,12 +11,14 @@ import Button from '../../Button/Button';
 import { contractsActions } from '../../../redux/actions';
 import { contractsSelectors, blockchainSelectors } from '../../../redux/selectors';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
+import router from '../../../router';
 
 function TextWrapper({ itemsOrItem, title, isArray }) {
   const identitiesContracts = useSelector(
     contractsSelectors.selectorIdentityContracts,
   );
 
+  if (!identitiesContracts) return null;
   return (
     <div className={styles.textWrapper}>
       <span>
@@ -107,10 +111,16 @@ ButtonsWrapper.propTypes = {
   isMeSignedAsJudge: PropTypes.bool.isRequired,
 };
 
-function ContractsList({ contracts }) {
+function ContractsList({ contracts, isOneItem }) {
   const walletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
+  const history = useHistory();
+  const isBigScreen = useMediaQuery('(min-width: 1250px)');
+  const handleClick = (id) => {
+    const routerLink = router.contracts.item.split(':')[0];
+    history.push(`${routerLink}${id}`);
+  };
   return (
     <div className={styles.itemsWrapper}>
       {contracts.map((contract) => {
@@ -139,8 +149,15 @@ function ContractsList({ contracts }) {
             title={`Contract ID: ${contractId}`}
           >
             <div className={styles.content}>
-              <span className={styles.title}>Content: &nbsp;</span>
-              <span>{data}</span>
+              <span className={styles.title}>Content:</span>
+              <br />
+              <br />
+              <span>{isOneItem ? data : data.slice(0, isBigScreen ? 1000 : 300)}</span>
+              {!isOneItem && (
+              <div className={styles.buttonMore}>
+                <Button green small onClick={() => handleClick(contractId)}>More</Button>
+              </div>
+              )}
             </div>
             <div className={styles.dataButtons}>
               <div className={styles.data}>
@@ -171,6 +188,10 @@ function ContractsList({ contracts }) {
   );
 }
 
+ContractsList.defaultProps = {
+  isOneItem: false,
+};
+
 ContractsList.propTypes = {
   contracts: PropTypes.arrayOf(
     PropTypes.shape({
@@ -183,6 +204,7 @@ ContractsList.propTypes = {
       partiesSignatures: PropTypes.arrayOf(PropTypes.string).isRequired,
     }),
   ).isRequired,
+  isOneItem: PropTypes.bool,
 };
 
 export default ContractsList;

@@ -1412,9 +1412,10 @@ const getIdentitiesNames = async (addresses) => {
   raw.map((identity, idx) => {
     identities[addresses[idx]] = {};
     const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
-    const nameHashed = unwrapIdentity.display.asRaw;
+    const nameHashed = unwrapIdentity?.display?.asRaw;
     const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
     identities[addresses[idx]].identity = name;
+
     return null;
   });
   return identities;
@@ -1928,6 +1929,29 @@ const getSignaturesForGivenId = (allSignatures, id) => allSignatures.find(
   ([contractId]) => contractId.args[0].eq(id),
 )[1].unwrapOrDefault();
 
+const getSingleContract = async (id) => {
+  const api = await getApi();
+
+  const [judgesSignature, partiesSignature, contract] = await api.queryMulti([
+    [api.query.contractsRegistry.judgesSignatures, id],
+    [api.query.contractsRegistry.partiesSignatures, id],
+    [api.query.contractsRegistry.contracts, id],
+  ]);
+
+  const judgesSignaturesUnwrap = judgesSignature.unwrapOr([]);
+  const partiesSignatureUnwrap = partiesSignature.unwrapOr([]);
+  const contractUnwrap = contract.unwrapOr([]);
+  return {
+    contractId: id,
+    data: Buffer.from(contractUnwrap?.data, 'hex').toString('utf-8'),
+    parties: contractUnwrap?.parties.map((party) => party.toString()),
+    creator: contractUnwrap?.creator.toString(),
+    deposit: contractUnwrap?.deposit.toString(),
+    judgesSignatures: judgesSignaturesUnwrap.map((signature) => signature.toString()),
+    partiesSignatures: partiesSignatureUnwrap.map((signature) => signature.toString()),
+  };
+};
+
 const getAllContracts = async () => {
   const api = await getApi();
 
@@ -2092,4 +2116,5 @@ export {
   removeContract,
   getAllJudges,
   getIsUserJudges,
+  getSingleContract,
 };

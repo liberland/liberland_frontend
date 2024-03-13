@@ -5,6 +5,8 @@ export const {
   signContract,
   signContractJudge,
   removeContract,
+  getMyContracts,
+  getSingleContract,
 } = createActions({
   GET_CONTRACTS: {
     CALL: undefined,
@@ -22,6 +24,16 @@ export const {
     FAILURE: undefined,
   },
   REMOVE_CONTRACT: {
+    CALL: undefined,
+    SUCCESS: undefined,
+    FAILURE: undefined,
+  },
+  GET_MY_CONTRACTS: {
+    CALL: undefined,
+    SUCCESS: undefined,
+    FAILURE: undefined,
+  },
+  GET_SINGLE_CONTRACT: {
     CALL: undefined,
     SUCCESS: undefined,
     FAILURE: undefined,

@@ -22,9 +22,21 @@ const selectorIdentityContracts = createSelector(
   (reducer) => reducer.names,
 );
 
+const selectorMyContracts = createSelector(
+  contractsReducer,
+  (reducer) => reducer.myContracts,
+);
+
+const selectorSingleContract = createSelector(
+  contractsReducer,
+  (reducer) => reducer.singleContract,
+);
+
 export {
   selectorContracts,
   selectorIsContractsLoading,
   selectorIsUserJudgde,
   selectorIdentityContracts,
+  selectorMyContracts,
+  selectorSingleContract,
 };

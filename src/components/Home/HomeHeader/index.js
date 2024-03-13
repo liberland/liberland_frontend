@@ -19,7 +19,6 @@ function HomeHeader() {
     [router.home.registries]: 'Registries',
     [router.home.staking]: 'Staking',
     [router.home.congress]: 'Congress',
-    [router.home.contracts]: 'Contracts',
     [router.home.voting]: 'Voting',
     [router.home.wallet]: 'Wallet',
     [router.wallet.ethBridge]: 'Ethereum Bridge',

@@ -72,5 +72,7 @@ export default {
   },
   contracts: {
     overview: '/home/contracts/overview',
+    myContracts: '/home/contracts/my-contracts',
+    item: '/home/contracts/overview/items/:id',
   },
 };

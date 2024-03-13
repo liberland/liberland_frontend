@@ -138,5 +138,7 @@ export default function* rootSaga() {
     contractsSagas.signContractAsPartyWatcher(),
     contractsSagas.signContractAsJudgeWatcher(),
     contractsSagas.removeContractWatcher(),
+    contractsSagas.getMyContractsWatcher(),
+    contractsSagas.getSingleContractWatcher(),
   ]);
 }
