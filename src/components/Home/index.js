@@ -20,6 +20,7 @@ import styles from './styles.module.scss';
 import Congress from '../Congress';
 
 import { blockchainSelectors } from '../../redux/selectors';
+import Contracts from '../Contracts';
 
 function Home() {
   const isWalletAdressSame = useSelector(
@@ -31,6 +32,7 @@ function Home() {
     <Route path={router.home.feed} component={Feed} />,
     <Route path={router.home.wallet} component={Wallet} />,
     <Route path={router.home.staking} component={Staking} />,
+    <Route path={router.home.contracts} component={Contracts} />,
     <Route path={router.home.offices} component={Offices} />,
   ];
 
