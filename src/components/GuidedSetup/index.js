@@ -57,7 +57,7 @@ function GuidedSetup({ children }) {
   );
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
   const isLoadingUser = useSelector(userSelectors.selectIsLoading);
-  const roles = useSelector(userSelectors.selectUserRole);
+  const isResident = useSelector(onboardingSelectors.selectorIsResident);
 
   const isLoading = !isSessionReady
     || isLoadingUser
@@ -126,7 +126,7 @@ function GuidedSetup({ children }) {
       </GuidedSetupWrapper>
     );
   }
-  if (!notResidentAcceptedByUser && (roles.e_resident !== 'eresident')) {
+  if (!notResidentAcceptedByUser && !isResident) {
     return (
       <GuidedSetupWrapper>
         <InstructionOnBoard />

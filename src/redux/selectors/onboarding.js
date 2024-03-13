@@ -19,9 +19,15 @@ const selectorIneligibleForComplimentaryLLDIsLoading = createSelector(
   (reducer) => reducer.isLoading,
 );
 
+const selectorIsResident = createSelector(
+  onboardingReducer,
+  (reducer) => reducer.isResident,
+);
+
 export {
   selectorEligibleForComplimentaryLLD,
   selectorIneligibleForComplimentaryLLDReason,
   selectorIsSkipOnBoarding,
   selectorIneligibleForComplimentaryLLDIsLoading,
+  selectorIsResident,
 };
