@@ -26,8 +26,8 @@ export const getUsersByAddress = async (blockchainAddress) => {
     },
   });
 
-  return data.map(({ uid, merits, dollars }) => ({
-    uid,
+  return data.map(({ id, merits, dollars }) => ({
+    id,
     merits: ethers.utils.parseUnits(merits.toFixed(12), 12),
     dollars: ethers.utils.parseUnits(dollars.toFixed(12), 12),
   }));

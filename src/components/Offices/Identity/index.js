@@ -341,7 +341,7 @@ function SubmitForm({identity, backendMerits, backendDollars, hash}) {
       officesActions.provideJudgementAndAssets.call({
         walletAddress: sender,
         address: identity.address,
-        uid: identity.backend?.uid,
+        id: identity.backend?.id,
         hash,
         merits: parseMerits(values.amountLLM),
         dollars: parseDollars(values.amountLLD),
