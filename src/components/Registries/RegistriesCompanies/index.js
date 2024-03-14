@@ -37,6 +37,7 @@ function RegistriesCompanies() {
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
+  const blockNumber = useSelector(blockchainSelectors.blockNumber);
   useEffect(() => {
     dispatch(
       registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress),
@@ -46,7 +47,7 @@ function RegistriesCompanies() {
 
   const handleGenerateButton = async (companyId) => {
     const pathName = 'certificate';
-    const blob = await generatePdf(userWalletAddress, companyId, pathName);
+    const blob = await generatePdf(userWalletAddress, companyId, pathName, blockNumber);
 
     const href = URL.createObjectURL(blob);
     const file = `${pathName}.pdf`;
