@@ -41,7 +41,7 @@ function* getIdentityWorker(action) {
 }
 
 function* provideJudgementAndAssetsWorker(action) {
-  if ((action.payload.merits || action.payload.dollars) && !action.payload.uid) {
+  if ((action.payload.merits || action.payload.dollars) && !action.payload.id) {
     throw new Error('Tried to transfer LLD or LLM but we have no user id!');
   }
   yield call(provideJudgementAndAssets, action.payload);
@@ -50,7 +50,7 @@ function* provideJudgementAndAssetsWorker(action) {
 
   if (action.payload.merits?.gt(0)) {
     try {
-      yield call(backend.addMeritTransaction, action.payload.uid, action.payload.merits * -1);
+      yield call(backend.addMeritTransaction, action.payload.id, action.payload.merits * -1);
     } catch (e) {
       throw new Error(e.response.data.error.message);
     }
@@ -58,7 +58,7 @@ function* provideJudgementAndAssetsWorker(action) {
 
   if (action.payload.dollars?.gt(0)) {
     try {
-      yield call(backend.addDollarsTransaction, action.payload.uid, action.payload.dollars * -1);
+      yield call(backend.addDollarsTransaction, action.payload.id, action.payload.dollars * -1);
     } catch (e) {
       throw new Error(e.response.data.error.message);
     }
