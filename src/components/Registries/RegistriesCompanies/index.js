@@ -101,45 +101,45 @@ function RegistriesCompanies() {
                       === expandedDetailsForCompany
                     }
                 />
-                <div className={styles.companyContentContainer}>
-                  <Button
-                    green
-                    small
-                    onClick={() => setExpandedDetailsForCompany(
-                      registeredCompany?.staticFields[0]?.display,
-                    )}
-                    className={styles.buttonSeparation}
-                  >
-                    View details
-                  </Button>
-                  <NavLink
-                    to={`${router.registries.companies.home}/edit/${registeredCompany?.id}#registered`}
-                  >
-                    <Button
-                      secondary
-                      small
-                      className={styles.buttonSeparation}
-                    >
-                      Request change
-                    </Button>
-                  </NavLink>
-                  <Button
-                    red
-                    small
-                    onClick={() => setIsDeleteCompanyModalOpen(true)}
-                    className={styles.buttonSeparation}
-                  >
-                    Request Deletion
-                  </Button>
+              </div>
+              <div className={styles.companyButtons}>
+                <Button
+                  green
+                  small
+                  onClick={() => setExpandedDetailsForCompany(
+                    registeredCompany?.staticFields[0]?.display,
+                  )}
+                  className={styles.buttonSeparation}
+                >
+                  View details
+                </Button>
+                <NavLink
+                  to={`${router.registries.companies.home}/edit/${registeredCompany?.id}#registered`}
+                >
                   <Button
                     secondary
                     small
                     className={styles.buttonSeparation}
-                    onClick={() => handleGenerateButton(registeredCompany.id)}
                   >
-                    Generate Certificate
+                    Request change
                   </Button>
-                </div>
+                </NavLink>
+                <Button
+                  red
+                  small
+                  onClick={() => setIsDeleteCompanyModalOpen(true)}
+                  className={styles.buttonSeparation}
+                >
+                  Request Deletion
+                </Button>
+                <Button
+                  secondary
+                  small
+                  className={styles.buttonSeparation}
+                  onClick={() => handleGenerateButton(registeredCompany.id)}
+                >
+                  Generate Certificate
+                </Button>
               </div>
               {isDeleteCompanyModalOpen && (
               <DeleteCompanyModal
@@ -156,7 +156,7 @@ function RegistriesCompanies() {
       <Card
         title="Requested Companies"
         key="requestedCompanies"
-        className={stylesPage.sectionWrapper}
+        className={cx(stylesPage.sectionWrapper, stylesPage.gapFlex)}
       >
         {registries?.officialUserRegistryEntries?.companies?.requested.map(
           (requestedCompany) => (requestedCompany?.invalid ? (
@@ -186,7 +186,7 @@ function RegistriesCompanies() {
                     }
                 />
               </div>
-              <div className={styles.companyContentEnd}>
+              <div className={styles.companyButtons}>
                 {!requestedCompany.unregister && (
                 <Button
                   green

@@ -5,36 +5,36 @@
   background-color: $transparent3;
   margin-bottom: 0.75rem;
 }
-.companyContentContainer{
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-
-  @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    flex-direction: row;
-  }
-}
-.buttonSeparation{
-  margin:0.25rem;
-}
-
-.companyContentEnd{
-  flex-direction: row;
-  justify-content: end;
-  align-items: center;
-  display: flex;
-}
 
 .companyButtons{
   align-items: center;
-  justify-content: center;
   display: flex;
-  flex-direction: column;
   flex-wrap: wrap;
-  
+  gap: 10px;
+
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
-    flex-direction: row;
+
+    @media screen and (min-width: map-get($breakpoints, 'desktop')){
+      justify-content: flex-end;
+      flex-direction: row;
+    }
   }
+
+  & > a > button {
+    width: 100%;
+  }
+
+  & > *{
+    flex: 1;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      flex: 1;
+  
+      @media screen and (min-width: map-get($breakpoints, 'desktop')){
+        flex: unset;
+      }
+    }
+  }
+  
+
 }

@@ -15,8 +15,10 @@ import RegistriesAllCompanies from './RegistriesAllCompanies';
 
 function Registries() {
   return (
-    <div>
-      <RegistriesHeader />
+    <div className={stylesPage.sectionWrapper}>
+      <div className={stylesPage.menuAddressWrapper}>
+        <RegistriesHeader />
+      </div>
       <div className={stylesPage.contentWrapper}>
         <Switch>
           <Route
