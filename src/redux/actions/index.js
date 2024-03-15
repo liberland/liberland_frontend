@@ -12,6 +12,7 @@ import * as bridgeActions from './bridge';
 import * as validatorActions from './validator';
 import * as congressActions from './congress';
 import * as onBoardingActions from './onboarding';
+import * as contractsActions from './contracts';
 
 export {
   authActions,
@@ -28,4 +29,5 @@ export {
   validatorActions,
   congressActions,
   onBoardingActions,
+  contractsActions,
 };

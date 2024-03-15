@@ -199,59 +199,6 @@ export const newCompanyDataObject = {
       ]
     },
     {
-      key: "statutoryOrganMembers",
-      display: 'List of statuatory organ members',
-      name: 'Statutory Organ Member',
-      fields: [
-        {
-          key: 'walletAddress',
-          display: 'Liberland wallet address',
-          type: 'text',
-          encryptable: true
-        },
-        {
-          key: 'name',
-          display: 'Name of statuatory organ member',
-          type: 'text',
-          encryptable: true
-        },
-        {
-          key: 'dob',
-          display: 'Date of Birth of statuatory organ member',
-          type: 'text',
-          encryptable: true
-        },
-        {
-          key: 'passportNumber',
-          display: 'Passport number of statuatory organ member',
-          type: 'text',
-          encryptable: true
-        }
-      ],
-      data: [
-        [{
-          key: 'walletAddress',
-          display: 'Liberland wallet address',
-          isEncrypted: false
-        },
-        {
-          key: 'name',
-          display: 'Name of statuatory organ member',
-          isEncrypted: false
-        },
-        {
-          key: 'dob',
-          display: 'Date of Birth of statuatory organ member',
-          isEncrypted: false
-        },
-        {
-          key: 'passportNumber',
-          display: 'Passport number of statuatory organ member',
-          isEncrypted: false
-        }]
-      ]
-    },
-    {
       key: "principals",
       display: 'List of principals',
       name: 'Principal',

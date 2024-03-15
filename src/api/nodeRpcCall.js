@@ -964,6 +964,34 @@ const getLegislation = async (tier) => {
   return legislationById;
 };
 
+const getOfficialRegistryEntries = async () => {
+  const api = await getApi();
+  const allEntites = await api.query.companyRegistry.registries.entries(0);
+  const registeredCompanies = [];
+  allEntites.forEach((companyRegistry) => {
+    const [key, companyValue] = companyRegistry;
+    const entityId = key.toHuman();
+    let companyData;
+    try {
+      if (companyValue.isNone) companyData = { unregister: true };
+      else {
+        const compressed = companyValue?.isSome
+          ? companyValue.unwrap().data : companyValue.data;
+        companyData = api.createType('CompanyData', pako.inflate(compressed));
+      }
+
+      const formObject = blockchainDataToFormObject(companyData);
+
+      const dataObject = { ...formObject, id: entityId[1] };
+      registeredCompanies.push(dataObject);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  });
+  return registeredCompanies;
+};
+
 const getOfficialUserRegistryEntries = async (walletAddress) => {
   const api = await getApi();
   const ownerEntites = await api.query.companyRegistry.ownerEntities.entries(walletAddress);
@@ -1384,9 +1412,10 @@ const getIdentitiesNames = async (addresses) => {
   raw.map((identity, idx) => {
     identities[addresses[idx]] = {};
     const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
-    const nameHashed = unwrapIdentity.display.asRaw;
+    const nameHashed = unwrapIdentity?.display?.asRaw;
     const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
     identities[addresses[idx]].identity = name;
+
     return null;
   });
   return identities;
@@ -1896,6 +1925,90 @@ const fetchPendingIdentities = async () => {
   return processed.filter((entity) => entity.data.judgements.length === 0);
 };
 
+const getSignaturesForGivenId = (allSignatures, id) => allSignatures.find(
+  ([contractId]) => contractId.args[0].eq(id),
+)[1].unwrapOrDefault();
+
+const getSingleContract = async (id) => {
+  const api = await getApi();
+
+  const [judgesSignature, partiesSignature, contract] = await api.queryMulti([
+    [api.query.contractsRegistry.judgesSignatures, id],
+    [api.query.contractsRegistry.partiesSignatures, id],
+    [api.query.contractsRegistry.contracts, id],
+  ]);
+
+  const judgesSignaturesUnwrap = judgesSignature.unwrapOr([]);
+  const partiesSignatureUnwrap = partiesSignature.unwrapOr([]);
+  const contractUnwrap = contract.unwrapOr([]);
+  return {
+    contractId: id,
+    data: Buffer.from(contractUnwrap?.data, 'hex').toString('utf-8'),
+    parties: contractUnwrap?.parties.map((party) => party.toString()),
+    creator: contractUnwrap?.creator.toString(),
+    deposit: contractUnwrap?.deposit.toString(),
+    judgesSignatures: judgesSignaturesUnwrap.map((signature) => signature.toString()),
+    partiesSignatures: partiesSignatureUnwrap.map((signature) => signature.toString()),
+  };
+};
+
+const getAllContracts = async () => {
+  const api = await getApi();
+
+  const [rawJudgesSignatures, rawPartiesSignatures, rawContracts] = await Promise.all([
+    api.query.contractsRegistry.judgesSignatures.entries(),
+    api.query.contractsRegistry.partiesSignatures.entries(),
+    api.query.contractsRegistry.contracts.entries(),
+  ]);
+
+  return rawContracts.map(([id, maybeContract]) => {
+    const contractId = id.args[0];
+    const judgesSignatures = getSignaturesForGivenId(rawJudgesSignatures, contractId);
+    const partiesSignatures = getSignaturesForGivenId(rawPartiesSignatures, contractId);
+
+    const contract = maybeContract.unwrapOr(null);
+    return {
+      contractId: contractId.toString(),
+      data: Buffer.from(contract?.data, 'hex').toString('utf-8'),
+      parties: contract?.parties.map((party) => party.toString()),
+      creator: contract?.creator.toString(),
+      deposit: contract?.deposit.toString(),
+      judgesSignatures: judgesSignatures.map((signature) => signature.toString()),
+      partiesSignatures: partiesSignatures.map((signature) => signature.toString()),
+    };
+  });
+};
+
+const signContractAsParty = async (contractId, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.contractsRegistry.partySignContract(contractId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const signContractAsJudge = async (contractId, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.contractsRegistry.judgeSignContract(contractId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const removeContract = async (contractId, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.contractsRegistry.removeContract(contractId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getAllJudges = async () => {
+  const api = await getApi();
+  const rawJudges = await api.query.contractsRegistry.judges.entries();
+  return rawJudges.filter(([, isJudge]) => isJudge.isTrue).map(([address]) => address.args[0]);
+};
+
+const getIsUserJudges = async (walletAddress) => {
+  const api = await getApi();
+  const rawIsJudge = await api.query.contractsRegistry.judges(walletAddress);
+  return rawIsJudge.isTrue;
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1996,4 +2109,12 @@ export {
   requestUnregisterCompanyRegistration,
   fetchPendingIdentities,
   getIdentitiesNames,
+  getOfficialRegistryEntries,
+  getAllContracts,
+  signContractAsParty,
+  signContractAsJudge,
+  removeContract,
+  getAllJudges,
+  getIsUserJudges,
+  getSingleContract,
 };

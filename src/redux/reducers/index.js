@@ -14,6 +14,7 @@ import bridgeReducer from './bridge';
 import validatorReducer from './validator';
 import congressReducer from './congress';
 import onboardingReducer from './onboarding';
+import contractsReducer from './contracts';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -31,6 +32,7 @@ const rootReducer = combineReducers({
   validator: validatorReducer,
   congress: congressReducer,
   onboarding: onboardingReducer,
+  contracts: contractsReducer,
 });
 
 export default rootReducer;

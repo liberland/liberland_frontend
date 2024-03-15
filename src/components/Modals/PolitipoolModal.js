@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 // COMPONENTS
 import { useForm } from 'react-hook-form';
 import { BN_ZERO } from '@polkadot/util';
+import cx from 'classnames';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
@@ -46,6 +47,11 @@ function PolitipoolModal({ closeModal }) {
     >
       <div className={styles.h3}>PolitiPool</div>
       <div className={styles.title}>Amount LLM</div>
+      <div className={cx(styles.description, styles.modalDescription)}>
+        Thank you for contributing with your voluntary tax. You will be able to use your LLMs as voting power and
+        also dividend rewards in case of a government budget surplus. However, keep in mind that should you wish
+        to go on welfare, you will only be able to unpool 10% of your LLMs a year.
+      </div>
       <TextInput
         register={register}
         validate={validateUnbondValue}

@@ -140,3 +140,9 @@
     font-size: 28px;
   }
 }
+
+.gapFlex{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

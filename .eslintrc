@@ -1,6 +1,8 @@
 {
-  "extends": "airbnb",
+  "extends": ["airbnb", "airbnb/hooks", "plugin:react-hooks/recommended"],
   "rules": {
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "react/prop-types": 2,
     "react/button-has-type": 0,

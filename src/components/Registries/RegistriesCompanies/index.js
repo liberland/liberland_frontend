@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import cx from 'classnames';
 import {
   blockchainSelectors,
   registriesSelectors,
@@ -14,6 +15,7 @@ import { RenderRegistryItemDetails } from '../../../utils/registryFormBuilder';
 import DeleteCompanyModal from '../../Modals/DeleteCompanyModal';
 import router from '../../../router';
 import { generatePdf } from '../../../api/middleware';
+import stylesPage from '../../../utils/pagesBase.module.scss';
 
 function InvalidCompany({ id }) {
   return (
@@ -61,7 +63,7 @@ function RegistriesCompanies() {
   };
 
   return (
-    <div>
+    <div className={stylesPage.gapFlex}>
       <NavLink
         to={`${router.registries.companies.create}`}
         className={styles.newCompanyButton}
@@ -70,7 +72,11 @@ function RegistriesCompanies() {
           <h3>Register new company</h3>
         </Button>
       </NavLink>
-      <Card title="Registered Companies" key="registeredCompanies">
+      <Card
+        title="Registered Companies"
+        key="registeredCompanies"
+        className={cx(stylesPage.sectionWrapper, stylesPage.gapFlex)}
+      >
         {registries?.officialUserRegistryEntries?.companies?.registered.map(
           (registeredCompany) => (registeredCompany?.invalid ? (
             <InvalidCompany
@@ -81,7 +87,7 @@ function RegistriesCompanies() {
             <Card
               title={`${registeredCompany?.staticFields[0]?.display}`}
               key={registeredCompany?.id}
-              className={styles.companyCardContainer}
+              className={stylesPage.overviewWrapper}
             >
               <small>
                 Company ID:
@@ -95,7 +101,7 @@ function RegistriesCompanies() {
                       === expandedDetailsForCompany
                     }
                 />
-                <div className={styles.companyButtons}>
+                <div className={styles.companyContentContainer}>
                   <Button
                     green
                     small
@@ -147,7 +153,11 @@ function RegistriesCompanies() {
           )),
         )}
       </Card>
-      <Card title="Requested Companies" key="requestedCompanies">
+      <Card
+        title="Requested Companies"
+        key="requestedCompanies"
+        className={stylesPage.sectionWrapper}
+      >
         {registries?.officialUserRegistryEntries?.companies?.requested.map(
           (requestedCompany) => (requestedCompany?.invalid ? (
             <InvalidCompany
@@ -161,7 +171,7 @@ function RegistriesCompanies() {
                   ?? (requestedCompany.unregister && 'Delete request')
               }`}
               key={requestedCompany.id}
-              className={styles.companyCardContainer}
+              className={stylesPage.overviewWrapper}
             >
               <small>
                 Company request ID:
