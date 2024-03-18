@@ -1,6 +1,6 @@
 import { web3FromAddress } from '@polkadot/extension-dapp';
 import pako from 'pako';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHex, BN_ZERO, BN_ONE } from '@polkadot/util';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
@@ -2009,6 +2009,41 @@ const getIsUserJudges = async (walletAddress) => {
   return rawIsJudge.isTrue;
 };
 
+const getStakingData = async (walletAddress) => {
+  const api = await getApi();
+  const stakingInfo = await api.derive.staking?.account(walletAddress);
+  if (!stakingInfo?.unlocking || stakingInfo.unlocking?.length === 0) return null;
+  const progress = await api.derive.session.progress();
+  const isStalled = progress.eraProgress.gt(BN_ZERO) && progress.eraProgress.gt(progress.eraLength);
+
+  return stakingInfo.unlocking.filter(
+    ({ remainingEras, value }) => value.gt(BN_ZERO)
+    && remainingEras.gt(BN_ZERO),
+  )
+    .map((unlock) => ({
+      unlock,
+      eras: unlock.remainingEras,
+      blocks: unlock.remainingEras
+        .sub(BN_ONE)
+        .imul(progress.eraLength)
+        .iadd(progress.eraLength)
+        .isub(
+          // in the case of a stalled era, this would not be accurate. We apply the mod here
+          // otherwise we would enter into negative values (which is "accurate" since we are
+          // overdue, but confusing since it implied it needed to be done already).
+          //
+          // This does mean that in cases of era stalls we would have an jiggling time, i.e.
+          // would be down and then when a session completes, would be higher again, just to
+          // repeat the cycle again
+          //
+          // See https://github.com/polkadot-js/apps/issues/9397#issuecomment-1532465939
+          isStalled
+            ? progress.eraProgress.mod(progress.eraLength)
+            : progress.eraProgress,
+        ),
+    }));
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -2117,4 +2152,5 @@ export {
   getAllJudges,
   getIsUserJudges,
   getSingleContract,
+  getStakingData,
 };

@@ -51,7 +51,7 @@ export default function StakeManagement() {
           <>
             <PendingRewardsData />
             <RewardsConfig />
-            <Unbonding />
+            <Unbonding {...{ info }} />
             <div className={styles.stakingActionButtonsWrapper}>
               <Button small primary onClick={handleStakeModalOpen}>
                 ADD STAKE

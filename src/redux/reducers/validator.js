@@ -18,6 +18,7 @@ const initialState = {
   payee: null,
   nominators: [],
   bondingDuration: BN_ZERO,
+  stakingData: null,
 };
 
 const validatorReducer = handleActions({
@@ -108,6 +109,10 @@ const validatorReducer = handleActions({
   [validatorActions.getBondingDuration.success]: (state, action) => ({
     ...state,
     bondingDuration: action.payload.bondingDuration,
+  }),
+  [validatorActions.getStakingData.success]: (state, action) => ({
+    ...state,
+    stakingData: action.payload.stakingData,
   }),
 }, initialState);
 
