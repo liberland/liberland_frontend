@@ -199,6 +199,46 @@ export const newCompanyDataObject = {
       ]
     },
     {
+      key: "relevantContracts",
+      display: 'List of relevant on-chain contract ids',
+      name: 'Relevant Contracts',
+      fields: [
+        {
+          key: 'id',
+          display: 'Contract id',
+          type: 'text',
+          encryptable: true
+        },
+      ],
+      data: [
+        [{
+          key: 'id',
+          display: 'Contract id',
+          isEncrypted: false
+        }]
+      ]
+    },
+    {
+      key: "relevantAssets",
+      display: 'List of relevant on-chain asset ids',
+      name: 'Relevant Assets',
+      fields: [
+        {
+          key: 'id',
+          display: 'Asset id',
+          type: 'text',
+          encryptable: true
+        },
+      ],
+      data: [
+        [{
+          key: 'id',
+          display: 'Asset id',
+          isEncrypted: false
+        }]
+      ]
+    },
+    {
       key: "principals",
       display: 'List of principals',
       name: 'Principal',
