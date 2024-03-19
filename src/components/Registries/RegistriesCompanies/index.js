@@ -49,7 +49,7 @@ function RegistriesCompanies() {
 
   const handleGenerateButton = async (companyId) => {
     const pathName = 'certificate';
-    const blob = await generatePdf(userWalletAddress, companyId, pathName, blockNumber);
+    const blob = await generatePdf(companyId, pathName, blockNumber);
 
     const href = URL.createObjectURL(blob);
     const file = `${pathName}.pdf`;

@@ -12,13 +12,10 @@ export const getComplimentaryLLD = async (usingWalletAddress) => {
     .catch((e) => e.response);
 };
 
-export const generatePdf = async (usingWalletAddress, companyId, pathName, blockNumber) => {
-  const userToken = JSON.parse(localStorage.getItem('ROCP_token'));
+export const generatePdf = async (companyId, pathName, blockNumber) => {
   const middlewareApi = getMiddlewareApi();
   try {
     const response = await middlewareApi.post('/v1/certificate', {
-      usingWalletAddress,
-      userToken,
       companyId,
       pathName,
       blockNumber,
