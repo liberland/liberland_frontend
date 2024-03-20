@@ -2091,7 +2091,6 @@ const removeLiquidity = async (
   const api = await getApi();
   const extrinsic = api.tx.assetConversion.removeLiquidity(
     asset1,
-
     asset2,
     lpTokenBurn,
     amount1MinReceive,
