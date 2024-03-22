@@ -16,7 +16,8 @@ import NoConnectedWalletComponent from './NoConnectedWalletComponent';
 import MissingWalletComponent from './MissingWalletComponent';
 import OnBoarding from './OnBording';
 import { onBoardingActions } from '../../redux/actions';
-import {parseIdentityData, parseLegal} from "../../utils/identityParser";
+import InstructionOnBoard from './OnBording/InstructionOnBoard';
+import { parseIdentityData, parseLegal } from '../../utils/identityParser';
 
 const useIsUnsupportedBrowser = () => {
   const [isBrave, setIsBrave] = useState(null);
@@ -56,6 +57,7 @@ function GuidedSetup({ children }) {
   );
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
   const isLoadingUser = useSelector(userSelectors.selectIsLoading);
+  const isResident = useSelector(onboardingSelectors.selectorIsResident);
 
   const isLoading = !isSessionReady
     || isLoadingUser
@@ -68,12 +70,10 @@ function GuidedSetup({ children }) {
     setAcceptedBrowser(true);
   };
 
+  const isSkippedOnBoardingGetLLD = sessionStorage.getItem('SkippedOnBoardingGetLLD');
+  const notResidentAcceptedByUser = sessionStorage.getItem('notResidentAcceptedByUser');
   const [isIdentityEmpty, setIsIdentityEmpty] = useState(true);
   const identityData = useSelector(identitySelectors.selectorIdentity);
-
-  const isSkippedOnBoardingGetLLD = sessionStorage.getItem(
-    'SkippedOnBoardingGetLLD',
-  );
 
   useEffect(() => {
     if (identityData?.isSome) {
@@ -83,7 +83,7 @@ function GuidedSetup({ children }) {
         !parseIdentityData(info?.display)
         && !parseLegal(info)
         && !parseIdentityData(info?.web)
-        && !parseIdentityData(info?.email)
+        && !parseIdentityData(info?.email),
       );
     }
   }, [identityData]);
@@ -91,6 +91,7 @@ function GuidedSetup({ children }) {
   useEffect(() => {
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
   }, [dispatch, liquidDollars]);
+
   if (isLoading) {
     return (
       <GuidedSetupWrapper>
@@ -122,6 +123,22 @@ function GuidedSetup({ children }) {
     return (
       <GuidedSetupWrapper>
         <NoConnectedWalletComponent />
+      </GuidedSetupWrapper>
+    );
+  }
+  if (!notResidentAcceptedByUser && !isResident) {
+    return (
+      <GuidedSetupWrapper>
+        <InstructionOnBoard />
+      </GuidedSetupWrapper>
+    );
+  }
+
+  if ((isUserEligibleForComplimentaryLLD && isSkippedOnBoardingGetLLD !== 'true')
+  || isSkippedOnBoardingGetLLD === 'secondStep') {
+    return (
+      <GuidedSetupWrapper>
+        <OnBoarding />
       </GuidedSetupWrapper>
     );
   }

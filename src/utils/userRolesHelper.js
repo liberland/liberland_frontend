@@ -1,6 +1,6 @@
 export const USER_ROLES = [
   'Citizen',
-  'EResident',
+  'eresident',
   'AssemblyMember',
   'MinisterOfInterior',
   'NonCitizen',
@@ -15,12 +15,17 @@ export const userRolesHelper = {
 
   assignJsIdentity: (identity) => {
     switch (identity) {
-      case 'Citizen': return { citizen: 'citizen' };
+      case 'Citizen':
+        return { citizen: 'citizen' };
       // TODO eresident wont work - not referenced in code
-      case 'EResident': return { e_resident: 'eresident', non_citizen: 'non_citizen' };
-      case 'AssemblyMember': return { assemblyMember: 'assemblyMember', citizen: 'citizen' };
-      case 'MinisterOfInterior': return { ministerOfInterior: 'ministerOfInterior', citizen: 'citizen' };
-      default: return { non_citizen: 'non_citizen' };
+      case 'eresident':
+        return { e_resident: 'eresident', non_citizen: 'non_citizen' };
+      case 'AssemblyMember':
+        return { assemblyMember: 'assemblyMember', citizen: 'citizen' };
+      case 'MinisterOfInterior':
+        return { ministerOfInterior: 'ministerOfInterior', citizen: 'citizen' };
+      default:
+        return { non_citizen: 'non_citizen' };
     }
   },
 };
