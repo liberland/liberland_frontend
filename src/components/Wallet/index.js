@@ -18,6 +18,7 @@ import Bridge from './Bridge';
 import Card from '../Card';
 import RoleHOC from '../../hocs/RoleHOC';
 import AssetOverview from './AssetOverview';
+import Exchange from './Exchange';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -77,6 +78,10 @@ function Wallet() {
             <Route
               path={router.wallet.overView}
               component={overView}
+            />
+            <Route
+              path={router.wallet.exchange}
+              component={Exchange}
             />
             <Route
               exact

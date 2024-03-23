@@ -1,10 +1,11 @@
 import { web3FromAddress } from '@polkadot/extension-dapp';
 import pako from 'pako';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHex, BN } from '@polkadot/util';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
+import { convertToEnumDex, formatter, getDecimalsForAsset } from '../utils/dexFormater';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -1997,56 +1998,145 @@ const fetchPendingIdentities = async () => {
   return processed.filter((entity) => entity.data.judgements.length === 0);
 };
 
-const getDexPools = async () => {
-  const api = await getApi();
-  const pools = await api.query.assetConversion.pools.entries();
-  return pools.map(([poolKey, maybePoolData]) => {
-    const [asset1, asset2] = poolKey.args[0];
-    const { lpToken } = maybePoolData.unwrapOrDefault();
-
-    return {
-      asset1,
-      asset2,
-      lpToken,
-    };
-  });
-};
-
-const getDexReserves = async (asset1, asset2) => {
-  const api = await getApi();
-  const maybeReserves = await api.call.assetConversionApi.getReserves(asset1, asset2);
-  if (maybeReserves.isNone) {
-    throw new Error('Given pool doesnt exist');
-  }
-  const [reservesOfAsset1, reservesOfAsset2] = maybeReserves.unwrap();
-
-  return {
-    asset1: reservesOfAsset1,
-    asset2: reservesOfAsset2,
-  };
-};
-
 const getSwapPriceExactTokensForTokens = async (asset1, asset2, amount) => {
   const api = await getApi();
+
   const maybeRate = await api.call.assetConversionApi.quotePriceExactTokensForTokens(asset1, asset2, amount, true);
   if (maybeRate.isNone) {
-    throw new Error('Given pool doesnt exist');
+    return null;
   }
-  return maybeRate.unwrap();
+  return formatter(maybeRate.unwrap());
 };
 
 const getSwapPriceTokensForExactTokens = async (asset1, asset2, amount) => {
   const api = await getApi();
   const maybeRate = await api.call.assetConversionApi.quotePriceTokensForExactTokens(asset1, asset2, amount, true);
   if (maybeRate.isNone) {
-    throw new Error('Given pool doesnt exist');
+    return null;
   }
-  return maybeRate.unwrap();
+  return formatter(maybeRate.unwrap());
+};
+
+const getDexReserves = async (asset1, asset2) => {
+  const api = await getApi();
+  const maybeReserves = await api.call.assetConversionApi.getReserves(asset1, asset2);
+  if (maybeReserves.isNone) {
+    return null;
+  }
+  const [reservesOfAsset1, reservesOfAsset2] = maybeReserves.unwrap();
+  return {
+    asset1: reservesOfAsset1.toString(),
+    asset2: reservesOfAsset2.toString(),
+  };
+};
+
+const getLpTokensOwnedByAddress = async (lpTokenId, address) => {
+  const api = await getApi();
+  const maybeTokens = await api.query.poolAssets.account(lpTokenId, address);
+
+  if (maybeTokens.isNone) {
+    return null;
+  }
+  const tokens = maybeTokens.unwrapOrDefault();
+  const balance = tokens.balance.toString();
+  return { balance };
+};
+
+const getDexPools = async (walletAddress) => {
+  try {
+    const api = await getApi();
+    const pools = await api.query.assetConversion.pools.entries();
+
+    const poolsData = await Promise.all(pools.map(async ([poolKey, maybePoolData]) => {
+      const [asset1, asset2] = poolKey.args[0];
+      const { lpToken } = maybePoolData.unwrapOrDefault();
+      const asset1checkIsNative = asset1.value.toString();
+      const asset2checkIsNative = asset2.value.toString();
+      const asset2Tronsform = asset2checkIsNative || asset2.toString();
+      const asset1Tronsform = asset1checkIsNative || asset1.toString();
+      const lpTokenTransform = lpToken.toString();
+      const [lpTokensValue, reserved] = await Promise.all([
+        getLpTokensOwnedByAddress(lpTokenTransform, walletAddress),
+        getDexReserves(asset1, asset2),
+      ]);
+      return {
+        asset1: asset1Tronsform,
+        asset2: asset2Tronsform,
+        lpToken: lpTokenTransform,
+        lpTokensBalance: lpTokensValue?.balance,
+        reserved,
+      };
+    }));
+    const assets = [];
+
+    const liquidityForPool = [];
+    poolsData.forEach((item) => {
+      const { lpToken } = item;
+      liquidityForPool.push([api.query.poolAssets.account, [lpToken, walletAddress]]);
+    });
+
+    const [liquidityData, assetsData] = await Promise.all([
+      api.queryMulti(liquidityForPool),
+      getAdditionalAssets(walletAddress, true),
+    ]);
+
+    const wholeDataPools = await Promise.all(poolsData.map(async (item, index) => {
+      const { asset1, asset2 } = item;
+      assets.push(asset1, asset2);
+      const asset1Metadata = assetsData[Number(asset1)]?.metadata;
+      const assetData1 = {
+        decimals: asset1Metadata?.decimals,
+        deposit: asset1Metadata?.deposit,
+        name: asset1Metadata?.name,
+        symbol: asset1Metadata?.symbol,
+      };
+
+      const asset2Metadata = assetsData[Number(asset2)]?.metadata;
+      const assetData2 = {
+        decimals: asset2Metadata?.decimals,
+        deposit: asset2Metadata?.deposit,
+        name: asset2Metadata?.name,
+        symbol: asset2Metadata?.symbol,
+      };
+      const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
+      const decimalsOf1 = getDecimalsForAsset(asset1, assetData1?.decimals);
+      const decimalsOf2 = getDecimalsForAsset(asset2, assetData2?.decimals);
+      const swapPriceExactTokensForTokens = await getSwapPriceExactTokensForTokens(
+        enum1,
+        enum2,
+        new BN(10 ** decimalsOf1),
+      );
+      const swapPriceTokensForExactTokens = await getSwapPriceTokensForExactTokens(
+        enum1,
+        enum2,
+        new BN(10 ** decimalsOf2),
+      );
+      return {
+        ...item,
+        assetData2,
+        assetData1,
+        swapPriceExactTokensForTokens,
+        swapPriceTokensForExactTokens,
+        liquidity: liquidityData[index].isSome ? liquidityData[index].value.balance.toString() : null,
+      };
+    }));
+    return wholeDataPools;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error fetching DEX pools:', error);
+    return [];
+  }
 };
 
 const swapExactTokensForTokens = async (path, amountIn, amountOutMin, sendTo, walletAddress) => {
   const api = await getApi();
-  const extrinsic = api.tx.assetConversion.swapExactTokensForTokens(path, amountIn, amountOutMin, sendTo, true);
+  const extrinsic = api.tx.assetConversion.swapExactTokensForTokens(
+    path,
+    amountIn,
+    amountOutMin,
+    sendTo,
+    true,
+  );
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
@@ -2091,7 +2181,6 @@ const removeLiquidity = async (
   const api = await getApi();
   const extrinsic = api.tx.assetConversion.removeLiquidity(
     asset1,
-
     asset2,
     lpTokenBurn,
     amount1MinReceive,
@@ -2099,11 +2188,6 @@ const removeLiquidity = async (
     withdrawTo,
   );
   return submitExtrinsic(extrinsic, walletAddress, api);
-};
-
-const getLpTokensOwnedByAddress = async (lpTokenId, address) => {
-  const api = await getApi();
-  return api.query.poolAssets.account(lpTokenId, address);
 };
 
 const getSignaturesForGivenId = (allSignatures, id) => allSignatures.find(

@@ -11,6 +11,7 @@ import * as bridgeSelectors from './bridge';
 import * as validatorSelectors from './validator';
 import * as congressSelectors from './congress';
 import * as onboardingSelectors from './onboarding';
+import * as dexSelectors from './dex';
 
 export {
   errorsSelectors,
@@ -26,4 +27,5 @@ export {
   validatorSelectors,
   congressSelectors,
   onboardingSelectors,
+  dexSelectors,
 };

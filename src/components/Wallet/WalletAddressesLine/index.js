@@ -46,6 +46,10 @@ function WalletAddressesLine({ walletAddress }) {
       route: router.wallet.overView,
       title: 'WALLET',
     },
+    {
+      route: router.wallet.exchange,
+      title: 'EXCHANGE',
+    },
   ];
 
   if (process.env.REACT_APP_BRIDGE_TAB_ENABLED === 'true' || process.env.REACT_APP_BRIDGE_TAB_ENABLED === true) {

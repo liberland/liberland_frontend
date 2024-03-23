@@ -39,6 +39,7 @@ export default {
     view: '/home/legislation/:tier',
   },
   wallet: {
+    exchange: '/home/wallet/exchange',
     allTransactions: '/home/wallet/all-transactions',
     ethBridge: '/home/wallet/eth-bridge',
     ethBridgeDeposit: '/home/wallet/eth-bridge/deposit',
