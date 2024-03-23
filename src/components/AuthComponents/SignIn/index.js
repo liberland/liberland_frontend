@@ -23,12 +23,6 @@ function SignIn() {
   const goToLiberlandSignin = () => {
     login();
   };
-  const goToLiberland2FASignin = () => {
-    window.location.replace(process.env.REACT_APP_SSO2FA_API_IMPLICIT_LINK);
-  };
-  const goToLiberland2FASignout = () => {
-    window.location.replace(process.env.REACT_APP_SSO2FA_API_LOGOUT_IMPLICIT_LINK);
-  };
 
   return (
     <div>
@@ -77,12 +71,7 @@ function SignIn() {
 
       </div>
       <div className={styles.twoFAbuttons}>
-        <div onClick={goToLiberland2FASignin}>
-          2fa login
-        </div>
-        <div onClick={goToLiberland2FASignout}>
-          2fa logout
-        </div>
+        <a href={`${process.env.REACT_APP_SSO_API_ADMIN_LINK}`}>admin login</a>
       </div>
     </div>
   );

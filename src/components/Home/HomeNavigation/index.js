@@ -65,6 +65,7 @@ function HomeNavigation() {
 
   const handleLogout = () => {
     logOut();
+    localStorage.setItem('isAdminLogin', 'true')
     dispatch(authActions.signOut.call(history));
   };
 
@@ -126,6 +127,14 @@ function HomeNavigation() {
       icon: VotingIcon,
       isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED,
       isAdressWalletDiffrentThanRegistered: false,
+    },
+    {
+      route: router.home.contracts,
+      title: 'CONTRACTS',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: DocumentsIcon,
+      isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.legislation,

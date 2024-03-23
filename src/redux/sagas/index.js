@@ -11,7 +11,6 @@ import * as bridgeSagas from './bridge';
 import * as validatorSagas from './validator';
 import * as congressSagas from './congress';
 import * as onboardingSagas from './onboarding';
-import * as dexSagas from './dex';
 
 export default function* rootSaga() {
   yield all([
@@ -132,12 +131,5 @@ export default function* rootSaga() {
     // ONBOARDING
     onboardingSagas.claimComplimentaryLLDWatcher(),
     onboardingSagas.getIsEligibleForComplimentaryLLDWatcher(),
-
-    // DEX
-    dexSagas.getPoolsWatcher(),
-    dexSagas.addLiquidityWatcher(),
-    dexSagas.swapExactTokensForTokensWatcher(),
-    dexSagas.swapTokensForExactTokensWatcher(),
-    dexSagas.getDexReservesWatcher(),
   ]);
 }

@@ -25,6 +25,7 @@
     "crypto-browserify": "^3.12.0",
     "css-loader": "^6.7.1",
     "dotenv-webpack": "^7.1.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "ethers": "^5",
     "file-loader": "^6.2.0",
     "graphql": "^16.6.0",
@@ -66,7 +67,7 @@
     "eslint": "node_modules/.bin/eslint src/",
     "webpack-dev-server": "webpack-dev-server",
     "dev": "webpack-dev-server --mode=development",
-    "prod": "webpack --mode=production"
+    "prod": "rm -rf dist/* && webpack --mode=production"
   },
   "eslintConfig": {
     "extends": "react-app"
