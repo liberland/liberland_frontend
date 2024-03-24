@@ -48,20 +48,18 @@ export const maybeGetApprovedEresidency = async () => {
 };
 
 export const addMeritTransaction = async (userId, amount) => {
-  const formattedAmount = ethers.utils.formatUnits(amount, 12);
   await api.post('/merit-transactions', {
     userId,
-    amount: formattedAmount,
+    amount: amount,
     source: 'blockchain-fe-app',
     comment: 'User onboarding on blockchain',
   });
 };
 
 export const addDollarsTransaction = async (userId, amount) => {
-  const formattedAmount = ethers.utils.formatUnits(amount, 12);
   await api.post('/dollar-transactions', {
     userId,
-    amount: formattedAmount,
+    amount: amount,
     source: 'blockchain-fe-app',
     comment: 'User onboarding on blockchain',
   });

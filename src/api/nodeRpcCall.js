@@ -5,6 +5,7 @@ import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
+import {parseDollars, parseMerits} from "../utils/walletHelpers";
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -275,6 +276,8 @@ const bridgeConstants = async (asset) => {
 const provideJudgementAndAssets = async ({
   address, hash, walletAddress, merits, dollars,
 }) => {
+  merits = parseMerits(merits)
+  dollars = parseDollars(dollars)
   const api = await getApi();
   const calls = [];
 

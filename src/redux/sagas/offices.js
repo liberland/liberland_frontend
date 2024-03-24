@@ -21,6 +21,7 @@ import { blockchainSelectors } from '../selectors';
 import router from '../../router';
 import * as backend from '../../api/backend'
 import {addDollarsTransaction} from "../../api/backend";
+import {parseDollars, parseMerits} from "../../utils/walletHelpers";
 // WORKERS
 
 function* getIdentityWorker(action) {
@@ -48,7 +49,7 @@ function* provideJudgementAndAssetsWorker(action) {
   yield put(officesActions.provideJudgementAndAssets.success());
   yield put(officesActions.officeGetIdentity.call(action.payload.address));
 
-  if (action.payload.merits?.gt(0)) {
+  if (parseMerits(action.payload.merits)?.gt(0)) {
     try {
       yield call(backend.addMeritTransaction, action.payload.id, action.payload.merits * -1);
     } catch (e) {
@@ -56,14 +57,13 @@ function* provideJudgementAndAssetsWorker(action) {
     }
   }
 
-  if (action.payload.dollars?.gt(0)) {
+  if (parseDollars(action.payload.dollars)?.gt(0)) {
     try {
       yield call(backend.addDollarsTransaction, action.payload.id, action.payload.dollars * -1);
     } catch (e) {
       throw new Error(e.response.data.error.message);
     }
   }
-
 }
 
 function* getCompanyRequestWorker(action) {
