@@ -17,6 +17,7 @@ export const {
   getBondingDuration,
   unbond,
   withdrawUnbonded,
+  getStakingData,
 } = createActions({
   PAYOUT: {
     call: undefined,
@@ -94,6 +95,11 @@ export const {
     failure: undefined,
   },
   WITHDRAW_UNBONDED: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_STAKING_DATA: {
     call: undefined,
     success: undefined,
     failure: undefined,

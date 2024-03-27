@@ -46,3 +46,8 @@ export const bondingDuration = createSelector(
   validatorReducer,
   (reducer) => reducer.bondingDuration,
 );
+
+export const stakingData = createSelector(
+  validatorReducer,
+  (reducer) => reducer.stakingData,
+);

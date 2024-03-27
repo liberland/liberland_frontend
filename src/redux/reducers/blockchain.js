@@ -49,7 +49,10 @@ const blockchainReducer = handleActions({
   }),
   [blockchainActions.activeEra.value]: (state, action) => ({
     ...state,
-    error: action.payload,
+    activeEra: action.payload.unwrapOr({
+      index: BN_ZERO,
+      start: BN_ZERO,
+    }),
   }),
   [blockchainActions.fetchPreimage.success]: (state, { payload }) => ({
     ...state,
