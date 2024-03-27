@@ -27,23 +27,50 @@ UnbondingRow.propTypes = {
   blocks: PropTypes.object.isRequired,
 };
 
+function UnbondingRowReady({ value }) {
+  return (
+    <li>
+      {formatDollars(value)}
+      {' '}
+      LLD
+      {' '}
+      ready to withdraw
+    </li>
+  );
+}
+
+UnbondingRowReady.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  value: PropTypes.object.isRequired,
+};
+
 export default function Unbonding({ info }) {
   const dispatch = useDispatch();
   const stakingData = useSelector(validatorSelectors.stakingData);
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
+  const activeEra = useSelector(blockchainSelectors.activeEra);
 
   useEffect(() => {
     if (info.unlocking.length === 0) return;
     dispatch(validatorActions.getStakingData.call());
   }, [dispatch, blockNumber, info]);
 
-  if (!stakingData || stakingData.length <= 0) return null;
+  if (
+    !info?.unlocking
+    || info?.unlocking.length === 0
+  ) return null;
 
   return (
     <>
       Currently unstaking:
       <ul>
-        {stakingData.map(({
+        {
+        info.unlocking.map(({ era, value }) => (
+          activeEra.index.gte(era)
+            && <UnbondingRowReady key={era.toString()} {...{ value }} />
+        ))
+        }
+        {stakingData && stakingData.map(({
           unlock,
           eras,
           blocks,

@@ -63,7 +63,7 @@ function UnbondModal({
         {' '}
         {formatDollars(maxUnbond)}
         {' '}
-        LLD. Note that unstaking takes
+        LLD. Note that unstaking takes up to
         {' '}
         {eraToDays(bondingDuration)}
         {' '}
