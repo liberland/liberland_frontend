@@ -343,8 +343,8 @@ function SubmitForm({identity, backendMerits, backendDollars, hash}) {
         address: identity.address,
         id: identity.backend?.id,
         hash,
-        merits: parseMerits(values.amountLLM),
-        dollars: parseDollars(values.amountLLD),
+        merits: values.amountLLM,
+        dollars: values.amountLLD,
       }),
     );
   };
