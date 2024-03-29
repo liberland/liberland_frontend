@@ -1,6 +1,6 @@
 import { web3FromAddress } from '@polkadot/extension-dapp';
 import pako from 'pako';
-import { u8aToHex } from '@polkadot/util';
+import { u8aToHex, hexToU8a } from '@polkadot/util';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
@@ -1928,58 +1928,88 @@ const fetchPendingIdentities = async () => {
   return processed.filter((entity) => entity.data.judgements.length === 0);
 };
 
-const getSignaturesForGivenId = (allSignatures, id) => allSignatures.find(
-  ([contractId]) => contractId.args[0].eq(id),
-)[1].unwrapOrDefault();
+const handleContractData = (data) => {
+  let result = null;
+  if (!data) return result;
+  try {
+    const hexData = data.toString('hex');
+    result = Buffer.from(pako.inflate(hexToU8a(hexData))).toString('utf-8');
+  } catch (err) {
+    result = Buffer.from(data).toString('utf-8');
+  }
+  return result;
+};
 
-const getSingleContract = async (id) => {
+const getSignaturesForContracts = async (contractId) => {
   const api = await getApi();
+  const judgesSignatures = await api.query.contractsRegistry.judgesSignatures.entries(contractId);
+  const judgesSignaturesList = judgesSignatures.map(
+    ([key, isSigned]) => ({ key: key.args[1].toString(), isSigned: isSigned.isTrue }),
+  );
+  const partiesSignatures = await api.query.contractsRegistry.partiesSignatures.entries(contractId);
+  const partiesSignaturesList = partiesSignatures.map(
+    ([key, isSigned]) => ({ key: key.args[1].toString(), isSigned: isSigned.isTrue }),
+  );
+  const judgesFiltered = judgesSignaturesList.filter((item) => item.isSigned === true);
+  const partiesFiltered = partiesSignaturesList.filter((item) => item.isSigned === true);
 
-  const [judgesSignature, partiesSignature, contract] = await api.queryMulti([
-    [api.query.contractsRegistry.judgesSignatures, id],
-    [api.query.contractsRegistry.partiesSignatures, id],
-    [api.query.contractsRegistry.contracts, id],
-  ]);
+  return { judgesSignaturesList: judgesFiltered, partiesSignaturesList: partiesFiltered };
+};
 
-  const judgesSignaturesUnwrap = judgesSignature.unwrapOr([]);
-  const partiesSignatureUnwrap = partiesSignature.unwrapOr([]);
-  const contractUnwrap = contract.unwrapOr([]);
+const getSingleContract = async (contractId) => {
+  const api = await getApi();
+  const contract = await api.query.contractsRegistry.contracts(contractId);
+  const contractUnwrap = contract.unwrapOr(null);
+  const data = handleContractData(contractUnwrap?.data);
+  const parties = (contract?.parties && contract?.parties.length > 0)
+    ? contract?.parties.map((party) => party.toString())
+    : [];
+
+  const { judgesSignaturesList, partiesSignaturesList } = await getSignaturesForContracts(contractId);
+
+  const keysArrayJudges = judgesSignaturesList.map((obj) => obj.key);
+  const keysArrayParties = partiesSignaturesList.map((obj) => obj.key);
+
   return {
-    contractId: id,
-    data: Buffer.from(contractUnwrap?.data, 'hex').toString('utf-8'),
-    parties: contractUnwrap?.parties.map((party) => party.toString()),
+    contractId: contractId.toString(),
+    data,
+    parties,
     creator: contractUnwrap?.creator.toString(),
     deposit: contractUnwrap?.deposit.toString(),
-    judgesSignatures: judgesSignaturesUnwrap.map((signature) => signature.toString()),
-    partiesSignatures: partiesSignatureUnwrap.map((signature) => signature.toString()),
+    judgesSignaturesList: keysArrayJudges,
+    partiesSignaturesList: keysArrayParties,
   };
 };
 
 const getAllContracts = async () => {
   const api = await getApi();
+  const rawContracts = await api.query.contractsRegistry.contracts.entries();
 
-  const [rawJudgesSignatures, rawPartiesSignatures, rawContracts] = await Promise.all([
-    api.query.contractsRegistry.judgesSignatures.entries(),
-    api.query.contractsRegistry.partiesSignatures.entries(),
-    api.query.contractsRegistry.contracts.entries(),
-  ]);
-
-  return rawContracts.map(([id, maybeContract]) => {
+  const contractPromises = rawContracts.map(async ([id, maybeContract]) => {
     const contractId = id.args[0];
-    const judgesSignatures = getSignaturesForGivenId(rawJudgesSignatures, contractId);
-    const partiesSignatures = getSignaturesForGivenId(rawPartiesSignatures, contractId);
-
     const contract = maybeContract.unwrapOr(null);
+    const data = handleContractData(contract?.data);
+
+    const { judgesSignaturesList, partiesSignaturesList } = await getSignaturesForContracts(contractId);
+    const parties = (contract?.parties && contract?.parties.length > 0)
+      ? contract?.parties.map((party) => party.toString())
+      : [];
+    const keysArrayJudges = judgesSignaturesList.map((obj) => obj.key);
+    const keysArrayParties = partiesSignaturesList.map((obj) => obj.key);
     return {
       contractId: contractId.toString(),
-      data: Buffer.from(contract?.data, 'hex').toString('utf-8'),
-      parties: contract?.parties.map((party) => party.toString()),
+      data,
+      parties,
       creator: contract?.creator.toString(),
       deposit: contract?.deposit.toString(),
-      judgesSignatures: judgesSignatures.map((signature) => signature.toString()),
-      partiesSignatures: partiesSignatures.map((signature) => signature.toString()),
+      judgesSignaturesList: keysArrayJudges,
+      partiesSignaturesList: keysArrayParties,
     };
   });
+
+  const contracts = await Promise.all(contractPromises);
+
+  return contracts;
 };
 
 const signContractAsParty = async (contractId, walletAddress) => {
@@ -2010,6 +2040,16 @@ const getIsUserJudges = async (walletAddress) => {
   const api = await getApi();
   const rawIsJudge = await api.query.contractsRegistry.judges(walletAddress);
   return rawIsJudge.isTrue;
+};
+
+const createContract = async (data, parties, walletAddress) => {
+  const api = await getApi();
+
+  const encodedData = new TextEncoder().encode(data);
+  const compressed = pako.deflate(encodedData);
+
+  const extrinsic = api.tx.contractsRegistry.createContract(u8aToHex(compressed), parties);
+  return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
 export {
@@ -2120,4 +2160,6 @@ export {
   getAllJudges,
   getIsUserJudges,
   getSingleContract,
+  createContract,
+  getSignaturesForContracts,
 };
