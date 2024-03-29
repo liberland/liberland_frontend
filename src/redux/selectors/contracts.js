@@ -32,6 +32,11 @@ const selectorSingleContract = createSelector(
   (reducer) => reducer.singleContract,
 );
 
+const selectorSignatures = createSelector(
+  contractsReducer,
+  (reducer) => reducer.signatures,
+);
+
 export {
   selectorContracts,
   selectorIsContractsLoading,
@@ -39,4 +44,5 @@ export {
   selectorIdentityContracts,
   selectorMyContracts,
   selectorSingleContract,
+  selectorSignatures,
 };

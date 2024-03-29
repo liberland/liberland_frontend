@@ -8,6 +8,7 @@ export const {
   getMyContracts,
   getSingleContract,
   createContract,
+  getSignaturesForContracts,
 } = createActions({
   GET_CONTRACTS: {
     CALL: undefined,
@@ -40,6 +41,11 @@ export const {
     FAILURE: undefined,
   },
   CREATE_CONTRACT: {
+    CALL: undefined,
+    SUCCESS: undefined,
+    FAILURE: undefined,
+  },
+  GET_SIGNATURES_FOR_CONTRACTS: {
     CALL: undefined,
     SUCCESS: undefined,
     FAILURE: undefined,

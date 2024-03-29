@@ -19,7 +19,6 @@ function MyContracts() {
   }, [dispatch]);
 
   if (!myContracts) return <div>Loading...</div>;
-
   return (
     <>
       <Button onClick={handleModal} primary medium>Create Contract</Button>

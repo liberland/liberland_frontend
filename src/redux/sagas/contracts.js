@@ -11,20 +11,19 @@ import {
   getIdentitiesNames,
   getSingleContract,
   createContract,
+  getSignaturesForContracts,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors, contractsSelectors } from '../selectors';
 
 function addNameIdentityToAdress(contract) {
   const {
-    creator, judgesSignatures, parties, partiesSignatures,
+    creator, parties,
   } = contract;
-  const arrays = [
+  const arrays = creator ? [
     creator,
-    ...judgesSignatures,
     ...parties,
-    ...partiesSignatures,
-  ];
+  ] : contract;
   return Array.from(
     new Set(arrays),
   );
@@ -34,6 +33,12 @@ function* addNameIdentityToEachAdress(contracts) {
   const addresses = Array.isArray(contracts)
     ? contracts.map((contract) => addNameIdentityToAdress(contract)) : addNameIdentityToAdress(contracts);
   const flattenedAddresses = Array.from(new Set([].concat(...addresses)));
+  const names = yield call(getIdentitiesNames, flattenedAddresses);
+  return names;
+}
+
+function* addNameIdentityToAddresses(addresses) {
+  const flattenedAddresses = Array.from(new Set([...addresses]));
   const names = yield call(getIdentitiesNames, flattenedAddresses);
   return names;
 }
@@ -78,7 +83,7 @@ function* getMyContractsWorker() {
       contractsSelectors.selectorIsUserJudgde,
     );
     const myContracts = isUserJudge
-      ? contracts : contracts.filter((item) => item.parties.includes(walletAddress));
+      ? contracts : contracts.filter((item) => item.parties.includes(walletAddress) || item.creator === walletAddress);
     yield put(
       contractsActions.getMyContracts.success({ myContracts }),
     );
@@ -119,13 +124,41 @@ export function* getContractsWorkerWatcher() {
   }
 }
 
+function* getSignaturesForContractsWorker(action) {
+  try {
+    const contractId = action.payload;
+    const { judgesSignaturesList, partiesSignaturesList } = yield call(getSignaturesForContracts, contractId);
+    const keysArrayJudges = judgesSignaturesList.map((obj) => obj.key);
+    const keysArrayParties = partiesSignaturesList.map((obj) => obj.key);
+    const names = yield addNameIdentityToAddresses([...keysArrayJudges, ...keysArrayParties]);
+    yield put(
+      contractsActions.getSignaturesForContracts.success(
+        {
+          signatures: { judgesSignaturesList: keysArrayJudges, partiesSignaturesList: keysArrayParties },
+          names,
+        },
+      ),
+    );
+  } catch (e) {
+    yield put(contractsActions.getSignaturesForContracts.failure(e));
+  }
+}
+
+export function* getSignaturesForContractsWatcher() {
+  try {
+    yield takeLatest(contractsActions.getSignaturesForContracts.call, getSignaturesForContractsWorker);
+  } catch (e) {
+    yield put(contractsActions.getSignaturesForContracts.failure(e));
+  }
+}
+
 function* signContractAsPartyWorker({ payload: { contractId } }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
   yield call(signContractAsParty, contractId, walletAddress);
-  yield put(contractsActions.getContracts.call());
   yield put(contractsActions.signContract.success());
+  yield put(contractsActions.getContracts.call());
 }
 
 export function* signContractAsPartyWatcher() {
@@ -140,8 +173,8 @@ function* signContractAsJudgeWorker({ payload: { contractId } }) {
     blockchainSelectors.userWalletAddressSelector,
   );
   yield call(signContractAsJudge, contractId, walletAddress);
-  yield put(contractsActions.getContracts.call());
   yield put(contractsActions.signContractJudge.success());
+  yield put(contractsActions.getContracts.call());
 }
 
 export function* signContractAsJudgeWatcher() {
@@ -173,7 +206,6 @@ function* createContractWorker({ payload: { data, parties } }) {
     blockchainSelectors.userWalletAddressSelector,
   );
   yield call(createContract, data, parties, walletAddress);
-
   yield put(contractsActions.createContract.success());
   yield put(contractsActions.getContracts.call());
 }

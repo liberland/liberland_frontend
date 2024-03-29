@@ -141,5 +141,6 @@ export default function* rootSaga() {
     contractsSagas.getMyContractsWatcher(),
     contractsSagas.getSingleContractWatcher(),
     contractsSagas.createContractWatcher(),
+    contractsSagas.getSignaturesForContractsWatcher(),
   ]);
 }

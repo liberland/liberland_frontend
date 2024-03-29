@@ -8,6 +8,7 @@ const initialState = {
   names: null,
   myContracts: [],
   singleContract: null,
+  signatures: [],
 };
 
 const contractReducer = handleActions(
@@ -19,6 +20,8 @@ const contractReducer = handleActions(
       contractsActions.signContractJudge.call,
       contractsActions.getContracts.call,
       contractsActions.createContract.call,
+      contractsActions.getSignaturesForContracts.call,
+      contractsActions.getSingleContract.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -37,6 +40,10 @@ const contractReducer = handleActions(
       contractsActions.signContractJudge.success,
       contractsActions.createContract.success,
       contractsActions.createContract.failure,
+      contractsActions.getSignaturesForContracts.failure,
+      contractsActions.getSignaturesForContracts.success,
+      contractsActions.getSingleContract.success,
+      contractsActions.getSingleContract.failure,
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
@@ -46,7 +53,6 @@ const contractReducer = handleActions(
       ...state,
       contracts: initialState.contracts,
       isUserJudge: initialState.isUserJudge,
-      names: initialState.names,
     }),
 
     [contractsActions.getContracts.success]: (state, action) => ({
@@ -70,13 +76,18 @@ const contractReducer = handleActions(
       ...state,
       singleContract: initialState.singleContract,
       isUserJudge: initialState.isUserJudge,
-      names: initialState.names,
     }),
 
     [contractsActions.getSingleContract.success]: (state, action) => ({
       ...state,
       singleContract: action.payload.singleContract,
       isUserJudge: action.payload.isUserJudge,
+      names: action.payload.names,
+    }),
+
+    [contractsActions.getSignaturesForContracts.success]: (state, action) => ({
+      ...state,
+      signatures: { ...state.signatures, [action.payload.signatures.contractId]: action.payload.signatures },
       names: action.payload.names,
     }),
   },
