@@ -1982,13 +1982,13 @@ const getAllContracts = async () => {
     const data = handleContractData(contract?.data);
 
     return {
-      contractId,
+      contractId: contractId.toString(),
       data,
-      parties: contract?.parties,
-      creator: contract?.creator,
-      deposit: contract?.deposit,
-      judgesSignatures,
-      partiesSignatures,
+      parties: contract?.parties.map((party) => party.toString()),
+      creator: contract?.creator.toString(),
+      deposit: contract?.deposit.toString(),
+      judgesSignatures: judgesSignatures.map((signature) => signature.toString()),
+      partiesSignatures: partiesSignatures.map((signature) => signature.toString()),
     };
   });
 };

@@ -3,10 +3,10 @@ import { contractsActions } from '../actions';
 
 const initialState = {
   loading: false,
-  contracts: null,
+  contracts: [],
   isUserJudge: false,
   names: null,
-  myContracts: null,
+  myContracts: [],
   singleContract: null,
 };
 
@@ -18,6 +18,7 @@ const contractReducer = handleActions(
       contractsActions.signContract.call,
       contractsActions.signContractJudge.call,
       contractsActions.getContracts.call,
+      contractsActions.createContract.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -34,6 +35,8 @@ const contractReducer = handleActions(
       contractsActions.removeContract.success,
       contractsActions.signContractJudge.failure,
       contractsActions.signContractJudge.success,
+      contractsActions.createContract.success,
+      contractsActions.createContract.failure,
     )]: (state) => ({
       ...state,
       loading: initialState.loading,

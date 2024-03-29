@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import cx from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { useMediaQuery } from 'usehooks-ts';
+import Markdown from 'markdown-to-jsx';
 import styles from './styles.module.scss';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import Card from '../../Card';
@@ -19,6 +19,7 @@ function TextWrapper({ itemsOrItem, title, isArray }) {
   );
 
   if (!identitiesContracts) return null;
+
   return (
     <div className={styles.textWrapper}>
       <span>
@@ -116,7 +117,6 @@ function ContractsList({ contracts, isOneItem }) {
     blockchainSelectors.userWalletAddressSelector,
   );
   const history = useHistory();
-  const isBigScreen = useMediaQuery('(min-width: 1250px)');
   const handleClick = (id) => {
     const routerLink = router.contracts.item.split(':')[0];
     history.push(`${routerLink}${id}`);
@@ -133,6 +133,9 @@ function ContractsList({ contracts, isOneItem }) {
           partiesSignatures,
         } = contract;
 
+        const lines = data.split('\n');
+
+        const truncatedContent = lines.slice(0, 5).join('\n');
         const isContractSign = judgesSignatures.length > 0 || partiesSignatures.length > 0;
         const isMeSigned = partiesSignatures.includes(walletAddress);
         const isMeSignedAsJudge = judgesSignatures.includes(walletAddress);
@@ -152,7 +155,7 @@ function ContractsList({ contracts, isOneItem }) {
               <span className={styles.title}>Content:</span>
               <br />
               <br />
-              <span>{isOneItem ? data : data.slice(0, isBigScreen ? 1000 : 300)}</span>
+              <Markdown>{isOneItem ? data : truncatedContent}</Markdown>
               {!isOneItem && (
               <div className={styles.buttonMore}>
                 <Button green small onClick={() => handleClick(contractId)}>More</Button>
@@ -161,11 +164,13 @@ function ContractsList({ contracts, isOneItem }) {
             </div>
             <div className={styles.dataButtons}>
               <div className={styles.data}>
-                {infoContract.map(({ itemsOrItem, title }) => {
+                {infoContract.map(({ itemsOrItem, title }, index) => {
                   const isArray = Array.isArray(itemsOrItem);
                   if (isArray && itemsOrItem.length < 1) return null;
                   return (
                     <TextWrapper
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={index + title}
                       title={title}
                       itemsOrItem={itemsOrItem}
                       isArray={isArray}
@@ -196,7 +201,6 @@ ContractsList.propTypes = {
   contracts: PropTypes.arrayOf(
     PropTypes.shape({
       contractId: PropTypes.string.isRequired,
-      creatorId: PropTypes.string.isRequired,
       creator: PropTypes.string.isRequired,
       data: PropTypes.string.isRequired,
       judgesSignatures: PropTypes.arrayOf(PropTypes.string).isRequired,

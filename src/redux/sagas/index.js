@@ -140,5 +140,6 @@ export default function* rootSaga() {
     contractsSagas.removeContractWatcher(),
     contractsSagas.getMyContractsWatcher(),
     contractsSagas.getSingleContractWatcher(),
+    contractsSagas.createContractWatcher(),
   ]);
 }

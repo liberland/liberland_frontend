@@ -10,6 +10,7 @@ import {
   getIsUserJudges,
   getIdentitiesNames,
   getSingleContract,
+  createContract,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors, contractsSelectors } from '../selectors';
@@ -160,11 +161,26 @@ function* removeContractWorker({ payload: { contractId } }) {
   yield put(contractsActions.getContracts.call());
 }
 
-// WATCHERS
-
 export function* removeContractWatcher() {
   yield* blockchainWatcher(
     contractsActions.removeContract,
     removeContractWorker,
+  );
+}
+
+function* createContractWorker({ payload: { data, parties } }) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+  yield call(createContract, data, parties, walletAddress);
+
+  yield put(contractsActions.createContract.success());
+  yield put(contractsActions.getContracts.call());
+}
+
+export function* createContractWatcher() {
+  yield* blockchainWatcher(
+    contractsActions.createContract,
+    createContractWorker,
   );
 }
