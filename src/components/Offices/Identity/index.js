@@ -37,7 +37,6 @@ function IdentityForm() {
     setPendingIdentities(pendingIdentities)
   }
   const onSubmit = ({ account }) => {
-    console.log('submitting')
     dispatch(officesActions.officeGetIdentity.call(account));
   };
   return (
@@ -47,7 +46,6 @@ function IdentityForm() {
           return (<div>{pendingIdentity.address}
             <button onClick={
               () => {
-                console.log('fetching')
                 dispatch(officesActions.officeGetIdentity.call(pendingIdentity.address))
               }}>fetch</button></div>)
         })}

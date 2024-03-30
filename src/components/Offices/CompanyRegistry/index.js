@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
@@ -12,6 +12,7 @@ import { officesSelectors, blockchainSelectors } from '../../../redux/selectors'
 import styles from './styles.module.scss';
 import { NavLink } from 'react-router-dom/cjs/react-router-dom.min';
 import router from '../../../router';
+import {fetchCompanyRequests} from "../../../api/nodeRpcCall";
 
 function CompanyForm() {
   const dispatch = useDispatch();
@@ -20,32 +21,56 @@ function CompanyForm() {
     register,
   } = useForm();
 
+  const [requestedCompanies, setRequestedCompanies] = useState([]);
+
   const onSubmit = ({ entity_id }) => {
     dispatch(officesActions.getCompanyRequest.call(entity_id));
     dispatch(officesActions.getCompanyRegistration.call(entity_id));
   };
 
+  const doFetchRequestedCompanies = async () => {
+    const pendingCompanyIndexes = await fetchCompanyRequests()
+    setRequestedCompanies(pendingCompanyIndexes)
+  }
+
   return (
-    <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-      <div className={styles.h3}>Verify company registration request</div>
-
-      <TextInput
-        register={register}
-        name="entity_id"
-        placeholder="Company ID"
-        required
-      />
-
-      <div className={styles.buttonWrapper}>
-        <Button
-          primary
-          medium
-          type="submit"
-        >
-          Fetch data
+    <div>
+      <div>
+        {requestedCompanies.map(requestedCompany => {
+          return (
+            <div>
+              Registrar id {requestedCompany.indexes[0]} request index {requestedCompany.indexes[1]}
+            <button onClick={
+              () => {
+                dispatch(officesActions.getCompanyRequest.call(requestedCompany.indexes[1]))
+              }}>fetch</button></div>)
+        })}
+        <Button primary medium onClick={() => doFetchRequestedCompanies()}>
+          Fetch requested companies
         </Button>
       </div>
-    </form>
+
+      <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        <div className={styles.h3}>Verify company registration request</div>
+        <TextInput
+          register={register}
+          name="entity_id"
+          placeholder="Company ID"
+          required
+        />
+
+        <div className={styles.buttonWrapper}>
+          <Button
+            primary
+            medium
+            type="submit"
+          >
+            Fetch data
+          </Button>
+        </div>
+      </form>
+    </div>
+
   );
 }
 
@@ -90,7 +115,7 @@ function CompanyRegistration({ registration }) {
       {' '}
       {registration.registration.editableByRegistrar.toString()}
       <div className={styles.buttonWrapper}>
-        {registration.registration.editableByRegistrar.isTrue && 
+        {registration.registration.editableByRegistrar.isTrue &&
           <NavLink
             to={`${router.offices.companyRegistry.home}/edit/${registration.entity_id}`}
           >

@@ -1,9 +1,9 @@
-import { web3FromAddress } from '@polkadot/extension-dapp';
+import {web3FromAddress} from '@polkadot/extension-dapp';
 import pako from 'pako';
-import { u8aToHex, hexToU8a } from '@polkadot/util';
-import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
-import { handleMyDispatchErrors } from '../utils/therapist';
-import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
+import {hexToU8a, u8aToHex} from '@polkadot/util';
+import {USER_ROLES, userRolesHelper} from '../utils/userRolesHelper';
+import {handleMyDispatchErrors} from '../utils/therapist';
+import {blockchainDataToFormObject} from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
 import {parseDollars, parseMerits} from "../utils/walletHelpers";
 
@@ -1936,6 +1936,15 @@ const fetchPendingIdentities = async () => {
   return processed.filter((entity) => entity.data.judgements.length === 0);
 };
 
+const fetchCompanyRequests = async () => {
+  const api = await getApi();
+  const raw = await api.query.companyRegistry.requests.entries();
+  return raw.map((rawEntry) => ({
+    indexes: rawEntry[0].toHuman(),
+  }))
+
+}
+
 const handleContractData = (data) => {
   let result = null;
   if (!data) return result;
@@ -2159,6 +2168,7 @@ export {
   setRegisteredCompanyData,
   requestUnregisterCompanyRegistration,
   fetchPendingIdentities,
+  fetchCompanyRequests,
   getIdentitiesNames,
   getOfficialRegistryEntries,
   getAllContracts,
