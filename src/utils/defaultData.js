@@ -204,7 +204,7 @@ export const newCompanyDataObject = {
       name: 'Relevant Contracts',
       fields: [
         {
-          key: 'id',
+          key: 'contractId',
           display: 'Contract id',
           type: 'text',
           encryptable: true
@@ -212,7 +212,7 @@ export const newCompanyDataObject = {
       ],
       data: [
         [{
-          key: 'id',
+          key: 'contractId',
           display: 'Contract id',
           isEncrypted: false
         }]
@@ -224,7 +224,7 @@ export const newCompanyDataObject = {
       name: 'Relevant Assets',
       fields: [
         {
-          key: 'id',
+          key: 'assetId',
           display: 'Asset id',
           type: 'text',
           encryptable: true
@@ -232,7 +232,7 @@ export const newCompanyDataObject = {
       ],
       data: [
         [{
-          key: 'id',
+          key: 'assetId',
           display: 'Asset id',
           isEncrypted: false
         }]

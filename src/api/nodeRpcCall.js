@@ -75,6 +75,12 @@ const getApi = async () => {
           signingAbility: 'Encryptable', // FIXME enum
           signingAbilityConditions: 'Encryptable',
         },
+        RelevantAsset: {
+          assetId: 'Encryptable'
+        },
+        RelevantContract: {
+          contractId: 'Encryptable'
+        },
         CompanyData: {
           name: 'Text',
           // Truthful scope of business
@@ -94,6 +100,8 @@ const getApi = async () => {
           principals: 'Vec<Principal>',
           shareholders: 'Vec<Shareholder>',
           UBOs: 'Vec<UBO>',
+          relevantAssets: 'Vec<RelevantAsset>',
+          relevantContracts: 'Vec<RelevantContract>',
         },
       },
     });
