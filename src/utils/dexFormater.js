@@ -18,7 +18,12 @@ export const formatter = (v, decimals = 12) => formatBalance(
 );
 
 export const formatterDecimals = (balance, decimals) => {
-  const chainDecimals = decimals || 12;
+  let chainDecimals = 12;
+  if (decimals === 0) {
+    chainDecimals = 0;
+  } else if (decimals) {
+    chainDecimals = decimals;
+  }
   const bigBalance = new BN(balance);
   const baseFactor = new BN(10).pow(new BN(chainDecimals));
 

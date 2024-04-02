@@ -28,7 +28,7 @@ function TradeTokensModal({
   handleModal, assets, isBuy,
 }) {
   const dispatch = useDispatch();
-  const walletAdrees = useSelector(userSelectors.selectWalletAddress);
+  const walletAddress = useSelector(userSelectors.selectWalletAddress);
   const assetBalance = useSelector(walletSelectors.selectorAssetBalance);
   const reserves = useSelector(dexSelectors.selectorReserves);
   const [isChecked, setIsChecked] = useState(false);
@@ -87,8 +87,7 @@ function TradeTokensModal({
         path: { asset1, asset2 },
         amount,
         amountMin,
-        sendTo: walletAdrees,
-        walletAdrees,
+        sendTo: walletAddress,
       };
       dispatch(
         isBuy

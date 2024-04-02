@@ -2029,19 +2029,29 @@ const fetchPendingIdentities = async () => {
   return processed.filter((entity) => entity.data.judgements.length === 0);
 };
 
-const getSwapPriceExactTokensForTokens = async (asset1, asset2, amount) => {
+const getSwapPriceExactTokensForTokens = async (asset1, asset2, amount, includeTax = true) => {
   const api = await getApi();
 
-  const maybeRate = await api.call.assetConversionApi.quotePriceExactTokensForTokens(asset1, asset2, amount, true);
+  const maybeRate = await api.call.assetConversionApi.quotePriceExactTokensForTokens(
+    asset1,
+    asset2,
+    amount,
+    includeTax,
+  );
   if (maybeRate.isNone) {
     return null;
   }
   return maybeRate.unwrap();
 };
 
-const getSwapPriceTokensForExactTokens = async (asset1, asset2, amount) => {
+const getSwapPriceTokensForExactTokens = async (asset1, asset2, amount, includeTax = true) => {
   const api = await getApi();
-  const maybeRate = await api.call.assetConversionApi.quotePriceTokensForExactTokens(asset1, asset2, amount, true);
+  const maybeRate = await api.call.assetConversionApi.quotePriceTokensForExactTokens(
+    asset1,
+    asset2,
+    amount,
+    includeTax,
+  );
   if (maybeRate.isNone) {
     return null;
   }
@@ -2121,19 +2131,20 @@ const getAndConvertTokensData = async (
       enum1,
       enum2,
       (new BN(10)).pow(decimalsOf1),
+      false,
     );
     const swapPriceTokensForExactTokens = await getSwapPriceTokensForExactTokens(
       enum1,
       enum2,
       (new BN(10)).pow(decimalsOf2),
+      false,
     );
-
     const price1 = formatter(swapPriceExactTokensForTokens, Number(decimalsOf1));
     const price2 = formatter(swapPriceTokensForExactTokens, Number(decimalsOf2));
-
-    const priceExactForToken = Number(price1) === 0 ? formatterDecimals(swapPriceExactTokensForTokens) : price1;
-    const priceTokenForExact = Number(price2) === 0 ? formatterDecimals(swapPriceTokensForExactTokens) : price2;
-
+    const priceExactForToken = Number(price1) === 0
+      ? formatterDecimals(swapPriceExactTokensForTokens, decimalsOf1) : price1;
+    const priceTokenForExact = Number(price2) === 0
+      ? formatterDecimals(swapPriceTokensForExactTokens, decimalsOf2) : price2;
     return {
       priceExactForToken,
       priceTokenForExact,
