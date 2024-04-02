@@ -65,7 +65,7 @@ function HomeNavigation() {
 
   const handleLogout = () => {
     logOut();
-    localStorage.setItem('isAdminLogin', 'true')
+    localStorage.setItem('isAdminLogin', 'true');
     dispatch(authActions.signOut.call(history));
   };
 
@@ -158,7 +158,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: false,
+      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.staking,
