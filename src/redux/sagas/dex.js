@@ -4,7 +4,7 @@ import {
 import { dexActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import {
-  getDexPools,
+  getDexPoolsExtendData,
   addLiquidity,
   swapExactTokensForTokens,
   swapTokensForExactTokens,
@@ -15,7 +15,7 @@ import { convertToEnumDex } from '../../utils/dexFormater';
 
 function* getPoolsWorker() {
   const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  const allContracts = yield call(getDexPools, userWalletAddress);
+  const allContracts = yield call(getDexPoolsExtendData, userWalletAddress);
   yield put(dexActions.getPools.success(allContracts));
 }
 
@@ -55,6 +55,7 @@ function* swapExactTokensForTokensWorker(action) {
   const { enum1, enum2 } = convertToEnumDex(path.asset1, path.asset2);
   yield call(swapExactTokensForTokens, [enum1, enum2], amount, amountMin, sendTo, userWalletAddress);
   yield put(dexActions.swapExactTokensForTokens.success());
+  yield put(dexActions.getPools.call());
 }
 
 export function* swapExactTokensForTokensWatcher() {
@@ -69,6 +70,7 @@ function* swapTokensForExactTokensWorker(action) {
   const { enum1, enum2 } = convertToEnumDex(path.asset1, path.asset2);
   yield call(swapTokensForExactTokens, [enum1, enum2], amount, amountMin, sendTo, userWalletAddress);
   yield put(dexActions.swapTokensForExactTokens.success());
+  yield put(dexActions.getPools.call());
 }
 
 export function* swapTokensForExactTokensWatcher() {

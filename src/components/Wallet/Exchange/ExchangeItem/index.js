@@ -30,7 +30,6 @@ function ExchangeItem({ dex }) {
 
   const asset1ToShow = useMemo(() => makeAssetToShow(asset1, assetData1?.symbol), [assetData1, asset1]);
   const asset2ToShow = useMemo(() => makeAssetToShow(asset2, assetData2?.symbol), [assetData2, asset2]);
-
   const assets = {
     asset1,
     asset2,
@@ -57,41 +56,61 @@ function ExchangeItem({ dex }) {
       )}
       <div className={styles.item}>
         <div className={styles.buttons}>
-          <div className={styles.transactionButtons}>
-            <Button
-              disabled={!reserved}
-              small
-              primary
-              onClick={() => {
-                handleModal();
-                setIsBuyTrade(false);
-              }}
-            >
-              SELL
-              {' '}
-              {asset1ToShow}
-              {' '}
-              FOR
-              {' '}
-              {asset2ToShow}
-            </Button>
-            <Button
-              disabled={!reserved}
-              small
-              primary
-              onClick={() => {
-                handleModal();
-                setIsBuyTrade(true);
-              }}
-            >
-              BUY
-              {' '}
-              {asset1ToShow}
-              {' '}
-              FOR
-              {' '}
-              {asset2ToShow}
-            </Button>
+          <div className={styles.buttonsWithRate}>
+            <div className={styles.transactionButtons}>
+              <Button
+                disabled={!reserved}
+                small
+                primary
+                onClick={() => {
+                  handleModal();
+                  setIsBuyTrade(false);
+                }}
+              >
+                SELL
+                {' '}
+                {asset1ToShow}
+                {' '}
+                FOR
+                {' '}
+                {asset2ToShow}
+              </Button>
+              <Button
+                disabled={!reserved}
+                small
+                primary
+                onClick={() => {
+                  handleModal();
+                  setIsBuyTrade(true);
+                }}
+              >
+                BUY
+                {' '}
+                {asset1ToShow}
+                {' '}
+                FOR
+                {' '}
+                {asset2ToShow}
+              </Button>
+            </div>
+            {swapPriceTokensForExactTokens
+            && swapPriceExactTokensForTokens
+              && (
+              <div className={styles.exchangeRate}>
+                <span>
+                  <span className={styles.bold}>{asset1ToShow}</span>
+                  {` = ${swapPriceTokensForExactTokens} `}
+                  <span className={styles.bold}>{asset2ToShow}</span>
+                </span>
+
+                <span>
+                  <span className={styles.bold}>{asset2ToShow}</span>
+                  {` = ${swapPriceExactTokensForTokens} `}
+                  <span className={styles.bold}>{asset1ToShow}</span>
+                </span>
+
+              </div>
+              )}
           </div>
           <div>
             <Button
@@ -113,8 +132,8 @@ function ExchangeItem({ dex }) {
           liquidity={liquidity}
           reserved={reserved}
           lpTokensBalance={lpTokensBalance}
-          swapPriceExactTokensForTokens={swapPriceExactTokensForTokens}
-          swapPriceTokensForExactTokens={swapPriceTokensForExactTokens}
+          asset1Decimals={assetData1?.decimals}
+          asset2Decimals={assetData2?.decimals}
         />
         )}
       </div>

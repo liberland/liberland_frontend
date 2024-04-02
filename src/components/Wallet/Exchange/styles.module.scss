@@ -21,9 +21,27 @@
     justify-content: space-between;
     gap: 10px;
 
-    .transactionButtons{
+    .buttonsWithRate{
       display: flex;
-      gap: 15px;
+      flex-direction: column;
+      gap: 10px;
+
+      .exchangeRate{
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        .bold{
+          font-weight: 700;
+          font-style: italic;
+        }
+      }
+
+      .transactionButtons{
+        display: flex;
+        gap: 15px;
+      }
     }
   }
 }

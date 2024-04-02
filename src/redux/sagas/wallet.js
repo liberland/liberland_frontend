@@ -11,6 +11,8 @@ import {
   getValidators, getNominatorTargets,
   setNominatorTargets,
   unpool, getAdditionalAssets, sendAssetTransfer,
+  getLLD,
+  getAssetData,
 } from '../../api/nodeRpcCall';
 import { getHistoryTransfers } from '../../api/explorer';
 
@@ -30,6 +32,30 @@ function* getAdditionalAssetsWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const additionalAssets = yield call(getAdditionalAssets, walletAddress);
   yield put(walletActions.getAdditionalAssets.success(additionalAssets));
+}
+
+function* getAssetBalanceWorker(action) {
+  const asset = action.payload;
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  let balance;
+  if (asset === 'Native') {
+    balance = yield getLLD(walletAddress);
+  } else {
+    balance = yield getAssetData(asset, walletAddress);
+  }
+  yield put(walletActions.getAssetBalance.success(balance));
+}
+
+function* getAssetsBalanceWorker(action) {
+  const assets = action.payload;
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const assetsBalance = yield Promise.all(assets.map((asset) => {
+    if (asset === 'Native') {
+      return getLLD(walletAddress);
+    }
+    return getAssetData(asset, walletAddress);
+  }));
+  yield put(walletActions.getAssetsBalance.success(assetsBalance));
 }
 
 function* stakeToPolkaWorker(action) {
@@ -121,6 +147,14 @@ function* getAdditionalAssetsWatcher() {
   yield* blockchainWatcher(walletActions.getAdditionalAssets, getAdditionalAssetsWorker);
 }
 
+function* getAssetBalanceWatcher() {
+  yield* blockchainWatcher(walletActions.getAssetBalance, getAssetBalanceWorker);
+}
+
+function* getAssetsBalanceWatcher() {
+  yield* blockchainWatcher(walletActions.getAssetsBalance, getAssetsBalanceWorker);
+}
+
 function* sendTransferWatcher() {
   yield* blockchainWatcher(walletActions.sendTransfer, sendTransferWorker);
 }
@@ -173,4 +207,6 @@ export {
   getNominatorTargetsWatcher,
   setNominatorTargetsWatcher,
   unpoolWatcher,
+  getAssetBalanceWatcher,
+  getAssetsBalanceWatcher,
 };

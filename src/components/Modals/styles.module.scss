@@ -62,6 +62,13 @@
     }
   }
 
+  & .titleFlex{
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; 
+    flex-wrap: wrap;
+  }
+
   & .buttonWrapper {
     display: flex;
     align-items: center;

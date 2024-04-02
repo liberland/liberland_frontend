@@ -8,9 +8,12 @@ import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
-import { dexActions } from '../../redux/actions';
-import { dexSelectors, userSelectors } from '../../redux/selectors';
-import { getDecimalsForAsset } from '../../utils/dexFormater';
+import { dexActions, walletActions } from '../../redux/actions';
+import { dexSelectors, userSelectors, walletSelectors } from '../../redux/selectors';
+import {
+  calculateAmountDesiredFormatted,
+  convertLiquidityData, formatProperlyValue, getDecimalsBN,
+} from '../../utils/dexFormater';
 import { AssetsPropTypes } from '../Wallet/Exchange/proptypes';
 
 function AddLiquidityModal({
@@ -40,11 +43,16 @@ function AddLiquidityModal({
   const [isChecked, setIsChecked] = useState(false);
   const walletAddress = useSelector(userSelectors.selectWalletAddress);
   const reserves = useSelector(dexSelectors.selectorReserves);
+  const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
 
   const isDisplayNone = isChecked ? null : styles.displayNone;
 
   useEffect(() => {
     dispatch(dexActions.getDexReserves.call({ asset1, asset2 }));
+  }, [dispatch, asset1, asset2]);
+
+  useEffect(() => {
+    dispatch(walletActions.getAssetsBalance.call([asset1, asset2]));
   }, [dispatch, asset1, asset2]);
 
   const reservesThisAssets = useMemo(() => {
@@ -60,21 +68,25 @@ function AddLiquidityModal({
       amount1Desired, amount1Min: ammountInputValue1, amount2Desired, amount2Min: ammountInputValue2,
     } = data;
 
-    const asset1Decimals = 10 ** getDecimalsForAsset(asset1, assetData1.decimals);
-    const asset2Decimals = 10 ** getDecimalsForAsset(asset2, assetData2.decimals);
-    const amount1Min = amount1Desired * ammountInputValue1
-    || (reservesThisAssets.asset1 / reservesThisAssets.asset2) * asset1Decimals;
-    const amount2Min = amount2Desired * ammountInputValue2
-    || (reservesThisAssets.asset2 / reservesThisAssets.asset1) * asset2Decimals;
-    const amount1DesiredFormated = amount1Desired * asset1Decimals;
-    const amount2DesiredFormated = amount2Desired * asset2Decimals;
-
+    const {
+      ammount1, ammount2, amount1Min, amount2Min,
+    } = convertLiquidityData(
+      amount1Desired,
+      amount2Desired,
+      asset1,
+      asset2,
+      assetData1?.decimals,
+      assetData2?.decimals,
+      reservesThisAssets,
+      ammountInputValue1,
+      ammountInputValue2,
+    );
     const mintTo = walletAddress;
     dispatch(dexActions.addLiquidity.call({
-      amount1Desired: new BN(amount1DesiredFormated),
-      amount1Min: new BN(amount1Min),
-      amount2Desired: new BN(amount2DesiredFormated),
-      amount2Min: new BN(amount2Min),
+      amount1Desired: ammount1,
+      amount1Min,
+      amount2Desired: ammount2,
+      amount2Min,
       asset1,
       asset2,
       walletAddress,
@@ -82,6 +94,20 @@ function AddLiquidityModal({
     }));
     handleModal();
   };
+
+  const validate = (v, assetBalance, decimals, asset) => {
+    if (Number.isNaN(parseInt(v))) {
+      return 'Not a valid number';
+    }
+    const decimalsBN = getDecimalsBN(asset, decimals);
+    const inputBN = calculateAmountDesiredFormatted(v, decimalsBN);
+    const assetBN = new BN(assetBalance);
+    if (inputBN.gt(assetBN)) {
+      return 'Input greater than balance';
+    }
+    return true;
+  };
+
   return (
     <form
       className={styles.getCitizenshipModal}
@@ -94,17 +120,27 @@ function AddLiquidityModal({
         {' - '}
         {asset2ToShow}
       </h3>
-      <div className={styles.title}>
-        Amount
-        {' '}
-        {asset1ToShow}
-        {' '}
-        Desired
+      <div className={cx(styles.title, styles.titleFlex)}>
+        <span>
+          Amount
+          {' '}
+          {asset1ToShow}
+          {' '}
+          Desired
+        </span>
+        {assetsBalance && assetsBalance.length > 0
+        && (
+        <span>
+          Balance
+          {' '}
+          {assetsBalance[0]
+            ? formatProperlyValue(asset1, assetsBalance[0], asset1ToShow, assetData1?.decimals || 0) : 0}
+        </span>
+        )}
       </div>
       <TextInput
-        value={null}
         required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
+        validate={(v) => validate(v, assetsBalance[0], assetData1?.decimals, asset1)}
         errorTitle="amount1Desired"
         register={register}
         name="amount1Desired"
@@ -126,16 +162,27 @@ function AddLiquidityModal({
       {errors?.amount1Desired && (
         <div className={styles.error}>{errors.amount1Desired.message}</div>
       )}
-      <div className={styles.title}>
-        Amount
-        {' '}
-        {asset2ToShow}
-        {' '}
-        Desired
+      <div className={cx(styles.title, styles.titleFlex)}>
+        <span>
+          Amount
+          {' '}
+          {asset2ToShow}
+          {' '}
+          Desired
+        </span>
+        {assetsBalance && assetsBalance.length > 0
+        && (
+        <span>
+          Balance
+          {' '}
+          {assetsBalance[1]
+            ? formatProperlyValue(asset2, assetsBalance[1], asset2ToShow, assetData2?.decimals || 0) : 0}
+        </span>
+        )}
       </div>
       <TextInput
         required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
+        validate={(v) => validate(v, assetsBalance[1], assetData2?.decimals, asset2)}
         errorTitle="amount2Desired"
         register={register}
         name="amount2Desired"

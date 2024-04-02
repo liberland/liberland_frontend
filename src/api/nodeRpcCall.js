@@ -5,7 +5,9 @@ import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
-import { convertToEnumDex, formatter, getDecimalsForAsset } from '../utils/dexFormater';
+import {
+  convertAssetData, convertToEnumDex, formatter, formatterDecimals, getDecimalsForAsset,
+} from '../utils/dexFormater';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -249,6 +251,34 @@ const getLldBalances = async (addresses) => {
     const api = await getApi();
     const balances = await api.query.system.account.multi(addresses);
     return addresses.reduce((acc, addr, idx) => Object.assign(acc, { [addr]: balances[idx].data.free }), {});
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const getLLD = async (address) => {
+  try {
+    const api = await getApi();
+    const balances = await api.query.system.account(address);
+    return balances.data.free;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const getAssetData = async (asset, address) => {
+  try {
+    const api = await getApi();
+    const maybeData = await api.query.assets.account(asset, address);
+    if (maybeData.isSome) {
+      const data = maybeData.unwrapOrDefault();
+      return data.balance;
+    }
+    return null;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -2006,7 +2036,7 @@ const getSwapPriceExactTokensForTokens = async (asset1, asset2, amount) => {
   if (maybeRate.isNone) {
     return null;
   }
-  return formatter(maybeRate.unwrap());
+  return maybeRate.unwrap();
 };
 
 const getSwapPriceTokensForExactTokens = async (asset1, asset2, amount) => {
@@ -2015,7 +2045,7 @@ const getSwapPriceTokensForExactTokens = async (asset1, asset2, amount) => {
   if (maybeRate.isNone) {
     return null;
   }
-  return formatter(maybeRate.unwrap());
+  return maybeRate.unwrap();
 };
 
 const getDexReserves = async (asset1, asset2) => {
@@ -2047,7 +2077,6 @@ const getDexPools = async (walletAddress) => {
   try {
     const api = await getApi();
     const pools = await api.query.assetConversion.pools.entries();
-
     const poolsData = await Promise.all(pools.map(async ([poolKey, maybePoolData]) => {
       const [asset1, asset2] = poolKey.args[0];
       const { lpToken } = maybePoolData.unwrapOrDefault();
@@ -2056,6 +2085,7 @@ const getDexPools = async (walletAddress) => {
       const asset2Tronsform = asset2checkIsNative || asset2.toString();
       const asset1Tronsform = asset1checkIsNative || asset1.toString();
       const lpTokenTransform = lpToken.toString();
+
       const [lpTokensValue, reserved] = await Promise.all([
         getLpTokensOwnedByAddress(lpTokenTransform, walletAddress),
         getDexReserves(asset1, asset2),
@@ -2068,8 +2098,58 @@ const getDexPools = async (walletAddress) => {
         reserved,
       };
     }));
-    const assets = [];
+    return poolsData;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('Error fetching DEX pools:', err);
+    return [];
+  }
+};
 
+const getAndConvertTokensData = async (
+  asset1,
+  asset2,
+  asset1Decimals,
+  asset2Decimals,
+) => {
+  try {
+    const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
+
+    const decimalsOf1 = new BN(getDecimalsForAsset(asset1, asset1Decimals));
+    const decimalsOf2 = new BN(getDecimalsForAsset(asset2, asset2Decimals));
+    const swapPriceExactTokensForTokens = await getSwapPriceExactTokensForTokens(
+      enum1,
+      enum2,
+      (new BN(10)).pow(decimalsOf1),
+    );
+    const swapPriceTokensForExactTokens = await getSwapPriceTokensForExactTokens(
+      enum1,
+      enum2,
+      (new BN(10)).pow(decimalsOf2),
+    );
+
+    const price1 = formatter(swapPriceExactTokensForTokens, Number(decimalsOf1));
+    const price2 = formatter(swapPriceTokensForExactTokens, Number(decimalsOf2));
+
+    const priceExactForToken = Number(price1) === 0 ? formatterDecimals(swapPriceExactTokensForTokens) : price1;
+    const priceTokenForExact = Number(price2) === 0 ? formatterDecimals(swapPriceTokensForExactTokens) : price2;
+
+    return {
+      priceExactForToken,
+      priceTokenForExact,
+    };
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('Error geting tokens swap data: ', err);
+    return { priceExactForToken: null, priceTokenForExact: null };
+  }
+};
+
+const getDexPoolsExtendData = async (walletAddress) => {
+  try {
+    const api = await getApi();
+    const poolsData = await getDexPools(walletAddress);
+    const assets = [];
     const liquidityForPool = [];
     poolsData.forEach((item) => {
       const { lpToken } = item;
@@ -2080,51 +2160,38 @@ const getDexPools = async (walletAddress) => {
       api.queryMulti(liquidityForPool),
       getAdditionalAssets(walletAddress, true),
     ]);
-
     const wholeDataPools = await Promise.all(poolsData.map(async (item, index) => {
       const { asset1, asset2 } = item;
       assets.push(asset1, asset2);
-      const asset1Metadata = assetsData[Number(asset1)]?.metadata;
-      const assetData1 = {
-        decimals: asset1Metadata?.decimals,
-        deposit: asset1Metadata?.deposit,
-        name: asset1Metadata?.name,
-        symbol: asset1Metadata?.symbol,
-      };
 
-      const asset2Metadata = assetsData[Number(asset2)]?.metadata;
-      const assetData2 = {
-        decimals: asset2Metadata?.decimals,
-        deposit: asset2Metadata?.deposit,
-        name: asset2Metadata?.name,
-        symbol: asset2Metadata?.symbol,
-      };
-      const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
-      const decimalsOf1 = getDecimalsForAsset(asset1, assetData1?.decimals);
-      const decimalsOf2 = getDecimalsForAsset(asset2, assetData2?.decimals);
-      const swapPriceExactTokensForTokens = await getSwapPriceExactTokensForTokens(
-        enum1,
-        enum2,
-        new BN(10 ** decimalsOf1),
-      );
-      const swapPriceTokensForExactTokens = await getSwapPriceTokensForExactTokens(
-        enum1,
-        enum2,
-        new BN(10 ** decimalsOf2),
-      );
+      const { assetData1, assetData2 } = convertAssetData(assetsData, asset1, asset2);
+      let priceExactForToken = 0;
+      let priceTokenForExact = 0;
+      if (liquidityData[index].isSome) {
+        const { priceExactForToken: price1, priceTokenForExact: price2 } = await getAndConvertTokensData(
+          asset1,
+          asset2,
+          assetData1?.decimals,
+          assetData2?.decimals,
+        );
+
+        priceExactForToken = price1;
+        priceTokenForExact = price2;
+      }
+
       return {
         ...item,
         assetData2,
         assetData1,
-        swapPriceExactTokensForTokens,
-        swapPriceTokensForExactTokens,
+        swapPriceExactTokensForTokens: Number(priceExactForToken) === 0 ? null : priceExactForToken,
+        swapPriceTokensForExactTokens: Number(priceTokenForExact) === 0 ? null : priceTokenForExact,
         liquidity: liquidityData[index].isSome ? liquidityData[index].value.balance.toString() : null,
       };
     }));
     return wholeDataPools;
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error fetching DEX pools:', error);
+    console.error('Error fetching DEX pools with extend data: ', error);
     return [];
   }
 };
@@ -2377,6 +2444,7 @@ export {
   getIdentitiesNames,
   getOfficialRegistryEntries,
   getDexPools,
+  getDexPoolsExtendData,
   getDexReserves,
   getSwapPriceExactTokensForTokens,
   getSwapPriceTokensForExactTokens,
@@ -2392,4 +2460,6 @@ export {
   getAllJudges,
   getIsUserJudges,
   getSingleContract,
+  getAssetData,
+  getLLD,
 };

@@ -19,13 +19,11 @@ function ExchangeList() {
       <div>Loading..</div>
     );
   }
-
   if (dexs.length < 1) {
     return (
       <div>There is no any pool...</div>
     );
   }
-
   return (
     <div className={cx(stylesPage.overViewCard, styles.list)}>
       {

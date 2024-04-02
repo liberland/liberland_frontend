@@ -37,7 +37,7 @@ export const formatDollars = (grains) => _format(grains, dollarDecimals);
 export const parseMerits = (merits) => _parse(merits, meritDecimals);
 export const parseDollars = (dollars) => _parse(dollars, dollarDecimals);
 export const parseAssets = (assets, assetDecimals) => _parse(assets, assetDecimals);
-export const formatAssets = (assets, assetDecimals) => _format(assets, parseInt(assetDecimals));
+export const formatAssets = (assets, assetDecimals) => _format(assets, Number(assetDecimals));
 
 const configDefault = {
   isSymbolFirst: false,

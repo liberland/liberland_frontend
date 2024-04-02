@@ -11,6 +11,8 @@ import * as bridgeSagas from './bridge';
 import * as validatorSagas from './validator';
 import * as congressSagas from './congress';
 import * as onboardingSagas from './onboarding';
+import * as dexSagas from './dex';
+import * as contractsSagas from './contracts';
 
 export default function* rootSaga() {
   yield all([
@@ -38,6 +40,8 @@ export default function* rootSaga() {
     walletSagas.unpoolWatcher(),
     walletSagas.getTransfersTxWatcher(),
     walletSagas.getAdditionalAssetsWatcher(),
+    walletSagas.getAssetBalanceWatcher(),
+    walletSagas.getAssetsBalanceWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),
@@ -131,5 +135,20 @@ export default function* rootSaga() {
     // ONBOARDING
     onboardingSagas.claimComplimentaryLLDWatcher(),
     onboardingSagas.getIsEligibleForComplimentaryLLDWatcher(),
+
+    // DEX
+    dexSagas.getPoolsWatcher(),
+    dexSagas.addLiquidityWatcher(),
+    dexSagas.swapExactTokensForTokensWatcher(),
+    dexSagas.swapTokensForExactTokensWatcher(),
+    dexSagas.getDexReservesWatcher(),
+
+    // CONTRACTS
+    contractsSagas.getContractsWorkerWatcher(),
+    contractsSagas.signContractAsPartyWatcher(),
+    contractsSagas.signContractAsJudgeWatcher(),
+    contractsSagas.removeContractWatcher(),
+    contractsSagas.getMyContractsWatcher(),
+    contractsSagas.getSingleContractWatcher(),
   ]);
 }
