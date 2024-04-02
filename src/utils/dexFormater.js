@@ -169,7 +169,7 @@ export const converTransferData = async (
     );
     amountMinItem = amountMinDecimalList[amountMinDecimalList.length - 1];
   }
-  const amountMinData = calculateAmountDesiredFormatted(amountOutMin, actualDecimal);
+  const amountMinData = calculateAmountDesiredFormatted(amountOutMin || '', actualDecimal);
   const amountMinDecimal = amountMinItem === '0' ? new BN(1) : new BN(amountMinItem);
 
   const amountOutMinBN = amountMinData.mul(actualDecimal);
