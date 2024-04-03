@@ -11,7 +11,7 @@ import {
 export default function EditCompany() {
   const { companyId } = useParams();
   const dispatch = useDispatch();
-  const history = useHistory()
+  const history = useHistory();
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
@@ -19,15 +19,19 @@ export default function EditCompany() {
     dispatch(
       registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress),
     );
-  }, [dispatch, registriesActions]);
+  }, [dispatch, userWalletAddress]);
   const registries = useSelector(registriesSelectors.registries);
-
   const requestType = window.location.hash.substring(1);
-  const registeredCompanyData = registries?.officialUserRegistryEntries?.companies?.[requestType][
-    Number(companyId)
-  ];
+  const companies = registries?.officialUserRegistryEntries?.companies?.[requestType];
+  const registeredCompanyData = companies?.find((item) => item.id === companyId);
 
-  if (!registeredCompanyData) return null;
+  if (!registeredCompanyData) {
+    return (
+      <div>
+        There is no company with this id
+      </div>
+    );
+  }
 
   const onSubmit = (companyData) => {
     dispatch(
