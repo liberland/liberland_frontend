@@ -24,8 +24,6 @@ export const ExchangeItemPropTypes = {
   assetData1: AssetDataPropTypes.isRequired,
   assetData2: AssetDataPropTypes.isRequired,
   reserved: ReservedAssetPropTypes.isRequired,
-  swapPriceExactTokensForTokens: PropTypes.string.isRequired,
-  swapPriceTokensForExactTokens: PropTypes.string.isRequired,
 };
 
 export const AssetsPropTypes = PropTypes.shape({

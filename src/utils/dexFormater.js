@@ -1,6 +1,6 @@
 import { formatBalance, BN } from '@polkadot/util';
 import {
-  formatAssets, formatDollars, formatMerits,
+  formatDollars, formatMerits,
 } from './walletHelpers';
 import { getAmountsIn, getAmountsOut } from './getAmounts';
 
@@ -13,7 +13,7 @@ export function convertToEnumDex(asset1, asset2) {
 export const formatter = (v, decimals = 12) => formatBalance(
   v,
   {
-    decimals, forceUnit: '-', withSi: false, locale: 'en', withZero: false,
+    decimals, forceUnit: '-', withSi: false, locale: 'en', withAll: true,
   },
 );
 
@@ -55,11 +55,10 @@ export const formatProperlyValue = (asset, value, symbol, decimals) => {
     formattedValue = formatDollars(value);
   } else if (asset === '1') {
     formattedValue = formatMerits(value);
-  } else if (decimals === 0) {
-    formattedValue = formatter(value, decimals);
   } else {
-    formattedValue = formatAssets(value, decimals);
+    formattedValue = formatter(value, decimals);
   }
+
   const returnValue = symbol ? `${formattedValue} ${symbol}` : formattedValue;
   return returnValue;
 };
@@ -158,7 +157,6 @@ export const converTransferData = async (
   const amount = calculateAmountDesiredFormatted(amountDesired, actualDecimal);
   const reserveAsset1 = new BN(reservesThisAssets.asset1.toString());
   const reserveAsset2 = new BN(reservesThisAssets.asset2.toString());
-
   let amountMinItem = null;
   if (!amountOutMin) {
     const amountMinDecimalList = isBuy ? await getAmountsIn(
@@ -226,4 +224,14 @@ export const convertAssetData = (assetsData, asset1, asset2) => {
     symbol: asset2Metadata?.symbol,
   };
   return { assetData1, assetData2 };
+};
+
+export const convertExchangeRate = (reserved1, reserved2, decimals, asset) => {
+  const reserved1BN = new BN(reserved1);
+  const reserved2BN = new BN(reserved2);
+  const quotient = reserved1BN.div(reserved2BN);
+  const remainder = reserved1BN.mod(reserved2BN);
+  const exchangeRate = quotient.add(remainder);
+  const swapPrice = formatProperlyValue(asset, exchangeRate, null, Number(decimals));
+  return swapPrice;
 };

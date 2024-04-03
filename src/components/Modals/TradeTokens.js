@@ -108,8 +108,8 @@ function TradeTokensModal({
         const decimalsNumber = isBuy ? decimals2 : decimals1;
         const amount = getBNDataToFindPrice(asset, decimalsNumber, searchTerm);
         const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
-        const tradeData = isBuy ? await getSwapPriceTokensForExactTokens(enum1, enum2, amount)
-          : await getSwapPriceExactTokensForTokens(enum1, enum2, amount);
+        const tradeData = isBuy ? await getSwapPriceTokensForExactTokens(enum1, enum2, amount, true)
+          : await getSwapPriceExactTokensForTokens(enum1, enum2, amount, true);
         setActualPrice(tradeData?.toString() || 0);
         resolve(tradeData?.toString() || 0);
       } catch (err) {
