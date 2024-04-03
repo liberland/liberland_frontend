@@ -1,13 +1,35 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { BN_ZERO } from '@polkadot/util';
 import { formatDollars } from '../../../../utils/walletHelpers';
 import { blockchainSelectors, validatorSelectors } from '../../../../redux/selectors';
-import { eraToDays } from '../../../../utils/staking';
+import { blockTimeFormatted, stakingInfoToProgress } from '../../../../utils/staking';
+import { validatorActions } from '../../../../redux/actions';
 
-function UnbondingRow({ value, era }) {
-  const activeEra = useSelector(blockchainSelectors.activeEra);
-  const ready = activeEra.index.gte(era.unwrap());
+function UnbondingRow({ unlock, blocks }) {
+  return (
+    <li>
+      {formatDollars(unlock.value)}
+      {' '}
+      LLD
+      {' '}
+      {
+       `will unlock in ${blockTimeFormatted(blocks)}`
+      }
+    </li>
+  );
+}
+
+UnbondingRow.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  unlock: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  blocks: PropTypes.object.isRequired,
+};
+
+function UnbondingRowReady({ value }) {
+  if (!value || value.lte(BN_ZERO)) return null;
 
   return (
     <li>
@@ -15,29 +37,49 @@ function UnbondingRow({ value, era }) {
       {' '}
       LLD
       {' '}
-      {ready ? 'ready to withdraw' : `will unlock on ${eraToDays(era)} Days`}
+      ready to withdraw
     </li>
   );
 }
 
-UnbondingRow.propTypes = {
+UnbondingRowReady.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   value: PropTypes.object.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  era: PropTypes.object.isRequired,
 };
 
-export default function Unbonding() {
-  const info = useSelector(validatorSelectors.info);
+export default function Unbonding({ info }) {
+  const dispatch = useDispatch();
+  const { stakingInfo, sessionProgress } = useSelector(validatorSelectors.stakingData);
+  const blockNumber = useSelector(blockchainSelectors.blockNumber);
+  const stakingData = stakingInfoToProgress(stakingInfo, sessionProgress) ?? [];
 
-  if (!info || info.unlocking.length <= 0) return null;
+  useEffect(() => {
+    if (info.unlocking.length === 0) return;
+    dispatch(validatorActions.getStakingData.call());
+  }, [dispatch, blockNumber, info]);
 
+  if (stakingData.length === 0 && (!stakingInfo?.redeemable || stakingInfo?.redeemable.lte(BN_ZERO))) return null;
   return (
     <>
       Currently unstaking:
       <ul>
-        {info.unlocking.map(({ value, era }) => <UnbondingRow key={era.toString()} {...{ value, era }} />)}
+        <UnbondingRowReady value={stakingInfo?.redeemable} />
+        {stakingData.map(({
+          unlock,
+          eras,
+          blocks,
+        }) => (
+          <UnbondingRow
+            key={eras.toString()}
+            {...{ unlock, eras, blocks }}
+          />
+        ))}
       </ul>
     </>
   );
 }
+
+Unbonding.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  info: PropTypes.object.isRequired,
+};
