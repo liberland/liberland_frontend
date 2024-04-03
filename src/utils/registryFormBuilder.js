@@ -201,6 +201,10 @@ export function BuildRegistryForm({
     defaultValues,
   });
 
+  if (formObject.invalid) {
+    return <div>This company&apos;s registry data is corrupted. Please contact administration.</div>;
+  }
+
   return (
     <form onSubmit={handleSubmit((result) => {
       callback(result);
