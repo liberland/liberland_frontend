@@ -1,4 +1,5 @@
 import { formatBalance, BN } from '@polkadot/util';
+import { BigNumber } from 'ethers';
 import {
   formatDollars, formatMerits,
 } from './walletHelpers';
@@ -13,7 +14,7 @@ export function convertToEnumDex(asset1, asset2) {
 export const formatter = (v, decimals = 12) => formatBalance(
   v,
   {
-    decimals, forceUnit: '-', withSi: false, locale: 'en', withAll: true,
+    decimals, forceUnit: '-', withSi: false, locale: 'en', withAll: true, withZero: false,
   },
 );
 
@@ -28,10 +29,12 @@ export const formatterDecimals = (balance, decimals) => {
   const baseFactor = new BN(10).pow(new BN(chainDecimals));
 
   const integerPart = bigBalance.div(baseFactor).toString();
-  const remainder = bigBalance.mod(baseFactor).toString();
-  const formattedRemainder = remainder.padStart(chainDecimals, '0');
-
-  return `${integerPart}.${formattedRemainder}`;
+  const remainder = bigBalance.mod(baseFactor);
+  const formattedRemainder = remainder.toString().padStart(chainDecimals, '0');
+  if (!remainder.isZero()) {
+    return `${integerPart}.${formattedRemainder}`;
+  }
+  return `${integerPart}`;
 };
 
 export const makeAssetToShow = (asset, symbol) => {
@@ -226,12 +229,43 @@ export const convertAssetData = (assetsData, asset1, asset2) => {
   return { assetData1, assetData2 };
 };
 
-export const convertExchangeRate = (reserved1, reserved2, decimals, asset) => {
-  const reserved1BN = new BN(reserved1);
-  const reserved2BN = new BN(reserved2);
-  const quotient = reserved1BN.div(reserved2BN);
-  const remainder = reserved1BN.mod(reserved2BN);
-  const exchangeRate = quotient.add(remainder);
-  const swapPrice = formatProperlyValue(asset, exchangeRate, null, Number(decimals));
-  return swapPrice;
+export const getExchangeRate = (reserved1, reserved2, decimals1, decimals2) => {
+  if (!reserved1 || !reserved2) {
+    return null;
+  }
+
+  const reservedFormated1 = formatterDecimals(reserved1, decimals1);
+  const reservedFormated2 = formatterDecimals(reserved2, decimals2);
+
+  const num1 = BigNumber.from(reservedFormated1.replace('.', ''));
+  const num2 = BigNumber.from(reservedFormated2.replace('.', ''));
+
+  // Count the number of decimal places in both numbers
+  const decimalPlaces1 = (reservedFormated1.split('.')[1] || '').length;
+  const decimalPlaces2 = (reservedFormated2.split('.')[1] || '').length;
+
+  // Shift the decimal places to the right by the total number of decimal places
+  const shiftedNum1 = num1.mul(BigNumber.from(10).pow(decimalPlaces2));
+  const shiftedNum2 = num2.mul(BigNumber.from(10).pow(decimalPlaces1));
+
+  // Perform division
+  let result = shiftedNum1.div(shiftedNum2);
+  const isNeededMultiply = result.isZero();
+  if (isNeededMultiply) {
+    const shiftedNum1Multiple = shiftedNum1.mul(BigNumber.from(10).pow(BigNumber.from(18)));
+    result = shiftedNum1Multiple.div(shiftedNum2);
+  }
+  // Adjust the result to have the correct number of decimal places
+  const length = (result.toString().length || 0) - (decimalPlaces1 || 0) + (isNeededMultiply ? 18 : 0);
+  const resultWithDecimal = result.toString().padStart(length, '0');
+  const decimalIndex = resultWithDecimal.length - (decimalPlaces1 || 0) - (isNeededMultiply ? 18 - decimalPlaces1 : 0);
+
+  const integer = resultWithDecimal.slice(0, decimalIndex);
+  const decimal = resultWithDecimal.slice(decimalIndex);
+
+  if (decimal) {
+    return `${integer}.${decimal}`;
+  }
+
+  return integer;
 };

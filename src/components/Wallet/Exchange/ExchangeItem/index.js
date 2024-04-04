@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { convertExchangeRate, makeAssetToShow } from '../../../../utils/dexFormater';
+import { getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormater';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
 import AddLiquidityModalWrapper from '../../../Modals/AddLiquidityModal';
 import styles from '../styles.module.scss';
@@ -38,17 +38,17 @@ function ExchangeItem({ dex }) {
     reserved,
   };
 
-  const swapPriceTokensForExactTokens = convertExchangeRate(
-    reserved.asset1,
-    reserved.asset2,
-    assetData1.decimals,
-    asset1,
+  const swapPriceTokensForExactTokens = getExchangeRate(
+    reserved?.asset1,
+    reserved?.asset2,
+    assetData1?.decimals,
+    assetData2?.decimals,
   );
-  const swapPriceExactTokensForTokens = convertExchangeRate(
-    reserved.asset2,
-    reserved.asset1,
-    assetData2.decimals,
-    asset2,
+  const swapPriceExactTokensForTokens = getExchangeRate(
+    reserved?.asset2,
+    reserved?.asset1,
+    assetData2?.decimals,
+    assetData1?.decimals,
   );
 
   return (

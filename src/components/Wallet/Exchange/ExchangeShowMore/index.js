@@ -20,7 +20,7 @@ function ExchangeShowMore({
   return (
     <div className={styles.moreDetails}>
       <div className={styles.reserved}>
-        {(!reserved?.asset2 || !reserved?.asset1) && (
+        {(reserved?.asset2?.isEmpty || reserved?.asset1?.isEmpty) && (
         <div>
           Pool don&apos;t have any liquidity
         </div>
