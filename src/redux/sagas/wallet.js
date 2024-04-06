@@ -11,7 +11,6 @@ import {
   getValidators, getNominatorTargets,
   setNominatorTargets,
   unpool, getAdditionalAssets, sendAssetTransfer,
-  getLLD,
   getAssetData,
 } from '../../api/nodeRpcCall';
 import { getHistoryTransfers } from '../../api/explorer';
@@ -39,7 +38,8 @@ function* getAssetBalanceWorker(action) {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   let balance;
   if (asset === 'Native') {
-    balance = yield getLLD(walletAddress);
+    const { liquidAmount } = yield getBalanceByAddress(walletAddress);
+    balance = liquidAmount.amount;
   } else {
     balance = yield getAssetData(asset, walletAddress);
   }
@@ -49,9 +49,10 @@ function* getAssetBalanceWorker(action) {
 function* getAssetsBalanceWorker(action) {
   const assets = action.payload;
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  const assetsBalance = yield Promise.all(assets.map((asset) => {
+  const assetsBalance = yield Promise.all(assets.map(async (asset) => {
     if (asset === 'Native') {
-      return getLLD(walletAddress);
+      const { liquidAmount } = await getBalanceByAddress(walletAddress);
+      return liquidAmount.amount;
     }
     return getAssetData(asset, walletAddress);
   }));

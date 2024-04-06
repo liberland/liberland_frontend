@@ -13,6 +13,7 @@ import { dexSelectors, userSelectors, walletSelectors } from '../../redux/select
 import {
   calculateAmountDesiredFormatted,
   convertLiquidityData, formatProperlyValue, getDecimalsBN,
+  getExchangeRate,
 } from '../../utils/dexFormater';
 import { AssetsPropTypes } from '../Wallet/Exchange/proptypes';
 
@@ -20,6 +21,14 @@ function AddLiquidityModal({
   handleModal, assets,
 }) {
   const dispatch = useDispatch();
+  const walletAddress = useSelector(userSelectors.selectWalletAddress);
+  const reserves = useSelector(dexSelectors.selectorReserves);
+  const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
+  const [isChecked, setIsChecked] = useState(false);
+  const [inputAsset1, setInputAsset1] = useState('');
+  const [inputAsset2, setInputAsset2] = useState('');
+
+  const isDisplayNone = isChecked ? null : styles.displayNone;
   const {
     handleSubmit,
     register,
@@ -40,21 +49,6 @@ function AddLiquidityModal({
     asset2ToShow,
   } = assets;
 
-  const [isChecked, setIsChecked] = useState(false);
-  const walletAddress = useSelector(userSelectors.selectWalletAddress);
-  const reserves = useSelector(dexSelectors.selectorReserves);
-  const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
-
-  const isDisplayNone = isChecked ? null : styles.displayNone;
-
-  useEffect(() => {
-    dispatch(dexActions.getDexReserves.call({ asset1, asset2 }));
-  }, [dispatch, asset1, asset2]);
-
-  useEffect(() => {
-    dispatch(walletActions.getAssetsBalance.call([asset1, asset2]));
-  }, [dispatch, asset1, asset2]);
-
   const reservesThisAssets = useMemo(() => {
     if (reserves && asset1 && asset2) {
       return reserves[asset1 + asset2];
@@ -65,11 +59,11 @@ function AddLiquidityModal({
   const onSubmit = (data) => {
     if (!isValid) return;
     const {
-      amount1Desired, amount1Min: ammountInputValue1, amount2Desired, amount2Min: ammountInputValue2,
+      amount1Desired, amount2Desired, minAmountPercent,
     } = data;
 
     const {
-      ammount1, ammount2, amount1Min, amount2Min,
+      amount1, amount2, amount1Min, amount2Min,
     } = convertLiquidityData(
       amount1Desired,
       amount2Desired,
@@ -77,15 +71,14 @@ function AddLiquidityModal({
       asset2,
       assetData1?.decimals,
       assetData2?.decimals,
-      reservesThisAssets,
-      ammountInputValue1,
-      ammountInputValue2,
+      minAmountPercent,
     );
     const mintTo = walletAddress;
+
     dispatch(dexActions.addLiquidity.call({
-      amount1Desired: ammount1,
+      amount1Desired: amount1,
       amount1Min,
-      amount2Desired: ammount2,
+      amount2Desired: amount2,
       amount2Min,
       asset1,
       asset2,
@@ -107,6 +100,48 @@ function AddLiquidityModal({
     }
     return true;
   };
+
+  const handleChangeInput = (e, asset) => {
+    if (!reservesThisAssets) return;
+    const { value } = e.target;
+    let rate = null;
+
+    const isAsset1 = asset === reservesThisAssets.asset1Number;
+
+    if (isAsset1) {
+      rate = getExchangeRate(
+        reservesThisAssets.asset1,
+        reservesThisAssets.asset2,
+        assetData1?.decimals,
+        assetData2?.decimals,
+      );
+    } else {
+      rate = getExchangeRate(
+        reservesThisAssets.asset2,
+        reservesThisAssets.asset1,
+        assetData2?.decimals,
+        assetData1?.decimals,
+      );
+    }
+    const calculateExchange = () => value * rate;
+    const exchangeOtherAssetValue = calculateExchange();
+
+    if (isAsset1) {
+      setInputAsset2(exchangeOtherAssetValue);
+      setInputAsset1(value);
+    } else {
+      setInputAsset1(exchangeOtherAssetValue);
+      setInputAsset2(value);
+    }
+  };
+
+  useEffect(() => {
+    dispatch(dexActions.getDexReserves.call({ asset1, asset2 }));
+  }, [dispatch, asset1, asset2]);
+
+  useEffect(() => {
+    dispatch(walletActions.getAssetsBalance.call([asset1, asset2]));
+  }, [dispatch, asset1, asset2]);
 
   return (
     <form
@@ -141,23 +176,11 @@ function AddLiquidityModal({
       <TextInput
         required
         validate={(v) => validate(v, assetsBalance[0], assetData1?.decimals, asset1)}
-        errorTitle="amount1Desired"
+        errorTitle={asset1ToShow}
         register={register}
         name="amount1Desired"
-      />
-      <div className={cx(styles.title, isDisplayNone)}>
-        Amount
-        {' '}
-        {asset1ToShow}
-        {' '}
-        Min
-      </div>
-      <TextInput
-        className={cx(isDisplayNone)}
-        validate={(v) => (!v ? true : !Number.isNaN(parseInt(v)) || 'Not a valid number')}
-        errorTitle="amount1Min"
-        register={register}
-        name="amount1Min"
+        onChange={(e) => handleChangeInput(e, asset1)}
+        value={inputAsset1}
       />
       {errors?.amount1Desired && (
         <div className={styles.error}>{errors.amount1Desired.message}</div>
@@ -183,33 +206,28 @@ function AddLiquidityModal({
       <TextInput
         required
         validate={(v) => validate(v, assetsBalance[1], assetData2?.decimals, asset2)}
-        errorTitle="amount2Desired"
+        errorTitle={asset2ToShow}
         register={register}
         name="amount2Desired"
+        onChange={(e) => handleChangeInput(e, asset2)}
+        value={inputAsset2}
       />
       {errors?.amount2Desired && (
         <div className={styles.error}>{errors.amount2Desired.message}</div>
       )}
-
-      {errors?.amount1Min && (
-        <div className={cx(styles.error, isDisplayNone)}>{errors.amount1Min.message}</div>
-      )}
       <div className={cx(styles.title, isDisplayNone)}>
-        Amount
-        {' '}
-        {asset2ToShow}
-        {' '}
-        Min
+        Max Slippage (in percent %)
       </div>
       <TextInput
         className={cx(isDisplayNone)}
         validate={(v) => (!v ? true : !Number.isNaN(parseInt(v)) || 'Not a valid number')}
-        errorTitle="amount2Min"
+        errorTitle="minAmountPercent"
         register={register}
-        name="amount2Min"
+        name="minAmountPercent"
+        placeholder="Default max slippage is 0.5%"
       />
-      {errors?.amount2Min && (
-        <div className={cx(styles.error, isDisplayNone)}>{errors.amount2Min.message}</div>
+      {errors?.minAmountPercent && (
+        <div className={cx(styles.error, isDisplayNone)}>{errors.minAmountPercent.message}</div>
       )}
       <div className={styles.checkbox}>
         <label>

@@ -258,18 +258,6 @@ const getLldBalances = async (addresses) => {
   }
 };
 
-const getLLD = async (address) => {
-  try {
-    const api = await getApi();
-    const balances = await api.query.system.account(address);
-    return balances.data.free;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    throw e;
-  }
-};
-
 const getAssetData = async (asset, address) => {
   try {
     const api = await getApi();
@@ -2038,10 +2026,7 @@ const getSwapPriceExactTokensForTokens = async (asset1, asset2, amount, includeT
     amount,
     includeTax,
   );
-  if (maybeRate.isNone) {
-    return null;
-  }
-  return maybeRate.unwrap();
+  return maybeRate.unwrapOr(null);
 };
 
 const getSwapPriceTokensForExactTokens = async (asset1, asset2, amount, includeTax = true) => {
@@ -2052,10 +2037,7 @@ const getSwapPriceTokensForExactTokens = async (asset1, asset2, amount, includeT
     amount,
     includeTax,
   );
-  if (maybeRate.isNone) {
-    return null;
-  }
-  return maybeRate.unwrap();
+  return maybeRate.unwrapOr(null);
 };
 
 const getDexReserves = async (asset1, asset2) => {
@@ -2092,8 +2074,8 @@ const getDexPools = async (walletAddress) => {
       const { lpToken } = maybePoolData.unwrapOrDefault();
       const asset1checkIsNative = asset1.value.toString();
       const asset2checkIsNative = asset2.value.toString();
-      const asset2Tronsform = asset2checkIsNative || asset2.toString();
-      const asset1Tronsform = asset1checkIsNative || asset1.toString();
+      const asset2Transform = asset2checkIsNative || asset2.toString();
+      const asset1Transform = asset1checkIsNative || asset1.toString();
       const lpTokenTransform = lpToken.toString();
 
       const [lpTokensValue, reserved] = await Promise.all([
@@ -2101,8 +2083,8 @@ const getDexPools = async (walletAddress) => {
         getDexReserves(asset1, asset2),
       ]);
       return {
-        asset1: asset1Tronsform,
-        asset2: asset2Tronsform,
+        asset1: asset1Transform,
+        asset2: asset2Transform,
         lpToken: lpTokenTransform,
         lpTokensBalance: lpTokensValue?.balance,
         reserved,
@@ -2120,12 +2102,7 @@ const getDexPoolsExtendData = async (walletAddress) => {
   try {
     const api = await getApi();
     const poolsData = await getDexPools(walletAddress);
-    const assets = [];
-    const liquidityForPool = [];
-    poolsData.forEach((item) => {
-      const { lpToken } = item;
-      liquidityForPool.push([api.query.poolAssets.account, [lpToken, walletAddress]]);
-    });
+    const liquidityForPool = poolsData.map(({ lpToken }) => [api.query.poolAssets.account, [lpToken, walletAddress]]);
 
     const [liquidityData, assetsData] = await Promise.all([
       api.queryMulti(liquidityForPool),
@@ -2133,10 +2110,7 @@ const getDexPoolsExtendData = async (walletAddress) => {
     ]);
     const wholeDataPools = await Promise.all(poolsData.map(async (item, index) => {
       const { asset1, asset2 } = item;
-      assets.push(asset1, asset2);
-
       const { assetData1, assetData2 } = convertAssetData(assetsData, asset1, asset2);
-
       return {
         ...item,
         assetData2,
@@ -2417,5 +2391,4 @@ export {
   getIsUserJudges,
   getSingleContract,
   getAssetData,
-  getLLD,
 };

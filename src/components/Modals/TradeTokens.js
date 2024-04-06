@@ -70,8 +70,8 @@ function TradeTokensModal({
 
   const onSubmit = async (data) => {
     if (!isValid) return;
-    const { amountIn, amountOutMin } = data;
-    const amountOut = amountOutMin.length > 0 ? amountOutMin : undefined;
+    const { amountIn, minAmountPercent } = data;
+    const amountOut = minAmountPercent.length > 0 ? minAmountPercent : undefined;
     try {
       const { amount, amountMin } = await converTransferData(
         asset1,
@@ -81,7 +81,6 @@ function TradeTokensModal({
         amountIn,
         amountOut,
         isBuy,
-        reservesThisAssets,
       );
       const swapData = {
         path: { asset1, asset2 },
@@ -108,8 +107,8 @@ function TradeTokensModal({
         const decimalsNumber = isBuy ? decimals2 : decimals1;
         const amount = getBNDataToFindPrice(asset, decimalsNumber, searchTerm);
         const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
-        const tradeData = isBuy ? await getSwapPriceTokensForExactTokens(enum1, enum2, amount, true)
-          : await getSwapPriceExactTokensForTokens(enum1, enum2, amount, true);
+        const tradeData = isBuy ? await getSwapPriceTokensForExactTokens(enum1, enum2, amount, false)
+          : await getSwapPriceExactTokensForTokens(enum1, enum2, amount, false);
         setActualPrice(tradeData?.toString() || 0);
         resolve(tradeData?.toString() || 0);
       } catch (err) {
@@ -141,12 +140,17 @@ function TradeTokensModal({
       return 'Input greater than balance';
     }
 
-    if (isBuy) {
-      const priceBN = new BN(price);
-      if (priceBN.isZero() || priceBN.gte(new BN(reservesThisAssets.asset1))) {
-        return 'Input value exceeds reserves';
-      }
+    const showReserve = isBuy
+      ? (reservesThisAssets?.asset1
+    && formatProperlyValue(asset1, reservesThisAssets?.asset1, asset1ToShow, assetData1?.decimals || 0))
+      : (reservesThisAssets?.asset2
+    && formatProperlyValue(asset2, reservesThisAssets?.asset2, asset2ToShow, assetData2?.decimals || 0));
+
+    const priceBN = new BN(price);
+    if (priceBN.isZero() || priceBN.gte(new BN(isBuy ? reservesThisAssets?.asset1 : reservesThisAssets?.asset2))) {
+      return `Input value exceeds reserves max ${showReserve}`;
     }
+
     return true;
   };
 
@@ -212,16 +216,15 @@ function TradeTokensModal({
         <div className={styles.error}>{errors.amountIn.message}</div>
       )}
       <div className={cx(styles.title, isDisplayNone)}>
-        Amount Out Min (
-        {!isBuy ? asset2ToShow : asset1ToShow}
-        )
+        Max Slippage (in percent %)
       </div>
       <TextInput
         className={cx(isDisplayNone)}
         validate={(v) => (!v ? true : !Number.isNaN(parseInt(v)) || 'Not a valid number')}
-        errorTitle="Amount Out Min"
+        errorTitle="Amount Percent"
         register={register}
-        name="amountOutMin"
+        name="minAmountPercent"
+        placeholder="Default max slippage is 0.5%"
       />
       {errors?.amountOutMin && (
         <div className={cx(styles.error, isDisplayNone)}>{errors.amountOutMin.message}</div>
