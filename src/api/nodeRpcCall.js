@@ -1,11 +1,11 @@
-import {web3FromAddress} from '@polkadot/extension-dapp';
+import { web3FromAddress } from '@polkadot/extension-dapp';
 import pako from 'pako';
-import {hexToU8a, u8aToHex} from '@polkadot/util';
-import {USER_ROLES, userRolesHelper} from '../utils/userRolesHelper';
-import {handleMyDispatchErrors} from '../utils/therapist';
-import {blockchainDataToFormObject} from '../utils/registryFormBuilder';
+import { hexToU8a, u8aToHex } from '@polkadot/util';
+import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
+import { handleMyDispatchErrors } from '../utils/therapist';
+import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
-import {parseDollars, parseMerits} from "../utils/walletHelpers";
+import { parseDollars, parseMerits } from '../utils/walletHelpers';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -76,10 +76,10 @@ const getApi = async () => {
           signingAbilityConditions: 'Encryptable',
         },
         RelevantAsset: {
-          assetId: 'Encryptable'
+          assetId: 'Encryptable',
         },
         RelevantContract: {
-          contractId: 'Encryptable'
+          contractId: 'Encryptable',
         },
         CompanyData: {
           name: 'Text',
@@ -233,59 +233,11 @@ const getAdditionalAssets = async (address, isIndexNeed = false) => {
   }
 };
 
-const bridgeSubscribe = async (asset, receipt_id, onChange) => {
-  const api = await getApi();
-  let bridge;
-  /* eslint-disable eqeqeq */
-  if (asset == 'LLM') bridge = api.query.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.query.ethLLDBridge;
-  // returns unsub func
-  return {
-    unsubscribe: await bridge.statusOf(receipt_id, onChange),
-  };
-};
-
-const bridgeDeposit = async ({ asset, amount, ethereumRecipient }, walletAddress) => {
-  const api = await getApi();
-  let bridge;
-  if (asset == 'LLM') bridge = api.tx.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.tx.ethLLDBridge;
-  // eslint-disable-next-line no-undef
-  else throw new Exception('Unknown asset');
-
-  const call = bridge.deposit(amount, ethereumRecipient);
-  return submitExtrinsic(call, walletAddress, api);
-};
-
-const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress) => {
-  const api = await getApi();
-  let bridge;
-  if (asset == 'LLM') bridge = api.tx.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.tx.ethLLDBridge;
-  // eslint-disable-next-line no-undef
-  else throw new Exception('Unknown asset');
-
-  const call = bridge.withdraw(receipt_id);
-  return submitExtrinsic(call, walletAddress, api);
-};
-
-const bridgeConstants = async (asset) => {
-  const api = await getApi();
-  let bridge;
-  if (asset == 'LLM') bridge = api.consts.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.consts.ethLLDBridge;
-  /* eslint-enable eqeqeq */
-  // eslint-disable-next-line no-undef
-  else throw new Exception('Unknown asset');
-
-  return bridge;
-};
-
 const provideJudgementAndAssets = async ({
   address, hash, walletAddress, merits, dollars,
 }) => {
-  merits = parseMerits(merits)
-  dollars = parseDollars(dollars)
+  const parsedMerits = parseMerits(merits);
+  const parsedDollars = parseDollars(dollars);
   const api = await getApi();
   const calls = [];
 
@@ -294,13 +246,13 @@ const provideJudgementAndAssets = async ({
   const officeJudgementCall = api.tx.identityOffice.execute(judgementCall);
   calls.push(officeJudgementCall);
 
-  if (dollars?.gt(0)) {
-    const lldCall = api.tx.balances.transfer(address, dollars.toString());
+  if (parsedDollars?.gt(0)) {
+    const lldCall = api.tx.balances.transfer(address, parsedDollars.toString());
     const officeLldCall = api.tx.identityOffice.execute(lldCall);
     calls.push(officeLldCall);
   }
-  if (merits?.gt(0)) {
-    const llmCall = api.tx.llm.sendLlmToPolitipool(address, merits.toString());
+  if (parsedMerits?.gt(0)) {
+    const llmCall = api.tx.llm.sendLlmToPolitipool(address, parsedMerits.toString());
     const officeLlmCall = api.tx.identityOffice.execute(llmCall);
     calls.push(officeLlmCall);
   }
@@ -1941,9 +1893,8 @@ const fetchCompanyRequests = async () => {
   const raw = await api.query.companyRegistry.requests.entries();
   return raw.map((rawEntry) => ({
     indexes: rawEntry[0].toHuman(),
-  }))
-
-}
+  }));
+};
 
 const handleContractData = (data) => {
   let result = null;
@@ -2103,14 +2054,10 @@ export {
   getCitizenCount,
   getLandNFTMetadataJson,
   setLandNFTMetadata,
-  bridgeWithdraw,
-  bridgeSubscribe,
-  bridgeDeposit,
   getBlockEvents,
   getLlmBalances,
   getLldBalances,
   getAdditionalAssets,
-  bridgeConstants,
   batchPayoutStakers,
   getStakersRewards,
   getSessionValidators,

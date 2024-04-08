@@ -9,7 +9,6 @@ export const {
   updateTransferWithdrawTx,
   getTransfersToEthereum,
   getTransfersToSubstrate,
-  getBridgesConstants,
 } = createActions({
   DEPOSIT: {
     call: undefined,
@@ -43,11 +42,6 @@ export const {
     failure: undefined,
   },
   GET_TRANSFERS_TO_SUBSTRATE: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  GET_BRIDGES_CONSTANTS: {
     call: undefined,
     success: undefined,
     failure: undefined,

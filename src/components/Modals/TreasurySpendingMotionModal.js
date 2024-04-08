@@ -8,8 +8,8 @@ import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { TextInput } from '../InputComponents';
 import { congressActions } from '../../redux/actions';
-import { isValidSubstrateAddress } from '../../utils/bridge';
-import { parseDollars } from '../../utils/walletHelpers';
+
+import { parseDollars, isValidSubstrateAddress } from '../../utils/walletHelpers';
 
 import styles from './styles.module.scss';
 

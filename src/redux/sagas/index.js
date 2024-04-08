@@ -7,7 +7,6 @@ import * as legislationSagas from './legislation';
 import * as officesSagas from './offices';
 import * as registriesSagas from './registries';
 import * as identitySagas from './identity';
-import * as bridgeSagas from './bridge';
 import * as validatorSagas from './validator';
 import * as congressSagas from './congress';
 import * as onboardingSagas from './onboarding';
@@ -78,15 +77,6 @@ export default function* rootSaga() {
     registriesSagas.requestEditCompanyRegistrationWatcher(),
     registriesSagas.cancelCompanyRequestWatcher(),
     registriesSagas.requestUnregisterCompanyRegistrationWatcher(),
-
-    // BRIDGE
-    bridgeSagas.withdrawWatcher(),
-    bridgeSagas.depositWatcher(),
-    bridgeSagas.burnWatcher(),
-    bridgeSagas.monitorBurnWatcher(),
-    bridgeSagas.getTransfersToEthereumWatcher(),
-    bridgeSagas.getTransfersToSubstrateWatcher(),
-    bridgeSagas.getBridgesConstantsWatcher(),
 
     // VALIDATOR
     validatorSagas.payoutWatcher(),

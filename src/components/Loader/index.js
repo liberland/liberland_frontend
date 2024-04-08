@@ -10,7 +10,6 @@ import {
   officesSelectors,
   identitySelectors,
   legislationSelectors,
-  bridgeSelectors,
   validatorSelectors,
   congressSelectors,
   registriesSelectors,
@@ -27,7 +26,6 @@ function Loader({ children }) {
   const isLoadingOffices = useSelector(officesSelectors.selectorIsLoading);
   const isLoadingIdentity = useSelector(identitySelectors.selectorIsLoading);
   const isLoadingLegislation = useSelector(legislationSelectors.gettingLegislation);
-  const isLoadingBridge = useSelector(bridgeSelectors.isLoading);
   const isLoadingValidator = useSelector(validatorSelectors.isLoading);
   const isLoadingCongress = useSelector(congressSelectors.isLoading);
   const isGetRegistries = useSelector(registriesSelectors.isGetRegistries);
@@ -40,7 +38,6 @@ function Loader({ children }) {
     isLoadingOffices,
     isLoadingIdentity,
     isLoadingLegislation,
-    isLoadingBridge,
     isLoadingValidator,
     isLoadingCongress,
     isGetRegistries,

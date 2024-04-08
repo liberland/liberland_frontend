@@ -15,10 +15,9 @@ import {
 } from '../../../redux/selectors';
 import styles from './styles.module.scss';
 import Table from '../../Table';
-import {parseIdentityData, parseLegal} from '../../../utils/identityParser';
-import { isValidSubstrateAddress } from '../../../utils/bridge';
-import {fetchPendingIdentities} from "../../../api/nodeRpcCall";
-import {parseDollars, parseMerits} from "../../../utils/walletHelpers";
+import { parseLegal } from '../../../utils/identityParser';
+import { isValidSubstrateAddress } from '../../../utils/walletHelpers';
+import { fetchPendingIdentities } from '../../../api/nodeRpcCall';
 
 function IdentityForm() {
   const dispatch = useDispatch();
@@ -33,22 +32,26 @@ function IdentityForm() {
   const [pendingIdentities, setPendingIdentities] = useState([]);
 
   const doFetchPendingIdentities = async () => {
-    const pendingIdentities = await fetchPendingIdentities()
-    setPendingIdentities(pendingIdentities)
-  }
+    const fetchedPendingIdentities = await fetchPendingIdentities();
+    setPendingIdentities(fetchedPendingIdentities);
+  };
   const onSubmit = ({ account }) => {
     dispatch(officesActions.officeGetIdentity.call(account));
   };
   return (
     <div>
       <div>
-        {pendingIdentities.map(pendingIdentity => {
-          return (<div>{pendingIdentity.address}
+        {pendingIdentities.map((pendingIdentity) => (
+          <div>
+            {pendingIdentity.address}
             <button onClick={
-              () => {
-                dispatch(officesActions.officeGetIdentity.call(pendingIdentity.address))
-              }}>fetch</button></div>)
-        })}
+              () => (dispatch(officesActions.officeGetIdentity.call(pendingIdentity.address)))
+              }
+            >
+              fetch
+            </button>
+          </div>
+        ))}
         <Button primary medium onClick={() => doFetchPendingIdentities()}>
           Fetch pending identities
         </Button>
@@ -122,6 +125,9 @@ function parseEligibleOn(eligible_on) {
 }
 
 function EligibleOnAnalysis({ identity }) {
+  const blockNumber = useSelector(blockchainSelectors.blockNumber);
+  const [now] = useState(new Date());
+
   let eligible_on = identity.info.additional.find(([key, _]) => key.eq('eligible_on'));
   if (!eligible_on) {
     return (
@@ -145,8 +151,6 @@ function EligibleOnAnalysis({ identity }) {
     identity: PropTypes.instanceOf(Map).isRequired,
   };
 
-  const blockNumber = useSelector(blockchainSelectors.blockNumber);
-  const [now] = useState(new Date());
   const eligibleOnBlockNumber = parseEligibleOn(eligible_on);
   const msFromNow = (eligibleOnBlockNumber - blockNumber) * 6 * 1000;
   const eligibleOnDate = new Date(now.getTime() + msFromNow);
@@ -311,13 +315,15 @@ function IdentityInfo() {
           {judgement}
         </div>
       </div>
-     <SubmitForm backendMerits={backendMerits} backendDollars={backendDollars} identity={identity} hash={hash}/>
+      <SubmitForm backendMerits={backendMerits} backendDollars={backendDollars} identity={identity} hash={hash} />
 
     </>
   );
 }
 
-function SubmitForm({identity, backendMerits, backendDollars, hash}) {
+function SubmitForm({
+  identity, backendMerits, backendDollars, hash,
+}) {
   const dispatch = useDispatch();
   const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
   const defaultValues = {
@@ -326,13 +332,10 @@ function SubmitForm({identity, backendMerits, backendDollars, hash}) {
   };
   const {
     handleSubmit,
-    formState: { errors },
     register,
   } = useForm({
-    mode: 'all', defaultValues
+    mode: 'all', defaultValues,
   });
-
-
 
   const provideJudgementAndSendTokens = (values) => {
     dispatch(
@@ -367,8 +370,16 @@ function SubmitForm({identity, backendMerits, backendDollars, hash}) {
         </Button>
       </div>
     </form>
-  )
+  );
 }
+
+SubmitForm.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  identity: PropTypes.object.isRequired,
+  backendMerits: PropTypes.instanceOf(ethers.BigNumber).isRequired,
+  backendDollars: PropTypes.instanceOf(ethers.BigNumber).isRequired,
+  hash: PropTypes.string.isRequired,
+};
 
 function Identity() {
   return (

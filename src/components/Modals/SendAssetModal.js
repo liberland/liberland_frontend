@@ -11,8 +11,7 @@ import Button from '../Button/Button';
 
 // STYLES
 import styles from './styles.module.scss';
-import { isValidSubstrateAddress } from '../../utils/bridge';
-import { parseAssets } from '../../utils/walletHelpers';
+import { parseAssets, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 
