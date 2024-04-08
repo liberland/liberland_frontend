@@ -79,8 +79,8 @@ function TradeTokensModal({
         asset2,
         decimals2,
         amountIn,
-        amountOut,
         isBuy,
+        amountOut,
       );
       const swapData = {
         path: { asset1, asset2 },

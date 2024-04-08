@@ -34,9 +34,19 @@ function ExchangeShowMore({
         )}
       </div>
       <div className={styles.liquidity}>
-        {liquidity
-          ? `Your liquidity: ${((liquidity / lpTokensBalance) * 100)}% (${liquidity} Lp Tokens)`
-          : 'Not found your liquidity in this pool'}
+        <div className={styles.text}>
+          <span>
+            {liquidity ? `Your liquidity: ${((lpTokensBalance / liquidity) * 100)}% (${lpTokensBalance} Lp Tokens)`
+              : 'Not found your liquidity in this pool'}
+          </span>
+          <span>
+            {`Pooled ${asset1ToShow}: ${(reserved.asset1 * lpTokensBalance) / liquidity}`}
+          </span>
+          <span>
+            {`Pooled ${asset2ToShow}: ${(reserved.asset2 * lpTokensBalance) / liquidity}`}
+          </span>
+        </div>
+
         <Button small green onClick={handleModalLiquidity}>
           Add liquidity
         </Button>

@@ -25,13 +25,12 @@ function AddLiquidityModal({
   const reserves = useSelector(dexSelectors.selectorReserves);
   const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
   const [isChecked, setIsChecked] = useState(false);
-  const [inputAsset1, setInputAsset1] = useState('');
-  const [inputAsset2, setInputAsset2] = useState('');
 
   const isDisplayNone = isChecked ? null : styles.displayNone;
   const {
     handleSubmit,
     register,
+    setValue,
     formState: { errors, isValid },
   } = useForm({
     mode: 'onChange',
@@ -74,7 +73,6 @@ function AddLiquidityModal({
       minAmountPercent,
     );
     const mintTo = walletAddress;
-
     dispatch(dexActions.addLiquidity.call({
       amount1Desired: amount1,
       amount1Min,
@@ -108,7 +106,7 @@ function AddLiquidityModal({
 
     const isAsset1 = asset === reservesThisAssets.asset1Number;
 
-    if (isAsset1) {
+    if (!isAsset1) {
       rate = getExchangeRate(
         reservesThisAssets.asset1,
         reservesThisAssets.asset2,
@@ -123,15 +121,14 @@ function AddLiquidityModal({
         assetData1?.decimals,
       );
     }
-    const calculateExchange = () => value * rate;
-    const exchangeOtherAssetValue = calculateExchange();
+    const exchangeOtherAssetValue = value * rate;
 
     if (isAsset1) {
-      setInputAsset2(exchangeOtherAssetValue);
-      setInputAsset1(value);
+      setValue('amount1Desired', value);
+      setValue('amount2Desired', exchangeOtherAssetValue);
     } else {
-      setInputAsset1(exchangeOtherAssetValue);
-      setInputAsset2(value);
+      setValue('amount1Desired', exchangeOtherAssetValue);
+      setValue('amount2Desired', value);
     }
   };
 
@@ -180,7 +177,6 @@ function AddLiquidityModal({
         register={register}
         name="amount1Desired"
         onChange={(e) => handleChangeInput(e, asset1)}
-        value={inputAsset1}
       />
       {errors?.amount1Desired && (
         <div className={styles.error}>{errors.amount1Desired.message}</div>
@@ -210,7 +206,6 @@ function AddLiquidityModal({
         register={register}
         name="amount2Desired"
         onChange={(e) => handleChangeInput(e, asset2)}
-        value={inputAsset2}
       />
       {errors?.amount2Desired && (
         <div className={styles.error}>{errors.amount2Desired.message}</div>

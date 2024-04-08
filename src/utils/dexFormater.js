@@ -3,6 +3,11 @@ import { BigNumber } from 'ethers';
 import {
   formatDollars, formatMerits,
 } from './walletHelpers';
+// eslint-disable-next-line import/no-cycle
+import {
+  getSwapPriceExactTokensForTokens,
+  getSwapPriceTokensForExactTokens,
+} from '../api/nodeRpcCall';
 
 export function convertToEnumDex(asset1, asset2) {
   const enum1 = asset1 === 'Native' ? asset1 : { Asset: asset1 };
@@ -97,8 +102,9 @@ const calculateAmountMin = (
 };
 
 export const calculateAmountDesiredFormatted = (desiredAmount, decimals) => {
-  const decimalsFromValue = desiredAmount.split('.')[1]?.length || 0;
-  return new BN(desiredAmount.replace('.', ''))
+  const valueString = desiredAmount.toString();
+  const decimalsFromValue = valueString.split('.')[1]?.length || '0';
+  return new BN(valueString.replace('.', ''))
     .mul(decimals)
     .div((new BN(10)
       .pow(new BN(decimalsFromValue))));
@@ -140,18 +146,41 @@ export const converTransferData = async (
   asset2,
   asset2Decimals,
   amountDesired,
-  amountOutMin,
   isBuy,
+  amountOut,
 ) => {
   const asset1DecimalsBN = getDecimalsBN(asset1, asset1Decimals);
   const asset2DecimalsBN = getDecimalsBN(asset2, asset2Decimals);
   const actualDecimal = isBuy ? asset2DecimalsBN : asset1DecimalsBN;
+
+  const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
   const amount = calculateAmountDesiredFormatted(amountDesired, actualDecimal);
-  const amountMin = calculateAmountMin(
-    amount,
-    amountOutMin,
-    !isBuy,
-  );
+  let amountMin = null;
+  if (isBuy) {
+    const swapPrice = await getSwapPriceTokensForExactTokens(enum1, enum2, amount);
+    const swapPriceFormat = formatterDecimals(
+      swapPrice,
+      asset2Decimals,
+    );
+    const amountMinData = calculateAmountDesiredFormatted(swapPriceFormat, asset2DecimalsBN);
+    amountMin = calculateAmountMin(
+      amountMinData,
+      amountOut,
+      !isBuy,
+    );
+  } else {
+    const swapPrice = await getSwapPriceExactTokensForTokens(enum1, enum2, amount);
+    const swapPriceFormat = formatProperlyValue(
+      swapPrice,
+      asset1Decimals,
+    );
+    const amountMinData = calculateAmountDesiredFormatted(swapPriceFormat, asset1DecimalsBN);
+    amountMin = calculateAmountMin(
+      amountMinData,
+      amountOut,
+      !isBuy,
+    );
+  }
   return { amount, amountMin };
 };
 

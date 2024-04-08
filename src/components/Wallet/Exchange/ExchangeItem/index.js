@@ -111,13 +111,13 @@ function ExchangeItem({ dex }) {
               <div className={styles.exchangeRate}>
                 <span>
                   <span className={styles.bold}>{asset1ToShow}</span>
-                  {` = ${swapPriceTokensForExactTokens} `}
+                  {` = ${swapPriceExactTokensForTokens} `}
                   <span className={styles.bold}>{asset2ToShow}</span>
                 </span>
 
                 <span>
                   <span className={styles.bold}>{asset2ToShow}</span>
-                  {` = ${swapPriceExactTokensForTokens} `}
+                  {` = ${swapPriceTokensForExactTokens} `}
                   <span className={styles.bold}>{asset1ToShow}</span>
                 </span>
 
