@@ -133,7 +133,7 @@ function HomeNavigation() {
       title: 'CONTRACTS',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
-      isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
+      isDiscouraged: process.env.REACT_APP_IS_CONTRACTS_DISCOURAGED,
       isAdressWalletDiffrentThanRegistered: true,
     },
     {
