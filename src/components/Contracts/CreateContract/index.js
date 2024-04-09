@@ -10,9 +10,9 @@ import ModalRoot from '../../Modals/ModalRoot';
 import styles from '../../Modals/styles.module.scss';
 import InputSearch from '../../InputComponents/InputSearchAddressName';
 
-function CreateContract({ handleModal }) {
+function CreateContract({ handleModal, isMyContracts }) {
   const dispatch = useDispatch();
-  const [inputs, setInputs] = useState(['']);
+  const [inputs, setInputs] = useState([]);
 
   const {
     handleSubmit, formState: { errors }, register, setValue,
@@ -25,9 +25,6 @@ function CreateContract({ handleModal }) {
   };
 
   const handleDeleteInput = (index) => {
-    if (inputs.length === 1) {
-      return;
-    }
     const newInputs = [...inputs.slice(0, index), ...inputs.slice(index + 1)];
     setInputs(newInputs);
   };
@@ -41,7 +38,8 @@ function CreateContract({ handleModal }) {
     });
     dispatch(contractsActions.createContract.call({
       data: data.contractData,
-      parties: inputsData,
+      parties: inputsData.length > 0 ? inputsData : null,
+      isMyContracts,
     }));
     handleModal();
   };
@@ -88,7 +86,6 @@ function CreateContract({ handleModal }) {
                 return true;
               }}
             />
-            {index >= 1 && (
             <Button
               className={stylesOwn.button}
               onClick={() => handleDeleteInput(index)}
@@ -96,7 +93,6 @@ function CreateContract({ handleModal }) {
             >
               -
             </Button>
-            )}
           </div>
           { errors[`input${index}`]?.message && <div className={styles.error}>{errors[`input${index}`].message}</div> }
         </div>
@@ -128,6 +124,7 @@ function CreateContract({ handleModal }) {
 
 CreateContract.propTypes = {
   handleModal: PropTypes.func.isRequired,
+  isMyContracts: PropTypes.bool.isRequired,
 };
 
 function CreateContractModalWrapper(props) {

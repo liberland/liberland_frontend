@@ -22,8 +22,8 @@ function MyContracts() {
   return (
     <>
       <Button onClick={handleModal} primary medium>Create Contract</Button>
-      {myContracts.length < 1 ? <div>No data...</div> : <ContractsList contracts={myContracts} />}
-      {isModalOpen && <CreateContractModalWrapper handleModal={handleModal} />}
+      {myContracts.length < 1 ? <div>No data...</div> : <ContractsList contracts={myContracts} isMyContracts />}
+      {isModalOpen && <CreateContractModalWrapper handleModal={handleModal} isMyContracts />}
     </>
 
   );
