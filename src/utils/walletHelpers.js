@@ -86,7 +86,6 @@ export const formatAssetTransaction = (dollars_raw, asset, decimals, config = co
   config,
 );
 
-// FIXME this is generic, we should move it to walletHelpers and use everywhere
 export const isValidSubstrateAddress = (address) => {
   try {
     encodeAddress(
