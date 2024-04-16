@@ -18,7 +18,8 @@ function MissingWalletComponent() {
       <br />
       <p>Please log in with a browser or app that has this address available.</p>
       <p>
-        Alternatively, you can reigster another address on
+        Alternatively, you can register another address on
+        {' '}
         <a href={process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}>liberland.org</a>
         {' '}
         or contact support.
@@ -26,6 +27,7 @@ function MissingWalletComponent() {
       <br />
       <p>
         If you are absolutely sure you want to change your wallet address to one available on this device
+        {' '}
         <button onClick={() => setShowWallets(true)}>
           <b>click here</b>
         </button>
