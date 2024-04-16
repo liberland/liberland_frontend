@@ -21,9 +21,6 @@ function HomeHeader() {
     [router.home.congress]: 'Congress',
     [router.home.voting]: 'Voting',
     [router.home.wallet]: 'Wallet',
-    [router.wallet.ethBridge]: 'Ethereum Bridge',
-    [router.wallet.ethBridgeDeposit]: 'Ethereum Bridge',
-    [router.wallet.ethBridgeWithdraw]: 'Ethereum Bridge',
   };
   const location = useLocation();
 

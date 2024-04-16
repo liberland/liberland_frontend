@@ -13,8 +13,7 @@ import InputSearch from '../InputComponents/InputSearchAddressName';
 
 // STYLES
 import styles from './styles.module.scss';
-import { isValidSubstrateAddress } from '../../utils/bridge';
-import { parseDollars, parseMerits } from '../../utils/walletHelpers';
+import { parseDollars, parseMerits, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
 import { walletSelectors } from '../../redux/selectors';
 
