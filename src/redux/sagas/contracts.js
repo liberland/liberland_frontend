@@ -152,13 +152,18 @@ export function* getSignaturesForContractsWatcher() {
   }
 }
 
-function* signContractAsPartyWorker({ payload: { contractId } }) {
+function* signContractAsPartyWorker({ payload: { contractId, isMyContracts } }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
   yield call(signContractAsParty, contractId, walletAddress);
   yield put(contractsActions.signContract.success());
-  yield put(contractsActions.getContracts.call());
+
+  if (isMyContracts) {
+    yield put(contractsActions.getMyContracts.call());
+  } else {
+    yield put(contractsActions.getContracts.call());
+  }
 }
 
 export function* signContractAsPartyWatcher() {
@@ -168,13 +173,17 @@ export function* signContractAsPartyWatcher() {
   );
 }
 
-function* signContractAsJudgeWorker({ payload: { contractId } }) {
+function* signContractAsJudgeWorker({ payload: { contractId, isMyContracts } }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
   yield call(signContractAsJudge, contractId, walletAddress);
   yield put(contractsActions.signContractJudge.success());
-  yield put(contractsActions.getContracts.call());
+  if (isMyContracts) {
+    yield put(contractsActions.getMyContracts.call());
+  } else {
+    yield put(contractsActions.getContracts.call());
+  }
 }
 
 export function* signContractAsJudgeWatcher() {
@@ -184,14 +193,18 @@ export function* signContractAsJudgeWatcher() {
   );
 }
 
-function* removeContractWorker({ payload: { contractId } }) {
+function* removeContractWorker({ payload: { contractId, isMyContracts } }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
   yield call(removeContract, contractId, walletAddress);
 
   yield put(contractsActions.removeContract.success());
-  yield put(contractsActions.getContracts.call());
+  if (isMyContracts) {
+    yield put(contractsActions.getMyContracts.call());
+  } else {
+    yield put(contractsActions.getContracts.call());
+  }
 }
 
 export function* removeContractWatcher() {
@@ -201,13 +214,17 @@ export function* removeContractWatcher() {
   );
 }
 
-function* createContractWorker({ payload: { data, parties } }) {
+function* createContractWorker({ payload: { data, parties, isMyContracts } }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
   yield call(createContract, data, parties, walletAddress);
   yield put(contractsActions.createContract.success());
-  yield put(contractsActions.getContracts.call());
+  if (isMyContracts) {
+    yield put(contractsActions.getMyContracts.call());
+  } else {
+    yield put(contractsActions.getContracts.call());
+  }
 }
 
 export function* createContractWatcher() {

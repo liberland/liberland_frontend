@@ -62,16 +62,18 @@ function ButtonsWrapper({
   isContractSign,
   isMeSignedAsJudge,
   isMeSigned,
+  isMyContracts,
 }) {
   const dispatch = useDispatch();
   const isUserJudge = useSelector(contractsSelectors.selectorIsUserJudgde);
+
   return (
     <div className={styles.buttonsWrapper}>
       {!isMeSigned && (
         <Button
           small
           primary
-          onClick={() => dispatch(contractsActions.signContract.call({ contractId }))}
+          onClick={() => dispatch(contractsActions.signContract.call({ contractId, isMyContracts }))}
         >
           SIGN AS PARTY
         </Button>
@@ -84,6 +86,7 @@ function ButtonsWrapper({
           onClick={() => dispatch(
             contractsActions.signContractJudge.call({
               contractId,
+              isMyContracts,
             }),
           )}
         >
@@ -95,7 +98,7 @@ function ButtonsWrapper({
         <Button
           small
           primary
-          onClick={() => dispatch(contractsActions.removeContract.call({ contractId }))}
+          onClick={() => dispatch(contractsActions.removeContract.call({ contractId, isMyContracts }))}
         >
           REMOVE
         </Button>
@@ -104,7 +107,12 @@ function ButtonsWrapper({
   );
 }
 
+ButtonsWrapper.defaultProps = {
+  isMyContracts: false,
+};
+
 ButtonsWrapper.propTypes = {
+  isMyContracts: PropTypes.bool,
   contractId: PropTypes.string.isRequired,
   isContractSign: PropTypes.bool.isRequired,
   isMeSigned: PropTypes.bool.isRequired,
@@ -119,6 +127,7 @@ function ContractItem({
   isOneItem,
   judgesSignaturesList,
   partiesSignaturesList,
+  isMyContracts,
 }) {
   const walletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
@@ -181,6 +190,7 @@ function ContractItem({
           isMeSignedAsJudge={isMeSignedAsJudge}
           contractId={contractId}
           isContractSign={isContractSign}
+          isMyContracts={isMyContracts}
         />
       </div>
     </Card>
@@ -189,9 +199,11 @@ function ContractItem({
 
 ContractItem.defaultProps = {
   isOneItem: false,
+  isMyContracts: false,
 };
 
 ContractItem.propTypes = {
+  isMyContracts: PropTypes.bool,
   contractId: PropTypes.string.isRequired,
   creator: PropTypes.string.isRequired,
   data: PropTypes.string.isRequired,
@@ -201,12 +213,17 @@ ContractItem.propTypes = {
   partiesSignaturesList: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-function ContractsList({ contracts, isOneItem }) {
+function ContractsList({ contracts, isOneItem, isMyContracts }) {
   return (
     <div className={styles.itemsWrapper}>
       {contracts.map((contract, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <ContractItem key={contract.contractId + index} {...contract} isOneItem={isOneItem} />
+        <ContractItem
+          // eslint-disable-next-line react/no-array-index-key
+          key={contract.contractId + index}
+          {...contract}
+          isOneItem={isOneItem}
+          isMyContracts={isMyContracts}
+        />
       ))}
     </div>
   );
@@ -214,9 +231,11 @@ function ContractsList({ contracts, isOneItem }) {
 
 ContractsList.defaultProps = {
   isOneItem: false,
+  isMyContracts: false,
 };
 
 ContractsList.propTypes = {
+  isMyContracts: PropTypes.bool,
   contracts: PropTypes.arrayOf(
     PropTypes.shape({
       contractId: PropTypes.string.isRequired,
