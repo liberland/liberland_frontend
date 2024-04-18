@@ -42,9 +42,6 @@ export default {
   wallet: {
     exchange: '/home/wallet/exchange',
     allTransactions: '/home/wallet/all-transactions',
-    ethBridge: '/home/wallet/eth-bridge',
-    ethBridgeDeposit: '/home/wallet/eth-bridge/deposit',
-    ethBridgeWithdraw: '/home/wallet/eth-bridge/withdraw',
     overView: '/home/wallet/overview',
   },
   registries: {

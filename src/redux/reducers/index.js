@@ -10,7 +10,6 @@ import democracyReducer from './democracy';
 import officesReducer from './offices';
 import registriesReducer from './registries';
 import identityReducer from './identity';
-import bridgeReducer from './bridge';
 import validatorReducer from './validator';
 import congressReducer from './congress';
 import onboardingReducer from './onboarding';
@@ -29,7 +28,6 @@ const rootReducer = combineReducers({
   offices: officesReducer,
   registries: registriesReducer,
   identity: identityReducer,
-  bridge: bridgeReducer,
   validator: validatorReducer,
   congress: congressReducer,
   onboarding: onboardingReducer,

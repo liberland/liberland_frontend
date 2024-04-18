@@ -14,8 +14,7 @@ import InputSearch from '../InputComponents/InputSearchAddressName';
 // STYLES
 import styles from './styles.module.scss';
 import { walletActions } from '../../redux/actions';
-import { isValidSubstrateAddress } from '../../utils/bridge';
-import { parseMerits, valueToBN } from '../../utils/walletHelpers';
+import { parseMerits, valueToBN, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import { walletSelectors } from '../../redux/selectors';
 
 function SendLLMModal({

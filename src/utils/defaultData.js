@@ -57,13 +57,6 @@ export const newCompanyDataObject = {
       encryptable: false
     },
     {
-      key: "history",
-      name: 'History',
-      display: 'History of transfer of shares',
-      type: 'text',
-      encryptable: false
-    },
-    {
       key: "registryAllowedToEdit",
       name: 'Registry allowed to edit',
       display: 'Allow registry to edit details on-chain. Required for registration',
@@ -160,7 +153,7 @@ export const newCompanyDataObject = {
         },
         {
           key: 'country',
-          display: 'Country id - make me a list',
+          display: 'Country',
           type: 'text',
           encryptable: true
         }
@@ -204,16 +197,16 @@ export const newCompanyDataObject = {
       name: 'Relevant Contracts',
       fields: [
         {
-          key: 'id',
-          display: 'Contract id',
+          key: 'contractId',
+          display: 'Contract id or link',
           type: 'text',
           encryptable: true
         },
       ],
       data: [
         [{
-          key: 'id',
-          display: 'Contract id',
+          key: 'contractId',
+          display: 'Contract id or link',
           isEncrypted: false
         }]
       ]
@@ -224,7 +217,7 @@ export const newCompanyDataObject = {
       name: 'Relevant Assets',
       fields: [
         {
-          key: 'id',
+          key: 'assetId',
           display: 'Asset id',
           type: 'text',
           encryptable: true
@@ -232,7 +225,7 @@ export const newCompanyDataObject = {
       ],
       data: [
         [{
-          key: 'id',
+          key: 'assetId',
           display: 'Asset id',
           isEncrypted: false
         }]

@@ -34,6 +34,7 @@ function Home() {
     <Route path={router.home.staking} component={Staking} />,
     <Route path={router.home.contracts} component={Contracts} />,
     <Route path={router.home.offices} component={Offices} />,
+    <Route path={router.home.registries} component={Registries} />,
   ];
 
   const alwaysRenderedRoutesLast = (
@@ -52,7 +53,6 @@ function Home() {
     <Route path={router.home.documents} component={Documents} />,
     <Route path={router.home.voting} component={Voting} />,
     <Route path={router.home.legislation} component={Legislation} />,
-    <Route path={router.home.registries} component={Registries} />,
     <Route path={router.wallet.allTransactions} component={AllTransactions} />,
     <Route path={router.home.congress} component={Congress} />,
   ];

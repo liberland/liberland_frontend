@@ -1,12 +1,13 @@
 import { web3FromAddress } from '@polkadot/extension-dapp';
 import pako from 'pako';
-import { u8aToHex } from '@polkadot/util';
+import { hexToU8a, u8aToHex } from '@polkadot/util';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
 // eslint-disable-next-line import/no-cycle
 import { convertAssetData } from '../utils/dexFormater';
+import { parseDollars, parseMerits } from '../utils/walletHelpers';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -82,6 +83,12 @@ const getApi = async () => {
           signingAbility: 'Encryptable', // FIXME enum
           signingAbilityConditions: 'Encryptable',
         },
+        RelevantAsset: {
+          assetId: 'Encryptable',
+        },
+        RelevantContract: {
+          contractId: 'Encryptable',
+        },
         CompanyData: {
           name: 'Text',
           // Truthful scope of business
@@ -101,6 +108,8 @@ const getApi = async () => {
           principals: 'Vec<Principal>',
           shareholders: 'Vec<Shareholder>',
           UBOs: 'Vec<UBO>',
+          relevantAssets: 'Vec<RelevantAsset>',
+          relevantContracts: 'Vec<RelevantContract>',
         },
       },
       runtime: {
@@ -315,57 +324,11 @@ const getAdditionalAssets = async (address, isIndexNeed = false) => {
   }
 };
 
-const bridgeSubscribe = async (asset, receipt_id, onChange) => {
-  const api = await getApi();
-  let bridge;
-  /* eslint-disable eqeqeq */
-  if (asset == 'LLM') bridge = api.query.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.query.ethLLDBridge;
-  // returns unsub func
-  return {
-    unsubscribe: await bridge.statusOf(receipt_id, onChange),
-  };
-};
-
-const bridgeDeposit = async ({ asset, amount, ethereumRecipient }, walletAddress) => {
-  const api = await getApi();
-  let bridge;
-  if (asset == 'LLM') bridge = api.tx.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.tx.ethLLDBridge;
-  // eslint-disable-next-line no-undef
-  else throw new Exception('Unknown asset');
-
-  const call = bridge.deposit(amount, ethereumRecipient);
-  return submitExtrinsic(call, walletAddress, api);
-};
-
-const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress) => {
-  const api = await getApi();
-  let bridge;
-  if (asset == 'LLM') bridge = api.tx.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.tx.ethLLDBridge;
-  // eslint-disable-next-line no-undef
-  else throw new Exception('Unknown asset');
-
-  const call = bridge.withdraw(receipt_id);
-  return submitExtrinsic(call, walletAddress, api);
-};
-
-const bridgeConstants = async (asset) => {
-  const api = await getApi();
-  let bridge;
-  if (asset == 'LLM') bridge = api.consts.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.consts.ethLLDBridge;
-  /* eslint-enable eqeqeq */
-  // eslint-disable-next-line no-undef
-  else throw new Exception('Unknown asset');
-
-  return bridge;
-};
-
 const provideJudgementAndAssets = async ({
   address, hash, walletAddress, merits, dollars,
 }) => {
+  const parsedMerits = parseMerits(merits);
+  const parsedDollars = parseDollars(dollars);
   const api = await getApi();
   const calls = [];
 
@@ -374,13 +337,13 @@ const provideJudgementAndAssets = async ({
   const officeJudgementCall = api.tx.identityOffice.execute(judgementCall);
   calls.push(officeJudgementCall);
 
-  if (dollars?.gt(0)) {
-    const lldCall = api.tx.balances.transfer(address, dollars.toString());
+  if (parsedDollars?.gt(0)) {
+    const lldCall = api.tx.balances.transfer(address, parsedDollars.toString());
     const officeLldCall = api.tx.identityOffice.execute(lldCall);
     calls.push(officeLldCall);
   }
-  if (merits?.gt(0)) {
-    const llmCall = api.tx.llm.sendLlmToPolitipool(address, merits.toString());
+  if (parsedMerits?.gt(0)) {
+    const llmCall = api.tx.llm.sendLlmToPolitipool(address, parsedMerits.toString());
     const officeLlmCall = api.tx.identityOffice.execute(llmCall);
     calls.push(officeLlmCall);
   }
@@ -2187,58 +2150,96 @@ const removeLiquidity = async (
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
-const getSignaturesForGivenId = (allSignatures, id) => allSignatures.find(
-  ([contractId]) => contractId.args[0].eq(id),
-)[1].unwrapOrDefault();
-
-const getSingleContract = async (id) => {
+const fetchCompanyRequests = async () => {
   const api = await getApi();
+  const raw = await api.query.companyRegistry.requests.entries();
+  return raw.map((rawEntry) => ({
+    indexes: rawEntry[0].toHuman(),
+  }));
+};
 
-  const [judgesSignature, partiesSignature, contract] = await api.queryMulti([
-    [api.query.contractsRegistry.judgesSignatures, id],
-    [api.query.contractsRegistry.partiesSignatures, id],
-    [api.query.contractsRegistry.contracts, id],
-  ]);
+const handleContractData = (data) => {
+  let result = null;
+  if (!data) return result;
+  try {
+    const hexData = data.toString('hex');
+    result = Buffer.from(pako.inflate(hexToU8a(hexData))).toString('utf-8');
+  } catch (err) {
+    result = Buffer.from(data).toString('utf-8');
+  }
+  return result;
+};
 
-  const judgesSignaturesUnwrap = judgesSignature.unwrapOr([]);
-  const partiesSignatureUnwrap = partiesSignature.unwrapOr([]);
-  const contractUnwrap = contract.unwrapOr([]);
+const getSignaturesForContracts = async (contractId) => {
+  const api = await getApi();
+  const judgesSignatures = await api.query.contractsRegistry.judgesSignatures.entries(contractId);
+  const judgesSignaturesList = judgesSignatures.map(
+    ([key, isSigned]) => ({ key: key.args[1].toString(), isSigned: isSigned.isTrue }),
+  );
+  const partiesSignatures = await api.query.contractsRegistry.partiesSignatures.entries(contractId);
+  const partiesSignaturesList = partiesSignatures.map(
+    ([key, isSigned]) => ({ key: key.args[1].toString(), isSigned: isSigned.isTrue }),
+  );
+  const judgesFiltered = judgesSignaturesList.filter((item) => item.isSigned === true);
+  const partiesFiltered = partiesSignaturesList.filter((item) => item.isSigned === true);
+
+  return { judgesSignaturesList: judgesFiltered, partiesSignaturesList: partiesFiltered };
+};
+
+const getSingleContract = async (contractId) => {
+  const api = await getApi();
+  const contract = await api.query.contractsRegistry.contracts(contractId);
+  const contractUnwrap = contract.unwrapOr(null);
+  const data = handleContractData(contractUnwrap?.data);
+  const parties = (contract?.parties && contract?.parties.length > 0)
+    ? contract?.parties.map((party) => party.toString())
+    : [];
+
+  const { judgesSignaturesList, partiesSignaturesList } = await getSignaturesForContracts(contractId);
+
+  const keysArrayJudges = judgesSignaturesList.map((obj) => obj.key);
+  const keysArrayParties = partiesSignaturesList.map((obj) => obj.key);
+
   return {
-    contractId: id,
-    data: Buffer.from(contractUnwrap?.data, 'hex').toString('utf-8'),
-    parties: contractUnwrap?.parties.map((party) => party.toString()),
+    contractId: contractId.toString(),
+    data,
+    parties,
     creator: contractUnwrap?.creator.toString(),
     deposit: contractUnwrap?.deposit.toString(),
-    judgesSignatures: judgesSignaturesUnwrap.map((signature) => signature.toString()),
-    partiesSignatures: partiesSignatureUnwrap.map((signature) => signature.toString()),
+    judgesSignaturesList: keysArrayJudges,
+    partiesSignaturesList: keysArrayParties,
   };
 };
 
 const getAllContracts = async () => {
   const api = await getApi();
+  const rawContracts = await api.query.contractsRegistry.contracts.entries();
 
-  const [rawJudgesSignatures, rawPartiesSignatures, rawContracts] = await Promise.all([
-    api.query.contractsRegistry.judgesSignatures.entries(),
-    api.query.contractsRegistry.partiesSignatures.entries(),
-    api.query.contractsRegistry.contracts.entries(),
-  ]);
-
-  return rawContracts.map(([id, maybeContract]) => {
+  const contractPromises = rawContracts.map(async ([id, maybeContract]) => {
     const contractId = id.args[0];
-    const judgesSignatures = getSignaturesForGivenId(rawJudgesSignatures, contractId);
-    const partiesSignatures = getSignaturesForGivenId(rawPartiesSignatures, contractId);
-
     const contract = maybeContract.unwrapOr(null);
+    const data = handleContractData(contract?.data);
+
+    const { judgesSignaturesList, partiesSignaturesList } = await getSignaturesForContracts(contractId);
+    const parties = (contract?.parties && contract?.parties.length > 0)
+      ? contract?.parties.map((party) => party.toString())
+      : [];
+    const keysArrayJudges = judgesSignaturesList.map((obj) => obj.key);
+    const keysArrayParties = partiesSignaturesList.map((obj) => obj.key);
     return {
       contractId: contractId.toString(),
-      data: Buffer.from(contract?.data, 'hex').toString('utf-8'),
-      parties: contract?.parties.map((party) => party.toString()),
+      data,
+      parties,
       creator: contract?.creator.toString(),
       deposit: contract?.deposit.toString(),
-      judgesSignatures: judgesSignatures.map((signature) => signature.toString()),
-      partiesSignatures: partiesSignatures.map((signature) => signature.toString()),
+      judgesSignaturesList: keysArrayJudges,
+      partiesSignaturesList: keysArrayParties,
     };
   });
+
+  const contracts = await Promise.all(contractPromises);
+
+  return contracts;
 };
 
 const signContractAsParty = async (contractId, walletAddress) => {
@@ -2269,6 +2270,16 @@ const getIsUserJudges = async (walletAddress) => {
   const api = await getApi();
   const rawIsJudge = await api.query.contractsRegistry.judges(walletAddress);
   return rawIsJudge.isTrue;
+};
+
+const createContract = async (data, parties, walletAddress) => {
+  const api = await getApi();
+
+  const encodedData = new TextEncoder().encode(data);
+  const compressed = pako.deflate(encodedData);
+
+  const extrinsic = api.tx.contractsRegistry.createContract(u8aToHex(compressed), parties);
+  return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
 export {
@@ -2305,14 +2316,10 @@ export {
   getCitizenCount,
   getLandNFTMetadataJson,
   setLandNFTMetadata,
-  bridgeWithdraw,
-  bridgeSubscribe,
-  bridgeDeposit,
   getBlockEvents,
   getLlmBalances,
   getLldBalances,
   getAdditionalAssets,
-  bridgeConstants,
   batchPayoutStakers,
   getStakersRewards,
   getSessionValidators,
@@ -2370,6 +2377,7 @@ export {
   setRegisteredCompanyData,
   requestUnregisterCompanyRegistration,
   fetchPendingIdentities,
+  fetchCompanyRequests,
   getIdentitiesNames,
   getOfficialRegistryEntries,
   getDexPools,
@@ -2390,4 +2398,6 @@ export {
   getIsUserJudges,
   getSingleContract,
   getAssetData,
+  createContract,
+  getSignaturesForContracts,
 };

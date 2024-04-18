@@ -1,6 +1,7 @@
 import {
-  BN, BN_ONE, BN_ZERO, formatBalance,
+  BN, BN_ONE, BN_ZERO, formatBalance, hexToU8a, isHex,
 } from '@polkadot/util';
+import { decodeAddress, encodeAddress } from '@polkadot/keyring';
 import { ethers } from 'ethers';
 import { parseInt } from 'lodash';
 
@@ -91,3 +92,17 @@ export const formatAssetTransaction = (dollars_raw, asset, decimals, config = co
   decimals,
   config,
 );
+
+export const isValidSubstrateAddress = (address) => {
+  try {
+    encodeAddress(
+      isHex(address)
+        ? hexToU8a(address)
+        : decodeAddress(address),
+    );
+
+    return true;
+  } catch (error) {
+    return false;
+  }
+};

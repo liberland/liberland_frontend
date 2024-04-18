@@ -13,7 +13,6 @@ import styles from './styles.module.scss';
 import stylesPage from '../../utils/pagesBase.module.scss';
 import WalletOverview from './WalletOverview';
 import WalletTransactionHistory from './WalletTransactionHistory';
-import Bridge from './Bridge';
 
 import Card from '../Card';
 import RoleHOC from '../../hocs/RoleHOC';
@@ -71,10 +70,6 @@ function Wallet() {
 
         <div>
           <Switch>
-            <Route
-              path={router.wallet.ethBridge}
-              component={Bridge}
-            />
             <Route
               path={router.wallet.overView}
               component={overView}

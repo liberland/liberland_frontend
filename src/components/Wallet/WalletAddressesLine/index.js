@@ -52,13 +52,6 @@ function WalletAddressesLine({ walletAddress }) {
     },
   ];
 
-  if (process.env.REACT_APP_BRIDGE_TAB_ENABLED === 'true' || process.env.REACT_APP_BRIDGE_TAB_ENABLED === true) {
-    navigationList.push({
-      route: router.wallet.ethBridge,
-      title: 'ETHEREUM BRIDGE',
-    });
-  }
-
   return (
     <>
       <NotificationPortal ref={notificationRef} />
