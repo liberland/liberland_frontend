@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { BN } from '@polkadot/util';
 import { formatProperlyValue } from '../../../../utils/dexFormater';
 import Button from '../../../Button/Button';
 import styles from '../styles.module.scss';
@@ -17,6 +18,13 @@ function ExchangeShowMore({
   asset1Decimals,
   asset2Decimals,
 }) {
+  const calculatePooled = (
+    assetToShow,
+    lpTokensData,
+    liquidityData,
+    reservedAsset,
+  ) => (new BN(reservedAsset).mul(new BN(lpTokensData))).div(new BN(liquidityData));
+
   return (
     <div className={styles.moreDetails}>
       <div className={styles.reserved}>
@@ -28,23 +36,52 @@ function ExchangeShowMore({
         {reserved && (
         <div>
           {`In the pool
-              ${formatProperlyValue(asset1, reserved.asset1, asset1ToShow, asset1Decimals || 0)}  
-            / ${formatProperlyValue(asset2, reserved.asset2, asset2ToShow, asset2Decimals || 0)}` }
+              ${formatProperlyValue(asset1, reserved.asset1, asset1Decimals || 0, asset1ToShow)}  
+            / ${formatProperlyValue(asset2, reserved.asset2, asset2Decimals || 0, asset2ToShow)}` }
         </div>
         )}
       </div>
       <div className={styles.liquidity}>
         <div className={styles.text}>
-          <span>
-            {liquidity ? `Your liquidity: ${((lpTokensBalance / liquidity) * 100)}% (${lpTokensBalance} Lp Tokens)`
-              : 'Not found your liquidity in this pool'}
-          </span>
-          <span>
-            {`Pooled ${asset1ToShow}: ${(reserved.asset1 * lpTokensBalance) / liquidity}`}
-          </span>
-          <span>
-            {`Pooled ${asset2ToShow}: ${(reserved.asset2 * lpTokensBalance) / liquidity}`}
-          </span>
+          {liquidity
+            ? (
+              <>
+                <span>
+                  Your liquidity:
+                  {' '}
+                  {((lpTokensBalance / liquidity) * 100)}
+                  % (
+                  {lpTokensBalance}
+                  {' '}
+                  Lp Tokens)
+                </span>
+                <span>
+                  {`Pooled ${asset1ToShow}: `}
+                  {formatProperlyValue(
+                    asset1,
+                    calculatePooled(asset1ToShow, lpTokensBalance, liquidity, reserved.asset1),
+                    asset1Decimals || 0,
+                    asset1ToShow,
+                  )}
+                </span>
+                <span>
+                  {`Pooled ${asset2ToShow}: `}
+                  {formatProperlyValue(
+                    asset2,
+                    calculatePooled(asset2ToShow, lpTokensBalance, liquidity, reserved.asset2),
+                    asset2Decimals || 0,
+                    asset2ToShow,
+                  )}
+                </span>
+              </>
+            )
+
+            : (
+              <span>
+                Not found your liquidity in this pool
+              </span>
+            )}
+
         </div>
 
         <Button small green onClick={handleModalLiquidity}>

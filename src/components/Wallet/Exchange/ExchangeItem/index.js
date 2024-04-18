@@ -25,7 +25,6 @@ function ExchangeItem({ dex }) {
     assetData2,
     reserved,
   } = dex;
-
   const asset1ToShow = useMemo(() => makeAssetToShow(asset1, assetData1?.symbol), [assetData1, asset1]);
   const asset2ToShow = useMemo(() => makeAssetToShow(asset2, assetData2?.symbol), [assetData2, asset2]);
   const assets = {

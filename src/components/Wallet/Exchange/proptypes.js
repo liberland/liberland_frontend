@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types';
 
 export const ReservedAssetPropTypes = PropTypes.shape({
-  asset1: PropTypes.string,
-  asset2: PropTypes.string,
+  // eslint-disable-next-line react/forbid-prop-types
+  asset1: PropTypes.object,
+  // eslint-disable-next-line react/forbid-prop-types
+  asset2: PropTypes.object,
 });
 
 export const AssetDataPropTypes = PropTypes.shape({

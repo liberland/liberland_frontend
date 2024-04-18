@@ -47,11 +47,24 @@ const dexReducer = handleActions(
       pools: action.payload,
     }),
 
-    [dexActions.getDexReserves.success]: (state, action) => ({
-      ...state,
-      reserves: { [action.payload.asset1Number + action.payload.asset2Number]: action.payload, ...state.reserves },
+    [dexActions.getDexReserves.success]: (state, action) => {
+      const cos = {
+        ...state,
+        reserves: state?.reserves ? {
+          [action.payload.asset1Number]: {
+            ...state.reserves[action.payload.asset1Number],
+            [action.payload.asset2Number]: action.payload,
+          },
+        } : {
+          [action.payload.asset1Number]: {
+            [action.payload.asset2Number]: action.payload,
+          },
+        },
+
+      };
+      return cos;
     }
-    ),
+    ,
   },
   initialState,
 );

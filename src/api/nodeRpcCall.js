@@ -5,9 +5,8 @@ import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
-import {
-  convertAssetData,
-} from '../utils/dexFormater';
+// eslint-disable-next-line import/no-cycle
+import { convertAssetData } from '../utils/dexFormater';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -2031,6 +2030,7 @@ const getSwapPriceExactTokensForTokens = async (asset1, asset2, amount, includeT
 
 const getSwapPriceTokensForExactTokens = async (asset1, asset2, amount, includeTax = true) => {
   const api = await getApi();
+
   const maybeRate = await api.call.assetConversionApi.quotePriceTokensForExactTokens(
     asset1,
     asset2,
@@ -2086,7 +2086,7 @@ const getDexPools = async (walletAddress) => {
         asset1: asset1Transform,
         asset2: asset2Transform,
         lpToken: lpTokenTransform,
-        lpTokensBalance: lpTokensValue?.balance,
+        lpTokensBalance: lpTokensValue?.balance || 0,
         reserved,
       };
     }));
@@ -2103,7 +2103,6 @@ const getDexPoolsExtendData = async (walletAddress) => {
     const api = await getApi();
     const poolsData = await getDexPools(walletAddress);
     const liquidityForPool = poolsData.map(({ lpToken }) => [api.query.poolAssets.account, [lpToken, walletAddress]]);
-
     const [liquidityData, assetsData] = await Promise.all([
       api.queryMulti(liquidityForPool),
       getAdditionalAssets(walletAddress, true),
@@ -2115,7 +2114,7 @@ const getDexPoolsExtendData = async (walletAddress) => {
         ...item,
         assetData2,
         assetData1,
-        liquidity: liquidityData[index].isSome ? liquidityData[index].value.balance.toString() : null,
+        liquidity: liquidityData[index].isSome ? liquidityData[index].value.balance.toString() : 0,
       };
     }));
     return wholeDataPools;

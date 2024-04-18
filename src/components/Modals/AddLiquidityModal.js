@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropsTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
@@ -9,20 +9,20 @@ import { TextInput } from '../InputComponents';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
-import { dexSelectors, userSelectors, walletSelectors } from '../../redux/selectors';
+import { userSelectors, walletSelectors } from '../../redux/selectors';
 import {
-  calculateAmountDesiredFormatted,
-  convertLiquidityData, formatProperlyValue, getDecimalsBN,
-  getExchangeRate,
+  convertLiquidityData, convertToEnumDex, formatProperlyValue,
+  parseProperlyValue,
 } from '../../utils/dexFormater';
 import { AssetsPropTypes } from '../Wallet/Exchange/proptypes';
+import { sanitizeValue } from '../../utils/walletHelpers';
+import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } from '../../api/nodeRpcCall';
 
 function AddLiquidityModal({
   handleModal, assets,
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(userSelectors.selectWalletAddress);
-  const reserves = useSelector(dexSelectors.selectorReserves);
   const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
   const [isChecked, setIsChecked] = useState(false);
 
@@ -31,12 +31,10 @@ function AddLiquidityModal({
     handleSubmit,
     register,
     setValue,
+    trigger,
     formState: { errors, isValid },
   } = useForm({
     mode: 'onChange',
-    defaultValues: {
-      cos: null,
-    },
   });
 
   const {
@@ -47,13 +45,6 @@ function AddLiquidityModal({
     asset1ToShow,
     asset2ToShow,
   } = assets;
-
-  const reservesThisAssets = useMemo(() => {
-    if (reserves && asset1 && asset2) {
-      return reserves[asset1 + asset2];
-    }
-    return null;
-  }, [asset1, asset2, reserves]);
 
   const onSubmit = (data) => {
     if (!isValid) return;
@@ -66,11 +57,11 @@ function AddLiquidityModal({
     } = convertLiquidityData(
       amount1Desired,
       amount2Desired,
-      asset1,
-      asset2,
       assetData1?.decimals,
       assetData2?.decimals,
       minAmountPercent,
+      asset1,
+      asset2,
     );
     const mintTo = walletAddress;
     dispatch(dexActions.addLiquidity.call({
@@ -87,54 +78,40 @@ function AddLiquidityModal({
   };
 
   const validate = (v, assetBalance, decimals, asset) => {
-    if (Number.isNaN(parseInt(v))) {
+    if (Number.isNaN(Number(v))) {
       return 'Not a valid number';
     }
-    const decimalsBN = getDecimalsBN(asset, decimals);
-    const inputBN = calculateAmountDesiredFormatted(v, decimalsBN);
+    const sanitizedValue = sanitizeValue(v.toString());
+    const inputBN = parseProperlyValue(asset, sanitizedValue, decimals);
     const assetBN = new BN(assetBalance);
     if (inputBN.gt(assetBN)) {
       return 'Input greater than balance';
     }
     return true;
   };
+  const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
 
-  const handleChangeInput = (e, asset) => {
-    if (!reservesThisAssets) return;
+  const handleChangeInput = async (e, asset) => {
     const { value } = e.target;
-    let rate = null;
 
-    const isAsset1 = asset === reservesThisAssets.asset1Number;
+    const isAsset1 = asset === asset1;
+    const sanitizedValue = sanitizeValue(value.toString());
+    const assetFormat = isAsset1 ? asset2 : asset1;
+    const amount = parseProperlyValue(
+      isAsset1 ? asset1 : asset2,
+      sanitizedValue,
+      isAsset1 ? assetData1?.decimals : assetData2?.decimals,
+    );
+    const tradeData = await (isAsset1
+      ? getSwapPriceExactTokensForTokens
+      : getSwapPriceTokensForExactTokens)(enum1, enum2, amount, false);
+    const decimalsOut = isAsset1 ? assetData2?.decimals : assetData1?.decimals;
+    const formatedValue = formatProperlyValue(assetFormat, tradeData, decimalsOut);
 
-    if (!isAsset1) {
-      rate = getExchangeRate(
-        reservesThisAssets.asset1,
-        reservesThisAssets.asset2,
-        assetData1?.decimals,
-        assetData2?.decimals,
-      );
-    } else {
-      rate = getExchangeRate(
-        reservesThisAssets.asset2,
-        reservesThisAssets.asset1,
-        assetData2?.decimals,
-        assetData1?.decimals,
-      );
-    }
-    const exchangeOtherAssetValue = value * rate;
-
-    if (isAsset1) {
-      setValue('amount1Desired', value);
-      setValue('amount2Desired', exchangeOtherAssetValue);
-    } else {
-      setValue('amount1Desired', exchangeOtherAssetValue);
-      setValue('amount2Desired', value);
-    }
+    setValue('amount1Desired', isAsset1 ? value : formatedValue);
+    setValue('amount2Desired', isAsset1 ? formatedValue : value);
+    trigger(isAsset1 ? 'amountIn2' : 'amountIn1');
   };
-
-  useEffect(() => {
-    dispatch(dexActions.getDexReserves.call({ asset1, asset2 }));
-  }, [dispatch, asset1, asset2]);
 
   useEffect(() => {
     dispatch(walletActions.getAssetsBalance.call([asset1, asset2]));
@@ -166,7 +143,7 @@ function AddLiquidityModal({
           Balance
           {' '}
           {assetsBalance[0]
-            ? formatProperlyValue(asset1, assetsBalance[0], asset1ToShow, assetData1?.decimals || 0) : 0}
+            ? formatProperlyValue(asset1, assetsBalance[0], assetData1?.decimals || 0, asset1ToShow) : 0}
         </span>
         )}
       </div>
@@ -195,7 +172,7 @@ function AddLiquidityModal({
           Balance
           {' '}
           {assetsBalance[1]
-            ? formatProperlyValue(asset2, assetsBalance[1], asset2ToShow, assetData2?.decimals || 0) : 0}
+            ? formatProperlyValue(asset2, assetsBalance[1], assetData2?.decimals || 0, asset2ToShow) : 0}
         </span>
         )}
       </div>

@@ -41,6 +41,7 @@ function* addLiquidityWorker(action) {
   );
   yield put(dexActions.addLiquidity.success());
   yield put(dexActions.getPools.call());
+  yield put(dexActions.getDexReserves.call({ asset1, asset2 }));
 }
 
 export function* addLiquidityWatcher() {
@@ -49,13 +50,15 @@ export function* addLiquidityWatcher() {
 
 function* swapExactTokensForTokensWorker(action) {
   const {
-    path, amount, amountMin, sendTo,
+    path, amount, amountMin, sendTo, dexReservePair,
   } = action.payload;
   const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  const { enum1, enum2 } = convertToEnumDex(path.asset1, path.asset2);
+  const [asset1, asset2] = path;
+  const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
   yield call(swapExactTokensForTokens, [enum1, enum2], amount, amountMin, sendTo, userWalletAddress);
   yield put(dexActions.swapExactTokensForTokens.success());
   yield put(dexActions.getPools.call());
+  yield put(dexActions.getDexReserves.call({ asset1: dexReservePair.asset1, asset2: dexReservePair.asset2 }));
 }
 
 export function* swapExactTokensForTokensWatcher() {
@@ -64,13 +67,15 @@ export function* swapExactTokensForTokensWatcher() {
 
 function* swapTokensForExactTokensWorker(action) {
   const {
-    path, amount, amountMin, sendTo,
+    path, amount, amountMin, sendTo, dexReservePair,
   } = action.payload;
   const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  const { enum1, enum2 } = convertToEnumDex(path.asset1, path.asset2);
+  const [asset1, asset2] = path;
+  const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
   yield call(swapTokensForExactTokens, [enum1, enum2], amount, amountMin, sendTo, userWalletAddress);
   yield put(dexActions.swapTokensForExactTokens.success());
   yield put(dexActions.getPools.call());
+  yield put(dexActions.getDexReserves.call({ asset1: dexReservePair.asset1, asset2: dexReservePair.asset2 }));
 }
 
 export function* swapTokensForExactTokensWatcher() {
@@ -81,7 +86,7 @@ function* getDexReservesWorker(action) {
   const { asset1, asset2 } = action.payload;
   const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
   const dexReserves = yield call(getDexReserves, enum1, enum2);
-  yield put(dexActions.getDexReserves.success({ asset1Number: asset1, asset2Number: asset2, ...dexReserves }));
+  yield put(dexActions.getDexReserves.success({ ...dexReserves, asset1Number: asset1, asset2Number: asset2 }));
 }
 
 export function* getDexReservesWatcher() {

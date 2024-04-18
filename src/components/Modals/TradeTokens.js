@@ -3,7 +3,6 @@ import PropsTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import cx from 'classnames';
-import _ from 'lodash';
 import { BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
@@ -12,29 +11,27 @@ import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
 import { userSelectors, dexSelectors, walletSelectors } from '../../redux/selectors';
 import {
-  calculateAmountDesiredFormatted,
   converTransferData,
   convertToEnumDex,
   formatProperlyValue,
-  formatterDecimals,
-  getBNDataToFindPrice,
-  getDecimalsBN,
   getDecimalsForAsset,
+  parseProperlyValue,
 } from '../../utils/dexFormater';
 import { AssetsPropTypes } from '../Wallet/Exchange/proptypes';
 import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } from '../../api/nodeRpcCall';
+import { sanitizeValue } from '../../utils/walletHelpers';
 
 function TradeTokensModal({
   handleModal, assets, isBuy,
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(userSelectors.selectWalletAddress);
-  const assetBalance = useSelector(walletSelectors.selectorAssetBalance);
+  const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
   const reserves = useSelector(dexSelectors.selectorReserves);
   const [isChecked, setIsChecked] = useState(false);
+  const [isAsset1State, setIsAsset1State] = useState(false);
   const isDisplayNone = isChecked ? null : styles.displayNone;
-  const [searchAmount, setSearchAmount] = useState('');
-  const [actualPrice, setActualPrice] = useState(null);
+  const [formatedValue, setFormatedValue] = useState({});
 
   const {
     asset1,
@@ -48,11 +45,10 @@ function TradeTokensModal({
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
 
   const reservesThisAssets = useMemo(() => {
-    if (reserves && asset1 && asset2 && reserves[asset1 + asset2]) {
-      const indexAsset = asset1 + asset2;
-      const asset1Value = Number(reserves[indexAsset].asset1);
-      const asset2Value = Number(reserves[indexAsset].asset2);
-      return { ...reserves[indexAsset], asset1: asset1Value, asset2: asset2Value };
+    if (reserves && asset1 && asset2 && reserves[asset1][asset2]) {
+      const asset1Value = Number(reserves[asset1][asset2].asset1);
+      const asset2Value = Number(reserves[asset1][asset2].asset2);
+      return { ...reserves[asset1][asset2], asset1: asset1Value, asset2: asset2Value };
     }
     return null;
   }, [asset1, asset2, reserves]);
@@ -60,97 +56,162 @@ function TradeTokensModal({
   const {
     handleSubmit,
     register,
+    setValue,
+    setError,
+    trigger,
     formState: { errors, isValid },
-  } = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      cos: null,
-    },
-  });
+  } = useForm({ mode: 'onChange' });
 
   const onSubmit = async (data) => {
-    if (!isValid) return;
-    const { amountIn, minAmountPercent } = data;
-    const amountOut = minAmountPercent.length > 0 ? minAmountPercent : undefined;
     try {
+      if (!isValid) return;
+      const { amountIn1, amountIn2, minAmountPercent } = data;
+      const amountOut = minAmountPercent.length > 0 ? minAmountPercent : undefined;
       const { amount, amountMin } = await converTransferData(
         asset1,
         decimals1,
         asset2,
         decimals2,
-        amountIn,
+        amountIn1,
+        amountIn2,
         isBuy,
         amountOut,
+        isAsset1State,
       );
+
+      const path = isBuy ? [asset2, asset1] : [asset1, asset2];
+
       const swapData = {
-        path: { asset1, asset2 },
+        path,
         amount,
         amountMin,
         sendTo: walletAddress,
+        dexReservePair: { asset1, asset2 },
       };
-      dispatch(
-        isBuy
-          ? dexActions.swapTokensForExactTokens.call(swapData) : dexActions.swapExactTokensForTokens.call(swapData),
-      );
+
+      if (!isBuy) {
+        dispatch(isAsset1State
+          ? dexActions.swapExactTokensForTokens.call(swapData)
+          : dexActions.swapTokensForExactTokens.call(swapData));
+      } else {
+        dispatch(isAsset1State
+          ? dexActions.swapExactTokensForTokens.call(swapData)
+          : dexActions.swapTokensForExactTokens.call(swapData));
+      }
+
+      handleModal();
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
     }
-
-    handleModal();
   };
 
-  const debouncedSearch = (searchTerm) => new Promise((resolve, reject) => {
-    _.debounce(async () => {
-      try {
-        const asset = isBuy ? asset2 : asset1;
-        const decimalsNumber = isBuy ? decimals2 : decimals1;
-        const amount = getBNDataToFindPrice(asset, decimalsNumber, searchTerm);
-        const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
-        const tradeData = isBuy ? await getSwapPriceTokensForExactTokens(enum1, enum2, amount, false)
-          : await getSwapPriceExactTokensForTokens(enum1, enum2, amount, false);
-        setActualPrice(tradeData?.toString() || 0);
-        resolve(tradeData?.toString() || 0);
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error('Error fetching API data:', err);
-        setActualPrice(null);
-        reject(err);
+  const handleInputChange = async (event, asset) => {
+    const term = event?.target?.value;
+    try {
+      setFormatedValue({});
+      const isAsset1 = asset1 === asset;
+      const sanitizedValue = sanitizeValue(term.toString());
+      if (!sanitizedValue || sanitizedValue === 0
+        || (sanitizedValue.split('.')[1]?.length || 0) > (isAsset1 ? decimals2 : decimals1)) {
+        return;
       }
-    }, 500)(searchTerm);
-  });
+      const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
+      setIsAsset1State(isAsset1);
+      let tradeData = null;
+      let amount = null;
+      let assetFormat = null;
+      let decimalsOut = null;
+      let showReserve = null;
+      let reserve = null;
 
-  const handleInputChange = (event) => {
-    const term = event.target.value;
-    setSearchAmount(term);
+      if (!isBuy) {
+        assetFormat = isAsset1 ? asset2 : asset1;
+        amount = parseProperlyValue(isAsset1 ? asset1 : asset2, sanitizedValue, isAsset1 ? decimals1 : decimals2);
+        tradeData = await (isAsset1
+          ? getSwapPriceExactTokensForTokens
+          : getSwapPriceTokensForExactTokens)(enum1, enum2, amount, false);
+        decimalsOut = isAsset1 ? assetData2?.decimals : assetData1?.decimals;
+        showReserve = formatProperlyValue(assetFormat, reservesThisAssets[isAsset1
+          ? 'asset2' : 'asset1'], decimalsOut, isAsset1 ? asset2ToShow : asset1ToShow);
+        reserve = reservesThisAssets[isAsset1 ? 'asset2' : 'asset1'];
+      } else {
+        assetFormat = isAsset1 ? asset1 : asset2;
+        amount = parseProperlyValue(isAsset1 ? asset2 : asset1, sanitizedValue, isAsset1 ? decimals2 : decimals1);
+        tradeData = await (isAsset1
+          ? getSwapPriceTokensForExactTokens
+          : getSwapPriceExactTokensForTokens)(enum1, enum2, amount, false);
+        decimalsOut = isAsset1 ? assetData1?.decimals : assetData2?.decimals;
+        showReserve = formatProperlyValue(assetFormat, reservesThisAssets[isBuy
+          ? 'asset1' : 'asset2'], decimalsOut, isBuy ? asset1ToShow : asset2ToShow);
+        reserve = reservesThisAssets[isBuy ? 'asset1' : 'asset2'];
+      }
+
+      const formatedValueData = tradeData ? formatProperlyValue(
+        assetFormat,
+        tradeData,
+        decimalsOut,
+      ) : '';
+
+      setValue('amountIn1', isAsset1 ? sanitizedValue : formatedValueData);
+      setValue('amountIn2', isAsset1 ? formatedValueData : sanitizedValue);
+      trigger();
+
+      if (!tradeData) {
+        const msg = `No trade data from api for ${asset}`;
+        setError(
+          !isAsset1 ? 'amountIn1' : 'amountIn2',
+          { type: 'custom', message: msg },
+        );
+        setFormatedValue({ [asset]: { value: tradeData, msg } });
+      }
+
+      const priceBN = new BN(tradeData);
+
+      if (priceBN.gte(new BN(reserve.toString()))) {
+        const msg = `Input value exceeds reserves max ${showReserve}`;
+        setError(
+          !isAsset1 ? 'amountIn1' : 'amountIn2',
+          { type: 'custom', message: msg },
+        );
+        setFormatedValue({ [asset]: { value: tradeData, msg } });
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching API data:', err);
+    }
   };
 
-  const validate = async (v) => {
-    if (Number.isNaN(Number(v))) {
+  const validate = async (v, assetBalance, decimals, asset) => {
+    const value = sanitizeValue(v?.toString());
+    if (!v) {
+      return 'Required';
+    }
+    if (Number.isNaN(Number(value))) {
       return 'Not a valid number';
     }
-    const price = await debouncedSearch(v);
-    const decimalsBN = getDecimalsBN(
-      isBuy ? asset2 : asset1,
-      isBuy ? assetData2?.decimals : assetData1?.decimals,
-    );
-    const inputBN = calculateAmountDesiredFormatted(v, decimalsBN);
-    const assetBN = new BN(assetBalance);
-    if (inputBN.gt(assetBN)) {
-      return 'Input greater than balance';
+    const isAsset1 = asset1 !== asset;
+    const tradeValue = formatedValue[asset];
+    if (tradeValue) {
+      const { msg, value: valueData } = tradeValue;
+      const priceBN = new BN(valueData);
+      const reserve = reservesThisAssets[isBuy ? 'asset1' : 'asset2'];
+
+      if (priceBN.gte(new BN(reserve.toString()))) {
+        return msg;
+      }
     }
 
-    const showReserve = isBuy
-      ? (reservesThisAssets?.asset1
-    && formatProperlyValue(asset1, reservesThisAssets?.asset1, asset1ToShow, assetData1?.decimals || 0))
-      : (reservesThisAssets?.asset2
-    && formatProperlyValue(asset2, reservesThisAssets?.asset2, asset2ToShow, assetData2?.decimals || 0));
-
-    const priceBN = new BN(price);
-    if (priceBN.isZero() || priceBN.gte(new BN(isBuy ? reservesThisAssets?.asset1 : reservesThisAssets?.asset2))) {
-      return `Input value exceeds reserves max ${showReserve}`;
+    if ((value.split('.')[1]?.length || 0) > decimals) {
+      return `${isAsset1 ? asset2ToShow : asset1ToShow} don't have this amount of decimals`;
     }
-
+    if (isBuy ? asset !== asset1 : asset === asset1) {
+      const inputBN = parseProperlyValue(asset, value, decimals);
+      const assetBN = new BN(assetBalance.toString());
+      if (inputBN.gt(assetBN)) {
+        return 'Input greater than balance';
+      }
+    }
     return true;
   };
 
@@ -159,8 +220,8 @@ function TradeTokensModal({
   }, [dispatch, asset1, asset2]);
 
   useEffect(() => {
-    dispatch(walletActions.getAssetBalance.call(isBuy ? asset2 : asset1));
-  }, [dispatch, isBuy, asset1, asset2]);
+    dispatch(walletActions.getAssetsBalance.call([asset1, asset2]));
+  }, [dispatch, asset1, asset2]);
 
   return (
     <form
@@ -186,34 +247,56 @@ function TradeTokensModal({
         <span>
           Balance
           {' '}
-          {assetBalance ? formatProperlyValue(
+          {assetsBalance && assetsBalance.length > 0 ? formatProperlyValue(
             isBuy ? asset2 : asset1,
-            assetBalance,
-            isBuy ? asset2ToShow : asset1ToShow,
+            isBuy ? assetsBalance[1] : assetsBalance[0],
             isBuy ? decimals2 : decimals1,
+            isBuy ? asset2ToShow : asset1ToShow,
           ) : 0}
         </span>
       </div>
-      {(actualPrice && actualPrice !== 0) ? (
-        <div>
-          You will earn
-          {' '}
-          {formatterDecimals(new BN(actualPrice), isBuy ? decimals1 : decimals2)}
-          {' '}
-          {isBuy ? asset1ToShow : asset2ToShow}
-        </div>
-      ) : null}
       <TextInput
         required
-        value={searchAmount}
-        onChange={handleInputChange}
-        validate={async (v) => validate(v)}
-        errorTitle="Amount In"
+        onChange={(v) => handleInputChange(v, asset1)}
+        validate={(v) => (isBuy
+          ? validate(v, assetsBalance[1], decimals2, asset2)
+          : validate(v, assetsBalance[0], decimals1, asset1))}
+        errorTitle={`Amount In ${asset1ToShow}`}
         register={register}
-        name="amountIn"
+        name="amountIn1"
       />
-      {errors?.amountIn && (
-        <div className={styles.error}>{errors.amountIn.message}</div>
+      {errors?.amountIn1 && (
+        <div className={styles.error}>{errors.amountIn1.message}</div>
+      )}
+      <div className={cx(styles.title, styles.titleFlex)}>
+        <span>
+          Amount Out (
+          {!isBuy ? asset2ToShow : asset1ToShow}
+          )
+        </span>
+        <span>
+          Balance
+          {' '}
+          {assetsBalance && assetsBalance.length > 0 ? formatProperlyValue(
+            isBuy ? asset1 : asset2,
+            isBuy ? assetsBalance[0] : assetsBalance[1],
+            isBuy ? decimals1 : decimals2,
+            isBuy ? asset1ToShow : asset2ToShow,
+          ) : 0}
+        </span>
+      </div>
+      <TextInput
+        required
+        onChange={(v) => handleInputChange(v, asset2)}
+        validate={(v) => (!isBuy
+          ? validate(v, assetsBalance[1], decimals2, asset2)
+          : validate(v, assetsBalance[0], decimals1, asset1))}
+        errorTitle={`Amount In 2 ${asset2ToShow}`}
+        register={register}
+        name="amountIn2"
+      />
+      {errors?.amountIn2 && (
+        <div className={styles.error}>{errors.amountIn2.message}</div>
       )}
       <div className={cx(styles.title, isDisplayNone)}>
         Max Slippage (in percent %)

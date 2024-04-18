@@ -16,7 +16,7 @@ export const valueToBN = (i) => {
   return new BN(s);
 };
 
-const _format = ((value, decimals) => formatBalance(
+const _format = ((value, decimals, withAll = false) => formatBalance(
   valueToBN(value),
   {
     decimals,
@@ -24,20 +24,27 @@ const _format = ((value, decimals) => formatBalance(
     withSi: false,
     locale: 'en',
     withZero: false,
+    withAll,
   },
 ));
+
+export const sanitizeValue = (value) => value.replace(/,/g, '');
 
 const _parse = (value, decimals) => {
   const ethersBN = ethers.utils.parseUnits(value, decimals);
   return new BN(ethersBN.toHexString().replace(/^0x/, ''), 'hex');
 };
 
-export const formatMerits = (grains) => _format(grains, meritDecimals);
-export const formatDollars = (grains) => _format(grains, dollarDecimals);
+export const formatMerits = (grains, withAll = false) => _format(grains, meritDecimals, withAll);
+export const formatDollars = (grains, withAll = false) => _format(grains, dollarDecimals, withAll);
 export const parseMerits = (merits) => _parse(merits, meritDecimals);
 export const parseDollars = (dollars) => _parse(dollars, dollarDecimals);
 export const parseAssets = (assets, assetDecimals) => _parse(assets, assetDecimals);
-export const formatAssets = (assets, assetDecimals) => _format(assets, Number(assetDecimals));
+export const formatAssets = (assets, assetDecimals, withAll = false) => _format(
+  assets,
+  Number(assetDecimals),
+  withAll,
+);
 
 const configDefault = {
   isSymbolFirst: false,

@@ -1,7 +1,12 @@
 import { formatBalance, BN } from '@polkadot/util';
 import { BigNumber } from 'ethers';
 import {
+  formatAssets,
   formatDollars, formatMerits,
+  parseAssets,
+  parseDollars,
+  parseMerits,
+  sanitizeValue,
 } from './walletHelpers';
 // eslint-disable-next-line import/no-cycle
 import {
@@ -55,19 +60,31 @@ export const makeAssetToShow = (asset, symbol) => {
   return assetToShow;
 };
 
-export const formatProperlyValue = (asset, value, symbol, decimals) => {
+export const formatProperlyValue = (asset, value, decimals, symbol) => {
   let formattedValue;
-
   if (asset === 'Native') {
-    formattedValue = formatDollars(value);
+    formattedValue = formatDollars(value, true);
   } else if (asset === '1') {
-    formattedValue = formatMerits(value);
+    formattedValue = formatMerits(value, true);
   } else {
-    formattedValue = formatter(value, decimals);
+    formattedValue = formatAssets(value, decimals || 0, true);
   }
 
   const returnValue = symbol ? `${formattedValue} ${symbol}` : formattedValue;
   return returnValue;
+};
+
+export const parseProperlyValue = (asset, value, decimals) => {
+  let parsedValue;
+  if (asset === 'Native') {
+    parsedValue = parseDollars(value);
+  } else if (asset === '1') {
+    parsedValue = parseMerits(value);
+  } else {
+    parsedValue = parseAssets(value, decimals);
+  }
+
+  return parsedValue;
 };
 
 export const getDecimalsForAsset = (asset, decimal) => {
@@ -85,47 +102,30 @@ const calculateAmountMin = (
   subResult = true,
 ) => {
   const defaultMinPercent = 0.5;
-  const minAmountValue = (Number(minAmountPercent || defaultMinPercent) / 100);
-  const multiplier = new BN((minAmountValue * 1e18).toString());
-  const { div, mod } = amount.mul(multiplier).divmod(new BN(1e18.toString()));
-  const stringValue = mod.toString();
+  const minAmountValue = (Number(minAmountPercent || defaultMinPercent) / 100).toString();
+  const lengthDecimalPercent = minAmountValue.split('.')[1].length;
+  const minAmountPercentBN = parseAssets(minAmountValue, lengthDecimalPercent);
+  const decimalsBN = new BN(10).pow(new BN(lengthDecimalPercent));
+  const percentBN = amount.mul(minAmountPercentBN).divn(decimalsBN);
 
-  const integerPart = stringValue.slice(0, -1e18.toString().length) || '0';
-  const decimalPart = stringValue.slice(-1e18.toString().length);
-
-  const dividedValueString = `${integerPart}.${decimalPart}`;
-  const substract = new BN(Number(div) + Number(dividedValueString));
-  const result = subResult
-    ? amount.sub(substract.isZero() ? new BN(2) : substract)
-    : amount.add(substract.isZero() ? new BN(2) : substract);
-  return result;
+  if (subResult) {
+    const sub = amount.sub(percentBN.isZero() ? new BN(3) : percentBN);
+    return sub.lte(new BN(0)) ? 1 : sub;
+  }
+  return amount.add(percentBN.isZero() ? new BN(3) : percentBN);
 };
-
-export const calculateAmountDesiredFormatted = (desiredAmount, decimals) => {
-  const valueString = desiredAmount.toString();
-  const decimalsFromValue = valueString.split('.')[1]?.length || '0';
-  return new BN(valueString.replace('.', ''))
-    .mul(decimals)
-    .div((new BN(10)
-      .pow(new BN(decimalsFromValue))));
-};
-
-export const getDecimalsBN = (asset, decimals) => new BN(10).pow(new BN(getDecimalsForAsset(asset, decimals)));
 
 export const convertLiquidityData = (
   amount1Desired,
   amount2Desired,
-  asset1,
-  asset2,
   asset1Decimals,
   asset2Decimals,
   minAmountPercent,
+  asset1,
+  asset2,
 ) => {
-  const asset1DecimalsBN = getDecimalsBN(asset1, asset1Decimals);
-  const asset2DecimalsBN = getDecimalsBN(asset2, asset2Decimals);
-
-  const amount1 = calculateAmountDesiredFormatted(amount1Desired, asset1DecimalsBN);
-  const amount2 = calculateAmountDesiredFormatted(amount2Desired, asset2DecimalsBN);
+  const amount1 = parseProperlyValue(asset1, sanitizeValue(amount1Desired), asset1Decimals);
+  const amount2 = parseProperlyValue(asset2, sanitizeValue(amount2Desired), asset2Decimals);
 
   const amount1Min = calculateAmountMin(
     amount1,
@@ -145,69 +145,46 @@ export const converTransferData = async (
   asset1Decimals,
   asset2,
   asset2Decimals,
-  amountDesired,
+  amount1Desired,
+  amount2Desired,
   isBuy,
   amountOut,
+  isAsset1,
 ) => {
-  const asset1DecimalsBN = getDecimalsBN(asset1, asset1Decimals);
-  const asset2DecimalsBN = getDecimalsBN(asset2, asset2Decimals);
-  const actualDecimal = isBuy ? asset2DecimalsBN : asset1DecimalsBN;
-
   const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
-  const amount = calculateAmountDesiredFormatted(amountDesired, actualDecimal);
-  let amountMin = null;
+
+  let amount = null;
+  let amountData = null;
+  let subResult = true;
+
   if (isBuy) {
-    const swapPrice = await getSwapPriceTokensForExactTokens(enum1, enum2, amount);
-    const swapPriceFormat = formatterDecimals(
-      swapPrice,
-      asset2Decimals,
+    amount = parseProperlyValue(
+      isAsset1 ? asset2 : asset1,
+      isAsset1 ? amount1Desired : amount2Desired,
+      isAsset1 ? asset2Decimals : asset1Decimals,
     );
-    const amountMinData = calculateAmountDesiredFormatted(swapPriceFormat, asset2DecimalsBN);
-    amountMin = calculateAmountMin(
-      amountMinData,
-      amountOut,
-      !isBuy,
-    );
+    amountData = await (isAsset1
+      ? getSwapPriceExactTokensForTokens
+      : getSwapPriceTokensForExactTokens)(enum2, enum1, amount);
+    subResult = isAsset1 ? false : subResult;
   } else {
-    const swapPrice = await getSwapPriceExactTokensForTokens(enum1, enum2, amount);
-    const swapPriceFormat = formatProperlyValue(
-      swapPrice,
-      asset1Decimals,
+    amount = parseProperlyValue(
+      isAsset1 ? asset1 : asset2,
+      isAsset1 ? amount1Desired : amount2Desired,
+      isAsset1 ? asset1Decimals : asset2Decimals,
     );
-    const amountMinData = calculateAmountDesiredFormatted(swapPriceFormat, asset1DecimalsBN);
-    amountMin = calculateAmountMin(
-      amountMinData,
-      amountOut,
-      !isBuy,
-    );
+    amountData = await (isAsset1
+      ? getSwapPriceExactTokensForTokens
+      : getSwapPriceTokensForExactTokens)(enum1, enum2, amount);
+    subResult = isAsset1 ? false : subResult;
   }
+
+  const amountMin = calculateAmountMin(
+    new BN(amountData),
+    amountOut,
+    !subResult,
+  );
   return { amount, amountMin };
-};
-
-export const getBNDataToFindPrice = (asset, decimalsNumber, searchTerm) => {
-  const decimalsData = getDecimalsForAsset(asset, decimalsNumber);
-  const decimalsBN = getDecimalsBN(asset, decimalsData);
-  const amount = calculateAmountDesiredFormatted(searchTerm, decimalsBN);
-  return amount;
-};
-
-export const checkIfValueGreaterThanReserved = (
-  v,
-  asset1,
-  asset1Decimals,
-  asset2,
-  asset2Decimals,
-  reservesThisAssets,
-  isBuy,
-) => {
-  const decimals = isBuy ? asset1Decimals : asset2Decimals;
-  const asset = isBuy ? asset1 : asset2;
-  const decimalsData = getDecimalsForAsset(asset, decimals);
-  const decimalsBN = getDecimalsBN(asset, decimalsData);
-  const value = calculateAmountDesiredFormatted(v, decimalsBN);
-
-  const reserved = new BN(isBuy ? reservesThisAssets.asset2 : reservesThisAssets.asset1);
-  return value.gte(reserved);
 };
 
 export const convertAssetData = (assetsData, asset1, asset2) => {
