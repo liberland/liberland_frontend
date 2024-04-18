@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import cx from 'classnames';
-import { dexSelectors } from '../../../../redux/selectors';
+import { blockchainSelectors, dexSelectors } from '../../../../redux/selectors';
 import { dexActions } from '../../../../redux/actions';
 import stylesPage from '../../../../utils/pagesBase.module.scss';
 import styles from '../styles.module.scss';
@@ -10,9 +10,11 @@ import ExchangeItem from '../ExchangeItem';
 function ExchangeList() {
   const dispatch = useDispatch();
   const dexs = useSelector(dexSelectors.selectorDex);
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+
   useEffect(() => {
     dispatch(dexActions.getPools.call());
-  }, [dispatch]);
+  }, [dispatch, walletAddress]);
 
   if (!dexs) {
     return (
