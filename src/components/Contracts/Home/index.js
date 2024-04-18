@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import ContractsList from '../ContractsList';
-import { contractsSelectors } from '../../../redux/selectors';
+import { blockchainSelectors, contractsSelectors } from '../../../redux/selectors';
 import { contractsActions } from '../../../redux/actions';
 
 function HomeContract() {
   const dispatch = useDispatch();
   const contracts = useSelector(contractsSelectors.selectorContracts);
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   useEffect(() => {
     dispatch(contractsActions.getContracts.call());
-  }, [dispatch]);
+  }, [dispatch, walletAddress]);
 
   if (!contracts) return <div>Loading...</div>;
 

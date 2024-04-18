@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import cx from 'classnames';
-import { validatorSelectors } from '../../redux/selectors';
+import { blockchainSelectors, validatorSelectors } from '../../redux/selectors';
 import { validatorActions } from '../../redux/actions';
 import StakeManagement from './StakeManagement';
 import Validator from './Validator';
@@ -12,10 +12,11 @@ import stylesStacking from './styles.module.scss';
 export default function Staking() {
   const dispatch = useDispatch();
   const info = useSelector(validatorSelectors.info);
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   useEffect(() => {
     dispatch(validatorActions.getInfo.call());
-  }, [dispatch]);
+  }, [dispatch, walletAddress]);
 
   if (!info) return null; // loading
 

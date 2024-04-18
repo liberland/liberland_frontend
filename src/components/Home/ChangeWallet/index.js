@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import routesNotSameWallet from '../../../router/routesNotSameWallet';
 import router from '../../../router';
-import { blockchainActions, validatorActions } from '../../../redux/actions';
+import { blockchainActions, validatorActions, walletActions } from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
 import truncate from '../../../utils/truncate';
 import styles from './styles.module.scss';
@@ -21,6 +21,7 @@ function ChangeWallet({ setIsMenuOpen }) {
     if (!address) return;
     dispatch(blockchainActions.setUserWallet.success(address));
     dispatch(validatorActions.getInfo.call());
+    dispatch(walletActions.getWallet.call());
     if (
       !routesNotSameWallet.some((path) => path === history.location.pathname)
     ) {
