@@ -140,7 +140,7 @@ export const convertLiquidityData = (
   };
 };
 
-export const converTransferData = async (
+export const convertTransferData = async (
   asset1,
   asset1Decimals,
   asset2,

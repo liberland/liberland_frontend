@@ -11,7 +11,7 @@ import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
 import { userSelectors, dexSelectors, walletSelectors } from '../../redux/selectors';
 import {
-  converTransferData,
+  convertTransferData,
   convertToEnumDex,
   formatProperlyValue,
   getDecimalsForAsset,
@@ -67,7 +67,7 @@ function TradeTokensModal({
       if (!isValid) return;
       const { amountIn1, amountIn2, minAmountPercent } = data;
       const amountOut = minAmountPercent.length > 0 ? minAmountPercent : undefined;
-      const { amount, amountMin } = await converTransferData(
+      const { amount, amountMin } = await convertTransferData(
         asset1,
         decimals1,
         asset2,
@@ -247,7 +247,7 @@ function TradeTokensModal({
         <span>
           Balance
           {' '}
-          {assetsBalance && assetsBalance.length > 0 ? formatProperlyValue(
+          {(assetsBalance && assetsBalance.length > 0) ? formatProperlyValue(
             isBuy ? asset2 : asset1,
             isBuy ? assetsBalance[1] : assetsBalance[0],
             isBuy ? decimals2 : decimals1,

@@ -52,9 +52,10 @@ function* getAssetsBalanceWorker(action) {
   const assetsBalance = yield Promise.all(assets.map(async (asset) => {
     if (asset === 'Native') {
       const { liquidAmount } = await getBalanceByAddress(walletAddress);
-      return liquidAmount.amount;
+      return liquidAmount?.amount || 0;
     }
-    return getAssetData(asset, walletAddress);
+    const assetData = await getAssetData(asset, walletAddress);
+    return assetData || 0;
   }));
   yield put(walletActions.getAssetsBalance.success(assetsBalance));
 }
