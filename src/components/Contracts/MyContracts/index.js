@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { contractsSelectors } from '../../../redux/selectors';
+import { blockchainSelectors, contractsSelectors } from '../../../redux/selectors';
 import { contractsActions } from '../../../redux/actions';
 import ContractsList from '../ContractsList';
 import Button from '../../Button/Button';
@@ -9,6 +9,7 @@ import CreateContractModalWrapper from '../CreateContract';
 function MyContracts() {
   const dispatch = useDispatch();
   const myContracts = useSelector(contractsSelectors.selectorMyContracts);
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleModal = () => {
     setIsModalOpen((prevValue) => !prevValue);
@@ -16,7 +17,7 @@ function MyContracts() {
 
   useEffect(() => {
     dispatch(contractsActions.getMyContracts.call());
-  }, [dispatch]);
+  }, [dispatch, walletAddress]);
 
   if (!myContracts) return <div>Loading...</div>;
   return (

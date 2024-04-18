@@ -59,7 +59,7 @@ function Profile({ className }) {
   useEffect(() => {
     dispatch(identityActions.getIdentity.call(walletAddress));
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
-  }, [liquidDollars, dispatch]);
+  }, [liquidDollars, dispatch, walletAddress]);
 
   const toggleModalOnchainIdentity = () => {
     setIsModalOpenOnchainIdentity(!isModalOpenOnchainIdentity);
