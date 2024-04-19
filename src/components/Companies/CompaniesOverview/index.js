@@ -32,7 +32,7 @@ InvalidCompany.propTypes = {
   id: PropTypes.string.isRequired,
 };
 
-function RegistriesCompanies() {
+function CompaniesOverview() {
   const [expandedDetailsForCompany, setExpandedDetailsForCompany] = useState(null);
   const [isDeleteCompanyModalOpen, setIsDeleteCompanyModalOpen] = useState(false);
   const dispatch = useDispatch();
@@ -65,7 +65,7 @@ function RegistriesCompanies() {
   return (
     <div className={stylesPage.gapFlex}>
       <NavLink
-        to={`${router.registries.companies.create}`}
+        to={`${router.companies.create}`}
         className={styles.newCompanyButton}
       >
         <Button primary medium>
@@ -114,7 +114,7 @@ function RegistriesCompanies() {
                   View details
                 </Button>
                 <NavLink
-                  to={`${router.registries.companies.home}/edit/${registeredCompany?.id}#registered`}
+                  to={`${router.companies.home}/edit/${registeredCompany?.id}#registered`}
                 >
                   <Button
                     secondary
@@ -201,7 +201,7 @@ function RegistriesCompanies() {
                 )}
                 {!requestedCompany.unregister && (
                 <NavLink
-                  to={`${router.registries.companies.home}/edit/${requestedCompany.id}#requested`}
+                  to={`${router.companies.home}/edit/${requestedCompany.id}#requested`}
                 >
                   <Button
                     secondary
@@ -233,4 +233,4 @@ function RegistriesCompanies() {
   );
 }
 
-export default RegistriesCompanies;
+export default CompaniesOverview;

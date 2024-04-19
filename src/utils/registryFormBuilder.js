@@ -114,16 +114,7 @@ export function GetFieldsForm({
                             />
                           )}
                       </div>
-                      <div>
-                        {dynamicField.encryptable ? <span>Encrypt Field? </span> : null }
-                        {dynamicField.encryptable
-                          ? (
-                            <input
-                              {...register(buildFieldName(formKey, index, dynamicField, 'isEncrypted'))}
-                              type="checkbox"
-                            />
-                          ) : null }
-                      </div>
+
                     </div>
                   </div>
                 );
@@ -136,7 +127,7 @@ export function GetFieldsForm({
         ))}
         <div style={{ display: 'flex', margin: '16px', justifyContent: 'flex-end' }}>
           <Button type="button" onClick={() => append({})} small green>
-            Append
+            Add
             {' '}
             {displayName}
           </Button>

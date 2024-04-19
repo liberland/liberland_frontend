@@ -15,6 +15,7 @@ import Legislation from '../Legislation';
 import Offices from '../Offices';
 import Staking from '../Staking';
 import Registries from '../Registries';
+import Companies from '../Companies';
 import AllTransactions from '../Wallet/AllTransactions';
 import styles from './styles.module.scss';
 import Congress from '../Congress';
@@ -35,6 +36,7 @@ function Home() {
     <Route path={router.home.contracts} component={Contracts} />,
     <Route path={router.home.offices} component={Offices} />,
     <Route path={router.home.registries} component={Registries} />,
+    <Route path={router.home.companies} component={Companies} />,
   ];
 
   const alwaysRenderedRoutesLast = (

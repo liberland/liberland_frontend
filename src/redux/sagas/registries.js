@@ -54,7 +54,7 @@ function* requestCompanyRegistrationWorker(action) {
   );
   yield put(registriesActions.getOfficialUserRegistryEntries.call(walletAddress));
   yield put(registriesActions.requestCompanyRegistrationAction.success());
-  action.payload.history.push(router.registries.companies.home);
+  action.payload.history.push(router.companies.home);
 }
 
 function* requestEditCompanyRegistrationWorker(action) {
@@ -67,7 +67,7 @@ function* requestEditCompanyRegistrationWorker(action) {
   );
   yield put(registriesActions.getOfficialUserRegistryEntries.call(walletAddress));
   yield put(registriesActions.requestEditCompanyRegistrationAction.success());
-  action.payload.history.push(router.registries.companies.home);
+  action.payload.history.push(router.companies.home);
 }
 
 function* cancelCompanyRequestWorker(action) {

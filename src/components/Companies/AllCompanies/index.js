@@ -4,7 +4,7 @@ import { registriesSelectors } from '../../../redux/selectors';
 import { registriesActions } from '../../../redux/actions';
 import CompaniesCard from '../CompaniesCard';
 
-function RegistriesAllCompanies() {
+function AllCompanies() {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -21,4 +21,4 @@ function RegistriesAllCompanies() {
   );
 }
 
-export default RegistriesAllCompanies;
+export default AllCompanies;
