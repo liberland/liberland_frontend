@@ -14,6 +14,7 @@ export default {
     staking: '/home/staking',
     congress: '/home/congress',
     contracts: '/home/contracts',
+    companies: '/home/companies',
   },
   guidedSetup: '/guided-setup',
   offices: {
@@ -45,12 +46,6 @@ export default {
   },
   registries: {
     overview: '/home/registries/overview',
-    companies: {
-      home: '/home/registries/companies',
-      overview: '/home/registries/companies/overview',
-      create: '/home/registries/companies/create',
-      edit: '/home/registries/companies/edit/:companyId',
-    },
     allCompanies: '/home/registries/allCompanies',
     land: '/home/registries/land',
     assets: '/home/registries/assets',
@@ -71,5 +66,11 @@ export default {
     overview: '/home/contracts/overview',
     myContracts: '/home/contracts/my-contracts',
     item: '/home/contracts/overview/browser/:id',
+  },
+  companies: {
+    home: '/home/companies',
+    create: '/home/companies/create',
+    edit: '/home/companies/edit/:companyId',
+    allCompanies: '/home/companies/allCompanies',
   },
 };

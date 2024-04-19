@@ -9,14 +9,6 @@ const navigationList = [
     title: 'Overview',
   },
   {
-    route: `${router.registries.companies.overview}`,
-    title: 'My Companies',
-  },
-  {
-    route: `${router.registries.allCompanies}`,
-    title: 'Companies',
-  },
-  {
     route: `${router.registries.land}`,
     title: 'Land',
   },

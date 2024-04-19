@@ -153,6 +153,14 @@ function HomeNavigation() {
       isAdressWalletDiffrentThanRegistered: true,
     },
     {
+      route: router.home.companies,
+      title: 'COMPANIES',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: DocumentsIcon,
+      isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: true,
+    },
+    {
       route: router.home.registries,
       title: 'REGISTRIES',
       access: ['citizen', 'assemblyMember', 'non_citizen'],
