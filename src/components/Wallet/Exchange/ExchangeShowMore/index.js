@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { BN } from '@polkadot/util';
-import { formatProperlyValue } from '../../../../utils/dexFormater';
+import { getDecimalsForAsset } from '../../../../utils/dexFormatter';
 import Button from '../../../Button/Button';
 import styles from '../styles.module.scss';
 import { ReservedAssetPropTypes } from '../proptypes';
+import { formatAssets } from '../../../../utils/walletHelpers';
 
 function ExchangeShowMore({
   handleModalLiquidity,
@@ -19,11 +20,13 @@ function ExchangeShowMore({
   asset2Decimals,
 }) {
   const calculatePooled = (
-    assetToShow,
     lpTokensData,
     liquidityData,
     reservedAsset,
   ) => (new BN(reservedAsset).mul(new BN(lpTokensData))).div(new BN(liquidityData));
+
+  const decimals1 = getDecimalsForAsset(asset1, asset1Decimals);
+  const decimals2 = getDecimalsForAsset(asset2, asset2Decimals);
 
   return (
     <div className={styles.moreDetails}>
@@ -36,8 +39,8 @@ function ExchangeShowMore({
         {reserved && (
         <div>
           {`In the pool
-              ${formatProperlyValue(asset1, reserved.asset1, asset1Decimals || 0, asset1ToShow)}  
-            / ${formatProperlyValue(asset2, reserved.asset2, asset2Decimals || 0, asset2ToShow)}` }
+              ${formatAssets(reserved.asset1, decimals1, { symbol: asset1ToShow, withAll: true })}  
+            / ${formatAssets(reserved.asset2, decimals2, { symbol: asset2ToShow, withAll: true })}` }
         </div>
         )}
       </div>
@@ -57,20 +60,18 @@ function ExchangeShowMore({
                 </span>
                 <span>
                   {`Pooled ${asset1ToShow}: `}
-                  {formatProperlyValue(
-                    asset1,
-                    calculatePooled(asset1ToShow, lpTokensBalance, liquidity, reserved.asset1),
-                    asset1Decimals || 0,
-                    asset1ToShow,
+                  {formatAssets(
+                    calculatePooled(lpTokensBalance, liquidity, reserved.asset1),
+                    decimals1,
+                    { symbol: asset1ToShow, withAll: true },
                   )}
                 </span>
                 <span>
                   {`Pooled ${asset2ToShow}: `}
-                  {formatProperlyValue(
-                    asset2,
-                    calculatePooled(asset2ToShow, lpTokensBalance, liquidity, reserved.asset2),
-                    asset2Decimals || 0,
-                    asset2ToShow,
+                  {formatAssets(
+                    calculatePooled(lpTokensBalance, liquidity, reserved.asset2),
+                    decimals2,
+                    { symbol: asset2ToShow, withAll: true },
                   )}
                 </span>
               </>

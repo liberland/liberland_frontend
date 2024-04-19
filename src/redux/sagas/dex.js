@@ -11,7 +11,7 @@ import {
   getDexReserves,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
-import { convertToEnumDex } from '../../utils/dexFormater';
+import { convertToEnumDex } from '../../utils/dexFormatter';
 
 function* getPoolsWorker() {
   const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);

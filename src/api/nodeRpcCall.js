@@ -6,7 +6,7 @@ import { handleMyDispatchErrors } from '../utils/therapist';
 import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
 // eslint-disable-next-line import/no-cycle
-import { convertAssetData } from '../utils/dexFormater';
+import { convertAssetData } from '../utils/dexFormatter';
 import { parseDollars, parseMerits } from '../utils/walletHelpers';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
@@ -2077,7 +2077,7 @@ const getDexPoolsExtendData = async (walletAddress) => {
         ...item,
         assetData2,
         assetData1,
-        liquidity: liquidityData[index].isSome ? liquidityData[index].value.balance.toString() : 0,
+        liquidity: liquidityData[index].isSome && liquidityData[index].value.balance,
       };
     }));
     return wholeDataPools;

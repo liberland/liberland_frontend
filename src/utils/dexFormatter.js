@@ -1,12 +1,9 @@
 import { formatBalance, BN } from '@polkadot/util';
 import { BigNumber } from 'ethers';
 import {
-  formatAssets,
-  formatDollars, formatMerits,
+  calculateAmountMax,
+  calculateAmountMin,
   parseAssets,
-  parseDollars,
-  parseMerits,
-  sanitizeValue,
 } from './walletHelpers';
 // eslint-disable-next-line import/no-cycle
 import {
@@ -60,33 +57,6 @@ export const makeAssetToShow = (asset, symbol) => {
   return assetToShow;
 };
 
-export const formatProperlyValue = (asset, value, decimals, symbol) => {
-  let formattedValue;
-  if (asset === 'Native') {
-    formattedValue = formatDollars(value, true);
-  } else if (asset === '1') {
-    formattedValue = formatMerits(value, true);
-  } else {
-    formattedValue = formatAssets(value, decimals || 0, true);
-  }
-
-  const returnValue = symbol ? `${formattedValue} ${symbol}` : formattedValue;
-  return returnValue;
-};
-
-export const parseProperlyValue = (asset, value, decimals) => {
-  let parsedValue;
-  if (asset === 'Native') {
-    parsedValue = parseDollars(value);
-  } else if (asset === '1') {
-    parsedValue = parseMerits(value);
-  } else {
-    parsedValue = parseAssets(value, decimals);
-  }
-
-  return parsedValue;
-};
-
 export const getDecimalsForAsset = (asset, decimal) => {
   if (asset === 'Native') {
     return 12;
@@ -96,36 +66,15 @@ export const getDecimalsForAsset = (asset, decimal) => {
   return decimal || 0;
 };
 
-const calculateAmountMin = (
-  amount,
-  minAmountPercent,
-  subResult = true,
-) => {
-  const defaultMinPercent = 0.5;
-  const minAmountValue = (Number(minAmountPercent || defaultMinPercent) / 100).toString();
-  const lengthDecimalPercent = minAmountValue.split('.')[1].length;
-  const minAmountPercentBN = parseAssets(minAmountValue, lengthDecimalPercent);
-  const decimalsBN = new BN(10).pow(new BN(lengthDecimalPercent));
-  const percentBN = amount.mul(minAmountPercentBN).divn(decimalsBN);
-
-  if (subResult) {
-    const sub = amount.sub(percentBN.isZero() ? new BN(3) : percentBN);
-    return sub.lte(new BN(0)) ? 1 : sub;
-  }
-  return amount.add(percentBN.isZero() ? new BN(3) : percentBN);
-};
-
 export const convertLiquidityData = (
   amount1Desired,
   amount2Desired,
   asset1Decimals,
   asset2Decimals,
   minAmountPercent,
-  asset1,
-  asset2,
 ) => {
-  const amount1 = parseProperlyValue(asset1, sanitizeValue(amount1Desired), asset1Decimals);
-  const amount2 = parseProperlyValue(asset2, sanitizeValue(amount2Desired), asset2Decimals);
+  const amount1 = parseAssets(amount1Desired, asset1Decimals);
+  const amount2 = parseAssets(amount2Desired, asset2Decimals);
 
   const amount1Min = calculateAmountMin(
     amount1,
@@ -155,35 +104,23 @@ export const convertTransferData = async (
 
   let amount = null;
   let amountData = null;
-  let subResult = true;
+
+  const getSwapPrice = isAsset1 ? getSwapPriceExactTokensForTokens : getSwapPriceTokensForExactTokens;
+  const isAmountMax = !isAsset1;
+  const amountIn = isAsset1 ? amount1Desired : amount2Desired;
 
   if (isBuy) {
-    amount = parseProperlyValue(
-      isAsset1 ? asset2 : asset1,
-      isAsset1 ? amount1Desired : amount2Desired,
-      isAsset1 ? asset2Decimals : asset1Decimals,
-    );
-    amountData = await (isAsset1
-      ? getSwapPriceExactTokensForTokens
-      : getSwapPriceTokensForExactTokens)(enum2, enum1, amount);
-    subResult = isAsset1 ? false : subResult;
+    const decimals = isAsset1 ? asset2Decimals : asset1Decimals;
+    amount = parseAssets(amountIn, decimals);
+    amountData = await getSwapPrice(enum2, enum1, amount);
   } else {
-    amount = parseProperlyValue(
-      isAsset1 ? asset1 : asset2,
-      isAsset1 ? amount1Desired : amount2Desired,
-      isAsset1 ? asset1Decimals : asset2Decimals,
-    );
-    amountData = await (isAsset1
-      ? getSwapPriceExactTokensForTokens
-      : getSwapPriceTokensForExactTokens)(enum1, enum2, amount);
-    subResult = isAsset1 ? false : subResult;
+    const decimals = isAsset1 ? asset1Decimals : asset2Decimals;
+    amount = parseAssets(amountIn, decimals);
+    amountData = await getSwapPrice(enum1, enum2, amount);
   }
 
-  const amountMin = calculateAmountMin(
-    new BN(amountData),
-    amountOut,
-    !subResult,
-  );
+  const calculateFunc = isAmountMax ? calculateAmountMax : calculateAmountMin;
+  const amountMin = calculateFunc(new BN(amountData), amountOut);
   return { amount, amountMin };
 };
 

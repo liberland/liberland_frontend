@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormater';
+import { getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormatter';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
 import AddLiquidityModalWrapper from '../../../Modals/AddLiquidityModal';
 import styles from '../styles.module.scss';

@@ -41,11 +41,18 @@ export const formatDollars = (grains, withAll = false) => _format(grains, dollar
 export const parseMerits = (merits) => _parse(merits, meritDecimals);
 export const parseDollars = (dollars) => _parse(dollars, dollarDecimals);
 export const parseAssets = (assets, assetDecimals) => _parse(assets, assetDecimals);
-export const formatAssets = (assets, assetDecimals, withAll = false) => _format(
-  assets,
-  Number(assetDecimals),
-  withAll,
-);
+
+const defaultFormatAssetsSettings = {
+  withAll: false,
+  symbol: null,
+};
+export const formatAssets = (assets, assetDecimals, settingsProps = defaultFormatAssetsSettings) => {
+  const settings = { ...defaultFormatAssetsSettings, ...settingsProps };
+  const { withAll, symbol } = settings;
+  const formatedValue = _format(assets, Number(assetDecimals), withAll);
+  const returnValue = symbol ? `${formatedValue} ${symbol}` : formatedValue;
+  return returnValue;
+};
 
 const configDefault = {
   isSymbolFirst: false,
@@ -105,4 +112,37 @@ export const isValidSubstrateAddress = (address) => {
   } catch (error) {
     return false;
   }
+};
+
+export const calculateSlippage = (
+  amount,
+  minAmountPercent,
+) => {
+  const defaultMinPercent = 0.5;
+  const denominator = 10000;
+  const slippagePercentBN = new BN(((Number(minAmountPercent) || defaultMinPercent) * denominator) / 100);
+  return new BN(amount).mul(slippagePercentBN).div(new BN(denominator));
+};
+
+export const calculateAmountMax = (
+  amount,
+  minAmountPercent,
+) => {
+  const slippage = calculateSlippage(
+    amount,
+    minAmountPercent,
+  );
+  return new BN(amount).add(slippage.isZero() ? new BN(2) : slippage);
+};
+
+export const calculateAmountMin = (
+  amount,
+  minAmountPercent,
+) => {
+  const slippage = calculateSlippage(
+    amount,
+    minAmountPercent,
+  );
+  const sub = new BN(amount).sub(slippage.isZero() ? new BN(2) : slippage);
+  return sub.lte(new BN(0)) ? 1 : sub;
 };

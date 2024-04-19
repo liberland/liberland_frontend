@@ -13,13 +13,11 @@ import { userSelectors, dexSelectors, walletSelectors } from '../../redux/select
 import {
   convertTransferData,
   convertToEnumDex,
-  formatProperlyValue,
   getDecimalsForAsset,
-  parseProperlyValue,
-} from '../../utils/dexFormater';
+} from '../../utils/dexFormatter';
 import { AssetsPropTypes } from '../Wallet/Exchange/proptypes';
 import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } from '../../api/nodeRpcCall';
-import { sanitizeValue } from '../../utils/walletHelpers';
+import { formatAssets, parseAssets, sanitizeValue } from '../../utils/walletHelpers';
 
 function TradeTokensModal({
   handleModal, assets, isBuy,
@@ -57,14 +55,20 @@ function TradeTokensModal({
     handleSubmit,
     register,
     setValue,
-    setError,
     trigger,
-    formState: { errors, isValid },
-  } = useForm({ mode: 'onChange' });
+    setError,
+    formState: { errors },
+  } = useForm({
+    mode: 'onChange',
+    // reValidateMode: 'onChange',
+    defaultValues: {
+      amountIn1: '',
+      amountIn2: '',
+    },
+  });
 
   const onSubmit = async (data) => {
     try {
-      if (!isValid) return;
       const { amountIn1, amountIn2, minAmountPercent } = data;
       const amountOut = minAmountPercent.length > 0 ? minAmountPercent : undefined;
       const { amount, amountMin } = await convertTransferData(
@@ -111,51 +115,50 @@ function TradeTokensModal({
     try {
       setFormatedValue({});
       const isAsset1 = asset1 === asset;
-      const sanitizedValue = sanitizeValue(term.toString());
-      if (!sanitizedValue || sanitizedValue === 0
-        || (sanitizedValue.split('.')[1]?.length || 0) > (isAsset1 ? decimals2 : decimals1)) {
+      if (!term || term === 0
+        || (term.split('.')[1]?.length || 0) > (isAsset1 ? decimals2 : decimals1)) {
         return;
       }
       const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
       setIsAsset1State(isAsset1);
       let tradeData = null;
       let amount = null;
-      let assetFormat = null;
       let decimalsOut = null;
       let showReserve = null;
       let reserve = null;
 
       if (!isBuy) {
-        assetFormat = isAsset1 ? asset2 : asset1;
-        amount = parseProperlyValue(isAsset1 ? asset1 : asset2, sanitizedValue, isAsset1 ? decimals1 : decimals2);
-        tradeData = await (isAsset1
-          ? getSwapPriceExactTokensForTokens
-          : getSwapPriceTokensForExactTokens)(enum1, enum2, amount, false);
-        decimalsOut = isAsset1 ? assetData2?.decimals : assetData1?.decimals;
-        showReserve = formatProperlyValue(assetFormat, reservesThisAssets[isAsset1
-          ? 'asset2' : 'asset1'], decimalsOut, isAsset1 ? asset2ToShow : asset1ToShow);
+        amount = parseAssets(term, isAsset1 ? decimals1 : decimals2);
+        const getSwapPrice = isAsset1 ? getSwapPriceExactTokensForTokens : getSwapPriceTokensForExactTokens;
+        tradeData = await getSwapPrice(enum1, enum2, amount, false);
+        decimalsOut = isAsset1 ? decimals2 : decimals1;
+        showReserve = formatAssets(
+          reservesThisAssets[isAsset1 ? 'asset2' : 'asset1'],
+          decimalsOut,
+          { symbol: isAsset1 ? asset2ToShow : asset1ToShow, withAll: true },
+        );
         reserve = reservesThisAssets[isAsset1 ? 'asset2' : 'asset1'];
       } else {
-        assetFormat = isAsset1 ? asset1 : asset2;
-        amount = parseProperlyValue(isAsset1 ? asset2 : asset1, sanitizedValue, isAsset1 ? decimals2 : decimals1);
-        tradeData = await (isAsset1
-          ? getSwapPriceTokensForExactTokens
-          : getSwapPriceExactTokensForTokens)(enum1, enum2, amount, false);
-        decimalsOut = isAsset1 ? assetData1?.decimals : assetData2?.decimals;
-        showReserve = formatProperlyValue(assetFormat, reservesThisAssets[isBuy
-          ? 'asset1' : 'asset2'], decimalsOut, isBuy ? asset1ToShow : asset2ToShow);
+        amount = parseAssets(term, isAsset1 ? decimals2 : decimals1);
+        const getSwapPrice = isAsset1 ? getSwapPriceTokensForExactTokens : getSwapPriceExactTokensForTokens;
+        tradeData = await getSwapPrice(enum1, enum2, amount, false);
+        decimalsOut = isAsset1 ? decimals1 : decimals2;
+        showReserve = formatAssets(
+          reservesThisAssets[isBuy ? 'asset1' : 'asset2'],
+          decimalsOut,
+          { symbol: isAsset1 ? asset1ToShow : asset2ToShow, withAll: true },
+        );
         reserve = reservesThisAssets[isBuy ? 'asset1' : 'asset2'];
       }
 
-      const formatedValueData = tradeData ? formatProperlyValue(
-        assetFormat,
+      const formatedValueData = tradeData ? formatAssets(
         tradeData,
         decimalsOut,
       ) : '';
-
-      setValue('amountIn1', isAsset1 ? sanitizedValue : formatedValueData);
-      setValue('amountIn2', isAsset1 ? formatedValueData : sanitizedValue);
-      trigger();
+      const sanitizedValue = sanitizeValue(formatedValueData);
+      setValue('amountIn1', isAsset1 ? term : sanitizedValue);
+      setValue('amountIn2', isAsset1 ? sanitizedValue : term);
+      await trigger();
 
       if (!tradeData) {
         const msg = `No trade data from api for ${asset}`;
@@ -183,14 +186,17 @@ function TradeTokensModal({
   };
 
   const validate = async (v, assetBalance, decimals, asset) => {
-    const value = sanitizeValue(v?.toString());
     if (!v) {
       return 'Required';
     }
-    if (Number.isNaN(Number(value))) {
+    if (Number.isNaN(Number(v))) {
       return 'Not a valid number';
     }
     const isAsset1 = asset1 !== asset;
+
+    if ((v.split('.')[1]?.length || 0) > decimals) {
+      return `${isAsset1 ? asset2ToShow : asset1ToShow} don't have this amount of decimals`;
+    }
     const tradeValue = formatedValue[asset];
     if (tradeValue) {
       const { msg, value: valueData } = tradeValue;
@@ -202,11 +208,8 @@ function TradeTokensModal({
       }
     }
 
-    if ((value.split('.')[1]?.length || 0) > decimals) {
-      return `${isAsset1 ? asset2ToShow : asset1ToShow} don't have this amount of decimals`;
-    }
     if (isBuy ? asset !== asset1 : asset === asset1) {
-      const inputBN = parseProperlyValue(asset, value, decimals);
+      const inputBN = parseAssets(v, decimals);
       const assetBN = new BN(assetBalance.toString());
       if (inputBN.gt(assetBN)) {
         return 'Input greater than balance';
@@ -247,12 +250,12 @@ function TradeTokensModal({
         <span>
           Balance
           {' '}
-          {(assetsBalance && assetsBalance.length > 0) ? formatProperlyValue(
-            isBuy ? asset2 : asset1,
-            isBuy ? assetsBalance[1] : assetsBalance[0],
-            isBuy ? decimals2 : decimals1,
-            isBuy ? asset2ToShow : asset1ToShow,
-          ) : 0}
+          {(assetsBalance && assetsBalance.length > 0)
+            ? formatAssets(
+              isBuy ? assetsBalance[1] : assetsBalance[0],
+              isBuy ? decimals2 : decimals1,
+              { symbol: isBuy ? asset2ToShow : asset1ToShow, withAll: true },
+            ) : 0}
         </span>
       </div>
       <TextInput
@@ -277,11 +280,10 @@ function TradeTokensModal({
         <span>
           Balance
           {' '}
-          {assetsBalance && assetsBalance.length > 0 ? formatProperlyValue(
-            isBuy ? asset1 : asset2,
+          {assetsBalance && assetsBalance.length > 0 ? formatAssets(
             isBuy ? assetsBalance[0] : assetsBalance[1],
             isBuy ? decimals1 : decimals2,
-            isBuy ? asset1ToShow : asset2ToShow,
+            { symbol: isBuy ? asset1ToShow : asset2ToShow, withAll: true },
           ) : 0}
         </span>
       </div>

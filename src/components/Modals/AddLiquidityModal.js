@@ -11,11 +11,10 @@ import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
 import { userSelectors, walletSelectors } from '../../redux/selectors';
 import {
-  convertLiquidityData, convertToEnumDex, formatProperlyValue,
-  parseProperlyValue,
-} from '../../utils/dexFormater';
+  convertLiquidityData, convertToEnumDex, getDecimalsForAsset,
+} from '../../utils/dexFormatter';
 import { AssetsPropTypes } from '../Wallet/Exchange/proptypes';
-import { sanitizeValue } from '../../utils/walletHelpers';
+import { formatAssets, parseAssets, sanitizeValue } from '../../utils/walletHelpers';
 import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } from '../../api/nodeRpcCall';
 
 function AddLiquidityModal({
@@ -32,7 +31,7 @@ function AddLiquidityModal({
     register,
     setValue,
     trigger,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm({
     mode: 'onChange',
   });
@@ -46,8 +45,10 @@ function AddLiquidityModal({
     asset2ToShow,
   } = assets;
 
-  const onSubmit = (data) => {
-    if (!isValid) return;
+  const decimals1 = getDecimalsForAsset(asset1, assetData1?.decimals);
+  const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
+
+  const onSubmit = async (data) => {
     const {
       amount1Desired, amount2Desired, minAmountPercent,
     } = data;
@@ -57,11 +58,9 @@ function AddLiquidityModal({
     } = convertLiquidityData(
       amount1Desired,
       amount2Desired,
-      assetData1?.decimals,
-      assetData2?.decimals,
+      decimals1,
+      decimals2,
       minAmountPercent,
-      asset1,
-      asset2,
     );
     const mintTo = walletAddress;
     dispatch(dexActions.addLiquidity.call({
@@ -78,11 +77,15 @@ function AddLiquidityModal({
   };
 
   const validate = (v, assetBalance, decimals, asset) => {
-    if (Number.isNaN(Number(v))) {
+    const isAsset1 = asset === asset1;
+    if ((v.split('.')[1]?.length || 0) > decimals) {
+      return `${isAsset1 ? asset1ToShow : asset2ToShow} don't have this amount of decimals`;
+    }
+    const inputBN = parseAssets(v, decimals);
+    if (Number.isNaN(Number(inputBN))) {
       return 'Not a valid number';
     }
-    const sanitizedValue = sanitizeValue(v.toString());
-    const inputBN = parseProperlyValue(asset, sanitizedValue, decimals);
+
     const assetBN = new BN(assetBalance);
     if (inputBN.gt(assetBN)) {
       return 'Input greater than balance';
@@ -93,24 +96,24 @@ function AddLiquidityModal({
 
   const handleChangeInput = async (e, asset) => {
     const { value } = e.target;
-
     const isAsset1 = asset === asset1;
-    const sanitizedValue = sanitizeValue(value.toString());
-    const assetFormat = isAsset1 ? asset2 : asset1;
-    const amount = parseProperlyValue(
-      isAsset1 ? asset1 : asset2,
-      sanitizedValue,
-      isAsset1 ? assetData1?.decimals : assetData2?.decimals,
-    );
-    const tradeData = await (isAsset1
-      ? getSwapPriceExactTokensForTokens
-      : getSwapPriceTokensForExactTokens)(enum1, enum2, amount, false);
-    const decimalsOut = isAsset1 ? assetData2?.decimals : assetData1?.decimals;
-    const formatedValue = formatProperlyValue(assetFormat, tradeData, decimalsOut);
 
-    setValue('amount1Desired', isAsset1 ? value : formatedValue);
-    setValue('amount2Desired', isAsset1 ? formatedValue : value);
-    trigger(isAsset1 ? 'amountIn2' : 'amountIn1');
+    if (!value || value === 0
+      || (value.split('.')[1]?.length || 0) > (isAsset1 ? decimals1 : decimals2)) {
+      return;
+    }
+    const amount = parseAssets(
+      value,
+      isAsset1 ? decimals1 : decimals2,
+    );
+    const getSwapPrice = isAsset1 ? getSwapPriceExactTokensForTokens : getSwapPriceTokensForExactTokens;
+    const tradeData = await getSwapPrice(enum1, enum2, amount, false);
+    const decimalsOut = isAsset1 ? decimals2 : decimals1;
+    const formatedValue = formatAssets(tradeData, decimalsOut);
+    const sanitizedValue = sanitizeValue(formatedValue.toString());
+    setValue('amount1Desired', isAsset1 ? value : sanitizedValue);
+    setValue('amount2Desired', isAsset1 ? sanitizedValue : value);
+    await trigger();
   };
 
   useEffect(() => {
@@ -143,13 +146,13 @@ function AddLiquidityModal({
           Balance
           {' '}
           {assetsBalance[0]
-            ? formatProperlyValue(asset1, assetsBalance[0], assetData1?.decimals || 0, asset1ToShow) : 0}
+            ? formatAssets(assetsBalance[0], decimals1, { symbol: asset1ToShow, withAll: true }) : 0}
         </span>
         )}
       </div>
       <TextInput
         required
-        validate={(v) => validate(v, assetsBalance[0], assetData1?.decimals, asset1)}
+        validate={(v) => validate(v, assetsBalance[0], decimals1, asset1)}
         errorTitle={asset1ToShow}
         register={register}
         name="amount1Desired"
@@ -172,13 +175,13 @@ function AddLiquidityModal({
           Balance
           {' '}
           {assetsBalance[1]
-            ? formatProperlyValue(asset2, assetsBalance[1], assetData2?.decimals || 0, asset2ToShow) : 0}
+            ? formatAssets(assetsBalance[1], decimals2, { symbol: asset2ToShow, withAll: true }) : 0}
         </span>
         )}
       </div>
       <TextInput
         required
-        validate={(v) => validate(v, assetsBalance[1], assetData2?.decimals, asset2)}
+        validate={(v) => validate(v, assetsBalance[1], decimals2, asset2)}
         errorTitle={asset2ToShow}
         register={register}
         name="amount2Desired"
