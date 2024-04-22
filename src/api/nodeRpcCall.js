@@ -1295,7 +1295,30 @@ const batchPayoutStakers = async (targets, walletAddress) => {
 const getStakersRewards = async (accounts) => {
   const api = await getApi();
 
-  return api.derive.staking.stakerRewardsMulti(accounts, false);
+  const allRewards = await api.derive.staking.stakerRewardsMulti(accounts, false);
+
+  // allRewards may include rewards from validators that no longer have a stash.
+  // Such rewards are unclaimable and essentially lost either way, so let's just
+  // filter them out.
+  const uniqValidatorsSet = new Set(allRewards.flatten().map(({ validators }) => Object.keys(validators)).flatten());
+  const uniqValidators = Array.from(uniqValidatorsSet);
+  const ledgers = await api.query.staking.ledger.multi(uniqValidators);
+  const brokenValidators = ledgers.reduce((broken, v, i) => {
+    if (v.isNone) {
+      return [...broken, uniqValidators[i]];
+    }
+    return broken;
+  }, []);
+  const validRewards = allRewards.map((accountRewards) => accountRewards.map((eraRewards) => {
+    const goodValidators = Object.keys(eraRewards.validators)
+      .filter((v) => !brokenValidators.includes(v))
+      .reduce((obj, v) => ({ ...obj, [v]: eraRewards.validators[v] }), {});
+    return {
+      ...eraRewards,
+      validators: goodValidators,
+    };
+  }).filter((eraRewards) => Object.keys(eraRewards.validators).length > 0));
+  return validRewards;
 };
 
 const getSessionValidators = async () => {
