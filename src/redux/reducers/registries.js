@@ -12,6 +12,7 @@ const registriesReducer = handleActions({
   [combineActions(
     registriesActions.getOfficialUserRegistryEntries.call,
     registriesActions.requestCompanyRegistrationAction.call,
+    registriesActions.requestEditCompanyRegistrationAction.call,
     registriesActions.requestCompanyEditAction.call,
     registriesActions.requestCompanyDeleteAction.call,
     registriesActions.registerCompanyAction.call,
@@ -31,6 +32,7 @@ const registriesReducer = handleActions({
     registriesActions.getOfficialUserRegistryEntries.success,
     registriesActions.getOfficialUserRegistryEntries.failure,
     registriesActions.requestCompanyRegistrationAction.failure,
+    registriesActions.requestEditCompanyRegistrationAction.failure,
     registriesActions.requestCompanyEditAction.failure,
     registriesActions.requestCompanyDeleteAction.failure,
     registriesActions.registerCompanyAction.failure,

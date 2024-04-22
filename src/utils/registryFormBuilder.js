@@ -12,7 +12,7 @@ const buildFieldName = (formKey, index, dynamicField, suffix) => (dynamicField.e
   : `${formKey}.${index}.${dynamicField.key}`);
 
 export function blockchainDataToFormObject(blockchainDataRaw) {
-  const blockchainData = blockchainDataRaw.toJSON();
+  const blockchainData = blockchainDataRaw.toJSON ? blockchainDataRaw.toJSON() : blockchainDataRaw;
   const supportedObject = JSON.parse(JSON.stringify(newCompanyDataObject));
   const staticFields = [];
   const dynamicFields = [];
