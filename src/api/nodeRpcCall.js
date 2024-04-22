@@ -1,6 +1,8 @@
 import { web3FromAddress } from '@polkadot/extension-dapp';
 import pako from 'pako';
-import { hexToU8a, u8aToHex } from '@polkadot/util';
+import {
+  hexToU8a, u8aToHex,
+} from '@polkadot/util';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
@@ -2020,6 +2022,16 @@ const createContract = async (data, parties, walletAddress) => {
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+const getStakingData = async (walletAddress) => {
+  const api = await getApi();
+  const [stakingInfo, sessionProgress] = await Promise.all([
+    api.derive.staking?.account(walletAddress),
+    api.derive.session.progress(),
+  ]);
+
+  return { stakingInfo, sessionProgress };
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -2127,4 +2139,5 @@ export {
   getSingleContract,
   createContract,
   getSignaturesForContracts,
+  getStakingData,
 };
