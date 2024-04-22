@@ -6,6 +6,7 @@ import { handleMyDispatchErrors } from '../utils/therapist';
 import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
 import { parseDollars, parseMerits } from '../utils/walletHelpers';
+import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -15,6 +16,7 @@ const getApi = async () => {
   if (__apiCache === null) {
     __apiCache = await ApiPromise.create({
       provider,
+      metadata: getMetadataCache(),
       types: {
         Coords: {
           lat: 'u64',
@@ -105,6 +107,11 @@ const getApi = async () => {
         },
       },
     });
+    setMetadataCache(
+      __apiCache.genesisHash,
+      __apiCache.runtimeVersion.specVersion.toNumber(),
+      __apiCache.runtimeMetadata.toHex(),
+    );
   }
   return __apiCache;
 };
