@@ -61,16 +61,12 @@ function ProposalItem({
 
   const [isProposalHidden, setIsProposalHidden] = useState(true);
   const notificationRef = useRef();
-  const handleCopyClick = (dataToCoppy) => {
-    navigator.clipboard.writeText(dataToCoppy);
-    notificationRef.current.addSuccess({ text: 'Address was copied' });
-  };
+
   return (
     <>
       <NotificationPortal ref={notificationRef} />
       <div className={stylesItem.itemWrapper}>
         <Header
-          handleCopyClick={handleCopyClick}
           hash={hash}
           setIsHidden={setIsProposalHidden}
           isHidden={isProposalHidden}
@@ -102,7 +98,7 @@ function ProposalItem({
             <Details proposal={{ hash, len }} isProposal />
             )}
         {!isProposalHidden && centralizedDatas?.length > 0
-          && <Discussions centralizedDatas={centralizedDatas} handleCopyClick={handleCopyClick} />}
+          && <Discussions centralizedDatas={centralizedDatas} />}
       </div>
     </>
   );
