@@ -132,7 +132,8 @@ export const calculateAmountMax = (
     amount,
     minAmountPercent,
   );
-  return new BN(amount).add(slippage.isZero() ? new BN(2) : slippage);
+  const amountBN = new BN(amount);
+  return slippage.isZero() ? amountBN : amountBN.add(slippage);
 };
 
 export const calculateAmountMin = (
@@ -143,6 +144,6 @@ export const calculateAmountMin = (
     amount,
     minAmountPercent,
   );
-  const sub = new BN(amount).sub(slippage.isZero() ? new BN(2) : slippage);
-  return sub.lte(new BN(0)) ? 1 : sub;
+  const amountBN = new BN(amount);
+  return slippage.isZero() ? amountBN : new BN(amount).sub(slippage);
 };

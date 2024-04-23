@@ -1,9 +1,11 @@
-import { formatBalance, BN } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import { BigNumber } from 'ethers';
 import {
   calculateAmountMax,
   calculateAmountMin,
+  formatAssets,
   parseAssets,
+  sanitizeValue,
 } from './walletHelpers';
 // eslint-disable-next-line import/no-cycle
 import {
@@ -17,39 +19,10 @@ export function convertToEnumDex(asset1, asset2) {
   return { enum1, enum2 };
 }
 
-export const formatter = (v, decimals = 12) => formatBalance(
-  v,
-  {
-    decimals, forceUnit: '-', withSi: false, locale: 'en', withAll: true, withZero: false,
-  },
-);
-
-export const formatterDecimals = (balance, decimals) => {
-  let chainDecimals = 12;
-  if (decimals === 0) {
-    chainDecimals = 0;
-  } else if (decimals) {
-    chainDecimals = decimals;
-  }
-  const bigBalance = new BN(balance);
-  const baseFactor = new BN(10).pow(new BN(chainDecimals));
-
-  const integerPart = bigBalance.div(baseFactor).toString();
-  const remainder = bigBalance.mod(baseFactor);
-  const formattedRemainder = remainder.toString().padStart(chainDecimals, '0');
-  if (!remainder.isZero()) {
-    return `${integerPart}.${formattedRemainder}`;
-  }
-  return `${integerPart}`;
-};
-
 export const makeAssetToShow = (asset, symbol) => {
   let assetToShow = asset;
-
   if (asset === 'Native') {
     assetToShow = 'LLD';
-  } else if (asset === '1') {
-    assetToShow = 'LLM';
   } else if (symbol) {
     assetToShow = symbol;
   }
@@ -59,8 +32,6 @@ export const makeAssetToShow = (asset, symbol) => {
 
 export const getDecimalsForAsset = (asset, decimal) => {
   if (asset === 'Native') {
-    return 12;
-  } if (asset === '1') {
     return 12;
   }
   return decimal || 0;
@@ -156,8 +127,8 @@ export const getExchangeRate = (reserved1, reserved2, decimals1, decimals2) => {
     return null;
   }
 
-  const reservedFormated1 = formatterDecimals(reserved1, decimals1);
-  const reservedFormated2 = formatterDecimals(reserved2, decimals2);
+  const reservedFormated1 = sanitizeValue(formatAssets(reserved1, decimals1, { withAll: true }));
+  const reservedFormated2 = sanitizeValue(formatAssets(reserved2, decimals2, { withAll: true }));
 
   const num1 = BigNumber.from(reservedFormated1.replace('.', ''));
   const num2 = BigNumber.from(reservedFormated2.replace('.', ''));
