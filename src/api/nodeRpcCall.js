@@ -1,6 +1,7 @@
 import { web3FromAddress } from '@polkadot/extension-dapp';
 import pako from 'pako';
 import {
+  BN_ZERO,
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
@@ -255,12 +256,12 @@ const provideJudgementAndAssets = async ({
   const officeJudgementCall = api.tx.identityOffice.execute(judgementCall);
   calls.push(officeJudgementCall);
 
-  if (parsedDollars?.gt(0)) {
+  if (parsedDollars?.gt(BN_ZERO)) {
     const lldCall = api.tx.balances.transfer(address, parsedDollars.toString());
     const officeLldCall = api.tx.identityOffice.execute(lldCall);
     calls.push(officeLldCall);
   }
-  if (parsedMerits?.gt(0)) {
+  if (parsedMerits?.gt(BN_ZERO)) {
     const llmCall = api.tx.llm.sendLlmToPolitipool(address, parsedMerits.toString());
     const officeLlmCall = api.tx.identityOffice.execute(llmCall);
     calls.push(officeLlmCall);

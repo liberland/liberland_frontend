@@ -22,6 +22,7 @@ import router from '../../router';
 import * as backend from '../../api/backend'
 import {addDollarsTransaction} from "../../api/backend";
 import {parseDollars, parseMerits} from "../../utils/walletHelpers";
+import {BN_ZERO} from "@polkadot/util";
 // WORKERS
 
 function* getIdentityWorker(action) {
@@ -42,14 +43,16 @@ function* getIdentityWorker(action) {
 }
 
 function* provideJudgementAndAssetsWorker(action) {
-  if ((action.payload.merits || action.payload.dollars) && !action.payload.id) {
+
+  if ((parseMerits(action.payload.merits)?.gt(BN_ZERO) || parseDollars(action.payload.dollars)?.gt(BN_ZERO))
+    && !action.payload.id) {
     throw new Error('Tried to transfer LLD or LLM but we have no user id!');
   }
   yield call(provideJudgementAndAssets, action.payload);
   yield put(officesActions.provideJudgementAndAssets.success());
   yield put(officesActions.officeGetIdentity.call(action.payload.address));
 
-  if (parseMerits(action.payload.merits)?.gt(0)) {
+  if (parseMerits(action.payload.merits)?.gt(BN_ZERO)) {
     try {
       yield call(backend.addMeritTransaction, action.payload.id, action.payload.merits * -1);
     } catch (e) {
@@ -57,7 +60,7 @@ function* provideJudgementAndAssetsWorker(action) {
     }
   }
 
-  if (parseDollars(action.payload.dollars)?.gt(0)) {
+  if (parseDollars(action.payload.dollars)?.gt(BN_ZERO)) {
     try {
       yield call(backend.addDollarsTransaction, action.payload.id, action.payload.dollars * -1);
     } catch (e) {
