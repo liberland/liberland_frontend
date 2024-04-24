@@ -1,23 +1,16 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useMediaQuery } from 'usehooks-ts';
 import cx from 'classnames';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 import libertarianTorch from '../../../../assets/images/libertariantorch.png';
-import truncate from '../../../../utils/truncate';
 import NotificationPortal from '../../../NotificationPortal';
-import { ReactComponent as CopyIcon } from '../../../../assets/icons/copy.svg';
+import CopyIconWithAddress from '../../../CopyIconWithAddress';
 
 function SelectedCandidateCard({
   politician, unselectCandidate, moveSelectedCandidate,
 }) {
   const notificationRef = useRef();
-  const handleCopyClick = (dataToCoppy) => {
-    navigator.clipboard.writeText(dataToCoppy);
-    notificationRef.current.addSuccess({ text: 'Address was copied' });
-  };
-  const isBigScreen = useMediaQuery('(min-width: 1200px)');
   return (
     <>
       <NotificationPortal ref={notificationRef} />
@@ -34,13 +27,9 @@ function SelectedCandidateCard({
             <img src={libertarianTorch} style={{ height: '100%' }} alt="" />
           </div>
           <div className={cx(styles.politicianDisplayName)}>
-            <CopyIcon
-              className={styles.copyIcon}
-              name="walletAddress"
-              onClick={() => handleCopyClick(politician.name)}
+            <CopyIconWithAddress
+              address={politician.name}
             />
-            <span>{truncate(politician.name, isBigScreen ? 20 : 12)}</span>
-
           </div>
         </div>
         <div className={styles.rightColumn}>

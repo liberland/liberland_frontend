@@ -1,23 +1,19 @@
 import React, { useState, useRef } from 'react';
-import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
 import Button from '../../Button/Button';
 import NotificationPortal from '../../NotificationPortal';
 
-import { blockchainSelectors } from '../../../redux/selectors';
-
 import { SendLLDModal, SendLLMModal, UnpoolModal } from '../../Modals';
 
 import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
-import { ReactComponent as CopyIcon } from '../../../assets/icons/copy.svg';
 
 import styles from './styles.module.scss';
-import truncate from '../../../utils/truncate';
 import router from '../../../router';
 import Tabs from '../../Tabs';
 import PolitipoolModal from '../../Modals/PolitipoolModal';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
 
 function WalletAddressesLine({ walletAddress }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,13 +23,6 @@ function WalletAddressesLine({ walletAddress }) {
   const notificationRef = useRef();
   const addresses = {
     walletAddress,
-  };
-
-  const userWalletAddressSelector = useSelector(blockchainSelectors.userWalletAddressSelector);
-
-  const handleCopyClick = () => {
-    navigator.clipboard.writeText(userWalletAddressSelector);
-    notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
 
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
@@ -58,8 +47,9 @@ function WalletAddressesLine({ walletAddress }) {
             <div className={styles.singleAddressWrapper}>
               <span className={styles.addressTitle}>Wallet address </span>
               <span className={styles.address}>
-                <CopyIcon className={styles.copyIcon} name="walletAddress" onClick={(e) => handleCopyClick(e)} />
-                {addresses.walletAddress ? truncate(addresses.walletAddress, 16) : ''}
+                <CopyIconWithAddress
+                  address={addresses.walletAddress}
+                />
               </span>
             </div>
           </div>

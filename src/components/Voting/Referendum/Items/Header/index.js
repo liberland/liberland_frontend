@@ -1,20 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import truncate from '../../../../../utils/truncate';
 import styles from '../item.module.scss';
-import { ReactComponent as CopyIcon } from '../../../../../assets/icons/copy.svg';
 import Button from '../../../../Button/Button';
+import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 
 function Header({
-  hash, children, handleCopyClick, setIsHidden, isHidden, textButton,
+  hash, children, setIsHidden, isHidden, textButton,
 }) {
   return (
     <div className={styles.header}>
       <span className={styles.title}>
         ID:
-        {truncate(hash, 20)}
         {' '}
-        <CopyIcon className={styles.copyIcon} name="proposalHash" onClick={() => handleCopyClick(hash)} />
+        <CopyIconWithAddress
+          address={hash}
+        />
       </span>
       <div className={styles.buttons}>
         {children}
@@ -44,7 +44,6 @@ Header.propTypes = {
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.node,
   ]).isRequired,
-  handleCopyClick: PropTypes.func.isRequired,
   setIsHidden: PropTypes.func.isRequired,
   isHidden: PropTypes.bool.isRequired,
   textButton: PropTypes.string,
