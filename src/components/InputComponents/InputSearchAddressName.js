@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import cx from 'classnames';
 import { getUsersIdentityData } from '../../api/explorer';
 import TextInput from './TextInput';
 import styles from './styles.module.scss';
@@ -73,7 +74,9 @@ function InputSearch({
                       &nbsp;
                         {id}
                       &nbsp;
-                        {isConfirmed && <span className={styles.icon}>&#10003;</span>}
+                        {isConfirmed
+                          ? <span className={styles.icon}>&#10003;</span>
+                          : <span className={cx(styles.icon, styles.iconRed)}>&#10005;</span>}
                       </span>
                     </button>
                   </li>
