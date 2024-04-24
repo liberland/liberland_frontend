@@ -17,7 +17,7 @@ export const valueToBN = (i) => {
   return new BN(s);
 };
 
-const _format = ((value, decimals) => formatBalance(
+const _format = ((value, decimals, withAll = false) => formatBalance(
   valueToBN(value),
   {
     decimals,
@@ -25,6 +25,7 @@ const _format = ((value, decimals) => formatBalance(
     withSi: false,
     locale: 'en',
     withZero: false,
+    withAll,
   },
 ));
 
@@ -51,7 +52,8 @@ export const formatTransaction = (value_raw, bigSymbol, smallSymbol, decimals, c
   const absIntvalue = value.abs();
 
   if (_parse(absIntvalue.toString(), decimals).gt(BN_ONE)) {
-    const formatValue = _format(absIntvalue, config.isAsset ? parseInt(decimals) : decimals);
+    const formatValue = _format(absIntvalue, config.isAsset ? parseInt(decimals) : decimals, true);
+
     return config.isSymbolFirst
       ? `${bigSymbol} ${prefix}${formatValue}`
       : `${prefix} ${formatValue} ${bigSymbol}`;
