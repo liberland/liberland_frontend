@@ -9,7 +9,7 @@ import { TextInput } from '../InputComponents';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
-import { userSelectors, dexSelectors, walletSelectors } from '../../redux/selectors';
+import { dexSelectors, walletSelectors, blockchainSelectors } from '../../redux/selectors';
 import {
   convertTransferData,
   convertToEnumDex,
@@ -23,7 +23,7 @@ function TradeTokensModal({
   handleModal, assets, isBuy,
 }) {
   const dispatch = useDispatch();
-  const walletAddress = useSelector(userSelectors.selectWalletAddress);
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
   const reserves = useSelector(dexSelectors.selectorReserves);
   const [isChecked, setIsChecked] = useState(false);

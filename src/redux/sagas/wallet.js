@@ -33,19 +33,6 @@ function* getAdditionalAssetsWorker() {
   yield put(walletActions.getAdditionalAssets.success(additionalAssets));
 }
 
-function* getAssetBalanceWorker(action) {
-  const asset = action.payload;
-  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  let balance;
-  if (asset === 'Native') {
-    const { liquidAmount } = yield getBalanceByAddress(walletAddress);
-    balance = liquidAmount.amount;
-  } else {
-    balance = yield getAssetData(asset, walletAddress);
-  }
-  yield put(walletActions.getAssetBalance.success(balance));
-}
-
 function* getAssetsBalanceWorker(action) {
   const assets = action.payload;
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
@@ -149,10 +136,6 @@ function* getAdditionalAssetsWatcher() {
   yield* blockchainWatcher(walletActions.getAdditionalAssets, getAdditionalAssetsWorker);
 }
 
-function* getAssetBalanceWatcher() {
-  yield* blockchainWatcher(walletActions.getAssetBalance, getAssetBalanceWorker);
-}
-
 function* getAssetsBalanceWatcher() {
   yield* blockchainWatcher(walletActions.getAssetsBalance, getAssetsBalanceWorker);
 }
@@ -209,6 +192,5 @@ export {
   getNominatorTargetsWatcher,
   setNominatorTargetsWatcher,
   unpoolWatcher,
-  getAssetBalanceWatcher,
   getAssetsBalanceWatcher,
 };

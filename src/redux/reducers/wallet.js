@@ -54,7 +54,6 @@ const walletReducer = handleActions(
       walletActions.setNominatorTargets.call,
       walletActions.unpool.call,
       walletActions.getTxTransfers.call,
-      walletActions.getAssetBalance.call,
       walletActions.getAssetsBalance.call,
     )]: (state) => ({
       ...state,
@@ -88,10 +87,6 @@ const walletReducer = handleActions(
     [walletActions.getAdditionalAssets.success]: (state, action) => ({
       ...state,
       additionalAssets: action.payload,
-    }),
-    [walletActions.getAssetBalance.success]: (state, action) => ({
-      ...state,
-      assetBalance: action.payload,
     }),
     [walletActions.getAssetsBalance.success]: (state, action) => ({
       ...state,
@@ -133,8 +128,6 @@ const walletReducer = handleActions(
       walletActions.unpool.failure,
       walletActions.getTxTransfers.success,
       walletActions.getTxTransfers.failure,
-      walletActions.getAssetBalance.success,
-      walletActions.getAssetBalance.failure,
       walletActions.getAssetsBalance.success,
       walletActions.getAssetsBalance.failure,
     )]: (state) => ({

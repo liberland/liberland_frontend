@@ -14,7 +14,6 @@ export const {
   getTxTransfers,
   getAdditionalAssets,
   sendAssetsTransfer,
-  getAssetBalance,
   getAssetsBalance,
 } = createActions({
   GET_WALLET: {

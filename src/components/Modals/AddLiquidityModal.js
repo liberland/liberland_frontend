@@ -9,7 +9,7 @@ import { TextInput } from '../InputComponents';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
-import { userSelectors, walletSelectors } from '../../redux/selectors';
+import { blockchainSelectors, walletSelectors } from '../../redux/selectors';
 import {
   convertLiquidityData, convertToEnumDex, getDecimalsForAsset,
 } from '../../utils/dexFormatter';
@@ -21,7 +21,7 @@ function AddLiquidityModal({
   handleModal, assets,
 }) {
   const dispatch = useDispatch();
-  const walletAddress = useSelector(userSelectors.selectWalletAddress);
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
   const [isChecked, setIsChecked] = useState(false);
 
