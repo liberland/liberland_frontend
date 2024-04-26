@@ -1305,7 +1305,48 @@ const batchPayoutStakers = async (targets, walletAddress) => {
 const getStakersRewards = async (accounts) => {
   const api = await getApi();
 
-  return api.derive.staking.stakerRewardsMulti(accounts, false);
+  const allRewards = await api.derive.staking.stakerRewardsMulti(accounts, false);
+
+  // allRewards may include rewards from validators that no longer have a stash.
+  // Such rewards are unclaimable and essentially lost either way, so let's just
+  // filter them out.
+
+  // First find all validators that our stakers got rewards from
+  const uniqValidatorsSet = new Set(allRewards.flatten().map(({ validators }) => Object.keys(validators)).flatten());
+  const uniqValidators = Array.from(uniqValidatorsSet);
+
+  // Validators are stashes, convert to controllers
+  const controllers = await api.query.staking.bonded.multi(uniqValidators);
+  const controllersWithIdx = controllers.map((v, i) => [i, v]);
+
+  // If there's no controller attached, it's not a stash
+  const noStashValidators = controllersWithIdx.filter(([, v]) => v.isNone).map(([i]) => uniqValidators[i]);
+
+  // Fetch ledgers for validators with controller
+  const stashValidators = controllersWithIdx.filter(([, v]) => v.isSome).map(([i, v]) => [i, v.unwrap()]);
+  const ledgers = await api.query.staking.ledger.multi(stashValidators.map(([, v]) => v));
+
+  // If there's no ledger, it's not a stash anymore
+  const noControllerValidators = ledgers.reduce((broken, v, i) => {
+    if (v.isNone) {
+      return [...broken, uniqValidators[stashValidators[i][0]]];
+    }
+    return broken;
+  }, []);
+
+  const brokenValidators = [...noStashValidators, ...noControllerValidators];
+
+  // filter out rewards from brokenValidators
+  const validRewards = allRewards.map((accountRewards) => accountRewards.map((eraRewards) => {
+    const goodValidators = Object.keys(eraRewards.validators)
+      .filter((v) => !brokenValidators.includes(v))
+      .reduce((obj, v) => ({ ...obj, [v]: eraRewards.validators[v] }), {});
+    return {
+      ...eraRewards,
+      validators: goodValidators,
+    };
+  }).filter((eraRewards) => Object.keys(eraRewards.validators).length > 0));
+  return validRewards;
 };
 
 const getSessionValidators = async () => {
