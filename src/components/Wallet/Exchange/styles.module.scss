@@ -66,6 +66,7 @@
     align-items: center;
     justify-content: space-between;
     text-align: center;
+    flex-wrap: wrap;
     gap: 5px;
 
     .text{
@@ -73,6 +74,11 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 4px;
+    }
+
+    .liquidityButtons{
+      display: flex;
+      gap: 10px;
     }
   }
 }

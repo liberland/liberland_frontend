@@ -9,6 +9,7 @@ import {
   swapExactTokensForTokens,
   swapTokensForExactTokens,
   getDexReserves,
+  removeLiquidity,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { convertToEnumDex } from '../../utils/dexFormatter';
@@ -91,4 +92,28 @@ function* getDexReservesWorker(action) {
 
 export function* getDexReservesWatcher() {
   yield* blockchainWatcher(dexActions.getDexReserves, getDexReservesWorker);
+}
+
+function* removeLiquidityWorker(action) {
+  const {
+    asset1, asset2, lpTokenBurn, amount1MinReceive, amount2MinReceive, withdrawTo,
+  } = action.payload;
+  const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
+  yield call(
+    removeLiquidity,
+    enum1,
+    enum2,
+    lpTokenBurn,
+    amount1MinReceive,
+    amount2MinReceive,
+    withdrawTo,
+    userWalletAddress,
+  );
+  yield put(dexActions.removeLiquidity.success());
+  yield put(dexActions.getPools.call());
+}
+
+export function* removeLiquiditWatcher() {
+  yield* blockchainWatcher(dexActions.removeLiquidity, removeLiquidityWorker);
 }

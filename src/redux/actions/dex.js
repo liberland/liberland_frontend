@@ -8,6 +8,7 @@ export const {
   swapExactTokensForTokens,
   swapTokensForExactTokens,
   getDexReserves,
+  removeLiquidity,
 } = createActions({
   GET_POOLS: {
     CALL: undefined,
@@ -35,6 +36,11 @@ export const {
     FAILURE: undefined,
   },
   GET_DEX_RESERVES: {
+    CALL: undefined,
+    SUCCESS: undefined,
+    FAILURE: undefined,
+  },
+  REMOVE_LIQUIDITY: {
     CALL: undefined,
     SUCCESS: undefined,
     FAILURE: undefined,

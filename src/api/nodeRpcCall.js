@@ -2017,6 +2017,19 @@ const getDexReserves = async (asset1, asset2) => {
   };
 };
 
+const getAssetsDataFromPool = async () => {
+  const api = await getApi();
+  const maybeAssetDataFromPool = await api.query.poolAssets.asset.entries();
+  const data = {};
+  maybeAssetDataFromPool.map((item) => {
+    const asset = item[0].toHuman()[0];
+    const { supply } = item[1].unwrapOr(null);
+    data[asset] = { supply };
+    return { supply, asset };
+  });
+  return data;
+};
+
 const getLpTokensOwnedByAddress = async (lpTokenId, address) => {
   const api = await getApi();
   const maybeTokens = await api.query.poolAssets.account(lpTokenId, address);
@@ -2033,6 +2046,7 @@ const getDexPools = async (walletAddress) => {
   try {
     const api = await getApi();
     const pools = await api.query.assetConversion.pools.entries();
+    const assetsPoolData = await getAssetsDataFromPool();
     const poolsData = await Promise.all(pools.map(async ([poolKey, maybePoolData]) => {
       const [asset1, asset2] = poolKey.args[0];
       const { lpToken } = maybePoolData.unwrapOrDefault();
@@ -2041,20 +2055,23 @@ const getDexPools = async (walletAddress) => {
       const asset2Transform = asset2checkIsNative || asset2.toString();
       const asset1Transform = asset1checkIsNative || asset1.toString();
       const lpTokenTransform = lpToken.toString();
-
-      const [lpTokensValue, reserved] = await Promise.all([
+      const [lpTokensValue, reserved, assetsData] = await Promise.all([
         getLpTokensOwnedByAddress(lpTokenTransform, walletAddress),
         getDexReserves(asset1, asset2),
+        getAdditionalAssets(walletAddress, true, true),
       ]);
+      const { assetData1, assetData2 } = convertAssetData(assetsData, asset1Transform, asset2Transform);
       return {
         asset1: asset1Transform,
         asset2: asset2Transform,
+        assetData1,
+        assetData2,
         lpToken: lpTokenTransform,
         lpTokensBalance: lpTokensValue?.balance || 0,
         reserved,
       };
     }));
-    return poolsData;
+    return { poolsData, assetsPoolData };
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('Error fetching DEX pools:', err);
@@ -2064,24 +2081,8 @@ const getDexPools = async (walletAddress) => {
 
 const getDexPoolsExtendData = async (walletAddress) => {
   try {
-    const api = await getApi();
-    const poolsData = await getDexPools(walletAddress);
-    const liquidityForPool = poolsData.map(({ lpToken }) => [api.query.poolAssets.account, [lpToken, walletAddress]]);
-    const [liquidityData, assetsData] = await Promise.all([
-      api.queryMulti(liquidityForPool),
-      getAdditionalAssets(walletAddress, true, true),
-    ]);
-    const wholeDataPools = await Promise.all(poolsData.map(async (item, index) => {
-      const { asset1, asset2 } = item;
-      const { assetData1, assetData2 } = convertAssetData(assetsData, asset1, asset2);
-      return {
-        ...item,
-        assetData2,
-        assetData1,
-        liquidity: liquidityData[index].isSome && liquidityData[index].value.balance,
-      };
-    }));
-    return wholeDataPools;
+    const dexData = await getDexPools(walletAddress);
+    return dexData;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Error fetching DEX pools with extend data: ', error);

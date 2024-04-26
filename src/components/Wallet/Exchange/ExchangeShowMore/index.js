@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { BN } from '@polkadot/util';
-import { getDecimalsForAsset } from '../../../../utils/dexFormatter';
+import { BN, BN_HUNDRED } from '@polkadot/util';
+import { calculatePooled, getDecimalsForAsset } from '../../../../utils/dexFormatter';
 import Button from '../../../Button/Button';
 import styles from '../styles.module.scss';
 import { ReservedAssetPropTypes } from '../proptypes';
@@ -9,6 +9,7 @@ import { formatAssets } from '../../../../utils/walletHelpers';
 
 function ExchangeShowMore({
   handleModalLiquidity,
+  handleModalLiquidityRemove,
   asset1,
   asset2,
   liquidity,
@@ -18,20 +19,14 @@ function ExchangeShowMore({
   lpTokensBalance,
   asset1Decimals,
   asset2Decimals,
+  isReservedDataEmpty,
 }) {
-  const calculatePooled = (
-    lpTokensData,
-    liquidityData,
-    reservedAsset,
-  ) => (new BN(reservedAsset).mul(new BN(lpTokensData))).div(new BN(liquidityData));
-
   const decimals1 = getDecimalsForAsset(asset1, asset1Decimals);
   const decimals2 = getDecimalsForAsset(asset2, asset2Decimals);
-
   return (
     <div className={styles.moreDetails}>
       <div className={styles.reserved}>
-        {(reserved?.asset2?.isEmpty || reserved?.asset1?.isEmpty) && (
+        {isReservedDataEmpty && (
         <div>
           Pool doesn&apos;t have any liquidity
         </div>
@@ -46,13 +41,13 @@ function ExchangeShowMore({
       </div>
       <div className={styles.liquidity}>
         <div className={styles.text}>
-          {liquidity
+          {lpTokensBalance !== 0 || !liquidity
             ? (
               <>
                 <span>
                   Your liquidity:
                   {' '}
-                  {((lpTokensBalance / liquidity) * 100)}
+                  {new BN(lpTokensBalance).mul(BN_HUNDRED).div(new BN(liquidity)).toString()}
                   % (
                   {lpTokensBalance}
                   {' '}
@@ -84,10 +79,18 @@ function ExchangeShowMore({
             )}
 
         </div>
+        <div className={styles.liquidityButtons}>
+          {!isReservedDataEmpty
+            && (
+            <Button small green onClick={handleModalLiquidityRemove}>
+              Remove Liquidity
+            </Button>
+            )}
 
-        <Button small green onClick={handleModalLiquidity}>
-          Add liquidity
-        </Button>
+          <Button small green onClick={handleModalLiquidity}>
+            Add liquidity
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -99,21 +102,22 @@ ExchangeShowMore.defaultProps = {
   reserved: null,
   lpTokensBalance: null,
   liquidity: null,
-
 };
 
 ExchangeShowMore.propTypes = {
   reserved: ReservedAssetPropTypes,
   handleModalLiquidity: PropTypes.func.isRequired,
+  handleModalLiquidityRemove: PropTypes.func.isRequired,
   asset1: PropTypes.string.isRequired,
   asset2: PropTypes.string.isRequired,
   lpTokensBalance: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  liquidity: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  // eslint-disable-next-line react/forbid-prop-types
+  liquidity: PropTypes.object,
   asset1ToShow: PropTypes.string.isRequired,
   asset2ToShow: PropTypes.string.isRequired,
   asset1Decimals: PropTypes.number,
   asset2Decimals: PropTypes.number,
-
+  isReservedDataEmpty: PropTypes.bool.isRequired,
 };
 
 export default ExchangeShowMore;

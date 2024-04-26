@@ -22,7 +22,6 @@ export const ExchangeItemPropTypes = {
   asset2: PropTypes.string.isRequired,
   lpTokensBalance: PropTypes.string.isRequired,
   lpTokens: PropTypes.string.isRequired,
-  liquidity: PropTypes.string.isRequired,
   assetData1: AssetDataPropTypes.isRequired,
   assetData2: AssetDataPropTypes.isRequired,
   reserved: ReservedAssetPropTypes.isRequired,

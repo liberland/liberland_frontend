@@ -131,6 +131,7 @@ export default function* rootSaga() {
     dexSagas.swapExactTokensForTokensWatcher(),
     dexSagas.swapTokensForExactTokensWatcher(),
     dexSagas.getDexReservesWatcher(),
+    dexSagas.removeLiquiditWatcher(),
 
     // CONTRACTS
     contractsSagas.getContractsWorkerWatcher(),

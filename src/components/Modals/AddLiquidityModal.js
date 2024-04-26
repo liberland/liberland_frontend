@@ -18,7 +18,7 @@ import { formatAssets, parseAssets, sanitizeValue } from '../../utils/walletHelp
 import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } from '../../api/nodeRpcCall';
 
 function AddLiquidityModal({
-  handleModal, assets,
+  handleModal, assets, isReservedDataEmpty,
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -102,12 +102,20 @@ function AddLiquidityModal({
       || (value.split('.')[1]?.length || 0) > (isAsset1 ? decimals1 : decimals2)) {
       return;
     }
+
+    if (isReservedDataEmpty) {
+      setValue(isAsset1 ? 'amount1Desired' : 'amount2Desired', value);
+      return;
+    }
+
     const amount = parseAssets(
       value,
       isAsset1 ? decimals1 : decimals2,
     );
     const getSwapPrice = isAsset1 ? getSwapPriceExactTokensForTokens : getSwapPriceTokensForExactTokens;
+
     const tradeData = await getSwapPrice(enum1, enum2, amount, false);
+
     const decimalsOut = isAsset1 ? decimals2 : decimals1;
     const formatedValue = formatAssets(tradeData, decimalsOut);
     const sanitizedValue = sanitizeValue(formatedValue.toString());
@@ -230,6 +238,7 @@ function AddLiquidityModal({
 AddLiquidityModal.propTypes = {
   handleModal: PropsTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
+  isReservedDataEmpty: PropsTypes.bool.isRequired,
 };
 
 function AddLiquidityModalWrapper(props) {

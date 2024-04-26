@@ -14,6 +14,7 @@ const dexReducer = handleActions(
       dexActions.addLiquidity.call,
       dexActions.swapTokensForExactTokens.call,
       dexActions.swapExactTokensForTokens.call,
+      dexActions.removeLiquidity.call,
       dexActions.getDexReserves.call,
     )]: (state) => ({
       ...state,
@@ -25,6 +26,8 @@ const dexReducer = handleActions(
       dexActions.swapExactTokensForTokens.failure,
       dexActions.swapTokensForExactTokens.success,
       dexActions.swapTokensForExactTokens.failure,
+      dexActions.removeLiquidity.success,
+      dexActions.removeLiquidity.failure,
       dexActions.getDexReserves.success,
       dexActions.getDexReserves.failure,
       dexActions.getDexReserves.call,

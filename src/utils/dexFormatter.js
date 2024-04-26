@@ -165,3 +165,9 @@ export const getExchangeRate = (reserved1, reserved2, decimals1, decimals2) => {
 
   return removeTrailingZerosFromString(resultString);
 };
+
+export const calculatePooled = (
+  lpTokensData,
+  liquidityData,
+  reservedAsset,
+) => (new BN(reservedAsset).mul(new BN(lpTokensData))).div(new BN(liquidityData));

@@ -1,0 +1,62 @@
+@import '../../../assets/main.scss';
+
+.percentBurnTokens{
+  width: 100%;
+  margin-top: 70px;
+
+  .percentList{
+    display: flex;
+    flex-direction: column-reverse;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 18px;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      flex-direction: row;
+    }
+
+    .percentShow{
+      font-size: 26px;
+      min-width: 41px;
+    }
+
+    .percentButtons{
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+
+      .buttonStyle{
+        padding: 10px 20px;
+
+        @media screen and (min-width: map-get($breakpoints, 'tablet')){
+          padding: 20px 40px;
+        }
+      }
+    }
+  }
+}
+
+.pooledAssetsToBurn{
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .assetToBurn{
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+  }
+}
+
+.progresBar{
+  width: 100%;
+  input{
+    width: 100%;
+  }
+}
+

@@ -21,7 +21,9 @@ function ExchangeList() {
       <div>Loading..</div>
     );
   }
-  if (dexs.length < 1) {
+  const { poolsData, assetsPoolData } = dexs;
+
+  if (poolsData?.length < 1) {
     return (
       <div>There is no any pool...</div>
     );
@@ -29,11 +31,12 @@ function ExchangeList() {
   return (
     <div className={cx(stylesPage.overViewCard, styles.list)}>
       {
-        dexs.map((dex, index) => (
+        poolsData?.map((pool, index) => (
           <ExchangeItem
-            dex={dex}
+            poolData={pool}
+            assetsPoolData={assetsPoolData}
             // eslint-disable-next-line react/no-array-index-key
-            key={index + dex.asset1 + dex.asset2}
+            key={index + pool.asset1 + pool.asset2}
           />
         ))
 }

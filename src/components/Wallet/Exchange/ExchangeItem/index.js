@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { getDecimalsForAsset, getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormatter';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
 import AddLiquidityModalWrapper from '../../../Modals/AddLiquidityModal';
@@ -6,25 +7,29 @@ import styles from '../styles.module.scss';
 import Button from '../../../Button/Button';
 import ExchangeShowMore from '../ExchangeShowMore';
 import { ExchangeItemPropTypes } from '../proptypes';
+import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
 
-function ExchangeItem({ dex }) {
+function ExchangeItem({ poolData, assetsPoolData }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isBuyTrade, setIsBuyTrade] = useState(false);
   const [isShowMoreOpen, setIsShowMoreOpen] = useState(false);
   const [isOpenLiquidityModal, setIsOpenLiquidityModal] = useState(false);
+  const [isModalRemoveLiquidityOpen, setIsModalRemoveLiquidityOpen] = useState(false);
   const handleModalLiquidity = () => setIsOpenLiquidityModal(
     (prevValue) => !prevValue,
   );
+
   const handleModal = () => setIsModalOpen((prevValue) => !prevValue);
+  const handleModalLiquidityRemove = () => setIsModalRemoveLiquidityOpen((prevValue) => !prevValue);
   const {
     asset1,
     asset2,
     lpTokensBalance,
-    liquidity,
     assetData1,
     assetData2,
     reserved,
-  } = dex;
+    lpToken,
+  } = poolData;
   const asset1ToShow = useMemo(() => makeAssetToShow(asset1, assetData1?.symbol), [assetData1, asset1]);
   const asset2ToShow = useMemo(() => makeAssetToShow(asset2, assetData2?.symbol), [assetData2, asset2]);
   const assets = {
@@ -53,6 +58,10 @@ function ExchangeItem({ dex }) {
     decimals1,
   );
 
+  const liquidity = assetsPoolData[lpToken]?.supply;
+
+  const isReservedDataEmpty = reserved ? (reserved?.asset2?.isEmpty || reserved?.asset1?.isEmpty) : true;
+
   return (
     <>
       {isModalOpen && (
@@ -66,6 +75,16 @@ function ExchangeItem({ dex }) {
         <AddLiquidityModalWrapper
           handleModal={handleModalLiquidity}
           assets={assets}
+          isReservedDataEmpty={isReservedDataEmpty}
+        />
+      )}
+      {isModalRemoveLiquidityOpen && (
+        <RemoveLiquidityModalWrapper
+          handleModal={handleModalLiquidityRemove}
+          assets={assets}
+          reserved={reserved}
+          lpTokensBalance={lpTokensBalance}
+          liquidity={liquidity}
         />
       )}
       <div className={styles.item}>
@@ -138,6 +157,7 @@ function ExchangeItem({ dex }) {
         </div>
         {isShowMoreOpen && (
         <ExchangeShowMore
+          handleModalLiquidityRemove={handleModalLiquidityRemove}
           handleModalLiquidity={handleModalLiquidity}
           asset1={asset1}
           asset2={asset2}
@@ -148,6 +168,7 @@ function ExchangeItem({ dex }) {
           lpTokensBalance={lpTokensBalance}
           asset1Decimals={assetData1?.decimals}
           asset2Decimals={assetData2?.decimals}
+          isReservedDataEmpty={isReservedDataEmpty}
         />
         )}
       </div>
@@ -156,7 +177,10 @@ function ExchangeItem({ dex }) {
 }
 
 ExchangeItem.propTypes = {
-  dex: ExchangeItemPropTypes.isRequired,
+  poolData: ExchangeItemPropTypes.isRequired,
+  assetsPoolData: PropTypes.shape({
+    supply: PropTypes.string,
+  }).isRequired,
 };
 
 export default ExchangeItem;
