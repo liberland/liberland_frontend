@@ -17,11 +17,11 @@ const selectorReserves = createSelector(
   (reducer) => reducer.reserves,
 );
 
-const selectorWithdrawlFee = createSelector(
+const selectorWithdrawalFee = createSelector(
   dexReducer,
-  (reducer) => reducer.withdrawlFee,
+  (reducer) => reducer.withdrawalFee,
 );
 
 export {
-  selectorDex, selectorIsLoading, selectorReserves, selectorWithdrawlFee,
+  selectorDex, selectorIsLoading, selectorReserves, selectorWithdrawalFee,
 };

@@ -31,13 +31,13 @@ export function* getPoolsWatcher() {
   yield* blockchainWatcher(dexActions.getPools, getPoolsWorker);
 }
 
-function* getWithdrawlFeeWorker() {
-  const withdrawlFee = yield call(getLiquidityWithdrawalFee);
-  yield put(dexActions.getWithdrawlFee.success(withdrawlFee));
+function* getWithdrawalFeeWorker() {
+  const withdrawalFee = yield call(getLiquidityWithdrawalFee);
+  yield put(dexActions.getWithdrawalFee.success(withdrawalFee));
 }
 
-export function* getWithdrawlFeeWatcher() {
-  yield* blockchainWatcher(dexActions.getWithdrawlFee, getWithdrawlFeeWorker);
+export function* getWithdrawalFeeWatcher() {
+  yield* blockchainWatcher(dexActions.getWithdrawalFee, getWithdrawalFeeWorker);
 }
 
 function* addLiquidityWorker(action) {

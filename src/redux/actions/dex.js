@@ -9,7 +9,7 @@ export const {
   swapTokensForExactTokens,
   getDexReserves,
   removeLiquidity,
-  getWithdrawlFee,
+  getWithdrawalFee,
 } = createActions({
   GET_POOLS: {
     CALL: undefined,
@@ -46,7 +46,7 @@ export const {
     SUCCESS: undefined,
     FAILURE: undefined,
   },
-  GET_WITHDRAWL_FEE: {
+  GET_WITHDRAWAL_FEE: {
     CALL: undefined,
     SUCCESS: undefined,
     FAILURE: undefined,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropsTypes from 'prop-types';
-import { BN, BN_HUNDRED } from '@polkadot/util';
+import { BN, BN_HUNDRED, BN_MILLION } from '@polkadot/util';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import ModalRoot from '../ModalRoot';
@@ -31,7 +31,7 @@ function RemoveLiquidityModal({
   });
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const withdrawlFee = useSelector(dexSelectors.selectorWithdrawlFee);
+  const withdrawalFee = useSelector(dexSelectors.selectorWithdrawalFee);
   const {
     asset1,
     asset2,
@@ -47,14 +47,18 @@ function RemoveLiquidityModal({
   const decimals1 = getDecimalsForAsset(asset1, assetData1?.decimals);
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
 
-  const calculateAssetToBurn = async (numberValue) => {
+  const calculateAssetToBurn = (numberValue) => {
     const tokensToBurn = new BN(lpTokensBalance).mul(new BN(numberValue)).div(BN_HUNDRED);
     setTokensToBurnState(tokensToBurn);
-    const fee = new BN(withdrawlFee);
+    const fee = new BN(withdrawalFee);
     const calculatedAmount1 = calculatePooled(tokensToBurn, liquidity, reserved.asset1);
     const calculatedAmount2 = calculatePooled(tokensToBurn, liquidity, reserved.asset2);
-    const asset1Data = !fee.isZero() ? calculatedAmount1.sub(calculatedAmount1.div(fee)) : calculatedAmount1;
-    const asset2Data = !fee.isZero() ? calculatedAmount2.sub(calculatedAmount2.div(fee)) : calculatedAmount2;
+    const asset1Data = !fee.isZero()
+      ? calculatedAmount1.sub(calculatedAmount1.mul(fee).div(BN_MILLION))
+      : calculatedAmount1;
+    const asset2Data = !fee.isZero()
+      ? calculatedAmount2.sub(calculatedAmount2.mul(fee).div(BN_MILLION))
+      : calculatedAmount2;
     return { asset1Data, asset2Data };
   };
 
@@ -88,7 +92,7 @@ function RemoveLiquidityModal({
   const isPercentZero = percentBurnTokens === 0;
 
   useEffect(() => {
-    dispatch(dexActions.getWithdrawlFee.call());
+    dispatch(dexActions.getWithdrawalFee.call());
   }, [dispatch]);
 
   return (
