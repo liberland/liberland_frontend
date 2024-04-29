@@ -2131,6 +2131,12 @@ const addLiquidity = async (
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+const getLiquidityWithdrawalFee = async () => {
+  const api = await getApi();
+  const maybeLiquidityWithdrawalFee = await api.consts.assetConversion.liquidityWithdrawalFee;
+  return Number(maybeLiquidityWithdrawalFee);
+};
+
 const removeLiquidity = async (
   asset1,
   asset2,
@@ -2391,6 +2397,7 @@ export {
   swapTokensForExactTokens,
   addLiquidity,
   removeLiquidity,
+  getLiquidityWithdrawalFee,
   getLpTokensOwnedByAddress,
   getAllContracts,
   signContractAsParty,

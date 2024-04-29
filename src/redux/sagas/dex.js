@@ -1,7 +1,7 @@
 import {
   put, call, select,
 } from 'redux-saga/effects';
-import { dexActions } from '../actions';
+import { dexActions, walletActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 import {
   getDexPoolsExtendData,
@@ -10,9 +10,16 @@ import {
   swapTokensForExactTokens,
   getDexReserves,
   removeLiquidity,
+  getLiquidityWithdrawalFee,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { convertToEnumDex } from '../../utils/dexFormatter';
+
+function* refreshData(asset1, asset2) {
+  yield put(dexActions.getPools.call());
+  yield put(dexActions.getDexReserves.call({ asset1, asset2 }));
+  yield put(walletActions.getWallet.call());
+}
 
 function* getPoolsWorker() {
   const userWalletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
@@ -22,6 +29,15 @@ function* getPoolsWorker() {
 
 export function* getPoolsWatcher() {
   yield* blockchainWatcher(dexActions.getPools, getPoolsWorker);
+}
+
+function* getWithdrawlFeeWorker() {
+  const withdrawlFee = yield call(getLiquidityWithdrawalFee);
+  yield put(dexActions.getWithdrawlFee.success(withdrawlFee));
+}
+
+export function* getWithdrawlFeeWatcher() {
+  yield* blockchainWatcher(dexActions.getWithdrawlFee, getWithdrawlFeeWorker);
 }
 
 function* addLiquidityWorker(action) {
@@ -40,9 +56,7 @@ function* addLiquidityWorker(action) {
     mintTo,
     walletAddress,
   );
-  yield put(dexActions.addLiquidity.success());
-  yield put(dexActions.getPools.call());
-  yield put(dexActions.getDexReserves.call({ asset1, asset2 }));
+  yield refreshData(asset1, asset2);
 }
 
 export function* addLiquidityWatcher() {
@@ -58,8 +72,7 @@ function* swapExactTokensForTokensWorker(action) {
   const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
   yield call(swapExactTokensForTokens, [enum1, enum2], amount, amountMin, sendTo, userWalletAddress);
   yield put(dexActions.swapExactTokensForTokens.success());
-  yield put(dexActions.getPools.call());
-  yield put(dexActions.getDexReserves.call({ asset1: dexReservePair.asset1, asset2: dexReservePair.asset2 }));
+  yield refreshData(dexReservePair.asset1, dexReservePair.asset2);
 }
 
 export function* swapExactTokensForTokensWatcher() {
@@ -75,8 +88,7 @@ function* swapTokensForExactTokensWorker(action) {
   const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
   yield call(swapTokensForExactTokens, [enum1, enum2], amount, amountMin, sendTo, userWalletAddress);
   yield put(dexActions.swapTokensForExactTokens.success());
-  yield put(dexActions.getPools.call());
-  yield put(dexActions.getDexReserves.call({ asset1: dexReservePair.asset1, asset2: dexReservePair.asset2 }));
+  yield refreshData(dexReservePair.asset1, dexReservePair.asset2);
 }
 
 export function* swapTokensForExactTokensWatcher() {
@@ -111,7 +123,7 @@ function* removeLiquidityWorker(action) {
     userWalletAddress,
   );
   yield put(dexActions.removeLiquidity.success());
-  yield put(dexActions.getPools.call());
+  yield refreshData(asset1, asset2);
 }
 
 export function* removeLiquiditWatcher() {

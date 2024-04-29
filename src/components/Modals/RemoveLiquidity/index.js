@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropsTypes from 'prop-types';
-import { BN, BN_HUNDRED, BN_THOUSAND } from '@polkadot/util';
+import { BN, BN_HUNDRED } from '@polkadot/util';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import ModalRoot from '../ModalRoot';
@@ -11,7 +11,7 @@ import { AssetsPropTypes, ReservedAssetPropTypes } from '../../Wallet/Exchange/p
 import ProgressBar from './ProgressBar';
 import styles from './styles.module.scss';
 import { dexActions } from '../../../redux/actions';
-import { blockchainSelectors } from '../../../redux/selectors';
+import { blockchainSelectors, dexSelectors } from '../../../redux/selectors';
 import { calculateAmountMin, formatAssets } from '../../../utils/walletHelpers';
 
 const listPercent = [25, 50, 75, 100];
@@ -31,6 +31,7 @@ function RemoveLiquidityModal({
   });
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const withdrawlFee = useSelector(dexSelectors.selectorWithdrawlFee);
   const {
     asset1,
     asset2,
@@ -46,14 +47,14 @@ function RemoveLiquidityModal({
   const decimals1 = getDecimalsForAsset(asset1, assetData1?.decimals);
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
 
-  const calculateAssetToBurn = (numberValue) => {
-    const tokensToBurn = new BN(lpTokensBalance).mul(new BN(numberValue)).div(new BN(BN_HUNDRED));
+  const calculateAssetToBurn = async (numberValue) => {
+    const tokensToBurn = new BN(lpTokensBalance).mul(new BN(numberValue)).div(BN_HUNDRED);
     setTokensToBurnState(tokensToBurn);
-    const fee = 1; // 0.1%
+    const fee = new BN(withdrawlFee);
     const calculatedAmount1 = calculatePooled(tokensToBurn, liquidity, reserved.asset1);
     const calculatedAmount2 = calculatePooled(tokensToBurn, liquidity, reserved.asset2);
-    const asset1Data = calculatedAmount1.mul(new BN(BN_THOUSAND - fee)).div(new BN(BN_THOUSAND));
-    const asset2Data = calculatedAmount2.mul(new BN(BN_THOUSAND - fee)).div(new BN(BN_THOUSAND));
+    const asset1Data = !fee.isZero() ? calculatedAmount1.sub(calculatedAmount1.div(fee)) : calculatedAmount1;
+    const asset2Data = !fee.isZero() ? calculatedAmount2.sub(calculatedAmount2.div(fee)) : calculatedAmount2;
     return { asset1Data, asset2Data };
   };
 
@@ -75,16 +76,20 @@ function RemoveLiquidityModal({
     handleModal();
   };
 
-  const handleChangeRange = (e) => {
+  const handleChangeRange = async (e) => {
     const numberValue = Number(e?.target?.value || e);
     setPercentBurnTokens(numberValue);
 
-    const { asset1Data, asset2Data } = calculateAssetToBurn(numberValue);
+    const { asset1Data, asset2Data } = await calculateAssetToBurn(numberValue);
     setAsset1Amount(Number(asset1Data));
     setAsset2Amount(Number(asset2Data));
   };
 
   const isPercentZero = percentBurnTokens === 0;
+
+  useEffect(() => {
+    dispatch(dexActions.getWithdrawlFee.call());
+  }, [dispatch]);
 
   return (
     <form

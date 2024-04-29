@@ -5,6 +5,7 @@ const initialState = {
   loading: false,
   pools: null,
   reserves: null,
+  withdrawlFee: null,
 };
 
 const dexReducer = handleActions(
@@ -16,6 +17,7 @@ const dexReducer = handleActions(
       dexActions.swapExactTokensForTokens.call,
       dexActions.removeLiquidity.call,
       dexActions.getDexReserves.call,
+      dexActions.getWithdrawlFee.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -26,6 +28,8 @@ const dexReducer = handleActions(
       dexActions.swapExactTokensForTokens.failure,
       dexActions.swapTokensForExactTokens.success,
       dexActions.swapTokensForExactTokens.failure,
+      dexActions.getWithdrawlFee.failure,
+      dexActions.getWithdrawlFee.success,
       dexActions.removeLiquidity.success,
       dexActions.removeLiquidity.failure,
       dexActions.getDexReserves.success,
@@ -48,6 +52,16 @@ const dexReducer = handleActions(
     [dexActions.getPools.success]: (state, action) => ({
       ...state,
       pools: action.payload,
+    }),
+
+    [dexActions.getWithdrawlFee.call]: (state) => ({
+      ...state,
+      withdrawlFee: null,
+    }),
+
+    [dexActions.getWithdrawlFee.success]: (state, action) => ({
+      ...state,
+      withdrawlFee: action.payload,
     }),
 
     [dexActions.getDexReserves.success]: (state, action) => {

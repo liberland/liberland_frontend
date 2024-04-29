@@ -1,20 +1,27 @@
 import { createSelector } from 'reselect';
 
-const identityReducer = (state) => state.dex;
+const dexReducer = (state) => state.dex;
 
 const selectorDex = createSelector(
-  identityReducer,
+  dexReducer,
   (reducer) => reducer.pools,
 );
 
 const selectorIsLoading = createSelector(
-  identityReducer,
+  dexReducer,
   (reducer) => reducer.loading,
 );
 
 const selectorReserves = createSelector(
-  identityReducer,
+  dexReducer,
   (reducer) => reducer.reserves,
 );
 
-export { selectorDex, selectorIsLoading, selectorReserves };
+const selectorWithdrawlFee = createSelector(
+  dexReducer,
+  (reducer) => reducer.withdrawlFee,
+);
+
+export {
+  selectorDex, selectorIsLoading, selectorReserves, selectorWithdrawlFee,
+};
