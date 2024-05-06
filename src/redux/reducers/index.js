@@ -13,6 +13,7 @@ import identityReducer from './identity';
 import validatorReducer from './validator';
 import congressReducer from './congress';
 import onboardingReducer from './onboarding';
+import dexReducer from './dex';
 import contractsReducer from './contracts';
 
 const rootReducer = combineReducers({
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
   validator: validatorReducer,
   congress: congressReducer,
   onboarding: onboardingReducer,
+  dex: dexReducer,
   contracts: contractsReducer,
 });
 

@@ -29,17 +29,30 @@ const _format = ((value, decimals, withAll = false) => formatBalance(
   },
 ));
 
+export const sanitizeValue = (value) => value.replace(/,/g, '');
+
 const _parse = (value, decimals) => {
   const ethersBN = ethers.utils.parseUnits(value, decimals);
   return new BN(ethersBN.toHexString().replace(/^0x/, ''), 'hex');
 };
 
-export const formatMerits = (grains) => _format(grains, meritDecimals);
-export const formatDollars = (grains) => _format(grains, dollarDecimals);
+export const formatMerits = (grains, withAll = false) => _format(grains, meritDecimals, withAll);
+export const formatDollars = (grains, withAll = false) => _format(grains, dollarDecimals, withAll);
 export const parseMerits = (merits) => _parse(merits, meritDecimals);
 export const parseDollars = (dollars) => _parse(dollars, dollarDecimals);
 export const parseAssets = (assets, assetDecimals) => _parse(assets, assetDecimals);
-export const formatAssets = (assets, assetDecimals) => _format(assets, parseInt(assetDecimals));
+
+const defaultFormatAssetsSettings = {
+  withAll: false,
+  symbol: null,
+};
+export const formatAssets = (assets, assetDecimals, settingsProps = defaultFormatAssetsSettings) => {
+  const settings = { ...defaultFormatAssetsSettings, ...settingsProps };
+  const { withAll, symbol } = settings;
+  const formatedValue = _format(assets, Number(assetDecimals), withAll);
+  const returnValue = symbol ? `${formatedValue} ${symbol}` : formatedValue;
+  return returnValue;
+};
 
 const configDefault = {
   isSymbolFirst: false,
@@ -100,4 +113,38 @@ export const isValidSubstrateAddress = (address) => {
   } catch (error) {
     return false;
   }
+};
+
+export const calculateSlippage = (
+  amount,
+  minAmountPercent,
+) => {
+  const defaultMinPercent = 0.5;
+  const denominator = 10000;
+  const slippagePercentBN = new BN(((Number(minAmountPercent) || defaultMinPercent) * denominator) / 100);
+  return new BN(amount).mul(slippagePercentBN).div(new BN(denominator));
+};
+
+export const calculateAmountMax = (
+  amount,
+  minAmountPercent,
+) => {
+  const slippage = calculateSlippage(
+    amount,
+    minAmountPercent,
+  );
+  const amountBN = new BN(amount);
+  return slippage.isZero() ? amountBN : amountBN.add(slippage);
+};
+
+export const calculateAmountMin = (
+  amount,
+  minAmountPercent,
+) => {
+  const slippage = calculateSlippage(
+    amount,
+    minAmountPercent,
+  );
+  const amountBN = new BN(amount);
+  return slippage.isZero() ? amountBN : new BN(amount).sub(slippage);
 };

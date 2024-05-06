@@ -10,6 +10,7 @@ import * as identitySelectors from './identity';
 import * as validatorSelectors from './validator';
 import * as congressSelectors from './congress';
 import * as onboardingSelectors from './onboarding';
+import * as dexSelectors from './dex';
 import * as contractsSelectors from './contracts';
 
 export {
@@ -25,5 +26,6 @@ export {
   validatorSelectors,
   congressSelectors,
   onboardingSelectors,
+  dexSelectors,
   contractsSelectors,
 };
