@@ -282,7 +282,7 @@ const getAssetData = async (asset, address) => {
   }
 };
 
-const getAdditionalAssets = async (address, isIndexNeed = false, getLLd = false) => {
+const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = false) => {
   try {
     const api = await getApi();
     const assetMetadatas = await api.query.assets.metadata.entries();
@@ -295,8 +295,8 @@ const getAdditionalAssets = async (address, isIndexNeed = false, getLLd = false)
     const assetQueries = [];
     processedMetadatas.forEach((asset) => {
       // Disregard LLM, asset of ID 1 because it has special treatment already
-      const isLLD = getLLd || !(asset.index === 1 || asset.index === '1');
-      if (isLLD) {
+      const isLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
+      if (isLLM) {
         assetQueries.push([api.query.assets.account, [asset.index, address]]);
         if (isIndexNeed) {
           indexedFilteredAssets[asset.index] = asset;
