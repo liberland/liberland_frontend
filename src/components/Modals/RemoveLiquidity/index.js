@@ -53,12 +53,8 @@ function RemoveLiquidityModal({
     const fee = new BN(withdrawalFee);
     const calculatedAmount1 = calculatePooled(tokensToBurn, liquidity, reserved.asset1);
     const calculatedAmount2 = calculatePooled(tokensToBurn, liquidity, reserved.asset2);
-    const asset1Data = !fee.isZero()
-      ? calculatedAmount1.sub(calculatedAmount1.mul(fee).div(BN_MILLION))
-      : calculatedAmount1;
-    const asset2Data = !fee.isZero()
-      ? calculatedAmount2.sub(calculatedAmount2.mul(fee).div(BN_MILLION))
-      : calculatedAmount2;
+    const asset1Data = calculatedAmount1.sub(calculatedAmount1.mul(fee).div(BN_MILLION));
+    const asset2Data = calculatedAmount2.sub(calculatedAmount2.mul(fee).div(BN_MILLION));
     return { asset1Data, asset2Data };
   };
 
