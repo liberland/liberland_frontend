@@ -1,6 +1,5 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
-
 import { useSelector } from 'react-redux';
 import router from '../../router';
 import HomeHeader from './HomeHeader';
@@ -29,19 +28,20 @@ function Home() {
   );
 
   const alwaysRenderedRoutes = [
-    <Route path={router.home.profile} component={Profile} />,
-    <Route path={router.home.feed} component={Feed} />,
-    <Route path={router.home.wallet} component={Wallet} />,
-    <Route path={router.home.staking} component={Staking} />,
-    <Route path={router.home.contracts} component={Contracts} />,
-    <Route path={router.home.offices} component={Offices} />,
-    <Route path={router.home.registries} component={Registries} />,
-    <Route path={router.home.companies} component={Companies} />,
+    <Route key={router.home.profile} path={router.home.profile} component={Profile} />,
+    <Route key={router.home.feed} path={router.home.feed} component={Feed} />,
+    <Route key={router.home.wallet} path={router.home.wallet} component={Wallet} />,
+    <Route key={router.home.staking} path={router.home.staking} component={Staking} />,
+    <Route key={router.home.contracts} path={router.home.contracts} component={Contracts} />,
+    <Route key={router.home.offices} path={router.home.offices} component={Offices} />,
+    <Route key={router.home.registries} path={router.home.registries} component={Registries} />,
+    <Route key={router.home.companies} path={router.home.companies} component={Companies} />,
   ];
 
   const alwaysRenderedRoutesLast = (
     <Route
       exact
+      key={router.home.index}
       path={router.home.index}
       render={() => (
         <RoleHOC>
@@ -52,11 +52,11 @@ function Home() {
   );
 
   const conditionalRoutes = [
-    <Route path={router.home.documents} component={Documents} />,
-    <Route path={router.home.voting} component={Voting} />,
-    <Route path={router.home.legislation} component={Legislation} />,
-    <Route path={router.wallet.allTransactions} component={AllTransactions} />,
-    <Route path={router.home.congress} component={Congress} />,
+    <Route key={router.home.documents} path={router.home.documents} component={Documents} />,
+    <Route key={router.home.voting} path={router.home.voting} component={Voting} />,
+    <Route key={router.home.legislation} path={router.home.legislation} component={Legislation} />,
+    <Route key={router.wallet.allTransactions} path={router.wallet.allTransactions} component={AllTransactions} />,
+    <Route key={router.home.congress} path={router.home.congress} component={Congress} />,
   ];
 
   const renderRoutes = isWalletAdressSame

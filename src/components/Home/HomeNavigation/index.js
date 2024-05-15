@@ -79,7 +79,7 @@ function HomeNavigation() {
   const switchToRegisteredWallet = (isMobile = false) => {
     dispatch(blockchainActions.setUserWallet.success(walletAddress));
     dispatch(validatorActions.getInfo.call());
-
+    localStorage.removeItem('BlockchainAdress');
     if (isMobile) {
       setIsMenuOpen(false);
     }
@@ -288,7 +288,7 @@ function HomeNavigation() {
               },
               index,
             ) => (
-              <>
+              <React.Fragment key={route}>
                 {isWalletAdressSame
                 || (!isWalletAdressSame
                   && isAdressWalletDiffrentThanRegistered) ? (
@@ -323,7 +323,7 @@ function HomeNavigation() {
                     )}
                   </>
                   )}
-              </>
+              </React.Fragment>
             ),
           )}
           <div
