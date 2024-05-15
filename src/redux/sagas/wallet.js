@@ -11,6 +11,7 @@ import {
   getValidators, getNominatorTargets,
   setNominatorTargets,
   unpool, getAdditionalAssets, sendAssetTransfer,
+  getAssetData,
 } from '../../api/nodeRpcCall';
 import { getHistoryTransfers } from '../../api/explorer';
 
@@ -30,6 +31,20 @@ function* getAdditionalAssetsWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const additionalAssets = yield call(getAdditionalAssets, walletAddress);
   yield put(walletActions.getAdditionalAssets.success(additionalAssets));
+}
+
+function* getAssetsBalanceWorker(action) {
+  const assets = action.payload;
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const assetsBalance = yield Promise.all(assets.map(async (asset) => {
+    if (asset === 'Native') {
+      const { liquidAmount } = await getBalanceByAddress(walletAddress);
+      return liquidAmount?.amount || 0;
+    }
+    const assetData = await getAssetData(asset, walletAddress);
+    return assetData || 0;
+  }));
+  yield put(walletActions.getAssetsBalance.success(assetsBalance));
 }
 
 function* stakeToPolkaWorker(action) {
@@ -121,6 +136,10 @@ function* getAdditionalAssetsWatcher() {
   yield* blockchainWatcher(walletActions.getAdditionalAssets, getAdditionalAssetsWorker);
 }
 
+function* getAssetsBalanceWatcher() {
+  yield* blockchainWatcher(walletActions.getAssetsBalance, getAssetsBalanceWorker);
+}
+
 function* sendTransferWatcher() {
   yield* blockchainWatcher(walletActions.sendTransfer, sendTransferWorker);
 }
@@ -173,4 +192,5 @@ export {
   getNominatorTargetsWatcher,
   setNominatorTargetsWatcher,
   unpoolWatcher,
+  getAssetsBalanceWatcher,
 };

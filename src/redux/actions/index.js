@@ -11,6 +11,7 @@ import * as identityActions from './identity';
 import * as validatorActions from './validator';
 import * as congressActions from './congress';
 import * as onBoardingActions from './onboarding';
+import * as dexActions from './dex';
 import * as contractsActions from './contracts';
 
 export {
@@ -27,5 +28,6 @@ export {
   validatorActions,
   congressActions,
   onBoardingActions,
+  dexActions,
   contractsActions,
 };

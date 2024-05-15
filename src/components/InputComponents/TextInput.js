@@ -19,9 +19,10 @@ function TextInput({
   disabled = false,
   onPaste,
   onChange,
+  className,
 }) {
   return (
-    <div className={styles.inputWrapper}>
+    <div className={cx(styles.inputWrapper, className)}>
       {Icon && <Icon className={styles.inputIcon} />}
       <input
         className={cx(styles.input, { [styles.withIcon]: Icon && withIcon })}

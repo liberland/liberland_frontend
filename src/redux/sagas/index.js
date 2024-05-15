@@ -10,6 +10,7 @@ import * as identitySagas from './identity';
 import * as validatorSagas from './validator';
 import * as congressSagas from './congress';
 import * as onboardingSagas from './onboarding';
+import * as dexSagas from './dex';
 import * as contractsSagas from './contracts';
 
 export default function* rootSaga() {
@@ -38,6 +39,7 @@ export default function* rootSaga() {
     walletSagas.unpoolWatcher(),
     walletSagas.getTransfersTxWatcher(),
     walletSagas.getAdditionalAssetsWatcher(),
+    walletSagas.getAssetsBalanceWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),
@@ -123,6 +125,15 @@ export default function* rootSaga() {
     // ONBOARDING
     onboardingSagas.claimComplimentaryLLDWatcher(),
     onboardingSagas.getIsEligibleForComplimentaryLLDWatcher(),
+
+    // DEX
+    dexSagas.getPoolsWatcher(),
+    dexSagas.addLiquidityWatcher(),
+    dexSagas.swapExactTokensForTokensWatcher(),
+    dexSagas.swapTokensForExactTokensWatcher(),
+    dexSagas.getDexReservesWatcher(),
+    dexSagas.removeLiquiditWatcher(),
+    dexSagas.getWithdrawalFeeWatcher(),
 
     // CONTRACTS
     contractsSagas.getContractsWorkerWatcher(),

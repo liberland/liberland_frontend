@@ -47,7 +47,7 @@ function ChangeWallet({ setIsMenuOpen }) {
       >
         {wallets.map((wallet) => (
           <option key={wallet.address} value={wallet.address}>
-            {truncate(wallet.address, 24)}
+            {`${wallet?.meta?.name} (${truncate(wallet.address, 10)})` || truncate(wallet.address, 24)}
           </option>
         ))}
       </select>

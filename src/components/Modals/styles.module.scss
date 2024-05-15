@@ -62,6 +62,13 @@
     }
   }
 
+  & .titleFlex{
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; 
+    flex-wrap: wrap;
+  }
+
   & .buttonWrapper {
     display: flex;
     align-items: center;
@@ -184,4 +191,14 @@
       margin-top: 50px;
     }
   }
+}
+
+.displayNone{
+  display: none;
+}
+
+.checkbox{
+  padding-top: 10px;
+  display: flex;
+  justify-content: flex-end;
 }

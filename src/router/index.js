@@ -41,6 +41,7 @@ export default {
     view: '/home/legislation/:tier',
   },
   wallet: {
+    exchange: '/home/wallet/exchange',
     allTransactions: '/home/wallet/all-transactions',
     overView: '/home/wallet/overview',
   },

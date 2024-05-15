@@ -35,6 +35,10 @@ function WalletAddressesLine({ walletAddress }) {
       route: router.wallet.overView,
       title: 'WALLET',
     },
+    {
+      route: router.wallet.exchange,
+      title: 'EXCHANGE',
+    },
   ];
 
   return (

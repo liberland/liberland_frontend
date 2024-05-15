@@ -11,7 +11,10 @@ const historyTransferQuery = `
     $orderByAssetTransfers: [AssetTransfersOrderBy!],
     $filterAssetTransfers: AssetTransferFilter,
     $orderByStakings: [StakingsOrderBy!],
-    $filterStakings: StakingFilter
+    $filterStakings: StakingFilter,
+    $filterSoraMinted: SoraMintedFilter,
+    $filterSoraBurned: SoraBurnedFilter,
+  
   ) {
     transfers(orderBy: $orderByTransfers, filter: $filterTransfers) {
       nodes {
@@ -79,6 +82,42 @@ const historyTransferQuery = `
         }
       }
     }
+
+    soraMinteds(
+      filter: $filterSoraMinted
+    ) {
+      nodes {
+        id
+        sender
+        recipientId
+        value
+        asset
+        block {
+            id,
+            number,
+            timestamp,
+        }
+        extrinsicIndex
+      }
+    }
+
+    soraBurneds(
+      filter: $filterSoraBurned
+    ) {
+      nodes {
+        id
+        senderId
+        recipient
+        value
+        asset
+        block {
+            id,
+            number,
+            timestamp,
+        }
+        extrinsicIndex
+      }
+    }
   }
 `;
 
@@ -117,32 +156,47 @@ function getStakingActionText(method) {
   }
 }
 
-const getFilterVariable = (substrate_address) => ({
+const getFilterVariable = (substrateAddress) => ({
   or: [
     {
       fromId: {
-        equalTo: substrate_address,
+        equalTo: substrateAddress,
       },
     },
     {
       toId: {
-        equalTo: substrate_address,
+        equalTo: substrateAddress,
       },
     },
   ],
 });
 
-const getFilterForStaking = (substrate_address) => ({
+const getFilterForStaking = (substrateAddress) => ({
   userId: {
-    equalTo: substrate_address,
+    equalTo: substrateAddress,
   },
 });
 
-export const getHistoryTransfers = async (substrate_address) => {
-  const filterVariable = getFilterVariable(substrate_address);
-  const stakingsFilter = getFilterForStaking(substrate_address);
+const getFilterSoraMinted = (substrateAddress) => ({
+  recipientId: {
+    equalTo: substrateAddress,
+  },
+});
+
+const getFilterSoraBurned = (substrateAddress) => ({
+  senderId: {
+    equalTo: substrateAddress,
+  },
+});
+
+const getWalletTransfers = async (substrateAddress) => {
+  const filterVariable = getFilterVariable(substrateAddress);
+  const stakingsFilter = getFilterForStaking(substrateAddress);
+  const filterSoraMinted = getFilterSoraMinted(substrateAddress);
+  const filterSoraBurned = getFilterSoraBurned(substrateAddress);
+
   const orderByVariable = ['BLOCK_NUMBER_DESC', 'EVENT_INDEX_DESC'];
-  const result = await getApi().post('/graphql', {
+  const { data } = await getApi().post('/graphql', {
     query: historyTransferQuery,
     variables: {
       orderByTransfers: orderByVariable,
@@ -153,27 +207,78 @@ export const getHistoryTransfers = async (substrate_address) => {
       filterAssetTransfers: filterVariable,
       filterStakings: stakingsFilter,
       orderByStakings: orderByVariable,
+      filterSoraMinted,
+      filterSoraBurned,
     },
   });
-  const assetsData = await getAdditionalAssets(substrate_address, true);
-  const stakingsData = result.data?.data?.stakings?.nodes;
-  const transfersAssets = result.data?.data?.assetTransfers?.nodes;
+  return data;
+};
+
+const parseSoraTransfer = (soraMinted, soraBurned, assetsData) => {
+  const soraBridgeName = 'Sora Bridge';
+  const soraMintedParsed = soraMinted.map(({
+    asset, block, recipientId, value,
+  }) => {
+    const parsedAsset = JSON.parse(asset);
+    const isLLD = Object.keys(parsedAsset)[0] === 'lld' && parsedAsset.lld === null;
+
+    return {
+      asset: isLLD ? 'LLD' : assetsData[parsedAsset.asset].metadata.symbol,
+      decimals: isLLD ? null : assetsData[parsedAsset.asset].metadata.decimals,
+      fromId: soraBridgeName,
+      toId: recipientId,
+      value,
+      block,
+    };
+  });
+
+  const soraBurnedParsed = soraBurned.map(({
+    asset, block, senderId, value,
+  }) => {
+    const parsedAsset = JSON.parse(asset);
+    const isLLD = Object.keys(parsedAsset)[0] === 'lld' && parsedAsset.lld === null;
+
+    return {
+      asset: isLLD ? 'LLD' : assetsData[parsedAsset.asset].metadata.symbol,
+      decimals: isLLD ? null : assetsData[parsedAsset.asset].metadata.decimals,
+      fromId: senderId,
+      toId: soraBridgeName,
+      value,
+      block,
+    };
+  });
+
+  return [...soraMintedParsed, ...soraBurnedParsed];
+};
+
+export const getHistoryTransfers = async (substrateAddress) => {
+  const [
+    transferData,
+    assetsData,
+  ] = await Promise.all([
+    getWalletTransfers(substrateAddress),
+    getAdditionalAssets(substrateAddress, true),
+  ]);
+
+  const soraMinted = transferData.data?.soraMinteds?.nodes ?? [];
+  const soraBurned = transferData.data?.soraBurneds?.nodes ?? [];
+  const stakingsData = transferData.data?.stakings?.nodes ?? [];
+  const transfersAssets = transferData.data?.assetTransfers?.nodes ?? [];
+  const transfersLLD = transferData.data?.transfers?.nodes ?? [];
+  const transfersLLM = transferData.data?.merits?.nodes ?? [];
+
   const filteredTransferAssets = transfersAssets.filter((item) => item.asset !== '1' && item.asset !== 1);
-  const transfersLLD = result.data?.data?.transfers?.nodes;
-  const transfersLLM = result.data?.data?.merits?.nodes;
-  const assets = filteredTransferAssets
-    ? filteredTransferAssets.map((n) => {
-      const newItem = {
-        ...n,
-        asset: assetsData[n.asset].metadata.symbol,
-        decimals: assetsData[n.asset].metadata.decimals,
-      };
-      return newItem;
-    }) : [];
-  const llm = transfersLLM ? transfersLLM.map((n) => ({ asset: 'LLM', ...n })) : [];
-  const lld = transfersLLD ? transfersLLD.map((n) => ({ asset: 'LLD', ...n })) : [];
+  const parsedSoraTransfers = parseSoraTransfer(soraMinted, soraBurned, assetsData);
+
+  const assets = filteredTransferAssets.map((n) => ({
+    ...n,
+    asset: assetsData[n.asset].metadata.symbol,
+    decimals: assetsData[n.asset].metadata.decimals,
+  }));
+  const llm = transfersLLM.map((n) => ({ asset: 'LLM', ...n }));
+  const lld = transfersLLD.map((n) => ({ asset: 'LLD', ...n }));
   const stakings = stakingsData.map((n) => ({ asset: 'LLD', stakingActionText: getStakingActionText(n.method), ...n }));
-  const transfers = [...assets, ...llm, ...lld, ...stakings];
+  const transfers = [...assets, ...llm, ...lld, ...stakings, ...parsedSoraTransfers];
 
   transfers.sort((a, b) => new BN(b.block.number).sub(new BN(a.block.number)));
 

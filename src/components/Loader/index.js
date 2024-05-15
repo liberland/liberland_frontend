@@ -13,6 +13,7 @@ import {
   validatorSelectors,
   congressSelectors,
   registriesSelectors,
+  dexSelectors,
   contractsSelectors,
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
@@ -29,6 +30,7 @@ function Loader({ children }) {
   const isLoadingValidator = useSelector(validatorSelectors.isLoading);
   const isLoadingCongress = useSelector(congressSelectors.isLoading);
   const isGetRegistries = useSelector(registriesSelectors.isGetRegistries);
+  const isLoadingDex = useSelector(dexSelectors.selectorIsLoading);
   const isLoadingContracts = useSelector(contractsSelectors.selectorIsContractsLoading);
 
   const isLoading = [
@@ -41,6 +43,7 @@ function Loader({ children }) {
     isLoadingValidator,
     isLoadingCongress,
     isGetRegistries,
+    isLoadingDex,
   ].some((isFetching) => isFetching);
 
   return (
