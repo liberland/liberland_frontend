@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
 import { AuthContext } from 'react-oauth2-code-pkce';
+import { useMediaQuery } from 'usehooks-ts';
 import { blockchainSelectors } from '../../../redux/selectors';
 // STYLES
 import styles from './styles.module.scss';
@@ -12,6 +13,7 @@ import { ReactComponent as Divider } from '../../../assets/icons/divider.svg';
 import { ReactComponent as WalletIcon } from '../../../assets/icons/wallet.svg';
 import Header from '../Header';
 import Button from '../../Button/Button';
+import truncate from '../../../utils/truncate';
 
 function SignIn() {
   const { login } = useContext(AuthContext);
@@ -19,6 +21,7 @@ function SignIn() {
     register,
   } = useForm();
   const allAccounts = useSelector(blockchainSelectors.allWalletsSelector);
+  const isTablet = useMediaQuery('(min-width: 768px)');
 
   const goToLiberlandSignin = () => {
     login();
@@ -47,9 +50,18 @@ function SignIn() {
         <form className={styles.signInForm}>
           <div className={styles.inputWrapper}>
             <select className={styles.addressSwitcher} {...register('wallet_address')} required>
-              { allAccounts.map((el) => (
-                <option key={el.address} value={el.address}>{el.address}</option>
-              ))}
+              { allAccounts.map((el) => {
+                const metaName = el?.meta?.name;
+                const { address } = el;
+                const addressToShow = metaName
+                  ? `${metaName} (${truncate(address, isTablet ? 35 : 20)})`
+                  : truncate(address, 24);
+                return (
+                  <option key={el.address} value={el.address}>
+                    {addressToShow}
+                  </option>
+                );
+              })}
             </select>
           </div>
         </form>
