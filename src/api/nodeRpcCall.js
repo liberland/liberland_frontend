@@ -525,8 +525,10 @@ const getValidators = async () => {
   const [auctionCounter, auctions, elected, waiting, validatorsKeys] = await Promise.all([
     api.query.auctions?.auctionCounter(),
     api.query.auctions,
-    api.derive.staking.electedInfo({ withController: true, withExposure: true, withPrefs: true }),
-    api.derive.staking.waitingInfo({ withController: true, withPrefs: true }),
+    api.derive.staking.electedInfo({
+      withController: true, withExposure: true, withPrefs: true, withLedger: true,
+    }),
+    api.derive.staking.waitingInfo({ withController: true, withPrefs: true, withLedger: true }),
     api.query.staking.validators.keys(),
   ]);
 

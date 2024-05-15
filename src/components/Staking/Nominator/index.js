@@ -50,7 +50,8 @@ function Nominator() {
   };
 
   const goToAdvancedPage = () => {
-    const stakingLink = `https://polkadot.js.org/apps/?rpc=${process.env.REACT_APP_NODE_ADDRESS}#/staking`;
+    // eslint-disable-next-line max-len
+    const stakingLink = `https://polkadotjs.blockchain.liberland.org/?rpc=${process.env.REACT_APP_NODE_ADDRESS}#/staking`;
     window.open(stakingLink);
   };
   /*
