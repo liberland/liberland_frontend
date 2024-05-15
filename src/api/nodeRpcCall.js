@@ -10,6 +10,7 @@ import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
 import { parseDollars, parseMerits } from '../utils/walletHelpers';
 import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
+import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -511,35 +512,61 @@ const subscribeBestBlockNumber = async (onNewBlockNumber) => {
   return null;
 };
 
+function accountsToString(accounts) {
+  return accounts.map((account) => account.toString());
+}
+
 const getValidators = async () => {
   const api = await getApi();
   const validators = [];
-  const validatorsKeys = await api.query.staking.validators.keys();
   const validatorQueries = [];
   const validatorIdentityQueries = [];
-  validatorsKeys.forEach((validatorKey, index) => {
-    const address = validatorKey.toHuman().pop();
-    validatorQueries.push([api.query.staking.validators, address]);
-    validatorIdentityQueries.push([api.query.identity.identityOf, address]);
-    validators[index] = { address };
+
+  const [auctionCounter, auctions, elected, waiting, validatorsKeys] = await Promise.all([
+    api.query.auctions?.auctionCounter(),
+    api.query.auctions,
+    api.derive.staking.electedInfo({ withController: true, withExposure: true, withPrefs: true }),
+    api.derive.staking.waitingInfo({ withController: true, withPrefs: true }),
+    api.query.staking.validators.keys(),
+  ]);
+
+  const totalIssuance = await api.query.balances?.totalIssuance();
+  const baseInfo = getBaseInfo(api, elected, waiting);
+  const inflation = calcInflation(auctions ? auctionCounter : BN_ZERO, totalIssuance, baseInfo?.totalStaked);
+
+  baseInfo.validators.forEach(async ({ key }) => {
+    validatorQueries.push([api.query.staking.validators, key]);
+    validatorIdentityQueries.push([api.query.identity.identityOf, key]);
   });
   const numOfValidators = validatorsKeys.length;
   const validatorsData = await api.queryMulti([
     ...validatorQueries,
     ...validatorIdentityQueries,
   ]);
+
+  const validatorsWithBaseInfo = inflation?.stakedReturn ? addReturns(inflation, baseInfo) : baseInfo;
+
   validatorsData.forEach((validatorData, index) => {
     const validatorHumanData = validatorData.toHuman();
+    const validatorWithBaseInfo = validatorsWithBaseInfo.validators[index];
+    if (!validatorWithBaseInfo) return;
     const dataToAdd = {
       ...((validatorHumanData?.commission !== undefined) && { commission: validatorHumanData.commission }),
       ...((validatorHumanData?.blocked !== undefined) && { blocked: validatorHumanData.blocked }),
       // eslint-disable-next-line max-len
       ...((validatorHumanData?.info?.display?.Raw !== undefined) && { displayName: validatorHumanData?.info?.display?.Raw }),
+      ...validatorWithBaseInfo,
+      isWaiting: accountsToString(baseInfo.waitingIds).includes(validatorWithBaseInfo.key),
     };
     validators[index % numOfValidators] = {
       ...validators[index % numOfValidators],
       ...dataToAdd,
     };
+  });
+  validators.sort((a, b) => {
+    if (a.isWaiting && !b.isWaiting) return -1;
+    if (!a.isWaiting && b.isWaiting) return 1;
+    return 0;
   });
   return validators;
 };

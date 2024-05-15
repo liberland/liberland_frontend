@@ -29,6 +29,8 @@ const _format = ((value, decimals, withAll = false) => formatBalance(
   },
 ));
 
+export const sanitizeValue = (value) => value.replace(/,/g, '');
+
 const _parse = (value, decimals) => {
   const ethersBN = ethers.utils.parseUnits(value, decimals);
   return new BN(ethersBN.toHexString().replace(/^0x/, ''), 'hex');
