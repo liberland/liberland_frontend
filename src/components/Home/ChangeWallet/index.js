@@ -45,11 +45,16 @@ function ChangeWallet({ setIsMenuOpen }) {
         className={styles.select}
         onChange={onChangeSelect}
       >
-        {wallets.map((wallet) => (
-          <option key={wallet.address} value={wallet.address}>
-            {`${wallet?.meta?.name} (${truncate(wallet.address, 10)})` || truncate(wallet.address, 24)}
-          </option>
-        ))}
+        {wallets.map((wallet) => {
+          const metaName = wallet?.meta?.name;
+          const { address } = wallet;
+          const addressToShow = metaName ? `${metaName} (${truncate(address, 10)})` : truncate(address, 24);
+          return (
+            <option key={wallet.address} value={wallet.address}>
+              {addressToShow}
+            </option>
+          );
+        })}
       </select>
     </div>
   );
