@@ -41,7 +41,6 @@ function Wallet() {
 
   const overView = () => (
     <div className={stylesPage.contentWrapper}>
-
       <WalletOverview
         totalBalance={totalBalance}
         balances={balances}

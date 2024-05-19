@@ -56,3 +56,67 @@ export const treasury = createSelector(
   congressReducer,
   (reducer) => reducer.treasury,
 );
+
+export const codeName = createSelector(
+  congressReducer,
+  (reducer) => reducer.codeName,
+);
+
+const walletInfo = createSelector(
+  congressReducer,
+  (reducer) => reducer.walletInfo,
+);
+
+export const walletAddress = createSelector(
+  walletInfo,
+  (reducer) => reducer?.walletAddress,
+);
+
+export const balances = createSelector(
+  walletInfo,
+  (reducer) => reducer.balances,
+);
+
+export const liquidMeritsBalance = createSelector(
+  balances,
+  (reducer) => (reducer.liquidMerits.amount),
+);
+
+export const liquidDollarsBalance = createSelector(
+  balances,
+  (reducer) => (reducer.liquidAmount?.amount),
+);
+
+export const totalBalance = createSelector(
+  balances,
+  (reducer) => (
+    reducer.totalAmount.amount
+  ),
+);
+
+export const totalLLM = createSelector(
+  balances,
+  (reducer) => (
+    reducer.meritsTotalAmount.amount
+  ),
+);
+
+export const isUserHavePolkaStake = createSelector(
+  balances,
+  (reducer) => reducer.polkastake.amount,
+);
+
+export const additionalAssets = createSelector(
+  congressReducer,
+  (reducer) => reducer.additionalAssets,
+);
+
+export const motionDurationInDays = createSelector(
+  congressReducer,
+  (reducer) => reducer.motionDurationInDays,
+);
+
+export const minSpendDelayInDays = createSelector(
+  congressReducer,
+  (reducer) => reducer.minSpendDelayInDays,
+);

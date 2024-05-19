@@ -2,9 +2,15 @@ import {
   put, takeLatest, call, select,
 } from 'redux-saga/effects';
 import {
-  congressActions, democracyActions, legislationActions,
+  congressActions,
+  democracyActions,
+  legislationActions,
 } from '../actions';
-import { blockchainSelectors } from '../selectors';
+import {
+  blockchainSelectors,
+  congressSelectors,
+  officesSelectors,
+} from '../selectors';
 import {
   applyForCongress,
   closeCongressMotion,
@@ -29,11 +35,44 @@ import {
   getTreasurySpendProposals,
   renounceCandidacy,
   voteAtMotions,
+  getBalanceByAddress,
+  getAdditionalAssets,
+  congressSendLld,
+  congressSendAssets,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { daysToBlocks } from '../../utils/nodeRpcCall';
-
+import { palletIdToAddress } from '../../utils/pallet';
 // WORKERS
+
+function* getWalletWorker() {
+  const codeName = yield select(congressSelectors.codeName);
+  const pallets = yield select(officesSelectors.selectorPallets);
+
+  if (!pallets) {
+    yield put(congressActions.getWallet.failure());
+    return;
+  }
+
+  const { palletId } = pallets.find((e) => e.palletName === codeName);
+  const walletAddress = palletIdToAddress(palletId);
+  const balances = yield call(getBalanceByAddress, walletAddress);
+  yield put(congressActions.getWallet.success({ balances, walletAddress }));
+}
+
+function* getAdditionalAssetsWorker() {
+  const congressWalletAddress = yield select(congressSelectors.walletAddress);
+  if (!congressWalletAddress) {
+    yield put(congressActions.getAdditionalAssets.failure());
+    return;
+  }
+
+  const additionalAssets = yield call(
+    getAdditionalAssets,
+    congressWalletAddress,
+  );
+  yield put(congressActions.getAdditionalAssets.success(additionalAssets));
+}
 
 function* applyForCongressWorker() {
   const walletAddress = yield select(
@@ -59,41 +98,116 @@ function* voteAtMotionsWorker(action) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  yield call(
-    voteAtMotions,
-    walletAddress,
-    proposal,
-    index,
-    vote,
-  );
+  yield call(voteAtMotions, walletAddress, proposal, index, vote);
   yield put(congressActions.getMotions.call());
   yield put(congressActions.voteAtMotions.success());
 }
 
 function* congressSendLlmWorker({
   payload: {
-    transferToAddress, transferAmount,
+    transferToAddress, transferAmount, remarkInfo, spendDelay,
   },
 }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
+  const blockNumber = yield select(
+    blockchainSelectors.blockNumber,
+  );
+  const motionDurationInDays = yield select(
+    congressSelectors.motionDurationInDays,
+  );
+  const minSpendDelayInDays = yield select(congressSelectors.minSpendDelayInDays);
   yield call(congressSendLlm, {
-    walletAddress, transferToAddress, transferAmount,
+    walletAddress,
+    transferToAddress,
+    transferAmount,
+    blockNumber,
+    remarkInfo,
+    spendDelay: spendDelay || minSpendDelayInDays,
+    motionDurationInDays,
   });
   yield put(congressActions.congressSendLlm.success());
 }
 
-function* congressSendLlmToPolitipoolWorker({
+function* congressSendLldWorker({
   payload: {
-    transferToAddress, transferAmount,
+    transferToAddress, transferAmount, remarkInfo, spendDelay,
   },
 }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
+  const blockNumber = yield select(
+    blockchainSelectors.blockNumber,
+  );
+  const motionDurationInDays = yield select(
+    congressSelectors.motionDurationInDays,
+  );
+  const minSpendDelayInDays = yield select(congressSelectors.minSpendDelayInDays);
+  yield call(congressSendLld, {
+    walletAddress,
+    transferToAddress,
+    transferAmount,
+    blockNumber,
+    remarkInfo,
+    spendDelay: spendDelay || minSpendDelayInDays,
+    motionDurationInDays,
+  });
+  yield put(congressActions.congressSendLld.success());
+}
+
+function* congressSendAssetsTransfer({
+  payload: {
+    transferToAddress, transferAmount, assetData, remarkInfo, spendDelay,
+  },
+}) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+  const blockNumber = yield select(
+    blockchainSelectors.blockNumber,
+  );
+  const motionDurationInDays = yield select(
+    congressSelectors.motionDurationInDays,
+  );
+  const minSpendDelayInDays = yield select(congressSelectors.minSpendDelayInDays);
+  yield call(congressSendAssets, {
+    walletAddress,
+    transferToAddress,
+    transferAmount,
+    assetData,
+    blockNumber,
+    remarkInfo,
+    spendDelay: spendDelay || minSpendDelayInDays,
+    motionDurationInDays,
+  });
+  yield put(congressActions.congressSendAssets.success());
+}
+
+function* congressSendLlmToPolitipoolWorker({
+  payload: {
+    transferToAddress, transferAmount, remarkInfo, spendDelay,
+  },
+}) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+  const blockNumber = yield select(
+    blockchainSelectors.blockNumber,
+  );
+  const motionDurationInDays = yield select(
+    congressSelectors.motionDurationInDays,
+  );
+  const minSpendDelayInDays = yield select(congressSelectors.minSpendDelayInDays);
   yield call(congressSendLlmToPolitipool, {
-    walletAddress, transferToAddress, transferAmount,
+    walletAddress,
+    transferToAddress,
+    transferAmount,
+    blockNumber,
+    remarkInfo,
+    spendDelay: spendDelay || minSpendDelayInDays,
+    motionDurationInDays,
   });
   yield put(congressActions.congressSendLlmToPolitipool.success());
 }
@@ -112,17 +226,15 @@ function* renounceCandidacyWorker(action) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  yield call(
-    renounceCandidacy,
-    walletAddress,
-    action.payload,
-  );
+  yield call(renounceCandidacy, walletAddress, action.payload);
   yield put(congressActions.getMembers.call());
   yield put(congressActions.getCandidates.call());
   yield put(congressActions.renounceCandidacy.success());
 }
 
-function* congressProposeLegislationWorker({ payload: { tier, id, sections } }) {
+function* congressProposeLegislationWorker({
+  payload: { tier, id, sections },
+}) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
@@ -149,7 +261,12 @@ function* congressProposeRepealLegislationWorker({
     discussionName,
     discussionDescription,
     discussionLink,
-    tier, id, section, fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
+    tier,
+    id,
+    section,
+    fastTrack,
+    fastTrackVotingPeriod,
+    fastTrackEnactmentPeriod,
   },
 }) {
   const walletAddress = yield select(
@@ -179,11 +296,13 @@ function* getTreasuryInfoWorker() {
   const proposals = yield call(getTreasurySpendProposals);
   const budget = yield call(getTreasuryBudget);
   const period = yield call(getTreasurySpendPeriod);
-  yield put(congressActions.getTreasuryInfo.success({
-    proposals,
-    budget,
-    period,
-  }));
+  yield put(
+    congressActions.getTreasuryInfo.success({
+      proposals,
+      budget,
+      period,
+    }),
+  );
 }
 
 function* approveTreasurySpendWorker({ payload: { id } }) {
@@ -207,7 +326,9 @@ function* unapproveTreasurySpendWorker({ payload: { id } }) {
 }
 
 function* closeMotionWorker({ payload: { proposal, index } }) {
-  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
   yield call(closeCongressMotion, proposal, index, walletAddress);
   yield put(congressActions.closeMotion.success());
   yield put(congressActions.getMotions.call());
@@ -218,8 +339,12 @@ function* congressProposeLegislationViaReferendumWorker({
     discussionName,
     discussionDescription,
     discussionLink,
-    tier, id, sections,
-    fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
+    tier,
+    id,
+    sections,
+    fastTrack,
+    fastTrackVotingPeriod,
+    fastTrackEnactmentPeriod,
   },
 }) {
   const walletAddress = yield select(
@@ -244,17 +369,25 @@ function* congressProposeLegislationViaReferendumWorker({
   yield put(congressActions.getMotions.call());
 }
 
-function* congressSendTreasuryLldWorker({ payload: { transferToAddress, transferAmount } }) {
+function* congressSendTreasuryLldWorker({
+  payload: { transferToAddress, transferAmount },
+}) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-
-  yield call(congressSendTreasuryLld, transferToAddress, transferAmount, walletAddress);
+  yield call(
+    congressSendTreasuryLld,
+    transferToAddress,
+    transferAmount,
+    walletAddress,
+  );
 
   yield put(congressActions.congressSendTreasuryLld.success());
 }
 
-function* congressDemocracyBlacklistWorker({ payload: { hash, referendumIndex } }) {
+function* congressDemocracyBlacklistWorker({
+  payload: { hash, referendumIndex },
+}) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
@@ -291,8 +424,13 @@ function* congressAmendLegislationViaReferendumWorker({
     discussionName,
     discussionDescription,
     discussionLink,
-    tier, id, section, content,
-    fastTrack, fastTrackVotingPeriod, fastTrackEnactmentPeriod,
+    tier,
+    id,
+    section,
+    content,
+    fastTrack,
+    fastTrackVotingPeriod,
+    fastTrackEnactmentPeriod,
   },
 }) {
   const walletAddress = yield select(
@@ -321,15 +459,15 @@ function* congressAmendLegislationViaReferendumWorker({
 // WATCHERS
 
 export function* applyForCongressWatcher() {
-  yield* blockchainWatcher(congressActions.applyForCongress, applyForCongressWorker);
+  yield* blockchainWatcher(
+    congressActions.applyForCongress,
+    applyForCongressWorker,
+  );
 }
 
 export function* getCandidatesWatcher() {
   try {
-    yield takeLatest(
-      congressActions.getCandidates.call,
-      getCandidatesWorker,
-    );
+    yield takeLatest(congressActions.getCandidates.call, getCandidatesWorker);
   } catch (e) {
     yield put(congressActions.getCandidates.failure(e));
   }
@@ -348,26 +486,46 @@ export function* voteAtMotionsWatcher() {
 }
 
 export function* congressSendLlmWatcher() {
-  yield* blockchainWatcher(congressActions.congressSendLlm, congressSendLlmWorker);
+  yield* blockchainWatcher(
+    congressActions.congressSendLlm,
+    congressSendLlmWorker,
+  );
+}
+
+export function* congressSendLldWatcher() {
+  yield* blockchainWatcher(
+    congressActions.congressSendLld,
+    congressSendLldWorker,
+  );
+}
+
+export function* congressSendAssetsTransferWatcher() {
+  yield* blockchainWatcher(
+    congressActions.congressSendAssets,
+    congressSendAssetsTransfer,
+  );
 }
 
 export function* congressSendLlmToPolitipoolWatcher() {
-  yield* blockchainWatcher(congressActions.congressSendLlmToPolitipool, congressSendLlmToPolitipoolWorker);
+  yield* blockchainWatcher(
+    congressActions.congressSendLlmToPolitipool,
+    congressSendLlmToPolitipoolWorker,
+  );
 }
 
 export function* getMembersWatcher() {
   try {
-    yield takeLatest(
-      congressActions.getMembers.call,
-      getMembersWorker,
-    );
+    yield takeLatest(congressActions.getMembers.call, getMembersWorker);
   } catch (e) {
     yield put(congressActions.getMembers.failure(e));
   }
 }
 
 export function* renounceCandidacyWatcher() {
-  yield* blockchainWatcher(congressActions.renounceCandidacy, renounceCandidacyWorker);
+  yield* blockchainWatcher(
+    congressActions.renounceCandidacy,
+    renounceCandidacyWorker,
+  );
 }
 
 export function* getRunnersUpWatcher() {
@@ -379,7 +537,10 @@ export function* getRunnersUpWatcher() {
 }
 
 export function* congressProposeLegislationWatcher() {
-  yield* blockchainWatcher(congressActions.congressProposeLegislation, congressProposeLegislationWorker);
+  yield* blockchainWatcher(
+    congressActions.congressProposeLegislation,
+    congressProposeLegislationWorker,
+  );
 }
 
 export function* congressRepealLegislationWatcher() {
@@ -453,5 +614,16 @@ export function* congressAmendLegislationViaReferendumWatcher() {
   yield* blockchainWatcher(
     congressActions.congressAmendLegislationViaReferendum,
     congressAmendLegislationViaReferendumWorker,
+  );
+}
+
+export function* getWalletWatcher() {
+  yield* blockchainWatcher(congressActions.getWallet, getWalletWorker);
+}
+
+export function* getAdditionalAssetsWatcher() {
+  yield* blockchainWatcher(
+    congressActions.getAdditionalAssets,
+    getAdditionalAssetsWorker,
   );
 }

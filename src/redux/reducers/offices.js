@@ -51,6 +51,7 @@ const officesReducer = handleActions({
     officesActions.getPalletIds.failure,
     officesActions.unregisterCompany.failure,
     officesActions.setRegisteredCompanyData.failure,
+    officesActions.getPalletIds.success,
   )]: (state) => ({
     ...state,
     loading: false,

@@ -112,6 +112,8 @@ export default function* rootSaga() {
     congressSagas.congressRepealLegislationWatcher(),
     congressSagas.congressSendLlmToPolitipoolWatcher(),
     congressSagas.congressSendLlmWatcher(),
+    congressSagas.congressSendLldWatcher(),
+    congressSagas.congressSendAssetsTransferWatcher(),
     congressSagas.congressSendTreasuryLldWatcher(),
     congressSagas.getCandidatesWatcher(),
     congressSagas.getMembersWatcher(),
@@ -121,6 +123,8 @@ export default function* rootSaga() {
     congressSagas.renounceCandidacyWatcher(),
     congressSagas.unapproveTreasurySpendWatcher(),
     congressSagas.voteAtMotionsWatcher(),
+    congressSagas.getWalletWatcher(),
+    congressSagas.getAdditionalAssetsWatcher(),
 
     // ONBOARDING
     onboardingSagas.claimComplimentaryLLDWatcher(),

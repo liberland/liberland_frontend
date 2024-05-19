@@ -18,7 +18,6 @@ const isUserWalletAddressSameAsUserAdress = createSelector(
   (state) => state,
   (reducer) => reducer.user.user.blockchainAddress
       === reducer.blockchain.userWalletAddress,
-
 );
 
 const errorExistsAndUnacknowledgedByUser = createSelector(

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../Button/Button';
 
@@ -7,7 +7,6 @@ import { congressActions } from '../../../redux/actions';
 import {
   congressSelectors,
 } from '../../../redux/selectors';
-import SpendingMotionModal from '../../Modals/SpendingMotionModal';
 import styles from '../styles.module.scss';
 import ProposeLegislationButton from '../ProposeLegislationButton';
 import ProposeLegislationViaReferendumButton from '../ProposeLegislationViaReferendumButton';
@@ -24,9 +23,6 @@ export default function Overview() {
     dispatch(congressActions.getMembers.call());
     dispatch(congressActions.getRunnersUp.call());
   }, [dispatch]);
-
-  const [isSpendingModalOpen, setIsSpendingModalOpen] = useState(false);
-  const handleSpendingModalOpen = () => setIsSpendingModalOpen(!isSpendingModalOpen);
 
   let userStatus = 'None';
   if (userIsMember) userStatus = 'Member';
@@ -57,13 +53,7 @@ export default function Overview() {
             <>
               <ProposeLegislationButton />
               <ProposeLegislationViaReferendumButton />
-              <Button small primary onClick={handleSpendingModalOpen}>
-                Create new spending
-              </Button>
             </>
-          )}
-          {isSpendingModalOpen && (
-            <SpendingMotionModal closeModal={handleSpendingModalOpen} />
           )}
           {(userIsMember || userIsCandidate || userIsRunnersUp) && (
             <Button

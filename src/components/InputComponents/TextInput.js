@@ -20,6 +20,8 @@ function TextInput({
   onPaste,
   onChange,
   className,
+  minLength,
+  maxLength,
 }) {
   return (
     <div className={cx(styles.inputWrapper, className)}>
@@ -39,6 +41,8 @@ function TextInput({
             pattern,
             required: required && `${errorTitle} is required`,
             onChange,
+            minLength,
+            maxLength,
           },
         )}
       />

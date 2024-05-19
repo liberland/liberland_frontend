@@ -1390,12 +1390,22 @@ const createProposalAndVote = async (threshold, proposalContent, vote) => {
   return [proposal, voteAye];
 };
 
-const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmount }) => {
+const congressProposeSpend = async ({
+  walletAddress, blockNumber, spendProposal, remarkInfo, spendDelay, motionDurationInDays,
+}) => {
+  if (spendDelay < 5) {
+    throw Error('Min spend delay is 5 days');
+  }
   const api = await getApi();
 
   const threshold = await congressMajorityThreshold();
+  const remark = api.tx.llm.remark(remarkInfo);
+  const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
+  const dayToBlocks = (24 * 60 * 60) / 6;
+  const motionDuration = motionDurationInDays * dayToBlocks;
 
-  const executeProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
+  const transferAtBlock = blockNumber + (spendDelay * dayToBlocks) + motionDuration;
+  const executeProposal = api.tx.scheduler.schedule(transferAtBlock, null, 0, transferAndRemark);
   const proposal = api.tx.councilAccount.execute(executeProposal);
 
   const extrinsics = await createProposalAndVote(threshold, proposal, true);
@@ -1403,16 +1413,55 @@ const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmoun
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
-const congressSendLlmToPolitipool = async ({ walletAddress, transferToAddress, transferAmount }) => {
+const congressSendLlm = async ({
+  walletAddress, transferToAddress, transferAmount, blockNumber, remarkInfo, spendDelay, motionDurationInDays,
+}) => {
+  const api = await getApi();
+  const spendProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
+
+  return congressProposeSpend({
+    walletAddress, spendProposal, blockNumber, remarkInfo, spendDelay, motionDurationInDays,
+  });
+};
+
+const congressSendLld = async ({
+  walletAddress, transferToAddress, transferAmount, blockNumber, remarkInfo, spendDelay, motionDurationInDays,
+}) => {
+  const api = await getApi();
+  const spendProposal = api.tx.balances.transfer(transferToAddress, transferAmount);
+
+  return congressProposeSpend({
+    walletAddress, spendProposal, blockNumber, remarkInfo, spendDelay, motionDurationInDays,
+  });
+};
+
+const congressSendLlmToPolitipool = async ({
+  walletAddress, transferToAddress, transferAmount, blockNumber, remarkInfo, motionDurationInDays,
+}) => {
   const api = await getApi();
 
-  const threshold = await congressMajorityThreshold();
+  const spendProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
+  return congressProposeSpend({
+    walletAddress, spendProposal, blockNumber, remarkInfo, motionDurationInDays,
+  });
+};
 
-  const executeProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
-  const proposal = api.tx.councilAccount.execute(executeProposal);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-  return submitExtrinsic(extrinsic, walletAddress, api);
+const congressSendAssets = async ({
+  walletAddress,
+  transferToAddress,
+  transferAmount,
+  blockNumber,
+  assetData,
+  remarkInfo,
+  spendDelay,
+  motionDurationInDays,
+}) => {
+  const api = await getApi();
+
+  const spendProposal = api.tx.assets.transfer(parseInt(assetData.index), transferToAddress, transferAmount);
+  return congressProposeSpend({
+    walletAddress, spendProposal, blockNumber, remarkInfo, spendDelay, motionDurationInDays,
+  });
 };
 
 const batchPayoutStakers = async (targets, walletAddress) => {
@@ -2499,4 +2548,6 @@ export {
   createContract,
   getSignaturesForContracts,
   getStakingData,
+  congressSendLld,
+  congressSendAssets,
 };
