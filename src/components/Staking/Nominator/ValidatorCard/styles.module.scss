@@ -21,10 +21,11 @@
 
 .avatarProfile{
   display: flex;
-  flex:1;
   align-items: center;
+  width: 100%;
 
-  @media (min-width: 48em) {
+  @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+    width: unset;
     flex:2;
     height:100%;
   }
@@ -111,21 +112,31 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
 
-  .nameAvaible{
-    display: flex;
-    gap: 7px;
+.mobileList{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+
+  .title{
+    font-weight: 700;
+    font-size: 16px;
+    margin-right: 4px;
+    display: block;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      font-size: 18px;
+    }
   }
+}
 
-  .commisionNameAllowed{
-    min-width: 140px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
+.wrapper{
+  background-color: $bg4;
 
-  .leftColumn{
-    display: flex;
-    gap: 2%;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    padding: 0;
   }
 }

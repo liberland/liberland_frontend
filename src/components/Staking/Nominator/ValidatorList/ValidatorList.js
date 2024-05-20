@@ -15,39 +15,19 @@ function ValidatorList({
   const isDesktopHigher = useMediaQuery('(min-width: 1400px)');
   return (
     <div className={stylesPage.transactionHistoryCard}>
-
-      <div className={cx(styles.validatorsListHeader, stylesPage.transactionHistoryCardHeader, styles.gridList)}>
-        {isDesktopHigher
-          ? (
-            <>
-              <span>NAME</span>
-              <span>TOTAL STAKE</span>
-              <span>OWN STAKE</span>
-              <span>OTHER STAKE</span>
-              <span>COMMISSION</span>
-              <span>ALLOWED</span>
-              <span>RETURN</span>
-              <span>NOMINATED</span>
-            </>
-          )
-          : (
-            <>
-              <div className={styles.nameCommisionAllowed}>
-                <span>NAME</span>
-                <div>
-                  <span>COMMISSION</span>
-                  {' / '}
-                  <span>ALLOWED</span>
-                </div>
-
-              </div>
-              <div className={styles.nominated}>
-                <span>NOMINATED BY ME</span>
-              </div>
-            </>
-          )}
-
-      </div>
+      {isDesktopHigher
+        && (
+          <div className={cx(styles.validatorsListHeader, stylesPage.transactionHistoryCardHeader, styles.gridList)}>
+            <span>NAME</span>
+            <span>TOTAL STAKE</span>
+            <span>OWN STAKE</span>
+            <span>OTHER STAKE</span>
+            <span>COMMISSION</span>
+            <span>ALLOWED</span>
+            <span>RETURN</span>
+            <span>NOMINATED</span>
+          </div>
+        )}
       <div className={styles.validatorsList}>
         {validators.map((validator, index) => {
           const {
