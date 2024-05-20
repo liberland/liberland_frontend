@@ -15,7 +15,7 @@ import NoWalletsDetectedInBrowser from './NoWalletsDetectedInBrowser';
 import NoConnectedWalletComponent from './NoConnectedWalletComponent';
 import MissingWalletComponent from './MissingWalletComponent';
 import OnBoarding from './OnBording';
-import { onBoardingActions } from '../../redux/actions';
+import { identityActions, onBoardingActions } from '../../redux/actions';
 import InstructionOnBoard from './OnBording/InstructionOnBoard';
 import { parseIdentityData, parseLegal } from '../../utils/identityParser';
 
@@ -72,8 +72,12 @@ function GuidedSetup({ children }) {
 
   const isSkippedOnBoardingGetLLD = sessionStorage.getItem('SkippedOnBoardingGetLLD');
   const notResidentAcceptedByUser = sessionStorage.getItem('notResidentAcceptedByUser');
+  const userHasIdentity = localStorage.getItem('userHasIdentity');
   const [isIdentityEmpty, setIsIdentityEmpty] = useState(true);
   const identityData = useSelector(identitySelectors.selectorIdentity);
+  const walletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
 
   useEffect(() => {
     if (identityData?.isSome) {
@@ -87,6 +91,16 @@ function GuidedSetup({ children }) {
       );
     }
   }, [identityData]);
+
+  useEffect(() => {
+    if (!isIdentityEmpty) {
+      localStorage.setItem('userHasIdentity', true);
+    }
+  }, [isIdentityEmpty]);
+
+  useEffect(() => {
+    dispatch(identityActions.getIdentity.call(walletAddress));
+  }, [dispatch, walletAddress]);
 
   useEffect(() => {
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
@@ -126,7 +140,7 @@ function GuidedSetup({ children }) {
       </GuidedSetupWrapper>
     );
   }
-  if (!notResidentAcceptedByUser && !isResident) {
+  if (!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true') {
     return (
       <GuidedSetupWrapper>
         <InstructionOnBoard />
@@ -134,7 +148,7 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if ((isUserEligibleForComplimentaryLLD && isSkippedOnBoardingGetLLD !== 'true')
+  if ((isUserEligibleForComplimentaryLLD && isSkippedOnBoardingGetLLD !== 'true' && userHasIdentity !== 'true')
   || isSkippedOnBoardingGetLLD === 'secondStep') {
     return (
       <GuidedSetupWrapper>
@@ -155,7 +169,7 @@ function GuidedSetup({ children }) {
     (isUserEligibleForComplimentaryLLD
       || isIdentityEmpty
       || isSkippedOnBoardingGetLLD === 'secondStep')
-    && isSkippedOnBoardingGetLLD !== 'true'
+    && isSkippedOnBoardingGetLLD !== 'true' && userHasIdentity !== 'true'
   ) {
     return (
       <GuidedSetupWrapper>
