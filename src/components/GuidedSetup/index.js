@@ -83,20 +83,16 @@ function GuidedSetup({ children }) {
     if (identityData?.isSome) {
       const identity = identityData.unwrap();
       const { info } = identity;
-      setIsIdentityEmpty(
-        !parseIdentityData(info?.display)
-        && !parseLegal(info)
-        && !parseIdentityData(info?.web)
-        && !parseIdentityData(info?.email),
-      );
+      const identityIsEmpty = !parseIdentityData(info?.display)
+      && !parseLegal(info)
+      && !parseIdentityData(info?.web)
+      && !parseIdentityData(info?.email);
+      setIsIdentityEmpty(identityIsEmpty);
+      if (!identityIsEmpty) {
+        localStorage.setItem('userHasIdentity', true);
+      }
     }
   }, [identityData]);
-
-  useEffect(() => {
-    if (!isIdentityEmpty) {
-      localStorage.setItem('userHasIdentity', true);
-    }
-  }, [isIdentityEmpty]);
 
   useEffect(() => {
     dispatch(identityActions.getIdentity.call(walletAddress));
