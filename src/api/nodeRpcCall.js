@@ -614,9 +614,7 @@ const getValidators = async () => {
   const validatorQueries = [];
   const validatorIdentityQueries = [];
 
-  const [auctionCounter, auctions, elected, waiting, validatorsKeys] = await Promise.all([
-    api.query.auctions?.auctionCounter(),
-    api.query.auctions,
+  const [elected, waiting, validatorsKeys] = await Promise.all([
     api.derive.staking.electedInfo({
       withController: true, withExposure: true, withPrefs: true, withLedger: true,
     }),
@@ -626,7 +624,7 @@ const getValidators = async () => {
 
   const totalIssuance = await api.query.balances?.totalIssuance();
   const baseInfo = getBaseInfo(api, elected, waiting);
-  const inflation = calcInflation(auctions ? auctionCounter : BN_ZERO, totalIssuance, baseInfo?.totalStaked);
+  const inflation = calcInflation(totalIssuance, baseInfo?.totalStaked);
 
   baseInfo.validators.forEach(async ({ key }) => {
     validatorQueries.push([api.query.staking.validators, key]);
