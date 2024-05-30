@@ -1,6 +1,9 @@
 import {
   extractTime, bnMin, BN_MAX_INTEGER, BN,
   BN_ZERO, BN_ONE,
+  BN_MILLION,
+  BN_HUNDRED,
+  arrayFlatten,
 } from '@polkadot/util';
 
 export const eraToDays = (era) => Math.round(era.toNumber() / 4);
@@ -70,3 +73,105 @@ export const stakingInfoToProgress = (stakingInfo, progress) => {
         ),
     }));
 };
+
+const DEFAULT_PARAMS = {
+  falloff: 0.1,
+  maxInflation: 0.1,
+  minInflation: 0.005,
+  idealStake: 0.75,
+};
+
+export function calcInflation(totalIssuance, totalStaked) {
+  const {
+    falloff, maxInflation, minInflation, idealStake,
+  } = DEFAULT_PARAMS;
+  const stakedFraction = totalStaked.isZero() || totalIssuance.isZero()
+    ? 0
+    : totalStaked.mul(BN_MILLION).div(totalIssuance).toNumber() / BN_MILLION.toNumber();
+  const idealInterest = maxInflation / idealStake;
+
+  const inflation = 100 * (minInflation + (
+    stakedFraction <= idealStake
+      ? (stakedFraction * (idealInterest - (minInflation / idealStake)))
+      : (((idealInterest * idealStake) - minInflation) * (2 ** ((idealStake - stakedFraction) / falloff)))
+  ));
+
+  return {
+    idealInterest,
+    idealStake,
+    inflation,
+    stakedFraction,
+    stakedReturn: stakedFraction
+      ? (inflation / stakedFraction)
+      : 0,
+  };
+}
+
+const extractSingle = (derive, api) => {
+  const emptyExposure = api.createType('Exposure');
+  return derive.info.map((item) => {
+    const {
+      accountId, exposure = emptyExposure, stakingLedger, validatorPrefs,
+    } = item;
+    const [bondOwn, bondTotal] = exposure.total
+      ? [exposure.own.unwrap(), exposure.total.unwrap()]
+      : [BN_ZERO, BN_ZERO];
+    const skipRewards = bondTotal.isZero();
+    const key = accountId.toString();
+    const dataSkipRewars = stakingLedger.total?.unwrap() || BN_ZERO;
+    return {
+      key,
+      accountId,
+      bondOther: bondTotal.sub(bondOwn),
+      bondOwn: skipRewards ? dataSkipRewars : bondOwn,
+      bondTotal: skipRewards ? dataSkipRewars : bondTotal,
+      isActive: !skipRewards,
+      skipRewards,
+      stakedReturn: 0,
+      stakedReturnCmp: 0,
+      commissionPer: validatorPrefs.commission.unwrap().toNumber() / 10_000_000,
+      validatorPrefs,
+    };
+  });
+};
+
+export function getBaseInfo(api, elected, waitingInfo) {
+  const baseInfo = extractSingle(elected, api);
+  const waiting = extractSingle(waitingInfo, api);
+  const activeTotals = baseInfo
+    .filter(({ isActive }) => isActive)
+    .map(({ bondTotal }) => bondTotal)
+    .sort((a, b) => a.cmp(b));
+  const totalStaked = activeTotals.reduce((total, value) => total.iadd(value), new BN(0));
+  const avgStaked = totalStaked.divn(activeTotals.length);
+  const waitingIds = waiting.map(({ key }) => key);
+  const validators = arrayFlatten([baseInfo, waiting]);
+  return {
+    totalStaked, avgStaked, waitingIds, validators,
+  };
+}
+
+export function addReturns(inflation, baseInfo) {
+  const { avgStaked } = baseInfo;
+  const { validators } = baseInfo;
+
+  if (!validators || !avgStaked || avgStaked.isZero()) {
+    return baseInfo;
+  }
+
+  const list = validators.map((v) => {
+    if (!v.skipRewards) {
+      const adjusted = avgStaked.mul(BN_HUNDRED).imuln(inflation.stakedReturn).div(v.bondTotal);
+      const stakedReturn = Math.min(adjusted.toNumber(), BN_MAX_INTEGER.toNumber()) / BN_HUNDRED.toNumber();
+      const stakedReturnCmp = (stakedReturn * (100 - v.commissionPer)) / 100;
+      return { ...v, stakedReturn, stakedReturnCmp };
+    }
+    return v;
+  });
+
+  return { ...baseInfo, validators: list };
+}
+
+export function areArraysSame(arr1, arr2) {
+  return arr1.slice().sort().toString() === arr2.slice().sort().toString();
+}
