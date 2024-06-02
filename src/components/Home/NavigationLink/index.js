@@ -67,7 +67,7 @@ NavigationLink.propTypes = {
   icon: PropTypes.any.isRequired,
   path: PropTypes.string,
   description: PropTypes.string,
-  isDiscouraged: PropTypes.bool,
+  isDiscouraged: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
 };
 
 export default NavigationLink;

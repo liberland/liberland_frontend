@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useSelector } from 'react-redux';
 
 import { AuthContext } from 'react-oauth2-code-pkce';
+import { useMediaQuery } from 'usehooks-ts';
 import { blockchainSelectors } from '../../../redux/selectors';
 // STYLES
 import styles from './styles.module.scss';
@@ -12,6 +13,7 @@ import { ReactComponent as Divider } from '../../../assets/icons/divider.svg';
 import { ReactComponent as WalletIcon } from '../../../assets/icons/wallet.svg';
 import Header from '../Header';
 import Button from '../../Button/Button';
+import truncate from '../../../utils/truncate';
 
 function SignIn() {
   const { login } = useContext(AuthContext);
@@ -19,15 +21,10 @@ function SignIn() {
     register,
   } = useForm();
   const allAccounts = useSelector(blockchainSelectors.allWalletsSelector);
+  const isTablet = useMediaQuery('(min-width: 768px)');
 
   const goToLiberlandSignin = () => {
     login();
-  };
-  const goToLiberland2FASignin = () => {
-    window.location.replace(process.env.REACT_APP_SSO2FA_API_IMPLICIT_LINK);
-  };
-  const goToLiberland2FASignout = () => {
-    window.location.replace(process.env.REACT_APP_SSO2FA_API_LOGOUT_IMPLICIT_LINK);
   };
 
   return (
@@ -53,9 +50,18 @@ function SignIn() {
         <form className={styles.signInForm}>
           <div className={styles.inputWrapper}>
             <select className={styles.addressSwitcher} {...register('wallet_address')} required>
-              { allAccounts.map((el) => (
-                <option key={el.address} value={el.address}>{el.address}</option>
-              ))}
+              { allAccounts.map((el) => {
+                const metaName = el?.meta?.name;
+                const { address } = el;
+                const addressToShow = metaName
+                  ? `${metaName} (${truncate(address, isTablet ? 35 : 20)})`
+                  : truncate(address, 24);
+                return (
+                  <option key={el.address} value={el.address}>
+                    {addressToShow}
+                  </option>
+                );
+              })}
             </select>
           </div>
         </form>
@@ -77,12 +83,7 @@ function SignIn() {
 
       </div>
       <div className={styles.twoFAbuttons}>
-        <div onClick={goToLiberland2FASignin}>
-          2fa login
-        </div>
-        <div onClick={goToLiberland2FASignout}>
-          2fa logout
-        </div>
+        <a href={`${process.env.REACT_APP_SSO_API_ADMIN_LINK}`}>admin login</a>
       </div>
     </div>
   );

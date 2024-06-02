@@ -23,7 +23,7 @@
 
 
   &.withMargin{
-    margin-bottom: 34px;
+    margin-bottom: 24px;
   }
 
   & .activeBg {
@@ -34,7 +34,8 @@
     background: $lightGrey;
   }
 
-  & a {
+  & a, 
+  & .link{
     padding: 11px 13px;
     align-items: center;
     display: flex;

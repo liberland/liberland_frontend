@@ -6,6 +6,7 @@ const initialState = {
   ineligibleForComplimentaryLLDReason: null,
   isSkipOnBoarding: true,
   isLoading: false,
+  isResident: false,
 };
 
 const onboardingReducer = handleActions({
@@ -28,6 +29,7 @@ const onboardingReducer = handleActions({
     isEligibleForComplimentaryLLD: action.payload.isEligibleForComplimentaryLLD,
     ineligibleForComplimentaryLLDReason: action.payload.ineligibleForComplimentaryLLDReason,
     isSkipOnBoarding: action.payload.isSkipOnBoarding,
+    isResident: action.payload.isResident,
     isLoading: false,
   }),
 

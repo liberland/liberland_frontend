@@ -53,11 +53,15 @@ function* getIsEligibleForComplimentaryLLDWorker() {
     let isEligibleForComplimentaryLLD = false;
     let ineligibleForComplimentaryLLDReason = null;
     let isSkipOnBoarding = true;
-
+    let isResident = false;
     const dolars = formatDollars(liquidDollars);
+
+    const maybeApprovedEresidency = yield call(maybeGetApprovedEresidency);
+    if (!maybeApprovedEresidency.isError) {
+      isResident = true;
+    }
     if (dolars === 0 || dolars === '0') {
       // Only eligible if no existing dollars
-      const maybeApprovedEresidency = yield call(maybeGetApprovedEresidency);
       if (maybeApprovedEresidency.isError) {
         const is401or404Error = maybeApprovedEresidency.errorResponse.status === 401
           || maybeApprovedEresidency.errorResponse.status === 404;
@@ -82,6 +86,7 @@ function* getIsEligibleForComplimentaryLLDWorker() {
         isEligibleForComplimentaryLLD,
         ineligibleForComplimentaryLLDReason,
         isSkipOnBoarding,
+        isResident,
       }),
     );
   } catch (e) {

@@ -1,18 +1,16 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { useMediaQuery } from 'usehooks-ts';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 import libertarianTorch from '../../../../assets/images/libertariantorch.png';
-import { ReactComponent as CopyIcon } from '../../../../assets/icons/copy.svg';
 
 import { democracyActions } from '../../../../redux/actions';
 import { blockchainSelectors, democracySelectors } from '../../../../redux/selectors';
 import { DelegateModal } from '../../../Modals';
 import Button from '../../../Button/Button';
-import truncate from '../../../../utils/truncate';
 import NotificationPortal from '../../../NotificationPortal';
+import CopyIconWithAddress from '../../../CopyIconWithAddress';
 
 function PoliticanCard({
   politician,
@@ -22,7 +20,6 @@ function PoliticanCard({
   const [isModalOpenDelegate, setIsModalOpenDelegate] = useState(false);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
-  const isBigScreen = useMediaQuery('(min-width: 1250px)');
 
   const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
   const handleModalOpenDelegate = () => {
@@ -31,11 +28,6 @@ function PoliticanCard({
   const handleSubmitDelegate = (delegateAddress) => {
     dispatch(democracyActions.delegate.call({ values: { delegateAddress }, userWalletAddress }));
     handleModalOpenDelegate();
-  };
-
-  const handleCopyClick = (dataToCoppy) => {
-    navigator.clipboard.writeText(dataToCoppy);
-    notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
 
   return (
@@ -50,12 +42,9 @@ function PoliticanCard({
         </div>
         <div className={styles.copyName}>
           <div className={styles.copyWithName}>
-            <CopyIcon
-              className={styles.copyIcon}
-              name="walletAddress"
-              onClick={() => handleCopyClick(politician.name)}
+            <CopyIconWithAddress
+              address={politician.name}
             />
-            <span>{isBigScreen ? politician.name : truncate(politician.name, 13)}</span>
           </div>
           <span className={styles.votesCounterMobile}>1 x Votes</span>
         </div>

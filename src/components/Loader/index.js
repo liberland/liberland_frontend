@@ -10,10 +10,11 @@ import {
   officesSelectors,
   identitySelectors,
   legislationSelectors,
-  bridgeSelectors,
   validatorSelectors,
   congressSelectors,
   registriesSelectors,
+  dexSelectors,
+  contractsSelectors,
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
 import BackgroundBlocker from '../BackgroundBlocker';
@@ -26,21 +27,23 @@ function Loader({ children }) {
   const isLoadingOffices = useSelector(officesSelectors.selectorIsLoading);
   const isLoadingIdentity = useSelector(identitySelectors.selectorIsLoading);
   const isLoadingLegislation = useSelector(legislationSelectors.gettingLegislation);
-  const isLoadingBridge = useSelector(bridgeSelectors.isLoading);
   const isLoadingValidator = useSelector(validatorSelectors.isLoading);
   const isLoadingCongress = useSelector(congressSelectors.isLoading);
   const isGetRegistries = useSelector(registriesSelectors.isGetRegistries);
+  const isLoadingDex = useSelector(dexSelectors.selectorIsLoading);
+  const isLoadingContracts = useSelector(contractsSelectors.selectorIsContractsLoading);
 
   const isLoading = [
+    isLoadingContracts,
     isGettingWalletInfo,
     isGettingDemocracyInfo,
     isLoadingOffices,
     isLoadingIdentity,
     isLoadingLegislation,
-    isLoadingBridge,
     isLoadingValidator,
     isLoadingCongress,
     isGetRegistries,
+    isLoadingDex,
   ].some((isFetching) => isFetching);
 
   return (

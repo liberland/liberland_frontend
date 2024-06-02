@@ -4,16 +4,16 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
 // COMPONENTS
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
 
 // STYLES
 import styles from './styles.module.scss';
-import { isValidSubstrateAddress } from '../../utils/bridge';
-import {parseAssets} from '../../utils/walletHelpers';
+import { parseAssets, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
+import InputSearch from '../InputComponents/InputSearchAddressName';
 
 // TODO add validation
 function SendAssetModal({ closeModal, assetData }) {
@@ -23,6 +23,7 @@ function SendAssetModal({ closeModal, assetData }) {
     handleSubmit,
     formState: { errors },
     register,
+    setValue,
   } = useForm({
     mode: 'all',
   });
@@ -31,24 +32,29 @@ function SendAssetModal({ closeModal, assetData }) {
     dispatch(walletActions.sendAssetsTransfer.call({
       recipient: values.recipient,
       amount: parseAssets(values.amount, assetData.metadata.decimals),
-      assetData: assetData
-    }))
+      assetData,
+    }));
     closeModal();
   };
 
   return (
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(transfer)}>
-      <div className={styles.h3}>Send {assetData.metadata.symbol}</div>
+      <div className={styles.h3}>
+        Send
+        {assetData.metadata.symbol}
+      </div>
       <div className={styles.description}>
         You are going to send tokens from your wallet
       </div>
 
       <div className={styles.title}>Send to address</div>
-      <TextInput
-        register={register}
-        name="recipient"
+      <InputSearch
+        errorTitle="Recipient"
+        isRequired
         placeholder="Send to address"
-        required
+        name="recipient"
+        register={register}
+        setValue={setValue}
         validate={((v) => {
           if (!isValidSubstrateAddress(v)) return 'Invalid Address';
           return true;
@@ -88,7 +94,8 @@ function SendAssetModal({ closeModal, assetData }) {
 
 SendAssetModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
-  assetData: PropTypes.any
+  // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
+  assetData: PropTypes.any,
 };
 
 function SendAssetModalWrapper(props) {

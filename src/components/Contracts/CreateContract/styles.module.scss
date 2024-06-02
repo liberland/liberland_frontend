@@ -1,0 +1,19 @@
+.inputWithDelete{
+  width: 100%;
+  display: flex;
+  gap: 5px;
+
+  & > div{
+    flex: 1;
+  }
+}
+
+.addButtonWrapper{
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.button{
+  aspect-ratio: 1/1;
+}

@@ -35,6 +35,8 @@ const initialState = {
   currentPageNumber: 0,
   validators: [],
   nominatorTargets: [],
+  assetBalance: null,
+  assetsBalance: [],
 };
 
 const walletReducer = handleActions(
@@ -52,6 +54,7 @@ const walletReducer = handleActions(
       walletActions.setNominatorTargets.call,
       walletActions.unpool.call,
       walletActions.getTxTransfers.call,
+      walletActions.getAssetsBalance.call,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
@@ -84,6 +87,10 @@ const walletReducer = handleActions(
     [walletActions.getAdditionalAssets.success]: (state, action) => ({
       ...state,
       additionalAssets: action.payload,
+    }),
+    [walletActions.getAssetsBalance.success]: (state, action) => ({
+      ...state,
+      assetsBalance: action.payload,
     }),
     [walletActions.setCurrentPageNumber.success]: (state, action) => ({
       ...state,
@@ -121,6 +128,8 @@ const walletReducer = handleActions(
       walletActions.unpool.failure,
       walletActions.getTxTransfers.success,
       walletActions.getTxTransfers.failure,
+      walletActions.getAssetsBalance.success,
+      walletActions.getAssetsBalance.failure,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,

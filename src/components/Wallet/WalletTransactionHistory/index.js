@@ -16,9 +16,8 @@ import Status from '../../Status';
 import { formatMeritTransaction, formatDollarTransaction, formatAssetTransaction } from '../../../utils/walletHelpers';
 
 import { blockchainSelectors } from '../../../redux/selectors';
-import truncate from '../../../utils/truncate';
-import { ReactComponent as CopyIcon } from '../../../assets/icons/copy.svg';
 import NotificationPortal from '../../NotificationPortal';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
 
 function WalletTransactionHistory({ failure, transactionHistory }) {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector).toString();
@@ -26,11 +25,6 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
   const isLarge = useMediaQuery('(min-width: 62em)');
   const isTabletHigher = useMediaQuery('(min-width: 1025px)');
   const isBigScreen = useMediaQuery('(min-width: 1520px)');
-
-  const handleCopyClick = (address) => {
-    navigator.clipboard.writeText(address);
-    notificationRef.current.addSuccess({ text: 'Address was copied' });
-  };
 
   return (
     <Card title="Transaction History" className={styles.cardWrapper}>
@@ -58,12 +52,17 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
               const value = transactionHistoryInfo.fromId === walletAddress
                 ? `-${transactionHistoryInfo.value}`
                 : transactionHistoryInfo.value;
-              const isAmountPositive = new BN(value).gt(BN_ZERO);
+              const isStakingTransaction = 'userId' in transactionHistoryInfo;
+              const isAmountPositive = isStakingTransaction ? transactionHistoryInfo?.isPositive
+                : new BN(value).gt(BN_ZERO);
               const imgAlt = isAmountPositive ? 'reviceIcon' : 'paymentIcon';
-
               const dateTransacionHistory = formatDate(new Date(transactionHistoryInfo.block.timestamp), true);
-              const userId = isAmountPositive ? transactionHistoryInfo.fromId : transactionHistoryInfo.toId;
-              const typeText = isAmountPositive ? 'from' : 'to';
+
+              const fromToId = isAmountPositive ? transactionHistoryInfo.fromId : transactionHistoryInfo.toId;
+              const userId = isStakingTransaction ? transactionHistoryInfo.userId : fromToId;
+
+              const typeTextFromToId = isAmountPositive ? 'from' : 'to';
+              const typeText = isStakingTransaction ? transactionHistoryInfo.stakingActionText : typeTextFromToId;
               const iconType = isAmountPositive ? reciveIcon : paymentIcon;
               const configFormat = {
                 isSymbolFirst: true,
@@ -92,7 +91,6 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
                   {isTabletHigher
                     ? (
                       <TransacionHistoryDesktop
-                        handleCopyClick={handleCopyClick}
                         value={asset}
                         isBigScreen={isBigScreen}
                         dateTransacionHistory={dateTransacionHistory}
@@ -104,7 +102,6 @@ function WalletTransactionHistory({ failure, transactionHistory }) {
                     )
                     : (
                       <TransacionHistoryMobile
-                        handleCopyClick={handleCopyClick}
                         value={asset}
                         isLarge={isLarge}
                         dateTransacionHistory={dateTransacionHistory}
@@ -128,7 +125,6 @@ function TransacionHistoryDesktop({
   imgAlt,
   typeText,
   userId,
-  handleCopyClick,
   isBigScreen,
   dateTransacionHistory,
   value,
@@ -145,12 +141,9 @@ function TransacionHistoryDesktop({
       </div>
       <p className={styles.bold}>
         <span className={styles.icon}>
-          <CopyIcon
-            className={styles.copyIcon}
-            name="walletAddress"
-            onClick={() => handleCopyClick(userId)}
+          <CopyIconWithAddress
+            address={userId}
           />
-          {isBigScreen ? userId : truncate(userId, 13)}
         </span>
       </p>
       <p className={styles.paymentFromDate}>{dateTransacionHistory}</p>
@@ -171,7 +164,6 @@ function TransacionHistoryDesktop({
 
 function TransacionHistoryMobile({
   typeText,
-  handleCopyClick,
   value,
   isLarge,
   dateTransacionHistory,
@@ -190,12 +182,9 @@ function TransacionHistoryMobile({
             {typeText}
             {' '}
             <span>
-              <CopyIcon
-                className={styles.copyIcon}
-                name="walletAddress"
-                onClick={() => handleCopyClick(userId)}
+              <CopyIconWithAddress
+                address={userId}
               />
-              {isLarge ? userId : truncate(userId, 13)}
             </span>
           </p>
 

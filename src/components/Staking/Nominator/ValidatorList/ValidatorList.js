@@ -12,54 +12,45 @@ function ValidatorList({
   selectingValidatorsDisabled,
   toggleSelectedValidator,
 }) {
-  const isTabletHigher = useMediaQuery('(min-width: 1025px)');
-
+  const isDesktopHigher = useMediaQuery('(min-width: 1400px)');
   return (
     <div className={stylesPage.transactionHistoryCard}>
-
-      <div className={cx(styles.validatorsListHeader, stylesPage.transactionHistoryCardHeader, styles.gridList)}>
-        {isTabletHigher
-          ? (
-            <>
-              <span>NAME</span>
-              <span>COMMISSION</span>
-              <span>ALLOWED</span>
-              <span>NOMINATED BY ME</span>
-            </>
-          )
-          : (
-            <>
-              <div className={styles.nameCommisionAllowed}>
-                <span>NAME</span>
-                <div>
-                  <span>COMMISSION</span>
-                  {' / '}
-                  <span>ALLOWED</span>
-                </div>
-
-              </div>
-              <div className={styles.nominated}>
-                <span>NOMINATED BY ME</span>
-              </div>
-            </>
-          )}
-
-      </div>
+      {isDesktopHigher
+        && (
+          <div className={cx(styles.validatorsListHeader, stylesPage.transactionHistoryCardHeader, styles.gridList)}>
+            <span>NAME</span>
+            <span>TOTAL STAKE</span>
+            <span>OWN STAKE</span>
+            <span>OTHER STAKE</span>
+            <span>COMMISSION</span>
+            <span>ALLOWED</span>
+            <span>RETURN</span>
+            <span>NOMINATED</span>
+          </div>
+        )}
       <div className={styles.validatorsList}>
-        {
-        validators.map((validator) => (
-          <ValidatorCard
-            key={validator.address}
-            name={validator.displayName ? validator.displayName : validator.address}
-            validatorAddress={validator.address}
-            commission={validator.commission}
-            blocked={validator.blocked}
-            nominatedByMe={selectedValidatorsAsTargets.includes(validator.address)}
-            toggleSelectedValidator={toggleSelectedValidator}
-            selectingValidatorsDisabled={selectingValidatorsDisabled}
-          />
-        ))
-      }
+        {validators.map((validator, index) => {
+          const {
+            bondTotal, bondOwn, bondOther, displayName, commission, blocked, stakedReturnCmp, accountId,
+          } = validator;
+          const address = accountId?.toString();
+          return (
+            <ValidatorCard
+              key={address || index}
+              stakedReturnCmp={stakedReturnCmp}
+              total={bondTotal}
+              own={bondOwn}
+              others={bondOther}
+              name={displayName || address}
+              validatorAddress={address}
+              commission={commission}
+              blocked={blocked}
+              nominatedByMe={selectedValidatorsAsTargets.includes(address)}
+              toggleSelectedValidator={toggleSelectedValidator}
+              selectingValidatorsDisabled={selectingValidatorsDisabled}
+            />
+          );
+        })}
       </div>
     </div>
   );
@@ -68,9 +59,9 @@ function ValidatorList({
 ValidatorList.propTypes = {
   validators: PropTypes.arrayOf(PropTypes.shape({
     displayName: PropTypes.string,
-    address: PropTypes.string.isRequired,
-    commission: PropTypes.string.isRequired,
-    blocked: PropTypes.bool.isRequired,
+    address: PropTypes.string,
+    commission: PropTypes.string,
+    blocked: PropTypes.bool,
   })).isRequired,
   selectedValidatorsAsTargets: PropTypes.arrayOf(PropTypes.string).isRequired,
   selectingValidatorsDisabled: PropTypes.bool.isRequired,

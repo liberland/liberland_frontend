@@ -12,7 +12,7 @@ const buildFieldName = (formKey, index, dynamicField, suffix) => (dynamicField.e
   : `${formKey}.${index}.${dynamicField.key}`);
 
 export function blockchainDataToFormObject(blockchainDataRaw) {
-  const blockchainData = blockchainDataRaw.toJSON();
+  const blockchainData = blockchainDataRaw.toJSON ? blockchainDataRaw.toJSON() : blockchainDataRaw;
   const supportedObject = JSON.parse(JSON.stringify(newCompanyDataObject));
   const staticFields = [];
   const dynamicFields = [];
@@ -114,16 +114,7 @@ export function GetFieldsForm({
                             />
                           )}
                       </div>
-                      <div>
-                        {dynamicField.encryptable ? <span>Encrypt Field? </span> : null }
-                        {dynamicField.encryptable
-                          ? (
-                            <input
-                              {...register(buildFieldName(formKey, index, dynamicField, 'isEncrypted'))}
-                              type="checkbox"
-                            />
-                          ) : null }
-                      </div>
+
                     </div>
                   </div>
                 );
@@ -136,7 +127,7 @@ export function GetFieldsForm({
         ))}
         <div style={{ display: 'flex', margin: '16px', justifyContent: 'flex-end' }}>
           <Button type="button" onClick={() => append({})} small green>
-            Append
+            Add
             {' '}
             {displayName}
           </Button>
@@ -200,6 +191,10 @@ export function BuildRegistryForm({
   } = useForm({
     defaultValues,
   });
+
+  if (formObject.invalid) {
+    return <div>This company&apos;s registry data is corrupted. Please contact administration.</div>;
+  }
 
   return (
     <form onSubmit={handleSubmit((result) => {

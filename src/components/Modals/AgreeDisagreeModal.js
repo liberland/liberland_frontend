@@ -11,6 +11,8 @@ function AgreeDisagreeModal({
   agreeButtonType,
   children,
   style,
+  buttonLeft,
+  buttonRight,
 }) {
   return (
     <div className={classNames(styles.agreeDisagree, style)}>
@@ -18,10 +20,10 @@ function AgreeDisagreeModal({
       {children || <span>This operation costs 100 LLD.</span>}
       <div className={styles.buttons}>
         <Button type="button" onClick={onDisagree} medium>
-          Cancel
+          {buttonLeft || 'Cancel'}
         </Button>
         <Button type={agreeButtonType} onClick={onAgree} primary medium>
-          Submit
+          {buttonRight || 'Submit'}
         </Button>
       </div>
     </div>
@@ -33,6 +35,8 @@ AgreeDisagreeModal.defaultProps = {
   onAgree: () => {},
   children: undefined,
   style: undefined,
+  buttonLeft: undefined,
+  buttonRight: undefined,
 };
 
 AgreeDisagreeModal.propTypes = {
@@ -42,6 +46,8 @@ AgreeDisagreeModal.propTypes = {
   agreeButtonType: PropTypes.string,
   children: PropTypes.element,
   style: PropTypes.string,
+  buttonLeft: PropTypes.string,
+  buttonRight: PropTypes.string,
 };
 
 export default AgreeDisagreeModal;

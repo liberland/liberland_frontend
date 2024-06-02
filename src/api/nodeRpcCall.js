@@ -1,10 +1,18 @@
 import { web3FromAddress } from '@polkadot/extension-dapp';
 import pako from 'pako';
-import { u8aToHex } from '@polkadot/util';
+import {
+  BN_ZERO,
+  hexToU8a, u8aToHex,
+} from '@polkadot/util';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
+// eslint-disable-next-line import/no-cycle
+import { convertAssetData } from '../utils/dexFormatter';
+import { parseDollars, parseMerits } from '../utils/walletHelpers';
+import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
+import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -14,7 +22,14 @@ const getApi = async () => {
   if (__apiCache === null) {
     __apiCache = await ApiPromise.create({
       provider,
+      metadata: getMetadataCache(),
       types: {
+        NativeOrAssetId: {
+          _enum: {
+            Native: null,
+            Asset: 'u32',
+          },
+        },
         Coords: {
           lat: 'u64',
           long: 'u64',
@@ -74,6 +89,12 @@ const getApi = async () => {
           signingAbility: 'Encryptable', // FIXME enum
           signingAbilityConditions: 'Encryptable',
         },
+        RelevantAsset: {
+          assetId: 'Encryptable',
+        },
+        RelevantContract: {
+          contractId: 'Encryptable',
+        },
         CompanyData: {
           name: 'Text',
           // Truthful scope of business
@@ -93,9 +114,83 @@ const getApi = async () => {
           principals: 'Vec<Principal>',
           shareholders: 'Vec<Shareholder>',
           UBOs: 'Vec<UBO>',
+          relevantAssets: 'Vec<RelevantAsset>',
+          relevantContracts: 'Vec<RelevantContract>',
         },
       },
+      runtime: {
+        AssetConversionApi: [
+          {
+            methods: {
+              get_reserves: {
+                description: 'Get pool reserves',
+                params: [
+                  {
+                    name: 'asset1',
+                    type: 'NativeOrAssetId',
+                  },
+                  {
+                    name: 'asset2',
+                    type: 'NativeOrAssetId',
+                  },
+                ],
+                type: 'Option<(Balance,Balance)>',
+              },
+              quote_price_exact_tokens_for_tokens: {
+                description: 'Quote price: exact tokens for tokens',
+                params: [
+                  {
+                    name: 'asset1',
+                    type: 'NativeOrAssetId',
+                  },
+                  {
+                    name: 'asset2',
+                    type: 'NativeOrAssetId',
+                  },
+                  {
+                    name: 'amount',
+                    type: 'u128',
+                  },
+                  {
+                    name: 'include_fee',
+                    type: 'bool',
+                  },
+                ],
+                type: 'Option<(Balance)>',
+              },
+              quote_price_tokens_for_exact_tokens: {
+                description: 'Quote price: tokens for exact tokens',
+                params: [
+                  {
+                    name: 'asset1',
+                    type: 'NativeOrAssetId',
+                  },
+                  {
+                    name: 'asset2',
+                    type: 'NativeOrAssetId',
+                  },
+                  {
+                    name: 'amount',
+                    type: 'u128',
+                  },
+                  {
+                    name: 'include_fee',
+                    type: 'bool',
+                  },
+                ],
+                type: 'Option<(Balance)>',
+              },
+            },
+            version: 1,
+          },
+        ],
+      },
     });
+    setMetadataCache(
+      __apiCache.genesisHash,
+      __apiCache.runtimeVersion.specVersion.toNumber(),
+      __apiCache.runtimeMetadata.toHex(),
+    );
   }
   return __apiCache;
 };
@@ -182,7 +277,23 @@ const getLldBalances = async (addresses) => {
   }
 };
 
-const getAdditionalAssets = async (address, isIndexNeed = false) => {
+const getAssetData = async (asset, address) => {
+  try {
+    const api = await getApi();
+    const maybeData = await api.query.assets.account(asset, address);
+    if (maybeData.isSome) {
+      const data = maybeData.unwrapOrDefault();
+      return data.balance;
+    }
+    return null;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = false) => {
   try {
     const api = await getApi();
     const assetMetadatas = await api.query.assets.metadata.entries();
@@ -195,7 +306,8 @@ const getAdditionalAssets = async (address, isIndexNeed = false) => {
     const assetQueries = [];
     processedMetadatas.forEach((asset) => {
       // Disregard LLM, asset of ID 1 because it has special treatment already
-      if (!(asset.index === 1 || asset.index === '1')) {
+      const isLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
+      if (isLLM) {
         assetQueries.push([api.query.assets.account, [asset.index, address]]);
         if (isIndexNeed) {
           indexedFilteredAssets[asset.index] = asset;
@@ -224,57 +336,11 @@ const getAdditionalAssets = async (address, isIndexNeed = false) => {
   }
 };
 
-const bridgeSubscribe = async (asset, receipt_id, onChange) => {
-  const api = await getApi();
-  let bridge;
-  /* eslint-disable eqeqeq */
-  if (asset == 'LLM') bridge = api.query.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.query.ethLLDBridge;
-  // returns unsub func
-  return {
-    unsubscribe: await bridge.statusOf(receipt_id, onChange),
-  };
-};
-
-const bridgeDeposit = async ({ asset, amount, ethereumRecipient }, walletAddress) => {
-  const api = await getApi();
-  let bridge;
-  if (asset == 'LLM') bridge = api.tx.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.tx.ethLLDBridge;
-  // eslint-disable-next-line no-undef
-  else throw new Exception('Unknown asset');
-
-  const call = bridge.deposit(amount, ethereumRecipient);
-  return submitExtrinsic(call, walletAddress, api);
-};
-
-const bridgeWithdraw = async ({ receipt_id, asset }, walletAddress) => {
-  const api = await getApi();
-  let bridge;
-  if (asset == 'LLM') bridge = api.tx.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.tx.ethLLDBridge;
-  // eslint-disable-next-line no-undef
-  else throw new Exception('Unknown asset');
-
-  const call = bridge.withdraw(receipt_id);
-  return submitExtrinsic(call, walletAddress, api);
-};
-
-const bridgeConstants = async (asset) => {
-  const api = await getApi();
-  let bridge;
-  if (asset == 'LLM') bridge = api.consts.ethLLMBridge;
-  else if (asset == 'LLD') bridge = api.consts.ethLLDBridge;
-  /* eslint-enable eqeqeq */
-  // eslint-disable-next-line no-undef
-  else throw new Exception('Unknown asset');
-
-  return bridge;
-};
-
 const provideJudgementAndAssets = async ({
   address, hash, walletAddress, merits, dollars,
 }) => {
+  const parsedMerits = parseMerits(merits);
+  const parsedDollars = parseDollars(dollars);
   const api = await getApi();
   const calls = [];
 
@@ -283,13 +349,13 @@ const provideJudgementAndAssets = async ({
   const officeJudgementCall = api.tx.identityOffice.execute(judgementCall);
   calls.push(officeJudgementCall);
 
-  if (dollars?.gt(0)) {
-    const lldCall = api.tx.balances.transfer(address, dollars.toString());
+  if (parsedDollars?.gt(BN_ZERO)) {
+    const lldCall = api.tx.balances.transfer(address, parsedDollars.toString());
     const officeLldCall = api.tx.identityOffice.execute(lldCall);
     calls.push(officeLldCall);
   }
-  if (merits?.gt(0)) {
-    const llmCall = api.tx.llm.sendLlmToPolitipool(address, merits.toString());
+  if (parsedMerits?.gt(BN_ZERO)) {
+    const llmCall = api.tx.llm.sendLlmToPolitipool(address, parsedMerits.toString());
     const officeLlmCall = api.tx.identityOffice.execute(llmCall);
     calls.push(officeLlmCall);
   }
@@ -538,35 +604,61 @@ const subscribeBestBlockNumber = async (onNewBlockNumber) => {
   return null;
 };
 
+function accountsToString(accounts) {
+  return accounts.map((account) => account.toString());
+}
+
 const getValidators = async () => {
   const api = await getApi();
   const validators = [];
-  const validatorsKeys = await api.query.staking.validators.keys();
   const validatorQueries = [];
   const validatorIdentityQueries = [];
-  validatorsKeys.forEach((validatorKey, index) => {
-    const address = validatorKey.toHuman().pop();
-    validatorQueries.push([api.query.staking.validators, address]);
-    validatorIdentityQueries.push([api.query.identity.identityOf, address]);
-    validators[index] = { address };
+
+  const [elected, waiting, validatorsKeys] = await Promise.all([
+    api.derive.staking.electedInfo({
+      withController: true, withExposure: true, withPrefs: true, withLedger: true,
+    }),
+    api.derive.staking.waitingInfo({ withController: true, withPrefs: true, withLedger: true }),
+    api.query.staking.validators.keys(),
+  ]);
+
+  const totalIssuance = await api.query.balances?.totalIssuance();
+  const baseInfo = getBaseInfo(api, elected, waiting);
+  const inflation = calcInflation(totalIssuance, baseInfo?.totalStaked);
+
+  baseInfo.validators.forEach(async ({ key }) => {
+    validatorQueries.push([api.query.staking.validators, key]);
+    validatorIdentityQueries.push([api.query.identity.identityOf, key]);
   });
   const numOfValidators = validatorsKeys.length;
   const validatorsData = await api.queryMulti([
     ...validatorQueries,
     ...validatorIdentityQueries,
   ]);
+
+  const validatorsWithBaseInfo = inflation?.stakedReturn ? addReturns(inflation, baseInfo) : baseInfo;
+
   validatorsData.forEach((validatorData, index) => {
     const validatorHumanData = validatorData.toHuman();
+    const validatorWithBaseInfo = validatorsWithBaseInfo.validators[index];
+    if (!validatorWithBaseInfo) return;
     const dataToAdd = {
       ...((validatorHumanData?.commission !== undefined) && { commission: validatorHumanData.commission }),
       ...((validatorHumanData?.blocked !== undefined) && { blocked: validatorHumanData.blocked }),
       // eslint-disable-next-line max-len
       ...((validatorHumanData?.info?.display?.Raw !== undefined) && { displayName: validatorHumanData?.info?.display?.Raw }),
+      ...validatorWithBaseInfo,
+      isWaiting: accountsToString(baseInfo.waitingIds).includes(validatorWithBaseInfo.key),
     };
     validators[index % numOfValidators] = {
       ...validators[index % numOfValidators],
       ...dataToAdd,
     };
+  });
+  validators.sort((a, b) => {
+    if (a.isWaiting && !b.isWaiting) return -1;
+    if (!a.isWaiting && b.isWaiting) return 1;
+    return 0;
   });
   return validators;
 };
@@ -964,6 +1056,34 @@ const getLegislation = async (tier) => {
   return legislationById;
 };
 
+const getOfficialRegistryEntries = async () => {
+  const api = await getApi();
+  const allEntites = await api.query.companyRegistry.registries.entries(0);
+  const registeredCompanies = [];
+  allEntites.forEach((companyRegistry) => {
+    const [key, companyValue] = companyRegistry;
+    const entityId = key.toHuman();
+    let companyData;
+    try {
+      if (companyValue.isNone) companyData = { unregister: true };
+      else {
+        const compressed = companyValue?.isSome
+          ? companyValue.unwrap().data : companyValue.data;
+        companyData = api.createType('CompanyData', pako.inflate(compressed));
+      }
+
+      const formObject = blockchainDataToFormObject(companyData);
+
+      const dataObject = { ...formObject, id: entityId[1] };
+      registeredCompanies.push(dataObject);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
+  });
+  return registeredCompanies;
+};
+
 const getOfficialUserRegistryEntries = async (walletAddress) => {
   const api = await getApi();
   const ownerEntites = await api.query.companyRegistry.ownerEntities.entries(walletAddress);
@@ -1304,7 +1424,48 @@ const batchPayoutStakers = async (targets, walletAddress) => {
 const getStakersRewards = async (accounts) => {
   const api = await getApi();
 
-  return api.derive.staking.stakerRewardsMulti(accounts, false);
+  const allRewards = await api.derive.staking.stakerRewardsMulti(accounts, false);
+
+  // allRewards may include rewards from validators that no longer have a stash.
+  // Such rewards are unclaimable and essentially lost either way, so let's just
+  // filter them out.
+
+  // First find all validators that our stakers got rewards from
+  const uniqValidatorsSet = new Set(allRewards.flatten().map(({ validators }) => Object.keys(validators)).flatten());
+  const uniqValidators = Array.from(uniqValidatorsSet);
+
+  // Validators are stashes, convert to controllers
+  const controllers = await api.query.staking.bonded.multi(uniqValidators);
+  const controllersWithIdx = controllers.map((v, i) => [i, v]);
+
+  // If there's no controller attached, it's not a stash
+  const noStashValidators = controllersWithIdx.filter(([, v]) => v.isNone).map(([i]) => uniqValidators[i]);
+
+  // Fetch ledgers for validators with controller
+  const stashValidators = controllersWithIdx.filter(([, v]) => v.isSome).map(([i, v]) => [i, v.unwrap()]);
+  const ledgers = await api.query.staking.ledger.multi(stashValidators.map(([, v]) => v));
+
+  // If there's no ledger, it's not a stash anymore
+  const noControllerValidators = ledgers.reduce((broken, v, i) => {
+    if (v.isNone) {
+      return [...broken, uniqValidators[stashValidators[i][0]]];
+    }
+    return broken;
+  }, []);
+
+  const brokenValidators = [...noStashValidators, ...noControllerValidators];
+
+  // filter out rewards from brokenValidators
+  const validRewards = allRewards.map((accountRewards) => accountRewards.map((eraRewards) => {
+    const goodValidators = Object.keys(eraRewards.validators)
+      .filter((v) => !brokenValidators.includes(v))
+      .reduce((obj, v) => ({ ...obj, [v]: eraRewards.validators[v] }), {});
+    return {
+      ...eraRewards,
+      validators: goodValidators,
+    };
+  }).filter((eraRewards) => Object.keys(eraRewards.validators).length > 0));
+  return validRewards;
 };
 
 const getSessionValidators = async () => {
@@ -1384,9 +1545,10 @@ const getIdentitiesNames = async (addresses) => {
   raw.map((identity, idx) => {
     identities[addresses[idx]] = {};
     const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
-    const nameHashed = unwrapIdentity.display.asRaw;
+    const nameHashed = unwrapIdentity?.display?.asRaw;
     const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
     identities[addresses[idx]].identity = name;
+
     return null;
   });
   return identities;
@@ -1896,6 +2058,326 @@ const fetchPendingIdentities = async () => {
   return processed.filter((entity) => entity.data.judgements.length === 0);
 };
 
+const getSwapPriceExactTokensForTokens = async (asset1, asset2, amount, includeTax = true) => {
+  const api = await getApi();
+
+  const maybeRate = await api.call.assetConversionApi.quotePriceExactTokensForTokens(
+    asset1,
+    asset2,
+    amount,
+    includeTax,
+  );
+  return maybeRate.unwrapOr(null);
+};
+
+const getSwapPriceTokensForExactTokens = async (asset1, asset2, amount, includeTax = true) => {
+  const api = await getApi();
+
+  const maybeRate = await api.call.assetConversionApi.quotePriceTokensForExactTokens(
+    asset1,
+    asset2,
+    amount,
+    includeTax,
+  );
+  return maybeRate.unwrapOr(null);
+};
+
+const getDexReserves = async (asset1, asset2) => {
+  const api = await getApi();
+  const maybeReserves = await api.call.assetConversionApi.getReserves(asset1, asset2);
+  if (maybeReserves.isNone) {
+    return null;
+  }
+  const [reservesOfAsset1, reservesOfAsset2] = maybeReserves.unwrap();
+  return {
+    asset1: reservesOfAsset1,
+    asset2: reservesOfAsset2,
+  };
+};
+
+const getAssetsDataFromPool = async () => {
+  const api = await getApi();
+  const maybeAssetDataFromPool = await api.query.poolAssets.asset.entries();
+  const data = {};
+  maybeAssetDataFromPool.map((item) => {
+    const asset = item[0].toHuman()[0];
+    const { supply } = item[1].unwrapOr(null);
+    data[asset] = { supply };
+    return { supply, asset };
+  });
+  return data;
+};
+
+const getLpTokensOwnedByAddress = async (lpTokenId, address) => {
+  const api = await getApi();
+  const maybeTokens = await api.query.poolAssets.account(lpTokenId, address);
+
+  if (maybeTokens.isNone) {
+    return null;
+  }
+  const tokens = maybeTokens.unwrapOrDefault();
+  const balance = tokens.balance.toString();
+  return { balance };
+};
+
+const getDexPools = async (walletAddress) => {
+  try {
+    const api = await getApi();
+    const pools = await api.query.assetConversion.pools.entries();
+    const assetsPoolData = await getAssetsDataFromPool();
+    const poolsData = await Promise.all(pools.map(async ([poolKey, maybePoolData]) => {
+      const [asset1, asset2] = poolKey.args[0];
+      const { lpToken } = maybePoolData.unwrapOrDefault();
+      const asset1checkIsNative = asset1.value.toString();
+      const asset2checkIsNative = asset2.value.toString();
+      const asset2Transform = asset2checkIsNative || asset2.toString();
+      const asset1Transform = asset1checkIsNative || asset1.toString();
+      const lpTokenTransform = lpToken.toString();
+      const [lpTokensValue, reserved, assetsData] = await Promise.all([
+        getLpTokensOwnedByAddress(lpTokenTransform, walletAddress),
+        getDexReserves(asset1, asset2),
+        getAdditionalAssets(walletAddress, true, true),
+      ]);
+      const { assetData1, assetData2 } = convertAssetData(assetsData, asset1Transform, asset2Transform);
+      return {
+        asset1: asset1Transform,
+        asset2: asset2Transform,
+        assetData1,
+        assetData2,
+        lpToken: lpTokenTransform,
+        lpTokensBalance: lpTokensValue?.balance || 0,
+        reserved,
+      };
+    }));
+    return { poolsData, assetsPoolData };
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('Error fetching DEX pools:', err);
+    return [];
+  }
+};
+
+const getDexPoolsExtendData = async (walletAddress) => {
+  try {
+    const dexData = await getDexPools(walletAddress);
+    return dexData;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error fetching DEX pools with extend data: ', error);
+    return [];
+  }
+};
+
+const swapExactTokensForTokens = async (path, amountIn, amountOutMin, sendTo, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.assetConversion.swapExactTokensForTokens(
+    path,
+    amountIn,
+    amountOutMin,
+    sendTo,
+    true,
+  );
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const swapTokensForExactTokens = async (path, amountOut, amountInMax, sendTo, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.assetConversion.swapTokensForExactTokens(path, amountOut, amountInMax, sendTo, true);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const addLiquidity = async (
+  asset1,
+  asset2,
+  amount1Desired,
+  amount2Desired,
+  amount1Min,
+  amount2Min,
+  mintTo,
+  walletAddress,
+) => {
+  const api = await getApi();
+  const extrinsic = api.tx.assetConversion.addLiquidity(
+    asset1,
+    asset2,
+    amount1Desired,
+    amount2Desired,
+    amount1Min,
+    amount2Min,
+    mintTo,
+  );
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getLiquidityWithdrawalFee = async () => {
+  const api = await getApi();
+  const maybeLiquidityWithdrawalFee = await api.consts.assetConversion.liquidityWithdrawalFee;
+  return Number(maybeLiquidityWithdrawalFee);
+};
+
+const removeLiquidity = async (
+  asset1,
+  asset2,
+  lpTokenBurn,
+  amount1MinReceive,
+  amount2MinReceive,
+  withdrawTo,
+  walletAddress,
+) => {
+  const api = await getApi();
+  const extrinsic = api.tx.assetConversion.removeLiquidity(
+    asset1,
+    asset2,
+    lpTokenBurn,
+    amount1MinReceive,
+    amount2MinReceive,
+    withdrawTo,
+  );
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const fetchCompanyRequests = async () => {
+  const api = await getApi();
+  const raw = await api.query.companyRegistry.requests.entries();
+  return raw.map((rawEntry) => ({
+    indexes: rawEntry[0].toHuman(),
+  }));
+};
+
+const handleContractData = (data) => {
+  let result = null;
+  if (!data) return result;
+  try {
+    const hexData = data.toString('hex');
+    result = Buffer.from(pako.inflate(hexToU8a(hexData))).toString('utf-8');
+  } catch (err) {
+    result = Buffer.from(data).toString('utf-8');
+  }
+  return result;
+};
+
+const getSignaturesForContracts = async (contractId) => {
+  const api = await getApi();
+  const judgesSignatures = await api.query.contractsRegistry.judgesSignatures.entries(contractId);
+  const judgesSignaturesList = judgesSignatures.map(
+    ([key, isSigned]) => ({ key: key.args[1].toString(), isSigned: isSigned.isTrue }),
+  );
+  const partiesSignatures = await api.query.contractsRegistry.partiesSignatures.entries(contractId);
+  const partiesSignaturesList = partiesSignatures.map(
+    ([key, isSigned]) => ({ key: key.args[1].toString(), isSigned: isSigned.isTrue }),
+  );
+  const judgesFiltered = judgesSignaturesList.filter((item) => item.isSigned === true);
+  const partiesFiltered = partiesSignaturesList.filter((item) => item.isSigned === true);
+
+  return { judgesSignaturesList: judgesFiltered, partiesSignaturesList: partiesFiltered };
+};
+
+const getSingleContract = async (contractId) => {
+  const api = await getApi();
+  const contract = await api.query.contractsRegistry.contracts(contractId);
+  const contractUnwrap = contract.unwrapOr(null);
+  const data = handleContractData(contractUnwrap?.data);
+  const parties = (contract?.parties && contract?.parties.length > 0)
+    ? contract?.parties.map((party) => party.toString())
+    : [];
+
+  const { judgesSignaturesList, partiesSignaturesList } = await getSignaturesForContracts(contractId);
+
+  const keysArrayJudges = judgesSignaturesList.map((obj) => obj.key);
+  const keysArrayParties = partiesSignaturesList.map((obj) => obj.key);
+
+  return {
+    contractId: contractId.toString(),
+    data,
+    parties,
+    creator: contractUnwrap?.creator.toString(),
+    deposit: contractUnwrap?.deposit.toString(),
+    judgesSignaturesList: keysArrayJudges,
+    partiesSignaturesList: keysArrayParties,
+  };
+};
+
+const getAllContracts = async () => {
+  const api = await getApi();
+  const rawContracts = await api.query.contractsRegistry.contracts.entries();
+
+  const contractPromises = rawContracts.map(async ([id, maybeContract]) => {
+    const contractId = id.args[0];
+    const contract = maybeContract.unwrapOr(null);
+    const data = handleContractData(contract?.data);
+
+    const { judgesSignaturesList, partiesSignaturesList } = await getSignaturesForContracts(contractId);
+    const parties = (contract?.parties && contract?.parties.length > 0)
+      ? contract?.parties.map((party) => party.toString())
+      : [];
+    const keysArrayJudges = judgesSignaturesList.map((obj) => obj.key);
+    const keysArrayParties = partiesSignaturesList.map((obj) => obj.key);
+    return {
+      contractId: contractId.toString(),
+      data,
+      parties,
+      creator: contract?.creator.toString(),
+      deposit: contract?.deposit.toString(),
+      judgesSignaturesList: keysArrayJudges,
+      partiesSignaturesList: keysArrayParties,
+    };
+  });
+
+  const contracts = await Promise.all(contractPromises);
+
+  return contracts;
+};
+
+const signContractAsParty = async (contractId, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.contractsRegistry.partySignContract(contractId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const signContractAsJudge = async (contractId, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.contractsRegistry.judgeSignContract(contractId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const removeContract = async (contractId, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.contractsRegistry.removeContract(contractId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getAllJudges = async () => {
+  const api = await getApi();
+  const rawJudges = await api.query.contractsRegistry.judges.entries();
+  return rawJudges.filter(([, isJudge]) => isJudge.isTrue).map(([address]) => address.args[0]);
+};
+
+const getIsUserJudges = async (walletAddress) => {
+  const api = await getApi();
+  const rawIsJudge = await api.query.contractsRegistry.judges(walletAddress);
+  return rawIsJudge.isTrue;
+};
+
+const createContract = async (data, parties, walletAddress) => {
+  const api = await getApi();
+
+  const encodedData = new TextEncoder().encode(data);
+  const compressed = pako.deflate(encodedData);
+
+  const extrinsic = api.tx.contractsRegistry.createContract(u8aToHex(compressed), parties);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getStakingData = async (walletAddress) => {
+  const api = await getApi();
+  const [stakingInfo, sessionProgress] = await Promise.all([
+    api.derive.staking?.account(walletAddress),
+    api.derive.session.progress(),
+  ]);
+
+  return { stakingInfo, sessionProgress };
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -1930,14 +2412,10 @@ export {
   getCitizenCount,
   getLandNFTMetadataJson,
   setLandNFTMetadata,
-  bridgeWithdraw,
-  bridgeSubscribe,
-  bridgeDeposit,
   getBlockEvents,
   getLlmBalances,
   getLldBalances,
   getAdditionalAssets,
-  bridgeConstants,
   batchPayoutStakers,
   getStakersRewards,
   getSessionValidators,
@@ -1995,5 +2473,29 @@ export {
   setRegisteredCompanyData,
   requestUnregisterCompanyRegistration,
   fetchPendingIdentities,
+  fetchCompanyRequests,
   getIdentitiesNames,
+  getOfficialRegistryEntries,
+  getDexPools,
+  getDexPoolsExtendData,
+  getDexReserves,
+  getSwapPriceExactTokensForTokens,
+  getSwapPriceTokensForExactTokens,
+  swapExactTokensForTokens,
+  swapTokensForExactTokens,
+  addLiquidity,
+  removeLiquidity,
+  getLiquidityWithdrawalFee,
+  getLpTokensOwnedByAddress,
+  getAllContracts,
+  signContractAsParty,
+  signContractAsJudge,
+  removeContract,
+  getAllJudges,
+  getIsUserJudges,
+  getSingleContract,
+  getAssetData,
+  createContract,
+  getSignaturesForContracts,
+  getStakingData,
 };

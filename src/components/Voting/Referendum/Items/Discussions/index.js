@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
-import truncate from '../../../../../utils/truncate';
-import { ReactComponent as CopyIcon } from '../../../../../assets/icons/copy.svg';
 import sanitizeUrlHelper from '../../../../../utils/sanitizeUrlHelper';
 import styles from '../item.module.scss';
 import { centralizedDatasType } from '../types';
 import Button from '../../../../Button/Button';
+import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 
-function DiscussionList({ centralizedDatas, handleCopyClick }) {
+function DiscussionList({ centralizedDatas }) {
   return (
     <ol>
       {centralizedDatas.map((centralizedData) => {
@@ -32,11 +31,8 @@ function DiscussionList({ centralizedDatas, handleCopyClick }) {
             (Discussion added by
             {' '}
             <span className={styles.centerItem}>
-              {truncate(centralizedData.proposerAddress, 13)}
-              <CopyIcon
-                className={styles.copyIcon}
-                name="walletAddress"
-                onClick={() => handleCopyClick(centralizedData.proposerAddress)}
+              <CopyIconWithAddress
+                address={centralizedData.proposerAddress}
               />
             </span>
             )
@@ -49,10 +45,9 @@ function DiscussionList({ centralizedDatas, handleCopyClick }) {
 
 DiscussionList.propTypes = {
   centralizedDatas: PropTypes.arrayOf(centralizedDatasType).isRequired,
-  handleCopyClick: PropTypes.func.isRequired,
 };
 
-function Discussions({ centralizedDatas, handleCopyClick }) {
+function Discussions({ centralizedDatas }) {
   const [isDiscussionsHidden, setIsDiscussionsHidden] = useState(true);
   return (
     <div className={styles.greyWrapper}>
@@ -61,14 +56,12 @@ function Discussions({ centralizedDatas, handleCopyClick }) {
         <div className={cx(!isDiscussionsHidden && styles.none)}>
           <DiscussionList
             centralizedDatas={[centralizedDatas[0]]}
-            handleCopyClick={handleCopyClick}
             isDiscussionsHidden={isDiscussionsHidden}
           />
         </div>
         <div className={cx(isDiscussionsHidden && styles.hidden)}>
           <DiscussionList
             centralizedDatas={centralizedDatas}
-            handleCopyClick={handleCopyClick}
             isDiscussionsHidden={isDiscussionsHidden}
           />
         </div>
@@ -95,7 +88,6 @@ function Discussions({ centralizedDatas, handleCopyClick }) {
 
 Discussions.propTypes = {
   centralizedDatas: PropTypes.arrayOf(centralizedDatasType).isRequired,
-  handleCopyClick: PropTypes.func.isRequired,
 };
 
 export default Discussions;

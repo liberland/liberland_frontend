@@ -13,13 +13,15 @@ export default {
     offices: '/home/offices',
     staking: '/home/staking',
     congress: '/home/congress',
+    contracts: '/home/contracts',
+    companies: '/home/companies',
   },
   guidedSetup: '/guided-setup',
   offices: {
     identity: '/home/offices/identity',
     companyRegistry: {
       home: '/home/offices/company_registry',
-      edit: '/home/offices/company_registry/edit/:companyId'
+      edit: '/home/offices/company_registry/edit/:companyId',
     },
     landRegistry: '/home/offices/land_registry',
     finances: '/home/offices/finances',
@@ -39,20 +41,13 @@ export default {
     view: '/home/legislation/:tier',
   },
   wallet: {
+    exchange: '/home/wallet/exchange',
     allTransactions: '/home/wallet/all-transactions',
-    ethBridge: '/home/wallet/eth-bridge',
-    ethBridgeDeposit: '/home/wallet/eth-bridge/deposit',
-    ethBridgeWithdraw: '/home/wallet/eth-bridge/withdraw',
     overView: '/home/wallet/overview',
   },
   registries: {
     overview: '/home/registries/overview',
-    companies: {
-      home: '/home/registries/companies',
-      overview: '/home/registries/companies/overview',
-      create: '/home/registries/companies/create',
-      edit: '/home/registries/companies/edit/:companyId',
-    },
+    allCompanies: '/home/registries/allCompanies',
     land: '/home/registries/land',
     assets: '/home/registries/assets',
     other: '/home/registries/other',
@@ -65,6 +60,18 @@ export default {
     motions: '/home/congress/motions',
     treasury: '/home/congress/treasury',
     addLegislation: '/home/congress/add-legislation',
-    addLegislationViaReferendum: '/home/congress/add-legislation-via-referendum',
+    addLegislationViaReferendum:
+      '/home/congress/add-legislation-via-referendum',
+  },
+  contracts: {
+    overview: '/home/contracts/overview',
+    myContracts: '/home/contracts/my-contracts',
+    item: '/home/contracts/overview/browser/:id',
+  },
+  companies: {
+    home: '/home/companies',
+    create: '/home/companies/create',
+    edit: '/home/companies/edit/:companyId',
+    allCompanies: '/home/companies/allCompanies',
   },
 };

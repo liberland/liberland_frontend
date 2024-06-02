@@ -39,6 +39,10 @@
     }
   }
 
+  & .modalDescription{
+    margin-bottom: 10px;
+  }
+
   & .error {
     font-size: 16px;
     color: $errorText;
@@ -56,6 +60,13 @@
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
       font-size: 17px;
     }
+  }
+
+  & .titleFlex{
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; 
+    flex-wrap: wrap;
   }
 
   & .buttonWrapper {
@@ -167,6 +178,7 @@
 .agreeDisagree{
   .buttons{
     display: flex;
+    justify-content: space-between;
     margin-top: 20px;
   }
 }
@@ -179,4 +191,14 @@
       margin-top: 50px;
     }
   }
+}
+
+.displayNone{
+  display: none;
+}
+
+.checkbox{
+  padding-top: 10px;
+  display: flex;
+  justify-content: flex-end;
 }

@@ -48,27 +48,24 @@
 }
 
 .gridList{
-  @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    display: grid;
-    text-align: left;
-    grid-template-columns: 7fr 3fr 3fr 4fr;
-
-    @media screen and (min-width: map-get($breakpoints, 'widescreen')){
-      grid-template-columns: 10fr 3fr 3fr 4fr;
-
-      @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
-        grid-template-columns: 13fr 3fr 3fr 4fr;
-      }
+    @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+      display: grid;
+      grid-template-columns: 4fr 3fr 3fr 3fr 3fr 3fr 3fr 3fr;
     }
 
     & > *{
       text-align: left;
+      display: flex;
+      align-items: center;
+      max-width: 100px;
 
-      &:nth-child(2), &:nth-child(3), &:nth-child(4){
+      &:nth-child(n + 2){
         text-align: right;
         justify-self: flex-end;
       }
-    }
 
-  }
+      &:first-child{
+        max-width: unset;
+      }
+    }
 }

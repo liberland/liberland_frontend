@@ -10,7 +10,6 @@ import {
 } from '../../../redux/selectors';
 import {
   onBoardingActions,
-  identityActions,
   walletActions,
 } from '../../../redux/actions';
 import Button from '../../Button/Button';
@@ -37,9 +36,6 @@ function OnBoarding() {
   );
   const userName = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
-  const walletAddress = useSelector(
-    blockchainSelectors.userWalletAddressSelector,
-  );
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const identity = useSelector(identitySelectors.selectorIdentity);
   const ineligibleForComplimentaryLLDReason = useSelector(
@@ -54,10 +50,6 @@ function OnBoarding() {
   useEffect(() => {
     setIsFirstStepSkipped(isSkipOnBoarding);
   }, [isSkipOnBoarding]);
-
-  useEffect(() => {
-    dispatch(identityActions.getIdentity.call(walletAddress));
-  }, [dispatch, walletAddress]);
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());

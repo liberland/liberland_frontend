@@ -13,6 +13,7 @@ import {
   getStakingBondingDuration,
   stakingUnbond,
   stakingWithdrawUnbonded,
+  getStakingData,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 
@@ -230,6 +231,12 @@ function* withdrawUnbondedWorker() {
   yield put(validatorActions.getInfo.call());
 }
 
+function* getStakingDataWorker() {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  const { stakingInfo, sessionProgress } = yield call(getStakingData, walletAddress);
+  yield put(validatorActions.getStakingData.success({ stakingInfo, sessionProgress }));
+}
+
 // WATCHERS
 
 function* payoutWatcher() {
@@ -324,6 +331,10 @@ function* withdrawUnbondedWatcher() {
   yield* blockchainWatcher(validatorActions.withdrawUnbonded, withdrawUnbondedWorker);
 }
 
+function* getStakingDataWatcher() {
+  yield* blockchainWatcher(validatorActions.getStakingData, getStakingDataWorker);
+}
+
 export {
   payoutWatcher,
   getPendingRewardsWatcher,
@@ -341,4 +352,5 @@ export {
   getBondingDurationWatcher,
   unbondWatcher,
   withdrawUnbondedWatcher,
+  getStakingDataWatcher,
 };

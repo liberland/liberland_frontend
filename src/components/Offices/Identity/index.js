@@ -16,9 +16,8 @@ import {
 import styles from './styles.module.scss';
 import Table from '../../Table';
 import { parseLegal } from '../../../utils/identityParser';
-import { isValidSubstrateAddress } from '../../../utils/bridge';
-import {fetchPendingIdentities} from "../../../api/nodeRpcCall";
-import {parseDollars} from "../../../utils/walletHelpers";
+import { isValidSubstrateAddress } from '../../../utils/walletHelpers';
+import { fetchPendingIdentities } from '../../../api/nodeRpcCall';
 
 function IdentityForm() {
   const dispatch = useDispatch();
@@ -33,42 +32,52 @@ function IdentityForm() {
   const [pendingIdentities, setPendingIdentities] = useState([]);
 
   const doFetchPendingIdentities = async () => {
-    const pendingIdentities = await fetchPendingIdentities()
-    setPendingIdentities(pendingIdentities)
-  }
+    const fetchedPendingIdentities = await fetchPendingIdentities();
+    setPendingIdentities(fetchedPendingIdentities);
+  };
   const onSubmit = ({ account }) => {
     dispatch(officesActions.officeGetIdentity.call(account));
   };
   return (
-    <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-
+    <div>
       <div>
-        {pendingIdentities.map(pendingIdentity => {
-          return (<p>{pendingIdentity.address}</p>)
-        })}
+        {pendingIdentities.map((pendingIdentity) => (
+          <div>
+            {pendingIdentity.address}
+            <button onClick={
+              () => (dispatch(officesActions.officeGetIdentity.call(pendingIdentity.address)))
+              }
+            >
+              fetch
+            </button>
+          </div>
+        ))}
         <Button primary medium onClick={() => doFetchPendingIdentities()}>
           Fetch pending identities
         </Button>
       </div>
 
-      <div className={styles.h3}>Verify citizenship request</div>
+      <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        <div className={styles.h3}>Verify citizenship request</div>
 
-      <TextInput
-        register={register}
-        name="account"
-        placeholder="Candidate's wallet address"
-        validate={(v) => isValidSubstrateAddress(v) || 'Invalid Address'}
-        required
-      />
-      {errors?.account?.message
+        <TextInput
+          register={register}
+          name="account"
+          placeholder="Candidate's wallet address"
+          validate={(v) => isValidSubstrateAddress(v) || 'Invalid Address'}
+          required
+        />
+        {errors?.account?.message
         && <div className={styles.error}>{errors.account.message}</div>}
 
-      <div className={styles.buttonWrapper}>
-        <Button primary medium type="submit">
-          Fetch Identity data
-        </Button>
-      </div>
-    </form>
+        <div className={styles.buttonWrapper}>
+          <Button primary medium type="submit">
+            Fetch Identity data
+          </Button>
+        </div>
+      </form>
+    </div>
+
   );
 }
 
@@ -116,6 +125,9 @@ function parseEligibleOn(eligible_on) {
 }
 
 function EligibleOnAnalysis({ identity }) {
+  const blockNumber = useSelector(blockchainSelectors.blockNumber);
+  const [now] = useState(new Date());
+
   let eligible_on = identity.info.additional.find(([key, _]) => key.eq('eligible_on'));
   if (!eligible_on) {
     return (
@@ -139,8 +151,6 @@ function EligibleOnAnalysis({ identity }) {
     identity: PropTypes.instanceOf(Map).isRequired,
   };
 
-  const blockNumber = useSelector(blockchainSelectors.blockNumber);
-  const [now] = useState(new Date());
   const eligibleOnBlockNumber = parseEligibleOn(eligible_on);
   const msFromNow = (eligibleOnBlockNumber - blockNumber) * 6 * 1000;
   const eligibleOnDate = new Date(now.getTime() + msFromNow);
@@ -209,16 +219,12 @@ function TokenTable({ backendMerits, backendDollars }) {
       ]}
       data={[
         {
-          //desc: 'LLM balance',
-          desc: 'Cannot read backend LLM balance',
-          //res: backendMerits ? ethers.utils.formatUnits(backendMerits, 12) : 0,
-          res: ethers.utils.formatUnits(0, 12),
+          desc: 'LLM ICM balance',
+          res: backendMerits ? ethers.utils.formatUnits(backendMerits, 12) : 0,
         },
         {
-          //desc: 'LLD balance',
-          desc: 'Cannot read backend LLD balance',
-          //res: backendDollars ? ethers.utils.formatUnits(backendDollars, 12) : 0,
-          res: ethers.utils.formatUnits(0, 12),
+          desc: 'LLD ICM balance',
+          res: backendDollars ? ethers.utils.formatUnits(backendDollars, 12) : 0,
         },
       ]}
     />
@@ -281,40 +287,15 @@ IdentityTable.propTypes = {
 };
 
 function IdentityInfo() {
-  const dispatch = useDispatch();
   const identity = useSelector(officesSelectors.selectorIdentity);
-  const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const {
-    handleSubmit,
-    formState: { errors },
-    register,
-  } = useForm({
-    mode: 'all',
-  });
-
   if (identity.onchain === null) return null;
   if (identity.onchain.isNone) return <MissingIdentity />;
 
   const onchain = identity.onchain.unwrap();
   const { hash } = onchain.info;
 
-  //const backendMerits = identity.backend?.merits ?? 0;
-  const backendMerits = ethers.utils.parseUnits('0', 12);
-  //const backendDollars = backendMerits?.div(10);
-  const backendDollars = ethers.utils.parseUnits('0', 12);
-
-  const provideJudgementAndSendTokens = (values) => {
-    dispatch(
-      officesActions.provideJudgementAndAssets.call({
-        walletAddress: sender,
-        address: identity.address,
-        uid: identity.backend?.uid,
-        hash,
-        merits: parseDollars(values.amountLLM),
-        dollars: parseDollars(values.amountLLD),
-      }),
-    );
-  };
+  const backendMerits = identity.backend?.merits ?? 0;
+  const backendDollars = identity.backend?.dollars ?? 0;
 
   const judgements = onchain.judgements
     .filter((i) => i[0].eq(0))
@@ -334,29 +315,71 @@ function IdentityInfo() {
           {judgement}
         </div>
       </div>
-      <form onSubmit={handleSubmit(provideJudgementAndSendTokens)}>
-        <TextInput
-          register={register}
-          name="amountLLM"
-          placeholder="Amount LLM"
-          required
-        />
-        <TextInput
-          register={register}
-          name="amountLLD"
-          placeholder="Amount LLD"
-          required
-        />
-        <div className={styles.buttonWrapper}>
-          <Button primary medium type="submit">
-            Provide KnownGood judgement and transfer LLM and LLD
-          </Button>
-        </div>
-      </form>
+      <SubmitForm backendMerits={backendMerits} backendDollars={backendDollars} identity={identity} hash={hash} />
 
     </>
   );
 }
+
+function SubmitForm({
+  identity, backendMerits, backendDollars, hash,
+}) {
+  const dispatch = useDispatch();
+  const sender = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const defaultValues = {
+    amountLLM: ethers.utils.formatUnits(backendMerits, 12),
+    amountLLD: ethers.utils.formatUnits(backendDollars, 12),
+  };
+  const {
+    handleSubmit,
+    register,
+  } = useForm({
+    mode: 'all', defaultValues,
+  });
+
+  const provideJudgementAndSendTokens = (values) => {
+    dispatch(
+      officesActions.provideJudgementAndAssets.call({
+        walletAddress: sender,
+        address: identity.address,
+        id: identity.backend?.id,
+        hash,
+        merits: values.amountLLM,
+        dollars: values.amountLLD,
+      }),
+    );
+  };
+
+  return (
+    <form onSubmit={handleSubmit(provideJudgementAndSendTokens)}>
+      <TextInput
+        register={register}
+        name="amountLLM"
+        placeholder="Amount LLM"
+        required
+      />
+      <TextInput
+        register={register}
+        name="amountLLD"
+        placeholder="Amount LLD"
+        required
+      />
+      <div className={styles.buttonWrapper}>
+        <Button primary medium type="submit">
+          Provide KnownGood judgement and transfer LLM and LLD
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+SubmitForm.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  identity: PropTypes.object.isRequired,
+  backendMerits: PropTypes.instanceOf(ethers.BigNumber).isRequired,
+  backendDollars: PropTypes.instanceOf(ethers.BigNumber).isRequired,
+  hash: PropTypes.string.isRequired,
+};
 
 function Identity() {
   return (

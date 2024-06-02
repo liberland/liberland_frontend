@@ -110,7 +110,7 @@ function OnchainIdentityModal({
         placeholder="Email"
       />
       <div className={styles.error}>{errors?.email?.message || errors?.email?.message}</div>
-      <div className={styles.title}>I am or want to become a</div>
+      <div className={styles.title}>I am a</div>
       <SelectInput
         register={register}
         name="onChainIdentity"

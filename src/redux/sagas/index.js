@@ -7,10 +7,11 @@ import * as legislationSagas from './legislation';
 import * as officesSagas from './offices';
 import * as registriesSagas from './registries';
 import * as identitySagas from './identity';
-import * as bridgeSagas from './bridge';
 import * as validatorSagas from './validator';
 import * as congressSagas from './congress';
 import * as onboardingSagas from './onboarding';
+import * as dexSagas from './dex';
+import * as contractsSagas from './contracts';
 
 export default function* rootSaga() {
   yield all([
@@ -38,6 +39,7 @@ export default function* rootSaga() {
     walletSagas.unpoolWatcher(),
     walletSagas.getTransfersTxWatcher(),
     walletSagas.getAdditionalAssetsWatcher(),
+    walletSagas.getAssetsBalanceWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),
@@ -71,20 +73,12 @@ export default function* rootSaga() {
     officesSagas.setRegisteredCompanyDataWatcher(),
 
     // REGISTRIES
+    registriesSagas.getOfficialRegistryEntriesWatcher(),
     registriesSagas.getOfficialUserRegistryEntriesWatcher(),
     registriesSagas.requestCompanyRegistrationWatcher(),
     registriesSagas.requestEditCompanyRegistrationWatcher(),
     registriesSagas.cancelCompanyRequestWatcher(),
     registriesSagas.requestUnregisterCompanyRegistrationWatcher(),
-
-    // BRIDGE
-    bridgeSagas.withdrawWatcher(),
-    bridgeSagas.depositWatcher(),
-    bridgeSagas.burnWatcher(),
-    bridgeSagas.monitorBurnWatcher(),
-    bridgeSagas.getTransfersToEthereumWatcher(),
-    bridgeSagas.getTransfersToSubstrateWatcher(),
-    bridgeSagas.getBridgesConstantsWatcher(),
 
     // VALIDATOR
     validatorSagas.payoutWatcher(),
@@ -103,6 +97,7 @@ export default function* rootSaga() {
     validatorSagas.getBondingDurationWatcher(),
     validatorSagas.unbondWatcher(),
     validatorSagas.withdrawUnbondedWatcher(),
+    validatorSagas.getStakingDataWatcher(),
 
     // CONGRESS
     congressSagas.applyForCongressWatcher(),
@@ -130,5 +125,24 @@ export default function* rootSaga() {
     // ONBOARDING
     onboardingSagas.claimComplimentaryLLDWatcher(),
     onboardingSagas.getIsEligibleForComplimentaryLLDWatcher(),
+
+    // DEX
+    dexSagas.getPoolsWatcher(),
+    dexSagas.addLiquidityWatcher(),
+    dexSagas.swapExactTokensForTokensWatcher(),
+    dexSagas.swapTokensForExactTokensWatcher(),
+    dexSagas.getDexReservesWatcher(),
+    dexSagas.removeLiquiditWatcher(),
+    dexSagas.getWithdrawalFeeWatcher(),
+
+    // CONTRACTS
+    contractsSagas.getContractsWorkerWatcher(),
+    contractsSagas.signContractAsPartyWatcher(),
+    contractsSagas.signContractAsJudgeWatcher(),
+    contractsSagas.removeContractWatcher(),
+    contractsSagas.getMyContractsWatcher(),
+    contractsSagas.getSingleContractWatcher(),
+    contractsSagas.createContractWatcher(),
+    contractsSagas.getSignaturesForContractsWatcher(),
   ]);
 }

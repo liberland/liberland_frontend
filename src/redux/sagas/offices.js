@@ -19,20 +19,22 @@ import { officesActions } from '../actions';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors } from '../selectors';
 import router from '../../router';
-
+import * as backend from '../../api/backend'
+import {addDollarsTransaction} from "../../api/backend";
+import {parseDollars, parseMerits} from "../../utils/walletHelpers";
+import {BN_ZERO} from "@polkadot/util";
 // WORKERS
 
 function* getIdentityWorker(action) {
   try {
     const onchain = yield call(getIdentity, action.payload);
-    /* const backendUsers = yield call(backend.getUsersByAddress, action.payload);
+    const backendUsers = yield call(backend.getUsersByAddress, action.payload);
     if (backendUsers.length > 1) {
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
       yield put(blockchainActions.setError.success({ details: 'More than one user has the same address?' }));
       return;
     }
-    yield put(officesActions.officeGetIdentity.success({ onchain, backend: backendUsers[0] })); */
-    yield put(officesActions.officeGetIdentity.success({ onchain, backend: {} }));
+    yield put(officesActions.officeGetIdentity.success({ onchain, backend: backendUsers[0] }));
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -41,9 +43,30 @@ function* getIdentityWorker(action) {
 }
 
 function* provideJudgementAndAssetsWorker(action) {
+
+  if ((parseMerits(action.payload.merits)?.gt(BN_ZERO) || parseDollars(action.payload.dollars)?.gt(BN_ZERO))
+    && !action.payload.id) {
+    throw new Error('Tried to transfer LLD or LLM but we have no user id!');
+  }
   yield call(provideJudgementAndAssets, action.payload);
   yield put(officesActions.provideJudgementAndAssets.success());
   yield put(officesActions.officeGetIdentity.call(action.payload.address));
+
+  if (parseMerits(action.payload.merits)?.gt(BN_ZERO)) {
+    try {
+      yield call(backend.addMeritTransaction, action.payload.id, action.payload.merits * -1);
+    } catch (e) {
+      throw new Error(e.response.data.error.message);
+    }
+  }
+
+  if (parseDollars(action.payload.dollars)?.gt(BN_ZERO)) {
+    try {
+      yield call(backend.addDollarsTransaction, action.payload.id, action.payload.dollars * -1);
+    } catch (e) {
+      throw new Error(e.response.data.error.message);
+    }
+  }
 }
 
 function* getCompanyRequestWorker(action) {

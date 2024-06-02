@@ -184,17 +184,12 @@ function ReferendumItem({
       .div(yayVotes.add(nayVotes)).toString()}%`
     : '0%';
   const notificationRef = useRef();
-  const handleCopyClick = (dataToCoppy) => {
-    navigator.clipboard.writeText(dataToCoppy);
-    notificationRef.current.addSuccess({ text: 'Address was copied' });
-  };
 
   return (
     <>
       <NotificationPortal ref={notificationRef} />
       <div className={styles.itemWrapper}>
         <Header
-          handleCopyClick={handleCopyClick}
           hash={hash}
           setIsHidden={setIsReferendumHidden}
           isHidden={isReferendumHidden}
@@ -243,7 +238,7 @@ function ReferendumItem({
             <div className={styles.discussionMetaLine}>
               {centralizedDatas?.length > 0
               && (
-                <Discussions centralizedDatas={centralizedDatas} handleCopyClick={handleCopyClick} />
+                <Discussions centralizedDatas={centralizedDatas} />
               )}
             </div>
 

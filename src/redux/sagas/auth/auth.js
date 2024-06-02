@@ -18,6 +18,8 @@ function* verifySessionWorker() {
       // stored token is valid
       // FIXME we should have to do it here, refactor stuff to fetch it separately
       user.role = yield call(getUserRoleRpc, user.blockchainAddress);
+      const userBlockchainAdressStorage = yield localStorage.getItem('BlockchainAdress');
+      yield put(blockchainActions.setUserWallet.success(userBlockchainAdressStorage || user.blockchainAddress));
       yield put(authActions.verifySession.success(user));
       return;
     } catch (e) {

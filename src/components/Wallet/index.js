@@ -13,11 +13,11 @@ import styles from './styles.module.scss';
 import stylesPage from '../../utils/pagesBase.module.scss';
 import WalletOverview from './WalletOverview';
 import WalletTransactionHistory from './WalletTransactionHistory';
-import Bridge from './Bridge';
 
 import Card from '../Card';
 import RoleHOC from '../../hocs/RoleHOC';
 import AssetOverview from './AssetOverview';
+import Exchange from './Exchange';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -29,7 +29,6 @@ function Wallet() {
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const dispatch = useDispatch();
   const history = useHistory();
-
   const redirectToViewAllTx = () => {
     history.push(router.wallet.allTransactions);
   };
@@ -38,7 +37,7 @@ function Wallet() {
     dispatch(walletActions.getWallet.call());
     dispatch(walletActions.getAdditionalAssets.call());
     dispatch(walletActions.getTxTransfers.call());
-  }, [dispatch]);
+  }, [dispatch, userWalletAddress]);
 
   const overView = () => (
     <div className={stylesPage.contentWrapper}>
@@ -72,12 +71,12 @@ function Wallet() {
         <div>
           <Switch>
             <Route
-              path={router.wallet.ethBridge}
-              component={Bridge}
-            />
-            <Route
               path={router.wallet.overView}
               component={overView}
+            />
+            <Route
+              path={router.wallet.exchange}
+              component={Exchange}
             />
             <Route
               exact

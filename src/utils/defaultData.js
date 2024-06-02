@@ -57,13 +57,6 @@ export const newCompanyDataObject = {
       encryptable: false
     },
     {
-      key: "history",
-      name: 'History',
-      display: 'History of transfer of shares',
-      type: 'text',
-      encryptable: false
-    },
-    {
       key: "registryAllowedToEdit",
       name: 'Registry allowed to edit',
       display: 'Allow registry to edit details on-chain. Required for registration',
@@ -160,7 +153,7 @@ export const newCompanyDataObject = {
         },
         {
           key: 'country',
-          display: 'Country id - make me a list',
+          display: 'Country',
           type: 'text',
           encryptable: true
         }
@@ -199,54 +192,41 @@ export const newCompanyDataObject = {
       ]
     },
     {
-      key: "statutoryOrganMembers",
-      display: 'List of statuatory organ members',
-      name: 'Statutory Organ Member',
+      key: "relevantContracts",
+      display: 'List of relevant on-chain contract ids',
+      name: 'Relevant Contracts',
       fields: [
         {
-          key: 'walletAddress',
-          display: 'Liberland wallet address',
+          key: 'contractId',
+          display: 'Contract id or link',
           type: 'text',
           encryptable: true
         },
-        {
-          key: 'name',
-          display: 'Name of statuatory organ member',
-          type: 'text',
-          encryptable: true
-        },
-        {
-          key: 'dob',
-          display: 'Date of Birth of statuatory organ member',
-          type: 'text',
-          encryptable: true
-        },
-        {
-          key: 'passportNumber',
-          display: 'Passport number of statuatory organ member',
-          type: 'text',
-          encryptable: true
-        }
       ],
       data: [
         [{
-          key: 'walletAddress',
-          display: 'Liberland wallet address',
+          key: 'contractId',
+          display: 'Contract id or link',
           isEncrypted: false
-        },
+        }]
+      ]
+    },
+    {
+      key: "relevantAssets",
+      display: 'List of relevant on-chain asset ids',
+      name: 'Relevant Assets',
+      fields: [
         {
-          key: 'name',
-          display: 'Name of statuatory organ member',
-          isEncrypted: false
+          key: 'assetId',
+          display: 'Asset id',
+          type: 'text',
+          encryptable: true
         },
-        {
-          key: 'dob',
-          display: 'Date of Birth of statuatory organ member',
-          isEncrypted: false
-        },
-        {
-          key: 'passportNumber',
-          display: 'Passport number of statuatory organ member',
+      ],
+      data: [
+        [{
+          key: 'assetId',
+          display: 'Asset id',
           isEncrypted: false
         }]
       ]

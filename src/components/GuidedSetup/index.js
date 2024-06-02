@@ -15,8 +15,9 @@ import NoWalletsDetectedInBrowser from './NoWalletsDetectedInBrowser';
 import NoConnectedWalletComponent from './NoConnectedWalletComponent';
 import MissingWalletComponent from './MissingWalletComponent';
 import OnBoarding from './OnBording';
-import { onBoardingActions } from '../../redux/actions';
-import {parseIdentityData, parseLegal} from "../../utils/identityParser";
+import { identityActions, onBoardingActions } from '../../redux/actions';
+import InstructionOnBoard from './OnBording/InstructionOnBoard';
+import { parseIdentityData, parseLegal } from '../../utils/identityParser';
 
 const useIsUnsupportedBrowser = () => {
   const [isBrave, setIsBrave] = useState(null);
@@ -56,6 +57,7 @@ function GuidedSetup({ children }) {
   );
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
   const isLoadingUser = useSelector(userSelectors.selectIsLoading);
+  const isResident = useSelector(onboardingSelectors.selectorIsResident);
 
   const isLoading = !isSessionReady
     || isLoadingUser
@@ -68,29 +70,38 @@ function GuidedSetup({ children }) {
     setAcceptedBrowser(true);
   };
 
+  const isSkippedOnBoardingGetLLD = sessionStorage.getItem('SkippedOnBoardingGetLLD');
+  const notResidentAcceptedByUser = sessionStorage.getItem('notResidentAcceptedByUser');
+  const userHasIdentity = localStorage.getItem('userHasIdentity');
   const [isIdentityEmpty, setIsIdentityEmpty] = useState(true);
   const identityData = useSelector(identitySelectors.selectorIdentity);
-
-  const isSkippedOnBoardingGetLLD = sessionStorage.getItem(
-    'SkippedOnBoardingGetLLD',
+  const walletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
   );
 
   useEffect(() => {
     if (identityData?.isSome) {
       const identity = identityData.unwrap();
       const { info } = identity;
-      setIsIdentityEmpty(
-        !parseIdentityData(info?.display)
-        && !parseLegal(info)
-        && !parseIdentityData(info?.web)
-        && !parseIdentityData(info?.email)
-      );
+      const identityIsEmpty = !parseIdentityData(info?.display)
+      && !parseLegal(info)
+      && !parseIdentityData(info?.web)
+      && !parseIdentityData(info?.email);
+      setIsIdentityEmpty(identityIsEmpty);
+      if (!identityIsEmpty) {
+        localStorage.setItem('userHasIdentity', true);
+      }
     }
   }, [identityData]);
 
   useEffect(() => {
+    dispatch(identityActions.getIdentity.call(walletAddress));
+  }, [dispatch, walletAddress]);
+
+  useEffect(() => {
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
   }, [dispatch, liquidDollars]);
+
   if (isLoading) {
     return (
       <GuidedSetupWrapper>
@@ -125,6 +136,22 @@ function GuidedSetup({ children }) {
       </GuidedSetupWrapper>
     );
   }
+  if (!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true') {
+    return (
+      <GuidedSetupWrapper>
+        <InstructionOnBoard />
+      </GuidedSetupWrapper>
+    );
+  }
+
+  if ((isUserEligibleForComplimentaryLLD && isSkippedOnBoardingGetLLD !== 'true' && userHasIdentity !== 'true')
+  || isSkippedOnBoardingGetLLD === 'secondStep') {
+    return (
+      <GuidedSetupWrapper>
+        <OnBoarding />
+      </GuidedSetupWrapper>
+    );
+  }
 
   if (!wallets.map((w) => w.address).includes(userWalletAddress)) {
     return (
@@ -138,7 +165,7 @@ function GuidedSetup({ children }) {
     (isUserEligibleForComplimentaryLLD
       || isIdentityEmpty
       || isSkippedOnBoardingGetLLD === 'secondStep')
-    && isSkippedOnBoardingGetLLD !== 'true'
+    && isSkippedOnBoardingGetLLD !== 'true' && userHasIdentity !== 'true'
   ) {
     return (
       <GuidedSetupWrapper>

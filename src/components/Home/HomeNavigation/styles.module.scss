@@ -74,5 +74,24 @@
   background: #F4F8FF;
   .navigationContent {
     padding: 0;
+    max-height: calc(100vh - 60px);
+    overflow: auto;
+  }
+}
+
+.buttonSwtichWalletWrapper{
+  margin: 5px 6.5% 5px 6.5%;
+  
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    margin: 10px 0 0 0;
+  }
+
+  .buttonSwtichWallet{
+    min-height: 51px;
+    width: 100%;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      min-height: 53px;
+    }
   }
 }
