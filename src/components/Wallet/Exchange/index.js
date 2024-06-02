@@ -9,6 +9,15 @@ function Exchange() {
   return (
     <div className={stylesPage.contentWrapper}>
       <div className={stylesPage.sectionWrapper}>
+        <Card className={cx(stylesPage.overviewWrapper, styles.cardWrapper)} title="Info">
+          <p>
+            Liberland DEX uses alghoritmic market making which may not always be up to date with other exchanges.
+            Arbitrage is possible.
+            <br />
+            <a href="https://liberland-1.gitbook.io/wiki/v/public-documents/blockchain/ecosystem/liberland-decentralized-exchange">Learn more</a>
+          </p>
+        </Card>
+        <br />
         <Card className={cx(stylesPage.overviewWrapper, styles.cardWrapper)} title="Overview">
           <ExchangeList />
         </Card>
