@@ -13,6 +13,7 @@ import { convertAssetData } from '../utils/dexFormatter';
 import { parseDollars, parseMerits } from '../utils/walletHelpers';
 import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
+import identityJudgementEnums from "../constants/identityJudgementEnums";
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -337,14 +338,14 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
 };
 
 const provideJudgementAndAssets = async ({
-  address, hash, walletAddress, merits, dollars,
+  address, hash, walletAddress, merits, dollars, judgementType= identityJudgementEnums.KNOWNGOOD
 }) => {
   const parsedMerits = parseMerits(merits);
   const parsedDollars = parseDollars(dollars);
   const api = await getApi();
   const calls = [];
 
-  const judgement = api.createType('IdentityJudgement', 'KnownGood');
+  const judgement = api.createType('IdentityJudgement', judgementType);
   const judgementCall = api.tx.identity.provideJudgement(0, address, judgement, hash);
   const officeJudgementCall = api.tx.identityOffice.execute(judgementCall);
   calls.push(officeJudgementCall);
