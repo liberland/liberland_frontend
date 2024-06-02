@@ -18,6 +18,7 @@ import Table from '../../Table';
 import { parseLegal } from '../../../utils/identityParser';
 import { isValidSubstrateAddress } from '../../../utils/walletHelpers';
 import { fetchPendingIdentities } from '../../../api/nodeRpcCall';
+import identityJudgementEnums from "../../../constants/identityJudgementEnums";
 
 function IdentityForm() {
   const dispatch = useDispatch();
@@ -346,6 +347,20 @@ function SubmitForm({
         hash,
         merits: values.amountLLM,
         dollars: values.amountLLD,
+        judgementType: identityJudgementEnums.KNOWNGOOD
+      }),
+    );
+  };
+  const provideLowQualityJudgement = () => {
+    dispatch(
+      officesActions.provideJudgementAndAssets.call({
+        walletAddress: sender,
+        address: identity.address,
+        id: identity.backend?.id,
+        hash,
+        merits: '0',
+        dollars: '0',
+        judgementType: identityJudgementEnums.LOWQUALITY
       }),
     );
   };
@@ -366,7 +381,10 @@ function SubmitForm({
       />
       <div className={styles.buttonWrapper}>
         <Button primary medium type="submit">
-          Provide KnownGood judgement and transfer LLM and LLD
+          Provide KnownGood judgement and transfer staked LLM and liquid LLD
+        </Button>
+        <Button primary medium onClick={() => {provideLowQualityJudgement()}}>
+          Provide LowQuality judgement
         </Button>
       </div>
     </form>
