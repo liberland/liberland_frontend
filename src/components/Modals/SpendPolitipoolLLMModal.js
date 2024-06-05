@@ -14,7 +14,7 @@ import InputSearch from '../InputComponents/InputSearchAddressName';
 import styles from './styles.module.scss';
 import { congressActions } from '../../redux/actions';
 import { parseMerits, valueToBN, isValidSubstrateAddress } from '../../utils/walletHelpers';
-import { walletSelectors } from '../../redux/selectors';
+import { congressSelectors } from '../../redux/selectors';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 
@@ -22,7 +22,7 @@ function SpendPolitipoolLLMModal({
   closeModal,
 }) {
   const dispatch = useDispatch();
-  const balances = useSelector(walletSelectors.selectorBalances);
+  const balances = useSelector(congressSelectors.selectorBalances);
   const balance = valueToBN(balances?.liquidMerits?.amount ?? 0);
 
   const {

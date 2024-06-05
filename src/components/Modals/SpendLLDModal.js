@@ -15,13 +15,13 @@ import InputSearch from '../InputComponents/InputSearchAddressName';
 import styles from './styles.module.scss';
 import { parseDollars, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import { congressActions } from '../../redux/actions';
-import { walletSelectors } from '../../redux/selectors';
+import { congressSelectors } from '../../redux/selectors';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 
 function SpendLLDModal({ closeModal }) {
   const dispatch = useDispatch();
-  const balances = useSelector(walletSelectors.selectorBalances);
+  const balances = useSelector(congressSelectors.selectorBalances);
   const balance = new BN(balances?.liquidAmount?.amount ?? 0);
 
   const {
