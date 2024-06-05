@@ -35,11 +35,11 @@ export default function Wallet() {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(congressActions.getWallet.call());
+    dispatch(congressActions.congressGetWallet.call());
   }, [dispatch, pallets]);
 
   useEffect(() => {
-    dispatch(congressActions.getAdditionalAssets.call());
+    dispatch(congressActions.congressGetAdditionalAssets.call());
   }, [dispatch, congresAccountAddress]);
 
   if (!congresAccountAddress) return null;
@@ -75,11 +75,11 @@ export default function Wallet() {
             styles.walletButtonsWrapper,
           )}
         >
-          <Button small secondary className={walletStyles.button} onClick={toggleModalPolitipoolLLMSpendOpen}>
+          <Button small primary className={walletStyles.button} onClick={toggleModalPolitipoolLLMSpendOpen}>
             <div className={walletStyles.icon}>
               <GraphIcon />
             </div>
-            SPEND POLITIPOOLED LLM
+            SPEND LLM (POLITIPOOL)
           </Button>
           <Button small primary className={walletStyles.button} onClick={toggleModalLLMSpendOpen}>
             <div className={walletStyles.icon}>
@@ -100,6 +100,7 @@ export default function Wallet() {
         totalBalance={totalBalance}
         balances={balances}
         liquidMerits={liquidMerits}
+        showStaked={false}
       />
       <AssetOverview
         additionalAssets={additionalAssets}

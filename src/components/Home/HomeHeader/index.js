@@ -23,6 +23,7 @@ function HomeHeader() {
     [router.home.wallet]: 'Wallet',
   };
   const location = useLocation();
+
   // const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   return titles[location.pathname] ? (
     <div className={styles.homeHeaderWrapper}>

@@ -50,20 +50,20 @@ function* getWalletWorker() {
   const pallets = yield select(officesSelectors.selectorPallets);
 
   if (!pallets) {
-    yield put(congressActions.getWallet.failure());
+    yield put(congressActions.congressGetWallet.failure());
     return;
   }
 
   const { palletId } = pallets.find((e) => e.palletName === codeName);
   const walletAddress = palletIdToAddress(palletId);
   const balances = yield call(getBalanceByAddress, walletAddress);
-  yield put(congressActions.getWallet.success({ balances, walletAddress }));
+  yield put(congressActions.congressGetWallet.success({ balances, walletAddress }));
 }
 
 function* getAdditionalAssetsWorker() {
   const congressWalletAddress = yield select(congressSelectors.walletAddress);
   if (!congressWalletAddress) {
-    yield put(congressActions.getAdditionalAssets.failure());
+    yield put(congressActions.congressGetAdditionalAssets.failure());
     return;
   }
 
@@ -71,7 +71,7 @@ function* getAdditionalAssetsWorker() {
     getAdditionalAssets,
     congressWalletAddress,
   );
-  yield put(congressActions.getAdditionalAssets.success(additionalAssets));
+  yield put(congressActions.congressGetAdditionalAssets.success(additionalAssets));
 }
 
 function* applyForCongressWorker() {
@@ -105,109 +105,73 @@ function* voteAtMotionsWorker(action) {
 
 function* congressSendLlmWorker({
   payload: {
-    transferToAddress, transferAmount, remarkInfo, spendDelay,
+    transferToAddress, transferAmount, remarkInfo, executionBlock,
   },
 }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const blockNumber = yield select(
-    blockchainSelectors.blockNumber,
-  );
-  const motionDurationInDays = yield select(
-    congressSelectors.motionDurationInDays,
-  );
-  const minSpendDelayInDays = yield select(congressSelectors.minSpendDelayInDays);
   yield call(congressSendLlm, {
     walletAddress,
     transferToAddress,
     transferAmount,
-    blockNumber,
     remarkInfo,
-    spendDelay: spendDelay || minSpendDelayInDays,
-    motionDurationInDays,
+    executionBlock,
   });
   yield put(congressActions.congressSendLlm.success());
 }
 
 function* congressSendLldWorker({
   payload: {
-    transferToAddress, transferAmount, remarkInfo, spendDelay,
+    transferToAddress, transferAmount, remarkInfo, executionBlock,
   },
 }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const blockNumber = yield select(
-    blockchainSelectors.blockNumber,
-  );
-  const motionDurationInDays = yield select(
-    congressSelectors.motionDurationInDays,
-  );
-  const minSpendDelayInDays = yield select(congressSelectors.minSpendDelayInDays);
   yield call(congressSendLld, {
     walletAddress,
     transferToAddress,
     transferAmount,
-    blockNumber,
     remarkInfo,
-    spendDelay: spendDelay || minSpendDelayInDays,
-    motionDurationInDays,
+    executionBlock,
   });
   yield put(congressActions.congressSendLld.success());
 }
 
 function* congressSendAssetsTransfer({
   payload: {
-    transferToAddress, transferAmount, assetData, remarkInfo, spendDelay,
+    transferToAddress, transferAmount, assetData, remarkInfo, executionBlock,
   },
 }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const blockNumber = yield select(
-    blockchainSelectors.blockNumber,
-  );
-  const motionDurationInDays = yield select(
-    congressSelectors.motionDurationInDays,
-  );
-  const minSpendDelayInDays = yield select(congressSelectors.minSpendDelayInDays);
   yield call(congressSendAssets, {
     walletAddress,
     transferToAddress,
     transferAmount,
     assetData,
-    blockNumber,
     remarkInfo,
-    spendDelay: spendDelay || minSpendDelayInDays,
-    motionDurationInDays,
+    executionBlock,
   });
   yield put(congressActions.congressSendAssets.success());
 }
 
 function* congressSendLlmToPolitipoolWorker({
   payload: {
-    transferToAddress, transferAmount, remarkInfo, spendDelay,
+    transferToAddress, transferAmount, remarkInfo, executionBlock,
   },
 }) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const blockNumber = yield select(
-    blockchainSelectors.blockNumber,
-  );
-  const motionDurationInDays = yield select(
-    congressSelectors.motionDurationInDays,
-  );
-  const minSpendDelayInDays = yield select(congressSelectors.minSpendDelayInDays);
   yield call(congressSendLlmToPolitipool, {
     walletAddress,
     transferToAddress,
     transferAmount,
-    blockNumber,
     remarkInfo,
-    spendDelay: spendDelay || minSpendDelayInDays,
-    motionDurationInDays,
+    executionBlock,
   });
   yield put(congressActions.congressSendLlmToPolitipool.success());
 }
@@ -618,12 +582,12 @@ export function* congressAmendLegislationViaReferendumWatcher() {
 }
 
 export function* getWalletWatcher() {
-  yield* blockchainWatcher(congressActions.getWallet, getWalletWorker);
+  yield* blockchainWatcher(congressActions.congressGetWallet, getWalletWorker);
 }
 
 export function* getAdditionalAssetsWatcher() {
   yield* blockchainWatcher(
-    congressActions.getAdditionalAssets,
+    congressActions.congressGetAdditionalAssets,
     getAdditionalAssetsWorker,
   );
 }

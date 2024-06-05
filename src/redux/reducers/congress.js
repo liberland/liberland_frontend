@@ -4,7 +4,7 @@ import { congressActions } from '../actions';
 
 const initialState = {
   codeName: 'councilAccount',
-  congressWalletInfo: {
+  walletInfo: {
     balances: {
       liberstake: {
         amount: BN_ZERO,
@@ -38,8 +38,6 @@ const initialState = {
     budget: BN_ZERO,
     period: BN_ZERO,
   },
-  motionDurationInDays: 7,
-  minSpendDelayInDays: 5,
 };
 
 const congressReducer = handleActions(
@@ -117,11 +115,11 @@ const congressReducer = handleActions(
       ...state,
       treasury: action.payload,
     }),
-    [congressActions.getWallet.success]: (state, action) => ({
+    [congressActions.congressGetWallet.success]: (state, action) => ({
       ...state,
       walletInfo: action.payload,
     }),
-    [congressActions.getAdditionalAssets.success]: (state, action) => ({
+    [congressActions.congressGetAdditionalAssets.success]: (state, action) => ({
       ...state,
       additionalAssets: action.payload,
     }),

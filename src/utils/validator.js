@@ -1,5 +1,5 @@
 import { BN_ZERO } from '@polkadot/util';
-import { parseMerits } from './walletHelpers';
+import { parseMerits, parseDollars } from './walletHelpers';
 
 export default class Validator {
   static email() {
@@ -14,11 +14,24 @@ export default class Validator {
     return /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
   }
 
-  static validateUnbondValue(maxUnbond, textUnbondValue) {
+  static validateValue(maxValue, value) {
+    if (value.gt(maxValue) || value.lte(BN_ZERO)) return 'Invalid amount';
+    return true;
+  }
+
+  static validateMeritsValue(maxValue, textValue) {
     try {
-      const unbondValue = parseMerits(textUnbondValue);
-      if (unbondValue.gt(maxUnbond) || unbondValue.lte(BN_ZERO)) return 'Invalid amount';
-      return true;
+      const value = parseMerits(textValue);
+      return Validator.validateValue(maxValue, value);
+    } catch (e) {
+      return 'Invalid amount';
+    }
+  }
+
+  static validateDollarsValue(maxValue, textValue) {
+    try {
+      const value = parseDollars(textValue);
+      return Validator.validateValue(maxValue, value);
     } catch (e) {
       return 'Invalid amount';
     }

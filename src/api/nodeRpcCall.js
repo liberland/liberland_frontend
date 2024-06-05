@@ -13,7 +13,7 @@ import { convertAssetData } from '../utils/dexFormatter';
 import { parseDollars, parseMerits } from '../utils/walletHelpers';
 import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
-import identityJudgementEnums from "../constants/identityJudgementEnums";
+import identityJudgementEnums from '../constants/identityJudgementEnums';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -338,7 +338,7 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
 };
 
 const provideJudgementAndAssets = async ({
-  address, hash, walletAddress, merits, dollars, judgementType= identityJudgementEnums.KNOWNGOOD
+  address, hash, walletAddress, merits, dollars, judgementType = identityJudgementEnums.KNOWNGOOD,
 }) => {
   const parsedMerits = parseMerits(merits);
   const parsedDollars = parseDollars(dollars);
@@ -1391,21 +1391,15 @@ const createProposalAndVote = async (threshold, proposalContent, vote) => {
 };
 
 const congressProposeSpend = async ({
-  walletAddress, blockNumber, spendProposal, remarkInfo, spendDelay, motionDurationInDays,
+  walletAddress, spendProposal, remarkInfo, executionBlock,
 }) => {
-  if (spendDelay < 5) {
-    throw Error('Min spend delay is 5 days');
-  }
   const api = await getApi();
 
   const threshold = await congressMajorityThreshold();
   const remark = api.tx.llm.remark(remarkInfo);
   const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
-  const dayToBlocks = (24 * 60 * 60) / 6;
-  const motionDuration = motionDurationInDays * dayToBlocks;
 
-  const transferAtBlock = blockNumber + (spendDelay * dayToBlocks) + motionDuration;
-  const executeProposal = api.tx.scheduler.schedule(transferAtBlock, null, 0, transferAndRemark);
+  const executeProposal = api.tx.scheduler.schedule(executionBlock, null, 0, transferAndRemark);
   const proposal = api.tx.councilAccount.execute(executeProposal);
 
   const extrinsics = await createProposalAndVote(threshold, proposal, true);
@@ -1414,35 +1408,35 @@ const congressProposeSpend = async ({
 };
 
 const congressSendLlm = async ({
-  walletAddress, transferToAddress, transferAmount, blockNumber, remarkInfo, spendDelay, motionDurationInDays,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
 
   return congressProposeSpend({
-    walletAddress, spendProposal, blockNumber, remarkInfo, spendDelay, motionDurationInDays,
+    walletAddress, spendProposal, remarkInfo, executionBlock,
   });
 };
 
 const congressSendLld = async ({
-  walletAddress, transferToAddress, transferAmount, blockNumber, remarkInfo, spendDelay, motionDurationInDays,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.balances.transfer(transferToAddress, transferAmount);
 
   return congressProposeSpend({
-    walletAddress, spendProposal, blockNumber, remarkInfo, spendDelay, motionDurationInDays,
+    walletAddress, spendProposal, remarkInfo, executionBlock,
   });
 };
 
 const congressSendLlmToPolitipool = async ({
-  walletAddress, transferToAddress, transferAmount, blockNumber, remarkInfo, motionDurationInDays,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock,
 }) => {
   const api = await getApi();
 
   const spendProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
   return congressProposeSpend({
-    walletAddress, spendProposal, blockNumber, remarkInfo, motionDurationInDays,
+    walletAddress, spendProposal, remarkInfo, executionBlock,
   });
 };
 
@@ -1450,17 +1444,15 @@ const congressSendAssets = async ({
   walletAddress,
   transferToAddress,
   transferAmount,
-  blockNumber,
   assetData,
   remarkInfo,
-  spendDelay,
-  motionDurationInDays,
+  executionBlock,
 }) => {
   const api = await getApi();
 
   const spendProposal = api.tx.assets.transfer(parseInt(assetData.index), transferToAddress, transferAmount);
   return congressProposeSpend({
-    walletAddress, spendProposal, blockNumber, remarkInfo, spendDelay, motionDurationInDays,
+    walletAddress, spendProposal, remarkInfo, executionBlock,
   });
 };
 

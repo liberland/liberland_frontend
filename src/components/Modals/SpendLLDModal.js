@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 
 // COMPONENTS
 import { useDispatch, useSelector } from 'react-redux';
-import { BN_ZERO, BN } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
@@ -15,29 +15,29 @@ import InputSearch from '../InputComponents/InputSearchAddressName';
 import styles from './styles.module.scss';
 import { parseDollars, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import { congressActions } from '../../redux/actions';
-import { walletSelectors, congressSelectors } from '../../redux/selectors';
+import { walletSelectors } from '../../redux/selectors';
 import Validator from '../../utils/validator';
+import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 
 function SpendLLDModal({ closeModal }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
-  const minSpendDelayInDays = useSelector(congressSelectors.minSpendDelayInDays);
-  const maxUnbond = BN.max(
-    BN_ZERO,
-    new BN(balances?.liquidAmount?.amount ?? 0).sub(parseDollars('2')), // leave at least 2 liquid LLD...
-  );
+  const balance = new BN(balances?.liquidAmount?.amount ?? 0);
 
   const {
     handleSubmit,
     formState: { errors },
     register,
     setValue,
+    watch,
   } = useForm({
     mode: 'all',
     defaultValues: {
-      spendDelay: minSpendDelayInDays,
+      votingDays: '7',
     },
   });
+  const votingDays = watch('votingDays');
+  const executionBlock = useCongressExecutionBlock(votingDays);
 
   const transfer = (values) => {
     dispatch(
@@ -45,7 +45,7 @@ function SpendLLDModal({ closeModal }) {
         transferToAddress: values.recipient,
         transferAmount: parseDollars(values.amount),
         remarkInfo: values.description || 'Congress spend LLD',
-        spendDelay: parseInt(values.spendDelay),
+        executionBlock,
       }),
     );
     closeModal();
@@ -82,7 +82,7 @@ function SpendLLDModal({ closeModal }) {
       <TextInput
         errorTitle="Amount LLD"
         register={register}
-        validate={(textUnbondValue) => Validator.validateUnbondValue(maxUnbond, textUnbondValue)}
+        validate={(textValue) => Validator.validateDollarsValue(balance, textValue)}
         name="amount"
         placeholder="Amount LLD"
         required
@@ -103,21 +103,27 @@ function SpendLLDModal({ closeModal }) {
       { errors?.description?.message
         && <div className={styles.error}>{errors.description.message}</div> }
 
-      <div className={styles.title}>Spend delay in days</div>
+      <div className={styles.title}>Congress voting time in days</div>
+      <div className={styles.description}>How long will it take Congress to close the motion?</div>
       <TextInput
         register={register}
-        name="spendDelay"
-        placeholder="Spend delay"
+        name="votingDays"
+        placeholder="Voting days"
         validate={((v) => {
-          if (parseInt(v) < minSpendDelayInDays) {
-            return `Minimum spend delay is ${minSpendDelayInDays} days`;
+          if (parseInt(v) < 1) {
+            return 'Must be at least 1 day';
           }
           return true;
         })}
         required
       />
-      { errors?.spendDelay?.message
-        && <div className={styles.error}>{errors.spendDelay.message}</div> }
+      <div>
+        If motion passes in time, actual transfer will execute on block
+        {executionBlock}
+        .
+      </div>
+      { errors?.votingDays?.message
+        && <div className={styles.error}>{errors.votingDays.message}</div> }
 
       <div className={styles.buttonWrapper}>
         <Button medium onClick={closeModal}>

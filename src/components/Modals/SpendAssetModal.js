@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
 // COMPONENTS
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
@@ -14,24 +14,26 @@ import styles from './styles.module.scss';
 import { parseAssets, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import { congressActions } from '../../redux/actions';
 import InputSearch from '../InputComponents/InputSearchAddressName';
-import { congressSelectors } from '../../redux/selectors';
+import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 
 // TODO add validation
 function SpendAssetModal({ closeModal, assetData }) {
   const dispatch = useDispatch();
-  const minSpendDelayInDays = useSelector(congressSelectors.minSpendDelayInDays);
 
   const {
     handleSubmit,
     formState: { errors },
     register,
     setValue,
+    watch,
   } = useForm({
     mode: 'all',
     defaultValues: {
-      spendDelay: minSpendDelayInDays,
+      votingDays: '7',
     },
   });
+  const votingDays = watch('votingDays');
+  const executionBlock = useCongressExecutionBlock(votingDays);
 
   const transfer = (values) => {
     dispatch(congressActions.congressSendAssets.call({
@@ -39,7 +41,7 @@ function SpendAssetModal({ closeModal, assetData }) {
       transferAmount: parseAssets(values.amount, assetData.metadata.decimals),
       assetData,
       remarkInfo: values.description || `Congress spend ${assetData.metadata.name} (${assetData.metadata.symbol})`,
-      spendDelay: parseInt(values.spendDelay),
+      executionBlock,
     }));
     closeModal();
   };
@@ -101,21 +103,27 @@ function SpendAssetModal({ closeModal, assetData }) {
       { errors?.description?.message
         && <div className={styles.error}>{errors.description.message}</div> }
 
-      <div className={styles.title}>Spend delay in days</div>
+      <div className={styles.title}>Congress voting time in days</div>
+      <div className={styles.description}>How long will it take Congress to close the motion?</div>
       <TextInput
         register={register}
-        name="spendDelay"
-        placeholder="Spend delay"
+        name="votingDays"
+        placeholder="Voting days"
         validate={((v) => {
-          if (parseInt(v) < minSpendDelayInDays) {
-            return `Minimum spend delay is ${minSpendDelayInDays} days`;
+          if (parseInt(v) < 1) {
+            return 'Must be at least 1 day';
           }
           return true;
         })}
         required
       />
-      { errors?.spendDelay?.message
-        && <div className={styles.error}>{errors.spendDelay.message}</div> }
+      <div>
+        If motion passes in time, actual transfer will execute on block
+        {executionBlock}
+        .
+      </div>
+      { errors?.votingDays?.message
+        && <div className={styles.error}>{errors.votingDays.message}</div> }
 
       <div className={styles.buttonWrapper}>
         <Button

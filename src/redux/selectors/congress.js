@@ -115,8 +115,3 @@ export const motionDurationInDays = createSelector(
   congressReducer,
   (reducer) => reducer.motionDurationInDays,
 );
-
-export const minSpendDelayInDays = createSelector(
-  congressReducer,
-  (reducer) => reducer.minSpendDelayInDays,
-);

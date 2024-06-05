@@ -182,7 +182,7 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
+      isAdressWalletDiffrentThanRegistered: false,
     },
   ];
 
@@ -211,7 +211,7 @@ function HomeNavigation() {
                     icon={icon}
                     path={location.pathname}
                     description={description}
-                    isDiscouraged={isDiscouraged === 'true'}
+                    isDiscouraged={isDiscouraged}
                   />
                 </RoleHOC>
               ) : null),
