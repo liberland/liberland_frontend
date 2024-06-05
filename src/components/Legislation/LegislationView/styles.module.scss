@@ -20,6 +20,8 @@
     }
 
     .legislationContent{
+        white-space: pre-wrap;
+        word-break: break-word;
         margin-top: 20px;
 
         @media screen and (min-width: map-get($breakpoints, 'tablet')){

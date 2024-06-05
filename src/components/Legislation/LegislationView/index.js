@@ -203,10 +203,12 @@ function ActionButtons({
 
 ActionButtons.propTypes = VetoStats.propTypes;
 
-const checkTextToShow = (text, isHidden, isBigScreen, isText) => {
-  if (!isText) {
+const checkTextToShow = (content, isHidden, isBigScreen) => {
+  if (!content.isSome) {
     return 'REPEALED';
   }
+
+  const text = new TextDecoder('utf-8').decode(content.unwrap());
 
   if (isHidden) {
     const maxLength = isBigScreen ? 60 : 40;
@@ -228,10 +230,9 @@ function SectionItem({
   const textButton = 'SECTION';
   const isBigScreen = useMediaQuery('(min-width: 1025px)');
   const text = useMemo(() => checkTextToShow(
-    content.unwrap().toHuman(),
+    content,
     isHidden,
     isBigScreen,
-    content.isSome,
   ), [isBigScreen, content, isHidden]);
 
   return (
@@ -343,7 +344,7 @@ function LegislationItem({
                 }, section) => (
                   <SectionItem
                     tier={tier}
-                    content={content}
+                    content={content.unwrap()}
                     id={id}
                     section={section}
                     repealProposalReferendum={{
@@ -421,7 +422,7 @@ function LegislationView() {
     dispatch(legislationActions.getCitizenCount.call());
     // required by RepealLegislationButton && CitizenProposeRepealLegislationButton
     dispatch(congressActions.getMembers.call());
-  }, [dispatch, tier, legislationActions]);
+  }, [dispatch, tier]);
 
   const legislation = useSelector(legislationSelectors.legislation);
 
