@@ -21,7 +21,7 @@ import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 
 function SpendLLDModal({ closeModal }) {
   const dispatch = useDispatch();
-  const balances = useSelector(congressSelectors.selectorBalances);
+  const balances = useSelector(congressSelectors.balances);
   const balance = new BN(balances?.liquidAmount?.amount ?? 0);
 
   const {

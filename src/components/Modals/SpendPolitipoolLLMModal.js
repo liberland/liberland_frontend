@@ -22,7 +22,7 @@ function SpendPolitipoolLLMModal({
   closeModal,
 }) {
   const dispatch = useDispatch();
-  const balances = useSelector(congressSelectors.selectorBalances);
+  const balances = useSelector(congressSelectors.balances);
   const balance = valueToBN(balances?.liquidMerits?.amount ?? 0);
 
   const {
