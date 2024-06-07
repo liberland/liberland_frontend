@@ -31,7 +31,7 @@ const selectorLiquidMeritsBalance = createSelector(
 
 const selectorLiquidDollarsBalance = createSelector(
   selectorBalances,
-  (reducer) => (reducer.liquidAmount.amount),
+  (reducer) => (reducer.liquidAmount?.amount),
 );
 
 const selectorTotalBalance = createSelector(

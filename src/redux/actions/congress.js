@@ -22,6 +22,10 @@ export const {
   renounceCandidacy,
   unapproveTreasurySpend,
   voteAtMotions,
+  congressGetWallet,
+  congressGetAdditionalAssets,
+  congressSendLld,
+  congressSendAssets,
 } = createActions({
   APPLY_FOR_CONGRESS: {
     call: undefined,
@@ -124,6 +128,26 @@ export const {
     failure: undefined,
   },
   VOTE_AT_MOTIONS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_GET_WALLET: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_GET_ADDITIONAL_ASSETS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_SEND_LLD: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_SEND_ASSETS: {
     call: undefined,
     success: undefined,
     failure: undefined,

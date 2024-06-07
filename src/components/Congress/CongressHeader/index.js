@@ -16,6 +16,10 @@ const navigationList = [
     route: `${router.congress.treasury}`,
     title: 'LLD Treasury',
   },
+  {
+    route: `${router.congress.wallet}`,
+    title: 'Congress wallet',
+  },
 ];
 
 export default function CongressHeader() {

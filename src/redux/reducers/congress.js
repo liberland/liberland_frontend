@@ -3,6 +3,31 @@ import { BN_ZERO } from '@polkadot/util';
 import { congressActions } from '../actions';
 
 const initialState = {
+  codeName: 'councilAccount',
+  walletInfo: {
+    balances: {
+      liberstake: {
+        amount: BN_ZERO,
+      },
+      polkastake: {
+        amount: 0,
+      },
+      liquidMerits: {
+        amount: 0,
+      },
+      totalAmount: {
+        amount: BN_ZERO,
+      },
+      liquidAmount: {
+        amount: BN_ZERO,
+      },
+      meritsTotalAmount: {
+        amount: 0,
+      },
+      electionLock: 0,
+    },
+  },
+  additionalAssets: [],
   candidates: [],
   loading: false,
   members: [],
@@ -89,6 +114,14 @@ const congressReducer = handleActions(
     [congressActions.getTreasuryInfo.success]: (state, action) => ({
       ...state,
       treasury: action.payload,
+    }),
+    [congressActions.congressGetWallet.success]: (state, action) => ({
+      ...state,
+      walletInfo: action.payload,
+    }),
+    [congressActions.congressGetAdditionalAssets.success]: (state, action) => ({
+      ...state,
+      additionalAssets: action.payload,
     }),
   },
   initialState,

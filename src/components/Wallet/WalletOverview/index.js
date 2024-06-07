@@ -1,54 +1,41 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ReactComponent as ArrowYellowUpIcon } from '../../../assets/icons/arrow-yellow-up.svg';
-import { ReactComponent as ArrowYellowDownIcon } from '../../../assets/icons/arrow-yellow-down.svg';
-import { ReactComponent as ArrowRedDownIcon } from '../../../assets/icons/arrow-red-down.svg';
-import { ReactComponent as ArrowRedUpIcon } from '../../../assets/icons/arrow-red-up.svg';
-import { ReactComponent as ArrowBlueDownIcon } from '../../../assets/icons/arrow-blue-down.svg';
-import { ReactComponent as ArrowBlueUpIcon } from '../../../assets/icons/arrow-blue-up.svg';
 import Card from '../../Card';
 
 import styles from './styles.module.scss';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 
 function WalletOverview({
-  balances, liquidMerits,
+  balances, liquidMerits, showStaked,
 }) {
-  const overviewInfo = [
-    {
-      amount: formatMerits(balances.liberstake.amount),
-      title: 'PolitiPooled',
-      diff: 2.4,
-      // eslint-disable-next-line no-constant-condition
-      getIcon: () => (2.4 > 0 ? <ArrowYellowUpIcon /> : <ArrowYellowDownIcon />),
-      currency: 'LLM',
-    },
-    {
-      amount: formatDollars(balances.polkastake.amount),
-      title: 'Validator Staked',
-      diff: 2.4,
-      // eslint-disable-next-line no-constant-condition
-      getIcon: () => (2.4 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
-      currency: 'LLD',
-    },
+  const overviewInfo = [];
+  if (showStaked) {
+    overviewInfo.push(...[
+      {
+        amount: formatMerits(balances.liberstake.amount),
+        title: 'PolitiPooled',
+        currency: 'LLM',
+      },
+      {
+        amount: formatDollars(balances.polkastake.amount),
+        title: 'Validator Staked',
+        currency: 'LLD',
+      },
+    ]);
+  }
+  overviewInfo.push(...[
     {
       amount: formatMerits(liquidMerits),
       title: 'Liquid',
-      diff: -0.4,
-      // eslint-disable-next-line no-constant-condition
-      getIcon: () => (-0.4 > 0 ? <ArrowBlueUpIcon /> : <ArrowBlueDownIcon />),
       currency: 'LLM',
     },
     {
       amount: formatDollars(balances.liquidAmount.amount),
       title: 'Liquid',
-      diff: -0.6,
-      // eslint-disable-next-line no-constant-condition
-      getIcon: () => (-0.6 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
       currency: 'LLD',
     },
-  ];
+  ]);
 
   return (
     <Card className={styles.overviewWrapper} title="Overview">
@@ -79,13 +66,15 @@ WalletOverview.defaultProps = {
   totalBalance: '0x0',
   balances: {},
   liquidMerits: 0,
+  showStaked: true,
 };
 
 WalletOverview.propTypes = {
   // eslint-disable-next-line
   totalBalance: PropTypes.string,
+  showStaked: PropTypes.bool,
   balances: PropTypes.shape({
-    free: PropTypes.shape({
+    liquidAmount: PropTypes.shape({
       amount: PropTypes.string,
     }),
     liberstake: PropTypes.shape({

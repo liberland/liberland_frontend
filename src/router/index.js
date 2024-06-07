@@ -62,6 +62,7 @@ export default {
     addLegislation: '/home/congress/add-legislation',
     addLegislationViaReferendum:
       '/home/congress/add-legislation-via-referendum',
+    wallet: '/home/congress/wallet',
   },
   contracts: {
     overview: '/home/contracts/overview',
