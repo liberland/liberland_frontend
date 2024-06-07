@@ -95,7 +95,7 @@ function SpendAssetModal({ closeModal, assetData }) {
       <TextInput
         register={register}
         minLength={{ value: 3, message: 'Min description length is 3 chars' }}
-        maxLength={{ value: 256, message: 'Min description length is 256 chars' }}
+        maxLength={{ value: 256, message: 'Max description length is 256 chars' }}
         name="description"
         placeholder="Spend description"
         required
