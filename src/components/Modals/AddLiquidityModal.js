@@ -114,7 +114,7 @@ function AddLiquidityModal({
     );
     const getSwapPrice = isAsset1 ? getSwapPriceExactTokensForTokens : getSwapPriceTokensForExactTokens;
 
-    const tradeData = await getSwapPrice(enum1, enum2, amount, false);
+    const tradeData = await getSwapPrice(enum1, enum2, amount);
 
     const decimalsOut = isAsset1 ? decimals2 : decimals1;
     const formatedValue = formatAssets(tradeData, decimalsOut);
