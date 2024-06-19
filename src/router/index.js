@@ -15,6 +15,7 @@ export default {
     congress: '/home/congress',
     contracts: '/home/contracts',
     companies: '/home/companies',
+    senate: '/home/senate',
   },
   guidedSetup: '/guided-setup',
   offices: {
@@ -25,6 +26,7 @@ export default {
     },
     landRegistry: '/home/offices/land_registry',
     finances: '/home/offices/finances',
+    scheduledCongressSpending: '/home/offices/scheduled-congress-spending',
   },
   documents: {
     myAccount: '/home/documents/my-account',
@@ -63,6 +65,11 @@ export default {
     addLegislationViaReferendum:
       '/home/congress/add-legislation-via-referendum',
     wallet: '/home/congress/wallet',
+  },
+  senate: {
+    motions: '/home/senate/motions',
+    scheduledCongressSpending: '/home/senate/scheduled-congress-spending',
+    wallet: '/home/senate/wallet',
   },
   contracts: {
     overview: '/home/contracts/overview',

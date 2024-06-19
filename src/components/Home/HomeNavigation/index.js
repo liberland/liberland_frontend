@@ -184,6 +184,14 @@ function HomeNavigation() {
       isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
       isAdressWalletDiffrentThanRegistered: false,
     },
+    {
+      route: router.home.senate,
+      title: 'SENATE',
+      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      icon: DocumentsIcon,
+      isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
+      isAdressWalletDiffrentThanRegistered: false,
+    },
   ];
 
   const desktopNavbar = (

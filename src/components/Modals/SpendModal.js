@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
 // COMPONENTS
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
@@ -12,18 +12,20 @@ import InputSearch from '../InputComponents/InputSearchAddressName';
 
 // STYLES
 import styles from './styles.module.scss';
-import { congressActions } from '../../redux/actions';
-import { parseMerits, valueToBN, isValidSubstrateAddress } from '../../utils/walletHelpers';
-import { congressSelectors } from '../../redux/selectors';
+import { parseMerits, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 
-function SpendPolitipoolLLMModal({
-  closeModal,
+function SpendModal({
+  closeModal, onSend, spendData, isCongress, balance,
 }) {
   const dispatch = useDispatch();
-  const balances = useSelector(congressSelectors.balances);
-  const balance = valueToBN(balances?.liquidMerits?.amount ?? 0);
+  const {
+    name, title = `Spend ${name}`,
+    description = 'You are going to create spend token proposal',
+    subtitle = 'Spend to address',
+    submitButtonText = 'Make transfer',
+  } = spendData;
 
   const {
     handleSubmit,
@@ -41,10 +43,10 @@ function SpendPolitipoolLLMModal({
   const executionBlock = useCongressExecutionBlock(votingDays);
 
   const transfer = (values) => {
-    dispatch(congressActions.congressSendLlmToPolitipool.call({
+    dispatch(onSend({
       transferToAddress: values.recipient,
       transferAmount: parseMerits(values.amount),
-      remarkInfo: values.description || 'Congress spend LLM to politipool',
+      remarkInfo: values.description || `${isCongress ? 'Congress' : 'Senate'} ${title}`,
       executionBlock,
     }));
     closeModal();
@@ -52,17 +54,19 @@ function SpendPolitipoolLLMModal({
 
   return (
     <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(transfer)}>
-      <div className={styles.h3}>Spend LLM to politipool</div>
+      <div className={styles.h3}>
+        {title}
+      </div>
       <div className={styles.description}>
-        You are going to create LLM spend proposal that will transfer LLM to recipients politipool
+        {description}
       </div>
 
-      <div className={styles.title}>Spend LLM to address&apos;s politipool</div>
+      <div className={styles.title}>{subtitle}</div>
       <InputSearch
         errorTitle="Recipient"
         register={register}
         name="recipient"
-        placeholder="Recipient's address"
+        placeholder={subtitle}
         isRequired
         setValue={setValue}
         validate={(v) => {
@@ -73,12 +77,17 @@ function SpendPolitipoolLLMModal({
       {errors?.recipient?.message
         && <div className={styles.error}>{errors.recipient.message}</div>}
 
-      <div className={styles.title}>Amount LLM</div>
+      <div className={styles.title}>
+        Amount
+        {' '}
+        {name}
+      </div>
       <TextInput
         register={register}
         validate={(textValue) => Validator.validateMeritsValue(balance, textValue)}
         name="amount"
-        placeholder="Amount LLM"
+        errorTitle="Amount"
+        placeholder={`Amount ${name}`}
         required
       />
       { errors?.amount?.message
@@ -89,6 +98,7 @@ function SpendPolitipoolLLMModal({
         register={register}
         minLength={{ value: 3, message: 'Min description length is 3 chars' }}
         maxLength={{ value: 256, message: 'Min description length is 256 chars' }}
+        errorTitle="Description"
         name="description"
         placeholder="Spend description"
         required
@@ -96,8 +106,18 @@ function SpendPolitipoolLLMModal({
       { errors?.description?.message
         && <div className={styles.error}>{errors.description.message}</div> }
 
-      <div className={styles.title}>Congress voting time in days</div>
-      <div className={styles.description}>How long will it take Congress to close the motion?</div>
+      <div className={styles.title}>
+        {isCongress ? 'Congress' : 'Senate'}
+        {' '}
+        voting time in days
+      </div>
+      <div className={styles.description}>
+        How long will it take
+        {' '}
+        {isCongress ? 'Congress' : 'Senate'}
+        {' '}
+        to close the motion?
+      </div>
       <TextInput
         register={register}
         name="votingDays"
@@ -112,6 +132,7 @@ function SpendPolitipoolLLMModal({
       />
       <div>
         If motion passes in time, actual transfer will execute on block
+        {' '}
         {executionBlock}
         .
       </div>
@@ -130,23 +151,44 @@ function SpendPolitipoolLLMModal({
           medium
           type="submit"
         >
-          Make transfer
+          {submitButtonText}
         </Button>
       </div>
     </form>
   );
 }
 
-SpendPolitipoolLLMModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+SpendModal.defaultProps = {
+  isCongress: true,
+  spendData: {
+    title: '',
+    description: '',
+    subtitle: '',
+    submitButtonText: '',
+  },
 };
 
-function SpendPolitipoolLLMModalWrapper(props) {
+SpendModal.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+  onSend: PropTypes.func.isRequired,
+  spendData: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    subtitle: PropTypes.string,
+    submitButtonText: PropTypes.string,
+  }),
+  isCongress: PropTypes.bool,
+  // eslint-disable-next-line react/forbid-prop-types
+  balance: PropTypes.object.isRequired,
+};
+
+function SpendModalWrapper(props) {
   return (
     <ModalRoot>
-      <SpendPolitipoolLLMModal {...props} />
+      <SpendModal {...props} />
     </ModalRoot>
   );
 }
 
-export default SpendPolitipoolLLMModalWrapper;
+export default SpendModalWrapper;

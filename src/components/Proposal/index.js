@@ -273,7 +273,12 @@ export function Proposal({ proposal, isDetailsHidden }) {
 
   return <Raw {...{ proposal }} />;
 }
+
+Proposal.defaultProps = {
+  isDetailsHidden: false,
+};
+
 Proposal.propTypes = {
   proposal: ProposalProp.isRequired,
-  isDetailsHidden: PropTypes.bool.isRequired,
+  isDetailsHidden: PropTypes.bool,
 };

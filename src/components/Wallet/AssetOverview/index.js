@@ -15,7 +15,7 @@ function AssetOverview({
   const handleModalCloseAssets = () => setWhichModalOpen(null);
   if (additionalAssets.length === 0) { return <div />; }
   // Show only assets that the user owns
-  let filteredAssets = additionalAssets.filter(asset => asset?.balance?.balance > 0)
+  const filteredAssets = additionalAssets.filter((asset) => asset?.balance?.balance > 0);
   return (
     <Card className={styles.assetOverviewWrapper} title="Additional assets">
       <div className={styles.assetOverViewCard}>
@@ -66,7 +66,16 @@ AssetOverview.defaultProps = {
 };
 
 AssetOverview.propTypes = {
-  additionalAssets: PropTypes.array,
+  additionalAssets: PropTypes.arrayOf(PropTypes.shape({
+    metadata: {
+      symbol: PropTypes.string,
+      name: PropTypes.string,
+      decimals: PropTypes.number,
+    },
+    balance: {
+      balance: PropTypes.number,
+    },
+  })),
 };
 
 export default AssetOverview;

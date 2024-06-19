@@ -1407,53 +1407,97 @@ const congressProposeSpend = async ({
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
-const congressSendLlm = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock,
+const createSenateProposalAndVote = async (threshold, proposalContent, vote) => {
+  const api = await getApi();
+  const proposal = api.tx.senate.propose(threshold, proposalContent, proposalContent.length);
+
+  const nextProposalIndex = await api.query.senate.proposalCount();
+  const voteAye = api.tx.senate.vote(proposalContent.method.hash, nextProposalIndex, vote);
+
+  return [proposal, voteAye];
+};
+
+const senateMajorityThreshold = async () => {
+  const api = await getApi();
+  const senateMember = await api.query.senate.members();
+  return Math.trunc(senateMember.length / 2) + 1;
+};
+
+const senateProposeSpend = async ({
+  walletAddress, spendProposal, remarkInfo, executionBlock,
+}) => {
+  const api = await getApi();
+
+  const threshold = await senateMajorityThreshold();
+  const remark = api.tx.llm.remark(remarkInfo);
+  const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
+
+  const executeProposal = api.tx.scheduler.schedule(executionBlock, null, 0, transferAndRemark);
+  const proposal = api.tx.senateAccount.execute(executeProposal);
+
+  const extrinsics = await createSenateProposalAndVote(threshold, proposal, true);
+  const extrinsic = api.tx.utility.batchAll(extrinsics);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const congressSenateSendLlm = async ({
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
+  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
 
-  return congressProposeSpend({
+  return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
   });
 };
 
-const congressSendLld = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock,
+const congressSenateSendLld = async ({
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.balances.transfer(transferToAddress, transferAmount);
+  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
 
-  return congressProposeSpend({
+  return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
   });
 };
 
-const congressSendLlmToPolitipool = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock,
+const congressSenateSendLlmToPolitipool = async ({
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
 }) => {
   const api = await getApi();
-
   const spendProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
-  return congressProposeSpend({
+  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+
+  return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
   });
 };
 
-const congressSendAssets = async ({
+const congressSenateSendAssets = async ({
   walletAddress,
   transferToAddress,
   transferAmount,
   assetData,
   remarkInfo,
   executionBlock,
+  isCongress = true,
 }) => {
   const api = await getApi();
-
   const spendProposal = api.tx.assets.transfer(parseInt(assetData.index), transferToAddress, transferAmount);
-  return congressProposeSpend({
+  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+
+  return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
   });
+};
+
+const senateVoteAtMotions = async (walletAddress, proposal, index, vote) => {
+  const api = await getApi();
+  const extrinsic = api.tx.senate.vote(proposal, index, vote);
+  return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
 const batchPayoutStakers = async (targets, walletAddress) => {
@@ -2020,9 +2064,10 @@ const decodeCall = async (bytes) => {
   return api.createType('Call', bytes);
 };
 
-const getScheduledCalls = async () => {
+const getScheduledCalls = async (getOnlyLookup = true) => {
   const api = await getApi();
   const agendaEntries = await api.query.scheduler.agenda.entries();
+
   const agendaItems = agendaEntries
     .flatMap(([key, calls]) => calls
       .map((call, idx) => ({
@@ -2034,19 +2079,19 @@ const getScheduledCalls = async () => {
       .map((item) => ({
         ...item,
         call: item.call.unwrap(),
-      })))
-    .filter((item) => item.call.call.isLookup // our FE only does lookups now
-      && item.call.maybePeriodic.isNone); // we're interested only in referendum results, so nonperiodic
+      })));
 
+  const lookupItems = agendaItems.filter((item) => item.call.call.isLookup // our FE only does lookups now
+      && item.call.maybePeriodic.isNone); // we're interested only in referendum results, so nonperiodic
   // we only want do download small preimages. fetching multi-megabyte setCode could be painful.
-  const bigAgendaItems = agendaItems.filter((item) => item.call.call.asLookup.len > 10240);
-  const smallAgendaItems = agendaItems.filter((item) => item.call.call.asLookup.len <= 10240);
+  const bigAgendaItems = lookupItems.filter((item) => item.call.call.asLookup.len > 10240);
+  const smallAgendaItems = lookupItems.filter((item) => item.call.call.asLookup.len <= 10240);
 
   const preimageIds = smallAgendaItems.map((item) => ([item.call.call.asLookup.hash_, item.call.call.asLookup.len]));
   const preimagesRaw = await api.query.preimage.preimageFor.multi(preimageIds);
   const preimages = preimagesRaw.map((raw) => (raw.isSome ? api.createType('Call', raw.unwrap()) : null));
 
-  return [
+  const lookupItemsData = [
     ...bigAgendaItems.map((item) => ({
       ...item,
       preimage: null,
@@ -2056,6 +2101,28 @@ const getScheduledCalls = async () => {
       preimage: preimages[idx],
     })),
   ];
+  if (getOnlyLookup) {
+    return { lookupItemsData };
+  }
+  const insideItems = agendaItems.filter((item) => item.call.call.isInline);
+
+  const preimagesInsideCall = insideItems.map(({ blockNumber, call, idx }) => ({
+    blockNumber,
+    asInlineCall: call.call.asInline,
+    idx,
+  }));
+
+  const preimagesInside = preimagesInsideCall.map(
+    ({ asInlineCall, blockNumber, idx }) => {
+      const proposal = api.createType('Call', asInlineCall);
+      return { proposal, blockNumber, idx };
+    },
+  );
+
+  return {
+    lookupItemsData,
+    preimagesInside,
+  };
 };
 
 const requestUnregisterCompanyRegistration = async (companyId, walletAddress) => {
@@ -2420,6 +2487,47 @@ const getStakingData = async (walletAddress) => {
   return { stakingInfo, sessionProgress };
 };
 
+const getSenateMembers = async () => {
+  const api = await getApi();
+  return api.query.senate.members();
+};
+
+const getSenateMotions = async () => {
+  const api = await getApi();
+  const proposals = await api.query.senate.proposals();
+  return Promise.all(
+    proposals.map(async (proposal) => {
+      const [proposalOf, voting] = await api.queryMulti([
+        [api.query.senate.proposalOf, proposal],
+        [api.query.senate.voting, proposal],
+      ]);
+      return {
+        proposal,
+        proposalOf,
+        voting,
+      };
+    }),
+  );
+};
+
+const senateProposeCancel = async (walletAddress, idx, executionBlock) => {
+  const api = await getApi();
+  const threshold = await senateMajorityThreshold();
+  const executeProposal = api.tx.scheduler.cancel(executionBlock, idx);
+  const extrinsics = await createSenateProposalAndVote(threshold, executeProposal, true);
+  const extrinsic = api.tx.utility.batchAll(extrinsics);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const closeSenateMotion = async (proposalHash, index, walletAddress) => {
+  const api = await getApi();
+  const proposal = await api.query.senate.proposalOf(proposalHash);
+  const { weight: weightBound } = await api.tx(proposal.unwrap()).paymentInfo(walletAddress);
+  const lengthBound = proposal.unwrap().toU8a().length;
+  const extrinsic = api.tx.senate.close(proposalHash, index, weightBound, lengthBound);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -2480,8 +2588,6 @@ export {
   stakingBondExtra,
   getMotions,
   voteAtMotions,
-  congressSendLlm,
-  congressSendLlmToPolitipool,
   stakingUnbond,
   stakingWithdrawUnbonded,
   subscribeActiveEra,
@@ -2540,6 +2646,13 @@ export {
   createContract,
   getSignaturesForContracts,
   getStakingData,
-  congressSendLld,
-  congressSendAssets,
+  congressSenateSendLlm,
+  congressSenateSendLld,
+  congressSenateSendLlmToPolitipool,
+  congressSenateSendAssets,
+  getSenateMembers,
+  getSenateMotions,
+  senateVoteAtMotions,
+  closeSenateMotion,
+  senateProposeCancel,
 };
