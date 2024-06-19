@@ -257,7 +257,7 @@ export const getHistoryTransfers = async (substrateAddress) => {
     assetsData,
   ] = await Promise.all([
     getWalletTransfers(substrateAddress),
-    getAdditionalAssets(substrateAddress, true),
+    getAdditionalAssets(substrateAddress, true, true),
   ]);
 
   const soraMinted = transferData.data?.soraMinteds?.nodes ?? [];
