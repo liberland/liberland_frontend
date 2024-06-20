@@ -44,6 +44,7 @@ export default {
     exchange: '/home/wallet/exchange',
     allTransactions: '/home/wallet/all-transactions',
     overView: '/home/wallet/overview',
+    bridge: '/home/wallet/bridge',
   },
   registries: {
     overview: '/home/registries/overview',
