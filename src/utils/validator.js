@@ -15,7 +15,8 @@ export default class Validator {
   }
 
   static validateValue(maxValue, value) {
-    if (value.gt(maxValue) || value.lte(BN_ZERO)) return 'Invalid amount';
+    if (value.gt(maxValue)) return 'Amount too high.';
+    if (value.lte(BN_ZERO)) return 'Invalid amount.';
     return true;
   }
 

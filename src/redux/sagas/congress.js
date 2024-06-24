@@ -22,8 +22,6 @@ import {
   congressProposeLegislationViaReferendum,
   congressProposeRepealLegislation,
   congressRepealLegislation,
-  congressSendLlm,
-  congressSendLlmToPolitipool,
   congressSendTreasuryLld,
   congressUnapproveTreasurySpend,
   getCongressCandidates,
@@ -37,8 +35,10 @@ import {
   voteAtMotions,
   getBalanceByAddress,
   getAdditionalAssets,
-  congressSendLld,
-  congressSendAssets,
+  congressSenateSendLlmToPolitipool,
+  congressSenateSendAssets,
+  congressSenateSendLld,
+  congressSenateSendLlm,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { daysToBlocks } from '../../utils/nodeRpcCall';
@@ -111,7 +111,7 @@ function* congressSendLlmWorker({
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  yield call(congressSendLlm, {
+  yield call(congressSenateSendLlm, {
     walletAddress,
     transferToAddress,
     transferAmount,
@@ -129,7 +129,7 @@ function* congressSendLldWorker({
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  yield call(congressSendLld, {
+  yield call(congressSenateSendLld, {
     walletAddress,
     transferToAddress,
     transferAmount,
@@ -147,7 +147,7 @@ function* congressSendAssetsTransfer({
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  yield call(congressSendAssets, {
+  yield call(congressSenateSendAssets, {
     walletAddress,
     transferToAddress,
     transferAmount,
@@ -166,7 +166,7 @@ function* congressSendLlmToPolitipoolWorker({
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  yield call(congressSendLlmToPolitipool, {
+  yield call(congressSenateSendLlmToPolitipool, {
     walletAddress,
     transferToAddress,
     transferAmount,

@@ -12,6 +12,7 @@ import * as congressSagas from './congress';
 import * as onboardingSagas from './onboarding';
 import * as dexSagas from './dex';
 import * as contractsSagas from './contracts';
+import * as senateSagas from './senate';
 
 export default function* rootSaga() {
   yield all([
@@ -148,5 +149,19 @@ export default function* rootSaga() {
     contractsSagas.getSingleContractWatcher(),
     contractsSagas.createContractWatcher(),
     contractsSagas.getSignaturesForContractsWatcher(),
+
+    // SENATE
+    senateSagas.getSenateMembersWatcher(),
+    senateSagas.getSenateMotionsWatcher(),
+    senateSagas.getWalletWatcher(),
+    senateSagas.getAdditionalAssetsWatcher(),
+    senateSagas.senateSendLldWatcher(),
+    senateSagas.senateSendLlmToPolitipoolWatcher(),
+    senateSagas.senateSendLlmWatcher(),
+    senateSagas.senateSendAssetsTransferWatcher(),
+    senateSagas.closeMotionWatcher(),
+    senateSagas.voteAtMotionsWatcher(),
+    senateSagas.getScheduledCongressSpendingWatcher(),
+    senateSagas.proposeCloseMotionWatcher(),
   ]);
 }

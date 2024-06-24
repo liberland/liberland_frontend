@@ -1,7 +1,7 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import CongressHeader from './CongressHeader';
-import styles from './styles.module.scss';
+import stylesPage from '../../utils/pagesBase.module.scss';
 import Overview from './Overview';
 import Motions from './Motions';
 import router from '../../router';
@@ -14,11 +14,11 @@ import { CongressAddLegislationViaReferendum } from '../Voting/Referendum/Propos
 
 function Congress() {
   return (
-    <div className={styles.congressWrapper}>
-      <div className={styles.navWrapper}>
+    <div className={stylesPage.sectionWrapper}>
+      <div className={stylesPage.menuAddressWrapper}>
         <CongressHeader />
       </div>
-      <div>
+      <div className={stylesPage.contentWrapper}>
         <Switch>
           <Route exact path={router.congress.overview} component={Overview} />
           <Route exact path={router.congress.motions} component={Motions} />

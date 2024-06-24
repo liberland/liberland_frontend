@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
 // COMPONENTS
-import { useDispatch, useSelector } from 'react-redux';
-import { BN } from '@polkadot/util';
+import { useDispatch } from 'react-redux';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
@@ -13,16 +12,20 @@ import InputSearch from '../InputComponents/InputSearchAddressName';
 
 // STYLES
 import styles from './styles.module.scss';
-import { parseDollars, isValidSubstrateAddress } from '../../utils/walletHelpers';
-import { congressActions } from '../../redux/actions';
-import { congressSelectors } from '../../redux/selectors';
+import { parseMerits, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 
-function SpendLLDModal({ closeModal }) {
+function SpendModal({
+  closeModal, onSend, spendData, isCongress, balance,
+}) {
   const dispatch = useDispatch();
-  const balances = useSelector(congressSelectors.balances);
-  const balance = new BN(balances?.liquidAmount?.amount ?? 0);
+  const {
+    name, title = `Spend ${name}`,
+    description = 'You are going to create spend token proposal',
+    subtitle = 'Spend to address',
+    submitButtonText = 'Make transfer',
+  } = spendData;
 
   const {
     handleSubmit,
@@ -40,33 +43,30 @@ function SpendLLDModal({ closeModal }) {
   const executionBlock = useCongressExecutionBlock(votingDays);
 
   const transfer = (values) => {
-    dispatch(
-      congressActions.congressSendLld.call({
-        transferToAddress: values.recipient,
-        transferAmount: parseDollars(values.amount),
-        remarkInfo: values.description || 'Congress spend LLD',
-        executionBlock,
-      }),
-    );
+    dispatch(onSend({
+      transferToAddress: values.recipient,
+      transferAmount: parseMerits(values.amount),
+      remarkInfo: values.description || `${isCongress ? 'Congress' : 'Senate'} ${title}`,
+      executionBlock,
+    }));
     closeModal();
   };
 
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(transfer)}
-    >
-      <div className={styles.h3}>Spend LLD</div>
+    <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(transfer)}>
+      <div className={styles.h3}>
+        {title}
+      </div>
       <div className={styles.description}>
-        You are going to create spend token proposal
+        {description}
       </div>
 
-      <div className={styles.title}>Spend to address</div>
+      <div className={styles.title}>{subtitle}</div>
       <InputSearch
         errorTitle="Recipient"
         register={register}
         name="recipient"
-        placeholder="Spend to address"
+        placeholder={subtitle}
         isRequired
         setValue={setValue}
         validate={(v) => {
@@ -74,27 +74,30 @@ function SpendLLDModal({ closeModal }) {
           return true;
         }}
       />
-      {errors?.recipient?.message && (
-        <div className={styles.error}>{errors.recipient.message}</div>
-      )}
+      {errors?.recipient?.message
+        && <div className={styles.error}>{errors.recipient.message}</div>}
 
-      <div className={styles.title}>Amount LLD</div>
+      <div className={styles.title}>
+        Amount
+        {' '}
+        {name}
+      </div>
       <TextInput
-        errorTitle="Amount LLD"
         register={register}
-        validate={(textValue) => Validator.validateDollarsValue(balance, textValue)}
+        validate={(textValue) => Validator.validateMeritsValue(balance, textValue)}
         name="amount"
-        placeholder="Amount LLD"
+        errorTitle="Amount"
+        placeholder={`Amount ${name}`}
         required
       />
-      {errors?.amount?.message && (
-        <div className={styles.error}>{errors.amount.message}</div>
-      )}
+      { errors?.amount?.message
+        && <div className={styles.error}>{errors.amount.message}</div> }
 
       <div className={styles.title}>Spend description</div>
       <TextInput
         register={register}
         minLength={{ value: 3, message: 'Min description length is 3 chars' }}
+        errorTitle="Description"
         maxLength={{ value: 256, message: 'Max description length is 256 chars' }}
         name="description"
         placeholder="Spend description"
@@ -103,8 +106,18 @@ function SpendLLDModal({ closeModal }) {
       { errors?.description?.message
         && <div className={styles.error}>{errors.description.message}</div> }
 
-      <div className={styles.title}>Congress voting time in days</div>
-      <div className={styles.description}>How long will it take Congress to close the motion?</div>
+      <div className={styles.title}>
+        {isCongress ? 'Congress' : 'Senate'}
+        {' '}
+        voting time in days
+      </div>
+      <div className={styles.description}>
+        How long will it take
+        {' '}
+        {isCongress ? 'Congress' : 'Senate'}
+        {' '}
+        to close the motion?
+      </div>
       <TextInput
         register={register}
         name="votingDays"
@@ -119,6 +132,7 @@ function SpendLLDModal({ closeModal }) {
       />
       <div>
         If motion passes in time, actual transfer will execute on block
+        {' '}
         {executionBlock}
         .
       </div>
@@ -126,27 +140,55 @@ function SpendLLDModal({ closeModal }) {
         && <div className={styles.error}>{errors.votingDays.message}</div> }
 
       <div className={styles.buttonWrapper}>
-        <Button medium onClick={closeModal}>
+        <Button
+          medium
+          onClick={closeModal}
+        >
           Cancel
         </Button>
-        <Button primary medium type="submit">
-          Make spend proposal
+        <Button
+          primary
+          medium
+          type="submit"
+        >
+          {submitButtonText}
         </Button>
       </div>
     </form>
   );
 }
 
-SpendLLDModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+SpendModal.defaultProps = {
+  isCongress: true,
+  spendData: {
+    title: '',
+    description: '',
+    subtitle: '',
+    submitButtonText: '',
+  },
 };
 
-function SpendLLDModalWrapper(props) {
+SpendModal.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+  onSend: PropTypes.func.isRequired,
+  spendData: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    subtitle: PropTypes.string,
+    submitButtonText: PropTypes.string,
+  }),
+  isCongress: PropTypes.bool,
+  // eslint-disable-next-line react/forbid-prop-types
+  balance: PropTypes.object.isRequired,
+};
+
+function SpendModalWrapper(props) {
   return (
     <ModalRoot>
-      <SpendLLDModal {...props} />
+      <SpendModal {...props} />
     </ModalRoot>
   );
 }
 
-export default SpendLLDModalWrapper;
+export default SpendModalWrapper;
