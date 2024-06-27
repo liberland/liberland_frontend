@@ -48,7 +48,7 @@ function RemoveLiquidityModal({
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
 
   const calculateAssetToBurn = (numberValue) => {
-    const tokensToBurn = new BN(lpTokensBalance).mul(new BN(numberValue)).div(BN_HUNDRED);
+    const tokensToBurn = new BN(lpTokensBalance?.toString() || 0).mul(new BN(numberValue)).div(BN_HUNDRED);
     setTokensToBurnState(tokensToBurn);
     const fee = new BN(withdrawalFee);
     const calculatedAmount1 = calculatePooled(tokensToBurn, liquidity, reserved.asset1);
@@ -59,8 +59,8 @@ function RemoveLiquidityModal({
   };
 
   const onSubmit = async () => {
-    const amount1MinReceive = calculateAmountMin(asset1Amount);
-    const amount2MinReceive = calculateAmountMin(asset2Amount);
+    const amount1MinReceive = calculateAmountMin(asset1Amount?.toString() || 0);
+    const amount2MinReceive = calculateAmountMin(asset2Amount?.toString() || 0);
     const withdrawTo = userWalletAddress;
     dispatch(dexActions.removeLiquidity.call(
       {
@@ -80,9 +80,9 @@ function RemoveLiquidityModal({
     const numberValue = Number(e?.target?.value || e);
     setPercentBurnTokens(numberValue);
 
-    const { asset1Data, asset2Data } = await calculateAssetToBurn(numberValue);
-    setAsset1Amount(Number(asset1Data));
-    setAsset2Amount(Number(asset2Data));
+    const { asset1Data, asset2Data } = calculateAssetToBurn(numberValue);
+    setAsset1Amount(asset1Data);
+    setAsset2Amount(asset2Data);
   };
 
   const isPercentZero = percentBurnTokens === 0;

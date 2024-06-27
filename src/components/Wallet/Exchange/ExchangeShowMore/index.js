@@ -80,7 +80,7 @@ function ExchangeShowMore({
 
         </div>
         <div className={styles.liquidityButtons}>
-          {!isReservedDataEmpty
+          {!isReservedDataEmpty && (lpTokensBalance !== 0 || !liquidity)
             && (
             <Button small green onClick={handleModalLiquidityRemove}>
               Remove Liquidity
