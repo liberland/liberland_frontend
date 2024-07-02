@@ -48,7 +48,7 @@ function RemoveLiquidityModal({
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
 
   const calculateAssetToBurn = (numberValue) => {
-    const tokensToBurn = new BN(lpTokensBalance?.toString() || 0).mul(new BN(numberValue)).div(BN_HUNDRED);
+    const tokensToBurn = new BN(lpTokensBalance).mul(new BN(numberValue)).div(BN_HUNDRED);
     setTokensToBurnState(tokensToBurn);
     const fee = new BN(withdrawalFee);
     const calculatedAmount1 = calculatePooled(tokensToBurn, liquidity, reserved.asset1);
@@ -59,8 +59,8 @@ function RemoveLiquidityModal({
   };
 
   const onSubmit = async () => {
-    const amount1MinReceive = calculateAmountMin(asset1Amount?.toString() || 0);
-    const amount2MinReceive = calculateAmountMin(asset2Amount?.toString() || 0);
+    const amount1MinReceive = calculateAmountMin(asset1Amount);
+    const amount2MinReceive = calculateAmountMin(asset2Amount);
     const withdrawTo = userWalletAddress;
     dispatch(dexActions.removeLiquidity.call(
       {
@@ -176,7 +176,8 @@ RemoveLiquidityModal.propTypes = {
   handleModal: PropsTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
   reserved: ReservedAssetPropTypes.isRequired,
-  lpTokensBalance: PropsTypes.string.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  lpTokensBalance: PropsTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   liquidity: PropsTypes.object.isRequired,
 };

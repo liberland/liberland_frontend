@@ -49,7 +49,7 @@ function ExchangeShowMore({
                   {' '}
                   {new BN(lpTokensBalance).mul(BN_HUNDRED).div(new BN(liquidity)).toString()}
                   % (
-                  {lpTokensBalance}
+                  {lpTokensBalance.toString()}
                   {' '}
                   Lp Tokens)
                 </span>
@@ -110,7 +110,8 @@ ExchangeShowMore.propTypes = {
   handleModalLiquidityRemove: PropTypes.func.isRequired,
   asset1: PropTypes.string.isRequired,
   asset2: PropTypes.string.isRequired,
-  lpTokensBalance: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  // eslint-disable-next-line react/forbid-prop-types
+  lpTokensBalance: PropTypes.object,
   // eslint-disable-next-line react/forbid-prop-types
   liquidity: PropTypes.object,
   asset1ToShow: PropTypes.string.isRequired,

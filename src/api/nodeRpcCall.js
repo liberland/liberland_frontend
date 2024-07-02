@@ -2158,7 +2158,7 @@ const getLpTokensOwnedByAddress = async (lpTokenId, address) => {
     return null;
   }
   const tokens = maybeTokens.unwrapOrDefault();
-  const balance = tokens.balance.toString();
+  const { balance } = tokens;
   return { balance };
 };
 
