@@ -826,102 +826,66 @@ const submitProposal = async (
 
 const getCongressMembersWithIdentity = async (walletAddress) => {
   const api = await getApi();
-  let [
+  const [
     councilMembers,
     candidates,
     // eslint-disable-next-line prefer-const
     currentCandidateVotesByUserQuery,
+    runnersUp,
   ] = await api.queryMulti([
     api.query.council.members,
     api.query.elections.candidates,
     [api.query.elections.voting, walletAddress],
-  ]);
-  councilMembers = councilMembers.toHuman();
-  const councilMembersIdentityQueries = [];
-  councilMembers.forEach((councilMember) => {
-    councilMembersIdentityQueries.push([api.query.identity.identityOf, councilMember]);
-  });
-
-  // eslint-disable-next-line eqeqeq
-  const councilMemberIdentities = councilMembersIdentityQueries.length == 0 ? []
-    : await api.queryMulti([
-      ...councilMembersIdentityQueries,
-    ]);
-
-  const crossReferencedCouncilMemberIdentities = [];
-
-  councilMemberIdentities.forEach((councilMemberIdentity) => {
-    const toHumanIdentity = councilMemberIdentity.toHuman();
-    // address use councilmembers.shift as its same ordering as councilmemberidentities
-    let rawIdentity = councilMembers.shift();
-    rawIdentity = typeof rawIdentity === 'string' ? rawIdentity : rawIdentity[0];
-    crossReferencedCouncilMemberIdentities.push({
-      name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
-      identityData: toHumanIdentity,
-      rawIdentity,
-    });
-  });
-
-  candidates = candidates.toHuman();
-  // TODO isolate in function ?
-  const candidatesIdentityQueries = [];
-  candidates.forEach((candidate) => {
-    candidatesIdentityQueries.push([api.query.identity.identityOf, candidate[0]]);
-  });
-
-  // eslint-disable-next-line eqeqeq
-  const candidateIdentities = candidatesIdentityQueries.length == 0 ? [] : await api.queryMulti([
-    ...candidatesIdentityQueries,
+    api.query.elections.runnersUp,
   ]);
 
-  const crossReferencedCandidateIdentities = [];
-  candidateIdentities.forEach((candidateIdentity) => {
-    const toHumanIdentity = candidateIdentity.toHuman();
-    // address use councilmembers.shift as its same ordering as councilmemberidentities
-    let rawIdentity = candidates.shift();
-    rawIdentity = typeof rawIdentity === 'string' ? rawIdentity : rawIdentity[0];
-    crossReferencedCandidateIdentities.push({
-      name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
-      identityData: toHumanIdentity,
-      rawIdentity,
+  async function getIdentityData(addresses) {
+    if (addresses.length === 0) return [];
+    const identityQueries = addresses.map((address) => [api.query.identity.identityOf, address]);
+    const identities = await api.queryMulti(identityQueries);
+    return addresses.map((address, index) => {
+      const identity = identities[index];
+      const displayName = identity.isSome && identity.unwrap().info.display.isRaw
+        ? identity.unwrap().info.display.asRaw.toUtf8()
+        : address.toString();
+      return {
+        name: displayName,
+        identityData: identity.isSome ? identity.unwrap().toJSON() : null,
+        rawIdentity: address.toString(),
+      };
     });
-  });
+  }
 
-  const currentCandidateVotesByUser = currentCandidateVotesByUserQuery.toHuman().votes;
+  const councilMembersList = councilMembers.map((member) => member.toString());
+  const candidatesList = candidates.map((candidate) => candidate[0].toString());
+  const currentCandidateVotesByUser = currentCandidateVotesByUserQuery.isSome
+    ? currentCandidateVotesByUserQuery.unwrap().votes.map((vote) => vote.toString())
+    : [];
+  const runnersUpList = runnersUp.map(([who]) => who[1].toString());
 
-  const currentCandidateVotesByUserIdentityQueries = [];
-  currentCandidateVotesByUser.forEach((currentCandidateVote) => {
-    currentCandidateVotesByUserIdentityQueries.push([api.query.identity.identityOf, currentCandidateVote]);
-  });
-
-  // eslint-disable-next-line max-len, eqeqeq
-  const currentCandidateVotesByUserIdentities = currentCandidateVotesByUserIdentityQueries.length == 0 ? [] : await api.queryMulti(
-    [
-      ...currentCandidateVotesByUserIdentityQueries,
-    ],
-  );
-
-  const crossReferencedCurrentCandidateVotesByUser = [];
-  currentCandidateVotesByUserIdentities.forEach((currentCandidateVoteIdentity) => {
-    const toHumanIdentity = currentCandidateVoteIdentity.toHuman();
-    // address use councilmembers.shift as its same ordering as councilmemberidentities
-    let rawIdentity = currentCandidateVotesByUser.shift();
-    rawIdentity = typeof rawIdentity === 'string' ? rawIdentity : rawIdentity[0];
-    crossReferencedCurrentCandidateVotesByUser.push({
-      name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
-      identityData: toHumanIdentity,
-      rawIdentity,
-    });
-  });
-  // TODO add runnersup
+  const [
+    crossReferencedCouncilMemberIdentities,
+    crossReferencedCandidateIdentities,
+    crossReferencedCurrentCandidateVotesByUser,
+    runnersUpListIdentities,
+  ] = await Promise.all([
+    getIdentityData(councilMembersList),
+    getIdentityData(candidatesList),
+    getIdentityData(currentCandidateVotesByUser),
+    getIdentityData(runnersUpList),
+  ]);
 
   /*
    const electionsInfo = useCall<DeriveElectionsInfo>(api.derive.elections.info);
    const allVotes = useCall<Record<string, AccountId[]>>(api.derive.council.votes, undefined, transformVotes);
    */
 
-  // eslint-disable-next-line max-len
-  return { currentCongressMembers: crossReferencedCouncilMemberIdentities, candidates: crossReferencedCandidateIdentities, currentCandidateVotesByUser: crossReferencedCurrentCandidateVotesByUser };
+  return {
+    runnersUp: runnersUpListIdentities,
+    currentCongressMembers: crossReferencedCouncilMemberIdentities,
+    candidates: crossReferencedCandidateIdentities,
+    currentCandidateVotesByUser: crossReferencedCurrentCandidateVotesByUser,
+  };
 };
 
 const voteForCongress = async (listofVotes, walletAddress) => {

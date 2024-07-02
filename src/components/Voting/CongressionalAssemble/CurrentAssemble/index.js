@@ -30,10 +30,12 @@ function CurrentAssemble({
 
         {
             currentCongressMembers?.map((currentCongressMember) => (
-              <div className={cx(stylesPage.transactionHistoryCardMain, styles.gridList)}>
+              <div
+                className={cx(stylesPage.transactionHistoryCardMain, styles.gridList)}
+                key={`current-congress-member${currentCongressMember.name}`}
+              >
                 <PoliticanCard
                   politician={currentCongressMember}
-                  key={`current-congress-member${currentCongressMember.name}`}
                 />
               </div>
             ))
