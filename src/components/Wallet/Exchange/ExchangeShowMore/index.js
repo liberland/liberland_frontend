@@ -41,17 +41,14 @@ function ExchangeShowMore({
       </div>
       <div className={styles.liquidity}>
         <div className={styles.text}>
-          {lpTokensBalance !== 0 || !liquidity
+          {!lpTokensBalance.isZero() || !liquidity
             ? (
               <>
                 <span>
                   Your liquidity:
                   {' '}
-                  {new BN(lpTokensBalance).mul(BN_HUNDRED).div(new BN(liquidity)).toString()}
-                  % (
-                  {lpTokensBalance.toString()}
-                  {' '}
-                  Lp Tokens)
+                  {lpTokensBalance.mul(BN_HUNDRED).div(new BN(liquidity)).toString()}
+                  %
                 </span>
                 <span>
                   {`Pooled ${asset1ToShow}: `}
@@ -80,7 +77,7 @@ function ExchangeShowMore({
 
         </div>
         <div className={styles.liquidityButtons}>
-          {!isReservedDataEmpty && (lpTokensBalance !== 0 || !liquidity)
+          {!isReservedDataEmpty && (!lpTokensBalance.isZero() || !liquidity)
             && (
             <Button small green onClick={handleModalLiquidityRemove}>
               Remove Liquidity

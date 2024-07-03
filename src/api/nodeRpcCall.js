@@ -2187,7 +2187,7 @@ const getDexPools = async (walletAddress) => {
         assetData1,
         assetData2,
         lpToken: lpTokenTransform,
-        lpTokensBalance: lpTokensValue?.balance || 0,
+        lpTokensBalance: lpTokensValue?.balance || BN_ZERO,
         reserved,
       };
     }));
