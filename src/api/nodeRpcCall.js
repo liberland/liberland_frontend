@@ -890,6 +890,10 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
 
 const voteForCongress = async (listofVotes, walletAddress) => {
   const api = await getApi();
+  if (listofVotes.length < 1) {
+    const voteExtrinsic = api.tx.elections.removeVoter();
+    return submitExtrinsic(voteExtrinsic, walletAddress, api);
+  }
   const votes = listofVotes.map((vote) => vote.rawIdentity);
 
   const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
