@@ -18,9 +18,28 @@ import Table from '../../Table';
 import { parseLegal } from '../../../utils/identityParser';
 import { isValidSubstrateAddress } from '../../../utils/walletHelpers';
 import { fetchPendingIdentities } from '../../../api/nodeRpcCall';
-import identityJudgementEnums from "../../../constants/identityJudgementEnums";
+import identityJudgementEnums from '../../../constants/identityJudgementEnums';
+
+function FetchedItem({ address }) {
+  const dispatch = useDispatch();
+  return (
+    <div key={address}>
+      {address}
+      <button onClick={
+        () => (dispatch(officesActions.officeGetIdentity.call(address)))
+        }
+      >
+        fetch
+      </button>
+    </div>
+  );
+}
+FetchedItem.propTypes = {
+  address: PropTypes.string.isRequired,
+};
 
 function IdentityForm() {
+  const pendingAdditionalMerits = useSelector(officesSelectors.selectorPendingAdditionalMerits);
   const dispatch = useDispatch();
   const {
     handleSubmit,
@@ -39,22 +58,29 @@ function IdentityForm() {
   const onSubmit = ({ account }) => {
     dispatch(officesActions.officeGetIdentity.call(account));
   };
+
+  const fetchPendingAdditionalMerits = () => {
+    dispatch(officesActions.getPendingAdditionalMerits.call());
+  };
   return (
     <div>
       <div>
         {pendingIdentities.map((pendingIdentity) => (
-          <div>
-            {pendingIdentity.address}
-            <button onClick={
-              () => (dispatch(officesActions.officeGetIdentity.call(pendingIdentity.address)))
-              }
-            >
-              fetch
-            </button>
-          </div>
+          <FetchedItem address={pendingIdentity.address} />
         ))}
-        <Button primary medium onClick={() => doFetchPendingIdentities()}>
+        <Button className={styles.button} primary medium onClick={() => doFetchPendingIdentities()}>
           Fetch pending identities
+        </Button>
+        {pendingAdditionalMerits.map((pendingAdditionalMerit) => (
+          <FetchedItem address={pendingAdditionalMerit.blockchainAddress} />
+        ))}
+        <Button
+          className={styles.button}
+          primary
+          medium
+          onClick={() => fetchPendingAdditionalMerits()}
+        >
+          Fetch pending additional merits
         </Button>
       </div>
 
@@ -347,7 +373,7 @@ function SubmitForm({
         hash,
         merits: values.amountLLM,
         dollars: values.amountLLD,
-        judgementType: identityJudgementEnums.KNOWNGOOD
+        judgementType: identityJudgementEnums.KNOWNGOOD,
       }),
     );
   };
@@ -360,7 +386,7 @@ function SubmitForm({
         hash,
         merits: '0',
         dollars: '0',
-        judgementType: identityJudgementEnums.LOWQUALITY
+        judgementType: identityJudgementEnums.LOWQUALITY,
       }),
     );
   };
@@ -383,7 +409,7 @@ function SubmitForm({
         <Button primary medium type="submit">
           Provide KnownGood judgement and transfer staked LLM and liquid LLD
         </Button>
-        <Button primary medium onClick={() => {provideLowQualityJudgement()}}>
+        <Button primary medium onClick={() => { provideLowQualityJudgement(); }}>
           Provide LowQuality judgement
         </Button>
       </div>
