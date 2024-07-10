@@ -23,7 +23,7 @@ import identityJudgementEnums from '../../../constants/identityJudgementEnums';
 function FetchedItem({ address }) {
   const dispatch = useDispatch();
   return (
-    <div key={address}>
+    <div>
       {address}
       <button onClick={
         () => (dispatch(officesActions.officeGetIdentity.call(address)))
@@ -66,13 +66,13 @@ function IdentityForm() {
     <div>
       <div>
         {pendingIdentities.map((pendingIdentity) => (
-          <FetchedItem address={pendingIdentity.address} />
+          <FetchedItem key={pendingIdentity.address} address={pendingIdentity.address} />
         ))}
         <Button className={styles.button} primary medium onClick={() => doFetchPendingIdentities()}>
           Fetch pending identities
         </Button>
         {pendingAdditionalMerits.map((pendingAdditionalMerit) => (
-          <FetchedItem address={pendingAdditionalMerit.blockchainAddress} />
+          <FetchedItem key={pendingAdditionalMerit.address} address={pendingAdditionalMerit.blockchainAddress} />
         ))}
         <Button
           className={styles.button}
