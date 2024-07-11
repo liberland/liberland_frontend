@@ -2126,7 +2126,7 @@ const getLpTokensOwnedByAddress = async (lpTokenId, address) => {
     return null;
   }
   const tokens = maybeTokens.unwrapOrDefault();
-  const balance = tokens.balance.toString();
+  const { balance } = tokens;
   return { balance };
 };
 
@@ -2155,7 +2155,7 @@ const getDexPools = async (walletAddress) => {
         assetData1,
         assetData2,
         lpToken: lpTokenTransform,
-        lpTokensBalance: lpTokensValue?.balance || 0,
+        lpTokensBalance: lpTokensValue?.balance || BN_ZERO,
         reserved,
       };
     }));

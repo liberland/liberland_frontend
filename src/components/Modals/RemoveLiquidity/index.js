@@ -80,9 +80,9 @@ function RemoveLiquidityModal({
     const numberValue = Number(e?.target?.value || e);
     setPercentBurnTokens(numberValue);
 
-    const { asset1Data, asset2Data } = await calculateAssetToBurn(numberValue);
-    setAsset1Amount(Number(asset1Data));
-    setAsset2Amount(Number(asset2Data));
+    const { asset1Data, asset2Data } = calculateAssetToBurn(numberValue);
+    setAsset1Amount(asset1Data);
+    setAsset2Amount(asset2Data);
   };
 
   const isPercentZero = percentBurnTokens === 0;
@@ -176,7 +176,8 @@ RemoveLiquidityModal.propTypes = {
   handleModal: PropsTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
   reserved: ReservedAssetPropTypes.isRequired,
-  lpTokensBalance: PropsTypes.string.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  lpTokensBalance: PropsTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   liquidity: PropsTypes.object.isRequired,
 };

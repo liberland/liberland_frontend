@@ -41,17 +41,14 @@ function ExchangeShowMore({
       </div>
       <div className={styles.liquidity}>
         <div className={styles.text}>
-          {lpTokensBalance !== 0 || !liquidity
+          {!lpTokensBalance.isZero() || !liquidity
             ? (
               <>
                 <span>
                   Your liquidity:
                   {' '}
-                  {new BN(lpTokensBalance).mul(BN_HUNDRED).div(new BN(liquidity)).toString()}
-                  % (
-                  {lpTokensBalance}
-                  {' '}
-                  Lp Tokens)
+                  {lpTokensBalance.mul(BN_HUNDRED).div(new BN(liquidity)).toString()}
+                  %
                 </span>
                 <span>
                   {`Pooled ${asset1ToShow}: `}
@@ -74,13 +71,13 @@ function ExchangeShowMore({
 
             : (
               <span>
-                Not found your liquidity in this pool
+                You dont have liquidity in this pool
               </span>
             )}
 
         </div>
         <div className={styles.liquidityButtons}>
-          {!isReservedDataEmpty
+          {!isReservedDataEmpty && (!lpTokensBalance.isZero() || !liquidity)
             && (
             <Button small green onClick={handleModalLiquidityRemove}>
               Remove Liquidity
@@ -110,7 +107,8 @@ ExchangeShowMore.propTypes = {
   handleModalLiquidityRemove: PropTypes.func.isRequired,
   asset1: PropTypes.string.isRequired,
   asset2: PropTypes.string.isRequired,
-  lpTokensBalance: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  // eslint-disable-next-line react/forbid-prop-types
+  lpTokensBalance: PropTypes.object,
   // eslint-disable-next-line react/forbid-prop-types
   liquidity: PropTypes.object,
   asset1ToShow: PropTypes.string.isRequired,
