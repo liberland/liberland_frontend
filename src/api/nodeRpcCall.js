@@ -858,8 +858,8 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
 
   const councilMembersList = councilMembers.map((member) => member.toString());
   const candidatesList = candidates.map((candidate) => candidate[0].toString());
-  const currentCandidateVotesByUser = currentCandidateVotesByUserQuery.isSome
-    ? currentCandidateVotesByUserQuery.unwrap().votes.map((vote) => vote.toString())
+  const currentCandidateVotesByUser = !currentCandidateVotesByUserQuery.isEmpty
+    ? currentCandidateVotesByUserQuery.votes.map((vote) => vote.toString())
     : [];
   const runnersUpList = runnersUp.map(([who]) => who[1].toString());
 
@@ -890,6 +890,10 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
 
 const voteForCongress = async (listofVotes, walletAddress) => {
   const api = await getApi();
+  if (listofVotes.length < 1) {
+    const voteExtrinsic = api.tx.elections.removeVoter();
+    return submitExtrinsic(voteExtrinsic, walletAddress, api);
+  }
   const votes = listofVotes.map((vote) => vote.rawIdentity);
 
   const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
