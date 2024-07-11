@@ -71,7 +71,7 @@ function ExchangeShowMore({
 
             : (
               <span>
-                Not found your liquidity in this pool
+                You dont have liquidity in this pool
               </span>
             )}
 
