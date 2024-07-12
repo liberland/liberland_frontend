@@ -90,7 +90,7 @@ export function* getAdditionalAssetsWatcher() {
 
 function* senateSendLlmWorker({
   payload: {
-    transferToAddress, transferAmount, remarkInfo, executionBlock,
+    transferToAddress, transferAmount, remarkInfo,
   },
 }) {
   const walletAddress = yield select(
@@ -101,7 +101,6 @@ function* senateSendLlmWorker({
     transferToAddress,
     transferAmount,
     remarkInfo,
-    executionBlock,
     isCongress,
   });
   yield put(senateActions.senateSendLlm.success());

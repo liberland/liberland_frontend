@@ -1410,7 +1410,6 @@ const congressProposeSpend = async ({
 const createSenateProposalAndVote = async (threshold, proposalContent, vote) => {
   const api = await getApi();
   const proposal = api.tx.senate.propose(threshold, proposalContent, proposalContent.length);
-
   const nextProposalIndex = await api.query.senate.proposalCount();
   const voteAye = api.tx.senate.vote(proposalContent.method.hash, nextProposalIndex, vote);
 
@@ -1424,7 +1423,7 @@ const senateMajorityThreshold = async () => {
 };
 
 const senateProposeSpend = async ({
-  walletAddress, spendProposal, remarkInfo, executionBlock,
+  walletAddress, spendProposal, remarkInfo,
 }) => {
   const api = await getApi();
 
@@ -1432,8 +1431,7 @@ const senateProposeSpend = async ({
   const remark = api.tx.llm.remark(remarkInfo);
   const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
 
-  const executeProposal = api.tx.scheduler.schedule(executionBlock, null, 0, transferAndRemark);
-  const proposal = api.tx.senateAccount.execute(executeProposal);
+  const proposal = api.tx.senateAccount.execute(transferAndRemark);
 
   const extrinsics = await createSenateProposalAndVote(threshold, proposal, true);
   const extrinsic = api.tx.utility.batchAll(extrinsics);
@@ -2524,8 +2522,7 @@ const closeSenateMotion = async (proposalHash, index, walletAddress) => {
   const proposal = await api.query.senate.proposalOf(proposalHash);
   const { weight: weightBound } = await api.tx(proposal.unwrap()).paymentInfo(walletAddress);
   const lengthBound = proposal.unwrap().toU8a().length;
-  const extrinsic = api.tx.senate.close(proposalHash, index, weightBound, lengthBound);
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return submitExtrinsic(api.tx.senate.close(proposalHash, index, weightBound, lengthBound), walletAddress, api);
 };
 
 export {
