@@ -18,6 +18,7 @@ const initialState = {
     LLM: {},
   },
   backendAddressLLMBalance: null,
+  pendingAdditionalMerits: [],
 };
 
 const officesReducer = handleActions({
@@ -31,6 +32,7 @@ const officesReducer = handleActions({
     officesActions.getPalletIds.call,
     officesActions.unregisterCompany.call,
     officesActions.setRegisteredCompanyData.call,
+    officesActions.getPendingAdditionalMerits.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -52,6 +54,8 @@ const officesReducer = handleActions({
     officesActions.unregisterCompany.failure,
     officesActions.setRegisteredCompanyData.failure,
     officesActions.getPalletIds.success,
+    officesActions.getPendingAdditionalMerits.failure,
+    officesActions.getPendingAdditionalMerits.success,
   )]: (state) => ({
     ...state,
     loading: false,
@@ -142,6 +146,14 @@ const officesReducer = handleActions({
   [officesActions.getPalletIds.success]: (state, action) => ({
     ...state,
     pallets: action.payload,
+  }),
+  [officesActions.getCompanyRequest.call]: (state) => ({
+    ...state,
+    pendingAdditionalMerits: initialState.pendingAdditionalMerits,
+  }),
+  [officesActions.getPendingAdditionalMerits.success]: (state, action) => ({
+    ...state,
+    pendingAdditionalMerits: action.payload,
   }),
 }, initialState);
 
