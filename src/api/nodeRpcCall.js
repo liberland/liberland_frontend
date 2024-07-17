@@ -2062,7 +2062,24 @@ const decodeCall = async (bytes) => {
   return api.createType('Call', bytes);
 };
 
-const getScheduledCalls = async (getOnlyLookup = true) => {
+const getPreImage = async (preimageId, len) => {
+  const api = await getApi();
+  const preimageRaw = await api.query.preimage.preimageFor([preimageId, len]);
+  const preimage = preimageRaw.isSome ? await api.createType('Call', preimageRaw.unwrap()) : null;
+  return preimage;
+};
+
+const getSectionType = (origin) => {
+  if (origin?.isSystem && origin.asSystem.isSigned) {
+    return 'congress';
+  }
+  if ((origin?.isSystem && origin.asSystem.isRoot) || (origin?.isDemocracy && origin.asDemocracy.isReferendum)) {
+    return 'democracy';
+  }
+  return null;
+};
+
+const getScheduledCalls = async () => {
   const api = await getApi();
   const agendaEntries = await api.query.scheduler.agenda.entries();
 
@@ -2074,13 +2091,20 @@ const getScheduledCalls = async (getOnlyLookup = true) => {
         call,
       }))
       .filter((item) => item.call.isSome)
-      .map((item) => ({
-        ...item,
-        call: item.call.unwrap(),
-      })));
+      .map((item) => {
+        const call = item.call.unwrap();
+        const sectionType = getSectionType(call.origin);
 
-  const lookupItems = agendaItems.filter((item) => item.call.call.isLookup // our FE only does lookups now
-      && item.call.maybePeriodic.isNone); // we're interested only in referendum results, so nonperiodic
+        return {
+          ...item,
+          call,
+          sectionType,
+        };
+      }));
+
+  const lookupItems = agendaItems.filter((item) => item.call.call.isLookup
+      && item.call.maybePeriodic.isNone);
+  // we're interested only in referendum results, so nonperiodic
   // we only want do download small preimages. fetching multi-megabyte setCode could be painful.
   const bigAgendaItems = lookupItems.filter((item) => item.call.call.asLookup.len > 10240);
   const smallAgendaItems = lookupItems.filter((item) => item.call.call.asLookup.len <= 10240);
@@ -2093,34 +2117,24 @@ const getScheduledCalls = async (getOnlyLookup = true) => {
     ...bigAgendaItems.map((item) => ({
       ...item,
       preimage: null,
+      needCallPreImage: true,
     })),
     ...smallAgendaItems.map((item, idx) => ({
       ...item,
       preimage: preimages[idx],
     })),
   ];
-  if (getOnlyLookup) {
-    return { lookupItemsData };
-  }
-  const insideItems = agendaItems.filter((item) => item.call.call.isInline);
 
-  const preimagesInsideCall = insideItems.map(({ blockNumber, call, idx }) => ({
-    blockNumber,
-    asInlineCall: call.call.asInline,
-    idx,
-  }));
-
-  const preimagesInside = preimagesInsideCall.map(
-    ({ asInlineCall, blockNumber, idx }) => {
-      const proposal = api.createType('Call', asInlineCall);
-      return { proposal, blockNumber, idx };
-    },
-  );
-
-  return {
-    lookupItemsData,
-    preimagesInside,
-  };
+  const inlineItems = agendaItems
+    .filter((item) => item.call.call.isInline && item.call.maybePeriodic.isNone)
+    .map((item) => {
+      const { call } = item;
+      return {
+        ...item,
+        proposal: api.createType('Call', call.call.asInline),
+      };
+    });
+  return [...lookupItemsData, ...inlineItems];
 };
 
 const requestUnregisterCompanyRegistration = async (companyId, walletAddress) => {
@@ -2652,4 +2666,5 @@ export {
   senateVoteAtMotions,
   closeSenateMotion,
   senateProposeCancel,
+  getPreImage,
 };

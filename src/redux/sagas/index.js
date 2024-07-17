@@ -151,7 +151,6 @@ export default function* rootSaga() {
     contractsSagas.getSignaturesForContractsWatcher(),
 
     // SENATE
-    senateSagas.getSenateMembersWatcher(),
     senateSagas.getSenateMotionsWatcher(),
     senateSagas.getWalletWatcher(),
     senateSagas.getAdditionalAssetsWatcher(),

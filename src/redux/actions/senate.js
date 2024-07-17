@@ -4,7 +4,6 @@ export const {
   senateSendLld,
   senateSendLlm,
   senateSendAssets,
-  senateGetMembers,
   senateGetMotions,
   senateSendLlmToPolitipool,
   senateSendTreasuryLld,
@@ -27,11 +26,6 @@ export const {
     failure: undefined,
   },
   SENATE_GET_MOTIONS: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
-  SENATE_GET_MEMBERS: {
     call: undefined,
     success: undefined,
     failure: undefined,

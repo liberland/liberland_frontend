@@ -37,6 +37,7 @@ export default function Wallet() {
         liquidMerits={liquidMerits}
         additionalAssets={additionalAssets}
         balances={balances}
+        isCongress={false}
         onSendFunctions={{
           LLD: (data) => senateActions.senateSendLld.call(data),
           LLM: (data) => senateActions.senateSendLlm.call(data),

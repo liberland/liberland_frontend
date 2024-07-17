@@ -43,8 +43,8 @@ function* getDemocracyWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const directDemocracyInfo = yield call(getDemocracyReferendums, walletAddress);
   const currentCongressMembers = yield call(getCongressMembersWithIdentity, walletAddress);
-  const { lookupItemsData } = yield call(getScheduledCalls);
-  const democracyHelper = { ...directDemocracyInfo, ...currentCongressMembers, scheduledCalls: lookupItemsData };
+  const scheduledCalls = yield call(getScheduledCalls);
+  const democracyHelper = { ...directDemocracyInfo, ...currentCongressMembers, scheduledCalls };
   const identitiesName = yield addNameForProposers(
     democracyHelper.crossReferencedReferendumsData,
     democracyHelper.crossReferencedProposalsData,

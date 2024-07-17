@@ -16,7 +16,7 @@ export default function Motions() {
   }, [dispatch]);
 
   if (!motions || motions.length < 1) {
-    return (<div>There is no any motion</div>);
+    return (<div>There are no open motions</div>);
   }
 
   return (

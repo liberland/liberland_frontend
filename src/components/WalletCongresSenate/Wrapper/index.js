@@ -21,9 +21,9 @@ export default function WalletCongresSenateWrapper({
   additionalAssets,
   onSendFunctions,
   balances,
+  isCongress,
 }) {
   const { LLD, LLM, LLMPolitipool } = onSendFunctions;
-
   const balanceLLD = new BN(balances?.liquidAmount?.amount ?? 0);
   const balanceLLM = valueToBN(balances?.liquidMerits?.amount ?? 0);
 
@@ -93,9 +93,12 @@ export default function WalletCongresSenateWrapper({
       />
       <AssetOverview
         additionalAssets={additionalAssets}
+        isRemarkNeeded
+        isCongress={isCongress}
       />
       {isModalOpenLLDSpend && (
       <SpendModalWrapper
+        isCongress={isCongress}
         closeModal={toggleModalLLDSpendOpen}
         onSend={LLD}
         spendData={{
@@ -107,6 +110,7 @@ export default function WalletCongresSenateWrapper({
       {isModalOpenLLMSpend
       && (
       <SpendModalWrapper
+        isCongress={isCongress}
         closeModal={toggleModalLLMSpendOpen}
         onSend={LLM}
         spendData={{
@@ -117,6 +121,7 @@ export default function WalletCongresSenateWrapper({
       )}
       {isModalOpenPolitipoolLLMSpend && (
       <SpendModalWrapper
+        isCongress={isCongress}
         closeModal={toggleModalPolitipoolLLMSpendOpen}
         spendData={{
           name: 'LLM to politipool',
@@ -132,7 +137,12 @@ export default function WalletCongresSenateWrapper({
   );
 }
 
+WalletCongresSenateWrapper.defaultProps = {
+  isCongress: true,
+};
+
 WalletCongresSenateWrapper.propTypes = {
+  isCongress: PropTypes.bool,
   totalBalance: PropTypes.oneOfType([PropTypes.number.isRequired, PropTypes.string.isRequired]).isRequired,
   congresAccountAddress: PropTypes.string.isRequired,
   liquidMerits: PropTypes.string.isRequired,

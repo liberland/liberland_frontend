@@ -31,16 +31,12 @@ const initialState = {
       electionLock: 0,
     },
   },
-  scheduledCalls: {
-    preimagesInside: [],
-    lookupItemsData: [],
-  },
+  scheduledCalls: [],
 };
 
 const senateReducer = handleActions(
   {
     [combineActions(
-      senateActions.senateGetMembers.call,
       senateActions.senateGetMotions.call,
       senateActions.senateGetWallet.call,
       senateActions.senateGetAdditionalAssets.call,
@@ -62,9 +58,6 @@ const senateReducer = handleActions(
       senateActions.senateProposeCongressMotionClose.success,
       senateActions.senateProposeCloseMotion.failure,
       senateActions.senateProposeCloseMotion.success,
-      senateActions.senateGetMembers.failure,
-      senateActions.senateGetMembers.success,
-      senateActions.senateGetMotions.failure,
       senateActions.senateGetMotions.success,
       senateActions.senateGetWallet.success,
       senateActions.senateGetWallet.failure,
@@ -75,10 +68,6 @@ const senateReducer = handleActions(
     )]: (state) => ({
       ...state,
       loading: false,
-    }),
-    [senateActions.senateGetMembers.success]: (state, action) => ({
-      ...state,
-      members: action.payload,
     }),
     [senateActions.senateGetMotions.success]: (state, action) => ({
       ...state,

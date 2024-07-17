@@ -12,7 +12,6 @@ import {
   getAdditionalAssets,
   getBalanceByAddress,
   getScheduledCalls,
-  getSenateMembers,
   getSenateMotions,
   senateProposeCancel,
   senateVoteAtMotions,
@@ -24,18 +23,6 @@ import { palletIdToAddress } from '../../utils/pallet';
 import { blockchainSelectors, officesSelectors, senateSelectors } from '../selectors';
 
 const isCongress = false;
-
-function* getMembersWorker() {
-  const members = yield call(getSenateMembers);
-  yield put(senateActions.senateGetMembers.success(members));
-}
-
-export function* getSenateMembersWatcher() {
-  yield* blockchainWatcher(
-    senateActions.senateGetMembers,
-    getMembersWorker,
-  );
-}
 
 function* getMotionsWorker() {
   const motions = yield call(getSenateMotions);
@@ -233,7 +220,7 @@ export function* proposeCloseMotionWatcher() {
 }
 
 function* getScheduledCongressSpendingWorker() {
-  const scheduledCalls = yield call(getScheduledCalls, false);
+  const scheduledCalls = yield call(getScheduledCalls);
   yield put(senateActions.senateGetCongressSpending.success(scheduledCalls));
 }
 

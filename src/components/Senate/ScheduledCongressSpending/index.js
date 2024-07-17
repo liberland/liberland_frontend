@@ -17,19 +17,18 @@ function ScheduledCongressSpending({ isVetoButton }) {
     dispatch(senateActions.senateGetCongressSpending.call());
   }, [dispatch]);
 
-  const { preimagesInside, lookupItemsData } = scheduledCalls;
-
-  if (!scheduledCalls || (preimagesInside.length < 1 && lookupItemsData.length < 1)) {
-    return (<div>There is no any item</div>);
+  if (!scheduledCalls || scheduledCalls.length < 1) {
+    return (<div>There are no open items</div>);
   }
-  const scheduledCallsList = [...preimagesInside, ...lookupItemsData];
 
   return (
     <>
-      {scheduledCallsList.map(({
-        preimage, proposal, blockNumber, idx,
+      {scheduledCalls.map(({
+        preimage, proposal, blockNumber, idx, sectionType,
       }) => {
         const proposalData = preimage || proposal;
+        if (sectionType !== 'congress') return null;
+
         const onVetoClick = () => {
           dispatch(senateActions.senateProposeCloseMotion.call(
             { executionBlock: blockNumber, idx },

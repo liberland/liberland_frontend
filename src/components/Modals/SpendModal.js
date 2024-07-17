@@ -106,38 +106,42 @@ function SpendModal({
       { errors?.description?.message
         && <div className={styles.error}>{errors.description.message}</div> }
 
-      <div className={styles.title}>
-        {isCongress ? 'Congress' : 'Senate'}
-        {' '}
-        voting time in days
-      </div>
-      <div className={styles.description}>
-        How long will it take
-        {' '}
-        {isCongress ? 'Congress' : 'Senate'}
-        {' '}
-        to close the motion?
-      </div>
-      <TextInput
-        register={register}
-        name="votingDays"
-        placeholder="Voting days"
-        validate={((v) => {
-          if (parseInt(v) < 1) {
-            return 'Must be at least 1 day';
-          }
-          return true;
-        })}
-        required
-      />
-      <div>
-        If motion passes in time, actual transfer will execute on block
-        {' '}
-        {executionBlock}
-        .
-      </div>
-      { errors?.votingDays?.message
+      {isCongress && (
+      <>
+        <div className={styles.title}>
+          {isCongress ? 'Congress' : 'Senate'}
+          {' '}
+          voting time in days
+        </div>
+        <div className={styles.description}>
+          How long will it take
+          {' '}
+          {isCongress ? 'Congress' : 'Senate'}
+          {' '}
+          to close the motion?
+        </div>
+        <TextInput
+          register={register}
+          name="votingDays"
+          placeholder="Voting days"
+          validate={((v) => {
+            if (parseInt(v) < 1) {
+              return 'Must be at least 1 day';
+            }
+            return true;
+          })}
+          required
+        />
+        <div>
+          If motion passes in time, actual transfer will execute on block
+          {' '}
+          {executionBlock}
+          .
+        </div>
+        { errors?.votingDays?.message
         && <div className={styles.error}>{errors.votingDays.message}</div> }
+      </>
+      )}
 
       <div className={styles.buttonWrapper}>
         <Button
