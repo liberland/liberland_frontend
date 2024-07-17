@@ -2499,11 +2499,6 @@ const getStakingData = async (walletAddress) => {
   return { stakingInfo, sessionProgress };
 };
 
-const getSenateMembers = async () => {
-  const api = await getApi();
-  return api.query.senate.members();
-};
-
 const getSenateMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.senate.proposals();
@@ -2661,7 +2656,6 @@ export {
   congressSenateSendLld,
   congressSenateSendLlmToPolitipool,
   congressSenateSendAssets,
-  getSenateMembers,
   getSenateMotions,
   senateVoteAtMotions,
   closeSenateMotion,
