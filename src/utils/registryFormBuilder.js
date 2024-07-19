@@ -119,13 +119,17 @@ export function GetFieldsForm({
                   </div>
                 );
               })}
-              <div style={{ display: 'flex', margin: '16px', justifyContent: 'flex-end' }}>
-                <Button small red type="button" onClick={() => remove(index)}>Delete</Button>
+              <div style={{ display: 'flex', margin: '16px', justifyContent: 'flex-start' }}>
+                <Button small red type="button" onClick={() => remove(index)}>
+                  Delete
+                  {' '}
+                  {displayName}
+                </Button>
               </div>
             </div>
           </Card>
         ))}
-        <div style={{ display: 'flex', margin: '16px', justifyContent: 'flex-end' }}>
+        <div style={{ display: 'flex', margin: '16px', justifyContent: 'flex-start' }}>
           <Button type="button" onClick={() => append({})} small green>
             Add
             {' '}
@@ -203,6 +207,23 @@ export function BuildRegistryForm({
     >
       <div id="static">
         <Card>
+          <h2>Register a new Liberland company</h2>
+          <br />
+          <p>
+            For full instructions, check out the
+            {' '}
+            <a
+              // eslint-disable-next-line max-len
+              href="https://liberland-1.gitbook.io/wiki/v/public-documents/blockchain/for-citizens/how-to-run-liberland-company"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Company registration guide
+            </a>
+            {' '}
+
+          </p>
+          <br />
           {formObject.staticFields.map((staticField) => {
             const staticFieldName = staticField.encryptable ? `${staticField.key}.value` : staticField.key;
             const staticFieldEncryptedName = `${staticField.key}.isEncrypted`;
@@ -248,7 +269,68 @@ export function BuildRegistryForm({
           errors={errors}
         />
       ))}
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <Card className="mediumMaxSize">
+        <h2>Choose company type</h2>
+        <h3>Dormant company</h3>
+        <p>
+          If you are registering a dormant company for reserving brand name,
+          establishing presence in Liberland or any other reason, and you do not intend to do any transactions or hold
+          any assets with this company until further notice (can change this at any time)
+          <br />
+          <br />
+          <b>
+            <a
+              href="https://blockchain.liberland.org/home/contracts/overview/browser/12"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Sign the Dormant company contract
+            </a>
+          </b>
+        </p>
+        <br />
+        <br />
+        <h3>Pure Liberland company</h3>
+        <p>
+          If you are registering a pure Liberland company, only operating under the jurisdiction of Liberland,
+          such as the territory of Liberland, Liberland ecosystem, Liberland blockchain, or doing business
+          only with Liberland citizens and e-residents
+          <br />
+          <br />
+          <b>
+            <a
+              href="https://blockchain.liberland.org/home/contracts/overview/browser/14"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Sign the Pure Liberland company contract
+            </a>
+          </b>
+        </p>
+        <br />
+        <br />
+        <h3>Internationally operating company</h3>
+        <p>
+          If you are registering a Liberland company intended to do business internationally, within jurisdictions
+          other than Liberland, you will need to comply with additional requirements and sign the
+          &quot;GoodBoi&quot; contract
+          <br />
+          <br />
+          <b>
+            <a
+              href="https://blockchain.liberland.org/home/contracts/overview/browser/13"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Sign the International Liberland &quot;GoodBoi&quot; company contract
+            </a>
+          </b>
+        </p>
+      </Card>
+      <br />
+      <br />
+      <br />
+      <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
         <Button
           primary
           small
