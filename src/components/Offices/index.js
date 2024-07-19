@@ -7,20 +7,21 @@ import OfficesHeader from './OfficesHeader';
 import Identity from './Identity';
 import CompanyRegistry from './CompanyRegistry';
 import CompanyRegistryEdit from './CompanyRegistry/EditCompany';
-import LandRegistry from "./LandRegistry";
-import Finances from "./Finances";
+import LandRegistry from './LandRegistry';
+import Finances from './Finances';
 import router from '../../router';
 
-import styles from './styles.module.scss';
+import stylesPage from '../../utils/pagesBase.module.scss';
+import ScheduledCongressSpendingWrapper from './ScheduledCongressSpendingWrapper';
 
 function Offices() {
   return (
-    <div className={styles.officesWrapper}>
-      <div className={styles.navWrapper}>
+    <div className={stylesPage.sectionWrapper}>
+      <div className={stylesPage.menuAddressWrapper}>
         <OfficesHeader />
       </div>
 
-      <div>
+      <div className={stylesPage.contentWrapper}>
         <Switch>
           <Route
             exact
@@ -53,6 +54,11 @@ function Offices() {
             exact
             path={router.offices.finances}
             component={Finances}
+          />
+          <Route
+            exact
+            path={router.offices.scheduledCongressSpending}
+            component={ScheduledCongressSpendingWrapper}
           />
         </Switch>
       </div>

@@ -71,23 +71,24 @@ WalletOverview.defaultProps = {
 
 WalletOverview.propTypes = {
   // eslint-disable-next-line
-  totalBalance: PropTypes.string,
+  totalBalance: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   showStaked: PropTypes.bool,
   balances: PropTypes.shape({
     liquidAmount: PropTypes.shape({
-      amount: PropTypes.string,
+      // eslint-disable-next-line react/forbid-prop-types
+      amount: PropTypes.object,
     }),
     liberstake: PropTypes.shape({
-      amount: PropTypes.string,
+      amount: PropTypes.number,
     }),
     polkastake: PropTypes.shape({
       amount: PropTypes.number,
     }),
     liquidMerits: PropTypes.shape({
-      amount: PropTypes.number,
+      amount: PropTypes.string,
     }),
   }),
-  liquidMerits: PropTypes.number,
+  liquidMerits: PropTypes.string,
 };
 
 export default WalletOverview;

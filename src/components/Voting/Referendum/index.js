@@ -76,60 +76,61 @@ function Referendum() {
               : null
         }
         <div className={styles.overViewCard}>
-          {
-              democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
-                <Card className={stylesPage.overviewWrapper} key={referendum.index}>
-                  <ReferendumItem
-                    centralizedDatas={referendum.centralizedDatas}
-                    voted={{
-                      yayVotes: referendum.votedAye,
-                      nayVotes: referendum.votedNay,
-                      votedTotal: referendum.votedTotal,
-                    }}
-                    hash={referendum.imageHash}
-                    delegating={delegatingTo !== undefined}
-                    alreadyVoted={alreadyVoted(referendum)}
-                    proposal={referendum.image.proposal}
-                    buttonVoteCallback={handleModalOpenVote}
-                    referendumIndex={parseInt(referendum.index)}
-                    blacklistMotion={referendum.blacklistMotion}
-                    userIsMember={userIsMember}
-                  />
-                </Card>
-              ))
-            }
+          {democracy.democracy?.crossReferencedReferendumsData?.length > 0
+            ? democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
+              <Card className={stylesPage.overviewWrapper} key={referendum.index}>
+                <ReferendumItem
+                  centralizedDatas={referendum.centralizedDatas}
+                  voted={{
+                    yayVotes: referendum.votedAye,
+                    nayVotes: referendum.votedNay,
+                    votedTotal: referendum.votedTotal,
+                  }}
+                  hash={referendum.imageHash}
+                  delegating={delegatingTo !== undefined}
+                  alreadyVoted={alreadyVoted(referendum)}
+                  proposal={referendum.image.proposal}
+                  buttonVoteCallback={handleModalOpenVote}
+                  referendumIndex={parseInt(referendum.index)}
+                  blacklistMotion={referendum.blacklistMotion}
+                  userIsMember={userIsMember}
+                />
+              </Card>
+            ))
+            : 'There are no active Referendums'}
         </div>
       </div>
       <div>
         <h3 className={styles.title}>Proposals</h3>
         <div className={styles.overViewCard}>
-          {
-              democracy.democracy?.crossReferencedProposalsData.map((proposal) => (
-                <Card className={stylesPage.overviewWrapper} key={proposal.index}>
-                  <ProposalItem
-                    centralizedDatas={proposal.centralizedDatas}
-                    boundedCall={proposal.boundedCall}
-                    blacklistMotion={proposal.blacklistMotion}
-                    userIsMember={userIsMember}
-                  />
-                </Card>
-              ))
-            }
+          { democracy.democracy?.crossReferencedProposalsData?.length > 0
+            ? democracy.democracy?.crossReferencedProposalsData.map((proposal) => (
+              <Card className={stylesPage.overviewWrapper} key={proposal.index}>
+                <ProposalItem
+                  centralizedDatas={proposal.centralizedDatas}
+                  boundedCall={proposal.boundedCall}
+                  blacklistMotion={proposal.blacklistMotion}
+                  userIsMember={userIsMember}
+                />
+              </Card>
+            ))
+            : 'There are no active Proposals'}
         </div>
       </div>
       <div>
         <h3 className={styles.title}>Dispatches</h3>
         <div className={styles.overViewCard}>
-          {democracy.democracy?.scheduledCalls.map((item) => (
-            <Card
-              className={cx(stylesPage.overviewWrapper, styles.itemWrapper)}
-              key={`${item.blockNumber.toString()}-${item.idx}`}
-            >
-              <DispatchItem
-                item={item}
-              />
-            </Card>
-          ))}
+          {democracy.democracy?.scheduledCalls?.length > 0
+            ? democracy.democracy?.scheduledCalls.map((item) => (
+              <Card
+                className={cx(stylesPage.overviewWrapper, styles.itemWrapper)}
+                key={`${item.blockNumber.toString()}-${item.idx}`}
+              >
+                <DispatchItem
+                  item={item}
+                />
+              </Card>
+            )) : 'There are no active Dispatches'}
         </div>
       </div>
       {isModalOpenVote && (

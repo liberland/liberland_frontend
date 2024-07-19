@@ -21,6 +21,7 @@ import Congress from '../Congress';
 
 import { blockchainSelectors } from '../../redux/selectors';
 import Contracts from '../Contracts';
+import Senate from '../Senate';
 
 function Home() {
   const isWalletAdressSame = useSelector(
@@ -57,6 +58,8 @@ function Home() {
     <Route key={router.home.legislation} path={router.home.legislation} component={Legislation} />,
     <Route key={router.wallet.allTransactions} path={router.wallet.allTransactions} component={AllTransactions} />,
     <Route key={router.home.congress} path={router.home.congress} component={Congress} />,
+    <Route key={router.home.senate} path={router.home.senate} component={Senate} />,
+
   ];
 
   const renderRoutes = isWalletAdressSame

@@ -20,6 +20,10 @@ const navigationList = [
     route: `${router.offices.finances}`,
     title: 'Government Finances',
   },
+  {
+    route: `${router.offices.scheduledCongressSpending}`,
+    title: 'Scheduled Congress Spending',
+  },
 ];
 
 function OfficesHeader() {

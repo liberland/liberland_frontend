@@ -1,18 +1,14 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import styles from './styles.module.scss';
-
-// REDUX
-import { congressActions } from '../../../redux/actions';
-import { congressSelectors } from '../../../redux/selectors';
+import { senateActions } from '../../../redux/actions';
+import { senateSelectors } from '../../../redux/selectors';
 import Motion from '../../WalletCongresSenate/Motion';
 
-export default function Motions() {
+function Motions() {
   const dispatch = useDispatch();
-  const motions = useSelector(congressSelectors.motions);
-
+  const motions = useSelector(senateSelectors.motions);
   useEffect(() => {
-    dispatch(congressActions.getMotions.call());
+    dispatch(senateActions.senateGetMotions.call());
   }, [dispatch]);
 
   if (!motions || motions.length < 1) {
@@ -20,17 +16,19 @@ export default function Motions() {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <>
       {motions.map(({ proposal, proposalOf, voting }) => (
         <Motion
           key={proposal}
           proposal={proposal.toString()}
           proposalOf={proposalOf.unwrap()}
           voting={voting.unwrap()}
-          voteMotion={(data) => congressActions.voteAtMotions.call(data)}
-          closeMotion={(data) => congressActions.closeMotion.call(data)}
+          voteMotion={(data) => senateActions.senateVoteAtMotions.call(data)}
+          closeMotion={(data) => senateActions.senateCloseMotion.call(data)}
         />
       ))}
-    </div>
+    </>
   );
 }
+
+export default Motions;

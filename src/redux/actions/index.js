@@ -13,6 +13,7 @@ import * as congressActions from './congress';
 import * as onBoardingActions from './onboarding';
 import * as dexActions from './dex';
 import * as contractsActions from './contracts';
+import * as senateActions from './senate';
 
 export {
   authActions,
@@ -30,4 +31,5 @@ export {
   onBoardingActions,
   dexActions,
   contractsActions,
+  senateActions,
 };

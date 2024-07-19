@@ -9,13 +9,15 @@ import Button from '../../Button/Button';
 
 function AssetOverview({
   additionalAssets,
+  isRemarkNeeded,
+  isCongress,
 }) {
   const [whichModalOpen, setWhichModalOpen] = useState(null);
   const handleModalOpenAssets = (symbol) => setWhichModalOpen(symbol);
   const handleModalCloseAssets = () => setWhichModalOpen(null);
   if (additionalAssets.length === 0) { return <div />; }
   // Show only assets that the user owns
-  let filteredAssets = additionalAssets.filter(asset => asset?.balance?.balance > 0)
+  const filteredAssets = additionalAssets.filter((asset) => asset?.balance?.balance > 0);
   return (
     <Card className={styles.assetOverviewWrapper} title="Additional assets">
       <div className={styles.assetOverViewCard}>
@@ -52,7 +54,14 @@ function AssetOverview({
                 </>
               </Button>
               {whichModalOpen === assetInfo.metadata.symbol
-              && <SendAssetModal assetData={assetInfo} closeModal={handleModalCloseAssets} />}
+              && (
+              <SendAssetModal
+                assetData={assetInfo}
+                closeModal={handleModalCloseAssets}
+                isRemarkNeeded={isRemarkNeeded}
+                isCongress={isCongress}
+              />
+              )}
             </div>
           ))
         }
@@ -63,10 +72,23 @@ function AssetOverview({
 }
 AssetOverview.defaultProps = {
   additionalAssets: [],
+  isRemarkNeeded: false,
+  isCongress: true,
 };
 
 AssetOverview.propTypes = {
-  additionalAssets: PropTypes.array,
+  isCongress: PropTypes.bool,
+  isRemarkNeeded: PropTypes.bool,
+  additionalAssets: PropTypes.arrayOf(PropTypes.shape({
+    metadata: {
+      symbol: PropTypes.string,
+      name: PropTypes.string,
+      decimals: PropTypes.number,
+    },
+    balance: {
+      balance: PropTypes.number,
+    },
+  })),
 };
 
 export default AssetOverview;

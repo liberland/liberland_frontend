@@ -12,6 +12,7 @@ import * as congressSelectors from './congress';
 import * as onboardingSelectors from './onboarding';
 import * as dexSelectors from './dex';
 import * as contractsSelectors from './contracts';
+import * as senateSelectors from './senate';
 
 export {
   errorsSelectors,
@@ -28,4 +29,5 @@ export {
   onboardingSelectors,
   dexSelectors,
   contractsSelectors,
+  senateSelectors,
 };
