@@ -239,7 +239,8 @@ export function BuildRegistryForm({
                         register={register}
                         style={{ width: '50%' }}
                         placeholder={staticField.name}
-                        validate={(v) => v !== '' || `${staticField.name} cannot be empty`}
+                        // TODO add validation thats per field, 'cannot be empty' is no good for optional fields
+                        // validate={(v) => v !== '' || `${staticField.name} cannot be empty`}
                       />
                       <div className="error">{errors?.[staticField.key]?.message}</div>
                     </>
@@ -274,8 +275,9 @@ export function BuildRegistryForm({
         <h3>Dormant company</h3>
         <p>
           If you are registering a dormant company for reserving brand name,
-          establishing presence in Liberland or any other reason, and you do not intend to do any transactions or hold
-          any assets with this company until further notice (can change this at any time)
+          establishing presence in Liberland, using this company to drive Liberland traffic to some other business,
+          or any other reason for which you do not intend to do any transactions or hold
+          assets with this company until further notice (can change this at any time)
           <br />
           <br />
           <b>
@@ -327,6 +329,15 @@ export function BuildRegistryForm({
           </b>
         </p>
       </Card>
+      <br />
+      <br />
+      <br />
+      <input
+        type="checkbox"
+        name="signedContract"
+      />
+      {' '}
+      <b>I have signed the relevant company type contract</b>
       <br />
       <br />
       <br />
