@@ -68,28 +68,34 @@ function CongressionalAssemble() {
     newSelectedCandidates[selectedPoliticianArrayIndex] = swapWithPolitician;
     setSelectedCandidates(newSelectedCandidates);
     setDidChangeSelectedCandidates(true);
-    return false;
   };
 
   useEffect(() => {
-    setSelectedCandidates(democracy?.democracy?.currentCandidateVotesByUser);
-    const members = democracy?.democracy?.currentCongressMembers;
-    let filteredEligibleUnselectedCandidates = members?.concat(democracy?.democracy?.candidates);
-    filteredEligibleUnselectedCandidates = filteredEligibleUnselectedCandidates?.filter((candidate) => {
-      let shouldKeep = true;
-      democracy?.democracy?.currentCandidateVotesByUser?.forEach((votedForCandidate) => {
-        if (votedForCandidate.rawIdentity === candidate.rawIdentity) {
-          shouldKeep = false;
-        }
-      });
-      return shouldKeep;
-    });
+    const {
+      currentCongressMembers, candidates, runnersUp, currentCandidateVotesByUser,
+    } = democracy?.democracy || {};
+    setSelectedCandidates(currentCandidateVotesByUser);
+
+    const allMembers = [
+      ...(currentCongressMembers || []),
+      ...(candidates || []),
+      ...(runnersUp || []),
+    ];
+    const votedForRawIdentities = new Set(
+      (currentCandidateVotesByUser || []).map((votedForCandidate) => votedForCandidate.rawIdentity),
+    );
+
+    const filteredEligibleUnselectedCandidates = allMembers.filter(
+      (member) => !votedForRawIdentities.has(member.rawIdentity),
+    );
     setEligibleUnselectedCandidates(filteredEligibleUnselectedCandidates);
   }, [democracy]);
 
   return (
     <div className={cx(stylesPage.contentWrapper, styles.contentWrapper)}>
-      <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />
+      {democracy?.democracy?.currentCongressMembers
+      && <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />}
+      {selectedCandidates && (
       <CandidateVoting
         eligibleUnselectedCandidates={eligibleUnselectedCandidates}
         selectedCandidates={selectedCandidates}
@@ -98,6 +104,8 @@ function CongressionalAssemble() {
         moveSelectedCandidate={moveSelectedCandidate}
         didChangeSelectedCandidates={didChangeSelectedCandidates}
       />
+      )}
+
     </div>
   );
 }

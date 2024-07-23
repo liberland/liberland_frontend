@@ -50,7 +50,7 @@ export const maybeGetApprovedEresidency = async () => {
 export const addMeritTransaction = async (userId, amount) => {
   await api.post('/merit-transactions', {
     userId,
-    amount: amount,
+    amount,
     source: 'blockchain-fe-app',
     comment: 'User onboarding on blockchain',
   });
@@ -59,7 +59,7 @@ export const addMeritTransaction = async (userId, amount) => {
 export const addDollarsTransaction = async (userId, amount) => {
   await api.post('/dollar-transactions', {
     userId,
-    amount: amount,
+    amount,
     source: 'blockchain-fe-app',
     comment: 'User onboarding on blockchain',
   });
@@ -75,3 +75,15 @@ export const addReferendum = async ({
 }) => api.post('/referenda', { // TODO fix API not to use chainIndex
   link, chainIndex: 0, name, description, hash, additionalMetadata, proposerAddress,
 });
+
+export const fetchPendingAdditionalMerits = async () => {
+  try {
+    const approvedEresidency = await api.get(
+      '/users/complex-view?meritsFrom=0.01&claimedOnboardingLld=true&order=userId&attributesNeeded=blockchainAddress',
+
+    );
+    return approvedEresidency.data;
+  } catch (e) {
+    return [];
+  }
+};

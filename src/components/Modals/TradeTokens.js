@@ -130,7 +130,7 @@ function TradeTokensModal({
       if (!isBuy) {
         amount = parseAssets(term, isAsset1 ? decimals1 : decimals2);
         const getSwapPrice = isAsset1 ? getSwapPriceExactTokensForTokens : getSwapPriceTokensForExactTokens;
-        tradeData = await getSwapPrice(enum1, enum2, amount, false);
+        tradeData = await getSwapPrice(enum1, enum2, amount);
         decimalsOut = isAsset1 ? decimals2 : decimals1;
         showReserve = formatAssets(
           reservesThisAssets[isAsset1 ? 'asset2' : 'asset1'],
@@ -141,7 +141,7 @@ function TradeTokensModal({
       } else {
         amount = parseAssets(term, isAsset1 ? decimals2 : decimals1);
         const getSwapPrice = isAsset1 ? getSwapPriceTokensForExactTokens : getSwapPriceExactTokensForTokens;
-        tradeData = await getSwapPrice(enum1, enum2, amount, false);
+        tradeData = await getSwapPrice(enum1, enum2, amount);
         decimalsOut = isAsset1 ? decimals1 : decimals2;
         showReserve = formatAssets(
           reservesThisAssets[isBuy ? 'asset1' : 'asset2'],

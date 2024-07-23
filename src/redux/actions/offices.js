@@ -10,7 +10,13 @@ export const {
   getPalletIds,
   unregisterCompany,
   setRegisteredCompanyData,
+  getPendingAdditionalMerits,
 } = createActions({
+  GET_PENDING_ADDITIONAL_MERITS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
   OFFICE_GET_IDENTITY: {
     call: undefined,
     success: undefined,

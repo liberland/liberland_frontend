@@ -37,6 +37,11 @@ const selectorPallets = createSelector(
   (reducer) => reducer.pallets,
 );
 
+const selectorPendingAdditionalMerits = createSelector(
+  officesReducer,
+  (reducer) => reducer.pendingAdditionalMerits,
+);
+
 export {
   selectorIdentity,
   selectorCompanyRequest,
@@ -45,4 +50,5 @@ export {
   selectorBalances,
   selectorBackendAddressLLMBalance,
   selectorPallets,
+  selectorPendingAdditionalMerits,
 };
