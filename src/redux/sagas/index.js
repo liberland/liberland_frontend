@@ -126,6 +126,8 @@ export default function* rootSaga() {
     congressSagas.voteAtMotionsWatcher(),
     congressSagas.getWalletWatcher(),
     congressSagas.getAdditionalAssetsWatcher(),
+    congressSagas.getAllBalanceForCongressWatcher(),
+    congressSagas.congressBudgetProposeWatcher(),
 
     // ONBOARDING
     onboardingSagas.claimComplimentaryLLDWatcher(),

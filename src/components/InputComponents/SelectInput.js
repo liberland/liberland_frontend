@@ -12,6 +12,8 @@ function SelectInput({
   withIcon = false,
   Icon,
   disabled = false,
+  selected = '',
+  onChange = null,
 }) {
   return (
     <div className={styles.inputWrapper}>
@@ -22,13 +24,14 @@ function SelectInput({
         width={width}
         disabled={disabled}
         {...register(name)}
+        onChange={(e) => (onChange ? onChange(e.target.value) : {})}
       >
         {options.map(
           (option) => (
             <option
               key={option.value}
               value={option.value}
-              selected={option.selected}
+              selected={option.value === selected}
             >
               {option.display}
             </option>

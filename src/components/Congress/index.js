@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import CongressHeader from './CongressHeader';
 import stylesPage from '../../utils/pagesBase.module.scss';
 import Overview from './Overview';
@@ -11,8 +12,26 @@ import Wallet from './Wallet';
 import { CongressAddLegislation } from '../Voting/Referendum/ProposalForms/CongressAddLegislation/CongressAddLegislation';
 // eslint-disable-next-line max-len
 import { CongressAddLegislationViaReferendum } from '../Voting/Referendum/ProposalForms/CongressAddLegislationViaReferendum/CongressAddLegislationViaReferendum';
+import { congressActions, officesActions } from '../../redux/actions';
+import { congressSelectors, officesSelectors } from '../../redux/selectors';
 
 function Congress() {
+  const dispatch = useDispatch();
+  const pallets = useSelector(officesSelectors.selectorPallets);
+  const congresAccountAddress = useSelector(congressSelectors.walletAddress);
+
+  useEffect(() => {
+    dispatch(officesActions.getPalletIds.call());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(congressActions.congressGetWallet.call());
+  }, [dispatch, pallets]);
+
+  useEffect(() => {
+    dispatch(congressActions.congressGetAdditionalAssets.call());
+  }, [dispatch, congresAccountAddress]);
+
   return (
     <div className={stylesPage.sectionWrapper}>
       <div className={stylesPage.menuAddressWrapper}>

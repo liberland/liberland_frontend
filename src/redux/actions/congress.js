@@ -26,7 +26,19 @@ export const {
   congressGetAdditionalAssets,
   congressSendLld,
   congressSendAssets,
+  getAllBalanceForCongress,
+  congressBudgetPropose,
 } = createActions({
+  CONGRESS_BUDGET_PROPOSE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_ALL_BALANCE_FOR_CONGRESS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
   APPLY_FOR_CONGRESS: {
     call: undefined,
     success: undefined,

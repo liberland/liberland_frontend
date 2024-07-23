@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import cx from 'classnames';
 import Button from '../../Button/Button';
-
 // REDUX
 import { congressActions } from '../../../redux/actions';
 import {
@@ -10,6 +10,7 @@ import {
 import styles from '../styles.module.scss';
 import ProposeLegislationButton from '../ProposeLegislationButton';
 import ProposeLegislationViaReferendumButton from '../ProposeLegislationViaReferendumButton';
+import ProposeBudgetButton from '../ProposeBudgetButton';
 
 export default function Overview() {
   const dispatch = useDispatch();
@@ -39,7 +40,7 @@ export default function Overview() {
             {userStatus}
           </p>
         </div>
-        <div className={styles.rowEnd}>
+        <div className={cx(styles.rowEnd, styles.gap)}>
           {!userIsCandidate && !userIsMember && !userIsRunnersUp && (
             <Button
               small
@@ -53,6 +54,7 @@ export default function Overview() {
             <>
               <ProposeLegislationButton />
               <ProposeLegislationViaReferendumButton />
+              <ProposeBudgetButton />
             </>
           )}
           {(userIsMember || userIsCandidate || userIsRunnersUp) && (
