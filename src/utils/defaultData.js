@@ -56,6 +56,13 @@ export const newCompanyDataObject = {
       type: 'checkbox',
       encryptable: false,
     },
+    {
+      key: 'companyType',
+      name: 'Company Type',
+      display: 'Company Type',
+      type: 'radio',
+      encryptable: false,
+    },
   ],
   dynamicFields: [
     {

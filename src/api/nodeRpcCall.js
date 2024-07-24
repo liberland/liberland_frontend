@@ -117,6 +117,7 @@ const getApi = async () => {
           UBOs: 'Vec<UBO>',
           relevantAssets: 'Vec<RelevantAsset>',
           relevantContracts: 'Vec<RelevantContract>',
+          companyType: 'Text',
         },
       },
       runtime: {

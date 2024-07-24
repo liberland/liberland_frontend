@@ -227,6 +227,7 @@ export function BuildRegistryForm({
           {formObject.staticFields.map((staticField) => {
             const staticFieldName = staticField.encryptable ? `${staticField.key}.value` : staticField.key;
             const staticFieldEncryptedName = `${staticField.key}.isEncrypted`;
+            if (staticField.key === 'companyType') return null;
             return (
               <div style={{ marginBottom: '0.5rem' }}>
                 <label style={{ fontWeight: 'bold', fontSize: '1.05rem' }}>{staticField.name}</label>
@@ -271,7 +272,11 @@ export function BuildRegistryForm({
       ))}
       <Card className="mediumMaxSize">
         <h2>Choose company type</h2>
-        <h3>Dormant company</h3>
+        {errors.companyType && <span className="error">You need to choose company type</span>}
+        <h3>
+          <input type="radio" value="Dormant" {...register('companyType', { required: true })} />
+          Dormant company
+        </h3>
         <p>
           If you are registering a dormant company for reserving brand name,
           establishing presence in Liberland or any other reason, and you do not intend to do any transactions or hold
@@ -290,7 +295,11 @@ export function BuildRegistryForm({
         </p>
         <br />
         <br />
-        <h3>Pure Liberland company</h3>
+        <h3>
+          <input type="radio" value="Liberland" {...register('companyType', { required: true })} />
+
+          Pure Liberland company
+        </h3>
         <p>
           If you are registering a pure Liberland company, only operating under the jurisdiction of Liberland,
           such as the territory of Liberland, Liberland ecosystem, Liberland blockchain, or doing business
@@ -309,7 +318,10 @@ export function BuildRegistryForm({
         </p>
         <br />
         <br />
-        <h3>Internationally operating company</h3>
+        <h3>
+          <input type="radio" value="International" {...register('companyType', { required: true })} />
+          Internationally operating company
+        </h3>
         <p>
           If you are registering a Liberland company intended to do business internationally, within jurisdictions
           other than Liberland, you will need to comply with additional requirements and sign the
@@ -355,8 +367,9 @@ export function RenderRegistryItemDetails({ mainDataObject, showAll = false }) {
   return (
     <div>
       <ul>
-        {mainDataObject?.staticFields.map((staticField) => (
-          <li>
+        {mainDataObject?.staticFields.map((staticField, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <li key={`${staticField.id}${index}`}>
             {staticField?.name}
             :
             {' '}
