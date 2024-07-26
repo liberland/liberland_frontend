@@ -61,3 +61,15 @@ export const closestNumberToZeroNotInArray = (arr) => {
     if (!arr.includes(i)) return i;
   }
 };
+
+export const hexToObject = (hexString) => {
+  const hex = hexString.startsWith('0x') ? hexString.slice(2) : hexString;
+
+  const bytes = new Uint8Array(hex.match(/.{1,2}/g).map((byte) => parseInt(byte, 16)));
+
+  const decoder = new TextDecoder();
+  const jsonString = decoder.decode(bytes);
+
+  const object = JSON.parse(jsonString);
+  return object;
+};
