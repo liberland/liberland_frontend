@@ -90,6 +90,7 @@ const officesReducer = handleActions({
       request: null,
     },
     isGetCompanyRequest: true,
+    pendingAdditionalMerits: initialState.pendingAdditionalMerits,
   }),
   [officesActions.getCompanyRequest.success]: (state, action) => ({
     ...state,
@@ -146,10 +147,6 @@ const officesReducer = handleActions({
   [officesActions.getPalletIds.success]: (state, action) => ({
     ...state,
     pallets: action.payload,
-  }),
-  [officesActions.getCompanyRequest.call]: (state) => ({
-    ...state,
-    pendingAdditionalMerits: initialState.pendingAdditionalMerits,
   }),
   [officesActions.getPendingAdditionalMerits.success]: (state, action) => ({
     ...state,
