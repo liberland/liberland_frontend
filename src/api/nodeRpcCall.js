@@ -47,6 +47,9 @@ const getApi = async () => {
         BrandName: {
           name: 'Encryptable',
         },
+        Contact: {
+          contact: 'Encryptable',
+        },
         OnlineAddress: {
           description: 'Encryptable',
           url: 'Encryptable',
@@ -118,6 +121,7 @@ const getApi = async () => {
           relevantAssets: 'Vec<RelevantAsset>',
           relevantContracts: 'Vec<RelevantContract>',
           companyType: 'Text',
+          contact: 'Vec<Contact>',
         },
       },
       runtime: {

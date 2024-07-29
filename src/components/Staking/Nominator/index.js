@@ -30,13 +30,13 @@ function Nominator() {
 
   const isMaxNumValidatorsSelected = (selectedValidators) => selectedValidators.length > 15;
   const toggleSelectedValidator = (validatorAddress) => {
-    if (isMaxNumValidatorsSelected(selectedValidatorsAsTargets)) return;
-
     let currentlySelectedValidators = selectedValidatorsAsTargets;
     const selectedValidatorsIncludesAddress = currentlySelectedValidators.includes(validatorAddress);
 
     if (selectedValidatorsIncludesAddress) {
       currentlySelectedValidators = currentlySelectedValidators.filter((e) => e !== validatorAddress);
+    } else if (isMaxNumValidatorsSelected(selectedValidatorsAsTargets)) {
+      return;
     } else {
       currentlySelectedValidators.push(validatorAddress);
     }

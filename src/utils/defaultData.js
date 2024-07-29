@@ -117,6 +117,26 @@ export const newCompanyDataObject = {
       ],
     },
     {
+      key: 'contact',
+      display: 'List of contacts',
+      name: 'Contact info (optional)',
+      fields: [
+        {
+          key: 'contact',
+          display: 'Contact info (optional)',
+          type: 'text',
+          encryptable: true,
+        },
+      ],
+      data: [
+        [{
+          key: 'contact',
+          display: 'Contact info (optional)',
+          isEncrypted: false,
+        }],
+      ],
+    },
+    {
       key: 'physicalAddresses',
       display: 'List of all physical addresses',
       name: 'Physical Address',
