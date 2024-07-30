@@ -36,7 +36,7 @@ function* payoutWorker() {
     throw e;
   }
 
-  const chunkSize = 10;
+  const chunkSize = 5;
   for (let i = 0; i < rewards.length; i += chunkSize) {
     yield call(batchPayoutStakers, rewards.slice(i, i + chunkSize), walletAddress);
   }
