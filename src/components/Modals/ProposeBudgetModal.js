@@ -4,18 +4,14 @@ import PropTypes from 'prop-types';
 
 // COMPONENTS
 import { useDispatch, useSelector } from 'react-redux';
-import { BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { SelectInput, TextInput } from '../InputComponents';
 import { congressActions } from '../../redux/actions';
 import { congressSelectors } from '../../redux/selectors';
-import { isValidSubstrateAddress, parseAssets } from '../../utils/walletHelpers';
-import {
-  closestNumberToZeroNotInArray,
-  extractItemsFromObject, getOperationType, OperationsType,
-} from '../../utils/councilHelper';
+import { isValidSubstrateAddress } from '../../utils/walletHelpers';
+import { closestNumberToZeroNotInArray, extractItemsFromObject, IndexHelper } from '../../utils/councilHelper';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
@@ -27,7 +23,7 @@ const defaultValueSpending = {
   optionsInput: [{
     value: 'LLD',
     display: 'Liberland Dolar (LLD)',
-    index: 0,
+    index: IndexHelper.LLD,
   }],
   indexItem: 0,
 };
@@ -40,6 +36,8 @@ const collectDataItemList = [
   'select',
   'category',
   'supplier',
+  'combined',
+  'finalDestination',
 ];
 
 function ProposeBudgetModal({
@@ -49,15 +47,16 @@ function ProposeBudgetModal({
   const allBalance = useSelector(congressSelectors.allBalance);
   const [itemsInList, setItemsInList] = useState([0]);
   const [spendings, setSpendings] = useState([defaultValueSpending]);
-  const [indexAssets, setIndexAssets] = useState({ 0: OperationsType.LLD });
 
   const {
     handleSubmit,
     register,
-    trigger,
     setValue,
     formState: { errors, isValid },
+    watch,
+    clearErrors,
     unregister,
+    setError,
   } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -71,17 +70,16 @@ function ProposeBudgetModal({
     if (!isValid) return;
     const bugetProposalItems = extractItemsFromObject(data, spendings[0].optionsInput);
     dispatch(congressActions.congressBudgetPropose.call({ bugetProposalItems, executionBlock }));
+    closeModal();
   };
 
   const optionsInputDefault = useMemo(() => allBalance.map((item) => {
     const { metadata, index, balance } = item;
     const { symbol, name, decimals } = metadata;
-    const operationType = getOperationType(symbol);
     return {
       value: symbol,
       display: `${name}  (${symbol})`,
       index,
-      operation: operationType,
       decimals,
       balance: balance?.balance || balance,
     };
@@ -93,7 +91,6 @@ function ProposeBudgetModal({
     setSpendings((oldValue) => [
       ...oldValue, { ...defaultValueSpending, optionsInput: optionsInputDefault, indexItem: newItemCounter },
     ]);
-    setIndexAssets((prevValue) => ({ ...prevValue, [newItemCounter]: OperationsType.LLD }));
   };
 
   const handleDeleteInput = (index, indexItem) => {
@@ -127,8 +124,7 @@ function ProposeBudgetModal({
       <div className={styles.description}>
         You are going to propose new budget proposal as a Congress member
       </div>
-      {spendings.map(({ optionsInput, indexItem }, index) => (
-        // eslint-disable-next-line react/no-array-index-key
+      {spendings.map(({ optionsInput, indexItem }, index) => ( // eslint-disable-next-line react/no-array-index-key
         <div key={`${index}-${indexItem}`}>
           <div className={styles.title}>
             Transfer
@@ -139,10 +135,6 @@ function ProposeBudgetModal({
               options={optionsInput}
               name={`select${indexItem}`}
               selected="LLD"
-              onChange={(item) => {
-                setIndexAssets((prevValue) => ({ ...prevValue, [indexItem]: item }));
-                setTimeout(() => trigger(`transfer${indexItem}`), 1);
-              }}
             />
           </div>
 
@@ -154,14 +146,12 @@ function ProposeBudgetModal({
             placeholder="Amount"
             required
             validate={(value) => {
-              const { balance, decimals } = optionsInput.find((item) => item.value === indexAssets[indexItem]);
               if (Number.isNaN(Number(value))) return 'Not a number';
-              const isValueHigher = parseAssets(value, decimals).gt(new BN(balance));
-              return isValueHigher ? 'Not enough balance' : true;
+              return true;
             }}
           />
           {errors?.[`transfer${indexItem}`]
-          && <div className={styles.error}>{errors[`transfer${indexItem}`].message}</div>}
+            && <div className={styles.error}>{errors[`transfer${indexItem}`].message}</div>}
 
           <div className={styles.title}>Recipient</div>
           <InputSearch
@@ -177,29 +167,36 @@ function ProposeBudgetModal({
             }}
           />
           {errors[`recipient${indexItem}`]?.message
-        && <div className={styles.error}>{errors[`recipient${indexItem}`].message}</div>}
+          && <div className={styles.error}>{errors[`recipient${indexItem}`].message}</div>}
 
-          <RemarkForm register={register} indexItem={indexItem} errors={errors} />
+          <RemarkForm
+            register={register}
+            indexItem={indexItem}
+            errors={errors}
+            watch={watch}
+            setError={setError}
+            clearErrors={clearErrors}
+          />
 
           <div className={styles.buttonWrapper}>
             {spendings.length > 1
-            && (
-            <Button
-              className={styles.button}
-              onClick={() => handleDeleteInput(index, indexItem)}
-              red
-            >
-              Delete Spending
-            </Button>
-            )}
+              && (
+              <Button
+                className={styles.button}
+                onClick={() => handleDeleteInput(index, indexItem)}
+                red
+              >
+                Delete Spending
+              </Button>
+              )}
             {index === spendings.length - 1 && (
-            <Button className={styles.button} medium green onClick={() => handleAddInput()}>
-              Add new spending
-            </Button>
+              <Button className={styles.button} medium green onClick={() => handleAddInput()}>
+                Add new spending
+              </Button>
             )}
           </div>
         </div>
-      )) }
+      ))}
 
       <div className={styles.title}>
         Congress

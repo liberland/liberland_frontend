@@ -14,7 +14,7 @@ import { parseDollars, parseMerits } from '../utils/walletHelpers';
 import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
-import { OperationsType } from '../utils/councilHelper';
+import { IndexHelper } from '../utils/councilHelper';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -1499,17 +1499,14 @@ const congressProposeBudget = async ({
 
   const proposeBudget = itemsCouncilPropose.map((itemCouncilPropose) => {
     const { transfer, remark: remarkInfo } = itemCouncilPropose;
-    const {
-      asset, index, balance, address,
-    } = transfer;
+    const { index, balance, address } = transfer;
 
     const remark = api.tx.llm.remark(remarkInfo);
     let transferProposal;
 
-    if (asset === OperationsType.LLD) {
+    if (index === IndexHelper.LLD) {
       transferProposal = api.tx.balances.transfer(address, balance);
-    }
-    if (asset === OperationsType.POLTIPOOL_LLM) {
+    } else if (index === IndexHelper.POLITIPOOL_LLM) {
       transferProposal = api.tx.llm.sendLlmToPolitipool(address, balance);
     } else {
       transferProposal = api.tx.assets.transfer(parseInt(index), address, balance);

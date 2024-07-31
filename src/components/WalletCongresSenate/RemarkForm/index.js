@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { ethers } from 'ethers';
 import { SelectInput, TextInput } from '../../InputComponents';
 import styles from '../../Modals/styles.module.scss';
 
@@ -43,12 +44,36 @@ const remarkOptions = {
   ],
 };
 
-export default function RemarkForm({ register, indexItem, errors }) {
-  const categoryName = indexItem ? `category${indexItem}` : 'category';
-  const projectName = indexItem ? `project${indexItem}` : 'project';
-  const supplierName = indexItem ? `supplier${indexItem}` : 'supplier';
-  const descriptionName = indexItem ? `description${indexItem}` : 'description';
-  const amountInUsd = indexItem ? `amountInUsd${indexItem}` : 'amountInUsd';
+export default function RemarkForm({
+  register, indexItem, errors, watch, setError, clearErrors,
+}) {
+  const categoryName = indexItem !== null ? `category${indexItem}` : 'category';
+  const projectName = indexItem !== null ? `project${indexItem}` : 'project';
+  const supplierName = indexItem !== null ? `supplier${indexItem}` : 'supplier';
+  const descriptionName = indexItem !== null ? `description${indexItem}` : 'description';
+  const amountInUsdName = indexItem !== null ? `amountInUsd${indexItem}` : 'amountInUsd';
+  const finalDestinationName = indexItem !== null ? `finalDestination${indexItem}` : 'finalDestination';
+  const combined = indexItem !== null ? `combined${indexItem}` : 'combined';
+
+  register(combined);
+  const category = watch(categoryName);
+  const project = watch(projectName);
+  const supplier = watch(supplierName);
+  const description = watch(descriptionName);
+  const amountInUsd = watch(amountInUsdName);
+  const finalDestination = watch(finalDestinationName);
+
+  const checkSingleRemark = () => {
+    const combinedData = `${category}${project}
+    ${supplier}${description}${amountInUsd}${finalDestination}`;
+    const encoder = new TextEncoder();
+    const byteLength = encoder.encode(combinedData).length;
+    if (byteLength > 256) {
+      setError(combined, { type: 'manual', message: 'Total input size exceeds 256 bytes' });
+    } else {
+      clearErrors(combined);
+    }
+  };
   return (
     <>
       <div className={styles.title}>Category</div>
@@ -66,7 +91,7 @@ export default function RemarkForm({ register, indexItem, errors }) {
         errorTitle="Project"
         placeholder="Project"
         required
-        maxLength={{ value: 256, message: 'Max Project length is 256 chars' }}
+        onChange={checkSingleRemark}
       />
       {errors?.[`${projectName}`]
           && <div className={styles.error}>{errors?.[`${projectName}`].message}</div>}
@@ -78,7 +103,7 @@ export default function RemarkForm({ register, indexItem, errors }) {
         errorTitle="Supplier"
         placeholder="Supplier"
         required
-        maxLength={{ value: 256, message: 'Max Supplier length is 256 chars' }}
+        onChange={checkSingleRemark}
       />
       {errors?.[`${supplierName}`]
           && <div className={styles.error}>{errors[`${supplierName}`].message}</div>}
@@ -90,18 +115,35 @@ export default function RemarkForm({ register, indexItem, errors }) {
         errorTitle="Description"
         placeholder="Description"
         required
-        maxLength={{ value: 256, message: 'Max description length is 256 chars' }}
+        onChange={checkSingleRemark}
       />
       {errors?.[`${descriptionName}`]
           && <div className={styles.error}>{errors[`${descriptionName}`].message}</div>}
 
+      <div className={styles.title}>Final Destination</div>
+      <TextInput
+        register={register}
+        name={finalDestinationName}
+        errorTitle="Final Destination"
+        placeholder="Final Destination"
+        required
+        onChange={checkSingleRemark}
+        validate={(v) => {
+          if (!ethers.utils.isAddress(v)) return 'Invalid Address';
+          return true;
+        }}
+      />
+      {errors?.[`${finalDestinationName}`]
+        && <div className={styles.error}>{errors?.[`${finalDestinationName}`].message}</div>}
+
       <div className={styles.title}>Amount in USD at date of payment</div>
       <TextInput
         register={register}
-        name={amountInUsd}
+        name={amountInUsdName}
         errorTitle="Amount in USD"
         placeholder="Amount in USD"
         required
+        onChange={checkSingleRemark}
         validate={(value) => {
           const number = Number(value);
           if (!(typeof number === 'number') || !(!Number.isNaN(number))) {
@@ -110,8 +152,10 @@ export default function RemarkForm({ register, indexItem, errors }) {
           return true;
         }}
       />
-      {errors?.[`${amountInUsd}`]
-          && <div className={styles.error}>{errors[`${amountInUsd}`].message}</div>}
+      {errors?.[`${amountInUsdName}`]
+          && <div className={styles.error}>{errors[`${amountInUsdName}`].message}</div>}
+
+      {errors?.[`${combined}`] && <div className={styles.error}>{errors[`${combined}`].message}</div>}
     </>
   );
 }
@@ -123,6 +167,9 @@ RemarkForm.defaultProps = {
 RemarkForm.propTypes = {
   register: PropTypes.func.isRequired,
   indexItem: PropTypes.number,
+  watch: PropTypes.func.isRequired,
+  setError: PropTypes.func.isRequired,
+  clearErrors: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   errors: PropTypes.any.isRequired,
 };

@@ -12,7 +12,6 @@ export const extractItemsFromObject = (obj, assetsData) => {
   const selectKeys = Object.keys(obj).filter((key) => key.startsWith('select'));
   const resultArray = selectKeys.map((key) => {
     const assetInfo = assetsData.find((item) => item.value === obj[key]);
-
     const remark = {
       currency: obj[key],
       project: obj[`project${key.slice(-1)}`],
@@ -20,10 +19,9 @@ export const extractItemsFromObject = (obj, assetsData) => {
       category: obj[`category${key.slice(-1)}`],
       supplier: obj[`supplier${key.slice(-1)}`],
       date: Date.now(),
-      finalDestination: obj[`recipient${key.slice(-1)}`],
+      finalDestination: obj[`finalDestination${key.slice(-1)}`],
       amountInUsd: obj[`amountInUsd${key.slice(-1)}`],
     };
-
     return {
       transfer: {
         asset: obj[key],
@@ -37,23 +35,9 @@ export const extractItemsFromObject = (obj, assetsData) => {
   return resultArray;
 };
 
-export const OperationsType = {
-  LLD: 'LLD',
-  LLM: 'LLM',
-  POLTIPOOL_LLM: 'POLTIPOOL_LLM',
-  ASSET: 'ASSET',
-};
-
-export const getOperationType = (itemValue) => {
-  if (itemValue === OperationsType.LLD) {
-    return OperationsType.LLD;
-  } if (itemValue === OperationsType.LLM) {
-    return OperationsType.LLM;
-  }
-  if (itemValue === OperationsType.POLTIPOOL_LLM) {
-    return OperationsType.POLTIPOOL_LLM;
-  }
-  return OperationsType.ASSET;
+export const IndexHelper = {
+  LLD: '0',
+  POLITIPOOL_LLM: '-1',
 };
 
 export const closestNumberToZeroNotInArray = (arr) => {

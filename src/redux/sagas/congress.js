@@ -9,7 +9,6 @@ import {
 import {
   blockchainSelectors,
   congressSelectors,
-  officesSelectors,
 } from '../selectors';
 import {
   applyForCongress,
@@ -40,16 +39,18 @@ import {
   congressSenateSendLld,
   congressSenateSendLlm,
   congressProposeBudget,
+  getPalletIds,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { daysToBlocks } from '../../utils/nodeRpcCall';
 import { palletIdToAddress } from '../../utils/pallet';
 import { formatMerits } from '../../utils/walletHelpers';
+import { IndexHelper } from '../../utils/councilHelper';
 // WORKERS
 
 function* getWalletWorker() {
   const codeName = yield select(congressSelectors.codeName);
-  const pallets = yield select(officesSelectors.selectorPallets);
+  const pallets = yield call(getPalletIds);
 
   if (!pallets) {
     yield put(congressActions.congressGetWallet.failure());
@@ -60,9 +61,7 @@ function* getWalletWorker() {
   const walletAddress = palletIdToAddress(palletId);
   const balances = yield call(getBalanceByAddress, walletAddress);
   yield put(congressActions.congressGetWallet.success({ balances, walletAddress }));
-}
 
-function* getAdditionalAssetsWorker(action) {
   const congressWalletAddress = yield select(congressSelectors.walletAddress);
   if (!congressWalletAddress) {
     yield put(congressActions.congressGetAdditionalAssets.failure());
@@ -73,7 +72,6 @@ function* getAdditionalAssetsWorker(action) {
     getAdditionalAssets,
     congressWalletAddress,
     false,
-    action.payload?.isLlmNeeded,
   );
   yield put(congressActions.congressGetAdditionalAssets.success(additionalAssets));
 }
@@ -455,10 +453,10 @@ function* getAllBalanceForCongressWorker(action) {
     balance: {
       balance: politiPollLlm,
     },
-    index: -1,
+    index: IndexHelper.POLITIPOOL_LLM,
     metadata: {
       name: 'PolitiPoll LLM',
-      symbol: 'POLTIPOOL_LLM',
+      symbol: 'POLITIPOOL_LLM',
       decimals: llmItem.metadata.decimals,
     },
   };
@@ -467,7 +465,7 @@ function* getAllBalanceForCongressWorker(action) {
     balance: {
       balance: lldBalance,
     },
-    index: 0,
+    index: IndexHelper.LLD,
     metadata: {
       decimals: '12',
       name: 'Liberland Dolar',
@@ -670,11 +668,4 @@ export function* congressAmendLegislationViaReferendumWatcher() {
 
 export function* getWalletWatcher() {
   yield* blockchainWatcher(congressActions.congressGetWallet, getWalletWorker);
-}
-
-export function* getAdditionalAssetsWatcher() {
-  yield* blockchainWatcher(
-    congressActions.congressGetAdditionalAssets,
-    getAdditionalAssetsWorker,
-  );
 }

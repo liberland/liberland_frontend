@@ -31,10 +31,12 @@ function SpendModal({
 
   const {
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     register,
     setValue,
     watch,
+    setError,
+    clearErrors,
   } = useForm({
     mode: 'all',
     defaultValues: {
@@ -45,8 +47,9 @@ function SpendModal({
   const executionBlock = useCongressExecutionBlock(votingDays);
 
   const transfer = (values) => {
+    if (!isValid) return;
     const {
-      project, description: descriptionRemark, category, supplier, amount, recipient, amountInUsd,
+      project, description: descriptionRemark, category, supplier, amount, recipient, amountInUsd, finalDestination,
     } = values;
     const remartInfo = {
       project,
@@ -55,9 +58,10 @@ function SpendModal({
       supplier,
       currency: name,
       date: Date.now(),
-      finalDestination: recipient,
+      finalDestination,
       amountInUsd,
     };
+
     dispatch(onSend({
       transferToAddress: recipient,
       transferAmount: parseMerits(amount),
@@ -108,7 +112,7 @@ function SpendModal({
       { errors?.amount?.message
         && <div className={styles.error}>{errors.amount.message}</div> }
 
-      <RemarkForm errors={errors} register={register} />
+      <RemarkForm errors={errors} register={register} clearErrors={clearErrors} setError={setError} watch={watch} />
 
       {isCongress && (
       <>

@@ -27,10 +27,12 @@ function SendAssetModal({
   const dispatch = useDispatch();
   const {
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     register,
     setValue,
     watch,
+    clearErrors,
+    setError,
   } = useForm({
     mode: 'all',
     defaultValues: {
@@ -41,8 +43,9 @@ function SendAssetModal({
   const executionBlock = useCongressExecutionBlock(votingDays);
 
   const transfer = (values) => {
+    if (!isValid) return;
     const {
-      recipient, project, description, category, supplier, amountInUsd,
+      recipient, project, description, category, supplier, amountInUsd, finalDestination,
     } = values;
     const amount = parseAssets(values.amount, assetData.metadata.decimals);
     if (!isRemarkNeeded) {
@@ -59,7 +62,7 @@ function SendAssetModal({
         supplier,
         currency: assetData.metadata.symbol,
         date: Date.now(),
-        finalDestination: recipient,
+        finalDestination,
         amountInUsd,
       };
       const data = {
@@ -130,7 +133,7 @@ function SendAssetModal({
       {isRemarkNeeded
         && (
         <>
-          <RemarkForm errors={errors} register={register} />
+          <RemarkForm errors={errors} register={register} clearErrors={clearErrors} setError={setError} watch={watch} />
 
           {isCongress && (
           <>
