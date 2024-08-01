@@ -1363,6 +1363,18 @@ const createProposalAndVote = async (threshold, proposalContent, vote) => {
   return [proposal, voteAye];
 };
 
+const handleCreateProposalAndVote = async (threshold, proposalData, walletAddress) => {
+  const api = await getApi();
+  const [proposal, voteAye] = await createProposalAndVote(threshold, proposalData, true);
+
+  if (threshold === 1) {
+    return submitExtrinsic(proposal, walletAddress, api);
+  }
+
+  const extrinsic = api.tx.utility.batchAll([proposal, voteAye]);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
 const congressProposeSpend = async ({
   walletAddress, spendProposal, remarkInfo, executionBlock,
 }) => {
@@ -1375,9 +1387,7 @@ const congressProposeSpend = async ({
   const executeProposal = api.tx.scheduler.schedule(executionBlock, null, 0, transferAndRemark);
   const proposal = api.tx.councilAccount.execute(executeProposal);
 
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const createSenateProposalAndVote = async (threshold, proposalContent, vote) => {
@@ -1400,14 +1410,17 @@ const senateProposeSpend = async ({
 }) => {
   const api = await getApi();
 
-  const threshold = await senateMajorityThreshold();
   const remark = api.tx.llm.remark(remarkInfo);
   const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
+  const proposalData = api.tx.senateAccount.execute(transferAndRemark);
+  const threshold = await senateMajorityThreshold();
+  const [proposal, voteAye] = await createSenateProposalAndVote(threshold, proposalData, true);
 
-  const proposal = api.tx.senateAccount.execute(transferAndRemark);
+  if (threshold === 1) {
+    return submitExtrinsic(proposal, walletAddress, api);
+  }
 
-  const extrinsics = await createSenateProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
+  const extrinsic = api.tx.utility.batchAll([proposal, voteAye]);
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
@@ -1685,9 +1698,7 @@ const congressProposeLegislation = async (tier, id, sections, walletAddress) => 
   const api = await getApi();
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.liberlandLegislation.addLegislation(tier, id, sections);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const congressRepealLegislation = async (tier, id, section, walletAddress) => {
@@ -1699,10 +1710,7 @@ const congressRepealLegislation = async (tier, id, section, walletAddress) => {
   const proposal = section !== null
     ? api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness)
     : api.tx.liberlandLegislation.repealLegislation(tier, id, witness);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const getTreasurySpendProposals = async () => {
@@ -1726,18 +1734,14 @@ const congressApproveTreasurySpend = async (proposalId, walletAddress) => {
   const api = await getApi();
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.treasury.approveProposal(proposalId);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const congressUnapproveTreasurySpend = async (proposalId, walletAddress) => {
   const api = await getApi();
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.treasury.removeApproval(proposalId);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const closeCongressMotion = async (proposalHash, index, walletAddress) => {
@@ -1775,7 +1779,7 @@ const congressProposeReferendum = async (
       len: referendumProposal.encodedLength,
     },
   };
-  const proposal = fastTrack
+  const proposalData = fastTrack
     ? api.tx.utility.batchAll([
       api.tx.democracy.externalPropose(lookup),
       api.tx.democracy.fastTrack(
@@ -1788,7 +1792,9 @@ const congressProposeReferendum = async (
 
   const threshold = await congressMajorityThreshold();
 
-  const proposeAndVote = await createProposalAndVote(threshold, proposal, true);
+  const [proposal, voteAye] = await createProposalAndVote(threshold, proposalData, true);
+
+  const proposeAndVote = threshold === 1 ? [proposal] : [proposal, voteAye];
   // eslint-disable-next-line max-len
   const existingPreimage = await api.query.preimage.preimageFor([referendumProposal.hash, referendumProposal.encodedLength]);
   const extrinsic = api.tx.utility.batchAll(
@@ -1907,10 +1913,7 @@ const congressSendTreasuryLld = async (transferToAddress, transferAmount, wallet
 
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.treasury.spend(transferAmount, transferToAddress);
-
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const getPalletIds = async () => {
@@ -1925,9 +1928,7 @@ const congressDemocracyBlacklist = async (proposalHash, referendumIndex, walletA
 
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.democracy.blacklist(proposalHash, referendumIndex ?? null);
-
-  const extrinsic = api.tx.utility.batchAll(await createProposalAndVote(threshold, proposal, true));
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const proposeAmendLegislation = async (
@@ -1978,8 +1979,7 @@ const congressAmendLegislation = async (tier, id, section, content, walletAddres
   const threshold = await congressMajorityThreshold();
   const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
   const proposal = api.tx.liberlandLegislation.amendLegislation(tier, id, section, content, witness);
-  const extrinsic = api.tx.utility.batchAll(await createProposalAndVote(threshold, proposal, true));
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const congressAmendLegislationViaReferendum = async (
@@ -2494,8 +2494,13 @@ const senateProposeCancel = async (walletAddress, idx, executionBlock) => {
   const api = await getApi();
   const threshold = await senateMajorityThreshold();
   const executeProposal = api.tx.scheduler.cancel(executionBlock, idx);
-  const extrinsics = await createSenateProposalAndVote(threshold, executeProposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
+  const [proposal, voteAye] = await createSenateProposalAndVote(threshold, executeProposal, true);
+
+  if (threshold === 1) {
+    return submitExtrinsic(proposal, walletAddress, api);
+  }
+
+  const extrinsic = api.tx.utility.batchAll([proposal, voteAye]);
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
