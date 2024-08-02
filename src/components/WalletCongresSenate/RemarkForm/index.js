@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ethers } from 'ethers';
 import { SelectInput, TextInput } from '../../InputComponents';
 import styles from '../../Modals/styles.module.scss';
 
@@ -128,10 +127,6 @@ export default function RemarkForm({
         placeholder="Final Destination"
         required
         onChange={checkSingleRemark}
-        validate={(v) => {
-          if (!ethers.utils.isAddress(v)) return 'Invalid Address';
-          return true;
-        }}
       />
       {errors?.[`${finalDestinationName}`]
         && <div className={styles.error}>{errors?.[`${finalDestinationName}`].message}</div>}

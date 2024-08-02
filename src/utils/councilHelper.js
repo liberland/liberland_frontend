@@ -36,7 +36,7 @@ export const extractItemsFromObject = (obj, assetsData) => {
 };
 
 export const IndexHelper = {
-  LLD: '0',
+  LLD: '-2',
   POLITIPOOL_LLM: '-1',
 };
 
