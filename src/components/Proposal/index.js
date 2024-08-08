@@ -237,8 +237,13 @@ function BatchAll({ proposal }) {
     && fastTrackMatches(calls[0], calls[1])) {
     return <FastTrackedReferendum proposal={calls[0]} fastTrack={calls[1]} />;
   }
-  // eslint-disable-next-line react/no-array-index-key
-  return calls.map((call, idx) => <Proposal key={idx} proposal={call} />);
+  return calls.map((call, idx) => (
+    // eslint-disable-next-line react/no-array-index-key
+    <div key={`proposal ${idx}`}>
+      <Proposal proposal={call} />
+      <br />
+    </div>
+  ));
 }
 BatchAll.propTypes = { proposal: ProposalProp.isRequired };
 
