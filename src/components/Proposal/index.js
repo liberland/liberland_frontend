@@ -325,7 +325,7 @@ function TransferAsset({ proposal }) {
   const formattedValue = asset ? formatAssets(value, asset?.metadata?.decimals) : value;
 
   useEffect(() => {
-    dispatch(walletActions.getAdditionalAssets.call());
+    dispatch(walletActions.getAdditionalAssets.call(true));
   }, [dispatch]);
 
   return (
@@ -364,27 +364,27 @@ function RemarkInfo({ proposal }) {
   return (
     <>
       <div>
-        Category :
+        Category:
         {' '}
         {category}
       </div>
       <div>
-        Project :
+        Project:
         {' '}
         {project}
       </div>
       <div>
-        Supplier :
+        Supplier:
         {' '}
         {supplier}
       </div>
       <div>
-        Desciption :
+        Desciption:
         {' '}
         {description}
       </div>
       <div>
-        Currency
+        Currency:
         {' '}
         {currency}
       </div>

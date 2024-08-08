@@ -27,9 +27,10 @@ function* getWalletWorker() {
   yield put(walletActions.getWallet.success({ balances }));
 }
 
-function* getAdditionalAssetsWorker() {
+function* getAdditionalAssetsWorker(action) {
+  const isLlmNeeded = action.payload || false;
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  const additionalAssets = yield call(getAdditionalAssets, walletAddress);
+  const additionalAssets = yield call(getAdditionalAssets, walletAddress, false, isLlmNeeded);
   yield put(walletActions.getAdditionalAssets.success(additionalAssets));
 }
 
