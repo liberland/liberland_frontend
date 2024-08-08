@@ -28,6 +28,7 @@ const initialState = {
     },
   },
   additionalAssets: [],
+  allBalance: [],
   candidates: [],
   loading: false,
   members: [],
@@ -61,6 +62,8 @@ const congressReducer = handleActions(
       congressActions.unapproveTreasurySpend.call,
       congressActions.congressDemocracyBlacklist.call,
       congressActions.renounceCandidacy.call,
+      congressActions.getAllBalanceForCongress.call,
+      congressActions.congressBudgetPropose.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -91,9 +94,17 @@ const congressReducer = handleActions(
       congressActions.congressDemocracyBlacklist.success,
       congressActions.renounceCandidacy.failure,
       congressActions.renounceCandidacy.success,
+      congressActions.getAllBalanceForCongress.failure,
+      congressActions.getAllBalanceForCongress.success,
+      congressActions.congressBudgetPropose.failure,
+      congressActions.congressBudgetPropose.success,
     )]: (state) => ({
       ...state,
       loading: false,
+    }),
+    [congressActions.getAllBalanceForCongress.success]: (state, action) => ({
+      ...state,
+      allBalance: action.payload,
     }),
     [congressActions.getCandidates.success]: (state, action) => ({
       ...state,

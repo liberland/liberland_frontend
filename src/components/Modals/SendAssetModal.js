@@ -17,6 +17,8 @@ import { congressActions, senateActions, walletActions } from '../../redux/actio
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
+import RemarkForm from '../WalletCongresSenate/RemarkForm';
+import { objectToHex } from '../../utils/councilHelper';
 
 // TODO add validation
 function SendAssetModal({
@@ -25,10 +27,12 @@ function SendAssetModal({
   const dispatch = useDispatch();
   const {
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     register,
     setValue,
     watch,
+    clearErrors,
+    setError,
   } = useForm({
     mode: 'all',
     defaultValues: {
@@ -39,20 +43,33 @@ function SendAssetModal({
   const executionBlock = useCongressExecutionBlock(votingDays);
 
   const transfer = (values) => {
+    if (!isValid) return;
+    const {
+      recipient, project, description, category, supplier, amountInUsd, finalDestination,
+    } = values;
     const amount = parseAssets(values.amount, assetData.metadata.decimals);
     if (!isRemarkNeeded) {
       dispatch(walletActions.sendAssetsTransfer.call({
-        recipient: values.recipient,
+        recipient,
         amount,
         assetData,
       }));
     } else {
-      const title = `Spend ${assetData.metadata.symbol}`;
+      const remarkInfo = {
+        project,
+        description,
+        category,
+        supplier,
+        currency: assetData.metadata.symbol,
+        date: Date.now(),
+        finalDestination,
+        amountInUsd,
+      };
       const data = {
         transferToAddress: values.recipient,
         transferAmount: amount,
         assetData,
-        remarkInfo: values.description || `${isCongress ? 'Congress' : 'Senate'} ${title}`,
+        remarkInfo: objectToHex(remarkInfo),
       };
       if (isCongress) {
         dispatch(congressActions.congressSendAssets.call({ ...data, executionBlock }));
@@ -116,18 +133,7 @@ function SendAssetModal({
       {isRemarkNeeded
         && (
         <>
-          <div className={styles.title}>Spend description</div>
-          <TextInput
-            register={register}
-            minLength={{ value: 3, message: 'Min description length is 3 chars' }}
-            errorTitle="Description"
-            maxLength={{ value: 256, message: 'Max description length is 256 chars' }}
-            name="description"
-            placeholder="Spend description"
-            required
-          />
-          { errors?.description?.message
-        && <div className={styles.error}>{errors.description.message}</div> }
+          <RemarkForm errors={errors} register={register} clearErrors={clearErrors} setError={setError} watch={watch} />
 
           {isCongress && (
           <>

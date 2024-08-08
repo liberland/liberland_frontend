@@ -15,6 +15,8 @@ import styles from './styles.module.scss';
 import { parseMerits, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
+import RemarkForm from '../WalletCongresSenate/RemarkForm';
+import { objectToHex } from '../../utils/councilHelper';
 
 function SpendModal({
   closeModal, onSend, spendData, isCongress, balance,
@@ -29,10 +31,12 @@ function SpendModal({
 
   const {
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     register,
     setValue,
     watch,
+    setError,
+    clearErrors,
   } = useForm({
     mode: 'all',
     defaultValues: {
@@ -43,10 +47,25 @@ function SpendModal({
   const executionBlock = useCongressExecutionBlock(votingDays);
 
   const transfer = (values) => {
+    if (!isValid) return;
+    const {
+      project, description: descriptionRemark, category, supplier, amount, recipient, amountInUsd, finalDestination,
+    } = values;
+    const remartInfo = {
+      project,
+      description: descriptionRemark,
+      category,
+      supplier,
+      currency: name,
+      date: Date.now(),
+      finalDestination,
+      amountInUsd,
+    };
+
     dispatch(onSend({
-      transferToAddress: values.recipient,
-      transferAmount: parseMerits(values.amount),
-      remarkInfo: values.description || `${isCongress ? 'Congress' : 'Senate'} ${title}`,
+      transferToAddress: recipient,
+      transferAmount: parseMerits(amount),
+      remarkInfo: objectToHex(remartInfo),
       executionBlock,
     }));
     closeModal();
@@ -93,18 +112,7 @@ function SpendModal({
       { errors?.amount?.message
         && <div className={styles.error}>{errors.amount.message}</div> }
 
-      <div className={styles.title}>Spend description</div>
-      <TextInput
-        register={register}
-        minLength={{ value: 3, message: 'Min description length is 3 chars' }}
-        errorTitle="Description"
-        maxLength={{ value: 256, message: 'Max description length is 256 chars' }}
-        name="description"
-        placeholder="Spend description"
-        required
-      />
-      { errors?.description?.message
-        && <div className={styles.error}>{errors.description.message}</div> }
+      <RemarkForm errors={errors} register={register} clearErrors={clearErrors} setError={setError} watch={watch} />
 
       {isCongress && (
       <>

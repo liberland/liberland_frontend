@@ -14,6 +14,7 @@ import { parseDollars, parseMerits } from '../utils/walletHelpers';
 import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
+import { IndexHelper } from '../utils/councilHelper';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -330,7 +331,7 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
       const assetResults = await api.queryMulti([...assetQueries]);
 
       assetResults.forEach((assetResult, index) => {
-        indexedFilteredAssets[index].balance = assetResult.toJSON();
+        indexedFilteredAssets[index].balance = assetResult.toJSON() || '0';
       });
       return indexedFilteredAssets;
     }
@@ -1476,6 +1477,38 @@ const congressSenateSendAssets = async ({
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
   });
+};
+const congressProposeBudget = async ({
+  walletAddress, itemsCouncilPropose, executionBlock,
+}) => {
+  const api = await getApi();
+
+  const proposeBudget = itemsCouncilPropose.map((itemCouncilPropose) => {
+    const { transfer, remark: remarkInfo } = itemCouncilPropose;
+    const { index, balance, address } = transfer;
+
+    const remark = api.tx.llm.remark(remarkInfo);
+    let transferProposal;
+
+    if (index === IndexHelper.LLD) {
+      transferProposal = api.tx.balances.transfer(address, balance);
+    } else if (index === IndexHelper.POLITIPOOL_LLM) {
+      transferProposal = api.tx.llm.sendLlmToPolitipool(address, balance);
+    } else {
+      transferProposal = api.tx.assets.transfer(parseInt(index), address, balance);
+    }
+
+    return { transferProposal, remark };
+  });
+  const threshold = await congressMajorityThreshold();
+  const transferAndRemark = api.tx.utility
+    .batchAll(proposeBudget.flatMap((item) => [item.transferProposal, item.remark]));
+  const executeProposal = api.tx.scheduler.schedule(executionBlock, null, 0, transferAndRemark);
+  const proposal = api.tx.councilAccount.execute(executeProposal);
+
+  const extrinsics = await createProposalAndVote(threshold, proposal, true);
+  const extrinsic = api.tx.utility.batchAll(extrinsics);
+  return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
 const senateVoteAtMotions = async (walletAddress, proposal, index, vote) => {
@@ -2639,4 +2672,5 @@ export {
   closeSenateMotion,
   senateProposeCancel,
   getPreImage,
+  congressProposeBudget,
 };

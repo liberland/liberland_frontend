@@ -115,3 +115,8 @@ export const motionDurationInDays = createSelector(
   congressReducer,
   (reducer) => reducer.motionDurationInDays,
 );
+
+export const allBalance = createSelector(
+  congressReducer,
+  (reducer) => reducer.allBalance,
+);
