@@ -9,7 +9,6 @@ import {
 import {
   blockchainSelectors,
   congressSelectors,
-  officesSelectors,
 } from '../selectors';
 import {
   applyForCongress,
@@ -39,15 +38,19 @@ import {
   congressSenateSendAssets,
   congressSenateSendLld,
   congressSenateSendLlm,
+  congressProposeBudget,
+  getPalletIds,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { daysToBlocks } from '../../utils/nodeRpcCall';
 import { palletIdToAddress } from '../../utils/pallet';
+import { formatMerits } from '../../utils/walletHelpers';
+import { IndexHelper } from '../../utils/councilHelper';
 // WORKERS
 
 function* getWalletWorker() {
   const codeName = yield select(congressSelectors.codeName);
-  const pallets = yield select(officesSelectors.selectorPallets);
+  const pallets = yield call(getPalletIds);
 
   if (!pallets) {
     yield put(congressActions.congressGetWallet.failure());
@@ -58,9 +61,7 @@ function* getWalletWorker() {
   const walletAddress = palletIdToAddress(palletId);
   const balances = yield call(getBalanceByAddress, walletAddress);
   yield put(congressActions.congressGetWallet.success({ balances, walletAddress }));
-}
 
-function* getAdditionalAssetsWorker() {
   const congressWalletAddress = yield select(congressSelectors.walletAddress);
   if (!congressWalletAddress) {
     yield put(congressActions.congressGetAdditionalAssets.failure());
@@ -70,6 +71,7 @@ function* getAdditionalAssetsWorker() {
   const additionalAssets = yield call(
     getAdditionalAssets,
     congressWalletAddress,
+    false,
   );
   yield put(congressActions.congressGetAdditionalAssets.success(additionalAssets));
 }
@@ -420,7 +422,90 @@ function* congressAmendLegislationViaReferendumWorker({
   yield put(congressActions.getMotions.call());
 }
 
+function* getAllBalanceForCongressWorker(action) {
+  const congressWalletAddress = yield select(congressSelectors.walletAddress);
+
+  if (!congressWalletAddress) {
+    yield put(congressActions.getAllBalanceForCongress.failure());
+    return;
+  }
+
+  const additionalAssets = yield call(
+    getAdditionalAssets,
+    congressWalletAddress,
+    false,
+    action.payload?.isLlmNeeded,
+  );
+
+  const balances = yield select(
+    congressSelectors.balances,
+  );
+  const lldBalance = yield select(
+    congressSelectors.liquidDollarsBalance,
+  );
+  const llmItem = additionalAssets.find((item) => item.index === 1);
+
+  const politiPollLlm = formatMerits(
+    balances.liberstake.amount,
+  );
+
+  const llmPolitiPool = {
+    balance: {
+      balance: politiPollLlm,
+    },
+    index: IndexHelper.POLITIPOOL_LLM,
+    metadata: {
+      name: 'PolitiPoll LLM',
+      symbol: 'POLITIPOOL_LLM',
+      decimals: llmItem.metadata.decimals,
+    },
+  };
+
+  const lldItem = {
+    balance: {
+      balance: lldBalance,
+    },
+    index: IndexHelper.LLD,
+    metadata: {
+      decimals: '12',
+      name: 'Liberland Dolar',
+      symbol: 'LLD',
+    },
+  };
+  yield put(congressActions.getAllBalanceForCongress.success([...additionalAssets, lldItem, llmPolitiPool]));
+}
+
+function* congressBudgetProposeWorker({
+  payload: {
+    bugetProposalItems, executionBlock,
+  },
+}) {
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+
+  yield call(congressProposeBudget, {
+    walletAddress, itemsCouncilPropose: bugetProposalItems, executionBlock,
+  });
+  yield put(congressActions.congressBudgetPropose.success());
+  yield put(congressActions.getMotions.call());
+}
+
 // WATCHERS
+
+export function* congressBudgetProposeWatcher() {
+  yield* blockchainWatcher(
+    congressActions.congressBudgetPropose,
+    congressBudgetProposeWorker,
+  );
+}
+
+export function* getAllBalanceForCongressWatcher() {
+  yield* blockchainWatcher(
+    congressActions.getAllBalanceForCongress,
+    getAllBalanceForCongressWorker,
+  );
+}
 
 export function* applyForCongressWatcher() {
   yield* blockchainWatcher(
@@ -583,11 +668,4 @@ export function* congressAmendLegislationViaReferendumWatcher() {
 
 export function* getWalletWatcher() {
   yield* blockchainWatcher(congressActions.congressGetWallet, getWalletWorker);
-}
-
-export function* getAdditionalAssetsWatcher() {
-  yield* blockchainWatcher(
-    congressActions.congressGetAdditionalAssets,
-    getAdditionalAssetsWorker,
-  );
 }
