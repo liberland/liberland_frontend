@@ -12,6 +12,7 @@ import {
   blockchainSelectors,
 } from '../../../redux/selectors';
 import { Proposal } from '../../Proposal';
+import { walletAddress } from '../../../redux/selectors/congress';
 
 export default function Motion({
   proposal, proposalOf, voting, voteMotion, closeMotion,
@@ -24,6 +25,8 @@ export default function Motion({
   const threshold = voting.threshold.toNumber();
 
   const isClosable = voting.ayes.length >= threshold;
+
+  const isClosableNaye = voting.nays.length >= 50;
 
   const voteMotionCall = (vote) => {
     const voteMotionData = {
@@ -96,6 +99,19 @@ export default function Motion({
                 Vote nay
               </Button>
           )}
+          {
+            isClosableNaye && (
+            <Button
+              small
+              secondary
+              onClick={() => dispatch(
+                closeMotion({ proposal, index: voting.index, walletAddress }),
+              )}
+            >
+              Close Motion
+            </Button>
+            )
+          }
         </div>
         <Proposal proposal={proposalOf} />
 
