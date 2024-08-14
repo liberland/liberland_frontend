@@ -54,9 +54,7 @@ function ProposeBudgetModal({
     setValue,
     formState: { errors, isValid },
     watch,
-    clearErrors,
     unregister,
-    setError,
   } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -170,12 +168,11 @@ function ProposeBudgetModal({
           && <div className={styles.error}>{errors[`recipient${indexItem}`].message}</div>}
 
           <RemarkForm
-            register={register}
             indexItem={indexItem}
             errors={errors}
+            register={register}
             watch={watch}
-            setError={setError}
-            clearErrors={clearErrors}
+            setValue={setValue}
           />
 
           <div className={styles.buttonWrapper}>

@@ -35,8 +35,6 @@ function SpendModal({
     register,
     setValue,
     watch,
-    setError,
-    clearErrors,
   } = useForm({
     mode: 'all',
     defaultValues: {
@@ -112,7 +110,7 @@ function SpendModal({
       { errors?.amount?.message
         && <div className={styles.error}>{errors.amount.message}</div> }
 
-      <RemarkForm errors={errors} register={register} clearErrors={clearErrors} setError={setError} watch={watch} />
+      <RemarkForm errors={errors} register={register} watch={watch} setValue={setValue} />
 
       {isCongress && (
       <>

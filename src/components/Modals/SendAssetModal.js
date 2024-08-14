@@ -31,8 +31,6 @@ function SendAssetModal({
     register,
     setValue,
     watch,
-    clearErrors,
-    setError,
   } = useForm({
     mode: 'all',
     defaultValues: {
@@ -133,7 +131,7 @@ function SendAssetModal({
       {isRemarkNeeded
         && (
         <>
-          <RemarkForm errors={errors} register={register} clearErrors={clearErrors} setError={setError} watch={watch} />
+          <RemarkForm errors={errors} register={register} watch={watch} setValue={setValue} />
 
           {isCongress && (
           <>

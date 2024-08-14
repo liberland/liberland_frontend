@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { SelectInput, TextInput } from '../../InputComponents';
 import styles from '../../Modals/styles.module.scss';
@@ -44,7 +44,7 @@ const remarkOptions = {
 };
 
 export default function RemarkForm({
-  register, indexItem, errors, watch, setError, clearErrors,
+  register, indexItem, errors, watch, setValue,
 }) {
   const categoryName = indexItem !== null ? `category${indexItem}` : 'category';
   const projectName = indexItem !== null ? `project${indexItem}` : 'project';
@@ -54,7 +54,6 @@ export default function RemarkForm({
   const finalDestinationName = indexItem !== null ? `finalDestination${indexItem}` : 'finalDestination';
   const combined = indexItem !== null ? `combined${indexItem}` : 'combined';
 
-  register(combined);
   const category = watch(categoryName);
   const project = watch(projectName);
   const supplier = watch(supplierName);
@@ -62,17 +61,18 @@ export default function RemarkForm({
   const amountInUsd = watch(amountInUsdName);
   const finalDestination = watch(finalDestinationName);
 
-  const checkSingleRemark = () => {
-    const combinedData = `${category}${project}
-    ${supplier}${description}${amountInUsd}${finalDestination}`;
+  useEffect(() => {
+    const combinedData = `${category}${project}${supplier}${description}${amountInUsd}${finalDestination}`;
     const encoder = new TextEncoder();
     const byteLength = encoder.encode(combinedData).length;
+
     if (byteLength > 256) {
-      setError(combined, { type: 'manual', message: 'Total input size exceeds 256 bytes' });
+      setValue(combined, combinedData, { shouldValidate: true });
     } else {
-      clearErrors(combined);
+      setValue(combined, combinedData, { shouldValidate: true });
     }
-  };
+  }, [category, project, supplier, description, amountInUsd, finalDestination, setValue, combined]);
+
   return (
     <>
       <div className={styles.title}>Category</div>
@@ -90,7 +90,6 @@ export default function RemarkForm({
         errorTitle="Project"
         placeholder="Project"
         required
-        onChange={checkSingleRemark}
       />
       {errors?.[`${projectName}`]
           && <div className={styles.error}>{errors?.[`${projectName}`].message}</div>}
@@ -102,7 +101,6 @@ export default function RemarkForm({
         errorTitle="Supplier"
         placeholder="Supplier"
         required
-        onChange={checkSingleRemark}
       />
       {errors?.[`${supplierName}`]
           && <div className={styles.error}>{errors[`${supplierName}`].message}</div>}
@@ -114,7 +112,6 @@ export default function RemarkForm({
         errorTitle="Description"
         placeholder="Description"
         required
-        onChange={checkSingleRemark}
       />
       {errors?.[`${descriptionName}`]
           && <div className={styles.error}>{errors[`${descriptionName}`].message}</div>}
@@ -126,7 +123,6 @@ export default function RemarkForm({
         errorTitle="Final Destination"
         placeholder="Final Destination"
         required
-        onChange={checkSingleRemark}
       />
       {errors?.[`${finalDestinationName}`]
         && <div className={styles.error}>{errors?.[`${finalDestinationName}`].message}</div>}
@@ -138,7 +134,6 @@ export default function RemarkForm({
         errorTitle="Amount in USD"
         placeholder="Amount in USD"
         required
-        onChange={checkSingleRemark}
         validate={(value) => {
           const number = Number(value);
           if (!(typeof number === 'number') || !(!Number.isNaN(number))) {
@@ -149,7 +144,19 @@ export default function RemarkForm({
       />
       {errors?.[`${amountInUsdName}`]
           && <div className={styles.error}>{errors[`${amountInUsdName}`].message}</div>}
-
+      <TextInput
+        className={styles.displayNone}
+        register={register}
+        name={combined}
+        validate={(value) => {
+          const encoder = new TextEncoder();
+          const byteLength = encoder.encode(value).length;
+          if (byteLength > 256) {
+            return 'Remark should have less than 256 bytes';
+          }
+          return true;
+        }}
+      />
       {errors?.[`${combined}`] && <div className={styles.error}>{errors[`${combined}`].message}</div>}
     </>
   );
@@ -163,8 +170,7 @@ RemarkForm.propTypes = {
   register: PropTypes.func.isRequired,
   indexItem: PropTypes.number,
   watch: PropTypes.func.isRequired,
-  setError: PropTypes.func.isRequired,
-  clearErrors: PropTypes.func.isRequired,
+  setValue: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   errors: PropTypes.any.isRequired,
 };
