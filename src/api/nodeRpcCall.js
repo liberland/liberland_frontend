@@ -1095,8 +1095,11 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
       if (optCompanyRegistryEntity.isNone) companyData = { unregister: true };
       else {
         // eslint-disable-next-line max-len
-        const compressed = optCompanyRegistryEntity?.isSome ? optCompanyRegistryEntity.unwrap().data : optCompanyRegistryEntity.data;
+        const optCompanyRegistryEntityUnwrap = optCompanyRegistryEntity?.isSome ? optCompanyRegistryEntity.unwrap() : optCompanyRegistryEntity;
+        const compressed = optCompanyRegistryEntityUnwrap.data;
         companyData = api.createType('CompanyData', pako.inflate(compressed));
+
+        companyData.set('registryAllowedToEdit', optCompanyRegistryEntityUnwrap.editableByRegistrar);
       }
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -1189,18 +1192,22 @@ const requestCompanyRegistration = async (companyData, registryAllowedToEdit, wa
 
   const data = api.createType('CompanyData', companyData);
   const compressed = pako.deflate(data.toU8a());
-
   const extrinsic = api.tx.companyRegistry.requestEntity(0, u8aToHex(compressed), !!registryAllowedToEdit);
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
-const requestEditCompanyRegistration = async (companyData, companyId, walletAddress) => {
+const requestEditCompanyRegistration = async (companyData, companyId, walletAddress, registryAllowedToEdit) => {
   const api = await getApi();
 
   const data = api.createType('CompanyData', companyData);
   const compressed = pako.deflate(data.toU8a());
 
-  const extrinsic = api.tx.companyRegistry.requestRegistration(0, companyId, u8aToHex(compressed), true);
+  const extrinsic = api.tx.companyRegistry.requestRegistration(
+    0,
+    companyId,
+    u8aToHex(compressed),
+    !!registryAllowedToEdit,
+  );
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
