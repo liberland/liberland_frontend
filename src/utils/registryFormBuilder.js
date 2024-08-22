@@ -18,7 +18,7 @@ export function blockchainDataToFormObject(blockchainDataRaw) {
   const dynamicFields = [];
 
   supportedObject.staticFields.forEach((staticField) => {
-    if (staticField.key in blockchainData) {
+    if (staticField.key in blockchainData || staticField.type === 'checkbox') {
       const fieldObject = staticField;
       fieldObject.display = blockchainData[staticField.key];
       staticFields.push(fieldObject);
@@ -190,10 +190,14 @@ export function BuildRegistryForm({
   formObject, buttonMessage, companyId, callback,
 }) {
   const defaultValues = getDefaultValuesFromDataObject(formObject, !!companyId);
+
   const {
     handleSubmit, register, control, formState: { errors },
   } = useForm({
-    defaultValues,
+    defaultValues: {
+      ...defaultValues,
+      registryAllowedToEdit: !!defaultValues.registryAllowedToEdit,
+    },
   });
 
   if (formObject.invalid) {
@@ -226,36 +230,39 @@ export function BuildRegistryForm({
           <br />
           {formObject.staticFields.map((staticField) => {
             const staticFieldName = staticField.encryptable ? `${staticField.key}.value` : staticField.key;
-            const staticFieldEncryptedName = `${staticField.key}.isEncrypted`;
+
             if (staticField.key === 'companyType') return null;
+            let fieldComponent = null;
+            if (staticField.type === 'text') {
+              fieldComponent = (
+                <>
+                  <TextInput
+                    name={staticField.key}
+                    register={register}
+                    style={{ width: '50%' }}
+                    placeholder={staticField.name}
+                  />
+                  <div className="error">{errors?.[staticField.key]?.message}</div>
+                </>
+              );
+            } else if (staticField.encryptable || staticField.type === 'checkbox') {
+              fieldComponent = (<input {...register(staticFieldName)} type="checkbox" />);
+            } else {
+              fieldComponent = (
+                <input
+                  type={staticField.type}
+                  name={staticField.key}
+                  {...register(staticFieldName)}
+                  placeholder={staticField.display}
+                />
+              );
+            }
+
             return (
-              <div style={{ marginBottom: '0.5rem' }}>
+              <div style={{ marginBottom: '0.5rem' }} key={staticFieldName}>
                 <label style={{ fontWeight: 'bold', fontSize: '1.05rem' }}>{staticField.name}</label>
                 <br />
-                {staticField.type === 'text'
-                  ? (
-                    <>
-                      <TextInput
-                        name={staticField.key}
-                        register={register}
-                        style={{ width: '50%' }}
-                        placeholder={staticField.name}
-                        // TODO add validation thats per field, 'cannot be empty' is no good for optional fields
-                        // validate={(v) => v !== '' || `${staticField.name} cannot be empty`}
-                      />
-                      <div className="error">{errors?.[staticField.key]?.message}</div>
-                    </>
-                  )
-                  : (
-                    <input
-                      type={staticField.type}
-                      name={staticField.key}
-                      {...register(staticFieldName)}
-                      placeholder={staticField.display}
-                    />
-                  )}
-
-                {staticField.encryptable ? <input {...register(staticFieldEncryptedName)} type="checkbox" /> : null }
+                {fieldComponent}
               </div>
             );
           })}

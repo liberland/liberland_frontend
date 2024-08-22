@@ -33,12 +33,14 @@ export default function EditCompany() {
     );
   }
 
-  const onSubmit = (companyData) => {
+  const onSubmit = (allCompanyData) => {
+    const { registryAllowedToEdit, ...companyData } = allCompanyData;
     dispatch(
       registriesActions.requestEditCompanyRegistrationAction.call({
         companyData,
         companyId,
         history,
+        registryAllowedToEdit,
       }),
     );
   };
