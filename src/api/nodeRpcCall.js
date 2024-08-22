@@ -14,6 +14,7 @@ import { parseDollars, parseMerits } from '../utils/walletHelpers';
 import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
+// eslint-disable-next-line import/no-cycle
 import { IndexHelper } from '../utils/councilHelper';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
@@ -123,6 +124,16 @@ const getApi = async () => {
           relevantContracts: 'Vec<RelevantContract>',
           companyType: 'Text',
           contact: 'Vec<Contact>',
+        },
+        RemarkInfo: {
+          category: 'Text',
+          project: 'Text',
+          supplier: 'Text',
+          description: 'Text',
+          finalDestination: 'Text',
+          amountInUSDAtDateOfPayment: 'u64',
+          date: 'u64',
+          currency: 'Text',
         },
       },
       runtime: {
@@ -2552,6 +2563,22 @@ const closeSenateMotion = async (proposalHash, index, walletAddress) => {
   return submitExtrinsic(api.tx.senate.close(proposalHash, index, weightBound, lengthBound), walletAddress, api);
 };
 
+const encodeRemark = async (dataToEncode) => {
+  const api = await getApi();
+  const data = api.createType('RemarkInfo', dataToEncode);
+  return u8aToHex(pako.deflate(data.toU8a()));
+};
+
+const decodeRemark = async (dataToEncode) => {
+  const api = await getApi();
+  const encodedData = dataToEncode.toHex();
+  const compressedData = hexToU8a(encodedData);
+  const decompressed = pako.inflate(compressedData);
+  const remarkInfo = api.createType('RemarkInfo', decompressed);
+
+  return remarkInfo;
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -2680,4 +2707,6 @@ export {
   senateProposeCancel,
   getPreImage,
   congressProposeBudget,
+  encodeRemark,
+  decodeRemark,
 };

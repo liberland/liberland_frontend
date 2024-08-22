@@ -6,7 +6,7 @@ import cx from 'classnames';
 import router from '../../router';
 import { blockchainActions, walletActions } from '../../redux/actions';
 import { blockchainSelectors, walletSelectors } from '../../redux/selectors';
-import { decodeCall } from '../../api/nodeRpcCall';
+import { decodeCall, decodeRemark } from '../../api/nodeRpcCall';
 import styles from './styles.module.scss';
 import stylesAnim from '../Voting/Referendum/Items/item.module.scss';
 import { formatAssets, formatDollars, formatMerits } from '../../utils/walletHelpers';
@@ -338,18 +338,32 @@ function TransferAsset({ proposal }) {
 TransferAsset.propTypes = { proposal: ProposalProp.isRequired };
 
 function RemarkInfo({ proposal }) {
-  const decoder = new TextDecoder();
-  const jsonString = decoder.decode(proposal.args[0]);
-  let parsedJson;
-  try {
-    parsedJson = JSON.parse(jsonString);
-  } catch (err) {
+  const [data, setData] = useState(null);
+  const bytes = proposal.get('args').data;
+
+  useEffect(() => {
+    decodeRemark(bytes).then((item) => {
+      setData({
+        currency: item.currency,
+        date: item.date,
+        amountInUsd: item.amountInUSDAtDateOfPayment,
+        category: item.category,
+        project: item.project,
+        supplier: item.supplier,
+        description: item.description,
+        finalDestination: item.finalDestination,
+      });
+    });
+  }, [bytes, proposal]);
+
+  if (!data) {
     return (
       <div>
-        {jsonString}
+        {JSON.stringify(proposal.toHuman(), null, 2)}
       </div>
     );
   }
+
   const {
     project,
     description,
@@ -359,48 +373,48 @@ function RemarkInfo({ proposal }) {
     date,
     finalDestination,
     amountInUsd,
-  } = parsedJson;
-  const dateTime = new Date(date);
+  } = data;
+  const dateTime = new Date(date.toNumber());
   const formatedDate = formatDate(dateTime, false, false);
   return (
     <>
       <div>
-        Category:
+        <b>Category:</b>
         {' '}
         {category}
       </div>
       <div>
-        Project:
+        <b>Project:</b>
         {' '}
         {project}
       </div>
       <div>
-        Supplier:
+        <b>Supplier:</b>
         {' '}
         {supplier}
       </div>
       <div>
-        Desciption:
+        <b>Description:</b>
         {' '}
         {description}
       </div>
       <div>
-        Currency:
+        <b>Currency:</b>
         {' '}
         {currency}
       </div>
       <div>
-        Amount in USD:
+        <b>Amount in USD:</b>
         {' '}
-        {amountInUsd}
+        {amountInUsd.toString()}
       </div>
       <div>
-        Final Destination:
+        <b>Final Destination:</b>
         {' '}
         {finalDestination}
       </div>
       <div>
-        Date:
+        <b>Date:</b>
         {' '}
         {formatedDate}
       </div>

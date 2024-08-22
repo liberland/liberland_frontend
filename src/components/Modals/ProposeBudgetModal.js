@@ -64,9 +64,9 @@ function ProposeBudgetModal({
 
   const executionBlock = useCongressExecutionBlock(7);
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (!isValid) return;
-    const bugetProposalItems = extractItemsFromObject(data, spendings[0].optionsInput);
+    const bugetProposalItems = await extractItemsFromObject(data, spendings[0].optionsInput);
     dispatch(congressActions.congressBudgetPropose.call({ bugetProposalItems, executionBlock }));
     closeModal();
   };

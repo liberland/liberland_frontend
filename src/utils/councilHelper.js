@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-cycle
+import { encodeRemark } from '../api/nodeRpcCall';
 import { parseAssets } from './walletHelpers';
 
 export const objectToHex = (object) => {
@@ -8,9 +10,9 @@ export const objectToHex = (object) => {
   return hexString;
 };
 
-export const extractItemsFromObject = (obj, assetsData) => {
+export const extractItemsFromObject = async (obj, assetsData) => {
   const selectKeys = Object.keys(obj).filter((key) => key.startsWith('select'));
-  const resultArray = selectKeys.map((key) => {
+  const resultArray = await Promise.all(selectKeys.map(async (key) => {
     const assetInfo = assetsData.find((item) => item.value === obj[key]);
     const remark = {
       currency: obj[key],
@@ -22,6 +24,7 @@ export const extractItemsFromObject = (obj, assetsData) => {
       finalDestination: obj[`finalDestination${key.slice(-1)}`],
       amountInUsd: obj[`amountInUsd${key.slice(-1)}`],
     };
+    const encodedRemark = await encodeRemark(remark);
     return {
       transfer: {
         asset: obj[key],
@@ -29,9 +32,9 @@ export const extractItemsFromObject = (obj, assetsData) => {
         recipient: obj[`recipient${key.slice(-1)}`],
         index: assetInfo.index,
       },
-      remark: objectToHex(remark),
+      remark: encodedRemark,
     };
-  });
+  }));
   return resultArray;
 };
 
