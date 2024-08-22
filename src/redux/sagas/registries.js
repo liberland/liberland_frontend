@@ -59,11 +59,13 @@ function* requestCompanyRegistrationWorker(action) {
 
 function* requestEditCompanyRegistrationWorker(action) {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+
   yield call(
     requestEditCompanyRegistration,
     action.payload.companyData,
     action.payload.companyId,
     walletAddress,
+    action.payload.registryAllowedToEdit,
   );
   yield put(registriesActions.getOfficialUserRegistryEntries.call(walletAddress));
   yield put(registriesActions.requestEditCompanyRegistrationAction.success());
