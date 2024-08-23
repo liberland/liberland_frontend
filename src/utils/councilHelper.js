@@ -22,7 +22,7 @@ export const extractItemsFromObject = async (obj, assetsData) => {
       supplier: obj[`supplier${key.slice(-1)}`],
       date: Date.now(),
       finalDestination: obj[`finalDestination${key.slice(-1)}`],
-      amountInUsd: obj[`amountInUsd${key.slice(-1)}`],
+      amountInUSDAtDateOfPayment: obj[`amountInUsd${key.slice(-1)}`],
     };
     const encodedRemark = await encodeRemark(remark);
     return {
