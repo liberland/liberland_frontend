@@ -18,7 +18,7 @@ import InputSearch from '../InputComponents/InputSearchAddressName';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
-import { objectToHex } from '../../utils/councilHelper';
+import { encodeRemark } from '../../api/nodeRpcCall';
 
 // TODO add validation
 function SendAssetModal({
@@ -31,8 +31,6 @@ function SendAssetModal({
     register,
     setValue,
     watch,
-    clearErrors,
-    setError,
   } = useForm({
     mode: 'all',
     defaultValues: {
@@ -42,7 +40,7 @@ function SendAssetModal({
   const votingDays = watch('votingDays');
   const executionBlock = useCongressExecutionBlock(votingDays);
 
-  const transfer = (values) => {
+  const transfer = async (values) => {
     if (!isValid) return;
     const {
       recipient, project, description, category, supplier, amountInUsd, finalDestination,
@@ -63,13 +61,14 @@ function SendAssetModal({
         currency: assetData.metadata.symbol,
         date: Date.now(),
         finalDestination,
-        amountInUsd,
+        amountInUSDAtDateOfPayment: Number(amountInUsd),
       };
+      const encodedRemark = await encodeRemark(remarkInfo);
       const data = {
         transferToAddress: values.recipient,
         transferAmount: amount,
         assetData,
-        remarkInfo: objectToHex(remarkInfo),
+        remarkInfo: encodedRemark,
       };
       if (isCongress) {
         dispatch(congressActions.congressSendAssets.call({ ...data, executionBlock }));
@@ -133,7 +132,7 @@ function SendAssetModal({
       {isRemarkNeeded
         && (
         <>
-          <RemarkForm errors={errors} register={register} clearErrors={clearErrors} setError={setError} watch={watch} />
+          <RemarkForm errors={errors} register={register} watch={watch} setValue={setValue} />
 
           {isCongress && (
           <>

@@ -11,10 +11,11 @@ import { SelectInput, TextInput } from '../InputComponents';
 import { congressActions } from '../../redux/actions';
 import { congressSelectors } from '../../redux/selectors';
 import { isValidSubstrateAddress } from '../../utils/walletHelpers';
-import { closestNumberToZeroNotInArray, extractItemsFromObject, IndexHelper } from '../../utils/councilHelper';
+import { closestNumberToZeroNotInArray, extractItemsFromObject } from '../../utils/council/councilHelper';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
+import { IndexHelper } from '../../utils/council/councilEnum';
 
 const defaultValueSpending = {
   currency: null,
@@ -54,9 +55,7 @@ function ProposeBudgetModal({
     setValue,
     formState: { errors, isValid },
     watch,
-    clearErrors,
     unregister,
-    setError,
   } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -66,9 +65,9 @@ function ProposeBudgetModal({
 
   const executionBlock = useCongressExecutionBlock(7);
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if (!isValid) return;
-    const bugetProposalItems = extractItemsFromObject(data, spendings[0].optionsInput);
+    const bugetProposalItems = await extractItemsFromObject(data, spendings[0].optionsInput);
     dispatch(congressActions.congressBudgetPropose.call({ bugetProposalItems, executionBlock }));
     closeModal();
   };
@@ -170,12 +169,11 @@ function ProposeBudgetModal({
           && <div className={styles.error}>{errors[`recipient${indexItem}`].message}</div>}
 
           <RemarkForm
-            register={register}
             indexItem={indexItem}
             errors={errors}
+            register={register}
             watch={watch}
-            setError={setError}
-            clearErrors={clearErrors}
+            setValue={setValue}
           />
 
           <div className={styles.buttonWrapper}>

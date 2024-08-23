@@ -16,7 +16,7 @@ import { parseMerits, isValidSubstrateAddress } from '../../utils/walletHelpers'
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
-import { objectToHex } from '../../utils/councilHelper';
+import { encodeRemark } from '../../api/nodeRpcCall';
 
 function SpendModal({
   closeModal, onSend, spendData, isCongress, balance,
@@ -35,8 +35,6 @@ function SpendModal({
     register,
     setValue,
     watch,
-    setError,
-    clearErrors,
   } = useForm({
     mode: 'all',
     defaultValues: {
@@ -46,7 +44,7 @@ function SpendModal({
   const votingDays = watch('votingDays');
   const executionBlock = useCongressExecutionBlock(votingDays);
 
-  const transfer = (values) => {
+  const transfer = async (values) => {
     if (!isValid) return;
     const {
       project, description: descriptionRemark, category, supplier, amount, recipient, amountInUsd, finalDestination,
@@ -59,13 +57,14 @@ function SpendModal({
       currency: name,
       date: Date.now(),
       finalDestination,
-      amountInUsd,
+      amountInUSDAtDateOfPayment: Number(amountInUsd),
     };
 
+    const encodedRemark = await encodeRemark(remartInfo);
     dispatch(onSend({
       transferToAddress: recipient,
       transferAmount: parseMerits(amount),
-      remarkInfo: objectToHex(remartInfo),
+      remarkInfo: encodedRemark,
       executionBlock,
     }));
     closeModal();
@@ -112,7 +111,7 @@ function SpendModal({
       { errors?.amount?.message
         && <div className={styles.error}>{errors.amount.message}</div> }
 
-      <RemarkForm errors={errors} register={register} clearErrors={clearErrors} setError={setError} watch={watch} />
+      <RemarkForm errors={errors} register={register} watch={watch} setValue={setValue} />
 
       {isCongress && (
       <>
