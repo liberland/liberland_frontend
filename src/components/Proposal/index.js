@@ -359,7 +359,7 @@ function RemarkInfo({ proposal }) {
   if (!data) {
     return (
       <div>
-        {JSON.stringify(proposal.toHuman(), null, 2)}
+        {new TextDecoder('utf-8').decode(bytes)}
       </div>
     );
   }
