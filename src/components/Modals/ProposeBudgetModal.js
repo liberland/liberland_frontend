@@ -11,11 +11,11 @@ import { SelectInput, TextInput } from '../InputComponents';
 import { congressActions } from '../../redux/actions';
 import { congressSelectors } from '../../redux/selectors';
 import { isValidSubstrateAddress } from '../../utils/walletHelpers';
-import { closestNumberToZeroNotInArray, extractItemsFromObject } from '../../utils/council./councilHelper';
+import { closestNumberToZeroNotInArray, extractItemsFromObject } from '../../utils/council/councilHelper';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
-import { IndexHelper } from '../../utils/council./councilEnum';
+import { IndexHelper } from '../../utils/council/councilEnum';
 
 const defaultValueSpending = {
   currency: null,

@@ -45,7 +45,7 @@ import { blockchainWatcher } from './base';
 import { daysToBlocks } from '../../utils/nodeRpcCall';
 import { palletIdToAddress } from '../../utils/pallet';
 import { formatMerits } from '../../utils/walletHelpers';
-import { IndexHelper } from '../../utils/council./councilEnum';
+import { IndexHelper } from '../../utils/council/councilEnum';
 // WORKERS
 
 function* getWalletWorker() {
