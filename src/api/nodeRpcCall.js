@@ -14,8 +14,7 @@ import { parseDollars, parseMerits } from '../utils/walletHelpers';
 import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
-// eslint-disable-next-line import/no-cycle
-import { IndexHelper } from '../utils/councilHelper';
+import { IndexHelper } from '../utils/council./councilEnum';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
