@@ -44,7 +44,7 @@ const selectorTotalBalance = createSelector(
 const selectorTotalLLM = createSelector(
   selectorBalances,
   (reducer) => (
-    reducer.meritsTotalAmount.amount
+    reducer?.meritsTotalAmount?.amount
   ),
 );
 

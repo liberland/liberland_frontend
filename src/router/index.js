@@ -1,5 +1,4 @@
 export default {
-  signIn: '/signin',
   signUp: '/signup',
   home: {
     index: '/home',

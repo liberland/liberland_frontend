@@ -37,8 +37,8 @@ function* verifySessionWorker() {
 function* signOutWorker() {
   try {
     yield put(authActions.signOut.success());
-    yield put(blockchainActions.setUserWallet.success(''));
     localStorage.clear();
+    sessionStorage.clear();
   } catch (error) {
     yield put(authActions.signOut.failure);
   }

@@ -12,12 +12,12 @@ const allWalletsSelector = createSelector(
 );
 const userWalletAddressSelector = createSelector(
   blockchainReducer,
-  (reducer) => reducer.userWalletAddress,
+  (reducer) => reducer?.userWalletAddress,
 );
 const isUserWalletAddressSameAsUserAdress = createSelector(
   (state) => state,
-  (reducer) => reducer.user.user.blockchainAddress
-      === reducer.blockchain.userWalletAddress,
+  (reducer) => reducer?.user?.user?.blockchainAddress
+      === reducer?.blockchain?.userWalletAddress,
 );
 
 const errorExistsAndUnacknowledgedByUser = createSelector(
