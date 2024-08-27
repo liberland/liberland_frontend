@@ -15,7 +15,7 @@ import { Proposal } from '../../Proposal';
 import { walletAddress } from '../../../redux/selectors/congress';
 
 export default function Motion({
-  proposal, proposalOf, voting, voteMotion, closeMotion,
+  proposal, proposalOf, voting, voteMotion, closeMotion, membersCount,
 }) {
   const dispatch = useDispatch();
   const userAddress = useSelector(
@@ -26,7 +26,7 @@ export default function Motion({
 
   const isClosable = voting.ayes.length >= threshold;
 
-  const isClosableNaye = voting.nays.length >= 50;
+  const isClosableNaye = voting.nays.length >= membersCount - threshold;
 
   const voteMotionCall = (vote) => {
     const voteMotionData = {
@@ -61,7 +61,7 @@ export default function Motion({
               <b>
                 {voting.nays.length}
                 /
-                {threshold}
+                {(membersCount / 2).toFixed()}
               </b>
             </p>
           </span>
@@ -138,4 +138,5 @@ Motion.propTypes = {
   }).isRequired,
   closeMotion: PropTypes.func.isRequired,
   voteMotion: PropTypes.func.isRequired,
+  membersCount: PropTypes.number.isRequired,
 };

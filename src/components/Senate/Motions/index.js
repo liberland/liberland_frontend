@@ -17,8 +17,11 @@ function Motions() {
 
   return (
     <>
-      {motions.map(({ proposal, proposalOf, voting }) => (
+      {motions.map(({
+        proposal, proposalOf, voting, membersCount,
+      }) => (
         <Motion
+          membersCount={membersCount}
           key={proposal}
           proposal={proposal.toString()}
           proposalOf={proposalOf.unwrap()}
