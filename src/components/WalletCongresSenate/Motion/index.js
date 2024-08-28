@@ -98,7 +98,6 @@ export default function Motion({
           )}
         </div>
         <Proposal proposal={proposalOf} />
-
       </Card>
     </div>
   );

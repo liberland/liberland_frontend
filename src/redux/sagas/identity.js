@@ -1,6 +1,6 @@
 import { put, takeLatest, call } from 'redux-saga/effects';
 
-import { getIdentity, setIdentity } from '../../api/nodeRpcCall';
+import { getIdentitiesNames, getIdentity, setIdentity } from '../../api/nodeRpcCall';
 
 import { identityActions } from '../actions';
 import { blockchainWatcher } from './base';
@@ -29,7 +29,24 @@ function* getIdentityWorker(action) {
   }
 }
 
+function* getIdentityMotionsWorker(action) {
+  try {
+    const identities = yield call(getIdentitiesNames, action.payload);
+    yield put(identityActions.getIdentityMotions.success(identities));
+  } catch (e) {
+    yield put(identityActions.getIdentityMotions.failure(e));
+  }
+}
+
 // WATCHERS
+
+function* getIdentityMotionsWatcher() {
+  try {
+    yield takeLatest(identityActions.getIdentityMotions.call, getIdentityMotionsWorker);
+  } catch (e) {
+    yield put(identityActions.getIdentityMotions.failure(e));
+  }
+}
 
 function* setIdentityWatcher() {
   yield* blockchainWatcher(identityActions.setIdentity, setIdentityWorker);
@@ -43,4 +60,4 @@ function* getIdentityWatcher() {
   }
 }
 
-export { setIdentityWatcher, getIdentityWatcher };
+export { setIdentityWatcher, getIdentityWatcher, getIdentityMotionsWatcher };

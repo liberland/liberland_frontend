@@ -31,6 +31,7 @@ function SendAssetModal({
     register,
     setValue,
     watch,
+    trigger,
   } = useForm({
     mode: 'all',
     defaultValues: {
@@ -94,6 +95,7 @@ function SendAssetModal({
 
       <div className={styles.title}>Send to address</div>
       <InputSearch
+        trigger={trigger}
         errorTitle="Recipient"
         isRequired
         placeholder="Send to address"

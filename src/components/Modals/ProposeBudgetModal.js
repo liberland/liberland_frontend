@@ -56,6 +56,7 @@ function ProposeBudgetModal({
     formState: { errors, isValid },
     watch,
     unregister,
+    trigger,
   } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -159,6 +160,7 @@ function ProposeBudgetModal({
             name={`recipient${indexItem}`}
             placeholder="Recipient"
             isRequired
+            trigger={trigger}
             setValue={setValue}
             validate={(v) => {
               if (!isValidSubstrateAddress(v)) return 'Invalid Address';
