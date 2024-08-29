@@ -1502,17 +1502,17 @@ const congressProposeBudget = async ({
 
   const proposeBudget = itemsCouncilPropose.map((itemCouncilPropose) => {
     const { transfer, remark: remarkInfo } = itemCouncilPropose;
-    const { index, balance, address } = transfer;
+    const { index, balance, recipient } = transfer;
 
     const remark = api.tx.llm.remark(remarkInfo);
     let transferProposal;
 
     if (index === IndexHelper.LLD) {
-      transferProposal = api.tx.balances.transfer(address, balance);
+      transferProposal = api.tx.balances.transfer(recipient, balance);
     } else if (index === IndexHelper.POLITIPOOL_LLM) {
-      transferProposal = api.tx.llm.sendLlmToPolitipool(address, balance);
+      transferProposal = api.tx.llm.sendLlmToPolitipool(recipient, balance);
     } else {
-      transferProposal = api.tx.assets.transfer(parseInt(index), address, balance);
+      transferProposal = api.tx.assets.transfer(parseInt(index), recipient, balance);
     }
 
     return { transferProposal, remark };
