@@ -47,6 +47,7 @@ export default {
     allTransactions: '/home/wallet/all-transactions',
     overView: '/home/wallet/overview',
     bridge: '/home/wallet/bridge',
+    nfts: '/home/wallet/nfts',
   },
   registries: {
     overview: '/home/registries/overview',

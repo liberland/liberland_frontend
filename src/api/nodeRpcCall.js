@@ -2578,6 +2578,48 @@ const decodeRemark = async (dataToEncode) => {
   return remarkInfo;
 };
 
+const getUserNfts = async (walletAddress) => {
+  const api = await getApi();
+  const nftEntries = await api.query.nfts.account.entries(walletAddress);
+
+  const collectionIds = [];
+  const nftIds = [];
+
+  nftEntries.forEach(([key]) => {
+    const [collectionId, nftId] = key.args.slice(1);
+    collectionIds.push(collectionId.toString());
+    nftIds.push(nftId.toString());
+  });
+
+  const [collectionMetadata, itemMetadata] = await Promise.all([
+    api.query.nfts.collectionMetadataOf.multi(collectionIds),
+    api.query.nfts.itemMetadataOf.multi(collectionIds.map((id, index) => [id, nftIds[index]])),
+  ]);
+
+  const decoder = new TextDecoder();
+
+  function processData(data) {
+    const decodedData = decoder.decode(data);
+    return JSON.parse(decodedData);
+  }
+  const nftDetails = collectionIds.map((collectionId, index) => {
+    const collectionData = collectionMetadata[index].unwrap();
+    const itemData = itemMetadata[index].unwrap();
+    return {
+      collectionId,
+      nftId: nftIds[index],
+      collectionMetadata: {
+        data: processData(collectionData.data).name,
+      },
+      itemMetadata: {
+        data: processData(itemData.data).imageUrl,
+      },
+    };
+  });
+
+  return nftDetails;
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -2708,4 +2750,5 @@ export {
   congressProposeBudget,
   encodeRemark,
   decodeRemark,
+  getUserNfts,
 };
