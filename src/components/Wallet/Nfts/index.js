@@ -36,22 +36,24 @@ function NftsComponent() {
                 return (
                   <div key={collectionId + nftId}>
                     <p>
-                      Collection Id:
+                      <b>Collection Id:</b>
                       {' '}
                       {collectionId}
                     </p>
                     <p>
-                      Name:
+                      <b>Name:</b>
                       {' '}
                       {collectionMetadata.data}
                     </p>
                     <p>
-                      Nft Id:
+                      <b>Nft Id:</b>
                       {' '}
                       {nftId}
                     </p>
                     <br />
-                    <img src={itemMetadata.data} alt={collectionMetadata.data} />
+                    <div className={styles.imageWrapper}>
+                      <img src={itemMetadata.data} alt={collectionMetadata.data} className={styles.image} />
+                    </div>
                   </div>
                 );
               })}
