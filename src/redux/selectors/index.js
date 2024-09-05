@@ -13,6 +13,7 @@ import * as onboardingSelectors from './onboarding';
 import * as dexSelectors from './dex';
 import * as contractsSelectors from './contracts';
 import * as senateSelectors from './senate';
+import * as nftsSelectors from './nfts';
 
 export {
   errorsSelectors,
@@ -30,4 +31,5 @@ export {
   dexSelectors,
   contractsSelectors,
   senateSelectors,
+  nftsSelectors,
 };

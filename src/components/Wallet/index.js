@@ -19,6 +19,7 @@ import RoleHOC from '../../hocs/RoleHOC';
 import AssetOverview from './AssetOverview';
 import Exchange from './Exchange';
 import Bridge from './Bridge';
+import NftsComponent from './Nfts';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -81,6 +82,10 @@ function Wallet() {
             <Route
               path={router.wallet.bridge}
               component={Bridge}
+            />
+            <Route
+              path={router.wallet.nfts}
+              component={NftsComponent}
             />
             <Route
               exact

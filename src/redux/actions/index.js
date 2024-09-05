@@ -14,6 +14,7 @@ import * as onBoardingActions from './onboarding';
 import * as dexActions from './dex';
 import * as contractsActions from './contracts';
 import * as senateActions from './senate';
+import * as nftsActions from './nfts';
 
 export {
   authActions,
@@ -32,4 +33,5 @@ export {
   dexActions,
   contractsActions,
   senateActions,
+  nftsActions,
 };
