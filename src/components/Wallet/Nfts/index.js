@@ -18,7 +18,7 @@ function NftsComponent() {
   if (!nfts) {
     return (
       <div>
-        No any nfts...
+        You dont have any NFTs
       </div>
     );
   }
