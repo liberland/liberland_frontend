@@ -1504,17 +1504,17 @@ const congressProposeBudget = async ({
 
   const proposeBudget = itemsCouncilPropose.map((itemCouncilPropose) => {
     const { transfer, remark: remarkInfo } = itemCouncilPropose;
-    const { index, balance, address } = transfer;
+    const { index, balance, recipient } = transfer;
 
     const remark = api.tx.llm.remark(remarkInfo);
     let transferProposal;
 
     if (index === IndexHelper.LLD) {
-      transferProposal = api.tx.balances.transfer(address, balance);
+      transferProposal = api.tx.balances.transfer(recipient, balance);
     } else if (index === IndexHelper.POLITIPOOL_LLM) {
-      transferProposal = api.tx.llm.sendLlmToPolitipool(address, balance);
+      transferProposal = api.tx.llm.sendLlmToPolitipool(recipient, balance);
     } else {
-      transferProposal = api.tx.assets.transfer(parseInt(index), address, balance);
+      transferProposal = api.tx.assets.transfer(parseInt(index), recipient, balance);
     }
 
     return { transferProposal, remark };
@@ -2586,6 +2586,48 @@ const decodeRemark = async (dataToEncode) => {
   return remarkInfo;
 };
 
+const getUserNfts = async (walletAddress) => {
+  const api = await getApi();
+  const nftEntries = await api.query.nfts.account.entries(walletAddress);
+
+  const collectionIds = [];
+  const nftIds = [];
+
+  nftEntries.forEach(([key]) => {
+    const [collectionId, nftId] = key.args.slice(1);
+    collectionIds.push(collectionId.toString());
+    nftIds.push(nftId.toString());
+  });
+
+  const [collectionMetadata, itemMetadata] = await Promise.all([
+    api.query.nfts.collectionMetadataOf.multi(collectionIds),
+    api.query.nfts.itemMetadataOf.multi(collectionIds.map((id, index) => [id, nftIds[index]])),
+  ]);
+
+  const decoder = new TextDecoder();
+
+  function processData(data) {
+    const decodedData = decoder.decode(data);
+    return JSON.parse(decodedData);
+  }
+  const nftDetails = collectionIds.map((collectionId, index) => {
+    const collectionData = collectionMetadata[index].unwrap();
+    const itemData = itemMetadata[index].unwrap();
+    return {
+      collectionId,
+      nftId: nftIds[index],
+      collectionMetadata: {
+        data: processData(collectionData.data).name,
+      },
+      itemMetadata: {
+        data: processData(itemData.data).imageUrl,
+      },
+    };
+  });
+
+  return nftDetails;
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -2716,4 +2758,5 @@ export {
   congressProposeBudget,
   encodeRemark,
   decodeRemark,
+  getUserNfts,
 };

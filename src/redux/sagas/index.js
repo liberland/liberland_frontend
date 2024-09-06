@@ -13,6 +13,7 @@ import * as onboardingSagas from './onboarding';
 import * as dexSagas from './dex';
 import * as contractsSagas from './contracts';
 import * as senateSagas from './senate';
+import * as nftsSagas from './nfts';
 
 export default function* rootSaga() {
   yield all([
@@ -165,5 +166,8 @@ export default function* rootSaga() {
     senateSagas.voteAtMotionsWatcher(),
     senateSagas.getScheduledCongressSpendingWatcher(),
     senateSagas.proposeCloseMotionWatcher(),
+
+    // NFTS
+    nftsSagas.getUserNftsWatcher(),
   ]);
 }
