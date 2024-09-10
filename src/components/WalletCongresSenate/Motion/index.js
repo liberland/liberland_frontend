@@ -26,7 +26,7 @@ export default function Motion({
 
   const isClosable = voting.ayes.length >= threshold;
 
-  const isClosableNaye = voting.nays.length >= membersCount - threshold;
+  const isClosableNaye = voting.nays.length > membersCount - threshold;
 
   const voteMotionCall = (vote) => {
     const voteMotionData = {
@@ -61,7 +61,7 @@ export default function Motion({
               <b>
                 {voting.nays.length}
                 /
-                {(membersCount / 2).toFixed()}
+                {threshold}
               </b>
             </p>
           </span>
