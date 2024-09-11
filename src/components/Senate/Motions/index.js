@@ -21,7 +21,7 @@ function Motions() {
         <Motion
           key={proposal}
           proposal={proposal.toString()}
-          proposalOf={proposalOf.unwrap()}
+          proposalOf={proposalOf}
           voting={voting.unwrap()}
           voteMotion={(data) => senateActions.senateVoteAtMotions.call(data)}
           closeMotion={(data) => senateActions.senateCloseMotion.call(data)}

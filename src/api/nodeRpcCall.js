@@ -2105,7 +2105,6 @@ const getSectionType = (origin) => {
 const getScheduledCalls = async () => {
   const api = await getApi();
   const agendaEntries = await api.query.scheduler.agenda.entries();
-
   const agendaItems = agendaEntries
     .flatMap(([key, calls]) => calls
       .map((call, idx) => ({
@@ -2525,19 +2524,47 @@ const getStakingData = async (walletAddress) => {
 const getSenateMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.senate.proposals();
+
   return Promise.all(
     proposals.map(async (proposal) => {
       const [proposalOf, voting] = await api.queryMulti([
         [api.query.senate.proposalOf, proposal],
         [api.query.senate.voting, proposal],
       ]);
+
+      const senateProposalHash = proposalOf.hash.toHex();
       return {
         proposal,
         proposalOf,
         voting,
+        hash: senateProposalHash,
       };
     }),
-  );
+  ).then((motions) => motions.filter(Boolean));
+};
+
+const matchScheduledWithSenateMotions = async () => {
+  const [senateMotions, sheduledMotions] = await Promise.all([getSenateMotions(), getScheduledCalls()]);
+
+  const motions = senateMotions.map((motion) => {
+    const { proposalOf } = motion;
+
+    const unwrappedProposalOf = proposalOf.unwrap();
+    if (unwrappedProposalOf.method === 'cancel' && unwrappedProposalOf.section === 'scheduler') {
+      const blockNumber = proposalOf.value.args[0].toString();
+      const matchingScheduledCall = sheduledMotions.find(
+        (scheduled) => scheduled.blockNumber.toString() === blockNumber,
+      );
+      if (!matchingScheduledCall) {
+        return { ...motion, proposalOf: unwrappedProposalOf };
+      }
+      const proposalData = { method: unwrappedProposalOf.method, section: unwrappedProposalOf.section };
+      const newProposal = { ...proposalData, args: matchingScheduledCall?.preimage || matchingScheduledCall?.proposal };
+      return { ...motion, proposalOf: newProposal };
+    }
+    return { ...motion, proposalOf: unwrappedProposalOf };
+  });
+  return motions;
 };
 
 const senateProposeCancel = async (walletAddress, idx, executionBlock) => {
@@ -2751,4 +2778,5 @@ export {
   encodeRemark,
   decodeRemark,
   getUserNfts,
+  matchScheduledWithSenateMotions,
 };
