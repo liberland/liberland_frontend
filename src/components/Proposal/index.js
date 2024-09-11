@@ -11,6 +11,7 @@ import styles from './styles.module.scss';
 import stylesAnim from '../Voting/Referendum/Items/item.module.scss';
 import { formatAssets, formatDollars, formatMerits } from '../../utils/walletHelpers';
 import formatDate from '../../utils/formatDate';
+import { useAddIdToContext } from './useAddIdToContect.js';
 /* eslint-disable react/forbid-prop-types */
 const ProposalProp = PropTypes.object;
 
@@ -296,6 +297,7 @@ function TransferLLD({ proposal }) {
   const value = proposal.args[1];
   const formattedValue = formatDollars(value);
   const identity = names?.[accountId]?.identity;
+  useAddIdToContext(accountId);
 
   return (
     <div>
@@ -315,6 +317,7 @@ function TransferLLM({ proposal }) {
   const formattedValue = formatMerits(value);
   const symbol = proposal.method === 'sendLlm' ? 'LLM' : 'PolitiPooled LLM';
   const identity = names?.[accountId]?.identity;
+  useAddIdToContext(accountId);
 
   return (
     <div>
@@ -332,6 +335,7 @@ function TransferAsset({ proposal }) {
   const assetId = proposal.args[0];
   const target = proposal.args[1].toString();
   const value = proposal.args[2].toString();
+  useAddIdToContext(target);
 
   const names = useSelector(identitySelectors.selectorIdentityMotions);
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);

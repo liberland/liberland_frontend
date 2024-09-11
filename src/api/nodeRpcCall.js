@@ -11,7 +11,7 @@ import * as centralizedBackend from './backend';
 // eslint-disable-next-line import/no-cycle
 import { convertAssetData } from '../utils/dexFormatter';
 import { parseDollars, parseMerits } from '../utils/walletHelpers';
-import { getMetadataCache, getNestedValue, setMetadataCache } from '../utils/nodeRpcCall';
+import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
@@ -1301,25 +1301,37 @@ const getBlockEvents = async (blockHash) => {
   }
 };
 
+const getIdentitiesNames = async (addresses) => {
+  const api = await getApi();
+  const raw = await api.query.identity.identityOf.multi(addresses);
+  const identities = {};
+  raw.map((identity, idx) => {
+    identities[addresses[idx]] = {};
+    const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
+    const nameHashed = unwrapIdentity?.display?.asRaw;
+    const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
+    identities[addresses[idx]].identity = name;
+
+    return null;
+  });
+  return identities;
+};
+
 const getMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.council.proposals();
-  const proposalsData = await Promise.all(proposals.map(async (proposal) => {
+  return Promise.all(proposals.map(async (proposal) => {
     const [proposalOf, voting] = await api.queryMulti([
       [api.query.council.proposalOf, proposal],
       [api.query.council.voting, proposal],
     ]);
-    const proposalData = proposalOf.unwrapOrDefault();
-    const path = ['args', 0, 'args', 3, 'args', 0, 0, 'args', 0];
-    const transferTo = getNestedValue(proposalData, path).toString();
+
     return {
       proposal,
       proposalOf,
       voting,
-      transferTo,
     };
   }));
-  return { proposalsData, names: proposalsData.map((items) => items.transferTo) };
 };
 
 const getCongressCandidates = async () => {
@@ -1658,22 +1670,6 @@ const getIdentities = async (addresses) => {
     address: addresses[idx],
     identity: identity.isSome ? identity.unwrap().info : null,
   }));
-};
-
-const getIdentitiesNames = async (addresses) => {
-  const api = await getApi();
-  const raw = await api.query.identity.identityOf.multi(addresses);
-  const identities = {};
-  raw.map((identity, idx) => {
-    identities[addresses[idx]] = {};
-    const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
-    const nameHashed = unwrapIdentity?.display?.asRaw;
-    const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
-    identities[addresses[idx]].identity = name;
-
-    return null;
-  });
-  return identities;
 };
 
 const stakingChill = async (walletAddress) => {
@@ -2533,19 +2529,15 @@ const getSenateMotions = async () => {
         [api.query.senate.proposalOf, proposal],
         [api.query.senate.voting, proposal],
       ]);
-      const proposalData = proposalOf.unwrapOrDefault();
-
-      const path = ['args', 0, 'args', 0, 0, 'args', 0];
-      const transferTo = getNestedValue(proposalData, path).toString();
       return {
         proposal,
         proposalOf,
         voting,
-        transferTo,
       };
     }),
   );
-  return { proposalsData, names: proposalsData.map((items) => items.transferTo) };
+
+  return proposalsData;
 };
 
 const senateProposeCancel = async (walletAddress, idx, executionBlock) => {
