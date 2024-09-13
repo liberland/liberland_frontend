@@ -91,7 +91,7 @@ function HomeNavigation() {
     {
       route: router.home.profile,
       title: homeTitle,
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       // eslint-disable-next-line react/no-unstable-nested-components
       icon: () => (
         <Avatar
@@ -104,7 +104,6 @@ function HomeNavigation() {
       ),
       description: `${formatMerits(totalBalance)} LLM`,
       isDiscouraged: false,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.feed,
@@ -112,15 +111,13 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: FeedIcon,
       isDiscouraged: process.env.REACT_APP_IS_FEED_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.wallet,
       title: 'WALLET',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: WalletIcon,
       isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.voting,
@@ -128,15 +125,13 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: VotingIcon,
       isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.contracts,
       title: 'CONTRACTS',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_CONTRACTS_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.legislation,
@@ -144,39 +139,34 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: ConstitutionIcon,
       isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.offices,
       title: 'OFFICES',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: ConstitutionIcon,
       isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.companies,
       title: 'COMPANIES',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.registries,
       title: 'REGISTRIES',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.staking,
       title: 'STAKING',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.congress,
@@ -184,7 +174,6 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.senate,
@@ -192,7 +181,6 @@ function HomeNavigation() {
       access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
   ];
   const desktopNavbar = (
@@ -210,20 +198,18 @@ function HomeNavigation() {
               access,
               description,
               isDiscouraged,
-              isAdressWalletDiffrentThanRegistered,
-            }) => (isWalletAdressSame
-              || (!isWalletAdressSame && isAdressWalletDiffrentThanRegistered) ? (
-                <RoleHOC key={route} roles={roles} access={access}>
-                  <NavigationLink
-                    route={route}
-                    title={title}
-                    icon={icon}
-                    path={location.pathname}
-                    description={description}
-                    isDiscouraged={isDiscouraged}
-                  />
-                </RoleHOC>
-              ) : null),
+            }) => (
+              <RoleHOC key={route} roles={roles} access={access}>
+                <NavigationLink
+                  route={route}
+                  title={title}
+                  icon={icon}
+                  path={location.pathname}
+                  description={description}
+                  isDiscouraged={isDiscouraged}
+                />
+              </RoleHOC>
+            ),
           )}
         {user ? (
           <div onClick={() => setLogoutIsModalOpen(true)}>
@@ -305,27 +291,24 @@ function HomeNavigation() {
                 access,
                 description,
                 isDiscouraged,
-                isAdressWalletDiffrentThanRegistered,
               },
               index,
             ) => (
               <React.Fragment key={route}>
-                {isWalletAdressSame
-                || (!isWalletAdressSame
-                  && isAdressWalletDiffrentThanRegistered) ? (
-                    <div key={route} onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                      <RoleHOC roles={roles} access={access}>
-                        <NavigationLink
-                          route={route}
-                          title={title}
-                          icon={icon}
-                          path={location.pathname}
-                          description={description}
-                          isDiscouraged={isDiscouraged === 'true'}
-                        />
-                      </RoleHOC>
-                    </div>
-                  ) : null}
+                {isWalletAdressSame ? (
+                  <div key={route} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                    <RoleHOC roles={roles} access={access}>
+                      <NavigationLink
+                        route={route}
+                        title={title}
+                        icon={icon}
+                        path={location.pathname}
+                        description={description}
+                        isDiscouraged={isDiscouraged === 'true'}
+                      />
+                    </RoleHOC>
+                  </div>
+                ) : null}
                 {index === 0
                   && (
                   <>

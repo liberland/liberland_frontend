@@ -43,6 +43,7 @@ function Profile({ className }) {
   const liquidDollars = useSelector(
     walletSelectors.selectorLiquidDollarsBalance,
   );
+  const user = useSelector(userSelectors.selectUser);
   const isUserEligibleForComplimentaryLLD = useSelector(
     onboardingSelectors.selectorEligibleForComplimentaryLLD,
   );
@@ -219,18 +220,21 @@ function Profile({ className }) {
                 >
                   Update identity
                 </Button>
-                <Button
-                  className={styles.textColor}
-                  medium
-                  primary={isUserEligibleForComplimentaryLLD && !isLoading}
-                  grey={!isUserEligibleForComplimentaryLLD || isLoading}
-                  onClick={handleGetFreeLLD}
-                  disabled={isLoading}
-                >
-                  {isUserEligibleForComplimentaryLLD
-                    ? 'Claim complimentary LLD'
-                    : ineligibleForComplimentaryLLDReason}
-                </Button>
+                {user
+                  && (
+                  <Button
+                    className={styles.textColor}
+                    medium
+                    primary={isUserEligibleForComplimentaryLLD && !isLoading}
+                    grey={!isUserEligibleForComplimentaryLLD || isLoading}
+                    onClick={handleGetFreeLLD}
+                    disabled={isLoading}
+                  >
+                    {isUserEligibleForComplimentaryLLD
+                      ? 'Claim complimentary LLD'
+                      : ineligibleForComplimentaryLLDReason}
+                  </Button>
+                  )}
               </div>
             </div>
           </div>
