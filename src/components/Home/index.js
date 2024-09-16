@@ -20,12 +20,10 @@ import Congress from '../Congress';
 
 import Contracts from '../Contracts';
 import Senate from '../Senate';
-import SignUp from '../AuthComponents/SignUp';
 
 function Home() {
   const renderRoutes = [
     <Route key={router.home.feed} path={router.home.feed} component={Feed} />,
-    <Route key={router.signUp} path={router.signUp} component={SignUp} />,
     <Route key={router.home.congress} path={router.home.congress} component={Congress} />,
     <Route key={router.home.senate} path={router.home.senate} component={Senate} />,
     <Route key={router.home.legislation} path={router.home.legislation} component={Legislation} />,

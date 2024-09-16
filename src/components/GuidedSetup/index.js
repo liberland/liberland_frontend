@@ -19,7 +19,12 @@ import NoConnectedWalletComponent from './NoConnectedWalletComponent';
 
 function GuidedSetup({ children }) {
   const dispatch = useDispatch();
-
+  const [notResidentAcceptedByUser, setNotResidentAcceptedByUser] = useState(sessionStorage.getItem(
+    'notResidentAcceptedByUser',
+  ));
+  const [isSkippedOnBoardingGetLLD, setIsSkippedOnBoardingGetLLD] = useState(sessionStorage.getItem(
+    'SkippedOnBoardingGetLLD',
+  ));
   const isSessionReady = useSelector(userSelectors.selectIsSessionReady);
   const extensions = useSelector(blockchainSelectors.extensionsSelector);
   const liquidDollars = useSelector(
@@ -37,12 +42,6 @@ function GuidedSetup({ children }) {
 
   const isLoading = !isSessionReady || isLoadingUser || extensions === null || wallets === null;
 
-  const isSkippedOnBoardingGetLLD = sessionStorage.getItem(
-    'SkippedOnBoardingGetLLD',
-  );
-  const notResidentAcceptedByUser = sessionStorage.getItem(
-    'notResidentAcceptedByUser',
-  );
   const userHasIdentity = localStorage.getItem('userHasIdentity');
   const [isIdentityEmpty, setIsIdentityEmpty] = useState(true);
   const identityData = useSelector(identitySelectors.selectorIdentity);
@@ -84,11 +83,10 @@ function GuidedSetup({ children }) {
   if (!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true') {
     return (
       <GuidedSetupWrapper>
-        <InstructionOnBoard />
+        <InstructionOnBoard setIsClicked={setNotResidentAcceptedByUser} />
       </GuidedSetupWrapper>
     );
   }
-
   if (
     (isUserEligibleForComplimentaryLLD
       || isIdentityEmpty
@@ -98,7 +96,7 @@ function GuidedSetup({ children }) {
   ) {
     return (
       <GuidedSetupWrapper>
-        <OnBoarding />
+        <OnBoarding setIsSkippedOnBoardingGetLLD={setIsSkippedOnBoardingGetLLD} />
       </GuidedSetupWrapper>
     );
   }

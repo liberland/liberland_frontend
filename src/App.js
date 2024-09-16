@@ -21,6 +21,7 @@ import { userSelectors } from './redux/selectors';
 import { authActions } from './redux/actions';
 import GuidedSetup from './components/GuidedSetup';
 import { CheckExtensionWalletProvider } from './components/CheckExtenstionWalletProvider';
+import SignIn from './components/AuthComponents/SigIn';
 
 function App() {
   const dispatch = useDispatch();
@@ -34,6 +35,7 @@ function App() {
     <Switch>
       <Route path={routes.signUp} component={SignUp} />
       <Route path={routes.home.index} component={Home} />
+      <Route key={routes.signIn} path={routes.signIn} component={SignIn} />
       <Route path="*" render={() => <Redirect to={routes.home.index} />} />
     </Switch>
   );
