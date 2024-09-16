@@ -220,21 +220,18 @@ function Profile({ className }) {
                 >
                   Update identity
                 </Button>
-                {user
-                  && (
-                  <Button
-                    className={styles.textColor}
-                    medium
-                    primary={isUserEligibleForComplimentaryLLD && !isLoading}
-                    grey={!isUserEligibleForComplimentaryLLD || isLoading}
-                    onClick={handleGetFreeLLD}
-                    disabled={isLoading}
-                  >
-                    {isUserEligibleForComplimentaryLLD
-                      ? 'Claim complimentary LLD'
-                      : ineligibleForComplimentaryLLDReason}
-                  </Button>
-                  )}
+                <Button
+                  className={styles.textColor}
+                  medium
+                  primary={isUserEligibleForComplimentaryLLD && !isLoading}
+                  grey={!isUserEligibleForComplimentaryLLD || isLoading}
+                  onClick={handleGetFreeLLD}
+                  disabled={isLoading}
+                >
+                  {isUserEligibleForComplimentaryLLD || !user
+                    ? 'Claim complimentary LLD'
+                    : ineligibleForComplimentaryLLDReason}
+                </Button>
               </div>
             </div>
           </div>

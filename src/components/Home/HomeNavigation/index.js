@@ -295,20 +295,18 @@ function HomeNavigation() {
               index,
             ) => (
               <React.Fragment key={route}>
-                {isWalletAdressSame ? (
-                  <div key={route} onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                    <RoleHOC roles={roles} access={access}>
-                      <NavigationLink
-                        route={route}
-                        title={title}
-                        icon={icon}
-                        path={location.pathname}
-                        description={description}
-                        isDiscouraged={isDiscouraged === 'true'}
-                      />
-                    </RoleHOC>
-                  </div>
-                ) : null}
+                <div key={route} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                  <RoleHOC roles={roles} access={access}>
+                    <NavigationLink
+                      route={route}
+                      title={title}
+                      icon={icon}
+                      path={location.pathname}
+                      description={description}
+                      isDiscouraged={isDiscouraged === 'true'}
+                    />
+                  </RoleHOC>
+                </div>
                 {index === 0
                   && (
                   <>
