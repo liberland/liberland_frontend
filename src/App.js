@@ -21,7 +21,7 @@ import { userSelectors } from './redux/selectors';
 import { authActions } from './redux/actions';
 import GuidedSetup from './components/GuidedSetup';
 import { CheckExtensionWalletProvider } from './components/CheckExtenstionWalletProvider';
-import SignIn from './components/AuthComponents/SigIn';
+import SignIn from './components/AuthComponents/SignIn';
 
 function App() {
   const dispatch = useDispatch();
