@@ -15,6 +15,7 @@ function CandidateVoting({
   moveSelectedCandidate, didChangeSelectedCandidates,
 }) {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+
   const dispatch = useDispatch();
   return (
     <Card className={stylesPage.overviewWrapper} title="Voting">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import {
   onboardingSelectors,
   blockchainSelectors,
@@ -17,7 +18,7 @@ import styles from './styles.module.scss';
 import router from '../../../router';
 import UpdateProfile from '../../Profile/UpdateProfile';
 
-function OnBoarding() {
+function OnBoarding({ setIsSkippedOnBoardingGetLLD }) {
   const dispatch = useDispatch();
   const history = useHistory();
   const isSkippedOnBoardingGetLLD = sessionStorage.getItem(
@@ -73,7 +74,9 @@ function OnBoarding() {
               ? 'Claim complimentary LLD'
               : ineligibleForComplimentaryLLDReason}
           </Button>
-          <Button onClick={() => setIsFirstStepSkipped(true)}>Skip</Button>
+          <Button onClick={() => setIsFirstStepSkipped(true)}>
+            Skip
+          </Button>
         </div>
       </div>
     );
@@ -97,6 +100,7 @@ function OnBoarding() {
             medium
             gray
             onClick={() => {
+              setIsSkippedOnBoardingGetLLD('true');
               sessionStorage.setItem('SkippedOnBoardingGetLLD', true);
               history.push(router.home);
             }}
@@ -118,5 +122,9 @@ function OnBoarding() {
     </>
   );
 }
+
+OnBoarding.propTypes = {
+  setIsSkippedOnBoardingGetLLD: PropTypes.func.isRequired,
+};
 
 export default OnBoarding;
