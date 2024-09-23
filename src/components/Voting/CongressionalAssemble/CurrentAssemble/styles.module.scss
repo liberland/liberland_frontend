@@ -3,7 +3,14 @@
 @import '../../../../assets/main.scss';
 
 .gridList{
+    display: flex;
+    flex-direction: column;
     font-size: 14px;
+    background: $lightGrey;
+    padding: 11px;
+    border-radius: 10px;
+    gap:10px;
+
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
         font-size: 17px;
     }
@@ -11,13 +18,13 @@
     @media screen and (min-width: map-get($breakpoints, 'desktop')){
       text-align: left;
       display: grid;
-      grid-template-columns: 4fr 3fr 2fr;
+      grid-template-columns: 3fr 4fr 2fr;
       justify-content: space-between;
 
       @media screen and (min-width: map-get($breakpoints, 'widescreen')){
-        grid-template-columns: 7fr 3fr 2fr;
+        grid-template-columns: 4fr 5fr 2fr;
         @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
-            grid-template-columns: 10fr 3fr 2fr;
+            grid-template-columns: 5fr 4fr 2fr;
         }
     }
       & > *{

@@ -9,3 +9,21 @@
         gap: 40px; 
       }
 }
+
+.modal{
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    min-width: 550px;
+  }
+
+  h3{
+    font-size: 20px;
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      font-size: 26px;
+    }
+  }
+
+  button{
+    width: 100%;
+  }
+}
