@@ -31,7 +31,8 @@ function CongressionalAssemble() {
 
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call());
-  }, [dispatch]);
+    setDidChangeSelectedCandidates(false);
+  }, [dispatch, userWalletAddress]);
 
   const selectCandidate = (politician) => {
     const newSelectedCandidates = selectedCandidates;
