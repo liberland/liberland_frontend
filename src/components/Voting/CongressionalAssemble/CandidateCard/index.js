@@ -34,18 +34,23 @@ function CandidateCard({ politician, selectCandidate }) {
           <div
             className={`${stylesVotes.politicianDisplayName} ${styles.maxContent}`}
           >
-            <CopyIconWithAddress address={politician.name} isTruncate={false} />
+            <CopyIconWithAddress
+              isTruncate={!politician.name}
+              name={politician.name}
+              legal={politician.legal}
+              address={politician.rawIdentity}
+            />
           </div>
         </div>
         <div className={stylesVotes.buttonWrapper}>
           {website && (
+          <a target="blank" href={sanitizeUrlHelper(hexToString(website))} className={styles.doubleChevron}>
             <button
-              className={cx(stylesVotes.unselectContainer, styles.background)}
+              className={cx(stylesVotes.unselectContainer, styles.background, styles.doubleChevron)}
             >
-              <a target="blank" href={sanitizeUrlHelper(hexToString(website))} className={styles.doubleChevron}>
-                WEBSITE
-              </a>
+              WEBSITE
             </button>
+          </a>
           )}
           <button
             className={cx(stylesVotes.unselectContainer, styles.background)}
@@ -61,7 +66,9 @@ function CandidateCard({ politician, selectCandidate }) {
 
 CandidateCard.propTypes = {
   politician: PropTypes.shape({
-    name: PropTypes.string.isRequired,
+    name: PropTypes.string,
+    legal: PropTypes.string,
+    rawIdentity: PropTypes.string.isRequired,
     identityData: PropTypes.shape({
       info: PropTypes.shape({
         web: PropTypes.shape({

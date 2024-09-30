@@ -861,13 +861,24 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     const identities = await api.queryMulti(identityQueries);
     return addresses.map((address, index) => {
       const identity = identities[index];
-      const displayName = identity.isSome && identity.unwrap().info.display.isRaw
-        ? identity.unwrap().info.display.asRaw.toUtf8()
-        : address.toString();
+
+      const isIdentity = identity.isSome;
+
+      const addressString = address.toString();
+      let name;
+      let legal;
+
+      if (isIdentity) {
+        const identityData = identity.unwrap();
+        const { info } = identityData;
+        legal = info.legal.isRaw ? info.legal.asRaw.toUtf8() : null;
+        name = info.display.isRaw ? info.display.asRaw.toUtf8() : null;
+      }
       return {
-        name: displayName,
+        name,
+        legal,
         identityData: identity.isSome ? identity.unwrap().toJSON() : null,
-        rawIdentity: address.toString(),
+        rawIdentity: addressString,
       };
     });
   }
