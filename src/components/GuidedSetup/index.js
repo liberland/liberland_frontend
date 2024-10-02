@@ -101,7 +101,7 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if (!userWalletAddress && !walletAddress) {
+  if ((!userWalletAddress && !walletAddress) || userWalletAddress < 2) {
     return (
       <GuidedSetupWrapper>
         <NoConnectedWalletComponent />

@@ -6,7 +6,6 @@ import Button from '../../Button/Button';
 import styles from '../styles.module.scss';
 import { propsWalletListUserID } from '../propsTypes/propTypes';
 import { blockchainSelectors, userSelectors } from '../../../redux/selectors';
-import { blockchainActions } from '../../../redux/actions';
 
 function WalletListComponent() {
   const dispatch = useDispatch();
@@ -33,9 +32,6 @@ function WalletListComponent() {
               onClick={() => setCentralizedBackendAddress(walletObject.address, userId, { dispatch })}
             >
               Connect
-            </Button>
-            <Button onClick={() => dispatch(blockchainActions.setUserWallet.success(walletObject.address))}>
-              Use
             </Button>
           </div>
           <br />
