@@ -15,7 +15,10 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
 import {
-  parseIdentityData, parseDOB, parseAdditionalFlag, parseCitizenshipJudgement, parseLegal,
+  parseDOB,
+  parseAdditionalFlag,
+  parseCitizenshipJudgement,
+  decodeAndFilter,
 } from '../../utils/identityParser';
 
 function OnchainIdentityModal({
@@ -42,11 +45,12 @@ function OnchainIdentityModal({
 
     identityDOB = parseDOB(info.additional, blockNumber);
 
+    const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email']);
     defaultValues = {
-      display: parseIdentityData(info.display) ?? name,
-      legal: parseLegal(info) ?? name,
-      web: parseIdentityData(info.web),
-      email: parseIdentityData(info.email),
+      display: decodedData?.display ?? name,
+      legal: decodedData?.legal ?? name,
+      web: decodedData?.web,
+      email: decodedData?.email,
       date_of_birth: identityDOB ?? undefined,
       older_than_15: !identityDOB,
       onChainIdentity,

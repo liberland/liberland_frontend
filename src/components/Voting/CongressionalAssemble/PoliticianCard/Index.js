@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { hexToString } from '@polkadot/util';
 import cx from 'classnames';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
@@ -24,7 +23,7 @@ function PoliticanCard({
   const [isModalOpenDelegate, setIsModalOpenDelegate] = useState(false);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
-  const website = politician.identityData.info.web?.raw;
+  const { website } = politician;
   const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
   const handleModalOpenDelegate = () => {
     setIsModalOpenDelegate(!isModalOpenDelegate);
@@ -59,7 +58,7 @@ function PoliticanCard({
       <div className={styles.buttonsWrapper}>
         {website && (
         <div className={styles.buttonWrapper}>
-          <a target="blank" href={sanitizeUrlHelper(hexToString(website))} className={styles.text}>
+          <a target="blank" href={sanitizeUrlHelper(website)} className={styles.text}>
             <Button
               className={cx(stylesVoting.unselectContainer, stylesVoting.buttonFont)}
               primary
@@ -110,6 +109,7 @@ PoliticanCard.propTypes = {
   politician: PropTypes.shape({
     name: PropTypes.string,
     legal: PropTypes.string,
+    website: PropTypes.string,
     rawIdentity: PropTypes.string.isRequired,
     identityData: PropTypes.shape({
       info: PropTypes.shape({

@@ -26,12 +26,13 @@ function CopyIconWithAddress({
   if (legal) {
     fullName += legal;
   }
+
   return (
     <div className={styles.copyIconWithAdress}>
       <NotificationPortal ref={notificationRef} />
-      {name ? (
+      {name || legal ? (
         <span>
-          {fullName}
+          {truncate(fullName, 40)}
         </span>
       ) : (
         <span>{isTruncate ? truncate(address, isBigScreen ? 18 : 12) : address}</span>

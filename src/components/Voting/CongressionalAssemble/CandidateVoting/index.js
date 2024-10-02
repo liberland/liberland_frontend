@@ -30,7 +30,7 @@ function CandidateVoting({
                   <CandidateCard
                     politician={eligibleUnselectedCandidate}
                     selectCandidate={selectCandidate}
-                    key={`candidate-${eligibleUnselectedCandidate.name}`}
+                    key={`candidate-${eligibleUnselectedCandidate.rawIdentity}`}
                   />
                 ))
               }

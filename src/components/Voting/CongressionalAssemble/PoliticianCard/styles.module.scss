@@ -45,8 +45,8 @@
     width: unset;
   }
 
-  @media screen and (min-width: map-get($breakpoints, 'widescreen')){
-    gap:75px
+  @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+    gap: 75px
   }
 }
 

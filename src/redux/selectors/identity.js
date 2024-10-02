@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { parseIdentityData, parseLegal } from '../../utils/identityParser';
 
 const identityReducer = (state) => state.identity;
 

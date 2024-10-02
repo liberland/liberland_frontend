@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
-import { hexToString } from '@polkadot/util';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 import libertarianTorch from '../../../../assets/images/libertariantorch.png';
@@ -12,7 +11,7 @@ import sanitizeUrlHelper from '../../../../utils/sanitizeUrlHelper';
 
 function CandidateCard({ politician, selectCandidate }) {
   const notificationRef = useRef();
-  const website = politician.identityData.info.web?.raw;
+  const { website } = politician;
 
   return (
     <>
@@ -44,7 +43,7 @@ function CandidateCard({ politician, selectCandidate }) {
         </div>
         <div className={stylesVotes.buttonWrapper}>
           {website && (
-          <a target="blank" href={sanitizeUrlHelper(hexToString(website))} className={styles.doubleChevron}>
+          <a target="blank" href={sanitizeUrlHelper(website)} className={styles.doubleChevron}>
             <button
               className={cx(stylesVotes.unselectContainer, styles.background, styles.doubleChevron)}
             >
@@ -68,6 +67,7 @@ CandidateCard.propTypes = {
   politician: PropTypes.shape({
     name: PropTypes.string,
     legal: PropTypes.string,
+    website: PropTypes.string,
     rawIdentity: PropTypes.string.isRequired,
     identityData: PropTypes.shape({
       info: PropTypes.shape({
