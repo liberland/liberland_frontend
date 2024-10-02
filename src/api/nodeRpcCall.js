@@ -653,7 +653,7 @@ const getValidators = async () => {
 
   baseInfo.validators.forEach(async ({ key }) => {
     validatorQueries.push([api.query.staking.validators, key]);
-    validatorIdentityQueries.push([api.query.identity.identityOf, '5GjYePC6HKJGGnEzEZzSvimy6uctuMat4Kr2tjACtKyY9nhT']);
+    validatorIdentityQueries.push([api.query.identity.identityOf, key]);
   });
   const numOfValidators = validatorsKeys.length;
   const validatorsData = await api.queryMulti([
@@ -1695,7 +1695,7 @@ const getIdentitiesNames = async (addresses) => {
     let legalData;
 
     if (unwrapIdentity) {
-      const decodedData = decodeAndFilter(unwrapIdentity, ['display', 'web', 'legal', 'email']);
+      const decodedData = decodeAndFilter(unwrapIdentity, ['display', 'legal']);
       nameData = decodedData?.display;
       legalData = decodedData?.legal;
     }
