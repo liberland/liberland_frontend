@@ -149,13 +149,6 @@ function CongressionalAssemble() {
     };
   }, [history, didChangeSelectedCandidates, isSideBlocked]);
 
-  // useEffect(() => {
-  //   if (!isSideBlocked && didChangeSelectedCandidates) {
-  //     setIsSideBlocked(true);
-  //   }
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [selectedCandidates, isSideBlocked]);
-
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call());
   }, [dispatch]);
