@@ -29,6 +29,11 @@ function CongressionalAssemble() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [navigationToLeave, setNavigationToLeave] = useState(null);
 
+  useEffect(() => {
+    dispatch(democracyActions.getDemocracy.call());
+    setDidChangeSelectedCandidates(false);
+  }, [dispatch, userWalletAddress]);
+
   const selectCandidate = (politician) => {
     const newSelectedCandidates = selectedCandidates;
     newSelectedCandidates.push(politician);

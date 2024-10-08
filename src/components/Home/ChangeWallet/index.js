@@ -1,7 +1,9 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { blockchainActions, validatorActions, walletActions } from '../../../redux/actions';
+import {
+  blockchainActions, democracyActions, validatorActions, walletActions,
+} from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
 import truncate from '../../../utils/truncate';
 import styles from './styles.module.scss';
@@ -18,6 +20,7 @@ function ChangeWallet({ setIsMenuOpen }) {
     dispatch(blockchainActions.setUserWallet.success(address));
     dispatch(validatorActions.getInfo.call());
     dispatch(walletActions.getWallet.call());
+    dispatch(democracyActions.getDemocracy.call());
     localStorage.setItem('BlockchainAdress', address);
   };
 
