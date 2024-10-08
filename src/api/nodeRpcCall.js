@@ -1307,14 +1307,16 @@ const getMotions = async () => {
 
   return Promise.all(
     proposals.map(async (proposal) => {
-      const [proposalOf, voting] = await api.queryMulti([
+      const [proposalOf, voting, members] = await api.queryMulti([
         [api.query.council.proposalOf, proposal],
         [api.query.council.voting, proposal],
+        [api.query.council.members],
       ]);
       return {
         proposal,
         proposalOf,
         voting,
+        membersCount: members.length,
       };
     }),
   );
@@ -2527,14 +2529,16 @@ const getSenateMotions = async () => {
   const proposals = await api.query.senate.proposals();
   return Promise.all(
     proposals.map(async (proposal) => {
-      const [proposalOf, voting] = await api.queryMulti([
+      const [proposalOf, voting, members] = await api.queryMulti([
         [api.query.senate.proposalOf, proposal],
         [api.query.senate.voting, proposal],
+        [api.query.senate.members],
       ]);
       return {
         proposal,
         proposalOf,
         voting,
+        membersCount: members.length,
       };
     }),
   );

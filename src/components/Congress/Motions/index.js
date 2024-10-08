@@ -21,8 +21,11 @@ export default function Motions() {
 
   return (
     <div className={styles.wrapper}>
-      {motions.map(({ proposal, proposalOf, voting }) => (
+      {motions.map(({
+        proposal, proposalOf, voting, membersCount,
+      }) => (
         <Motion
+          membersCount={membersCount}
           key={proposal}
           proposal={proposal.toString()}
           proposalOf={proposalOf.unwrap()}
