@@ -1,22 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
 import styles from './styles.module.scss';
 import Card from '../../../Card';
 import CandidateCard from '../CandidateCard';
 import SelectedCandidateCard from '../SelectedCandidateCard';
 import Button from '../../../Button/Button';
-import { blockchainSelectors } from '../../../../redux/selectors';
-import { democracyActions } from '../../../../redux/actions';
 import stylesPage from '../../../../utils/pagesBase.module.scss';
 
 function CandidateVoting({
   eligibleUnselectedCandidates, selectedCandidates, selectCandidate, unselectCandidate,
-  moveSelectedCandidate, didChangeSelectedCandidates,
+  moveSelectedCandidate, didChangeSelectedCandidates, handleUpdate,
 }) {
-  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-
-  const dispatch = useDispatch();
   return (
     <Card className={stylesPage.overviewWrapper} title="Voting">
       <div className={styles.candidateVotingContainer}>
@@ -41,7 +35,7 @@ function CandidateVoting({
             <span className={styles.candidatesHeader}>My preference ordered Votes</span>
             <Button
               primary={didChangeSelectedCandidates}
-              onClick={() => dispatch(democracyActions.voteForCongress.call({ selectedCandidates, userWalletAddress }))}
+              onClick={() => handleUpdate()}
             >
               UPDATE VOTE
             </Button>
@@ -70,6 +64,7 @@ const candidate = PropTypes.shape({
 });
 
 CandidateVoting.propTypes = {
+  handleUpdate: PropTypes.func.isRequired,
   eligibleUnselectedCandidates: PropTypes.arrayOf(candidate).isRequired,
   selectedCandidates: PropTypes.arrayOf(candidate).isRequired,
   selectCandidate: PropTypes.func.isRequired,
