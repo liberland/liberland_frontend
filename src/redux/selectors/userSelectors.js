@@ -10,7 +10,7 @@ const selectUser = createSelector(
 const selectUserRole = createSelector(
   selectUser,
   (user) => {
-    if (!user) return null;
+    if (!user) return ['guest'];
     return user.role;
   },
 );

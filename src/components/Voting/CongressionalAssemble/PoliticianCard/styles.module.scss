@@ -5,6 +5,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
 
 
   .copyName{
@@ -14,6 +15,10 @@
     .copyWithName{
       display: flex;
       align-items: center;
+      font-weight: 700;
+      @media screen and (min-width: map-get($breakpoints, 'tablet')){
+        font-size: 17px;
+      }
     }
     .votesCounterMobile{
       font-size: 13px;
@@ -31,15 +36,33 @@
   margin-right: 2px;
 }
 
+.buttonsWrapper{
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    width: unset;
+  }
+
+  @media screen and (min-width: map-get($breakpoints, 'widescreen')){
+    gap:75px
+  }
+}
+
 .buttonWrapper{
+  width: 100%;
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    width: unset;
+  }
    & > button {
+    width: 100%;
     padding: 0 10px;
     min-height: 40px;
     font-size: 14px;
-    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    @media screen and (min-width: map-get($breakpoints, 'desktop')){
+      width: unset;
       min-width: 150px;
       max-height: unset;
-      min-height: unset;
       min-height: 50px;
       font-size: 17px;
     }
@@ -66,4 +89,10 @@
   @media screen and (min-width: map-get($breakpoints, 'desktop')){
     margin-right: 3px;
   }
+}
+
+.text{
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
 }

@@ -1,10 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useLocation } from 'react-router-dom';
+import { AuthContext } from 'react-oauth2-code-pkce';
+import { useSelector } from 'react-redux';
 import router from '../../../router';
 
 import styles from './styles.module.scss';
+import Button from '../../Button/Button';
+import { userSelectors } from '../../../redux/selectors';
 
 function HomeHeader() {
+  const { login } = useContext(AuthContext);
+  const user = useSelector(userSelectors.selectUser);
+
   // TODO do we need this component at all ?
   const titles = {
     [router.home.profile]: 'My profile',
@@ -32,6 +39,11 @@ function HomeHeader() {
           <span className={styles.headerTitle}>
             {titles[location.pathname]}
           </span>
+          {!user && (
+          <Button primary small onClick={() => login()}>
+            Sign In
+          </Button>
+          )}
         </div>
       </div>
     </div>

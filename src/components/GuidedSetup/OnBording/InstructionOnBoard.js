@@ -1,10 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
 
 const link = 'https://liberland-1.gitbook.io/wiki/v/public-documents/blockchain/for-citizens/claiming-residency';
 
-function InstructionOnBoard() {
+function InstructionOnBoard({ setIsClicked }) {
+  const onClick = () => {
+    sessionStorage.setItem('notResidentAcceptedByUser', true);
+    setIsClicked(true);
+  };
   return (
     <div className={styles.wrapper}>
       <h3>You are not yet an e-resident.</h3>
@@ -20,7 +25,7 @@ function InstructionOnBoard() {
         <Button
           medium
           secondary
-          onClick={() => sessionStorage.setItem('notResidentAcceptedByUser', true)}
+          onClick={onClick}
         >
           Skip
         </Button>
@@ -28,5 +33,9 @@ function InstructionOnBoard() {
     </div>
   );
 }
+
+InstructionOnBoard.propTypes = {
+  setIsClicked: PropTypes.func.isRequired,
+};
 
 export default InstructionOnBoard;

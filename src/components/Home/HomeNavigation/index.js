@@ -41,8 +41,9 @@ import LogoutModal from '../../Modals/LogoutModal';
 import Button from '../../Button/Button';
 
 function HomeNavigation() {
-  const { logOut } = useContext(AuthContext);
+  const { logOut, login } = useContext(AuthContext);
   const location = useLocation();
+  const user = useSelector(userSelectors.selectUser);
   const roles = useSelector(userSelectors.selectUserRole);
   const name = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
@@ -65,8 +66,9 @@ function HomeNavigation() {
 
   const handleLogout = () => {
     logOut();
-    localStorage.setItem('isAdminLogin', 'true');
     dispatch(authActions.signOut.call(history));
+    window.location.href = `
+    ${process.env.REACT_APP_SSO_API}/logout?redirect=${process.env.REACT_APP_FRONTEND_REDIRECT}`;
   };
 
   useEffect(() => {
@@ -89,7 +91,7 @@ function HomeNavigation() {
     {
       route: router.home.profile,
       title: homeTitle,
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       // eslint-disable-next-line react/no-unstable-nested-components
       icon: () => (
         <Avatar
@@ -102,98 +104,85 @@ function HomeNavigation() {
       ),
       description: `${formatMerits(totalBalance)} LLM`,
       isDiscouraged: false,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.feed,
       title: 'FEED',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: FeedIcon,
       isDiscouraged: process.env.REACT_APP_IS_FEED_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.wallet,
       title: 'WALLET',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: WalletIcon,
       isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.voting,
       title: 'VOTING',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: VotingIcon,
       isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: false,
     },
     {
       route: router.home.contracts,
       title: 'CONTRACTS',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_CONTRACTS_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.legislation,
       title: 'LEGISLATION',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: ConstitutionIcon,
       isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: false,
     },
     {
       route: router.home.offices,
       title: 'OFFICES',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: ConstitutionIcon,
       isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.companies,
       title: 'COMPANIES',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.registries,
       title: 'REGISTRIES',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.staking,
       title: 'STAKING',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: true,
     },
     {
       route: router.home.congress,
       title: 'CONGRESS',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: false,
     },
     {
       route: router.home.senate,
       title: 'SENATE',
-      access: ['citizen', 'assemblyMember', 'non_citizen'],
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
       icon: DocumentsIcon,
       isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
-      isAdressWalletDiffrentThanRegistered: false,
     },
   ];
-
   const desktopNavbar = (
     <div className={`${styles.navigationWrapper}`}>
       <div className={styles.navigationContent}>
@@ -209,31 +198,42 @@ function HomeNavigation() {
               access,
               description,
               isDiscouraged,
-              isAdressWalletDiffrentThanRegistered,
-            }) => (isWalletAdressSame
-              || (!isWalletAdressSame && isAdressWalletDiffrentThanRegistered) ? (
-                <RoleHOC key={route} roles={roles} access={access}>
-                  <NavigationLink
-                    route={route}
-                    title={title}
-                    icon={icon}
-                    path={location.pathname}
-                    description={description}
-                    isDiscouraged={isDiscouraged}
-                  />
-                </RoleHOC>
-              ) : null),
+            }) => (
+              <RoleHOC key={route} roles={roles} access={access}>
+                <NavigationLink
+                  route={route}
+                  title={title}
+                  icon={icon}
+                  path={location.pathname}
+                  description={description}
+                  isDiscouraged={isDiscouraged}
+                />
+              </RoleHOC>
+            ),
           )}
-        <div onClick={() => setLogoutIsModalOpen(true)}>
-          <NavigationLink
-            route="logout"
-            title="LOGOUT"
-            icon={DocumentsIcon}
-            path="logout"
-          />
-        </div>
-        {
-          !isWalletAdressSame
+        {user ? (
+          <div onClick={() => setLogoutIsModalOpen(true)}>
+            <NavigationLink
+              route="logout"
+              title="LOGOUT"
+              icon={DocumentsIcon}
+              path="logout"
+            />
+          </div>
+        )
+          : (
+            <div onClick={() => login()}>
+              <NavigationLink
+                route="sigin"
+                title="SIGNIN"
+                icon={DocumentsIcon}
+                path="sigin"
+              />
+            </div>
+          )}
+
+        {user
+          && !isWalletAdressSame
           && (
             <div className={styles.buttonSwtichWalletWrapper}>
               <Button
@@ -244,11 +244,10 @@ function HomeNavigation() {
                 Switch to registered wallet
               </Button>
             </div>
-          )
-        }
+          )}
 
         <ChangeWallet />
-        {roles['e-resident'] === 'e-resident' ? <GetCitizenshipCard /> : ''}
+        {roles?.['e-resident'] === 'e-resident' ? <GetCitizenshipCard /> : ''}
         {isLogoutModalOpen && (
           <LogoutModal
             handleLogout={handleLogout}
@@ -292,32 +291,27 @@ function HomeNavigation() {
                 access,
                 description,
                 isDiscouraged,
-                isAdressWalletDiffrentThanRegistered,
               },
               index,
             ) => (
               <React.Fragment key={route}>
-                {isWalletAdressSame
-                || (!isWalletAdressSame
-                  && isAdressWalletDiffrentThanRegistered) ? (
-                    <div key={route} onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                      <RoleHOC roles={roles} access={access}>
-                        <NavigationLink
-                          route={route}
-                          title={title}
-                          icon={icon}
-                          path={location.pathname}
-                          description={description}
-                          isDiscouraged={isDiscouraged === 'true'}
-                        />
-                      </RoleHOC>
-                    </div>
-                  ) : null}
+                <div key={route} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                  <RoleHOC roles={roles} access={access}>
+                    <NavigationLink
+                      route={route}
+                      title={title}
+                      icon={icon}
+                      path={location.pathname}
+                      description={description}
+                      isDiscouraged={isDiscouraged === 'true'}
+                    />
+                  </RoleHOC>
+                </div>
                 {index === 0
                   && (
                   <>
                     <ChangeWallet setIsMenuOpen={setIsMenuOpen} />
-                    { !isWalletAdressSame && (
+                    { !isWalletAdressSame && !!walletAddress && (
                     <div className={styles.buttonSwtichWalletWrapper}>
                       <Button
                         className={styles.buttonSwtichWallet}
@@ -334,20 +328,31 @@ function HomeNavigation() {
               </React.Fragment>
             ),
           )}
-          <div
-            onClick={() => {
+          {user ? (
+            <div onClick={() => {
               setLogoutIsModalOpen(true);
-              setIsMenuOpen(!isMenuOpen);
+              setIsMenuOpen(false);
             }}
-          >
-            <NavigationLink
-              route="logout"
-              title="Logout"
-              icon={DocumentsIcon}
-              path="logout"
-            />
-          </div>
-          {roles['e-resident'] === 'e-resident' ? <GetCitizenshipCard /> : ''}
+            >
+              <NavigationLink
+                route="logout"
+                title="LOGOUT"
+                icon={DocumentsIcon}
+                path="logout"
+              />
+            </div>
+          )
+            : (
+              <div onClick={() => login()}>
+                <NavigationLink
+                  route="sigin"
+                  title="SIGNIN"
+                  icon={DocumentsIcon}
+                  path="sigin"
+                />
+              </div>
+            )}
+          {roles?.['e-resident'] === 'e-resident' ? <GetCitizenshipCard /> : ''}
           {isLogoutModalOpen && (
             <LogoutModal
               handleLogout={handleLogout}

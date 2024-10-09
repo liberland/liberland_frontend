@@ -27,11 +27,15 @@ function Motions() {
 
   return (
     <>
-      {motions.map(({ proposal, proposalOf, voting }, index) => {
+      {motions.map(({
+        proposal, proposalOf, voting, membersCount,
+      }, index) => {
         const isLastItem = motions.length - 1 === index;
         return (
           <div ref={isLastItem ? divRef : null} key={proposal}>
             <Motion
+              membersCount={membersCount}
+              key={proposal}
               proposal={proposal.toString()}
               proposalOf={proposalOf.unwrap()}
               voting={voting.unwrap()}
@@ -39,9 +43,9 @@ function Motions() {
               closeMotion={(data) => senateActions.senateCloseMotion.call(data)}
             />
           </div>
-
         );
       })}
+
     </>
   );
 }

@@ -14,6 +14,7 @@ import { congressActions } from '../../../redux/actions';
 import {
   congressSelectors,
   blockchainSelectors,
+  userSelectors,
 } from '../../../redux/selectors';
 import router from '../../../router';
 
@@ -95,7 +96,7 @@ export default function Treasury() {
   const treasuryInfo = useSelector(congressSelectors.treasury);
   const userIsMember = useSelector(congressSelectors.userIsMember);
   const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
-
+  const user = useSelector(userSelectors.selectUser);
   const [isSpendingModalOpen, setIsSpendingModalOpen] = useState(false);
   const handleSpendingModalOpen = () => setIsSpendingModalOpen(!isSpendingModalOpen);
 
@@ -154,9 +155,11 @@ export default function Treasury() {
           </p>
         </div>
         <div className={congressStyles.rowEnd}>
+          {user && (
           <Button primary medium onClick={handleSpendingModalOpen}>
             Propose spend
           </Button>
+          )}
         </div>
       </div>
       <div>

@@ -30,9 +30,12 @@ export default function Motions() {
 
   return (
     <div className={styles.wrapper}>
-      {motions.map(({ proposal, proposalOf, voting }, index) => (
+      {motions.map(({
+        proposal, proposalOf, voting, membersCount,
+      }, index) => (
         <div ref={motions.length - 1 === index ? divRef : null} key={proposal}>
           <Motion
+            membersCount={membersCount}
             key={proposal}
             proposal={proposal.toString()}
             proposalOf={proposalOf.unwrap()}

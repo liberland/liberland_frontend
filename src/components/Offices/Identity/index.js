@@ -103,6 +103,9 @@ function IdentityForm() {
           </Button>
         </div>
       </form>
+      <div className={styles.twoFAbuttons}>
+        <a href={`${process.env.REACT_APP_SSO_API_ADMIN_LINK}`}>admin login</a>
+      </div>
     </div>
 
   );

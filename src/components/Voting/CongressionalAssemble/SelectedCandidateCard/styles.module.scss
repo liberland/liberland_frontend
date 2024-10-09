@@ -6,9 +6,14 @@
   border-radius: 10px;
   background: $lightGrey;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 5px;
+  gap: 15px;
+
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    flex-direction: row;
+  }
 }
 
 
@@ -21,6 +26,13 @@
   justify-content: center;
 }
 
+.mobileNone{
+  display: none;
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    display: block;
+  }
+}
+
 .unselectContainerRed{
   background: $red;
 }
@@ -28,18 +40,22 @@
 .unselectContainer{
   border: none;
   height: 35px;
-  width: 35px;
+  width: 100%;
+
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    width: unset;
+  }
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
     height: 50px;
-    width: 50px;
   }
 
   .cross{
-    color: $bg4;
-    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    font-size: 13px;
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      font-size: 28px;
+      font-size: 17px;
     }
   }
 }
@@ -85,9 +101,14 @@
 .leftColumn,
 .rightColumn,
 .politicianDisplayName{
+  width: 100%;
   display: flex;
   align-items: center;
   font-weight: 700;
+
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    width: unset;
+  }
 }
 
 .leftColumn{
@@ -117,4 +138,36 @@
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
     height: 42px;
   }
+}
+
+.buttonWrapper{
+  display: flex;
+  gap: 10px;
+  width: 100%;
+
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    width: unset;
+  }
+}
+
+.mobileRemove{
+  display: block;
+
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    display: none;
+  }
+}
+
+.buttonFont{
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 13px;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    font-size: 17px;
+  }
+}
+
+.backgroundPrimary{
+  background: $primary;
 }

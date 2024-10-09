@@ -445,17 +445,17 @@ function* getAllBalanceForCongressWorker(action) {
   );
   const llmItem = additionalAssets.find((item) => item.index === 1);
 
-  const politiPollLlm = formatMerits(
+  const politiPoolLlm = formatMerits(
     balances.liberstake.amount,
   );
 
   const llmPolitiPool = {
     balance: {
-      balance: politiPollLlm,
+      balance: politiPoolLlm,
     },
     index: IndexHelper.POLITIPOOL_LLM,
     metadata: {
-      name: 'PolitiPoll LLM',
+      name: 'PolitiPool LLM',
       symbol: 'POLITIPOOL_LLM',
       decimals: llmItem.metadata.decimals,
     },

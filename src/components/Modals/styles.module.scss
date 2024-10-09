@@ -176,10 +176,21 @@
 }
 
 .agreeDisagree{
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    flex-direction: row;
+    margin-top: 20px;
+  }
   .buttons{
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    margin-top: 20px;
+    margin-top: 35px;
+    gap: 15px;
+
+    @media screen and (min-width: map-get($breakpoints, 'tablet')){
+      flex-direction: row;
+      margin-top: 20px;
+    }
   }
 }
 
