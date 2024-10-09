@@ -16,23 +16,14 @@ function CopyIconWithAddress({
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
 
-  let fullName = '';
-  if (name) {
-    fullName += name;
-  }
-  if (name && legal) {
-    fullName += ' - ';
-  }
-  if (legal) {
-    fullName += legal;
-  }
-
   return (
     <div className={styles.copyIconWithAdress}>
       <NotificationPortal ref={notificationRef} />
       {name || legal ? (
         <span>
-          {truncate(fullName, 40)}
+          {name && truncate(name, 20)}
+          {name && legal && ' - '}
+          {legal && truncate(legal, 20)}
         </span>
       ) : (
         <span>{isTruncate ? truncate(address, isBigScreen ? 18 : 12) : address}</span>

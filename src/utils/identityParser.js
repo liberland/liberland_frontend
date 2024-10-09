@@ -15,6 +15,21 @@ export function parseEligibleOn(eligible_on) {
   return parseInt(hex, 16);
 }
 
+export function parseLegal(info) {
+  if (!info) return undefined;
+  if (!info.additional) return undefined;
+
+  const parts = info.additional
+    .filter(([key, _]) => key.eq('legal'))
+    .map(([_, v]) => parseIdentityData(v))
+    .filter((x) => x !== undefined);
+
+  // eslint-disable-next-line eqeqeq
+  if (parts.length == 0) return parseIdentityData(info.legal);
+
+  return parts.join('');
+}
+
 export function parseAdditionalFlag(additional, flag) {
   if (!additional) return false;
 

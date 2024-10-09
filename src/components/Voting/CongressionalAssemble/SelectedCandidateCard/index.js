@@ -20,7 +20,7 @@ function SelectedCandidateCard({
       <div className={styles.politicianCardContainer}>
         <div className={styles.leftColumn}>
           <button
-            className={cx(styles.unselectContainer, styles.unselectContainerRed, styles.mobileNone)}
+            className={cx(styles.unselectContainer, styles.unselectContainerRed, styles.mobileNone, styles.minWidth)}
             onClick={() => unselectCandidate(politician)}
           >
             <span className={styles.cross}>REMOVE</span>
@@ -52,7 +52,7 @@ function SelectedCandidateCard({
             className={cx(styles.buttonFont, styles.unselectContainer)}
           >
             <button
-              className={cx(styles.unselectContainer, styles.backgroundPrimary, styles.buttonFont)}
+              className={cx(styles.unselectContainer, styles.backgroundPrimary, styles.buttonFont, styles.minWidth)}
             >
               WEBSITE
             </button>
