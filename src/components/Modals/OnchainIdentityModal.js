@@ -67,7 +67,7 @@ function OnchainIdentityModal({
   }
   const isWarning = identity.isSome && isKnownGood;
 
-  const [isUserAllowChangeIdentity, setIsUserAllowChangeIdentity] = useState(!isWarning);
+  const [isUserWarnAccepted, setIsUserWarnAccepted] = useState(!isWarning);
 
   const {
     handleSubmit,
@@ -90,7 +90,7 @@ function OnchainIdentityModal({
         to be up-to-date for your citizenship or e-residency.
       </div>
       <br />
-      {!isKnownGood ? null : (
+      {!isWarning ? null : (
         <div className={styles.description}>
           Warning! Your identity is currently confirmed by citizenship office
           as valid. Changing it will require reapproval - you&apos;ll
@@ -152,7 +152,7 @@ function OnchainIdentityModal({
         {errors?.e_resident?.message || errors?.citizen?.message}
       </div>
 
-      {isUserAllowChangeIdentity ? null : (
+      {isUserWarnAccepted ? null : (
         <>
           <div className={cx(styles.description, styles.warning)}>
             Warning! Your identity is currently confirmed by citizenship office
@@ -160,7 +160,7 @@ function OnchainIdentityModal({
             temporarily lose citizenship or e-resident rights onchain.
             Until its manually handled by ministry of interior which takes about two days.
           </div>
-          <Button medium red onClick={() => setIsUserAllowChangeIdentity(true)}>
+          <Button medium red onClick={() => setIsUserWarnAccepted(true)}>
             I want to change my identity
           </Button>
         </>
@@ -170,7 +170,7 @@ function OnchainIdentityModal({
         <Button className={styles.button} medium grey onClick={closeModal}>
           Cancel
         </Button>
-        <Button className={styles.button} primary medium type="submit" disabled={!isUserAllowChangeIdentity}>
+        <Button className={styles.button} primary medium type="submit" disabled={!isUserWarnAccepted}>
           Set identity
         </Button>
       </div>
