@@ -13,6 +13,7 @@ function NavigationLink({
   description,
   isDiscouraged,
 }) {
+  const emptyRoutes = ['logout', 'sigin'];
   return (
     <div
       className={cx(
@@ -23,11 +24,11 @@ function NavigationLink({
       style={{ opacity: (isDiscouraged === true || isDiscouraged === 'true') ? 0.2 : 1 }}
     >
       <NavLink
-        to={route === 'logout' ? '#' : route}
+        to={emptyRoutes.includes(route) ? '#' : route}
         activeClassName="active"
         className={cx(
           { [styles.activeBg]: path === route || path.includes(route) },
-          route === 'logout' && styles.logoutBg,
+          emptyRoutes.includes(route) && styles.logoutBg,
         )}
       >
         <div className={cx(typeof icon !== 'function' && styles.icon)}>

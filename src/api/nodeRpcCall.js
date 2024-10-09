@@ -1307,14 +1307,16 @@ const getMotions = async () => {
 
   return Promise.all(
     proposals.map(async (proposal) => {
-      const [proposalOf, voting] = await api.queryMulti([
+      const [proposalOf, voting, members] = await api.queryMulti([
         [api.query.council.proposalOf, proposal],
         [api.query.council.voting, proposal],
+        [api.query.council.members],
       ]);
       return {
         proposal,
         proposalOf,
         voting,
+        membersCount: members.length,
       };
     }),
   );
@@ -2527,9 +2529,10 @@ const getSenateMotions = async () => {
 
   return Promise.all(
     proposals.map(async (proposal) => {
-      const [proposalOf, voting] = await api.queryMulti([
+      const [proposalOf, voting, members] = await api.queryMulti([
         [api.query.senate.proposalOf, proposal],
         [api.query.senate.voting, proposal],
+        [api.query.senate.members],
       ]);
 
       const senateProposalHash = proposalOf.hash.toHex();
@@ -2538,6 +2541,7 @@ const getSenateMotions = async () => {
         proposalOf,
         voting,
         hash: senateProposalHash,
+        membersCount: members.length,
       };
     }),
   ).then((motions) => motions.filter(Boolean));
@@ -2559,8 +2563,10 @@ const matchScheduledWithSenateMotions = async () => {
         return { ...motion, proposalOf: unwrappedProposalOf };
       }
       const proposalData = { method: unwrappedProposalOf.method, section: unwrappedProposalOf.section };
-      const newProposal = { ...proposalData, args: matchingScheduledCall?.preimage || matchingScheduledCall?.proposal };
-      return { ...motion, proposalOf: newProposal };
+      const proposalWithDetails = {
+        ...proposalData, args: matchingScheduledCall?.preimage || matchingScheduledCall?.proposal,
+      };
+      return { ...motion, proposalOf: proposalWithDetails };
     }
     return { ...motion, proposalOf: unwrappedProposalOf };
   });

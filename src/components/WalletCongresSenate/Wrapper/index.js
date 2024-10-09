@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import cx from 'classnames';
 import { BN } from '@polkadot/util';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import walletStyles from '../../Wallet/styles.module.scss';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import Button from '../../Button/Button';
@@ -13,6 +14,7 @@ import WalletOverview from '../../Wallet/WalletOverview';
 import AssetOverview from '../../Wallet/AssetOverview';
 import SpendModalWrapper from '../../Modals/SpendModal';
 import { valueToBN } from '../../../utils/walletHelpers';
+import { userSelectors } from '../../../redux/selectors';
 
 export default function WalletCongresSenateWrapper({
   totalBalance,
@@ -26,6 +28,7 @@ export default function WalletCongresSenateWrapper({
   const { LLD, LLM, LLMPolitipool } = onSendFunctions;
   const balanceLLD = new BN(balances?.liquidAmount?.amount ?? 0);
   const balanceLLM = valueToBN(balances?.liquidMerits?.amount ?? 0);
+  const user = useSelector(userSelectors.selectUser);
 
   const [isModalOpenLLDSpend, setIsModalOpenLLDSpend] = useState(false);
   const [isModalOpenLLMSpend, setIsModalOpenLLMSpend] = useState(false);
@@ -64,24 +67,28 @@ export default function WalletCongresSenateWrapper({
             styles.walletButtonsWrapper,
           )}
         >
-          <Button small primary className={walletStyles.button} onClick={toggleModalPolitipoolLLMSpendOpen}>
-            <div className={walletStyles.icon}>
-              <GraphIcon />
-            </div>
-            SPEND LLM (POLITIPOOL)
-          </Button>
-          <Button small primary className={walletStyles.button} onClick={toggleModalLLMSpendOpen}>
-            <div className={walletStyles.icon}>
-              <UploadIcon />
-            </div>
-            SPEND LLM
-          </Button>
-          <Button small primary className={walletStyles.button} onClick={toggleModalLLDSpendOpen}>
-            <div className={walletStyles.icon}>
-              <UploadIcon />
-            </div>
-            SPEND LLD
-          </Button>
+          {user && (
+          <>
+            <Button small primary className={walletStyles.button} onClick={toggleModalPolitipoolLLMSpendOpen}>
+              <div className={walletStyles.icon}>
+                <GraphIcon />
+              </div>
+              SPEND LLM (POLITIPOOL)
+            </Button>
+            <Button small primary className={walletStyles.button} onClick={toggleModalLLMSpendOpen}>
+              <div className={walletStyles.icon}>
+                <UploadIcon />
+              </div>
+              SPEND LLM
+            </Button>
+            <Button small primary className={walletStyles.button} onClick={toggleModalLLDSpendOpen}>
+              <div className={walletStyles.icon}>
+                <UploadIcon />
+              </div>
+              SPEND LLD
+            </Button>
+          </>
+          )}
         </div>
       </div>
 

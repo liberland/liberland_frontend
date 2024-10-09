@@ -1,6 +1,6 @@
 export default {
-  signIn: '/signin',
   signUp: '/signup',
+  signIn: '/liberland-login',
   home: {
     index: '/home',
     feed: '/home/feed',

@@ -23,6 +23,10 @@ import { blockchainWatcher } from './base';
 
 function* getWalletWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  if (!walletAddress) {
+    yield put(walletActions.getWallet.failure());
+    return;
+  }
   const balances = yield call(getBalanceByAddress, walletAddress);
   yield put(walletActions.getWallet.success({ balances }));
 }

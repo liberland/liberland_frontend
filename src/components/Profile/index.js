@@ -43,6 +43,7 @@ function Profile({ className }) {
   const liquidDollars = useSelector(
     walletSelectors.selectorLiquidDollarsBalance,
   );
+  const user = useSelector(userSelectors.selectUser);
   const isUserEligibleForComplimentaryLLD = useSelector(
     onboardingSelectors.selectorEligibleForComplimentaryLLD,
   );
@@ -227,7 +228,7 @@ function Profile({ className }) {
                   onClick={handleGetFreeLLD}
                   disabled={isLoading}
                 >
-                  {isUserEligibleForComplimentaryLLD
+                  {isUserEligibleForComplimentaryLLD || !user
                     ? 'Claim complimentary LLD'
                     : ineligibleForComplimentaryLLDReason}
                 </Button>

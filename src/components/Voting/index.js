@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Switch, Route, Redirect,
 } from 'react-router-dom';
 
 import { NavLink, useLocation } from 'react-router-dom/cjs/react-router-dom.min';
 
+import { useSelector } from 'react-redux';
+import { AuthContext } from 'react-oauth2-code-pkce';
 import VotingHeader from './VotingHeader';
 import RoleHOC from '../../hocs/RoleHOC';
 import router from '../../router';
@@ -15,10 +17,12 @@ import stylesPage from '../../utils/pagesBase.module.scss';
 import Referendum from './Referendum';
 import { AddLegislation } from './Referendum/ProposalForms/AddLegislation/AddLegislation';
 import Button from '../Button/Button';
+import { userSelectors } from '../../redux/selectors';
 
 function Voting() {
   const location = useLocation();
-
+  const { login } = useContext(AuthContext);
+  const user = useSelector(userSelectors.selectUser);
   return (
     <div className={stylesPage.sectionWrapper}>
       <div className={stylesPage.menuAddressWrapper}>
@@ -27,9 +31,15 @@ function Voting() {
           {location.pathname === router.voting.referendum && (
           <NavLink
             className={styles.linkButton}
-            to={router.voting.addLegislation}
+            to={user ? router.voting.addLegislation : ''}
           >
-            <Button small primary>Propose</Button>
+            <Button
+              onClick={() => !user && login()}
+              small
+              primary
+            >
+              {user ? 'Propose' : 'Log in to propose referenda'}
+            </Button>
           </NavLink>
           )}
 

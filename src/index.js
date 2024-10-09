@@ -12,18 +12,19 @@ const defaultConfig = {
   tokenEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/token`,
   authorizationEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/authorize`,
   decodeToken: false,
+  autoLogin: false,
   postLogin: () => {
     store.dispatch(authActions.verifySession.call());
     store.dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
   },
   onRefreshTokenExpire: (event) => {
+    const storeData = store.getState();
     event.login();
     localStorage.removeItem('BlockchainAdress');
-    const storeData = store.getState();
+
     const walletAddress = storeData.user.user.blockchainAddress;
     store.dispatch(blockchainActions.setUserWallet.success(walletAddress));
   },
-
 };
 
 const adminAuthConfig = {
