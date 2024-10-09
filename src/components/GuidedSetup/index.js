@@ -80,27 +80,6 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if (!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true') {
-    return (
-      <GuidedSetupWrapper>
-        <InstructionOnBoard setIsClicked={setNotResidentAcceptedByUser} />
-      </GuidedSetupWrapper>
-    );
-  }
-  if (
-    (isUserEligibleForComplimentaryLLD
-      || isIdentityEmpty
-      || isSkippedOnBoardingGetLLD === 'secondStep')
-    && isSkippedOnBoardingGetLLD !== 'true'
-    && userHasIdentity !== 'true'
-  ) {
-    return (
-      <GuidedSetupWrapper>
-        <OnBoarding setIsSkippedOnBoardingGetLLD={setIsSkippedOnBoardingGetLLD} />
-      </GuidedSetupWrapper>
-    );
-  }
-
   if ((!userWalletAddress && !walletAddress) || userWalletAddress < 2) {
     return (
       <GuidedSetupWrapper>
@@ -113,6 +92,28 @@ function GuidedSetup({ children }) {
     return (
       <GuidedSetupWrapper>
         <MissingWalletComponent />
+      </GuidedSetupWrapper>
+    );
+  }
+
+  if (!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true') {
+    return (
+      <GuidedSetupWrapper>
+        <InstructionOnBoard setIsClicked={setNotResidentAcceptedByUser} />
+      </GuidedSetupWrapper>
+    );
+  }
+
+  if (
+    (isUserEligibleForComplimentaryLLD
+      || isIdentityEmpty
+      || isSkippedOnBoardingGetLLD === 'secondStep')
+    && isSkippedOnBoardingGetLLD !== 'true'
+    && userHasIdentity !== 'true'
+  ) {
+    return (
+      <GuidedSetupWrapper>
+        <OnBoarding setIsSkippedOnBoardingGetLLD={setIsSkippedOnBoardingGetLLD} />
       </GuidedSetupWrapper>
     );
   }
