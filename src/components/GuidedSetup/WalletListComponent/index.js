@@ -30,12 +30,12 @@ function WalletListComponent() {
             <Button
               primary
               className={styles.connectWalletAddressButton}
-              onClick={() => setCentralizedBackendAddress(walletObject.address, userId, { dispatch })}
+              onClick={() => {
+                dispatch(blockchainActions.setUserWallet.success(walletObject.address));
+                setCentralizedBackendAddress(walletObject.address, userId, { dispatch });
+              }}
             >
               Connect
-            </Button>
-            <Button onClick={() => dispatch(blockchainActions.setUserWallet.success(walletObject.address))}>
-              Use
             </Button>
           </div>
           <br />
