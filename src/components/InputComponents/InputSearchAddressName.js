@@ -14,6 +14,7 @@ function InputSearch({
   validate,
   setValue,
   isRequired,
+  trigger,
 }) {
   const inputProps = {
     errorTitle,
@@ -50,6 +51,7 @@ function InputSearch({
     setValue(name, suggestion);
     setInputValue(suggestion);
     setSuggestions([]);
+    trigger(name);
   };
 
   return (
@@ -99,6 +101,7 @@ InputSearch.propTypes = {
   validate: PropTypes.func.isRequired,
   setValue: PropTypes.func.isRequired,
   isRequired: PropTypes.bool.isRequired,
+  trigger: PropTypes.func.isRequired,
 };
 
 export default InputSearch;

@@ -15,3 +15,5 @@ export const getMetadataCache = () => {
 
   return undefined;
 };
+
+export const getNestedValue = (data, path) => path.reduce((acc, key) => acc && acc[key], data);

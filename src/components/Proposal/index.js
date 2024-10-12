@@ -5,12 +5,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import cx from 'classnames';
 import router from '../../router';
 import { blockchainActions, walletActions } from '../../redux/actions';
-import { blockchainSelectors, walletSelectors } from '../../redux/selectors';
+import { blockchainSelectors, identitySelectors, walletSelectors } from '../../redux/selectors';
 import { decodeCall, decodeRemark } from '../../api/nodeRpcCall';
 import styles from './styles.module.scss';
 import stylesAnim from '../Voting/Referendum/Items/item.module.scss';
 import { formatAssets, formatDollars, formatMerits } from '../../utils/walletHelpers';
 import formatDate from '../../utils/formatDate';
+import { useAddIdToContext } from './useAddIdToContect.js';
 /* eslint-disable react/forbid-prop-types */
 const ProposalProp = PropTypes.object;
 
@@ -291,25 +292,39 @@ function Schedule({ proposal }) {
 Schedule.propTypes = { proposal: ProposalProp.isRequired };
 
 function TransferLLD({ proposal }) {
+  const names = useSelector(identitySelectors.selectorIdentityMotions);
   const accountId = proposal.args[0].value.toString();
   const value = proposal.args[1];
   const formattedValue = formatDollars(value);
+  const identity = names?.[accountId]?.identity;
+  useAddIdToContext(accountId);
+
   return (
     <div>
-      {`Transfer ${formattedValue} (LLD) to ${accountId}`}
+      <b>Transfer</b>
+      {` ${formattedValue} (LLD) `}
+      <b>to</b>
+      {` ${identity ? `${identity} (${accountId})` : accountId}`}
     </div>
   );
 }
 TransferLLD.propTypes = { proposal: ProposalProp.isRequired };
 
 function TransferLLM({ proposal }) {
+  const names = useSelector(identitySelectors.selectorIdentityMotions);
   const accountId = proposal.args[0].toString();
   const value = proposal.args[1];
   const formattedValue = formatMerits(value);
   const symbol = proposal.method === 'sendLlm' ? 'LLM' : 'PolitiPooled LLM';
+  const identity = names?.[accountId]?.identity;
+  useAddIdToContext(accountId);
+
   return (
     <div>
-      {`Transfer ${formattedValue} (${symbol}) to ${accountId}`}
+      <b>Transfer</b>
+      {` ${formattedValue} (${symbol}) `}
+      <b>to</b>
+      {` ${identity ? `${identity} (${accountId})` : accountId}`}
     </div>
   );
 }
@@ -320,10 +335,13 @@ function TransferAsset({ proposal }) {
   const assetId = proposal.args[0];
   const target = proposal.args[1].toString();
   const value = proposal.args[2].toString();
+  useAddIdToContext(target);
 
+  const names = useSelector(identitySelectors.selectorIdentityMotions);
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const [asset] = additionalAssets.filter((item) => item.index === Number(assetId));
   const formattedValue = asset ? formatAssets(value, asset?.metadata?.decimals) : value;
+  const identity = names?.[target]?.identity;
 
   useEffect(() => {
     dispatch(walletActions.getAdditionalAssets.call(true));
@@ -331,7 +349,10 @@ function TransferAsset({ proposal }) {
 
   return (
     <div>
-      {`Transfer ${formattedValue} (${asset?.metadata?.symbol || assetId}) to ${target}`}
+      <b>Transfer</b>
+      {` ${formattedValue} (${asset?.metadata?.symbol || assetId}) `}
+      <b>to</b>
+      {` ${identity ? `${identity} (${target})` : target}`}
     </div>
   );
 }
@@ -459,9 +480,11 @@ export function Proposal({ proposal, isDetailsHidden }) {
 
 Proposal.defaultProps = {
   isDetailsHidden: false,
+  names: {},
 };
 
 Proposal.propTypes = {
   proposal: ProposalProp.isRequired,
   isDetailsHidden: PropTypes.bool,
+  names: PropTypes.object,
 };

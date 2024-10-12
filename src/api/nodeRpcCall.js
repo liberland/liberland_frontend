@@ -1301,6 +1301,22 @@ const getBlockEvents = async (blockHash) => {
   }
 };
 
+const getIdentitiesNames = async (addresses) => {
+  const api = await getApi();
+  const raw = await api.query.identity.identityOf.multi(addresses);
+  const identities = {};
+  raw.map((identity, idx) => {
+    identities[addresses[idx]] = {};
+    const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
+    const nameHashed = unwrapIdentity?.display?.asRaw;
+    const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
+    identities[addresses[idx]].identity = name;
+
+    return null;
+  });
+  return identities;
+};
+
 const getMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.council.proposals();
@@ -1658,22 +1674,6 @@ const getIdentities = async (addresses) => {
     address: addresses[idx],
     identity: identity.isSome ? identity.unwrap().info : null,
   }));
-};
-
-const getIdentitiesNames = async (addresses) => {
-  const api = await getApi();
-  const raw = await api.query.identity.identityOf.multi(addresses);
-  const identities = {};
-  raw.map((identity, idx) => {
-    identities[addresses[idx]] = {};
-    const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
-    const nameHashed = unwrapIdentity?.display?.asRaw;
-    const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
-    identities[addresses[idx]].identity = name;
-
-    return null;
-  });
-  return identities;
 };
 
 const stakingChill = async (walletAddress) => {
@@ -2527,7 +2527,7 @@ const getStakingData = async (walletAddress) => {
 const getSenateMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.senate.proposals();
-  return Promise.all(
+  const proposalsData = await Promise.all(
     proposals.map(async (proposal) => {
       const [proposalOf, voting, members] = await api.queryMulti([
         [api.query.senate.proposalOf, proposal],
@@ -2542,6 +2542,8 @@ const getSenateMotions = async () => {
       };
     }),
   );
+
+  return proposalsData;
 };
 
 const senateProposeCancel = async (walletAddress, idx, executionBlock) => {

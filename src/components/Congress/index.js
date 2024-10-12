@@ -13,6 +13,15 @@ import { CongressAddLegislation } from '../Voting/Referendum/ProposalForms/Congr
 // eslint-disable-next-line max-len
 import { CongressAddLegislationViaReferendum } from '../Voting/Referendum/ProposalForms/CongressAddLegislationViaReferendum/CongressAddLegislationViaReferendum';
 import { congressActions } from '../../redux/actions';
+import { MotionProvider } from '../WalletCongresSenate/ContextMotions';
+
+function MotionsWrapper() {
+  return (
+    <MotionProvider>
+      <Motions />
+    </MotionProvider>
+  );
+}
 
 function Congress() {
   const dispatch = useDispatch();
@@ -29,7 +38,7 @@ function Congress() {
       <div className={stylesPage.contentWrapper}>
         <Switch>
           <Route exact path={router.congress.overview} component={Overview} />
-          <Route exact path={router.congress.motions} component={Motions} />
+          <Route exact path={router.congress.motions} component={MotionsWrapper} />
           <Route exact path={router.congress.treasury} component={Treasury} />
           <Route exact path={router.congress.wallet} component={Wallet} />
           <Route exact path={router.congress.addLegislation} component={CongressAddLegislation} />
