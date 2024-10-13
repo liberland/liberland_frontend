@@ -10,7 +10,6 @@ import stylesPage from '../../../utils/pagesBase.module.scss';
 // REDUX
 import {
   blockchainSelectors,
-  userSelectors,
 } from '../../../redux/selectors';
 import { Proposal } from '../../Proposal';
 import { walletAddress } from '../../../redux/selectors/congress';
@@ -22,7 +21,6 @@ export default function Motion({
   const userAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const user = useSelector(userSelectors.selectUser);
 
   const threshold = voting.threshold.toNumber();
 
@@ -82,7 +80,7 @@ export default function Motion({
           </Button>
           )}
           {!voting.ayes.map((v) => v.toString()).includes(userAddress)
-            && !isClosable && user && (
+            && !isClosable && (
               <Button
                 small
                 primary
@@ -92,7 +90,7 @@ export default function Motion({
               </Button>
           )}
           {!voting.nays.map((v) => v.toString()).includes(userAddress)
-            && !isClosable && user && (
+            && !isClosable && (
               <Button
                 small
                 secondary
