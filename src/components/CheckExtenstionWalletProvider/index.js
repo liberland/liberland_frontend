@@ -27,11 +27,11 @@ export function CheckExtensionWalletProvider({ children }) {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const [acceptedBrowser, setAcceptedBrowser] = useState(
-    localStorage.getItem('unsupportedBrowserAcceptedByUser'),
+    sessionStorage.getItem('unsupportedBrowserAcceptedByUser'),
   );
   const isUnsupportedBrowser = useIsUnsupportedBrowser();
   const onUnsupportedBrowserAccept = () => {
-    localStorage.setItem('unsupportedBrowserAcceptedByUser', true);
+    sessionStorage.setItem('unsupportedBrowserAcceptedByUser', true);
     setAcceptedBrowser(true);
   };
 

@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { parseIdentityData, parseLegal } from '../../utils/identityParser';
 
 const identityReducer = (state) => state.identity;
 
@@ -13,4 +12,9 @@ const selectorIsLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
-export { selectorIdentity, selectorIsLoading };
+const selectorIdentityMotions = createSelector(
+  identityReducer,
+  (reducer) => reducer.identityMotions,
+);
+
+export { selectorIdentity, selectorIsLoading, selectorIdentityMotions };

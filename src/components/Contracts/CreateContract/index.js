@@ -15,7 +15,7 @@ function CreateContract({ handleModal, isMyContracts }) {
   const [inputs, setInputs] = useState([]);
 
   const {
-    handleSubmit, formState: { errors }, register, setValue,
+    handleSubmit, formState: { errors }, register, setValue, trigger,
   } = useForm({
     mode: 'all',
   });
@@ -70,6 +70,7 @@ function CreateContract({ handleModal, isMyContracts }) {
           </div>
           <div className={stylesOwn.inputWithDelete}>
             <InputSearch
+              trigger={trigger}
               errorTitle={`Input ${index + 1}`}
               isRequired
               placeholder="Write Address"
