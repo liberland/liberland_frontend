@@ -84,6 +84,18 @@ function CongressionalAssemble() {
     setDidChangeSelectedCandidates(true);
   };
 
+  const handleUpdate = () => {
+    dispatch(democracyActions.voteForCongress.call({ selectedCandidates, userWalletAddress }));
+    setIsModalOpen(false);
+    setDidChangeSelectedCandidates(false);
+    setIsSideBlocked(true);
+  };
+
+  const handleDiscardChanges = () => {
+    setIsModalOpen(false);
+    history.push(navigationToLeave);
+  };
+
   useEffect(() => {
     const {
       currentCongressMembers, candidates, runnersUp, currentCandidateVotesByUser,
@@ -104,11 +116,6 @@ function CongressionalAssemble() {
     );
     setEligibleUnselectedCandidates(filteredEligibleUnselectedCandidates);
   }, [democracy]);
-
-  const handleDiscardChanges = () => {
-    setIsModalOpen(false);
-    history.push(navigationToLeave);
-  };
 
   useEffect(() => {
     const handleBeforeUnload = (event) => {
@@ -146,6 +153,11 @@ function CongressionalAssemble() {
       }
     };
   }, [history, didChangeSelectedCandidates, isSideBlocked]);
+
+  useEffect(() => {
+    dispatch(democracyActions.getDemocracy.call());
+  }, [dispatch]);
+
   return (
     <>
       {isModalOpen
@@ -157,7 +169,7 @@ function CongressionalAssemble() {
           buttonRight="UPDATE VOTE"
           style={cx(stylesModal.getCitizenshipModal, styles.modal)}
           onDisagree={handleDiscardChanges}
-          onAgree={() => dispatch(democracyActions.voteForCongress.call({ selectedCandidates, userWalletAddress }))}
+          onAgree={() => handleUpdate()}
         >
           <h3>
             {isNotTablet
@@ -189,6 +201,7 @@ function CongressionalAssemble() {
       && <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />}
         {selectedCandidates && (
         <CandidateVoting
+          handleUpdate={handleUpdate}
           eligibleUnselectedCandidates={eligibleUnselectedCandidates}
           selectedCandidates={selectedCandidates}
           selectCandidate={selectCandidate}

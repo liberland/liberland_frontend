@@ -35,6 +35,7 @@ function SpendModal({
     register,
     setValue,
     watch,
+    trigger,
   } = useForm({
     mode: 'all',
     defaultValues: {
@@ -81,6 +82,7 @@ function SpendModal({
 
       <div className={styles.title}>{subtitle}</div>
       <InputSearch
+        trigger={trigger}
         errorTitle="Recipient"
         register={register}
         name="recipient"

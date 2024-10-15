@@ -30,6 +30,7 @@ function SendLLDModal({ closeModal }) {
     formState: { errors },
     register,
     setValue,
+    trigger,
   } = useForm({
     mode: 'all',
   });
@@ -76,6 +77,7 @@ function SendLLDModal({ closeModal }) {
         name="recipient"
         placeholder="Send to address"
         isRequired
+        trigger={trigger}
         setValue={setValue}
         validate={(v) => {
           if (!isValidSubstrateAddress(v)) return 'Invalid Address';

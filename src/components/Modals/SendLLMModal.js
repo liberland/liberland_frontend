@@ -29,6 +29,7 @@ function SendLLMModal({
     formState: { errors },
     register,
     setValue,
+    trigger,
   } = useForm({ mode: 'all' });
 
   const transfer = (values) => {
@@ -59,6 +60,7 @@ function SendLLMModal({
       <div className={styles.title}>Send to address</div>
       <InputSearch
         errorTitle="Recipient"
+        trigger={trigger}
         register={register}
         name="recipient"
         placeholder="Send to address"

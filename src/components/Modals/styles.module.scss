@@ -29,6 +29,7 @@
     margin-bottom: 20px;
   }
 
+
   & .description {
     font-size: 14px;
     color: $text5;
@@ -37,6 +38,11 @@
     @media screen and (min-width: map-get($breakpoints, 'tablet')){
       font-size: 17px;
     }
+  }
+  
+  & .warning{
+    color: $red;
+    margin: 10px 0;
   }
 
   & .modalDescription{
