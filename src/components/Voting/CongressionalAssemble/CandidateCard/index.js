@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
-import { hexToString } from '@polkadot/util';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 import libertarianTorch from '../../../../assets/images/libertariantorch.png';
@@ -12,7 +11,7 @@ import sanitizeUrlHelper from '../../../../utils/sanitizeUrlHelper';
 
 function CandidateCard({ politician, selectCandidate }) {
   const notificationRef = useRef();
-  const website = politician.identityData.info.web?.raw;
+  const { website } = politician;
 
   return (
     <>
@@ -34,18 +33,23 @@ function CandidateCard({ politician, selectCandidate }) {
           <div
             className={`${stylesVotes.politicianDisplayName} ${styles.maxContent}`}
           >
-            <CopyIconWithAddress address={politician.name} isTruncate={false} />
+            <CopyIconWithAddress
+              isTruncate={!politician.name}
+              name={politician.name}
+              legal={politician.legal}
+              address={politician.rawIdentity}
+            />
           </div>
         </div>
         <div className={stylesVotes.buttonWrapper}>
           {website && (
+          <a target="blank" href={sanitizeUrlHelper(website)} className={styles.doubleChevron}>
             <button
-              className={cx(stylesVotes.unselectContainer, styles.background)}
+              className={cx(stylesVotes.unselectContainer, styles.background, styles.doubleChevron)}
             >
-              <a target="blank" href={sanitizeUrlHelper(hexToString(website))} className={styles.doubleChevron}>
-                WEBSITE
-              </a>
+              WEBSITE
             </button>
+          </a>
           )}
           <button
             className={cx(stylesVotes.unselectContainer, styles.background)}
@@ -61,7 +65,10 @@ function CandidateCard({ politician, selectCandidate }) {
 
 CandidateCard.propTypes = {
   politician: PropTypes.shape({
-    name: PropTypes.string.isRequired,
+    name: PropTypes.string,
+    legal: PropTypes.string,
+    website: PropTypes.string,
+    rawIdentity: PropTypes.string.isRequired,
     identityData: PropTypes.shape({
       info: PropTypes.shape({
         web: PropTypes.shape({
