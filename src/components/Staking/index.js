@@ -8,6 +8,7 @@ import Validator from './Validator';
 import Nominator from './Nominator';
 import styles from '../../utils/pagesBase.module.scss';
 import stylesStacking from './styles.module.scss';
+import StakingHeader from "./StakingHeader";
 
 export default function Staking() {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ export default function Staking() {
   return (
     <div className={styles.sectionWrapper}>
       <div className={cx(styles.contentWrapper, stylesStacking.contentWrapper)}>
+        <StakingHeader />
         <StakeManagement />
         {render}
       </div>

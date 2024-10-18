@@ -31,7 +31,7 @@ function Feed() {
       Nominating puts you in the service of electing honest, reliable validators - the servers running the chain
       and receiving a portion of the newly minted LLD and block rewards. To maximize profits,
       choose the maximum possible number (16) of validators to stake in. 
-      To start staking LLD immediately, <a href="https://blockchain.liberland.org/home/staking">Go to staking</a>.
+      To start staking LLD immediately, <a href="https://blockchain.liberland.org/home/staking/overview">Go to staking</a>.
       If you are interested,
       <a href="https://liberland-1.gitbook.io/wiki/v/public-documents/blockchain/for-validators-nominators-and-stakers/staking">Learn more here</a>`,
     hashtags: ['#Staking', '#LLD'],
