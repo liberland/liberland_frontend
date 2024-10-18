@@ -855,7 +855,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     api.query.elections.runnersUp,
   ]);
 
-  async function getIdentityData(addresses) {
+  const getIdentityData = async (addresses) => {
     if (addresses.length === 0) return [];
     const identityQueries = addresses.map((address) => [api.query.identity.identityOf, address]);
     const identities = await api.queryMulti(identityQueries);
@@ -870,7 +870,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
         rawIdentity: address.toString(),
       };
     });
-  }
+  };
 
   const councilMembersList = councilMembers.map((member) => member.toString());
   const candidatesList = candidates.map((candidate) => candidate[0].toString());
@@ -891,12 +891,14 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     getIdentityData(runnersUpList),
   ]);
 
+  const electionsInfo = await api.derive.elections.info();
+
   /*
-   const electionsInfo = useCall<DeriveElectionsInfo>(api.derive.elections.info);
-   const allVotes = useCall<Record<string, AccountId[]>>(api.derive.council.votes, undefined, transformVotes);
-   */
+    const allVotes = useCall(api.derive.council.votes, undefined, transformVotes);
+  */
 
   return {
+    electionsInfo,
     runnersUp: runnersUpListIdentities,
     currentCongressMembers: crossReferencedCouncilMemberIdentities,
     candidates: crossReferencedCandidateIdentities,
