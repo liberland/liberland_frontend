@@ -11,6 +11,7 @@ import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 export default function Motions() {
   const dispatch = useDispatch();
   const motions = useSelector(congressSelectors.motions);
+  const userIsMember = useSelector(congressSelectors.userIsMember);
   const { motionIds } = useMotionContext();
   const divRef = useRef(null);
 
@@ -35,6 +36,7 @@ export default function Motions() {
       }, index) => (
         <div ref={motions.length - 1 === index ? divRef : null} key={proposal}>
           <Motion
+            userIsMember={userIsMember}
             membersCount={membersCount}
             key={proposal}
             proposal={proposal.toString()}

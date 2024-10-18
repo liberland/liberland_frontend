@@ -45,6 +45,7 @@ const senateReducer = handleActions(
       senateActions.senateGetCongressSpending.call,
       senateActions.senateProposeCongressMotionClose.call,
       senateActions.senateProposeCloseMotion.call,
+      senateActions.senateGetMembers.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -65,6 +66,8 @@ const senateReducer = handleActions(
       senateActions.senateGetCongressSpending.failure,
       senateActions.senateGetAdditionalAssets.success,
       senateActions.senateGetAdditionalAssets.failure,
+      senateActions.senateGetMembers.failure,
+      senateActions.senateGetMembers.success,
     )]: (state) => ({
       ...state,
       loading: false,
@@ -72,6 +75,10 @@ const senateReducer = handleActions(
     [senateActions.senateGetMotions.success]: (state, action) => ({
       ...state,
       motions: action.payload,
+    }),
+    [senateActions.senateGetMembers.success]: (state, action) => ({
+      ...state,
+      members: action.payload,
     }),
     [senateActions.senateGetWallet.success]: (state, action) => ({
       ...state,
