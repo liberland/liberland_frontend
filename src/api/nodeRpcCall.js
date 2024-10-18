@@ -855,7 +855,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     api.query.elections.runnersUp,
   ]);
 
-  async function getIdentityData(addresses) {
+  const getIdentityData = async (addresses) => {
     if (addresses.length === 0) return [];
     const identityQueries = addresses.map((address) => [api.query.identity.identityOf, address]);
     const identities = await api.queryMulti(identityQueries);
@@ -870,7 +870,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
         rawIdentity: address.toString(),
       };
     });
-  }
+  };
 
   const councilMembersList = councilMembers.map((member) => member.toString());
   const candidatesList = candidates.map((candidate) => candidate[0].toString());
