@@ -40,6 +40,7 @@ import {
   congressSenateSendLlm,
   congressProposeBudget,
   getPalletIds,
+  getIdentitiesNames,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { daysToBlocks } from '../../utils/nodeRpcCall';
@@ -180,7 +181,13 @@ function* congressSendLlmToPolitipoolWorker({
 
 function* getMembersWorker() {
   const members = yield call(getCongressMembers);
-  yield put(congressActions.getMembers.success(members));
+  const membersUnique = members.map((item) => item.toString());
+  const identities = yield call(getIdentitiesNames, membersUnique);
+  const membersWithIdentities = membersUnique.map((member) => ({
+    member,
+    identity: identities[member] || null,
+  }));
+  yield put(congressActions.getMembers.success(membersWithIdentities));
 }
 
 function* getRunnersUpWorker() {

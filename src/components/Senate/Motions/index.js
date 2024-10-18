@@ -8,6 +8,7 @@ import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 function Motions() {
   const dispatch = useDispatch();
   const motions = useSelector(senateSelectors.motions);
+  const userIsMember = useSelector(senateSelectors.userIsMember);
   const { motionIds } = useMotionContext();
   const divRef = useRef(null);
 
@@ -34,6 +35,7 @@ function Motions() {
         return (
           <div ref={isLastItem ? divRef : null} key={proposal}>
             <Motion
+              userIsMember={userIsMember}
               membersCount={membersCount}
               key={proposal}
               proposal={proposal.toString()}

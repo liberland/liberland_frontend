@@ -9,7 +9,7 @@ export default function Wallet() {
   const liquidMerits = useSelector(congressSelectors.liquidMeritsBalance);
   const congresAccountAddress = useSelector(congressSelectors.walletAddress);
   const additionalAssets = useSelector(congressSelectors.additionalAssets);
-
+  const userIsMember = useSelector(congressSelectors.userIsMember);
   const balances = useSelector(congressSelectors.balances);
 
   if (!congresAccountAddress || !balances) return null;
@@ -17,6 +17,7 @@ export default function Wallet() {
   return (
     <div>
       <WalletCongresSenateWrapper
+        userIsMember={userIsMember}
         totalBalance={totalBalance}
         congresAccountAddress={congresAccountAddress}
         liquidMerits={liquidMerits}

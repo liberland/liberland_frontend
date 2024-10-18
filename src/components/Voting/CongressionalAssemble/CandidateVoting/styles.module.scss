@@ -8,7 +8,7 @@
   flex-direction: column;
   gap: 27px;
 
-  @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+  @media screen and (min-width: map-get($breakpoints, 'big-screen')){
     flex-direction: row;
   }
 }

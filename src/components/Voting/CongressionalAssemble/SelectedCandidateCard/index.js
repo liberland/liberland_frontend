@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
-import { hexToString } from '@polkadot/util';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 import libertarianTorch from '../../../../assets/images/libertariantorch.png';
@@ -13,14 +12,15 @@ function SelectedCandidateCard({
   politician, unselectCandidate, moveSelectedCandidate,
 }) {
   const notificationRef = useRef();
-  const website = politician.identityData.info.web?.raw;
+  const { website } = politician;
+
   return (
     <>
       <NotificationPortal ref={notificationRef} />
       <div className={styles.politicianCardContainer}>
         <div className={styles.leftColumn}>
           <button
-            className={cx(styles.unselectContainer, styles.unselectContainerRed, styles.mobileNone)}
+            className={cx(styles.unselectContainer, styles.unselectContainerRed, styles.mobileNone, styles.minWidth)}
             onClick={() => unselectCandidate(politician)}
           >
             <span className={styles.cross}>REMOVE</span>
@@ -31,8 +31,10 @@ function SelectedCandidateCard({
           </div>
           <div className={cx(styles.politicianDisplayName)}>
             <CopyIconWithAddress
-              isTruncate={false}
-              address={politician.name}
+              isTruncate={!politician.name}
+              name={politician.name}
+              legal={politician.legal}
+              address={politician.rawIdentity}
             />
           </div>
         </div>
@@ -44,13 +46,17 @@ function SelectedCandidateCard({
             <span className={styles.cross}>REMOVE</span>
           </button>
           {website && (
-          <button
-            className={cx(styles.unselectContainer, styles.backgroundPrimary)}
+          <a
+            target="blank"
+            href={sanitizeUrlHelper(website)}
+            className={cx(styles.buttonFont, styles.unselectContainer)}
           >
-            <a target="blank" href={sanitizeUrlHelper(hexToString(website))} className={styles.buttonFont}>
+            <button
+              className={cx(styles.unselectContainer, styles.backgroundPrimary, styles.buttonFont, styles.minWidth)}
+            >
               WEBSITE
-            </a>
-          </button>
+            </button>
+          </a>
           )}
           <button onClick={() => moveSelectedCandidate(politician, 'up')} className={styles.orderButtonImageContainer}>
             <span className={styles.icon}>&#x2303;</span>
@@ -69,7 +75,10 @@ function SelectedCandidateCard({
 
 SelectedCandidateCard.propTypes = {
   politician: PropTypes.shape({
-    name: PropTypes.string.isRequired,
+    name: PropTypes.string,
+    legal: PropTypes.string,
+    website: PropTypes.string,
+    rawIdentity: PropTypes.string.isRequired,
     identityData: PropTypes.shape({
       info: PropTypes.shape({
         web: PropTypes.shape({

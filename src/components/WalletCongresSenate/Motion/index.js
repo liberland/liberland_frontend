@@ -16,7 +16,7 @@ import { Proposal } from '../../Proposal';
 import { walletAddress } from '../../../redux/selectors/congress';
 
 export default function Motion({
-  proposal, proposalOf, voting, voteMotion, closeMotion, membersCount,
+  proposal, proposalOf, voting, voteMotion, closeMotion, membersCount, userIsMember,
 }) {
   const dispatch = useDispatch();
   const userAddress = useSelector(
@@ -69,52 +69,55 @@ export default function Motion({
           </span>
         </div>
 
-        <div className={styles.buttonsContainer}>
-          {isClosable && (
-          <Button
-            medium
-            primary
-            onClick={() => dispatch(
-              closeMotion({ proposal, index: voting.index }),
+        {userIsMember ? (
+          <div className={styles.buttonsContainer}>
+            {isClosable && (
+            <Button
+              medium
+              primary
+              onClick={() => dispatch(
+                closeMotion({ proposal, index: voting.index }),
+              )}
+            >
+              Close & Execute
+            </Button>
             )}
-          >
-            Close & Execute
-          </Button>
-          )}
-          {!voting.ayes.map((v) => v.toString()).includes(userAddress)
-            && !isClosable && user && (
-              <Button
-                small
-                primary
-                onClick={() => voteMotionCall(true)}
-              >
-                Vote aye
-              </Button>
-          )}
-          {!voting.nays.map((v) => v.toString()).includes(userAddress)
-            && !isClosable && user && (
+            {!voting.ayes.map((v) => v.toString()).includes(userAddress)
+              && !isClosable && user && (
+                <Button
+                  small
+                  primary
+                  onClick={() => voteMotionCall(true)}
+                >
+                  Vote aye
+                </Button>
+            )}
+            {!voting.nays.map((v) => v.toString()).includes(userAddress)
+              && !isClosable && user && (
+                <Button
+                  small
+                  secondary
+                  onClick={() => voteMotionCall(false)}
+                >
+                  Vote nay
+                </Button>
+            )}
+            {
+              isClosableNaye && (
               <Button
                 small
                 secondary
-                onClick={() => voteMotionCall(false)}
+                onClick={() => dispatch(
+                  closeMotion({ proposal, index: voting.index, walletAddress }),
+                )}
               >
-                Vote nay
+                Close Motion
               </Button>
-          )}
-          {
-            isClosableNaye && (
-            <Button
-              small
-              secondary
-              onClick={() => dispatch(
-                closeMotion({ proposal, index: voting.index, walletAddress }),
-              )}
-            >
-              Close Motion
-            </Button>
-            )
-          }
-        </div>
+              )
+            }
+          </div>
+        )
+          : (<div className={styles.buttonsContainer} />)}
         <Proposal proposal={proposalOf} />
       </Card>
     </div>
@@ -140,4 +143,5 @@ Motion.propTypes = {
   closeMotion: PropTypes.func.isRequired,
   voteMotion: PropTypes.func.isRequired,
   membersCount: PropTypes.number.isRequired,
+  userIsMember: PropTypes.bool.isRequired,
 };
