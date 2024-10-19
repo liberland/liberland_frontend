@@ -14,6 +14,7 @@ import * as dexSagas from './dex';
 import * as contractsSagas from './contracts';
 import * as senateSagas from './senate';
 import * as nftsSagas from './nfts';
+import * as financesSagas from './finances';
 
 export default function* rootSaga() {
   yield all([
@@ -169,5 +170,8 @@ export default function* rootSaga() {
 
     // NFTS
     nftsSagas.getUserNftsWatcher(),
+
+    // FINANCES
+    financesSagas.getFinancesWatcher(),
   ]);
 }
