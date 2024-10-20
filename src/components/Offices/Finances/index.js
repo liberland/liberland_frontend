@@ -145,7 +145,7 @@ export default function Finances() {
             value: `${formatDollars(finances.lastWeekStakersRewards ?? 0)} LLD`,
           },
           {
-            metric: 'Weekly APY payouts for stakers',
+            metric: 'Staker APY',
             value: formatPercent(finances.stakerApyWeeklyPayouts),
           },
         ]}
