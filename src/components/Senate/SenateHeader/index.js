@@ -4,6 +4,10 @@ import router from '../../../router';
 
 const navigationList = [
   {
+    route: `${router.senate.overview}`,
+    title: 'Overview',
+  },
+  {
     route: `${router.senate.wallet}`,
     title: 'Senate Wallet',
   },

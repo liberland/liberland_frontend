@@ -12,7 +12,7 @@ export default function Wallet() {
   const liquidMerits = useSelector(senateSelectors.liquidMeritsBalance);
   const congresAccountAddress = useSelector(senateSelectors.walletAddress);
   const additionalAssets = useSelector(senateSelectors.additionalAssets);
-
+  const userIsMember = useSelector(senateSelectors.userIsMember);
   const balances = useSelector(senateSelectors.balances);
 
   useEffect(() => {
@@ -32,6 +32,7 @@ export default function Wallet() {
   return (
     <div>
       <WalletCongresSenateWrapper
+        userIsMember={userIsMember}
         totalBalance={totalBalance}
         congresAccountAddress={congresAccountAddress}
         liquidMerits={liquidMerits}

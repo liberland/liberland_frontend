@@ -7,7 +7,7 @@ import styles from './styles.module.scss';
 import { formatAssets } from '../../../utils/walletHelpers';
 import SendAssetModal from '../../Modals/SendAssetModal';
 import Button from '../../Button/Button';
-import { userSelectors } from '../../../redux/selectors';
+import { senateSelectors } from '../../../redux/selectors';
 
 function AssetOverview({
   additionalAssets,
@@ -15,9 +15,10 @@ function AssetOverview({
   isCongress,
 }) {
   const [whichModalOpen, setWhichModalOpen] = useState(null);
-  const user = useSelector(userSelectors.selectUser);
   const handleModalOpenAssets = (symbol) => setWhichModalOpen(symbol);
   const handleModalCloseAssets = () => setWhichModalOpen(null);
+  const userIsMember = useSelector(senateSelectors.userIsMember);
+
   if (additionalAssets.length === 0) { return <div />; }
   // Show only assets that the user owns
   const filteredAssets = additionalAssets.filter((asset) => asset?.balance?.balance > 0);
@@ -43,7 +44,7 @@ function AssetOverview({
                 </span>
 
               </p>
-              {user
+              {userIsMember
               && (
               <Button
                 className={styles.button}

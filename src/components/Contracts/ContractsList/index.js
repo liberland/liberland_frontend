@@ -30,7 +30,8 @@ function TextWrapper({ itemsOrItem, title, isArray }) {
               <li key={item + index}>
                 <CopyIconWithAddress
                   address={item}
-                  name={identitiesContracts[item]?.identity}
+                  name={identitiesContracts[item]?.identity?.name}
+                  legal={identitiesContracts[item]?.identity?.legal}
                 />
               </li>
             ))}
@@ -39,7 +40,8 @@ function TextWrapper({ itemsOrItem, title, isArray }) {
           <span>
             <CopyIconWithAddress
               address={itemsOrItem}
-              name={identitiesContracts[itemsOrItem]?.identity}
+              name={identitiesContracts[itemsOrItem]?.identity?.name}
+              legal={identitiesContracts[itemsOrItem]?.identity?.legal}
             />
           </span>
         )}

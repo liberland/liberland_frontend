@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { blockchainReducer } from './blockchainSelectors';
 
 const senateReducer = (state) => state.senate;
 
@@ -15,6 +16,24 @@ export const members = createSelector(
 export const motions = createSelector(
   senateReducer,
   (reducer) => reducer.motions,
+);
+
+export const userHasWalletSenateMember = createSelector(
+  senateReducer,
+  blockchainReducer,
+  (senateState, blockchainState) => {
+    const memberAddresses = senateState.members.map((member) => member.member);
+    const matchedWallet = blockchainState.allWallets.find((wallet) => memberAddresses.includes(wallet.address));
+    return matchedWallet?.address || null;
+  },
+);
+
+export const userIsMember = createSelector(
+  senateReducer,
+  blockchainReducer,
+  (senateState, blockchainState) => senateState.members
+    .map((m) => m.member.toString())
+    .includes(blockchainState.userWalletAddress),
 );
 
 export const scheduledCalls = createSelector(

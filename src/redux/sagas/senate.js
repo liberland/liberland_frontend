@@ -11,7 +11,9 @@ import {
   congressSenateSendLlmToPolitipool,
   getAdditionalAssets,
   getBalanceByAddress,
+  getIdentitiesNames,
   getScheduledCalls,
+  getSenateMembers,
   getSenateMotions,
   senateProposeCancel,
   senateVoteAtMotions,
@@ -33,6 +35,24 @@ export function* getSenateMotionsWatcher() {
   yield* blockchainWatcher(
     senateActions.senateGetMotions,
     getMotionsWorker,
+  );
+}
+
+function* getMembersWorker() {
+  const members = yield call(getSenateMembers);
+  const membersUnique = members.map((item) => item.toString());
+  const identities = yield call(getIdentitiesNames, membersUnique);
+  const membersWithIdentities = membersUnique.map((member) => ({
+    member,
+    identity: identities[member] || null,
+  }));
+  yield put(senateActions.senateGetMembers.success(membersWithIdentities));
+}
+
+export function* getSenateMembersWatcher() {
+  yield* blockchainWatcher(
+    senateActions.senateGetMembers,
+    getMembersWorker,
   );
 }
 

@@ -167,6 +167,7 @@ export default function* rootSaga() {
     senateSagas.voteAtMotionsWatcher(),
     senateSagas.getScheduledCongressSpendingWatcher(),
     senateSagas.proposeCloseMotionWatcher(),
+    senateSagas.getSenateMembersWatcher(),
 
     // NFTS
     nftsSagas.getUserNftsWatcher(),

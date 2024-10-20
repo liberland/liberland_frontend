@@ -22,11 +22,10 @@ import Card from '../Card';
 import UpdateProfile from './UpdateProfile';
 import { identityActions, onBoardingActions } from '../../redux/actions';
 import {
-  parseLegal,
-  parseIdentityData,
   parseDOB,
   parseAdditionalFlag,
   parseCitizenshipJudgement,
+  decodeAndFilter,
 } from '../../utils/identityParser';
 
 function Profile({ className }) {
@@ -71,25 +70,25 @@ function Profile({ className }) {
 
   const displayName = userName && lastName ? `${userName} ${lastName}` : '';
   const emptyElement = <em>&lt;empty&gt;</em>;
-
+  const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email']);
   const onChainIdenityList = [
     {
-      dataFunction: () => parseIdentityData(info?.display),
+      dataFunction: () => decodedData?.display,
       title: 'Display',
       isDataToShow: true,
     },
     {
-      dataFunction: () => parseLegal(info),
+      dataFunction: () => decodedData?.legal,
       title: 'Legal',
       isDataToShow: true,
     },
     {
-      dataFunction: () => parseIdentityData(info?.web),
+      dataFunction: () => decodedData?.web,
       title: 'Web',
       isDataToShow: true,
     },
     {
-      dataFunction: () => parseIdentityData(info?.email),
+      dataFunction: () => decodedData?.email,
       title: 'Email',
       isDataToShow: true,
     },
