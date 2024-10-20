@@ -8,6 +8,7 @@ import Card from '../../Card';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
+import { MotionProvider } from '../../WalletCongresSenate/ContextMotions';
 
 function ScheduledCongressSpending({ isVetoButton }) {
   const dispatch = useDispatch();
@@ -22,7 +23,7 @@ function ScheduledCongressSpending({ isVetoButton }) {
   }
 
   return (
-    <>
+    <MotionProvider>
       {scheduledCalls.map(({
         preimage, proposal, blockNumber, idx, sectionType,
       }) => {
@@ -48,7 +49,7 @@ function ScheduledCongressSpending({ isVetoButton }) {
           </Card>
         );
       })}
-    </>
+    </MotionProvider>
 
   );
 }
