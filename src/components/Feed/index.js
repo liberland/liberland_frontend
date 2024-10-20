@@ -18,7 +18,7 @@ function Feed() {
       Note that while no fields are mandatory except the age check, setting the display name is a good idea as it is your on-chain username.
       After setting your identity, the Ministry of Interior will verify it, and send you your tokens. This usually takes about a day.
       Once this is done, congratulations and welcome to Liberland blockchain!
-      For detailed steps, follow the <a href="https://liberland-1.gitbook.io/wiki/v/public-documents/blockchain/for-citizens/onboarding">Onboarding guide</a>
+      For detailed steps, follow the <a href="https://docs.liberland.org/public-documents/blockchain/for-citizens/onboarding">Onboarding guide</a>
       `,
       hashtags: ['#Onboarding'],
       type: 'liberland',
@@ -33,7 +33,7 @@ function Feed() {
       choose the maximum possible number (16) of validators to stake in. 
       To start staking LLD immediately, <a href="https://blockchain.liberland.org/home/staking">Go to staking</a>.
       If you are interested,
-      <a href="https://liberland-1.gitbook.io/wiki/v/public-documents/blockchain/for-validators-nominators-and-stakers/staking">Learn more here</a>`,
+      <a href="https://docs.liberland.org/public-documents/blockchain/for-validators-nominators-and-stakers/staking">Learn more here</a>`,
     hashtags: ['#Staking', '#LLD'],
     type: 'liberland',
   },
