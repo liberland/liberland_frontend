@@ -14,6 +14,7 @@ import * as dexSelectors from './dex';
 import * as contractsSelectors from './contracts';
 import * as senateSelectors from './senate';
 import * as nftsSelectors from './nfts';
+import * as financesSelectors from './finances';
 
 export {
   errorsSelectors,
@@ -32,4 +33,5 @@ export {
   contractsSelectors,
   senateSelectors,
   nftsSelectors,
+  financesSelectors,
 };

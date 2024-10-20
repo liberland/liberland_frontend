@@ -16,7 +16,7 @@ function CongressionalCountdown({ termDuration }) {
   const blockDurationMilis = 6000;
   const untilEnd = new Date(currentBlockTimestamp + (remaining * blockDurationMilis));
 
-  const ratio = Math.round(100 * (remaining / termDuration));
+  const ratio = Math.round(100 * (1 - (remaining / termDuration)));
 
   return (
     <Card className={stylesPage.overviewWrapper} title="Countdown until end of election">
