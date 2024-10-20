@@ -12,7 +12,7 @@ function HomeHeader() {
   const { login } = useContext(AuthContext);
   const user = useSelector(userSelectors.selectUser);
 
-  // TODO do we need this component at all ?
+  // TODO do we need this component at all ? It only works if the route is 'raw' aka doesnt have /overview etc
   const titles = {
     [router.home.profile]: 'My profile',
     [router.home.documents]: 'My documents',
@@ -30,7 +30,6 @@ function HomeHeader() {
     [router.home.wallet]: 'Wallet',
   };
   const location = useLocation();
-
   // const fullName = name && lastName ? `${name} ${lastName}` : undefined;
   return titles[location.pathname] ? (
     <div className={styles.homeHeaderWrapper}>
