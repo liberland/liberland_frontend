@@ -14,6 +14,7 @@ import * as dexSagas from './dex';
 import * as contractsSagas from './contracts';
 import * as senateSagas from './senate';
 import * as nftsSagas from './nfts';
+import * as ethSagas from './eth';
 
 export default function* rootSaga() {
   yield all([
@@ -169,5 +170,9 @@ export default function* rootSaga() {
 
     // NFTS
     nftsSagas.getUserNftsWatcher(),
+
+    // ETH
+    ethSagas.getWalletOptionsWatcher(),
+    ethSagas.getWalletConnectingWatcher(),
   ]);
 }

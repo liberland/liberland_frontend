@@ -17,6 +17,7 @@ import dexReducer from './dex';
 import contractsReducer from './contracts';
 import senateReducer from './senate';
 import nftsReducer from './nfts';
+import ethReducer from './eth';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -37,6 +38,7 @@ const rootReducer = combineReducers({
   contracts: contractsReducer,
   senate: senateReducer,
   nfts: nftsReducer,
+  eth: ethReducer,
 });
 
 export default rootReducer;

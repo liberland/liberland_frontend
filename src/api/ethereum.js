@@ -1,4 +1,5 @@
 import { createThirdwebClient, getContract, readContract } from 'thirdweb';
+import { createWallet, injectedProvider } from 'thirdweb/wallets';
 import { defineChain } from 'thirdweb/chains';
 
 const getThirdWebContract = (clientId, chainId, contractAddress) => {
@@ -12,7 +13,7 @@ const getThirdWebContract = (clientId, chainId, contractAddress) => {
     chain: defineChain(chainId),
     address: contractAddress,
   });
-  return contract;
+  return [client, contract];
 };
 
 const getTokenAddress = async (contract) => readContract({
@@ -26,9 +27,24 @@ const getLPStakeInfo = async (contract, userEthAddress) => readContract({
   method: 'function getStakeInfo(address userEthAddress) view returns (uint256 _tokensStaked, uint256 _rewards)',
   params: [userEthAddress],
 });
+ 
+const connectWallet = async ({ client, walletId, clientId }) => {
+  const wallet = createWallet(clientId); // pass the wallet id
+ 
+  // if user has wallet installed, connect to it
+  if (injectedProvider(walletId)) {
+    return await wallet.connect({ client });
+  } else {
+    return await wallet.connect({
+      client,
+      walletConnect: { showQrModal: true },
+    });
+  }
+};
 
 export {
   getThirdWebContract,
   getTokenAddress,
   getLPStakeInfo,
+  connectWallet,
 };
