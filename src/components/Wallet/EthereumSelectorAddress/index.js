@@ -1,43 +1,75 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { AuthContext } from 'react-oauth2-code-pkce';
+import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 import PropTypes from 'prop-types';
 import { ethSelectors } from '../../../redux/selectors';
 import { ethActions } from '../../../redux/actions';
-import Button from '../../../components/Button/Button';
-import useThirdWebContract from '../../../hooks/useThirdWebContract';
+import styles from './styles.module.scss';
 
-function EthereumSelectorAddress({ onAddressSelected, selectedWallet }) {
+function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
   const dispatch = useDispatch();
-  const auth = React.useContext(AuthContext);
-  const [client] = useThirdWebContract();
-
-  const select = React.useCallback(() => {
-    dispatch(ethActions.getConnectedEthWallet.call({
-        client: client,
-        walletId: selectedWallet.id,
-        clientId: auth.thirdWebClientId
-    }));
-  }, [dispatch]);
 
   const connected = useSelector(ethSelectors.selectorConnected);
   const connecting = useSelector(ethSelectors.selectorConnecting);
+  const error = useSelector(ethSelectors.selectorConnectError);
 
   React.useEffect(() => {
-    onAddressSelected(connected);
+    onAccountSelected(undefined);
   }, [connected]);
 
-  return (
-    <Button disabled={connecting} onClick={select} primary large>
-        {connecting ? "Connecting..." : connected ? "Switch account" : "Connect"}
-    </Button>
-  );
+  React.useEffect(() => {
+    if (selectedWallet) {
+      dispatch(
+        ethActions.getConnectedEthWallet.call({
+          walletId: selectedWallet.id,
+        })
+      );
+    }
+  }, [selectedWallet]);
+
+  if (!selectedWallet) {
+    return null;
+  }
+
+  if (connecting) {
+    return <div>Loading...</div>;
+  }
+
+  if (connected) {
+    return (
+      <label>
+        <div className={styles.label}>Select one of your accounts</div>
+        <ReactSearchAutocomplete
+          formatResult={(item) => item.name}
+          items={connected.accounts.map((account) => ({ id: account, name: account }))}
+          onSelect={({ id }) => onAccountSelected(id)}
+          onSearch={() => onAccountSelected(undefined)}
+          showClear
+          placeholder="Select accounts"
+          onClear={() => onAccountSelected(undefined)}
+          showItemsOnFocus
+        />
+      </label>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="error">
+        {error.message || typeof error === "string"
+          ? error
+          : "Something went wrong"}
+      </div>
+    );
+  }
+
+  return null;
 }
 
 EthereumSelectorAddress.propTypes = {
-  onAddressSelected: PropTypes.func.isRequired,
+  onAccountSelected: PropTypes.func.isRequired,
   selectedWallet: PropTypes.shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
   }),
 };

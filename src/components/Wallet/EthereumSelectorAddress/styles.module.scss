@@ -1,0 +1,11 @@
+@import "../../../assets/base/variables";
+
+.label {
+  margin-bottom: 10px;
+}
+
+.error {
+  font-size: 16px;
+  color: $errorText;
+  font-weight: 500;
+}

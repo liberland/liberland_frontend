@@ -22,4 +22,9 @@ const selectorConnecting = createSelector(
   (reducer) => reducer.connecting,
 );
 
-export { selectorWalletOptions, selectorWalletOptionsLoading, selectorConnected, selectorConnecting };
+const selectorConnectError = createSelector(
+  ethReducer,
+  (reducer) => reducer.walletError,
+);
+
+export { selectorWalletOptions, selectorWalletOptionsLoading, selectorConnected, selectorConnecting, selectorConnectError };

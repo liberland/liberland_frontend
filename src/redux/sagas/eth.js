@@ -1,6 +1,6 @@
-import { getAllWalletsList } from "thirdweb/wallets";
+import { getAllWalletsList } from 'thirdweb/wallets';
 import { put, takeLatest, call } from 'redux-saga/effects';
-
+import { connectWallet } from '../../api/ethereum';
 import { ethActions } from '../actions';
 
 // WORKERS
@@ -17,9 +17,9 @@ function* getWalletOptionsWorker(action) {
 function* connectWalletWorker(action) {
   try {
     const connected = yield call(connectWallet, action.payload);
-    yield put(ethActions.getEthWalletOptions.success(connected));
+    yield put(ethActions.getConnectedEthWallet.success(connected));
   } catch (e) {
-    yield put(ethActions.getEthWalletOptions.failure(e));
+    yield put(ethActions.getConnectedEthWallet.failure(e));
   }
 }
 

@@ -5,6 +5,7 @@ const initialState = {
   loading: false,
   connecting: false,
   wallet: null,
+  wallerError: null,
   walletOptions: [],
 };
 
@@ -16,6 +17,7 @@ const ethReducer = handleActions(
     }),
     [ethActions.getConnectedEthWallet.call]: (state) => ({
       ...state,
+      walletError: null,
       connecting: true,
     }),
 
@@ -39,11 +41,13 @@ const ethReducer = handleActions(
       ...state,
       walletOptions: [],
       wallet: null,
+      walletError: null,
     }),
 
     [ethActions.getConnectedEthWallet.call]: (state) => ({
       ...state,
       wallet: null,
+      walletError: null,
     }),
 
     [ethActions.getEthWalletOptions.success]: (state, action) => ({
@@ -54,6 +58,11 @@ const ethReducer = handleActions(
     [ethActions.getConnectedEthWallet.success]: (state, action) => ({
       ...state,
       wallet: action.payload,
+    }),
+  
+    [ethActions.getConnectedEthWallet.failure]: (state, action) => ({
+      ...state,
+      walletError: action.payload,
     }),
   },
   initialState,

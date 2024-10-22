@@ -10,9 +10,6 @@ import { authActions, blockchainActions, onBoardingActions } from './redux/actio
 
 const defaultConfig = {
   tokenEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/token`,
-  thirdWebClientId: process.env.REACT_APP_THIRD_WEB_CLIENT_ID,
-  thirdWebContractAddress: process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS,
-  thirdWebContractChainId: process.env.REACT_APP_THIRD_WEB_CHAIN_ID,
   authorizationEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/authorize`,
   decodeToken: false,
   autoLogin: false,

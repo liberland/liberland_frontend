@@ -1,15 +1,15 @@
 import React from 'react';
-import Autocomplete from 'react-autocomplete';
+import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { ethSelectors } from "../../../redux/selectors";
-import { ethActions } from "../../../redux/actions";
+import { ethSelectors } from '../../../redux/selectors';
+import { ethActions } from '../../../redux/actions';
 import styles from './styles.module.scss';
 
-function EthereumSelectorWallet({ onWalletSelected, selectedWallet }) {
+function EthereumSelectorWallet({ onWalletSelected }) {
   const dispatch = useDispatch();
 
-  useEffect(() => {
+  React.useEffect(() => {
     dispatch(ethActions.getEthWalletOptions.call());
   }, [dispatch]);
 
@@ -21,17 +21,19 @@ function EthereumSelectorWallet({ onWalletSelected, selectedWallet }) {
   }
 
   return (
-    <Autocomplete
-      getItemValue={(item) => item.name}
-      items={walletOptions}
-      renderItem={(item, isHighlighted) => (
-        <div className={isHighlighted ? styles.highlighted : styles.notHighlighted}>
-          {item.name}
-        </div>
-      )}
-      value={selectedWallet}
-      onSelect={onWalletSelected}
-    />
+    <label>
+      <div className={styles.label}>
+        Select ETH wallet provider
+      </div>
+      <ReactSearchAutocomplete
+        formatResult={(item) => item.name}
+        items={walletOptions}
+        onSelect={onWalletSelected}
+        placeholder="Select wallet provider"
+        onClear={() => onWalletSelected(undefined)}
+        showItemsOnFocus
+      />
+    </label>
   );
 }
 
