@@ -1,6 +1,12 @@
 import { getAllWalletsList } from 'thirdweb/wallets';
 import { put, takeLatest, call } from 'redux-saga/effects';
-import { connectWallet } from '../../api/ethereum';
+import {
+  connectWallet,
+  getTokenStakeContractInfo,
+  getTokenStakeAddressInfo,
+  getERC20Info,
+  getERC20Balance,
+} from '../../api/ethereum';
 import { ethActions } from '../actions';
 
 // WORKERS
@@ -23,7 +29,93 @@ function* connectWalletWorker(action) {
   }
 }
 
+function* tokenStakeContractInfoWorker(action) {
+  try {
+    const tokenStakeContractInfo = yield call(getTokenStakeContractInfo, action.payload);
+    yield put(ethActions.getTokenStakeContractInfo.success(tokenStakeContractInfo));
+  } catch (e) {
+    yield put(ethActions.getTokenStakeContractInfo.failure(e));
+  }
+}
+
+function* tokenStakeAddressInfoWorker(action) {
+  try {
+    const tokenStakeAddressInfo = yield call(getTokenStakeAddressInfo, action.payload);
+    yield put(ethActions.getTokenStakeAddressInfo.success({
+      ...tokenStakeAddressInfo,
+      ...action.payload,
+    }))
+  } catch (e) {
+    yield put(ethActions.getTokenStakeAddressInfo.failure({
+      ...e,
+      ...action.payload,
+    }));
+  }
+}
+
+function* erc20InfoWorker(action) {
+  try {
+    const erc20Info = yield call(getERC20Info, action.payload);
+    yield put(ethActions.getERC20Info.success({
+      ...erc20Info,
+      ...action.payload,
+    }))
+  } catch (e) {
+    yield put(ethActions.getERC20Info.failure({
+      ...e,
+      ...action.payload,
+    }));
+  }
+}
+
+function* erc20BalanceWorker(action) {
+  try {
+    const erc20Balance = yield call(getERC20Balance, action.payload);
+    yield put(ethActions.getERC20Balance.success({
+      ...erc20Balance,
+      ...action.payload,
+    }));
+  } catch (e) {
+    yield put(ethActions.getERC20Balance.failure({
+      ...e,
+      ...action.payload,
+    }));
+  }
+}
+
 // WATCHERS
+
+function* tokenStakeContractInfoWatcher() {
+  try {
+    yield takeLatest(ethActions.getTokenStakeContractInfo.call, tokenStakeContractInfoWorker);
+  } catch (e) {
+    yield put(ethActions.getTokenStakeContractInfo.failure(e));
+  }
+}
+
+function* tokenStakeAddressInfoWatcher() {
+  try {
+    yield takeLatest(ethActions.getTokenStakeAddressInfo.call, tokenStakeAddressInfoWorker);
+  } catch (e) {
+    yield put(ethActions.getTokenStakeAddressInfo.failure(e));
+  }
+}
+
+function* erc20InfoWatcher() {
+  try {
+    yield takeLatest(ethActions.getERC20Info.call, erc20InfoWorker);
+  } catch (e) {
+    yield put(ethActions.getERC20Info.failure(e));
+  }
+}
+
+function* erc20BalanceWatcher() {
+  try {
+    yield takeLatest(ethActions.getERC20Balance.call, erc20BalanceWorker);
+  } catch (e) {
+    yield put(ethActions.getERC20Balance.failure(e));
+  }
+}
 
 function* getWalletOptionsWatcher() {
   try {
@@ -41,4 +133,11 @@ function* getWalletConnectingWatcher() {
   }
 }
 
-export { getWalletOptionsWatcher, getWalletConnectingWatcher };
+export {
+  getWalletOptionsWatcher,
+  getWalletConnectingWatcher,
+  tokenStakeContractInfoWatcher,
+  tokenStakeAddressInfoWatcher,
+  erc20InfoWatcher,
+  erc20BalanceWatcher,
+};

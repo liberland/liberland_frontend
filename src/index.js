@@ -7,6 +7,7 @@ import { AuthProvider } from 'react-oauth2-code-pkce';
 import App from './App';
 import store from './redux/store';
 import { authActions, blockchainActions, onBoardingActions } from './redux/actions';
+import { isAdmin } from './utils/admin';
 
 const defaultConfig = {
   tokenEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/token`,
@@ -44,7 +45,7 @@ const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const isAdminLogin = urlParams.get('admin');
 if (isAdminLogin === 'true') { localStorage.setItem('isAdminLogin', 'true'); }
-const useAuthConfig = localStorage.getItem('isAdminLogin') === 'true' ? adminAuthConfig : authConfig;
+const useAuthConfig = isAdmin();
 
 ReactDOM.render(
   <Provider store={store}>

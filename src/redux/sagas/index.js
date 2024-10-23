@@ -174,5 +174,9 @@ export default function* rootSaga() {
     // ETH
     ethSagas.getWalletOptionsWatcher(),
     ethSagas.getWalletConnectingWatcher(),
+    ethSagas.tokenStakeContractInfoWatcher(),
+    ethSagas.tokenStakeAddressInfoWatcher(),
+    ethSagas.erc20InfoWatcher(),
+    ethSagas.erc20BalanceWatcher(),
   ]);
 }

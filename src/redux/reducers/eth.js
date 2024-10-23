@@ -7,10 +7,50 @@ const initialState = {
   wallet: null,
   wallerError: null,
   walletOptions: [],
+  tokenStakeContractInfoLoading: false,
+  tokenStakeContractInfo: null,
+  tokenStakeAddressInfo: {},
+  erc20Info: {},
+  erc20Balance: {},
 };
 
 const ethReducer = handleActions(
   {
+    [ethActions.getERC20Balance.call]: (state, action) => ({
+      ...state,
+      erc20Info: {
+        ...state.erc20Info,
+        [`${action.payload.erc20Address}/${action.payload.account}`]: {
+          loading: true,
+        }
+      }
+    }),
+    [ethActions.getERC20Info.call]: (state, action) => ({
+      ...state,
+      erc20Info: {
+        ...state.erc20Info,
+        [action.payload.erc20Address]: {
+          loading: true,
+        }
+      }
+    }),
+    [ethActions.getTokenStakeAddressInfo.call]: (state, action) => ({
+      ...state,
+      tokenStakeAddressInfo: {
+        ...state.tokenStakeAddressInfo,
+        [action.payload.userEthAddress]: {
+          loading: true,
+        },
+      },
+    }),
+    [ethActions.getTokenStakeContractInfo.call]: (state) => ({
+      ...state,
+      tokenStakeContractInfoLoading: true,
+    }),
+    [ethActions.getEthWalletOptions.call]: (state) => ({
+      ...state,
+      loading: true,
+    }),
     [ethActions.getEthWalletOptions.call]: (state) => ({
       ...state,
       loading: true,
@@ -27,6 +67,14 @@ const ethReducer = handleActions(
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
+    }),
+
+    [combineActions(
+      ethActions.getTokenStakeContractInfo.success,
+      ethActions.getTokenStakeContractInfo.failure,
+    )]: (state) => ({
+      ...state,
+      tokenStakeContractInfoLoading: initialState.tokenStakeContractInfoLoading,
     }),
 
     [combineActions(
@@ -48,6 +96,64 @@ const ethReducer = handleActions(
       ...state,
       wallet: null,
       walletError: null,
+    }),
+
+    [ethActions.getTokenStakeAddressInfo.success]: (state, action) => ({
+      ...state,
+      tokenStakeAddressInfo: {
+        ...state.tokenStakeAddressInfo,
+        [action.payload.userEthAddress]: action.payload,
+      },
+    }),
+
+    [ethActions.getTokenStakeAddressInfo.failure]: (state, action) => ({
+      ...state,
+      tokenStakeAddressInfo: {
+        ...state.tokenStakeAddressInfo,
+        [action.payload.userEthAddress]: { error: action.payload },
+      },
+    }),
+
+    [ethActions.getERC20Info.success]: (state, action) => ({
+      ...state,
+      erc20Info: {
+        ...state.erc20Info,
+        [action.payload.erc20Address]: action.payload,
+      }
+    }),
+
+    [ethActions.getERC20Info.failure]: (state, action) => ({
+      ...state,
+      erc20Info: {
+        ...state.erc20Info,
+        [action.payload.erc20Address]: { error: action.payload },
+      }
+    }),
+
+    [ethActions.getERC20Balance.success]: (state, action) => ({
+      ...state,
+      erc20Info: {
+        ...state.erc20Info,
+        [`${action.payload.erc20Address}/${action.payload.account}`]: action.payload,
+      }
+    }),
+
+    [ethActions.getERC20Balance.failure]: (state, action) => ({
+      ...state,
+      erc20Info: {
+        ...state.erc20Info,
+        [`${action.payload.erc20Address}/${action.payload.account}`]: { error: action.payload },
+      }
+    }),
+
+    [ethActions.getTokenStakeContractInfo.success]: (state, action) => ({
+      ...state,
+      tokenStakeContractInfo: action.payload,
+    }),
+
+    [ethActions.getTokenStakeContractInfo.failure]: (state, action) => ({
+      ...state,
+      tokenStakeContractInfo: { error: action.payload },
     }),
 
     [ethActions.getEthWalletOptions.success]: (state, action) => ({
