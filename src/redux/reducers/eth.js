@@ -132,16 +132,16 @@ const ethReducer = handleActions(
 
     [ethActions.getErc20Balance.success]: (state, action) => ({
       ...state,
-      erc20Info: {
-        ...state.erc20Info,
+      erc20Balance: {
+        ...state.erc20Balance,
         [`${action.payload.erc20Address}/${action.payload.account}`]: action.payload,
       }
     }),
 
     [ethActions.getErc20Balance.failure]: (state, action) => ({
       ...state,
-      erc20Info: {
-        ...state.erc20Info,
+      erc20Balance: {
+        ...state.erc20Balance,
         [`${action.payload.erc20Address}/${action.payload.account}`]: { error: action.payload },
       }
     }),

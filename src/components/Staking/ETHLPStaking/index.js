@@ -22,7 +22,7 @@ export default function ETHLPStaking () {
           selectedAccount={selectedAccount}
         />
       </div>
-      <TokenStakeInfo />
+      <TokenStakeInfo selectedAccount={selectedAccount} />
     </Card>
   )
 }

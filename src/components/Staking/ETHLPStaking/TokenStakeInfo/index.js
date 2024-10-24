@@ -7,18 +7,47 @@ import { formatCustom } from '../../../../utils/walletHelpers';
 import Table from '../../../Table';
 import Button from '../../../Button/Button';
 import styles from './styles.module.scss';
+import PropTypes from 'prop-types';
 
-function TokenStakeInfo() {
+function TokenStakeInfo({ selectedAccount }) {
   const dispatch = useDispatch();
   const tokenStakeInfo = useSelector(ethSelectors.selectorTokenStakeContractInfo);
+  const tokenStakeAddressInfo = useSelector(ethSelectors.selectorTokenStakeAddressInfo);
   const tokenStakeInfoLoading = useSelector(ethSelectors.selectorTokenStakeContractInfoLoading);
   const erc20Info = useSelector(ethSelectors.selectorERC20Info);
+  const erc20Balance = useSelector(ethSelectors.selectorERC20Balance);
 
   const getTokenStake = () => dispatch(ethActions.getTokenStakeContractInfo.call());
   const getERC20Info = (erc20Address) => dispatch(ethActions.getErc20Info.call({ erc20Address }));
+  const getTokenAddressInfo = (userEthAddress) => dispatch(ethActions.getTokenStakeAddressInfo.call({ userEthAddress }));
+  const getERC20Balance = (erc20Address, account) => dispatch(ethActions.getErc20Balance.call({ erc20Address, account }));
+  const getAddressRelated = () => {
+    if (selectedAccount && tokenStakeInfo && !tokenStakeInfo.error) {
+      getTokenAddressInfo(selectedAccount);
+      getERC20Balance(tokenStakeInfo.rewardToken, selectedAccount);
+      getERC20Balance(tokenStakeInfo.stakingToken, selectedAccount);
+    }
+  };
+  const selectTokenStakeAddressInfo = (account) => {
+    if (!selectedAccount ||
+      !tokenStakeAddressInfo[account] ||
+      tokenStakeAddressInfo[account].loading ||
+      tokenStakeAddressInfo[account].error
+    ) {
+      return undefined;
+    }
+    return tokenStakeAddressInfo[account];
+  };
 
   const erc20FromSelector = (erc20Address) => {
     const mapped = erc20Info[erc20Address];
+    if (!mapped || mapped.loading || mapped.error) {
+      return undefined;
+    }
+    return mapped;
+  };
+  const erc20BalanceFromSelector = (erc20Address, account) => {
+    const mapped = account && erc20Balance[erc20Address]?.[account];
     if (!mapped || mapped.loading || mapped.error) {
       return undefined;
     }
@@ -28,6 +57,10 @@ function TokenStakeInfo() {
   React.useEffect(() => {
     getTokenStake();
   }, []);
+
+  React.useEffect(() => {
+    getAddressRelated();
+  }, [selectedAccount, tokenStakeInfo]);
 
   React.useEffect(() => {
     if (tokenStakeInfo && !tokenStakeInfo.error) {
@@ -48,8 +81,11 @@ function TokenStakeInfo() {
     );
   }
 
-  const rewardTokenInfo = erc20FromSelector(tokenStakeInfo.rewardToken);
-  const stakingTokenInfo = erc20FromSelector(tokenStakeInfo.stakingToken);
+  const rewardTokenInfo = erc20FromSelector(tokenStakeInfo?.rewardToken);
+  const stakingTokenInfo = erc20FromSelector(tokenStakeInfo?.stakingToken);
+  const rewardTokenBalance = erc20BalanceFromSelector(tokenStakeInfo?.rewardToken, selectedAccount);
+  const stakingTokenBalance = erc20BalanceFromSelector(tokenStakeInfo?.stakingToken, selectedAccount);
+  const addressInfo = selectTokenStakeAddressInfo(selectedAccount);
 
   return (
     <div className={styles.detailContainer}>
@@ -66,6 +102,24 @@ function TokenStakeInfo() {
             }
           ]}
           data={[
+            {
+              info: 'Tokens staked',
+              value: !selectedAccount 
+                ? 'Select wallet and account'
+                : addressInfo 
+                ? `${formatCustom(addressInfo.stake[0].toString(), tokenStakeInfo.stakingTokenDecimals)}${
+                    stakingTokenInfo ? ` ${stakingTokenInfo.symbol}` : ""}`
+                : 'Loading...',
+            },
+            {
+              info: 'Your rewards',
+              value: !selectedAccount 
+                ? 'Select wallet and account'
+                : addressInfo 
+                ? `${formatCustom(addressInfo.stake[1].toString(), tokenStakeInfo.rewardTokenDecimals)}${
+                    rewardTokenInfo ? ` ${rewardTokenInfo.symbol}` : ""}`
+                : 'Loading...',
+            },
             {
               info: 'Reward ratio',
               value: parseFloat((10000n * tokenStakeInfo.getRewardRatio[0]) / tokenStakeInfo.getRewardRatio[1]) / 10000,
@@ -87,8 +141,17 @@ function TokenStakeInfo() {
               )
             },
             {
-              info: 'Reward token balance',
+              info: 'Reward token contract balance',
               value: `${formatCustom(tokenStakeInfo.getRewardTokenBalance.toString(), tokenStakeInfo.rewardTokenDecimals)}${
+                rewardTokenInfo ? ` ${rewardTokenInfo.symbol}` : ""}`
+            },
+            {
+              info: 'Reward token in your wallet',
+              value: !selectedAccount
+                ? 'Select wallet and account'
+                : !rewardTokenBalance || !tokenStakeInfo
+                ? 'Loading...'
+                :  `${formatCustom(rewardTokenBalance.balance.toString(), tokenStakeInfo.rewardTokenDecimals)}${
                 rewardTokenInfo ? ` ${rewardTokenInfo.symbol}` : ""}`
             },
             {
@@ -107,17 +170,36 @@ function TokenStakeInfo() {
               info: 'Staking token balance',
               value: `${formatCustom(tokenStakeInfo.stakingTokenBalance.toString(), tokenStakeInfo.stakingTokenDecimals)}${
                 stakingTokenInfo ? ` ${stakingTokenInfo.symbol}` : ""}`,
-            }
+            },
+            {
+              info: 'Staking token in your wallet',
+              value: !selectedAccount
+                ? 'Select wallet and account'
+                : !stakingTokenBalance || !tokenStakeInfo
+                ? 'Loading...'
+                :  `${formatCustom(stakingTokenBalance.balance.toString(), tokenStakeInfo.stakingTokenDecimals)}${
+                stakingTokenInfo ? ` ${stakingTokenInfo.symbol}` : ""}`
+            },
           ]}
         />
       </div>
       <div className={styles.buttonContainer}>
-        <Button green small onClick={() => getTokenStake()}>
+        <Button 
+          green
+          small
+          onClick={() => {
+            getTokenStake();
+            getAddressRelated();
+          }}>
           Refresh data
         </Button>
       </div>
     </div>
   );
 }
+
+TokenStakeInfo.PropTypes = {
+  selectedAccount: PropTypes.string,
+};
 
 export default TokenStakeInfo;

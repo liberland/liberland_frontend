@@ -1,5 +1,4 @@
 import React from 'react';
-import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { ethSelectors } from '../../../redux/selectors';
@@ -25,15 +24,22 @@ function EthereumSelectorWallet({ onWalletSelected }) {
       <div className={styles.label}>
         Select ETH wallet provider
       </div>
-      <ReactSearchAutocomplete
-        formatResult={(item) => item.name}
-        items={walletOptions}
-        onSelect={onWalletSelected}
-        placeholder="Select wallet provider"
-        onClear={() => onWalletSelected(undefined)}
-        showItemsOnFocus
-        showIcon={false}
-      />
+      <div className={styles.selectWrapper}>
+        <select
+          placeholder="Select wallet provider"
+          onChange={(event) => {
+            if (event.target.value !== "") {
+              onWalletSelected(walletOptions[event.target.selectedIndex - 1])
+            }
+          }}
+          className={styles.select}
+        >
+          <option value="" />
+          {walletOptions.map(({ id, name }) => (
+            <option value={id} key={id}>{name}</option>
+          ))}
+        </select>
+      </div>
     </label>
   );
 }

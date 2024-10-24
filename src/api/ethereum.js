@@ -66,54 +66,33 @@ const getTokenStakeOperations = async () => {
     return resolveOperation("function stake(uint256 _amount) payable", [tokens], tokens);
   };
 
-  const depositRewardTokens = (tokens) => {
-    return resolveOperation("function depositRewardTokens(uint256 _amount) payable", [tokens]);
-  };
-
-  const setRewardRatio = (numerator, denominator) => {
-    return resolveOperation("function setRewardRatio(uint256 _numerator, uint256 _denominator)", [numerator, denominator]);
-  };
-
-  const setTimeUnit = (timeUnit) => {
-    return resolveOperation("function setTimeUnit(uint80 _timeUnit)", [timeUnit]);
-  };
-
-  const withdraw = (amount) => {
-    return resolveOperation("function withdraw(uint256 _amount)", [amount]);
-  };
-
-  const withdrawRewardTokens = (amount) => {
-    return resolveOperation("function withdrawRewardTokens(uint256 _amount)", [amount]);
-  };
-
   return {
     claimRewards,
     stake,
-    depositRewardTokens,
-    setRewardRatio,
-    setTimeUnit,
-    withdraw,
-    withdrawRewardTokens,
   };
 };
 
-const getTokenStakeAddressInfo = ({ userEthAddress }) => {
+const getTokenStakeAddressInfo = async ({ userEthAddress }) => {
   const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS);
   
-  return readContract({
-    contract,
-    method: 'function getStakeInfo(address userEthAddress) view returns (uint256 _tokensStaked, uint256 _rewards)',
-    params: [userEthAddress],
-  });
+  return {
+    stake: await readContract({
+      contract,
+      method: 'function getStakeInfo(address userEthAddress) view returns (uint256 _tokensStaked, uint256 _rewards)',
+      params: [userEthAddress],
+    })
+  };
 };
 
-const getERC20Balance = ({ erc20Address, account }) => {
+const getERC20Balance = async ({ erc20Address, account }) => {
   const { contract } = getThirdWebContract(erc20Address);
-  return readContract({
-    contract,
-    method: "function balanceOf(address account) view returns (uint256)",
-    params: [account]
-  });
+  return {
+    balance: await readContract({
+      contract,
+      method: "function balanceOf(address account) view returns (uint256)",
+      params: [account]
+    }),
+  };
 }
 
 const getERC20Operations = ({ erc20Address }) => {

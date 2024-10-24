@@ -1,6 +1,5 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 import PropTypes from 'prop-types';
 import { ethSelectors } from '../../../redux/selectors';
 import { ethActions } from '../../../redux/actions';
@@ -39,17 +38,24 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
     return (
       <label>
         <div className={styles.label}>Select one of your accounts</div>
-        <ReactSearchAutocomplete
-          formatResult={(item) => item.name}
-          items={connected.accounts.map((account) => ({ id: account, name: account }))}
-          onSelect={({ id }) => onAccountSelected(id)}
-          onSearch={() => onAccountSelected(undefined)}
-          showClear
-          placeholder="Select accounts"
-          onClear={() => onAccountSelected(undefined)}
-          showItemsOnFocus
-          showIcon={false}
-        />
+        <div className={styles.selectWrapper}>
+          <select
+            placeholder='Select account'
+            onChange={(event) => {
+              if (event.target.value) {
+                onAccountSelected(event.target.value);
+              }
+            }}
+            className={styles.select}
+          >
+            <option value="" />
+            {connected.accounts.map((account) => (
+              <option value={account} key={account}>
+                {account}
+              </option>
+            ))}
+          </select>
+        </div>
       </label>
     );
   }
