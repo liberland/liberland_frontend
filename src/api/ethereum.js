@@ -31,7 +31,7 @@ const getThirdWebContract = (contractAddress) => {
   };
 };
 
-const resolveOperationFactory = (contractAddress) => async (methodName, params = [], wei = 0) => {
+const resolveOperationFactory = (contractAddress, account) => async (methodName, params = [], wei = 0) => {
   const { contract, client, chainId } = getThirdWebContract(contractAddress);
 
   const defaultParams = {
@@ -55,8 +55,8 @@ const resolveOperationFactory = (contractAddress) => async (methodName, params =
   });
 };
 
-const getTokenStakeOperations = async () => {
-  const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS);
+const getTokenStakeOperations = (account) => {
+  const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
 
   const claimRewards = () => {
     return resolveOperation("function claimRewards()");
@@ -94,16 +94,6 @@ const getERC20Balance = async ({ erc20Address, account }) => {
     }),
   };
 }
-
-const getERC20Operations = ({ erc20Address }) => {
-  const resolveOperation = resolveOperationFactory(erc20Address);
-  const approve = (spender, value) => resolveOperation("function approve(address spender, uint256 value) external returns (bool)", [
-    spender, value,
-  ]);
-  return {
-    approve,
-  };
-};
 
 const getERC20Info = async ({ erc20Address }) => {
   const { contract } = getThirdWebContract(erc20Address);
@@ -227,7 +217,6 @@ export {
   getTokenStakeAddressInfo,
   getTokenStakeOperations,
   getERC20Info,
-  getERC20Operations,
   getERC20Balance,
   getAvailableWallets,
 };
