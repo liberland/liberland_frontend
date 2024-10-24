@@ -48,6 +48,7 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
           placeholder="Select accounts"
           onClear={() => onAccountSelected(undefined)}
           showItemsOnFocus
+          showIcon={false}
         />
       </label>
     );
@@ -55,7 +56,7 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
   
   if (error) {
     return (
-      <div className="error">
+      <div className={styles.error}>
         {error.message || typeof error === "string"
           ? error
           : "Something went wrong"}

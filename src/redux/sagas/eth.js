@@ -1,11 +1,11 @@
-import { getAllWalletsList } from 'thirdweb/wallets';
-import { put, takeLatest, call } from 'redux-saga/effects';
+import { put, takeLatest, takeEvery, call } from 'redux-saga/effects';
 import {
   connectWallet,
   getTokenStakeContractInfo,
   getTokenStakeAddressInfo,
   getERC20Info,
   getERC20Balance,
+  getAvailableWallets,
 } from '../../api/ethereum';
 import { ethActions } from '../actions';
 
@@ -13,7 +13,7 @@ import { ethActions } from '../actions';
 
 function* getWalletOptionsWorker(action) {
   try {
-    const wallets = yield call(getAllWalletsList, action.payload);
+    const wallets = yield call(getAvailableWallets, action.payload);
     yield put(ethActions.getEthWalletOptions.success(wallets));
   } catch (e) {
     yield put(ethActions.getEthWalletOptions.failure(e));
@@ -56,12 +56,12 @@ function* tokenStakeAddressInfoWorker(action) {
 function* erc20InfoWorker(action) {
   try {
     const erc20Info = yield call(getERC20Info, action.payload);
-    yield put(ethActions.getERC20Info.success({
+    yield put(ethActions.getErc20Info.success({
       ...erc20Info,
       ...action.payload,
     }))
   } catch (e) {
-    yield put(ethActions.getERC20Info.failure({
+    yield put(ethActions.getErc20Info.failure({
       ...e,
       ...action.payload,
     }));
@@ -71,12 +71,12 @@ function* erc20InfoWorker(action) {
 function* erc20BalanceWorker(action) {
   try {
     const erc20Balance = yield call(getERC20Balance, action.payload);
-    yield put(ethActions.getERC20Balance.success({
+    yield put(ethActions.getErc20Balance.success({
       ...erc20Balance,
       ...action.payload,
     }));
   } catch (e) {
-    yield put(ethActions.getERC20Balance.failure({
+    yield put(ethActions.getErc20Balance.failure({
       ...e,
       ...action.payload,
     }));
@@ -103,17 +103,17 @@ function* tokenStakeAddressInfoWatcher() {
 
 function* erc20InfoWatcher() {
   try {
-    yield takeLatest(ethActions.getERC20Info.call, erc20InfoWorker);
+    yield takeEvery(ethActions.getErc20Info.call, erc20InfoWorker);
   } catch (e) {
-    yield put(ethActions.getERC20Info.failure(e));
+    yield put(ethActions.getErc20Info.failure(e));
   }
 }
 
 function* erc20BalanceWatcher() {
   try {
-    yield takeLatest(ethActions.getERC20Balance.call, erc20BalanceWorker);
+    yield takeEvery(ethActions.getErc20Balance.call, erc20BalanceWorker);
   } catch (e) {
-    yield put(ethActions.getERC20Balance.failure(e));
+    yield put(ethActions.getErc20Balance.failure(e));
   }
 }
 

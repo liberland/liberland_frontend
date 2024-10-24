@@ -16,7 +16,7 @@ const initialState = {
 
 const ethReducer = handleActions(
   {
-    [ethActions.getERC20Balance.call]: (state, action) => ({
+    [ethActions.getErc20Balance.call]: (state, action) => ({
       ...state,
       erc20Info: {
         ...state.erc20Info,
@@ -25,7 +25,7 @@ const ethReducer = handleActions(
         }
       }
     }),
-    [ethActions.getERC20Info.call]: (state, action) => ({
+    [ethActions.getErc20Info.call]: (state, action) => ({
       ...state,
       erc20Info: {
         ...state.erc20Info,
@@ -114,7 +114,7 @@ const ethReducer = handleActions(
       },
     }),
 
-    [ethActions.getERC20Info.success]: (state, action) => ({
+    [ethActions.getErc20Info.success]: (state, action) => ({
       ...state,
       erc20Info: {
         ...state.erc20Info,
@@ -122,7 +122,7 @@ const ethReducer = handleActions(
       }
     }),
 
-    [ethActions.getERC20Info.failure]: (state, action) => ({
+    [ethActions.getErc20Info.failure]: (state, action) => ({
       ...state,
       erc20Info: {
         ...state.erc20Info,
@@ -130,7 +130,7 @@ const ethReducer = handleActions(
       }
     }),
 
-    [ethActions.getERC20Balance.success]: (state, action) => ({
+    [ethActions.getErc20Balance.success]: (state, action) => ({
       ...state,
       erc20Info: {
         ...state.erc20Info,
@@ -138,7 +138,7 @@ const ethReducer = handleActions(
       }
     }),
 
-    [ethActions.getERC20Balance.failure]: (state, action) => ({
+    [ethActions.getErc20Balance.failure]: (state, action) => ({
       ...state,
       erc20Info: {
         ...state.erc20Info,

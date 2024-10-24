@@ -2,6 +2,7 @@ import React from 'react';
 import Card from '../../Card';
 import EthereumSelectorAddress from '../../Wallet/EthereumSelectorAddress';
 import EthereumSelectorWallet from '../../Wallet/EthereumSelectorWallet';
+import TokenStakeInfo from './TokenStakeInfo';
 import styles from './styles.module.scss';
 
 export default function ETHLPStaking () {
@@ -21,7 +22,7 @@ export default function ETHLPStaking () {
           selectedAccount={selectedAccount}
         />
       </div>
-      {selectedAccount}
+      <TokenStakeInfo />
     </Card>
   )
 }

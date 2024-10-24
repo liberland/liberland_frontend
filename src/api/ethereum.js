@@ -1,5 +1,5 @@
 import { createThirdwebClient, getContract, readContract, prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb';
-import { injectedProvider } from 'thirdweb/wallets';
+import { getAllWalletsList, injectedProvider } from 'thirdweb/wallets';
 import { defineChain } from 'thirdweb/chains';
 import { providers } from 'ethers';
 import { resolveMappedPromises } from '../utils/promise';
@@ -97,19 +97,17 @@ const getTokenStakeOperations = async () => {
   };
 };
 
-const getTokenStakeAddressInfo = async ({ userEthAddress }) => {
+const getTokenStakeAddressInfo = ({ userEthAddress }) => {
   const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS);
   
-  const stakeInfo = await readContract({
+  return readContract({
     contract,
     method: 'function getStakeInfo(address userEthAddress) view returns (uint256 _tokensStaked, uint256 _rewards)',
     params: [userEthAddress],
   });
-
-  return stakeInfo;
 };
 
-const getERC20Balance = async ({ erc20Address, account }) => {
+const getERC20Balance = ({ erc20Address, account }) => {
   const { contract } = getThirdWebContract(erc20Address);
   return readContract({
     contract,
@@ -118,7 +116,7 @@ const getERC20Balance = async ({ erc20Address, account }) => {
   });
 }
 
-const getERC20Operations = async ({ erc20Address }) => {
+const getERC20Operations = ({ erc20Address }) => {
   const resolveOperation = resolveOperationFactory(erc20Address);
   const approve = (spender, value) => resolveOperation("function approve(address spender, uint256 value) external returns (bool)", [
     spender, value,
@@ -149,8 +147,11 @@ const getERC20Info = async ({ erc20Address }) => {
     name,
     symbol,
     decimals,
-  }
-  return resolveMappedPromises(promises);
+  };
+
+  const resolved = await resolveMappedPromises(promises);
+
+  return resolved;
 };
 
 const getTokenStakeContractInfo = async () => {
@@ -235,6 +236,11 @@ const connectWallet = async ({ walletId }) => {
   };
 };
 
+const getAvailableWallets = async () => {
+  const walletOptions = await getAllWalletsList();
+  return walletOptions.filter(({ id }) => injectedProvider(id));
+};
+
 export {
   getThirdWebContract,
   connectWallet,
@@ -244,4 +250,5 @@ export {
   getERC20Info,
   getERC20Operations,
   getERC20Balance,
+  getAvailableWallets,
 };

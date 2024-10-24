@@ -32,6 +32,7 @@ function EthereumSelectorWallet({ onWalletSelected }) {
         placeholder="Select wallet provider"
         onClear={() => onWalletSelected(undefined)}
         showItemsOnFocus
+        showIcon={false}
       />
     </label>
   );

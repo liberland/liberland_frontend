@@ -5,8 +5,8 @@ export const {
   getConnectedEthWallet,
   getTokenStakeContractInfo,
   getTokenStakeAddressInfo,
-  getERC20Info,
-  getERC20Balance,
+  getErc20Info,
+  getErc20Balance,
 } = createActions({
   GET_ETH_WALLET_OPTIONS: {
     call: undefined,

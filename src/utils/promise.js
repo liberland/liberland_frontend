@@ -7,3 +7,7 @@ const resolveMappedPromises = async (promises) => {
     }
     return acc;
 };
+
+export {
+    resolveMappedPromises,
+};
