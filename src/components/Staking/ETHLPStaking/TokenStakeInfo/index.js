@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Tooltip from 'rc-tooltip';
 import { ethSelectors } from '../../../../redux/selectors';
@@ -6,10 +7,9 @@ import { ethActions } from '../../../../redux/actions';
 import { formatCustom } from '../../../../utils/walletHelpers';
 import Table from '../../../Table';
 import Button from '../../../Button/Button';
-import styles from './styles.module.scss';
-import PropTypes from 'prop-types';
 import StakeForm from '../StakeForm';
 import ClaimReward from '../ClaimReward';
+import styles from './styles.module.scss';
 
 function TokenStakeInfo({ selectedAccount }) {
   const dispatch = useDispatch();
@@ -91,10 +91,12 @@ function TokenStakeInfo({ selectedAccount }) {
 
   return (
     <div>
-      {selectedAccount && stakingTokenInfo && (
+      {selectedAccount && stakingTokenInfo && stakingTokenBalance && (
         <StakeForm account={selectedAccount} stakingToken={{
           ...stakingTokenInfo,
           address: tokenStakeInfo.stakingToken,
+          balance: stakingTokenBalance.balance.toString(),
+          decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
         }} />
       )}
       <div className={styles.detailContainer}>
@@ -155,7 +157,7 @@ function TokenStakeInfo({ selectedAccount }) {
                   rewardTokenInfo ? ` ${rewardTokenInfo.symbol}` : ""}`
               },
               {
-                info: 'Reward token in your wallet',
+                info: 'Reward token in your account',
                 value: !selectedAccount
                   ? 'Select wallet and account'
                   : !rewardTokenBalance || !tokenStakeInfo
@@ -181,7 +183,7 @@ function TokenStakeInfo({ selectedAccount }) {
                   stakingTokenInfo ? ` ${stakingTokenInfo.symbol}` : ""}`,
               },
               {
-                info: 'Staking token in your wallet',
+                info: 'Staking token in your account',
                 value: !selectedAccount
                   ? 'Select wallet and account'
                   : !stakingTokenBalance || !tokenStakeInfo

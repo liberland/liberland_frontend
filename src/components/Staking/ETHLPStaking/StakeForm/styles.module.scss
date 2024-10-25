@@ -39,3 +39,19 @@
   color: $succes;
   font-weight: 500;
 }
+
+.buttonRow {
+  display: flex;
+  flex-direction: column;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    flex-direction: row;
+  }
+}
+
+.stakeAll {
+  margin-bottom: 20px;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    margin-bottom: 0;
+    margin-right: 20px;
+  }
+}

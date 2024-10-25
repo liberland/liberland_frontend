@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { ethSelectors } from '../../../../redux/selectors';
 import { TextInput } from '../../../InputComponents';
 import Button from '../../../../components/Button/Button';
+import { formatCustom } from '../../../../utils/walletHelpers';
 import { getTokenStakeOperations } from '../../../../api/ethereum';
 import styles from './styles.module.scss';
 
@@ -75,14 +76,29 @@ function StakeForm({
             </div>
           )}
         </label>
-        <Button
-          primary
-          medium
-          type="submit"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Loading...' : 'Stake tokens'}
-        </Button>
+        <div className={styles.buttonRow}>
+          <div className={styles.stakeAll}>
+            <Button
+              secondary
+              medium
+              type="button"
+              disabled={isSubmitting}
+              onClick={() => setValue('stake', stakingToken.balance)}
+            >
+              Stake all {formatCustom(stakingToken.balance, stakingToken.decimals)} {stakingToken.symbol}
+            </Button>
+          </div>
+          <div>
+            <Button
+              primary
+              medium
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Loading...' : 'Stake tokens'}
+            </Button>
+          </div>
+        </div>
       </form>
     );
 }
@@ -93,6 +109,8 @@ StakeForm.propTypes = {
     name: PropTypes.string.isRequired,
     symbol: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
+    balance: PropTypes.string.isRequired,
+    decimals: PropTypes.number.isRequired,
   })
 };
 
