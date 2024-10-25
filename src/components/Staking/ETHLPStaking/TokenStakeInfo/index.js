@@ -92,7 +92,10 @@ function TokenStakeInfo({ selectedAccount }) {
   return (
     <div>
       {selectedAccount && stakingTokenInfo && (
-        <StakeForm account={selectedAccount} stakingToken={stakingTokenInfo} />
+        <StakeForm account={selectedAccount} stakingToken={{
+          ...stakingTokenInfo,
+          address: tokenStakeInfo.stakingToken,
+        }} />
       )}
       <div className={styles.detailContainer}>
         <div className={styles.tableContainer}>
@@ -199,8 +202,8 @@ function TokenStakeInfo({ selectedAccount }) {
             }}>
             Refresh data
           </Button>
-          {selectedAccount && (
-            <ClaimReward account={selectedAccount} />
+          {selectedAccount && tokenStakeInfo && (
+            <ClaimReward account={selectedAccount} erc20Address={tokenStakeInfo.stakingToken} />
           )}
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { createThirdwebClient, getContract, readContract, prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb';
 import { getAllWalletsList, injectedProvider } from 'thirdweb/wallets';
+import { ethers5Adapter } from 'thirdweb/adapters/ethers5';
 import { defineChain } from 'thirdweb/chains';
 import { providers } from 'ethers';
 import { resolveMappedPromises } from '../utils/promise';
@@ -14,25 +15,27 @@ const getThirdWebContract = (contractAddress) => {
   const client = createThirdwebClient({
     clientId,
   });
+  const chain = defineChain({
+    id: parseInt(chainId),
+    rpc: rpcUrl,
+    nativeCurrency,
+  });
   // connect to your contract
   const contract = getContract({
     client,
-    chain: defineChain({
-      id: parseInt(chainId),
-      rpc: rpcUrl,
-      nativeCurrency,
-    }),
+    chain,
     address: contractAddress,
   });
+
   return {
     client,
     contract,
-    chainId,
+    chain,
   };
 };
 
 const resolveOperationFactory = (contractAddress, account) => async (methodName, params = [], wei = 0) => {
-  const { contract, client, chainId } = getThirdWebContract(contractAddress);
+  const { contract, client, chain } = getThirdWebContract(contractAddress);
 
   const defaultParams = {
     contract,
@@ -44,26 +47,42 @@ const resolveOperationFactory = (contractAddress, account) => async (methodName,
     ...defaultParams,
     value: wei,
   });
+  const adaptedAccount = await ethers5Adapter.signer.fromEthers({
+      signer: account,
+  });
   const { transactionHash } = await sendTransaction({
     transaction,
-    account
+    account: adaptedAccount,
   });
   await waitForReceipt({
-    chain: chainId,
+    chain,
     client,
     transactionHash: transactionHash,
+    maxBlocksWaitTime: 20,
   });
 };
 
-const getTokenStakeOperations = (account) => {
+const getERC20Operations = (erc20Address, account) => {
+  const resolveOperation = resolveOperationFactory(erc20Address, account);
+  const approve = (spender, value) => resolveOperation("function approve(address spender, uint256 value) external returns (bool)", [
+    spender, value,
+  ]);
+  return {
+    approve,
+  };
+};
+
+const getTokenStakeOperations = (account, erc20Address) => {
   const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
 
   const claimRewards = () => {
     return resolveOperation("function claimRewards()");
   };
 
-  const stake = (tokens) => {
-    return resolveOperation("function stake(uint256 _amount) payable", [tokens], tokens);
+  const stake = async (tokens) => {
+    const erc20Operations = getERC20Operations(erc20Address, account);
+    await erc20Operations.approve(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, tokens);
+    return resolveOperation("function stake(uint256 _amount) payable", [tokens]);
   };
 
   return {
@@ -199,6 +218,7 @@ const connectWallet = async ({ walletId }) => {
 
   const provider = new providers.Web3Provider(injected);
   await injected.request({ method: "eth_requestAccounts" });
+
   return {
     provider,
     accounts: await provider.listAccounts(),

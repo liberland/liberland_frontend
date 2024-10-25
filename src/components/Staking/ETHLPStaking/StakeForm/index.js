@@ -1,6 +1,8 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
+import { ethSelectors } from '../../../../redux/selectors';
 import { TextInput } from '../../../InputComponents';
 import Button from '../../../../components/Button/Button';
 import { getTokenStakeOperations } from '../../../../api/ethereum';
@@ -26,10 +28,11 @@ function StakeForm({
     });
 
     const value = watch('stake', '');
-
+    const connected = useSelector(ethSelectors.selectorConnected);
     const onSubmit = async ({ stake }) => {
       try {
-        const operations = getTokenStakeOperations(account);
+        const signer = await connected.provider.getSigner(account);
+        const operations = getTokenStakeOperations(signer, stakingToken.address);
         await operations.stake(stake);
       } catch (e) {
         setError('stake', {
@@ -89,6 +92,7 @@ StakeForm.propTypes = {
   stakingToken: PropTypes.shape({
     name: PropTypes.string.isRequired,
     symbol: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
   })
 };
 
