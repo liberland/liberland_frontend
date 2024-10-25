@@ -22,8 +22,8 @@ const ethReducer = handleActions(
         ...state.erc20Info,
         [`${action.payload.erc20Address}/${action.payload.account}`]: {
           loading: true,
-        }
-      }
+        },
+      },
     }),
     [ethActions.getErc20Info.call]: (state, action) => ({
       ...state,
@@ -31,8 +31,8 @@ const ethReducer = handleActions(
         ...state.erc20Info,
         [action.payload.erc20Address]: {
           loading: true,
-        }
-      }
+        },
+      },
     }),
     [ethActions.getTokenStakeAddressInfo.call]: (state, action) => ({
       ...state,
@@ -119,7 +119,7 @@ const ethReducer = handleActions(
       erc20Info: {
         ...state.erc20Info,
         [action.payload.erc20Address]: action.payload,
-      }
+      },
     }),
 
     [ethActions.getErc20Info.failure]: (state, action) => ({
@@ -127,7 +127,7 @@ const ethReducer = handleActions(
       erc20Info: {
         ...state.erc20Info,
         [action.payload.erc20Address]: { error: action.payload },
-      }
+      },
     }),
 
     [ethActions.getErc20Balance.success]: (state, action) => ({
@@ -135,7 +135,7 @@ const ethReducer = handleActions(
       erc20Balance: {
         ...state.erc20Balance,
         [`${action.payload.erc20Address}/${action.payload.account}`]: action.payload,
-      }
+      },
     }),
 
     [ethActions.getErc20Balance.failure]: (state, action) => ({
@@ -143,7 +143,7 @@ const ethReducer = handleActions(
       erc20Balance: {
         ...state.erc20Balance,
         [`${action.payload.erc20Address}/${action.payload.account}`]: { error: action.payload },
-      }
+      },
     }),
 
     [ethActions.getTokenStakeContractInfo.success]: (state, action) => ({
@@ -165,7 +165,7 @@ const ethReducer = handleActions(
       ...state,
       wallet: action.payload,
     }),
-  
+
     [ethActions.getConnectedEthWallet.failure]: (state, action) => ({
       ...state,
       walletError: action.payload,

@@ -28,12 +28,13 @@ function EthereumSelectorWallet({ onWalletSelected }) {
         <select
           placeholder="Select wallet provider"
           onChange={(event) => {
-            if (event.target.value !== "") {
-              onWalletSelected(walletOptions[event.target.selectedIndex - 1])
+            if (event.target.value !== '') {
+              onWalletSelected(walletOptions[event.target.selectedIndex - 1]);
             }
           }}
           className={styles.select}
         >
+          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
           <option value="" />
           {walletOptions.map(({ id, name }) => (
             <option value={id} key={id}>{name}</option>

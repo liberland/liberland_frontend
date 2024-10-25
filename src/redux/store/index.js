@@ -8,7 +8,7 @@ const sagaMiddleware = createSagaMiddleware();
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 if (window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) {
-  BigInt.prototype.toJSON = function() { return this.toString() }
+  window.BigInt.prototype.toJSON = function toJSON() { return this.toString(); };
 }
 
 const store = createStore(

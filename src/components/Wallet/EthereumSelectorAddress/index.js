@@ -14,6 +14,7 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
 
   React.useEffect(() => {
     onAccountSelected(undefined);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected]);
 
   React.useEffect(() => {
@@ -21,9 +22,10 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
       dispatch(
         ethActions.getConnectedEthWallet.call({
           walletId: selectedWallet.id,
-        })
+        }),
       );
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedWallet]);
 
   if (!selectedWallet) {
@@ -40,7 +42,7 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
         <div className={styles.label}>Select one of your accounts</div>
         <div className={styles.selectWrapper}>
           <select
-            placeholder='Select account'
+            placeholder="Select account"
             onChange={(event) => {
               if (event.target.value) {
                 onAccountSelected(event.target.value);
@@ -48,6 +50,7 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
             }}
             className={styles.select}
           >
+            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <option value="" />
             {connected.accounts.map((account) => (
               <option value={account} key={account}>
@@ -59,13 +62,13 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
       </label>
     );
   }
-  
+
   if (error) {
     return (
       <div className={styles.error}>
-        {error.message || typeof error === "string"
+        {error.message || typeof error === 'string'
           ? error
-          : "Something went wrong"}
+          : 'Something went wrong'}
       </div>
     );
   }

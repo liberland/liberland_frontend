@@ -7,8 +7,8 @@ import { getTokenStakeOperations } from '../../../../api/ethereum';
 import styles from './styles.module.scss';
 
 function ClaimReward({
-    account,
-    erc20Address,
+  account,
+  erc20Address,
 }) {
   const [success, setSuccess] = React.useState();
   const [loading, setLoading] = React.useState();
@@ -17,7 +17,11 @@ function ClaimReward({
 
   return (
     <div className={styles.rewards}>
-      <Button primary small disabled={loading} onClick={async () => {
+      <Button
+        primary
+        small
+        disabled={loading}
+        onClick={async () => {
           const signer = await connected.provider.getSigner(account);
           const operations = getTokenStakeOperations(signer, erc20Address);
           setLoading(true);
@@ -28,13 +32,14 @@ function ClaimReward({
             setSuccess('Rewards claimed successfully, click on refresh to see the result.');
           } catch (e) {
             setError('Something went wrong');
+            // eslint-disable-next-line no-console
             console.error(e);
           } finally {
             setLoading(false);
           }
-        }
-      }>
-          {loading ? 'Loading...' : 'Claim reward!'}
+        }}
+      >
+        {loading ? 'Loading...' : 'Claim reward!'}
       </Button>
       {error && (
         <div className={styles.error}>

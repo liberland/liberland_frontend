@@ -52,5 +52,5 @@ root.render(
     <AuthProvider authConfig={useAuthConfig}>
       <App />
     </AuthProvider>
-  </Provider>
+  </Provider>,
 );

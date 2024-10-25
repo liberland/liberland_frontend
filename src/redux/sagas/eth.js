@@ -1,4 +1,6 @@
-import { put, takeLatest, takeEvery, call } from 'redux-saga/effects';
+import {
+  put, takeLatest, takeEvery, call,
+} from 'redux-saga/effects';
 import {
   connectWallet,
   getTokenStakeContractInfo,
@@ -44,7 +46,7 @@ function* tokenStakeAddressInfoWorker(action) {
     yield put(ethActions.getTokenStakeAddressInfo.success({
       ...tokenStakeAddressInfo,
       ...action.payload,
-    }))
+    }));
   } catch (e) {
     yield put(ethActions.getTokenStakeAddressInfo.failure({
       ...e,
@@ -59,7 +61,7 @@ function* erc20InfoWorker(action) {
     yield put(ethActions.getErc20Info.success({
       ...erc20Info,
       ...action.payload,
-    }))
+    }));
   } catch (e) {
     yield put(ethActions.getErc20Info.failure({
       ...e,

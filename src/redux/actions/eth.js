@@ -37,5 +37,5 @@ export const {
     call: undefined,
     success: undefined,
     failure: undefined,
-  }
+  },
 });

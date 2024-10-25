@@ -50,7 +50,7 @@ const selectorERC20Info = createSelector(
 const selectorERC20Balance = createSelector(
   ethReducer,
   (reducer) => Object.entries(reducer.erc20Balance).reduce((accumulator, [key, value]) => {
-    const [address, account] = key.split("/");
+    const [address, account] = key.split('/');
     if (!accumulator[address]) {
       accumulator[address] = {};
     }
