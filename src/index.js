@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import './index.scss';
 import './assets/main.scss';
@@ -46,11 +46,11 @@ const isAdminLogin = urlParams.get('admin');
 if (isAdminLogin === 'true') { localStorage.setItem('isAdminLogin', 'true'); }
 const useAuthConfig = localStorage.getItem('isAdminLogin') === 'true' ? adminAuthConfig : authConfig;
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+ReactDOM.render(
   <Provider store={store}>
     <AuthProvider authConfig={useAuthConfig}>
       <App />
     </AuthProvider>
   </Provider>,
+  document.getElementById('root'),
 );
