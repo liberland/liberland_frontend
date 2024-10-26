@@ -237,8 +237,8 @@ function TokenStakeInfo({ selectedAccount }) {
           >
             Refresh data
           </Button>
-          {selectedAccount && tokenStakeInfo && (
-            <ClaimReward account={selectedAccount} erc20Address={tokenStakeInfo.stakingToken} />
+          {selectedAccount && (
+            <ClaimReward account={selectedAccount} />
           )}
         </div>
       </div>

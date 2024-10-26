@@ -64,34 +64,25 @@ const resolveOperationFactory = (contractAddress, account) => async (methodName,
   });
 };
 
-const getERC20Operations = (erc20Address, account) => {
+const erc20Approve = async (erc20Address, account, spender, value) => {
   const resolveOperation = resolveOperationFactory(erc20Address, account);
-  const approve = (spender, value) => resolveOperation(
+  await resolveOperation(
     'function approve(address spender, uint256 value) external returns (bool)',
     [
       spender, value,
     ],
   );
-  return {
-    approve,
-  };
 };
 
-const getTokenStakeOperations = (account, erc20Address) => {
+const stakeTokens = async (account, erc20Address, tokens) => {
   const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
+  await erc20Approve(erc20Address, account, process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, tokens);
+  await resolveOperation('function stake(uint256 _amount) payable', [tokens]);
+};
 
-  const claimRewards = () => resolveOperation('function claimRewards()');
-
-  const stake = async (tokens) => {
-    const erc20Operations = getERC20Operations(erc20Address, account);
-    await erc20Operations.approve(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, tokens);
-    return resolveOperation('function stake(uint256 _amount) payable', [tokens]);
-  };
-
-  return {
-    claimRewards,
-    stake,
-  };
+const claimRewards = async (account) => {
+  const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
+  await resolveOperation('function claimRewards()');
 };
 
 const getTokenStakeAddressInfo = async ({ userEthAddress }) => {
@@ -238,7 +229,8 @@ export {
   connectWallet,
   getTokenStakeContractInfo,
   getTokenStakeAddressInfo,
-  getTokenStakeOperations,
+  stakeTokens,
+  claimRewards,
   getERC20Info,
   getERC20Balance,
   getAvailableWallets,

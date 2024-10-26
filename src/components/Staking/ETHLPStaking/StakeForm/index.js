@@ -6,7 +6,7 @@ import { ethSelectors } from '../../../../redux/selectors';
 import { TextInput } from '../../../InputComponents';
 import Button from '../../../Button/Button';
 import { formatCustom } from '../../../../utils/walletHelpers';
-import { getTokenStakeOperations } from '../../../../api/ethereum';
+import { stakeTokens } from '../../../../api/ethereum';
 import styles from './styles.module.scss';
 
 function StakeForm({
@@ -33,8 +33,7 @@ function StakeForm({
   const onSubmit = async ({ stake }) => {
     try {
       const signer = await connected.provider.getSigner(account);
-      const operations = getTokenStakeOperations(signer, stakingToken.address);
-      await operations.stake(stake);
+      await stakeTokens(signer, stakingToken.address, stake);
     } catch (e) {
       setError('stake', {
         message: 'Something went wrong',
@@ -51,9 +50,7 @@ function StakeForm({
       onSubmit={handleSubmit(onSubmit)}
     >
       <label className={styles.wrapper}>
-        Stake your
-        {' '}
-        {stakingToken.name}
+        Stake your ETH-LLD Uniswap v2 liquidity token
         <div className={styles.inputWrapper}>
           <TextInput
             register={register}
@@ -91,8 +88,7 @@ function StakeForm({
             Stake all
             {' '}
             {formatCustom(stakingToken.balance, stakingToken.decimals)}
-            {' '}
-            {stakingToken.symbol}
+            {' tokens'}
           </Button>
         </div>
         <div>
