@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { officesActions } from '../../../redux/actions';
-import { officesSelectors } from '../../../redux/selectors';
+import { officesActions, financesActions } from '../../../redux/actions';
+import { officesSelectors, financesSelectors } from '../../../redux/selectors';
 import Table from '../../Table';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import { palletIdToAddress } from '../../../utils/pallet';
-import truncate from '../../../utils/truncate';
 
 const DEFAULT_ACCOUNTS = [
   {
@@ -39,18 +38,21 @@ const DYNAMIC_ACCOUNTS = [
 const STATIC_ACCOUNTS = [
   {
     name: 'Onboarder LLD faucet',
-    address: process.env.REACT_APP_ONBOARDER_LLD_FAUCET_ADDRESS
-  }
-]
+    address: process.env.REACT_APP_ONBOARDER_LLD_FAUCET_ADDRESS,
+  },
+];
 
 export default function Finances() {
   const dispatch = useDispatch();
   const balances = useSelector(officesSelectors.selectorBalances);
   const pallets = useSelector(officesSelectors.selectorPallets);
+  const finances = useSelector(financesSelectors.selectorFinances);
+  const financesLoading = useSelector(financesSelectors.selectorIsLoading);
   const [accountsAddresses, setAccountsAddresses] = useState([]);
 
   useEffect(() => {
     dispatch(officesActions.getPalletIds.call());
+    dispatch(financesActions.getFinances.call());
   }, [dispatch]);
 
   useEffect(() => {
@@ -70,7 +72,7 @@ export default function Finances() {
         }),
       );
 
-      palletsAndAddresses = palletsAndAddresses.concat(STATIC_ACCOUNTS)
+      palletsAndAddresses = palletsAndAddresses.concat(STATIC_ACCOUNTS);
       setAccountsAddresses(palletsAndAddresses);
 
       const addressesToFetchBalancesFor = palletsAndAddresses.map(
@@ -82,32 +84,73 @@ export default function Finances() {
 
   if (!pallets || !balances) return 'Loading...';
 
+  const formatPercent = (value) => `${Math.round(10000 * value) / 100}%`;
+
   return (
-    <Table
-      columns={[
-        {
-          Header: 'Name',
-          accessor: 'name',
-        },
-        {
-          Header: 'Address',
-          accessor: 'address',
-        },
-        {
-          Header: 'LLM Balance',
-          accessor: 'llm',
-        },
-        {
-          Header: 'LLD Balance',
-          accessor: 'lld',
-        },
-      ]}
-      data={accountsAddresses.map((a) => ({
-        ...a,
-        address: a.address,
-        llm: `${formatMerits(balances.LLM[a.address] ?? 0)} LLM`,
-        lld: `${formatDollars(balances.LLD[a.address] ?? 0)} LLD`,
-      }))}
-    />
+    <>
+      <h3>Wallet addresses</h3>
+      <Table
+        columns={[
+          {
+            Header: 'Name',
+            accessor: 'name',
+          },
+          {
+            Header: 'Address',
+            accessor: 'address',
+          },
+          {
+            Header: 'LLM Balance',
+            accessor: 'llm',
+          },
+          {
+            Header: 'LLD Balance',
+            accessor: 'lld',
+          },
+        ]}
+        data={accountsAddresses.map((a) => ({
+          ...a,
+          address: a.address,
+          llm: `${formatMerits(balances.LLM[a.address] ?? 0)} LLM`,
+          lld: `${formatDollars(balances.LLD[a.address] ?? 0)} LLD`,
+        }))}
+      />
+      <h3>Financial metrics</h3>
+      {financesLoading && (
+      <div>Loading...</div>
+      )}
+      {finances && (
+      <Table
+        columns={[
+          {
+            Header: 'Metric name',
+            accessor: 'metric',
+          },
+          {
+            Header: 'Metric value',
+            accessor: 'value',
+          },
+        ]}
+        data={[
+          {
+            metric: 'Inflation',
+            value: formatPercent(finances.inflation),
+          },
+          {
+            metric: 'Congress rewards from last week',
+            value: `${formatDollars(finances.lastWeekCongressRewards ?? 0)} LLD`,
+          },
+          {
+            metric: 'Staker rewards from last week',
+            value: `${formatDollars(finances.lastWeekStakersRewards ?? 0)} LLD`,
+          },
+          {
+            metric: 'Staker APY',
+            value: formatPercent(finances.stakerApyWeeklyPayouts),
+          },
+        ]}
+      />
+      )}
+    </>
   );
 }

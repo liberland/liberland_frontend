@@ -25,6 +25,7 @@ export function CheckExtensionWalletProvider({ children }) {
   const isSessionReady = useSelector(userSelectors.selectIsSessionReady);
   const extensions = useSelector(blockchainSelectors.extensionsSelector);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const userBlockchainAdressStorage = localStorage.getItem('BlockchainAdress');
   const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const [acceptedBrowser, setAcceptedBrowser] = useState(
     sessionStorage.getItem('unsupportedBrowserAcceptedByUser'),
@@ -67,7 +68,7 @@ export function CheckExtensionWalletProvider({ children }) {
   }
 
   if (!walletAddress) {
-    dispatch(blockchainActions.setUserWallet.success(wallets[0].address));
+    dispatch(blockchainActions.setUserWallet.success(userBlockchainAdressStorage || wallets[0].address));
   }
 
   return children;

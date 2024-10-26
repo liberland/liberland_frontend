@@ -15,6 +15,7 @@ import * as contractsSagas from './contracts';
 import * as senateSagas from './senate';
 import * as nftsSagas from './nfts';
 import * as ethSagas from './eth';
+import * as financesSagas from './finances';
 
 export default function* rootSaga() {
   yield all([
@@ -178,5 +179,8 @@ export default function* rootSaga() {
     ethSagas.tokenStakeAddressInfoWatcher(),
     ethSagas.erc20InfoWatcher(),
     ethSagas.erc20BalanceWatcher(),
+
+    // FINANCES
+    financesSagas.getFinancesWatcher(),
   ]);
 }

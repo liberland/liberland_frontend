@@ -214,7 +214,7 @@ function CongressionalAssemble() {
         />
         )}
         {termDuration && (
-          <CongressionalCountdown termDuration={termDuration} />
+          <CongressionalCountdown termDuration={termDuration.toNumber()} />
         )}
       </div>
     </>

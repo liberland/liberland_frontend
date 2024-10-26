@@ -15,6 +15,7 @@ import * as contractsSelectors from './contracts';
 import * as senateSelectors from './senate';
 import * as nftsSelectors from './nfts';
 import * as ethSelectors from './eth';
+import * as financesSelectors from './finances';
 
 export {
   errorsSelectors,
@@ -34,4 +35,5 @@ export {
   senateSelectors,
   nftsSelectors,
   ethSelectors,
+  financesSelectors,
 };

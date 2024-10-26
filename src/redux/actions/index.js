@@ -16,6 +16,7 @@ import * as contractsActions from './contracts';
 import * as senateActions from './senate';
 import * as nftsActions from './nfts';
 import * as ethActions from './eth';
+import * as financesActions from './finances';
 
 export {
   authActions,
@@ -36,4 +37,5 @@ export {
   senateActions,
   nftsActions,
   ethActions,
+  financesActions,
 };
