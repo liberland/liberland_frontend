@@ -9,6 +9,7 @@ import Table from '../../../Table';
 import Button from '../../../Button/Button';
 import StakeForm from '../StakeForm';
 import ClaimReward from '../ClaimReward';
+import WithdrawForm from '../WithdrawForm';
 import styles from './styles.module.scss';
 
 function TokenStakeInfo({ selectedAccount }) {
@@ -121,6 +122,17 @@ function TokenStakeInfo({ selectedAccount }) {
             ...stakingTokenInfo,
             address: tokenStakeInfo.stakingToken,
             balance: stakingTokenBalance.balance.toString(),
+            decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
+          }}
+        />
+      )}
+      {selectedAccount && stakingTokenInfo && addressInfo && (
+        <WithdrawForm
+          account={selectedAccount}
+          stakingToken={{
+            ...stakingTokenInfo,
+            address: tokenStakeInfo.stakingToken,
+            balance: addressInfo.stake[0].toString(),
             decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
           }}
         />

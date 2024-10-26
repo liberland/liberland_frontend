@@ -7,10 +7,10 @@ import { ethSelectors } from '../../../../redux/selectors';
 import { TextInput } from '../../../InputComponents';
 import Button from '../../../Button/Button';
 import { formatCustom } from '../../../../utils/walletHelpers';
-import { stakeTokens } from '../../../../api/ethereum';
+import { withdrawTokens } from '../../../../api/ethereum';
 import styles from './styles.module.scss';
 
-function StakeForm({
+function WithdrawForm({
   account,
   stakingToken,
   onClose,
@@ -30,20 +30,20 @@ function StakeForm({
     mode: 'onChange',
   });
 
-  const value = watch('stake', '');
+  const value = watch('withdraw', '');
   const connected = useSelector(ethSelectors.selectorConnected);
-  const onSubmit = async ({ stake }) => {
+  const onSubmit = async ({ withdraw }) => {
     try {
       const signer = await connected.provider.getSigner(account);
-      await stakeTokens(signer, stakingToken.address, stake);
+      await withdrawTokens(signer, stakingToken.address, withdraw);
     } catch (e) {
-      setError('stake', {
+      setError('withdraw', {
         message: 'Something went wrong',
       });
       // eslint-disable-next-line no-console
       console.error(e);
     } finally {
-      setValue('stake', '');
+      setValue('withdraw', '');
     }
   };
 
@@ -60,29 +60,29 @@ function StakeForm({
       className={styles.form}
     >
       <label className={styles.wrapper}>
-        Stake your ETH-LLD Uniswap v2 liquidity token
+        Withdraw your ETH-LLD Uniswap v2 liquidity token
         <div className={styles.inputWrapper}>
           <TextInput
             register={register}
-            name="stake"
-            errorTitle="Stake"
+            name="withdraw"
+            errorTitle="Withdraw amount"
             value={value}
             className={styles.input}
-            onChange={(event) => setValue('stake', event.target.value)}
-            validate={(input) => (!input || /^-?\d*\.?\d+$/.test(input) ? undefined : 'Invalid stake')}
+            onChange={(event) => setValue('withdraw', event.target.value)}
+            validate={(input) => (!input || /^-?\d*\.?\d+$/.test(input) ? undefined : 'Invalid withdrawal amount')}
             disabled={isSubmitting}
             placeholder={stakingToken.symbol}
             required
           />
         </div>
-        {errors.stake && (
+        {errors.withdraw && (
         <div className={styles.error}>
-          {errors.stake.message}
+          {errors.withdraw.message}
         </div>
         )}
         {isSubmitSuccessful && (
         <div className={styles.success}>
-          Tokens staked successfully,
+          Withdrawal was successfull,
           <br />
           click on refresh to see the result.
           <br />
@@ -96,15 +96,15 @@ function StakeForm({
             Cancel
           </Button>
         </div>
-        <div className={styles.stakeAll}>
+        <div className={styles.withdrawAll}>
           <Button
             secondary
             medium
             type="button"
             disabled={isSubmitting}
-            onClick={() => setValue('stake', stakingToken.balance)}
+            onClick={() => setValue('withdraw', stakingToken.balance)}
           >
-            Stake all
+            Withdraw all
             {' '}
             {formatCustom(stakingToken.balance, stakingToken.decimals)}
             {' tokens'}
@@ -117,7 +117,7 @@ function StakeForm({
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Loading...' : 'Stake tokens'}
+            {isSubmitting ? 'Loading...' : 'Withdraw tokens'}
           </Button>
         </div>
       </div>
@@ -125,7 +125,7 @@ function StakeForm({
   );
 }
 
-StakeForm.propTypes = {
+WithdrawForm.propTypes = {
   account: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
   stakingToken: PropTypes.shape({
@@ -137,20 +137,20 @@ StakeForm.propTypes = {
   }).isRequired,
 };
 
-function StakeFormModalWrapper(props) {
+function WithdrawFormModalWrapper(props) {
   const [show, setShow] = React.useState();
   return (
     <div className={styles.modal}>
       <Button primary medium onClick={() => setShow(true)}>
-        Stake tokens
+        Withdraw tokens
       </Button>
       {show && (
         <ModalRoot>
-          <StakeForm {...props} onClose={() => setShow(false)} />
+          <WithdrawForm {...props} onClose={() => setShow(false)} />
         </ModalRoot>
       )}
     </div>
   );
 }
 
-export default StakeFormModalWrapper;
+export default WithdrawFormModalWrapper;

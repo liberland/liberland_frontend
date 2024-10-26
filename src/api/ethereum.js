@@ -85,6 +85,11 @@ const claimRewards = async (account) => {
   await resolveOperation('function claimRewards()');
 };
 
+const withdrawTokens = async (account, amount) => {
+  const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
+  await resolveOperation('function withdraw(uint256 _amount)', [amount]);
+};
+
 const getTokenStakeAddressInfo = async ({ userEthAddress }) => {
   const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS);
 
@@ -234,4 +239,5 @@ export {
   getERC20Info,
   getERC20Balance,
   getAvailableWallets,
+  withdrawTokens,
 };
