@@ -58,6 +58,7 @@ export default {
   },
   staking: {
     overview: '/home/staking/overview',
+    ethlpstaking: '/home/staking/ethlpstaking',
   },
   congress: {
     overview: '/home/congress/overview',

@@ -17,6 +17,7 @@ import dexReducer from './dex';
 import contractsReducer from './contracts';
 import senateReducer from './senate';
 import nftsReducer from './nfts';
+import ethReducer from './eth';
 import financesReducer from './finances';
 
 const rootReducer = combineReducers({
@@ -38,6 +39,7 @@ const rootReducer = combineReducers({
   contracts: contractsReducer,
   senate: senateReducer,
   nfts: nftsReducer,
+  eth: ethReducer,
   finances: financesReducer,
 });
 

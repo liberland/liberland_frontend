@@ -1,0 +1,18 @@
+@import '../../../../assets/base/variables';
+@import '../../../../assets/main';
+
+.error {
+  font-size: 16px;
+  color: $errorText;
+  font-weight: 500;
+}
+
+.success {
+  font-size: 16px;
+  color: $succes;
+  font-weight: 500;
+}
+
+.rewards {
+  margin-top: 15px;
+}

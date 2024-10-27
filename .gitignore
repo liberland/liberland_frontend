@@ -10,6 +10,8 @@
 
 # testing
 /coverage
+/dist
+anvil.json
 
 # production
 /build
