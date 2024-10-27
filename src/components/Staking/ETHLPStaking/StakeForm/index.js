@@ -78,8 +78,6 @@ function StakeForm({
           Tokens staked successfully,
           <br />
           click on refresh to see the result.
-          <br />
-          Form will close in 3 seconds.
         </div>
         )}
       </label>
