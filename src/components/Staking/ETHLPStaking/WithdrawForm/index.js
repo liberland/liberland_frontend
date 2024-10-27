@@ -78,8 +78,6 @@ function WithdrawForm({
           Withdrawal was successfull,
           <br />
           click on refresh to see the result.
-          <br />
-          Form will close in 3 seconds.
         </div>
         )}
       </label>
