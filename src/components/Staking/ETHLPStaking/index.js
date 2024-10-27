@@ -14,18 +14,17 @@ export default function ETHLPStaking() {
       <div className={stylesPage.sectionWrapper}>
         <Card title="Info" className={styles.card}>
           <p className={styles.info}>
-            To earn
+            You can earn
             {' '}
-            <strong>LLD rewards</strong>
-            , purchase
+            <strong>LLD rewards </strong>
+            on Ethereum, by staking UniswapV2 LLD-ETH LP tokens which
             {' '}
-            <strong>LP tokens</strong>
-            {' '}
-            with ETH and stake them in our pool.
-            For more details about the LP token, check the
-            {' '}
-            <a href="https://etherscan.io/address/0x8bafc89114d5f5B78806C0c84e465394Cb35f5Ea">
-              LP contract on Etherscan
+            <a href="https://app.uniswap.org/add/v2/ETH/0x054c9d4c6f4ea4e14391addd1812106c97d05690">
+              you can get here.
+            </a>
+            <br />
+            <a href="https://docs.liberland.org/public-documents/blockchain/for-validators-nominators-and-stakers/liquidity-staking">
+              Read the instructions for more details
             </a>
             .
           </p>
