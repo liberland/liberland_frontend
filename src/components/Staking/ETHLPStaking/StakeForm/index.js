@@ -47,13 +47,6 @@ function StakeForm({
     }
   };
 
-  React.useLayoutEffect(() => {
-    if (isSubmitSuccessful) {
-      setInterval(() => onClose(), 3000);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSubmitSuccessful]);
-
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -93,7 +86,7 @@ function StakeForm({
       <div className={styles.buttonRow}>
         <div className={styles.closeForm}>
           <Button disabled={isSubmitting} medium onClick={onClose}>
-            Cancel
+            Close
           </Button>
         </div>
         <div className={styles.stakeAll}>

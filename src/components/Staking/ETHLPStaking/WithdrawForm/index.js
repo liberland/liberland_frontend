@@ -35,7 +35,7 @@ function WithdrawForm({
   const onSubmit = async ({ withdraw }) => {
     try {
       const signer = await connected.provider.getSigner(account);
-      await withdrawTokens(signer, stakingToken.address, withdraw);
+      await withdrawTokens(signer, withdraw);
     } catch (e) {
       setError('withdraw', {
         message: 'Something went wrong',
@@ -46,13 +46,6 @@ function WithdrawForm({
       setValue('withdraw', '');
     }
   };
-
-  React.useLayoutEffect(() => {
-    if (isSubmitSuccessful) {
-      setInterval(() => onClose(), 3000);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSubmitSuccessful]);
 
   return (
     <form
@@ -93,7 +86,7 @@ function WithdrawForm({
       <div className={styles.buttonRow}>
         <div className={styles.closeForm}>
           <Button disabled={isSubmitting} medium onClick={onClose}>
-            Cancel
+            Close
           </Button>
         </div>
         <div className={styles.withdrawAll}>
