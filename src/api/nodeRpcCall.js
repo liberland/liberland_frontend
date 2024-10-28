@@ -2337,7 +2337,7 @@ const swapExactTokensForTokens = async (path, amountIn, amountOutMin, sendTo, wa
 
 const createNewPool = async (aAsset, bAsset, walletAddress) => {
   const api = await getApi();
-  const extrinsic = api.tx.assetConversion.newPool(aAsset, bAsset);
+  const extrinsic = api.tx.assetConversion.createPool(aAsset, bAsset);
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 

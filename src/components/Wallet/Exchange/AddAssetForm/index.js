@@ -1,10 +1,12 @@
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
+import { createNewPool } from '../../../../api/nodeRpcCall';
 import Button from '../../../Button/Button';
 import ModalRoot from '../../../Modals/ModalRoot';
-import { walletSelectors } from '../../../../redux/selectors';
-import { walletActions } from '../../../../redux/actions';
+import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
+import { walletActions, dexActions } from '../../../../redux/actions';
 import { ExchangeItemPropTypes } from '../proptypes';
 import styles from '../styles.module.scss';
 
@@ -12,8 +14,27 @@ function AddAssetFormDisplay({
   poolsData,
   onClose,
 }) {
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    watch,
+    setError,
+    formState: {
+      errors,
+      isSubmitting,
+      isSubmitSuccessful,
+    },
+  } = useForm({
+    mode: 'onChange',
+  });
+
+  const firstAsset = watch('firstAsset', '');
+  const secondAsset = watch('secondAsset', '');
+
   const dispatch = useDispatch();
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
+  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   React.useEffect(() => {
     dispatch(walletActions.getWallet.call());
@@ -30,6 +51,7 @@ function AddAssetFormDisplay({
       });
       return pairings;
     }, []);
+
     const usedPairings = poolsData.map(({
       asset1,
       assetData1,
@@ -47,8 +69,7 @@ function AddAssetFormDisplay({
       pairings[aAsset][bAsset] = true;
       return pairings;
     }, {});
-    // eslint-disable-next-line no-console
-    console.log(usedPairings);
+
     return allOptions?.reduce((mappedOptions, [aAsset, bAsset]) => {
       if (aAsset === 'Native') {
         if (!usedPairings[aAsset]?.[bAsset.metadata.symbol] && !usedPairings[bAsset.metadata.symbol]?.[aAsset]) {
@@ -66,27 +87,146 @@ function AddAssetFormDisplay({
         }
       } else if (!usedPairings[aAsset.metadata.symbol]?.[bAsset.metadata.symbol]
         && !usedPairings[bAsset.metadata.symbol]?.[aAsset.metadata.symbol]) {
-        mappedOptions[bAsset.metadata.symbol] ||= {};
-        mappedOptions[bAsset.metadata.symbol][aAsset.metadata.symbol] = [aAsset, bAsset];
         mappedOptions[aAsset.metadata.symbol] ||= {};
-        mappedOptions[aAsset.metadata.symbol][bAsset.metadata.symbol] = [bAsset, aAsset];
+        mappedOptions[aAsset.metadata.symbol][bAsset.metadata.symbol] = [aAsset, bAsset];
+        mappedOptions[bAsset.metadata.symbol] ||= {};
+        mappedOptions[bAsset.metadata.symbol][aAsset.metadata.symbol] = [bAsset, aAsset];
       }
       return mappedOptions;
     }, {});
   }, [poolsData, additionalAssets]);
 
+  const onSubmit = async ({ firstAsset: firstAssetKey, secondAsset: secondAssetKey }) => {
+    try {
+      const [aAsset, bAsset] = filtered[firstAssetKey][secondAssetKey];
+      const getAssetId = (asset) => (
+        asset === 'Native'
+          ? { Native: 'Native' }
+          : { Asset: asset.index.toString() }
+      );
+      await createNewPool(getAssetId(aAsset), getAssetId(bAsset), walletAddress);
+      dispatch(dexActions.getPools.call());
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      setError('firstAsset', { message: 'Something went wrong' });
+    }
+  };
+
   if (!filtered) {
     return <div>Loading...</div>;
   }
 
-  // eslint-disable-next-line no-console
-  console.log(filtered);
-
   return (
-    <form className={styles.form}>
-      <Button medium onClick={onClose}>
-        Close
-      </Button>
+    <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+      <div className={styles.selectRow}>
+        <div className={styles.firstAsset}>
+          <label>
+            <div className={styles.label}>
+              Select first pool asset
+            </div>
+            <div className={styles.selectWrapper}>
+              <select
+                {...register('firstAsset', {
+                  required: 'Select asset',
+                })}
+                placeholder="Pool asset"
+                disabled={isSubmitting}
+                onChange={(event) => {
+                  setValue('firstAsset', event.target.value);
+                }}
+                value={firstAsset}
+                className={styles.select}
+              >
+                {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                <option value="" />
+                {Object.entries(filtered)
+                  .filter(([_, values]) => Object.keys(values).length > 0)
+                  .map(([key, value]) => {
+                    const humanReadableName = key === 'Native'
+                      ? 'Liberland dollar'
+                      : Object.values(value)[0][0].metadata.symbol;
+                    return (
+                      <option
+                        value={key}
+                        key={key}
+                      >
+                        {humanReadableName}
+                      </option>
+                    );
+                  })}
+              </select>
+            </div>
+            {errors.firstAsset && (
+              <div className={styles.error}>
+                {errors.firstAsset.message}
+              </div>
+            )}
+            {isSubmitSuccessful && (
+              <div className={styles.success}>
+                Pool successfully created
+              </div>
+            )}
+          </label>
+        </div>
+        <div>
+          {firstAsset && (
+            <label>
+              <div className={styles.label}>
+                Select second pool asset
+              </div>
+              <div className={styles.selectWrapper}>
+                <select
+                  {...register('secondAsset', {
+                    required: 'Select asset',
+                  })}
+                  disabled={isSubmitting}
+                  placeholder="Pool asset"
+                  onChange={(event) => {
+                    setValue('secondAsset', event.target.value);
+                  }}
+                  value={secondAsset}
+                  className={styles.select}
+                >
+                  {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                  <option value="" />
+                  {Object.entries(filtered[firstAsset])
+                    .map(([key, value]) => {
+                      const humanReadableName = key === 'Native'
+                        ? 'Liberland dollar'
+                        : value[1].metadata.symbol;
+                      return (
+                        <option
+                          value={key}
+                          key={key}
+                        >
+                          {humanReadableName}
+                        </option>
+                      );
+                    })}
+                </select>
+              </div>
+              {errors.secondAsset && (
+                <div className={styles.error}>
+                  {errors.secondAsset.message}
+                </div>
+              )}
+            </label>
+          )}
+        </div>
+      </div>
+      <div className={styles.buttonRow}>
+        <div className={styles.closeForm}>
+          <Button type="button" medium onClick={onClose} disabled={isSubmitting}>
+            Close
+          </Button>
+        </div>
+        <div>
+          <Button type="submit" medium primary disabled={isSubmitting}>
+            {isSubmitting ? 'Loading...' : 'Create pair'}
+          </Button>
+        </div>
+      </div>
     </form>
   );
 }
