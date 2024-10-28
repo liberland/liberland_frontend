@@ -12,6 +12,7 @@ import {
   setNominatorTargets,
   unpool, getAdditionalAssets, sendAssetTransfer,
   getAssetData,
+  getAssetDetails,
 } from '../../api/nodeRpcCall';
 import { getHistoryTransfers } from '../../api/explorer';
 
@@ -36,6 +37,11 @@ function* getAdditionalAssetsWorker(action) {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
   const additionalAssets = yield call(getAdditionalAssets, walletAddress, false, isLlmNeeded);
   yield put(walletActions.getAdditionalAssets.success(additionalAssets));
+}
+
+function* getAssetDetailsWorker(action) {
+  const details = yield call(getAssetDetails, action.payload);
+  yield put(walletActions.getAssetsDetails.success(details));
 }
 
 function* getAssetsBalanceWorker(action) {
@@ -141,6 +147,10 @@ function* getAdditionalAssetsWatcher() {
   yield* blockchainWatcher(walletActions.getAdditionalAssets, getAdditionalAssetsWorker);
 }
 
+function* getAssetDetailsWatcher() {
+  yield* blockchainWatcher(walletActions.getAssetsDetails, getAssetDetailsWorker);
+}
+
 function* getAssetsBalanceWatcher() {
   yield* blockchainWatcher(walletActions.getAssetsBalance, getAssetsBalanceWorker);
 }
@@ -198,4 +208,5 @@ export {
   setNominatorTargetsWatcher,
   unpoolWatcher,
   getAssetsBalanceWatcher,
+  getAssetDetailsWatcher,
 };

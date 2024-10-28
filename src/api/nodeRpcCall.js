@@ -310,6 +310,54 @@ const getAssetData = async (asset, address) => {
   }
 };
 
+const getAssetDetails = async (ids) => {
+  try {
+    const api = await getApi();
+    const details = (await api.query.assets.asset.multi(ids)).map((asset) => asset.toJSON());
+    const assetQueries = details.reduce((queries, detail) => {
+      queries.push([api.query.identity.identityOf, detail.admin]);
+      queries.push([api.query.identity.identityOf, detail.freezer]);
+      queries.push([api.query.identity.identityOf, detail.issuer]);
+      queries.push([api.query.identity.identityOf, detail.owner]);
+      return queries;
+    }, []);
+    const assetResults = await api.queryMulti([...assetQueries]);
+    const resolvedIdentity = assetResults.map((result) => {
+      const json = result.toJSON();
+      return Buffer.from(json.info.display.raw.slice(2), 'hex').toString('utf-8');
+    }).reduce((accumulator, item) => {
+      const lastItem = accumulator[accumulator.length - 1];
+      if (!lastItem) {
+        accumulator.push([item]);
+      } else if (lastItem.length < 4) {
+        lastItem.push(item);
+      } else {
+        accumulator.push([item]);
+      }
+      return accumulator;
+    }, []);
+
+    const resolvedDetails = details.map((detail, index) => ({
+      ...detail,
+      supply: detail.supply.toString().startsWith('0x')
+        ? window.BigInt(detail.supply).toString()
+        : detail.supply,
+      identity: {
+        admin: resolvedIdentity[index][0],
+        freezer: resolvedIdentity[index][1],
+        issuer: resolvedIdentity[index][2],
+        owner: resolvedIdentity[index][3],
+      },
+    }));
+
+    return resolvedDetails;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
 const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = false) => {
   try {
     const api = await getApi();
@@ -2802,4 +2850,5 @@ export {
   getUserNfts,
   matchScheduledWithSenateMotions,
   createNewPool,
+  getAssetDetails,
 };
