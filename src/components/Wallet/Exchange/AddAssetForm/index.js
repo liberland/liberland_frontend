@@ -38,6 +38,7 @@ function AddAssetFormDisplay({
 
   React.useEffect(() => {
     dispatch(walletActions.getWallet.call());
+    dispatch(walletActions.getAdditionalAssets.call());
   }, [dispatch]);
 
   const filtered = React.useMemo(() => {
