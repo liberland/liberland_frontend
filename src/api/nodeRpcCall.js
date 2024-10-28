@@ -2335,6 +2335,12 @@ const swapExactTokensForTokens = async (path, amountIn, amountOutMin, sendTo, wa
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+const createNewPool = async (aAsset, bAsset, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.assetConversion.newPool(aAsset, bAsset);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
 const swapTokensForExactTokens = async (path, amountOut, amountInMax, sendTo, walletAddress) => {
   const api = await getApi();
   const extrinsic = api.tx.assetConversion.swapTokensForExactTokens(path, amountOut, amountInMax, sendTo, true);
@@ -2795,4 +2801,5 @@ export {
   decodeRemark,
   getUserNfts,
   matchScheduledWithSenateMotions,
+  createNewPool,
 };

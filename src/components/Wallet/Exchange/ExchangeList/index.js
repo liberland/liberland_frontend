@@ -6,6 +6,7 @@ import { dexActions } from '../../../../redux/actions';
 import stylesPage from '../../../../utils/pagesBase.module.scss';
 import styles from '../styles.module.scss';
 import ExchangeItem from '../ExchangeItem';
+import AddAssetForm from '../AddAssetForm';
 
 function ExchangeList() {
   const dispatch = useDispatch();
@@ -21,6 +22,7 @@ function ExchangeList() {
       <div>Loading..</div>
     );
   }
+
   const { poolsData, assetsPoolData } = dexs;
 
   if (poolsData?.length < 1) {
@@ -30,16 +32,15 @@ function ExchangeList() {
   }
   return (
     <div className={cx(stylesPage.overViewCard, styles.list)}>
-      {
-        poolsData?.map((pool, index) => (
-          <ExchangeItem
-            poolData={pool}
-            assetsPoolData={assetsPoolData}
-            // eslint-disable-next-line react/no-array-index-key
-            key={index + pool.asset1 + pool.asset2}
-          />
-        ))
-}
+      {poolsData?.map((pool, index) => (
+        <ExchangeItem
+          poolData={pool}
+          assetsPoolData={assetsPoolData}
+          // eslint-disable-next-line react/no-array-index-key
+          key={index + pool.asset1 + pool.asset2}
+        />
+      ))}
+      <AddAssetForm poolsData={poolsData} />
     </div>
   );
 }
