@@ -7,6 +7,7 @@ import TextInput from './TextInput';
 import styles from './styles.module.scss';
 
 function InputSearch({
+  id,
   errorTitle,
   register,
   name,
@@ -15,6 +16,7 @@ function InputSearch({
   setValue,
   isRequired,
   trigger,
+  defaultValue,
 }) {
   const inputProps = {
     errorTitle,
@@ -23,8 +25,9 @@ function InputSearch({
     placeholder,
     isRequired,
     validate,
+    id,
   };
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(defaultValue || '');
   const [suggestions, setSuggestions] = useState([]);
   const [isSuggestedListShown, setIsSuggestedListShown] = useState(true);
 
@@ -67,10 +70,10 @@ function InputSearch({
             <button className={styles.close} onClick={() => setIsSuggestedListShown(false)}>&#10005;</button>
             <ul className={styles.suggestionList}>
               {suggestions.map((result) => {
-                const { name: nameUser, id, isConfirmed } = result;
+                const { name: nameUser, id: userId, isConfirmed } = result;
                 return (
                   <li key={id}>
-                    <button onClick={() => handleSuggestionClick(id)}>
+                    <button onClick={() => handleSuggestionClick(userId)}>
                       <span>
                         <b>{nameUser}</b>
                       &nbsp;
@@ -94,6 +97,7 @@ function InputSearch({
 }
 
 InputSearch.propTypes = {
+  id: PropTypes.string,
   errorTitle: PropTypes.string.isRequired,
   register: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
@@ -102,6 +106,7 @@ InputSearch.propTypes = {
   setValue: PropTypes.func.isRequired,
   isRequired: PropTypes.bool.isRequired,
   trigger: PropTypes.func.isRequired,
+  defaultValue: PropTypes.string,
 };
 
 export default InputSearch;
