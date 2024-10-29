@@ -169,5 +169,16 @@ export default function* rootSaga() {
 
     // NFTS
     nftsSagas.getUserNftsWatcher(),
+    nftsSagas.createCollectionWatcher(),
+    nftsSagas.mintNftWatcher(),
+    nftsSagas.destroyNftWatcher(),
+    nftsSagas.setMetadataWatcher(),
+    nftsSagas.setAttributesWatcher(),
+    nftsSagas.sellNftWatcher(),
+    nftsSagas.bidNftWatcher(),
+    nftsSagas.transferNftWatcher(),
+    nftsSagas.getUserCollectionstWatcher(),
+    nftsSagas.getNftsWatcher(),
+    nftsSagas.getNftsOnSaleWatcher(),
   ]);
 }

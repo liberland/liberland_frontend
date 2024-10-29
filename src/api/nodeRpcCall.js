@@ -855,7 +855,6 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
   const [
     councilMembers,
     candidates,
-    // eslint-disable-next-line prefer-const
     currentCandidateVotesByUserQuery,
     runnersUp,
   ] = await api.queryMulti([
@@ -2616,47 +2615,210 @@ const decodeRemark = async (dataToEncode) => {
   return remarkInfo;
 };
 
-const getUserNfts = async (walletAddress) => {
+const decoder = new TextDecoder();
+
+function processData(data) {
+  const decodedData = decoder.decode(data);
+  try {
+    return JSON.parse(decodedData);
+  } catch (e) {
+    return { name: decodedData };
+  }
+}
+const getIpfsHash = (ipfsUrl) => {
+  if (ipfsUrl.startsWith('ipfs://')) {
+    return ipfsUrl.split('/').pop();
+  }
+  return ipfsUrl;
+};
+
+async function processUrlData(ipfsUrl, json = true) {
+  try {
+    const ipfsHash = getIpfsHash(ipfsUrl);
+    const url = `https://${process.env.REACT_APP_PINATA_GATEWAY}/ipfs/${ipfsHash}`;
+    const response = await fetch(url, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch IPFS data: ${response.status} ${response.statusText}`);
+    }
+    return json ? await response.json() : response;
+  } catch (error) {
+    return null;
+  }
+}
+
+const getAllNfts = async (filterIsOnSale = false) => {
   const api = await getApi();
-  const nftEntries = await api.query.nfts.account.entries(walletAddress);
 
-  const collectionIds = [];
-  const nftIds = [];
+  const nftEntries = await api.query.nfts.item.entries();
 
-  nftEntries.forEach(([key]) => {
-    const [collectionId, nftId] = key.args.slice(1);
-    collectionIds.push(collectionId.toString());
-    nftIds.push(nftId.toString());
-  });
+  const collectionIds = nftEntries.map(([key]) => key.args[0].toString());
+  const nftIds = nftEntries.map(([key]) => key.args[1].toString());
 
   const [collectionMetadata, itemMetadata] = await Promise.all([
     api.query.nfts.collectionMetadataOf.multi(collectionIds),
     api.query.nfts.itemMetadataOf.multi(collectionIds.map((id, index) => [id, nftIds[index]])),
   ]);
 
-  const decoder = new TextDecoder();
+  const nftDetails = await Promise.all(
+    nftEntries.map(async ([key], index) => {
+      const [collectionId, nftId] = key.args;
 
-  function processData(data) {
-    const decodedData = decoder.decode(data);
-    return JSON.parse(decodedData);
-  }
-  const nftDetails = collectionIds.map((collectionId, index) => {
-    const collectionData = collectionMetadata[index].unwrap();
-    const itemData = itemMetadata[index].unwrap();
-    return {
-      collectionId,
-      nftId: nftIds[index],
-      collectionMetadata: {
-        data: processData(collectionData.data).name,
-      },
-      itemMetadata: {
-        data: processData(itemData.data).imageUrl,
-      },
-    };
+      const collectionDataOpt = collectionMetadata[index];
+      const collectionMetadataUnwrapped = collectionDataOpt.isNone ? null : collectionDataOpt.unwrap();
+
+      const itemDataOpt = itemMetadata[index];
+      const itemMetadataUnwrapped = itemDataOpt.isNone ? null : itemDataOpt.unwrap();
+      const processedItemData = itemMetadataUnwrapped
+        ? await processUrlData(decoder.decode(itemMetadataUnwrapped.data))
+        : null;
+      let itemPrice;
+      if (filterIsOnSale) {
+        const itemPriceOpt = await api.query.nfts.itemPriceOf(collectionId, nftId);
+        itemPrice = itemPriceOpt.isNone ? null : itemPriceOpt.unwrap()[0].toString();
+        const isOnSale = itemPrice && itemPrice > 0;
+
+        if (!isOnSale) {
+          return null;
+        }
+      }
+
+      const imageUrl = processedItemData?.image;
+      const image = imageUrl ? await processUrlData(imageUrl, false) : null;
+
+      return {
+        collectionId: collectionId.toString(),
+        nftId: nftId.toString(),
+        collectionMetadata: {
+          name: collectionMetadataUnwrapped?.name?.toString(),
+        },
+        itemMetadata: {
+          ...processedItemData,
+          image: image?.url || imageUrl,
+          itemPrice,
+        },
+      };
+    }),
+  );
+
+  return nftDetails.filter((detail) => detail !== null);
+};
+
+async function checkUserCollection(userAddress) {
+  const api = await getApi();
+  const collectionKeys = await api.query.nfts.account.entries(userAddress);
+  const collectionIds = [];
+  const nftIds = [];
+
+  collectionKeys.forEach(([key]) => {
+    const [collectionId, nftId] = key.args.slice(1);
+    collectionIds.push(collectionId.toString());
+    nftIds.push(nftId.toString());
   });
+  return [collectionIds, nftIds];
+}
+
+const getUserNfts = async (walletAddress) => {
+  const api = await getApi();
+
+  const [collectionIds, nftIds] = await checkUserCollection(walletAddress);
+
+  const [collectionMetadata, itemMetadata] = await Promise.all([
+    api.query.nfts.collectionMetadataOf.multi(collectionIds),
+    api.query.nfts.itemMetadataOf.multi(collectionIds.map((id, index) => [id, nftIds[index]])),
+  ]);
+
+  const nftDetails = await Promise.all(
+    collectionIds.map(async (collectionId, index) => {
+      const collectionDataOpt = collectionMetadata[index];
+      const itemDataOpt = itemMetadata[index];
+
+      const collectionData = collectionDataOpt.isNone ? null : collectionDataOpt.unwrap();
+      const itemData = itemDataOpt.isNone ? null : itemDataOpt.unwrap();
+      const processedCollectionData = collectionData ? processData(collectionData.data) : null;
+      const processedItemData = itemData ? await processUrlData(decoder.decode(itemData.data)) : null;
+      const imageUrl = processedItemData?.image;
+      const image = imageUrl ? await processUrlData(imageUrl, false) : null;
+      return {
+        collectionId,
+        nftId: nftIds[index],
+        collectionMetadata: {
+          name: processedCollectionData?.name,
+        },
+        itemMetadata: {
+          ...processedItemData,
+          image: image?.url || imageUrl,
+        },
+      };
+    }),
+  );
 
   return nftDetails;
 };
+
+async function getUserCollection(walletAddress) {
+  const api = await getApi();
+
+  const collectionKeys = await api.query.nfts.collectionAccount.keys(walletAddress);
+
+  const collections = collectionKeys.map(({ args: [address, collectionId] }) => ({
+    address: address.toString(),
+    collectionId: collectionId.toNumber(),
+  }));
+
+  return collections;
+}
+
+async function createCollectionNfts(admin, config, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.create(admin, config);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function mintNFT(collectionId, itemId, mintTo, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.mint(collectionId, itemId, mintTo, null);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function destroyNFT(collectionId, itemId, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.burn(collectionId, itemId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function setMetadata(collectionId, itemId, metadataCID, walletAddress) {
+  const api = await getApi();
+  const metadata = `ipfs://${metadataCID}`;
+  const extrinsic = api.tx.nfts.setMetadata(collectionId, itemId, metadata);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function setAttributes(collectionId, itemId, namespace, key, value, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.setAttribute(collectionId, itemId, namespace, key, value);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function sellNFT(collectionId, itemId, price, walletAddress) {
+  const api = await getApi();
+  const buyer = api.createType('Option<MultiAddress>', null);
+  const extrinsic = api.tx.nfts.setPrice(collectionId, itemId, price, buyer);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function bidNFT(collectionId, itemId, bidPrice, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.buyItem(collectionId, itemId, bidPrice);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function transferNFT(collectionId, itemId, newOwner, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.transfer(collectionId, itemId, newOwner);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
 
 export {
   getBalanceByAddress,
@@ -2789,4 +2951,14 @@ export {
   encodeRemark,
   decodeRemark,
   getUserNfts,
+  createCollectionNfts,
+  mintNFT,
+  destroyNFT,
+  setMetadata,
+  setAttributes,
+  sellNFT,
+  bidNFT,
+  transferNFT,
+  getAllNfts,
+  getUserCollection,
 };

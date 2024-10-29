@@ -1,68 +1,78 @@
 import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { nftsActions } from '../../../redux/actions';
-import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
-import styles from './styles.module.scss';
-import Card from '../../Card';
+import { useSelector, useDispatch } from 'react-redux';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import router from '../../../router';
+
+import { blockchainSelectors } from '../../../redux/selectors';
+import { walletActions } from '../../../redux/actions';
+
 import stylesPage from '../../../utils/pagesBase.module.scss';
 
-function NftsComponent() {
+import RoleHOC from '../../../hocs/RoleHOC';
+import Tabs from '../../Tabs';
+import NftsComponent from './Overview';
+import OwnedNfts from './OwnedNfts';
+import Collections from './Collections';
+import OnSale from './OnSale';
+
+function NFTS() {
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const dispatch = useDispatch();
-  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const nfts = useSelector(nftsSelectors.userNftsSelector);
 
   useEffect(() => {
-    dispatch(nftsActions.getNfts.call(walletAddress));
-  }, [dispatch, walletAddress]);
+    dispatch(walletActions.getWallet.call());
+    dispatch(walletActions.getAdditionalAssets.call());
+    dispatch(walletActions.getTxTransfers.call());
+  }, [dispatch, userWalletAddress]);
 
-  if (!nfts) {
-    return (
-      <div>
-        You dont have any NFTs
-      </div>
-    );
-  }
+  const navigationList = [
+    {
+      route: router.home.wallet,
+      title: 'WALLET',
+    },
+    {
+      route: router.nfts.overview,
+      title: 'OVERVIEW',
+    },
+    {
+      route: router.nfts.ownedNfts,
+      title: 'OWNED NFTS',
+    },
+    {
+      route: router.nfts.collections,
+      title: 'COLLECTIONS',
+    },
+    {
+      route: router.nfts.shop,
+      title: 'ON SALE',
+    },
+  ];
 
   return (
-    <div className={stylesPage.contentWrapper}>
-      <div className={stylesPage.sectionWrapper}>
-        <Card className={stylesPage.overviewWrapper} title="Nfts">
-          <div className={stylesPage.overViewCard}>
-            <div className={styles.nfts}>
-              {nfts.map((nft) => {
-                const {
-                  collectionId, nftId, collectionMetadata, itemMetadata,
-                } = nft;
-                return (
-                  <div key={collectionId + nftId}>
-                    <p>
-                      <b>Collection Id:</b>
-                      {' '}
-                      {collectionId}
-                    </p>
-                    <p>
-                      <b>Name:</b>
-                      {' '}
-                      {collectionMetadata.data}
-                    </p>
-                    <p>
-                      <b>Nft Id:</b>
-                      {' '}
-                      {nftId}
-                    </p>
-                    <br />
-                    <div className={styles.imageWrapper}>
-                      <img src={itemMetadata.data} alt={collectionMetadata.data} className={styles.image} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </Card>
+    <div className={stylesPage.sectionWrapper}>
+      <div className={stylesPage.menuAddressWrapper}>
+        <Tabs navigationList={navigationList} arrowBack />
+      </div>
+
+      <div>
+        <Switch>
+          <Route path={router.nfts.overview} component={NftsComponent} />
+          <Route path={router.nfts.ownedNfts} component={OwnedNfts} />
+          <Route path={router.nfts.collections} component={Collections} />
+          <Route path={router.nfts.shop} component={OnSale} />
+          <Route
+            exact
+            path={router.home.nfts}
+            render={() => (
+              <RoleHOC>
+                <Redirect to={router.nfts.overview} />
+              </RoleHOC>
+            )}
+          />
+        </Switch>
       </div>
     </div>
   );
 }
 
-export default NftsComponent;
+export default NFTS;
