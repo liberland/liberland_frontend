@@ -4,19 +4,22 @@ import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
 import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
 import { walletActions } from '../../../../redux/actions';
-import { createAsset, updateAsset } from '../../../../api/nodeRpcCall';
+import { createOrUpdateAsset } from '../../../../api/nodeRpcCall';
 import ModalRoot from '../../../Modals/ModalRoot';
 import { TextInput } from '../../../InputComponents';
 import Button from '../../../Button/Button';
+import { isValidSubstrateAddress } from '../../../../utils/walletHelpers';
+import InputSearch from '../../../InputComponents/InputSearchAddressName';
 import styles from './styles.module.scss';
 
-function UpdateOrCreateAssetForm({ onClose, isCreate, assetId }) {
+function UpdateOrCreateAssetForm({ onClose, isCreate, defaultValues }) {
   const {
     handleSubmit,
     register,
     setValue,
     watch,
     setError,
+    trigger,
     formState: {
       errors,
       isSubmitting,
@@ -24,6 +27,7 @@ function UpdateOrCreateAssetForm({ onClose, isCreate, assetId }) {
     },
   } = useForm({
     mode: 'onChange',
+    defaultValues,
   });
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
@@ -36,29 +40,30 @@ function UpdateOrCreateAssetForm({ onClose, isCreate, assetId }) {
     symbol,
     decimals,
     balance,
+    admin,
+    issuer,
+    freezer,
   }) => {
     try {
-      if (isCreate) {
-        const nextId = additionalAssets.map((asset) => asset.index)
+      const nextId = isCreate ? (
+        additionalAssets.map((asset) => asset.index)
           .filter(Boolean)
-          .sort((a, b) => b - a)[0] + 1;
+          .sort((a, b) => b - a)[0] + 1
+      ) : defaultValues.id;
 
-        await createAsset({
-          id: nextId,
-          name,
-          symbol,
-          decimals,
-          minBalance: balance,
-          admin: userWalletAddress,
-        });
-      } else {
-        await updateAsset({
-          id: assetId,
-          decimals,
-          name,
-          symbol,
-        });
-      }
+      await createOrUpdateAsset({
+        id: nextId,
+        name,
+        symbol,
+        decimals,
+        minBalance: balance,
+        admin,
+        issuer,
+        freezer,
+        owner: userWalletAddress,
+        isCreate,
+        defaultValues,
+      });
       dispatch(walletActions.getAdditionalAssets.call());
     } catch {
       setError('name', { message: 'Something went wrong' });
@@ -70,7 +75,13 @@ function UpdateOrCreateAssetForm({ onClose, isCreate, assetId }) {
   const decimals = watch('decimals', '');
   const balance = watch('balance', '');
 
-  const submitButtonText = isCreate ? 'Create asset' : 'Update asset';
+  const submitButtonText = isCreate ? 'Create asset (~200 LLD)' : 'Update asset';
+
+  const validateAddress = (v) => (
+    !isValidSubstrateAddress(v)
+      ? 'Invalid Address'
+      : undefined
+  );
 
   if (!userWalletAddress || !additionalAssets) {
     return <div>Loading...</div>;
@@ -87,6 +98,10 @@ function UpdateOrCreateAssetForm({ onClose, isCreate, assetId }) {
           <div className={styles.inputWrapper}>
             <TextInput
               register={register}
+              minLength={{
+                value: 3,
+                message: 'Name must be longer than 2 characters',
+              }}
               name="name"
               errorTitle="Name"
               value={name}
@@ -104,7 +119,11 @@ function UpdateOrCreateAssetForm({ onClose, isCreate, assetId }) {
           )}
           {isSubmitSuccessful && (
             <div className={styles.success}>
-              Asset created successfully
+              Asset
+              {' '}
+              {isCreate ? 'created' : 'updated'}
+              {' '}
+              successfully
             </div>
           )}
         </label>
@@ -114,6 +133,10 @@ function UpdateOrCreateAssetForm({ onClose, isCreate, assetId }) {
             <TextInput
               register={register}
               name="symbol"
+              minLength={{
+                value: 3,
+                message: 'Symbol must be longer than 2 characters',
+              }}
               errorTitle="Symbol"
               value={symbol}
               className={styles.input}
@@ -178,6 +201,76 @@ function UpdateOrCreateAssetForm({ onClose, isCreate, assetId }) {
           </label>
         )}
       </div>
+      <hr className={styles.divider} />
+      <div className={styles.asset}>
+        <label className={styles.wrapper} htmlFor="admin">
+          Admin account
+          <div className={styles.inputWrapper}>
+            <InputSearch
+              id="admin"
+              errorTitle="Admin account"
+              register={register}
+              name="admin"
+              placeholder="Admin"
+              isRequired
+              trigger={trigger}
+              setValue={setValue}
+              validate={validateAddress}
+              defaultValue={defaultValues?.admin}
+            />
+          </div>
+          {errors.admin && (
+            <div className={styles.error}>
+              {errors.admin.message}
+            </div>
+          )}
+        </label>
+        <label className={styles.wrapper} htmlFor="issuer">
+          Issuer account
+          <div className={styles.inputWrapper}>
+            <InputSearch
+              id="issuer"
+              errorTitle="Issuer"
+              register={register}
+              name="issuer"
+              placeholder="Issuer"
+              isRequired
+              trigger={trigger}
+              setValue={setValue}
+              validate={validateAddress}
+              defaultValue={defaultValues?.issuer}
+            />
+          </div>
+          {errors.issuer && (
+            <div className={styles.error}>
+              {errors.issuer.message}
+            </div>
+          )}
+        </label>
+        <label className={styles.wrapper} htmlFor="freezer">
+          Freezer account
+          <div className={styles.inputWrapper}>
+            <InputSearch
+              id="freezer"
+              errorTitle="Freezer"
+              register={register}
+              name="freezer"
+              placeholder="Freezer"
+              isRequired
+              trigger={trigger}
+              setValue={setValue}
+              validate={validateAddress}
+              defaultValue={defaultValues?.freezer}
+            />
+          </div>
+          {errors.freezer && (
+            <div className={styles.error}>
+              {errors.freezer.message}
+            </div>
+          )}
+        </label>
+      </div>
+      <hr className={styles.divider} />
       <div className={styles.buttonRow}>
         <div className={styles.closeForm}>
           <Button disabled={isSubmitting} medium onClick={onClose}>
@@ -199,28 +292,36 @@ function UpdateOrCreateAssetForm({ onClose, isCreate, assetId }) {
   );
 }
 
+const defaultValues = PropTypes.shape({
+  id: PropTypes.number,
+  name: PropTypes.string,
+  symbol: PropTypes.string,
+  decimals: PropTypes.string,
+  balance: PropTypes.string,
+  admin: PropTypes.string,
+  issuer: PropTypes.string,
+  freezer: PropTypes.string,
+});
+
 UpdateOrCreateAssetForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   isCreate: PropTypes.bool,
-  assetId: PropTypes.oneOf([
-    PropTypes.string,
-    PropTypes.number,
-  ]),
+  defaultValues,
 };
 
 function UpdateOrCreateAssetFormModalWrapper({
-  isCreate, assetId,
+  isCreate, defaultValues: dV,
 }) {
   const [show, setShow] = React.useState();
   return (
-    <div className={styles.modal}>
-      <Button primary medium onClick={() => setShow(true)}>
-        {isCreate ? 'Create asset' : 'Update asset information'}
+    <div className={isCreate ? styles.modal : undefined}>
+      <Button primary nano={!isCreate} medium={isCreate} onClick={() => setShow(true)}>
+        {isCreate ? 'Create asset' : 'Update'}
       </Button>
       {show && (
         <ModalRoot>
           <UpdateOrCreateAssetForm
-            assetId={assetId}
+            defaultValues={dV}
             isCreate={isCreate}
             onClose={() => setShow(false)}
           />
@@ -232,10 +333,7 @@ function UpdateOrCreateAssetFormModalWrapper({
 
 UpdateOrCreateAssetFormModalWrapper.propTypes = {
   isCreate: PropTypes.bool,
-  assetId: PropTypes.oneOf([
-    PropTypes.string,
-    PropTypes.number,
-  ]),
+  defaultValues,
 };
 
 export default UpdateOrCreateAssetFormModalWrapper;

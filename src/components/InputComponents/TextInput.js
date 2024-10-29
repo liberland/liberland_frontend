@@ -5,6 +5,7 @@ import cx from 'classnames';
 import styles from './styles.module.scss';
 
 function TextInput({
+  id,
   register,
   name,
   placeholder,
@@ -28,6 +29,7 @@ function TextInput({
       {Icon && <Icon className={styles.inputIcon} />}
       <input
         className={cx(styles.input, { [styles.withIcon]: Icon && withIcon })}
+        id={id}
         name={name}
         placeholder={placeholder}
         width={width}

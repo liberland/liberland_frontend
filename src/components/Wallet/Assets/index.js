@@ -46,10 +46,22 @@ function Assets() {
       ...assetDetails[index]?.identity,
       supply: `${
         formatCustom(assetDetails[index]?.supply ?? '0', parseInt(asset.metadata.decimals))} ${asset.metadata.symbol}`,
-      update: assetDetails[index]?.identity.owner === userWalletAddress
-        || assetDetails[index]?.identity.admin === userWalletAddress
-        ? <UpdateOrCreateAssetFormModalWrapper assetId={asset.index} />
-        : undefined,
+      update: assetDetails[index]?.owner === userWalletAddress
+        || assetDetails[index]?.admin === userWalletAddress
+        ? (
+          <UpdateOrCreateAssetFormModalWrapper
+            defaultValues={{
+              admin: assetDetails[index]?.admin,
+              balance: assetDetails[index]?.balance,
+              decimals: asset.metadata.decimals,
+              freezer: assetDetails[index]?.freezer,
+              id: asset.index,
+              issuer: assetDetails[index]?.issuer,
+              name: asset.metadata.name,
+              symbol: asset.metadata.symbol,
+            }}
+          />
+        ) : undefined,
     }
   ));
 
