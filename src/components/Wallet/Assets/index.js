@@ -2,15 +2,19 @@ import React from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 import { useSelector, useDispatch } from 'react-redux';
 import cx from 'classnames';
-import { walletSelectors } from '../../../redux/selectors';
+import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
 import { walletActions } from '../../../redux/actions';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import Card from '../../Card';
 import Table from '../../Table';
 import styles from './styles.module.scss';
 import { formatCustom } from '../../../utils/walletHelpers';
+import UpdateOrCreateAssetFormModalWrapper from './UpdateOrCreateAssetForm';
 
 function Assets() {
+  const userWalletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const assetDetails = useSelector(walletSelectors.selectorAssetsDetails);
   const dispatch = useDispatch();
@@ -31,7 +35,7 @@ function Assets() {
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1025px)');
 
-  if (!assetDetails || !additionalAssets) {
+  if (!assetDetails || !additionalAssets || !userWalletAddress) {
     return <div>Loading...</div>;
   }
 
@@ -42,6 +46,10 @@ function Assets() {
       ...assetDetails[index]?.identity,
       supply: `${
         formatCustom(assetDetails[index]?.supply ?? '0', parseInt(asset.metadata.decimals))} ${asset.metadata.symbol}`,
+      update: assetDetails[index]?.identity.owner === userWalletAddress
+        || assetDetails[index]?.identity.admin === userWalletAddress
+        ? <UpdateOrCreateAssetFormModalWrapper assetId={asset.index} />
+        : undefined,
     }
   ));
 
@@ -86,6 +94,10 @@ function Assets() {
                 Header: 'Supply',
                 accessor: 'supply',
               },
+              {
+                Header: 'Update',
+                accessor: 'update',
+              },
             ] : [
               {
                 Header: 'Symbol',
@@ -95,8 +107,13 @@ function Assets() {
                 Header: 'Owner',
                 accessor: 'owner',
               },
+              {
+                Header: 'Update',
+                accessor: 'update',
+              },
             ]}
           />
+          <UpdateOrCreateAssetFormModalWrapper isCreate />
         </Card>
       </div>
     </div>

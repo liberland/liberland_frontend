@@ -267,6 +267,33 @@ const getIdentity = async (address) => {
   }
 };
 
+const createAsset = async ({
+  id, name, symbol, decimals, minBalance, admin,
+}) => {
+  try {
+    const api = await getApi();
+    await api.tx.assets.create(id, admin, minBalance);
+    await api.tx.assets.setMetadata(id, name, symbol, decimals);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const updateAsset = async ({
+  id, name, symbol, decimals,
+}) => {
+  try {
+    const api = await getApi();
+    await api.tx.assets.setMetadata(id, name, symbol, decimals);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
 const getLlmBalances = async (addresses) => {
   try {
     const api = await getApi();
@@ -2808,4 +2835,6 @@ export {
   decodeRemark,
   getUserNfts,
   getAssetDetails,
+  createAsset,
+  updateAsset,
 };
