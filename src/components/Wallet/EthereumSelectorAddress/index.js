@@ -66,9 +66,9 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
   if (error) {
     return (
       <div className={styles.error}>
-        {error.message || typeof error === 'string'
-          ? error
-          : 'Something went wrong'}
+        Something went wrong.
+        <br />
+        Try reconnecting provider.
       </div>
     );
   }
