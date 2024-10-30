@@ -6,12 +6,12 @@ import cx from 'classnames';
 import router from '../../router';
 import { blockchainActions, walletActions } from '../../redux/actions';
 import { blockchainSelectors, identitySelectors, walletSelectors } from '../../redux/selectors';
-import { decodeCall, decodeRemark } from '../../api/nodeRpcCall';
+import { decodeCall } from '../../api/nodeRpcCall';
 import styles from './styles.module.scss';
 import stylesAnim from '../Voting/Referendum/Items/item.module.scss';
 import { formatAssets, formatDollars, formatMerits } from '../../utils/walletHelpers';
-import formatDate from '../../utils/formatDate';
 import { useAddIdToContext } from './useAddIdToContect.js';
+import useRemark from '../../hooks/useRemark';
 /* eslint-disable react/forbid-prop-types */
 const ProposalProp = PropTypes.object;
 
@@ -359,44 +359,27 @@ function TransferAsset({ proposal }) {
 TransferAsset.propTypes = { proposal: ProposalProp.isRequired };
 
 function RemarkInfo({ proposal }) {
-  const [data, setData] = useState(null);
-  const bytes = proposal.get('args').data;
+  const remark = useRemark(proposal);
 
-  useEffect(() => {
-    decodeRemark(bytes).then((item) => {
-      setData({
-        currency: item.currency,
-        date: item.date,
-        amountInUsd: item.amountInUSDAtDateOfPayment,
-        category: item.category,
-        project: item.project,
-        supplier: item.supplier,
-        description: item.description,
-        finalDestination: item.finalDestination,
-      });
-    });
-  }, [bytes, proposal]);
-
-  if (!data) {
+  if (remark.decoded) {
     return (
       <div>
-        {new TextDecoder('utf-8').decode(bytes)}
+        {remark.decoded}
       </div>
     );
   }
 
   const {
-    project,
-    description,
-    category,
-    supplier,
-    currency,
-    date,
-    finalDestination,
     amountInUsd,
-  } = data;
-  const dateTime = new Date(date.toNumber());
-  const formatedDate = formatDate(dateTime, false, false);
+    category,
+    currency,
+    description,
+    finalDestination,
+    formatedDate,
+    project,
+    supplier,
+  } = remark;
+
   return (
     <>
       <div>
@@ -427,7 +410,7 @@ function RemarkInfo({ proposal }) {
       <div>
         <b>Amount in USD:</b>
         {' '}
-        {amountInUsd.toString()}
+        {amountInUsd}
       </div>
       <div>
         <b>Final Destination:</b>
@@ -480,11 +463,13 @@ export function Proposal({ proposal, isDetailsHidden }) {
 
 Proposal.defaultProps = {
   isDetailsHidden: false,
+  isTableRow: false,
   names: {},
 };
 
 Proposal.propTypes = {
   proposal: ProposalProp.isRequired,
   isDetailsHidden: PropTypes.bool,
+  isTableRow: PropTypes.bool,
   names: PropTypes.object,
 };
