@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { formatDistance, format } from 'date-fns';
+import { intervalToDuration, format } from 'date-fns';
 import congressionalCountdown from './styles.module.scss';
 import Card from '../../../Card';
 import {
@@ -12,24 +12,29 @@ import stylesPage from '../../../../utils/pagesBase.module.scss';
 function CongressionalCountdown({ termDuration }) {
   const currentBlockTimestamp = useSelector(blockchainSelectors.blockTimestamp);
   const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
-  const remaining = currentBlockNumber % termDuration;
+  const remaining = termDuration - (currentBlockNumber % termDuration);
   const blockDurationMilis = 6000;
   const untilEnd = new Date(currentBlockTimestamp + (remaining * blockDurationMilis));
 
   const ratio = Math.round(100 * (1 - (remaining / termDuration)));
+
+  const { days, hours } = intervalToDuration(
+    {
+      start: new Date(currentBlockTimestamp),
+      end: untilEnd,
+    },
+  );
 
   return (
     <Card className={stylesPage.overviewWrapper} title="Countdown until end of election">
       <div className={congressionalCountdown.countdown}>
         Election ends in
         {' '}
-        {formatDistance(
-          untilEnd,
-          new Date(currentBlockTimestamp),
-          {
-            addSuffix: true,
-          },
-        )}
+        {days === 1 && '1 day'}
+        {days > 1 && `${days} days`}
+        {hours === 1 && ' 1 hour'}
+        {hours > 1 && ` ${hours} hours`}
+        {!days && !hours && 'less than 1 hour'}
       </div>
       <time dateTime={untilEnd.toString()} className={congressionalCountdown.countdown}>
         Election end date:
