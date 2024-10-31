@@ -4,9 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { blockchainActions } from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
 import { decodeCall } from '../../../api/nodeRpcCall';
-import { Proposal } from '..';
 
-export function Preimage({ hash, len, isDetailsHidden }) {
+export function Preimage({
+  hash,
+  len,
+  isDetailsHidden,
+  children,
+}) {
   const dispatch = useDispatch();
   const [call, setCall] = React.useState(null);
   const preimages = useSelector(blockchainSelectors.preimages);
@@ -38,9 +42,13 @@ export function Preimage({ hash, len, isDetailsHidden }) {
       </div>
     );
   }
-  if (call === null) return <div>Loading details...</div>;
+  if (call === null) {
+    return <div>Loading details...</div>;
+  }
 
-  return <Proposal proposal={call} isDetailsHidden={isDetailsHidden} />;
+  return (
+    <>{children(call, isDetailsHidden)}</>
+  );
 }
 
 Preimage.propTypes = {
@@ -49,6 +57,7 @@ Preimage.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   len: PropTypes.object.isRequired,
   isDetailsHidden: PropTypes.bool.isRequired,
+  children: PropTypes.func.isRequired,
 };
 
 export default Preimage;
