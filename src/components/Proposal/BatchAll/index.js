@@ -1,24 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { isFastTrackProposal } from '../utils';
 import FastTrackedReferendum from '../FastTrackedReferendum';
 
 function BatchAll({ proposal, children }) {
-  function fastTrackMatches(prop, fastTrack) {
-    const fastTrackHash = fastTrack.args[0];
-    const p = prop.args[0];
-    if (p.isLookup) return p.asLookup.hash_.eq(fastTrackHash);
-
-    // our FE only uses Lookup
-    return false;
-  }
-
   const { args: [calls] } = proposal;
-  if (calls.length === 2
-    && calls[0].section === 'democracy'
-    && calls[0].method === 'externalPropose'
-    && calls[1].section === 'democracy'
-    && calls[1].method === 'fastTrack'
-    && fastTrackMatches(calls[0], calls[1])) {
+  if (isFastTrackProposal(proposal)) {
     return (
       <FastTrackedReferendum proposal={calls[0]} fastTrack={calls[1]}>
         {children}

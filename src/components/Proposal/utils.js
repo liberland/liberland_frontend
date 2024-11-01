@@ -1,63 +1,106 @@
 /* eslint-disable no-param-reassign */
-function groupProposals(proposals, methodFn = (prop) => prop.method, sectionFn = (prop) => prop.section) {
+function groupProposals(proposals) {
   return proposals.reduce((grouped, proposal) => {
-    const proposalMethod = methodFn(proposal) || 'raw';
-    const proposalSection = sectionFn(proposal) || 'raw';
-    grouped[proposalMethod] ||= {};
-    grouped[proposalMethod][proposalSection] ||= [];
-    grouped[proposalMethod][proposalSection].push(proposal);
+    const {
+      method,
+      section,
+    } = proposal.proposal.toHuman();
+
+    grouped[method] ||= {};
+    grouped[method][section] ||= [];
+    grouped[method][section].push(proposal);
     return grouped;
   }, {});
 }
 
 function isTableReady(proposal) {
-  const proposalMethod = proposal.method || 'raw';
-  const proposalSection = proposal.section || 'raw';
+  const {
+    method,
+    section,
+  } = proposal.proposal.toHuman();
 
-  if (proposalMethod === 'transfer' && proposalSection === 'balances') {
+  if (method === 'transfer' && section === 'balances') {
     return true;
   }
-  if ((proposalMethod === 'sendLlmToPolitipool' || proposalMethod === 'sendLlm') && proposalSection === 'llm') {
+  if ((method === 'sendLlmToPolitipool' || method === 'sendLlm') && section === 'llm') {
     return true;
   }
-  if (proposalMethod === 'transfer' && proposalSection === 'assets') {
+  if (method === 'transfer' && section === 'assets') {
     return true;
   }
-  if (proposalMethod === 'remark' && proposalSection === 'llm') {
+  if (method === 'remark' && section === 'llm') {
     return true;
   }
   return false;
 }
 
-function proposalHeading(proposal) {
-  const proposalMethod = proposal.method || 'raw';
-  const proposalSection = proposal.section || 'raw';
+function isFastTrackProposal(proposal) {
+  function fastTrackMatches(prop, fastTrack) {
+    const fastTrackHash = fastTrack.args[0];
+    const p = prop.args[0];
+    if (p.isLookup) return p.asLookup.hash_.eq(fastTrackHash);
 
-  if (proposalMethod === 'repealLegislation') {
+    // our FE only uses Lookup
+    return false;
+  }
+  const { args: [calls] } = proposal;
+  return calls.length === 2
+    && calls[0].section === 'democracy'
+    && calls[0].method === 'externalPropose'
+    && calls[1].section === 'democracy'
+    && calls[1].method === 'fastTrack'
+    && fastTrackMatches(calls[0], calls[1]);
+}
+
+function unBatchProposals(proposals) {
+  return proposals.reduce((unbatched, proposal) => {
+    const {
+      method,
+    } = proposal.proposal.toHuman();
+    if (method === 'batchAll' && !isFastTrackProposal(proposal.proposal)) {
+      const { args: [calls] } = proposal.proposal;
+      unbatched.push(...calls.map((call) => ({
+        ...proposal,
+        proposal: call,
+      })));
+    } else {
+      unbatched.push(proposal);
+    }
+    return unbatched;
+  }, []);
+}
+
+function proposalHeading(proposal) {
+  const {
+    method,
+    section,
+  } = proposal.proposal.toHuman();
+
+  if (method === 'repealLegislation') {
     return 'Repeal legislation';
-  } if (proposalMethod === 'repealLegislationSection') {
+  } if (method === 'repealLegislationSection') {
     return 'Repeal legislation section';
-  } if (proposalMethod === 'amendLegislation') {
+  } if (method === 'amendLegislation') {
     return 'Amend legislation';
-  } if (proposalMethod === 'addLegislation') {
+  } if (method === 'addLegislation') {
     return 'Add legislation';
-  } if (proposalMethod === 'batchAll') {
+  } if (method === 'batchAll') {
     return 'Batch';
-  } if (proposalMethod === 'externalProposeMajority') {
+  } if (method === 'externalProposeMajority') {
     return 'Propose majority';
-  } if (proposalMethod === 'blacklist' && proposalSection === 'democracy') {
+  } if (method === 'blacklist' && section === 'democracy') {
     return 'Blacklist';
-  } if (proposalMethod === 'execute' && (proposalSection === 'councilAccount' || proposalSection === 'senateAccount')) {
+  } if (method === 'execute' && (section === 'councilAccount' || section === 'senateAccount')) {
     return 'Execute';
-  } if (proposalMethod === 'schedule' && proposalSection === 'scheduler') {
+  } if (method === 'schedule' && section === 'scheduler') {
     return 'Schedule';
-  } if (proposalMethod === 'transfer' && proposalSection === 'balances') {
+  } if (method === 'transfer' && section === 'balances') {
     return 'Transfer LLD';
-  } if ((proposalMethod === 'sendLlmToPolitipool' || proposalMethod === 'sendLlm') && proposalSection === 'llm') {
+  } if ((method === 'sendLlmToPolitipool' || method === 'sendLlm') && section === 'llm') {
     return 'Transfer LLM';
-  } if (proposalMethod === 'transfer' && proposalSection === 'assets') {
+  } if (method === 'transfer' && section === 'assets') {
     return 'Transfer assets';
-  } if (proposalMethod === 'remark' && proposalSection === 'llm') {
+  } if (method === 'remark' && section === 'llm') {
     return 'Remark';
   }
 
@@ -68,4 +111,6 @@ export {
   groupProposals,
   isTableReady,
   proposalHeading,
+  unBatchProposals,
+  isFastTrackProposal,
 };

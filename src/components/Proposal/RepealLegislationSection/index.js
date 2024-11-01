@@ -26,7 +26,7 @@ function RepealLegislationSection({ proposal }) {
 }
 RepealLegislationSection.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
-  proposal: PropTypes.object({}),
+  proposal: PropTypes.object,
 };
 
 export default RepealLegislationSection;

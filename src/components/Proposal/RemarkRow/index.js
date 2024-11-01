@@ -7,7 +7,7 @@ function RemarkRow({ proposal, extra }) {
 
   if (remark.decoded) {
     return (
-      <tr>
+      <>
         <td colSpan={8}>
           {remark.decoded}
         </td>
@@ -16,7 +16,7 @@ function RemarkRow({ proposal, extra }) {
             {extra}
           </td>
         )}
-      </tr>
+      </>
     );
   }
 

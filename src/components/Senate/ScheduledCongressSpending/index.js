@@ -6,7 +6,12 @@ import { senateSelectors } from '../../../redux/selectors';
 import Card from '../../Card';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import Button from '../../Button/Button';
-import { groupProposals, proposalHeading, isTableReady } from '../../Proposal/utils';
+import {
+  groupProposals,
+  proposalHeading,
+  isTableReady,
+  unBatchProposals,
+} from '../../Proposal/utils';
 import { MotionProvider } from '../../WalletCongresSenate/ContextMotions';
 import ProposalTable from '../../Proposal/ProposalTable';
 import styles from './styles.module.scss';
@@ -21,14 +26,12 @@ function ScheduledCongressSpending({ isVetoButton }) {
   }, [dispatch]);
 
   const congressOnly = React.useMemo(
-    () => scheduledCalls?.filter(({ sectionType }) => sectionType === 'congress') || [],
+    () => unBatchProposals(scheduledCalls?.filter(({ sectionType }) => sectionType === 'congress') || []),
     [scheduledCalls],
   );
 
   const grouped = React.useMemo(() => groupProposals(
     congressOnly,
-    ({ preimage, proposal }) => (preimage || proposal).method,
-    ({ preimage, proposal }) => (preimage || proposal).section,
   ), [congressOnly]);
 
   if (!congressOnly.length) {

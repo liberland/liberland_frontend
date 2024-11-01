@@ -4,29 +4,31 @@ import { Proposal } from '..';
 
 function ProposalTable({ proposals, controls }) {
   const proposal = proposals[0];
-  const proposalMethod = proposal.method;
-  const proposalSection = proposal.section;
+  const {
+    method,
+    section,
+  } = proposal.toHuman();
 
   const headings = React.useMemo(() => {
-    if (proposalMethod === 'transfer' && proposalSection === 'balances') {
+    if (method === 'transfer' && section === 'balances') {
       return [
         'Transfer',
         'To',
       ];
     }
-    if ((proposalMethod === 'sendLlmToPolitipool' || proposalMethod === 'sendLlm') && proposalSection === 'llm') {
+    if ((method === 'sendLlmToPolitipool' || method === 'sendLlm') && section === 'llm') {
       return [
         'Transfer',
         'To',
       ];
     }
-    if (proposalMethod === 'transfer' && proposalSection === 'assets') {
+    if (method === 'transfer' && section === 'assets') {
       return [
         'Transfer',
         'To',
       ];
     }
-    if (proposalMethod === 'remark' && proposalSection === 'llm') {
+    if (method === 'remark' && section === 'llm') {
       return [
         'Category',
         'Project',
@@ -39,9 +41,9 @@ function ProposalTable({ proposals, controls }) {
       ];
     }
     // eslint-disable-next-line no-console
-    console.warn(`Trying to display proposal ${proposalMethod}/${proposalSection} as table. Unsupported`);
+    console.warn(`Trying to display proposal ${method}/${section} as table. Unsupported`);
     return [];
-  }, [proposalMethod, proposalSection]);
+  }, [method, section]);
 
   return (
     <table>
@@ -78,7 +80,7 @@ function ProposalTable({ proposals, controls }) {
 ProposalTable.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   proposals: PropTypes.shape(PropTypes.object.isRequired).isRequired,
-  controls: PropTypes.arrayOf(PropTypes.node.isRequired),
+  controls: PropTypes.arrayOf(PropTypes.node),
 };
 
 export default ProposalTable;
