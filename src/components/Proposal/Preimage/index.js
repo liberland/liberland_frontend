@@ -5,7 +5,7 @@ import { blockchainActions } from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
 import { decodeCall } from '../../../api/nodeRpcCall';
 
-export function Preimage({
+function Preimage({
   hash,
   len,
   isDetailsHidden,
@@ -33,7 +33,9 @@ export function Preimage({
     })();
   }, [preimage, call, setCall]);
 
-  if (preimage === undefined) return <div>Loading details...</div>;
+  if (preimage === undefined) {
+    return <div>Loading details...</div>;
+  }
   if (preimage.isNone) {
     return (
       <div>

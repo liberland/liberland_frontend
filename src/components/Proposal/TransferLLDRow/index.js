@@ -10,12 +10,14 @@ function TransferLLD({ proposal }) {
   } = useTransferLLD(proposal);
 
   return (
-    <div>
-      <b>Transfer</b>
-      {` ${formattedValue} (LLD) `}
-      <b>to</b>
-      {` ${identity ? `${identity} (${accountId})` : accountId}`}
-    </div>
+    <tr>
+      <td>
+        {`${formattedValue} (LLD) `}
+      </td>
+      <td>
+        {`${identity ? `${identity} (${accountId})` : accountId}`}
+      </td>
+    </tr>
   );
 }
 

@@ -1,27 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { identitySelectors, walletSelectors } from '../../../redux/selectors';
-import { walletActions } from '../../../redux/actions';
-import { formatAssets } from '../../../utils/walletHelpers';
-import { useAddIdToContext } from '../hooks/useAddIdToContext';
+import useTransferAsset from '../hooks/useTransferAsset';
 
 function TransferAsset({ proposal }) {
-  const dispatch = useDispatch();
-  const assetId = proposal.args[0];
-  const target = proposal.args[1].toString();
-  const value = proposal.args[2].toString();
-  useAddIdToContext(target);
-
-  const names = useSelector(identitySelectors.selectorIdentityMotions);
-  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
-  const [asset] = additionalAssets.filter((item) => item.index === Number(assetId));
-  const formattedValue = asset ? formatAssets(value, asset?.metadata?.decimals) : value;
-  const identity = names?.[target]?.identity;
-
-  React.useEffect(() => {
-    dispatch(walletActions.getAdditionalAssets.call(true));
-  }, [dispatch]);
+  const {
+    asset,
+    assetId,
+    formattedValue,
+    identity,
+    target,
+  } = useTransferAsset(proposal);
 
   return (
     <div>

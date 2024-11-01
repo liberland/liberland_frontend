@@ -14,8 +14,12 @@ import TransferLLM from './TransferLLM';
 import TransferAsset from './TransferAsset';
 import RemarkInfo from './RemarkInfo';
 import Raw from './Raw';
+import RemarkRow from './RemarkRow';
+import TransferLLMRow from './TransferLLMRow';
+import TransferAssetRow from './TransferAssetRow';
+import TransferLLDRow from './TransferLLDRow';
 
-export function Proposal({ proposal, isDetailsHidden }) {
+export function Proposal({ proposal, isDetailsHidden, isTableRow }) {
   const proposalMethod = proposal.method;
   const proposalSection = proposal.section;
   if (proposalMethod === 'repealLegislation') {
@@ -27,11 +31,23 @@ export function Proposal({ proposal, isDetailsHidden }) {
   } if (proposalMethod === 'addLegislation') {
     return <AddLegislation {...{ proposal }} isDetailsHidden={isDetailsHidden} />;
   } if (proposalMethod === 'batchAll') {
-    return <BatchAll {...{ proposal }} />;
+    return (
+      <BatchAll {...{ proposal }}>
+        {(prop) => <Proposal proposal={prop} />}
+      </BatchAll>
+    );
   } if (proposalMethod === 'externalProposeMajority') {
-    return <Referendum {...{ proposal }} />;
+    return (
+      <Referendum {...{ proposal }}>
+        {(prop) => <Proposal proposal={prop} />}
+      </Referendum>
+    );
   } if (proposalMethod === 'blacklist' && proposalSection === 'democracy') {
-    return <Blacklist {...{ proposal }} />;
+    return (
+      <Blacklist {...{ proposal }}>
+        {(prop) => <Proposal proposal={prop} />}
+      </Blacklist>
+    );
   } if (proposalMethod === 'execute' && (proposalSection === 'councilAccount' || proposalSection === 'senateAccount')) {
     return (
       <CouncilSenateExecute {...{ proposal }}>
@@ -45,13 +61,13 @@ export function Proposal({ proposal, isDetailsHidden }) {
       </Schedule>
     );
   } if (proposalMethod === 'transfer' && proposalSection === 'balances') {
-    return <TransferLLD {...{ proposal }} />;
+    return isTableRow ? <TransferLLDRow {...{ proposal }} /> : <TransferLLD {...{ proposal }} />;
   } if ((proposalMethod === 'sendLlmToPolitipool' || proposalMethod === 'sendLlm') && proposalSection === 'llm') {
-    return <TransferLLM {...{ proposal }} />;
+    return isTableRow ? <TransferLLMRow {...{ proposal }} /> : <TransferLLM {...{ proposal }} />;
   } if (proposalMethod === 'transfer' && proposalSection === 'assets') {
-    return <TransferAsset {...{ proposal }} />;
+    return isTableRow ? <TransferAsset {...{ proposal }} /> : <TransferAssetRow {...{ proposal }} />;
   } if (proposalMethod === 'remark' && proposalSection === 'llm') {
-    return <RemarkInfo {...{ proposal }} />;
+    return isTableRow ? <RemarkRow {...{ proposal }} /> : <RemarkInfo {...{ proposal }} />;
   }
 
   return <Raw {...{ proposal }} />;

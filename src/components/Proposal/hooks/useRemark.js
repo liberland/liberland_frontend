@@ -1,6 +1,6 @@
 import React from 'react';
-import formatDate from '../utils/formatDate';
-import { decodeRemark } from '../api/nodeRpcCall';
+import formatDate from '../../../utils/formatDate';
+import { decodeRemark } from '../../../api/nodeRpcCall';
 
 function useRemark(proposal) {
   const [data, setData] = React.useState(null);
