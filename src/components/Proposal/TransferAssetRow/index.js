@@ -12,14 +12,14 @@ function TransferAssetRow({ proposal }) {
   } = useTransferAsset(proposal);
 
   return (
-    <tr>
+    <>
       <td>
         {`${formattedValue} (${asset?.metadata?.symbol || assetId}) `}
       </td>
       <td>
         {`${identity ? `${identity} (${target})` : target}`}
       </td>
-    </tr>
+    </>
   );
 }
 

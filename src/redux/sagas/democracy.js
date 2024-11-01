@@ -23,7 +23,7 @@ import {
 
 // WORKERS
 
-function getProposers(crossReferencedList, isProposer = false) {
+function getProposers(crossReferencedList = [], isProposer = false) {
   const newMapedList = crossReferencedList.map((proposal) => {
     const list = proposal.centralizedDatas.map((item) => item.proposerAddress);
     return isProposer ? [proposal.proposer, ...list] : [...list];

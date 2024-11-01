@@ -32,7 +32,7 @@ function RemarkRow({ proposal, extra }) {
   } = remark;
 
   return (
-    <tr>
+    <>
       <td>
         {category}
       </td>
@@ -60,7 +60,7 @@ function RemarkRow({ proposal, extra }) {
       <td>
         {extra}
       </td>
-    </tr>
+    </>
   );
 }
 

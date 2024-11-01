@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Proposal } from '..';
 
-function ProposalTable({ proposals }) {
+function ProposalTable({ proposals, controls }) {
   const proposal = proposals[0];
   const proposalMethod = proposal.method;
   const proposalSection = proposal.section;
@@ -36,7 +36,6 @@ function ProposalTable({ proposals }) {
         'Amount in USD',
         'Final Destination',
         'Date',
-        'Controls',
       ];
     }
     // eslint-disable-next-line no-console
@@ -53,11 +52,23 @@ function ProposalTable({ proposals }) {
               {heading}
             </th>
           ))}
+          {controls && (
+            <th>
+              Controls
+            </th>
+          )}
         </tr>
       </thead>
       <tbody>
-        {proposals.map((prop) => (
-          <Proposal proposal={prop} key={prop} />
+        {proposals.map((prop, index) => (
+          <tr key={prop}>
+            <Proposal proposal={prop} isTableRow />
+            {controls && (
+              <td>
+                {controls[index]}
+              </td>
+            )}
+          </tr>
         ))}
       </tbody>
     </table>
@@ -67,6 +78,7 @@ function ProposalTable({ proposals }) {
 ProposalTable.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   proposals: PropTypes.shape(PropTypes.object.isRequired).isRequired,
+  controls: PropTypes.arrayOf(PropTypes.node.isRequired),
 };
 
 export default ProposalTable;

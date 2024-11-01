@@ -8,3 +8,5 @@ function Raw({ proposal }) {
 
 // eslint-disable-next-line react/forbid-prop-types
 Raw.propTypes = { proposal: PropTypes.object };
+
+export default Raw;

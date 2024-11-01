@@ -11,14 +11,14 @@ function TransferLLMRow({ proposal }) {
   } = useTransferLLM(proposal);
 
   return (
-    <tr>
+    <>
       <td>
         {`${formattedValue} (${symbol})`}
       </td>
       <td>
         {`${identity ? `${identity} (${accountId})` : accountId}`}
       </td>
-    </tr>
+    </>
   );
 }
 

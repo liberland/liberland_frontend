@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign */
-function groupProposals(proposals) {
+function groupProposals(proposals, methodFn = (prop) => prop.method, sectionFn = (prop) => prop.section) {
   return proposals.reduce((grouped, proposal) => {
-    const proposalMethod = proposal.method || 'raw';
-    const proposalSection = proposal.section || 'raw';
+    const proposalMethod = methodFn(proposal) || 'raw';
+    const proposalSection = sectionFn(proposal) || 'raw';
     grouped[proposalMethod] ||= {};
     grouped[proposalMethod][proposalSection] ||= [];
     grouped[proposalMethod][proposalSection].push(proposal);
@@ -64,7 +64,7 @@ function proposalHeading(proposal) {
   return 'Raw';
 }
 
-export default {
+export {
   groupProposals,
   isTableReady,
   proposalHeading,

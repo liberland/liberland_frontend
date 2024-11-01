@@ -6,9 +6,11 @@ import { senateSelectors } from '../../../redux/selectors';
 import Card from '../../Card';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import Button from '../../Button/Button';
-import styles from './styles.module.scss';
+import { groupProposals, proposalHeading, isTableReady } from '../../Proposal/utils';
 import { MotionProvider } from '../../WalletCongresSenate/ContextMotions';
-import RemarkTable from '../../Proposal/RemarkTable';
+import ProposalTable from '../../Proposal/ProposalTable';
+import styles from './styles.module.scss';
+import { Proposal } from '../../Proposal';
 
 function ScheduledCongressSpending({ isVetoButton }) {
   const dispatch = useDispatch();
@@ -18,46 +20,49 @@ function ScheduledCongressSpending({ isVetoButton }) {
     dispatch(senateActions.senateGetCongressSpending.call());
   }, [dispatch]);
 
-  const tableData = React.useMemo(() => scheduledCalls?.map(({
-    preimage,
-    proposal,
-    blockNumber,
-    idx,
-    sectionType,
-  }) => {
-    const proposalData = preimage || proposal;
-    if (sectionType !== 'congress') {
-      return undefined;
-    }
-    const onVetoClick = () => {
-      dispatch(senateActions.senateProposeCloseMotion.call(
-        { executionBlock: blockNumber, idx },
-      ));
-    };
-    return {
-      proposal: proposalData,
-      veto: isVetoButton ? (
-        <div className={styles.button}>
-          <Button onClick={onVetoClick} primary small>Veto</Button>
-        </div>
-      ) : null,
-    };
-  }).filter(Boolean), [isVetoButton, dispatch, scheduledCalls]);
+  const congressOnly = React.useMemo(
+    () => scheduledCalls?.filter(({ sectionType }) => sectionType === 'congress') || [],
+    [scheduledCalls],
+  );
 
-  if (!scheduledCalls || scheduledCalls.length < 1) {
+  const grouped = React.useMemo(() => groupProposals(
+    congressOnly,
+    ({ preimage, proposal }) => (preimage || proposal).method,
+    ({ preimage, proposal }) => (preimage || proposal).section,
+  ), [congressOnly]);
+
+  if (!congressOnly.length) {
     return (<div>There are no open items</div>);
   }
 
   return (
     <MotionProvider>
-      <Card className={stylesPage.overviewWrapper}>
-        <RemarkTable
-          data={tableData.map((row) => ({
-            proposal: row.proposal,
-            extra: row.veto,
-          }))}
-        />
-      </Card>
+      {Object.values(grouped).map((props) => Object.values(props).map((proposals) => (
+        <Card key={proposals[0]} title={proposalHeading(proposals[0])} className={stylesPage.overviewWrapper}>
+          {isTableReady(proposals[0]) ? (
+            <ProposalTable
+              proposals={proposals.map(({ preimage, proposal }) => preimage || proposal)}
+              controls={proposals.map(({
+                blockNumber,
+                idx,
+              }) => {
+                const onVetoClick = () => {
+                  dispatch(senateActions.senateProposeCloseMotion.call(
+                    { executionBlock: blockNumber, idx },
+                  ));
+                };
+                return isVetoButton ? (
+                  <div className={styles.button}>
+                    <Button onClick={onVetoClick} primary small>Veto</Button>
+                  </div>
+                ) : null;
+              })}
+            />
+          ) : proposals.map(({ preimage, proposal }) => (
+            <Proposal proposal={preimage || proposal} key={proposal} />
+          ))}
+        </Card>
+      )))}
     </MotionProvider>
 
   );
