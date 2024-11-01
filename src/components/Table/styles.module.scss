@@ -49,3 +49,17 @@
     border-radius: 0 15px 15px 0;
   }
 }
+
+.tableScrollSmallInnerContainer {
+  min-width: 500px;
+  max-width: 1200px;
+}
+
+.tableScrollBigInnerContainer {
+  min-width: 700px;
+  max-width: 1200px;
+}
+
+.tableScrollContainer {
+  overflow-x: auto;
+}
