@@ -9,6 +9,7 @@ import stylesPage from '../../../utils/pagesBase.module.scss';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
 import { MotionProvider } from '../../WalletCongresSenate/ContextMotions';
+import ProposalContainer from '../../Proposal/ProposalContainer';
 
 function ScheduledCongressSpending({ isVetoButton }) {
   const dispatch = useDispatch();
@@ -23,34 +24,36 @@ function ScheduledCongressSpending({ isVetoButton }) {
   }
 
   return (
-    <MotionProvider>
-      {scheduledCalls.map(({
-        preimage, proposal, blockNumber, idx, sectionType,
-      }) => {
-        const proposalData = preimage || proposal;
-        if (sectionType !== 'congress') return null;
+    <ProposalContainer>
+      <MotionProvider>
+        {scheduledCalls.map(({
+          preimage, proposal, blockNumber, idx, sectionType,
+        }) => {
+          const proposalData = preimage || proposal;
+          if (sectionType !== 'congress') return null;
 
-        const onVetoClick = () => {
-          dispatch(senateActions.senateProposeCloseMotion.call(
-            { executionBlock: blockNumber, idx },
-          ));
-        };
-        return (
-          <Card className={stylesPage.overviewWrapper} key={proposalData}>
-            {isVetoButton && (
-            <div className={styles.button}>
-              <Button onClick={onVetoClick} primary small>Veto</Button>
-            </div>
-            )}
+          const onVetoClick = () => {
+            dispatch(senateActions.senateProposeCloseMotion.call(
+              { executionBlock: blockNumber, idx },
+            ));
+          };
+          return (
+            <Card className={stylesPage.overviewWrapper} key={proposalData}>
+              {isVetoButton && (
+              <div className={styles.button}>
+                <Button onClick={onVetoClick} primary small>Veto</Button>
+              </div>
+              )}
 
-            <Proposal
-              proposal={proposalData}
-            />
-          </Card>
-        );
-      })}
-    </MotionProvider>
-
+              <Proposal
+                proposal={proposalData}
+                isTableRow
+              />
+            </Card>
+          );
+        })}
+      </MotionProvider>
+    </ProposalContainer>
   );
 }
 

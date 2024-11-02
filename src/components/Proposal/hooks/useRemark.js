@@ -22,7 +22,17 @@ function useRemark(proposal) {
   }, [bytes, proposal]);
 
   if (!data) {
-    return { decoded: new TextDecoder('utf-8').decode(bytes) };
+    return {
+      project: '',
+      description: '',
+      category: '',
+      supplier: '',
+      currency: '',
+      date: '',
+      finalDestination: '',
+      amountInUsd: '',
+      formatedDate: '',
+    };
   }
 
   const {
@@ -39,13 +49,13 @@ function useRemark(proposal) {
   const formatedDate = formatDate(dateTime, false, false);
 
   return {
-    category,
-    project,
-    supplier,
-    description,
-    currency,
+    category: category.toString(),
+    project: project.toString(),
+    supplier: supplier.toString(),
+    description: description.toString(),
+    currency: currency.toString(),
     amountInUsd: amountInUsd.toString(),
-    finalDestination,
+    finalDestination: finalDestination.toString(),
     formatedDate,
   };
 }

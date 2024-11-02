@@ -1,8 +1,8 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import useTransferLLM from '../hooks/useTransferLLM';
+import { useProposalContext } from '../ProposalContext';
 
-function TransferLLMRow({ proposal }) {
+function TransferLLMRow({ proposal, id }) {
   const {
     accountId,
     formattedValue,
@@ -10,19 +10,18 @@ function TransferLLMRow({ proposal }) {
     symbol,
   } = useTransferLLM(proposal);
 
-  return (
-    <>
-      <td>
-        {`${formattedValue} (${symbol})`}
-      </td>
-      <td>
-        {`${identity ? `${identity} (${accountId})` : accountId}`}
-      </td>
-    </>
-  );
+  const proposals = useProposalContext();
+
+  return proposals.addTabledProposal('transferLLM', id, [
+    `${formattedValue} (${symbol}) `,
+    `${identity ? `${identity} (${accountId})` : accountId}`,
+  ]);
 }
 
-// eslint-disable-next-line react/forbid-prop-types
-TransferLLMRow.propTypes = { proposal: PropTypes.object.isRequired };
+TransferLLMRow.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  proposal: PropTypes.object.isRequired,
+  id: PropTypes.string.isRequired,
+};
 
 export default TransferLLMRow;

@@ -21,6 +21,10 @@
   }
 
   .tbody {
+    tr:focus {
+      outline: none;
+      background-color: $grey;
+    }
     td{
       height: 90px;
       font-size: 14px;

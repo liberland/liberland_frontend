@@ -23,7 +23,6 @@ export function Proposal({
   proposal,
   isDetailsHidden,
   isTableRow,
-  hideTabled,
 }) {
   const proposalMethod = proposal.method;
   const proposalSection = proposal.section;
@@ -41,61 +40,58 @@ export function Proposal({
   }
   if (proposalMethod === 'batchAll') {
     return (
-      <BatchAll {...{ proposal }}>
-        {(prop) => <Proposal proposal={prop} />}
+      <BatchAll {...{ proposal }} isTableRow={isTableRow}>
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
       </BatchAll>
     );
   }
   if (proposalMethod === 'externalProposeMajority') {
     return (
       <Referendum {...{ proposal }}>
-        {(prop) => <Proposal proposal={prop} />}
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
       </Referendum>
     );
   }
   if (proposalMethod === 'blacklist' && proposalSection === 'democracy') {
     return (
       <Blacklist {...{ proposal }}>
-        {(prop) => <Proposal proposal={prop} />}
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
       </Blacklist>
     );
   }
   if (proposalMethod === 'execute' && (proposalSection === 'councilAccount' || proposalSection === 'senateAccount')) {
     return (
       <CouncilSenateExecute {...{ proposal }}>
-        {(prop) => <Proposal proposal={prop} />}
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
       </CouncilSenateExecute>
     );
   }
   if (proposalMethod === 'schedule' && proposalSection === 'scheduler') {
     return (
       <Schedule {...{ proposal }}>
-        {(prop) => <Proposal proposal={prop} />}
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
       </Schedule>
     );
-  } if (proposalMethod === 'transfer' && proposalSection === 'balances') {
-    if (hideTabled) {
-      return null;
-    }
-    return isTableRow ? <TransferLLDRow {...{ proposal }} /> : <TransferLLD {...{ proposal }} />;
+  }
+  if (proposalMethod === 'transfer' && proposalSection === 'balances') {
+    return isTableRow
+      ? <TransferLLDRow id={proposal.toString()} {...{ proposal }} />
+      : <TransferLLD {...{ proposal }} />;
   }
   if ((proposalMethod === 'sendLlmToPolitipool' || proposalMethod === 'sendLlm') && proposalSection === 'llm') {
-    if (hideTabled) {
-      return null;
-    }
-    return isTableRow ? <TransferLLMRow {...{ proposal }} /> : <TransferLLM {...{ proposal }} />;
+    return isTableRow
+      ? <TransferLLMRow id={proposal.toString()} {...{ proposal }} />
+      : <TransferLLM {...{ proposal }} />;
   }
   if (proposalMethod === 'transfer' && proposalSection === 'assets') {
-    if (hideTabled) {
-      return null;
-    }
-    return isTableRow ? <TransferAsset {...{ proposal }} /> : <TransferAssetRow {...{ proposal }} />;
+    return isTableRow
+      ? <TransferAssetRow id={proposal.toString()} {...{ proposal }} />
+      : <TransferAsset {...{ proposal }} />;
   }
   if (proposalMethod === 'remark' && proposalSection === 'llm') {
-    if (hideTabled) {
-      return null;
-    }
-    return isTableRow ? <RemarkRow {...{ proposal }} /> : <RemarkInfo {...{ proposal }} />;
+    return isTableRow
+      ? <RemarkRow id={proposal.toString()} {...{ proposal }} />
+      : <RemarkInfo {...{ proposal }} />;
   }
 
   return <Raw {...{ proposal }} />;
@@ -104,7 +100,6 @@ export function Proposal({
 Proposal.defaultProps = {
   isDetailsHidden: false,
   isTableRow: false,
-  hideTabled: false,
   names: {},
 };
 
@@ -113,7 +108,6 @@ Proposal.propTypes = {
   proposal: PropTypes.object.isRequired,
   isDetailsHidden: PropTypes.bool,
   isTableRow: PropTypes.bool,
-  hideTabled: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types
   names: PropTypes.object,
 };

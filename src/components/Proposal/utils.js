@@ -52,46 +52,54 @@ function isFastTrackProposal(proposal) {
     && fastTrackMatches(calls[0], calls[1]);
 }
 
-function proposalHeading(proposal) {
-  const {
-    method,
-    section,
-  } = proposal.proposal.toHuman();
-
-  if (method === 'repealLegislation') {
-    return 'Repeal legislation';
-  } if (method === 'repealLegislationSection') {
-    return 'Repeal legislation section';
-  } if (method === 'amendLegislation') {
-    return 'Amend legislation';
-  } if (method === 'addLegislation') {
-    return 'Add legislation';
-  } if (method === 'batchAll') {
-    return 'Batch';
-  } if (method === 'externalProposeMajority') {
-    return 'Propose majority';
-  } if (method === 'blacklist' && section === 'democracy') {
-    return 'Blacklist';
-  } if (method === 'execute' && (section === 'councilAccount' || section === 'senateAccount')) {
-    return 'Execute';
-  } if (method === 'schedule' && section === 'scheduler') {
-    return 'Schedule';
-  } if (method === 'transfer' && section === 'balances') {
+function proposalHeading(type) {
+  if (type === 'transferLLD') {
     return 'Transfer LLD';
-  } if ((method === 'sendLlmToPolitipool' || method === 'sendLlm') && section === 'llm') {
+  } if (type === 'transferLLM') {
     return 'Transfer LLM';
-  } if (method === 'transfer' && section === 'assets') {
+  } if (type === 'transferAsset') {
     return 'Transfer assets';
-  } if (method === 'remark' && section === 'llm') {
-    return 'Remark';
+  } if (type === 'remarks') {
+    return 'Remarks';
   }
 
-  return 'Raw';
+  return '';
+}
+
+function proposalTableHeadings(type) {
+  if (type === 'transferLLD' || type === 'transferLLM' || type === 'transferAsset') {
+    return {
+      headings: [
+        'Transfer',
+        'To',
+      ],
+      small: true,
+    };
+  }
+  if (type === 'remarks') {
+    return {
+      headings: [
+        'Category',
+        'Project',
+        'Supplier',
+        'Description',
+        'Currency',
+        'Amount in USD',
+        'Final Destination',
+        'Date',
+      ],
+      small: false,
+    };
+  }
+  // eslint-disable-next-line no-console
+  console.warn(`Trying to display proposal ${type} as table. Unsupported`);
+  return { headings: [], small: true };
 }
 
 export {
   groupProposals,
   isTableReady,
   proposalHeading,
+  proposalTableHeadings,
   isFastTrackProposal,
 };

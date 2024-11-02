@@ -1,27 +1,26 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import useTransferLLD from '../hooks/useTransferLLD';
+import { useProposalContext } from '../ProposalContext';
 
-function TransferLLD({ proposal }) {
+function TransferLLD({ proposal, id }) {
   const {
     accountId,
     formattedValue,
     identity,
   } = useTransferLLD(proposal);
 
-  return (
-    <>
-      <td>
-        {`${formattedValue} (LLD) `}
-      </td>
-      <td>
-        {`${identity ? `${identity} (${accountId})` : accountId}`}
-      </td>
-    </>
-  );
+  const proposals = useProposalContext();
+
+  return proposals.addTabledProposal('transferLLD', id, [
+    `${formattedValue} (LLD) `,
+    `${identity ? `${identity} (${accountId})` : accountId}`,
+  ]);
 }
 
-// eslint-disable-next-line react/forbid-prop-types
-TransferLLD.propTypes = { proposal: PropTypes.object.isRequired };
+TransferLLD.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  proposal: PropTypes.object.isRequired,
+  id: PropTypes.string.isRequired,
+};
 
 export default TransferLLD;

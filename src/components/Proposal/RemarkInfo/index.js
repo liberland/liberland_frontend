@@ -5,14 +5,6 @@ import useRemark from '../hooks/useRemark';
 function RemarkInfo({ proposal }) {
   const remark = useRemark(proposal);
 
-  if (remark.decoded) {
-    return (
-      <div>
-        {remark.decoded}
-      </div>
-    );
-  }
-
   const {
     amountInUsd,
     category,

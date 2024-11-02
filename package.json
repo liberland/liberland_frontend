@@ -33,6 +33,7 @@
     "lodash": "^4.17.15",
     "markdown-to-jsx": "^7.4.5",
     "node-sass": "^9.0.0",
+    "object-hash": "^3.0.0",
     "pako": "^2.1.0",
     "postcss": "^8.4.12",
     "postcss-flexbugs-fixes": "^5.0.2",

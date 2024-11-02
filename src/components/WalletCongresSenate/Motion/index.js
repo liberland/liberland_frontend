@@ -1,18 +1,27 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import Card from '../../Card';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
 import truncate from '../../../utils/truncate';
+import stylesPage from '../../../utils/pagesBase.module.scss';
 
 // REDUX
 import {
   blockchainSelectors,
 } from '../../../redux/selectors';
+import { Proposal } from '../../Proposal';
 import { walletAddress } from '../../../redux/selectors/congress';
 
 export default function Motion({
-  proposal, voting, voteMotion, closeMotion, membersCount,
+  proposal,
+  proposalOf,
+  voting,
+  voteMotion,
+  closeMotion,
+  membersCount,
+  isTableRow,
 }) {
   const dispatch = useDispatch();
   const userAddress = useSelector(
@@ -35,87 +44,96 @@ export default function Motion({
   };
 
   return (
-    <>
-      <div className={styles.metaInfoLine}>
-        <p>
-          Proposal id:
-          <b>{truncate(proposal, 13)}</b>
-        </p>
-        <span>
+    <div className={stylesPage.stakingWrapper}>
+      <Card className={stylesPage.overviewWrapper}>
+        <div className={styles.metaInfoLine}>
           <p>
-            Aye
-            {' '}
-            <b>
-              {voting.ayes.length}
-              /
-              {threshold}
-            </b>
+            Proposal id:
+            <b>{truncate(proposal, 13)}</b>
           </p>
-          <p>
-            Nay
-            {' '}
-            <b>
-              {voting.nays.length}
-              /
-              {threshold}
-            </b>
-          </p>
-        </span>
-      </div>
+          <span>
+            <p>
+              Aye
+              {' '}
+              <b>
+                {voting.ayes.length}
+                /
+                {threshold}
+              </b>
+            </p>
+            <p>
+              Nay
+              {' '}
+              <b>
+                {voting.nays.length}
+                /
+                {threshold}
+              </b>
+            </p>
+          </span>
+        </div>
 
-      <div className={styles.buttonsContainer}>
-        {isClosable && (
-        <Button
-          medium
-          primary
-          onClick={() => dispatch(
-            closeMotion({ proposal, index: voting.index }),
+        <div className={styles.buttonsContainer}>
+          {isClosable && (
+          <Button
+            medium
+            primary
+            onClick={() => dispatch(
+              closeMotion({ proposal, index: voting.index }),
+            )}
+          >
+            Close & Execute
+          </Button>
           )}
-        >
-          Close & Execute
-        </Button>
-        )}
-        {!voting.ayes.map((v) => v.toString()).includes(userAddress)
-          && !isClosable && (
-            <Button
-              small
-              primary
-              onClick={() => voteMotionCall(true)}
-            >
-              Vote aye
-            </Button>
-        )}
-        {!voting.nays.map((v) => v.toString()).includes(userAddress)
-          && !isClosable && (
+          {!voting.ayes.map((v) => v.toString()).includes(userAddress)
+            && !isClosable && (
+              <Button
+                small
+                primary
+                onClick={() => voteMotionCall(true)}
+              >
+                Vote aye
+              </Button>
+          )}
+          {!voting.nays.map((v) => v.toString()).includes(userAddress)
+            && !isClosable && (
+              <Button
+                small
+                secondary
+                onClick={() => voteMotionCall(false)}
+              >
+                Vote nay
+              </Button>
+          )}
+          {
+            isClosableNaye && (
             <Button
               small
               secondary
-              onClick={() => voteMotionCall(false)}
+              onClick={() => dispatch(
+                closeMotion({ proposal, index: voting.index, walletAddress }),
+              )}
             >
-              Vote nay
+              Close Motion
             </Button>
-        )}
-        {
-          isClosableNaye && (
-          <Button
-            small
-            secondary
-            onClick={() => dispatch(
-              closeMotion({ proposal, index: voting.index, walletAddress }),
-            )}
-          >
-            Close Motion
-          </Button>
-          )
-        }
-      </div>
-    </>
+            )
+          }
+        </div>
+        <Proposal proposal={proposalOf} isTableRow={isTableRow} />
+      </Card>
+    </div>
   );
 }
 
 /* eslint-disable react/forbid-prop-types */
 Motion.propTypes = {
   proposal: PropTypes.string.isRequired,
+  proposalOf: PropTypes.shape({
+    args: PropTypes.array.isRequired,
+    method: PropTypes.string.isRequired,
+    section: PropTypes.string.isRequired,
+    toHuman: PropTypes.func.isRequired,
+  }).isRequired,
   voting: PropTypes.shape({
     index: PropTypes.object.isRequired,
     threshold: PropTypes.object.isRequired,
@@ -126,4 +144,5 @@ Motion.propTypes = {
   closeMotion: PropTypes.func.isRequired,
   voteMotion: PropTypes.func.isRequired,
   membersCount: PropTypes.number.isRequired,
+  isTableRow: PropTypes.bool,
 };

@@ -1,8 +1,8 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import useTransferAsset from '../hooks/useTransferAsset';
+import { useProposalContext } from '../ProposalContext';
 
-function TransferAssetRow({ proposal }) {
+function TransferAssetRow({ proposal, id }) {
   const {
     asset,
     assetId,
@@ -11,19 +11,18 @@ function TransferAssetRow({ proposal }) {
     target,
   } = useTransferAsset(proposal);
 
-  return (
-    <>
-      <td>
-        {`${formattedValue} (${asset?.metadata?.symbol || assetId}) `}
-      </td>
-      <td>
-        {`${identity ? `${identity} (${target})` : target}`}
-      </td>
-    </>
-  );
+  const proposals = useProposalContext();
+
+  return proposals.addTabledProposal('transferAsset', id, [
+    `${formattedValue} (${asset?.metadata?.symbol || assetId})`,
+    `${identity ? `${identity} (${target})` : target}`,
+  ]);
 }
 
-// eslint-disable-next-line react/forbid-prop-types
-TransferAssetRow.propTypes = { proposal: PropTypes.object.isRequired };
+TransferAssetRow.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  proposal: PropTypes.object.isRequired,
+  id: PropTypes.string.isRequired,
+};
 
 export default TransferAssetRow;

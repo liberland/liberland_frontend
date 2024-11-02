@@ -1,24 +1,10 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import useRemark from '../hooks/useRemark';
+import { useProposalContext } from '../ProposalContext';
 
-function RemarkRow({ proposal, extra }) {
+function RemarkRow({ proposal, id }) {
   const remark = useRemark(proposal);
-
-  if (remark.decoded) {
-    return (
-      <>
-        <td colSpan={8}>
-          {remark.decoded}
-        </td>
-        {extra && (
-          <td>
-            {extra}
-          </td>
-        )}
-      </>
-    );
-  }
+  const proposals = useProposalContext();
 
   const {
     amountInUsd,
@@ -31,42 +17,22 @@ function RemarkRow({ proposal, extra }) {
     supplier,
   } = remark;
 
-  return (
-    <>
-      <td>
-        {category}
-      </td>
-      <td>
-        {project}
-      </td>
-      <td>
-        {supplier}
-      </td>
-      <td>
-        {description}
-      </td>
-      <td>
-        {currency}
-      </td>
-      <td>
-        {amountInUsd}
-      </td>
-      <td>
-        {finalDestination}
-      </td>
-      <td>
-        {formatedDate}
-      </td>
-      <td>
-        {extra}
-      </td>
-    </>
-  );
+  return proposals.addTabledProposal('remarks', id, [
+    category,
+    project,
+    supplier,
+    description,
+    currency,
+    amountInUsd,
+    finalDestination,
+    formatedDate,
+  ]);
 }
 
 RemarkRow.propTypes = {
-  proposal: PropTypes.shape({}).isRequired,
-  extra: PropTypes.node,
+  // eslint-disable-next-line react/forbid-prop-types
+  proposal: PropTypes.object.isRequired,
+  id: PropTypes.string.isRequired,
 };
 
 export default RemarkRow;

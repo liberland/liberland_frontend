@@ -1,105 +1,61 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Proposal } from '..';
+import objectHash from 'object-hash';
+import { useProposalContext } from '../ProposalContext';
+import { proposalHeading, proposalTableHeadings } from '../utils';
+import stylesPage from '../../../utils/pagesBase.module.scss';
 import styles from '../../Table/styles.module.scss';
+import Card from '../../Card';
 
-function ProposalTable({ proposals, controls }) {
-  const proposal = proposals[0];
-  const {
-    method,
-    section,
-  } = proposal.toHuman();
+function ProposalTable({ type }) {
+  const { headings, small } = React.useMemo(
+    () => proposalTableHeadings(type),
+    [type],
+  );
 
-  const { headings, small } = React.useMemo(() => {
-    if (method === 'transfer' && section === 'balances') {
-      return {
-        headings: [
-          'Transfer',
-          'To',
-        ],
-        small: true,
-      };
-    }
-    if ((method === 'sendLlmToPolitipool' || method === 'sendLlm') && section === 'llm') {
-      return {
-        headings: [
-          'Transfer',
-          'To',
-        ],
-        small: true,
-      };
-    }
-    if (method === 'transfer' && section === 'assets') {
-      return {
-        headings: [
-          'Transfer',
-          'To',
-        ],
-        small: true,
-      };
-    }
-    if (method === 'remark' && section === 'llm') {
-      return {
-        headings: [
-          'Category',
-          'Project',
-          'Supplier',
-          'Description',
-          'Currency',
-          'Amount in USD',
-          'Final Destination',
-          'Date',
-        ],
-        small: false,
-      };
-    }
-    // eslint-disable-next-line no-console
-    console.warn(`Trying to display proposal ${method}/${section} as table. Unsupported`);
-    return { headings: [], small: true };
-  }, [method, section]);
+  const { data } = useProposalContext();
 
-  const hasControls = React.useMemo(() => controls?.some(Boolean), [controls]);
+  const rows = Object.entries(data[type]);
+
+  if (!rows.length) {
+    return null;
+  }
 
   return (
-    <div className={styles.tableScrollContainer}>
-      <div className={small ? styles.tableScrollSmallInnerContainer : styles.tableScrollBigInnerContainer}>
-        <table className={styles.table}>
-          <thead className={styles.thead}>
-            <tr>
-              {headings.map((heading) => (
-                <th key={heading}>
-                  {heading}
-                </th>
-              ))}
-              {hasControls && (
-                <th>
-                  Controls
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody className={styles.tbody}>
-            {proposals.map((prop, index) => (
-              <tr key={prop}>
-                <Proposal proposal={prop} isTableRow />
-                {hasControls && (
-                  <td>
-                    {controls[index]}
-                  </td>
-                )}
+    <Card title={proposalHeading(type)} className={stylesPage.overviewWrapper}>
+      <div className={styles.tableScrollContainer}>
+        <div className={small ? styles.tableScrollSmallInnerContainer : styles.tableScrollBigInnerContainer}>
+          <table className={styles.table}>
+            <thead className={styles.thead}>
+              <tr>
+                {headings.map((heading) => (
+                  <th key={heading}>
+                    {heading}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className={styles.tbody}>
+              {rows.map(([key, row]) => (
+                <tr id={`hash${objectHash(key)}`} key={key} tabIndex={0}>
+                  {row.map((cell, index) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <td key={`${cell}-${index}`}>
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </Card>
   );
 }
 
 ProposalTable.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  proposals: PropTypes.arrayOf(PropTypes.object.isRequired).isRequired,
-  controls: PropTypes.arrayOf(PropTypes.node),
+  type: PropTypes.string.isRequired,
 };
 
 export default ProposalTable;

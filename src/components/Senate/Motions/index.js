@@ -4,6 +4,7 @@ import { identityActions, senateActions } from '../../../redux/actions';
 import { senateSelectors } from '../../../redux/selectors';
 import Motion from '../../WalletCongresSenate/Motion';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
+import ProposalContainer from '../../Proposal/ProposalContainer';
 
 function Motions() {
   const dispatch = useDispatch();
@@ -26,7 +27,7 @@ function Motions() {
   }
 
   return (
-    <>
+    <ProposalContainer>
       {motions.map(({
         proposal, proposalOf, voting, membersCount,
       }, index) => {
@@ -41,12 +42,12 @@ function Motions() {
               voting={voting.unwrap()}
               voteMotion={(data) => senateActions.senateVoteAtMotions.call(data)}
               closeMotion={(data) => senateActions.senateCloseMotion.call(data)}
+              isTableRow
             />
           </div>
         );
       })}
-
-    </>
+    </ProposalContainer>
   );
 }
 
