@@ -1,10 +1,10 @@
 /* eslint-disable no-param-reassign */
-function groupProposals(proposals) {
+function groupProposals(proposals, toHuman) {
   return proposals.reduce((grouped, proposal) => {
     const {
       method,
       section,
-    } = proposal.proposal.toHuman();
+    } = toHuman(proposal);
 
     grouped[method] ||= {};
     grouped[method][section] ||= [];
@@ -52,11 +52,11 @@ function isFastTrackProposal(proposal) {
     && fastTrackMatches(calls[0], calls[1]);
 }
 
-function unBatchProposals(proposals) {
+function unBatchProposals(proposals, toHuman) {
   return proposals.reduce((unbatched, proposal) => {
     const {
       method,
-    } = proposal.proposal.toHuman();
+    } = toHuman(proposal);
     if (method === 'batchAll' && !isFastTrackProposal(proposal.proposal)) {
       const { args: [calls] } = proposal.proposal;
       unbatched.push(...calls.map((call) => ({

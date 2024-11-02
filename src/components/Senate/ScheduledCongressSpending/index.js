@@ -26,12 +26,16 @@ function ScheduledCongressSpending({ isVetoButton }) {
   }, [dispatch]);
 
   const congressOnly = React.useMemo(
-    () => unBatchProposals(scheduledCalls?.filter(({ sectionType }) => sectionType === 'congress') || []),
+    () => unBatchProposals(
+      scheduledCalls?.filter(({ sectionType }) => sectionType === 'congress') || [],
+      (prop) => prop.proposal.toHuman(),
+    ),
     [scheduledCalls],
   );
 
   const grouped = React.useMemo(() => groupProposals(
     congressOnly,
+    (proposal) => proposal.proposal.toHuman(),
   ), [congressOnly]);
 
   if (!congressOnly.length) {
