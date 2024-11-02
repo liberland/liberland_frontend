@@ -52,24 +52,6 @@ function isFastTrackProposal(proposal) {
     && fastTrackMatches(calls[0], calls[1]);
 }
 
-function unBatchProposals(proposals, toHuman) {
-  return proposals.reduce((unbatched, proposal) => {
-    const {
-      method,
-    } = toHuman(proposal);
-    if (method === 'batchAll' && !isFastTrackProposal(proposal.proposal)) {
-      const { args: [calls] } = proposal.proposal;
-      unbatched.push(...calls.map((call) => ({
-        ...proposal,
-        proposal: call,
-      })));
-    } else {
-      unbatched.push(proposal);
-    }
-    return unbatched;
-  }, []);
-}
-
 function proposalHeading(proposal) {
   const {
     method,
@@ -111,6 +93,5 @@ export {
   groupProposals,
   isTableReady,
   proposalHeading,
-  unBatchProposals,
   isFastTrackProposal,
 };
