@@ -18,77 +18,90 @@ import RemarkRow from './RemarkRow';
 import TransferLLMRow from './TransferLLMRow';
 import TransferAssetRow from './TransferAssetRow';
 import TransferLLDRow from './TransferLLDRow';
+import {
+  isAddLegislation,
+  isAmendLegislation,
+  isBatchAll,
+  isBlacklist,
+  isCouncilSenateExecute,
+  isExternalProposeMajority,
+  isRemark,
+  isRepealLegislation,
+  isRepealLegislationSection,
+  isScheduler,
+  isTransferAssets,
+  isTransferLLD,
+  isTransferLLM,
+} from './utils';
 
 export function Proposal({
   proposal,
   isDetailsHidden,
   isTableRow,
 }) {
-  const proposalMethod = proposal.method;
-  const proposalSection = proposal.section;
-  if (proposalMethod === 'repealLegislation') {
+  if (isRepealLegislation(proposal)) {
     return <RepealLegislation {...{ proposal }} />;
   }
-  if (proposalMethod === 'repealLegislationSection') {
+  if (isRepealLegislationSection(proposal)) {
     return <RepealLegislationSection {...{ proposal }} />;
   }
-  if (proposalMethod === 'amendLegislation') {
+  if (isAmendLegislation(proposal)) {
     return <AmendLegislation {...{ proposal }} />;
   }
-  if (proposalMethod === 'addLegislation') {
+  if (isAddLegislation(proposal)) {
     return <AddLegislation {...{ proposal }} isDetailsHidden={isDetailsHidden} />;
   }
-  if (proposalMethod === 'batchAll') {
+  if (isBatchAll(proposal)) {
     return (
-      <BatchAll {...{ proposal }} isTableRow={isTableRow}>
+      <BatchAll {...{ proposal }} withId={isTableRow ? proposal.toJSON().callIndex : undefined}>
         {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
       </BatchAll>
     );
   }
-  if (proposalMethod === 'externalProposeMajority') {
+  if (isExternalProposeMajority(proposal)) {
     return (
       <Referendum {...{ proposal }}>
         {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
       </Referendum>
     );
   }
-  if (proposalMethod === 'blacklist' && proposalSection === 'democracy') {
+  if (isBlacklist(proposal)) {
     return (
       <Blacklist {...{ proposal }}>
         {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
       </Blacklist>
     );
   }
-  if (proposalMethod === 'execute' && (proposalSection === 'councilAccount' || proposalSection === 'senateAccount')) {
+  if (isCouncilSenateExecute(proposal)) {
     return (
       <CouncilSenateExecute {...{ proposal }}>
         {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
       </CouncilSenateExecute>
     );
   }
-  if (proposalMethod === 'schedule' && proposalSection === 'scheduler') {
+  if (isScheduler(proposal)) {
     return (
       <Schedule {...{ proposal }}>
         {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
       </Schedule>
     );
   }
-  if (proposalMethod === 'transfer' && proposalSection === 'balances') {
+  if (isTransferLLD(proposal)) {
     return isTableRow
       ? <TransferLLDRow id={proposal.toString()} {...{ proposal }} />
       : <TransferLLD {...{ proposal }} />;
   }
-  if ((proposalMethod === 'sendLlmToPolitipool' || proposalMethod === 'sendLlm') && proposalSection === 'llm') {
+  if (isTransferLLM(proposal)) {
     return isTableRow
       ? <TransferLLMRow id={proposal.toString()} {...{ proposal }} />
       : <TransferLLM {...{ proposal }} />;
   }
-  if (proposalMethod === 'transfer' && proposalSection === 'assets') {
+  if (isTransferAssets(proposal)) {
     return isTableRow
       ? <TransferAssetRow id={proposal.toString()} {...{ proposal }} />
       : <TransferAsset {...{ proposal }} />;
   }
-  if (proposalMethod === 'remark' && proposalSection === 'llm') {
+  if (isRemark(proposal)) {
     return isTableRow
       ? <RemarkRow id={proposal.toString()} {...{ proposal }} />
       : <RemarkInfo {...{ proposal }} />;

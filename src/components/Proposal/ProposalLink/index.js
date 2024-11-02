@@ -12,14 +12,14 @@ function ProposalLink({
   setTabledProposals,
 }) {
   React.useEffect(() => {
-    const fromType = tabledProposals[type];
+    const fromType = tabledProposals[type] || {};
     const fromKey = fromType[identifier] || [];
     const hasStateChanged = values.length !== fromKey.length || values.some((v, i) => v !== fromKey[i]);
     if (hasStateChanged) {
       setTabledProposals((proposals) => ({
         ...proposals,
         [type]: {
-          ...proposals[type],
+          ...proposals?.[type],
           [identifier]: values,
         },
       }));

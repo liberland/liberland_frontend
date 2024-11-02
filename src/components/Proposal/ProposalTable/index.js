@@ -15,7 +15,7 @@ function ProposalTable({ type }) {
 
   const { data } = useProposalContext();
 
-  const rows = Object.entries(data[type]);
+  const rows = Object.entries(data[type] || {});
 
   if (!rows.length) {
     return null;

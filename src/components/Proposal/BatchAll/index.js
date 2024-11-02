@@ -4,7 +4,7 @@ import { isFastTrackProposal } from '../utils';
 import FastTrackedReferendum from '../FastTrackedReferendum';
 import styles from '../styles.module.scss';
 
-function BatchAll({ proposal, children, isTableRow }) {
+function BatchAll({ proposal, children, withId }) {
   const { args: [calls] } = proposal;
   if (isFastTrackProposal(proposal)) {
     return (
@@ -13,10 +13,13 @@ function BatchAll({ proposal, children, isTableRow }) {
       </FastTrackedReferendum>
     );
   }
-  if (isTableRow) {
+  if (withId) {
     return (
       <div>
-        List of proposals found in batch:
+        List of proposals found in batch
+        {' '}
+        {withId}
+        :
         <ul>
           {calls.map((call, idx) => (
             // eslint-disable-next-line react/no-array-index-key
@@ -41,7 +44,7 @@ BatchAll.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   proposal: PropTypes.object.isRequired,
   children: PropTypes.func.isRequired,
-  isTableRow: PropTypes.bool,
+  withId: PropTypes.string,
 };
 
 export default BatchAll;

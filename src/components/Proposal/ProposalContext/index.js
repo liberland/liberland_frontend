@@ -2,19 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ProposalLink from '../ProposalLink';
 
-const defaultContext = {
-  remarks: {},
-  transferLLD: {},
-  transferLLM: {},
-  transferAsset: {},
-};
-
-const ProposalContext = React.createContext({ data: defaultContext });
+const ProposalContext = React.createContext({ data: {} });
 
 export function ProposalProvider({
   children,
 }) {
-  const [tabledProposals, setTabledProposals] = React.useState(defaultContext);
+  const [tabledProposals, setTabledProposals] = React.useState({});
   const addTabledProposal = React.useCallback(
     (type, identifier, values) => (
       <ProposalLink
