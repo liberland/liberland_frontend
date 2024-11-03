@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 function Schedule({ proposal, children }) {
   const { args } = proposal;
+
   return (
     <div>
       Schedule call to be made on

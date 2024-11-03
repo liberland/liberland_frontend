@@ -8,7 +8,7 @@ import styles from '../../Table/styles.module.scss';
 import Card from '../../Card';
 
 function ProposalTable({ type }) {
-  const { headings, small } = React.useMemo(
+  const headings = React.useMemo(
     () => proposalTableHeadings(type),
     [type],
   );
@@ -24,7 +24,7 @@ function ProposalTable({ type }) {
   return (
     <Card title={proposalHeading(type)} className={stylesPage.overviewWrapper}>
       <div className={styles.tableScrollContainer}>
-        <div className={small ? styles.tableScrollSmallInnerContainer : styles.tableScrollBigInnerContainer}>
+        <div className={styles.tableInnerScrollContainer}>
           <table className={styles.table}>
             <thead className={styles.thead}>
               <tr>
@@ -41,7 +41,9 @@ function ProposalTable({ type }) {
                   {row.map((cell, index) => (
                     // eslint-disable-next-line react/no-array-index-key
                     <td key={`${cell}-${index}`}>
-                      {cell}
+                      <div className={styles.bigTextContainer}>
+                        {cell}
+                      </div>
                     </td>
                   ))}
                 </tr>

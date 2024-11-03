@@ -1,3 +1,7 @@
+import useTransferAsset from './hooks/useTransferAsset';
+import useTransferLLD from './hooks/useTransferLLD';
+import useTransferLLM from './hooks/useTransferLLM';
+
 function isFastTrackProposal(proposal) {
   function fastTrackMatches(prop, fastTrack) {
     const fastTrackHash = fastTrack.args[0];
@@ -78,6 +82,16 @@ function isTransferWithRemark(proposal) {
   return calls.length === 2 && isTransfer(calls[0]) && isRemark(calls[1]);
 }
 
+function getTransferHook(proposal) {
+  if (isTransferLLD(proposal)) {
+    return useTransferLLD;
+  }
+  if (isTransferLLM(proposal)) {
+    return useTransferLLM;
+  }
+  return useTransferAsset;
+}
+
 function proposalHeading(type) {
   if (type === 'transferLLD') {
     return 'Transfer LLD';
@@ -99,49 +113,40 @@ function proposalHeading(type) {
 
 function proposalTableHeadings(type) {
   if (type === 'transferLLD' || type === 'transferLLM' || type === 'transferAsset') {
-    return {
-      headings: [
-        'Transfer',
-        'To',
-      ],
-      small: true,
-    };
+    return [
+      'Transfer',
+      'To',
+    ];
   }
   if (type === 'remarks') {
-    return {
-      headings: [
-        'Category',
-        'Project',
-        'Supplier',
-        'Description',
-        'Currency',
-        'Amount in USD',
-        'Final Destination',
-        'Date',
-      ],
-      small: false,
-    };
+    return [
+      'Category',
+      'Project',
+      'Supplier',
+      'Description',
+      'Currency',
+      'Amount in USD',
+      'Final Destination',
+      'Date',
+    ];
   }
   if (type === 'remarkedTransfer') {
-    return {
-      headings: [
-        'Transfer',
-        'To',
-        'Category',
-        'Project',
-        'Supplier',
-        'Description',
-        'Currency',
-        'Amount in USD',
-        'Final Destination',
-        'Date',
-      ],
-      small: false,
-    };
+    return [
+      'Transfer',
+      'Amount in USD',
+      'Category',
+      'Project',
+      'Supplier',
+      'Description',
+      'Currency',
+      'Final Destination',
+      'Date',
+      'To',
+    ];
   }
   // eslint-disable-next-line no-console
   console.warn(`Trying to display proposal ${type} as table. Unsupported`);
-  return { headings: [], small: true };
+  return [];
 }
 
 export {
@@ -163,4 +168,5 @@ export {
   isTransferAssets,
   isTransferLLD,
   isTransferLLM,
+  getTransferHook,
 };

@@ -4,19 +4,12 @@ import { useProposalContext } from '../ProposalContext';
 
 function TransferAssetRow({ proposal, id }) {
   const {
-    asset,
-    assetId,
-    formattedValue,
-    identity,
-    target,
+    formattedRow,
   } = useTransferAsset(proposal);
 
   const proposals = useProposalContext();
 
-  return proposals.addTabledProposal('transferAsset', id, [
-    `${formattedValue} (${asset?.metadata?.symbol || assetId})`,
-    `${identity ? `${identity} (${target})` : target}`,
-  ]);
+  return proposals.addTabledProposal('transferAsset', id, formattedRow);
 }
 
 TransferAssetRow.propTypes = {

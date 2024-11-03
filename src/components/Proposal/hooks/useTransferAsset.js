@@ -28,6 +28,10 @@ function useTransferAsset(proposal) {
     asset,
     assetId,
     target,
+    formattedRow: [
+      `${formattedValue} (${asset?.metadata?.symbol || assetId})`,
+      `${identity ? `${identity} (${target})` : target}`,
+    ],
   };
 }
 

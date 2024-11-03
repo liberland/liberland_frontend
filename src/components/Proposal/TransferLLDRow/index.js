@@ -4,17 +4,12 @@ import { useProposalContext } from '../ProposalContext';
 
 function TransferLLD({ proposal, id }) {
   const {
-    accountId,
-    formattedValue,
-    identity,
+    formattedRow,
   } = useTransferLLD(proposal);
 
   const proposals = useProposalContext();
 
-  return proposals.addTabledProposal('transferLLD', id, [
-    `${formattedValue} (LLD) `,
-    `${identity ? `${identity} (${accountId})` : accountId}`,
-  ]);
+  return proposals.addTabledProposal('transferLLD', id, formattedRow);
 }
 
 TransferLLD.propTypes = {

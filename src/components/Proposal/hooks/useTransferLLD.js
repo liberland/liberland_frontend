@@ -15,6 +15,10 @@ function useTransferLLD(proposal) {
     formattedValue,
     identity,
     accountId,
+    formattedRow: [
+      `${formattedValue} (LLD) `,
+      `${identity ? `${identity} (${accountId})` : accountId}`,
+    ],
   };
 }
 

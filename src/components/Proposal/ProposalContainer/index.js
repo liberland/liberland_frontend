@@ -7,6 +7,7 @@ function ProposalContainer({ children }) {
   return (
     <ProposalProvider>
       {children}
+      <ProposalTable type="remarkedTransfer" />
       <ProposalTable type="transferLLD" />
       <ProposalTable type="transferLLM" />
       <ProposalTable type="transferAsset" />

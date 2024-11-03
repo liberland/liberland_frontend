@@ -17,6 +17,10 @@ function useTransferLLM(proposal) {
     formattedValue,
     identity,
     accountId,
+    formattedRow: [
+      `${formattedValue} (${symbol}) `,
+      `${identity ? `${identity} (${accountId})` : accountId}`,
+    ],
   };
 }
 
