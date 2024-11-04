@@ -7,6 +7,21 @@ const selectorWalletOptions = createSelector(
   (reducer) => reducer.walletOptions,
 );
 
+const selectorWethLpExchangeRate = createSelector(
+  ethReducer,
+  (reducer) => reducer.wethLpExchangeRate,
+);
+
+const selectorWethLpExchangeRateLoading = createSelector(
+  ethReducer,
+  (reducer) => reducer.wethLpExchangeRateLoading,
+);
+
+const selectorWethLpExchangeRateError = createSelector(
+  ethReducer,
+  (reducer) => reducer.wethLpExchangeRateError,
+);
+
 const selectorWalletOptionsLoading = createSelector(
   ethReducer,
   (reducer) => reducer.loading,
@@ -70,4 +85,7 @@ export {
   selectorTokenStakeAddressInfo,
   selectorERC20Info,
   selectorERC20Balance,
+  selectorWethLpExchangeRate,
+  selectorWethLpExchangeRateLoading,
+  selectorWethLpExchangeRateError,
 };

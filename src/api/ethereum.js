@@ -64,6 +64,60 @@ const resolveOperationFactory = (contractAddress, account) => async (methodName,
   });
 };
 
+const getSwapExchangeRate = async ({ decimals }) => {
+  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_ADDRESS);
+  const [token0, token1] = await readContract({
+    contract,
+    method: 'function getReserves() view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast)',
+    params: [],
+  });
+  const dec = window.BigInt(decimals);
+  return {
+    exchangeRate: ((token0 * dec) / token1) / dec,
+  };
+};
+
+const depositWETH = async (account, ethAmount) => {
+  const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS, account);
+  await resolveOperation(
+    'function deposit() public payable',
+    [],
+    ethAmount,
+  );
+};
+
+const withdrawWETH = async (account, ethAmount) => {
+  const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS, account);
+  await resolveOperation(
+    'function withdraw(uint256 wad)',
+    [ethAmount],
+  );
+};
+
+const swapWETHForLP = async (
+  account,
+  ethAmount,
+  desiredAmount,
+  tokenAddress,
+) => {
+  try {
+    const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_UNISWAP_ADDRESS, account);
+    const [
+      leftover,
+      tokens,
+    ] = await resolveOperation(
+      // eslint-disable-next-line max-len
+      'function swapTokensForExactTokens(uint256 amountOut,uint256 amountInMax,address[] calldata path,address to,uint256 deadline) external returns (uint256[] memory amounts)',
+      [desiredAmount, ethAmount, [process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS, tokenAddress]],
+    );
+    return [leftover, tokens];
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    return [ethAmount, 0];
+  }
+};
+
 const erc20Approve = async (erc20Address, account, spender, value) => {
   const resolveOperation = resolveOperationFactory(erc20Address, account);
   await resolveOperation(
@@ -78,6 +132,34 @@ const stakeTokens = async (account, erc20Address, tokens) => {
   const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
   await erc20Approve(erc20Address, account, process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, tokens);
   await resolveOperation('function stake(uint256 _amount) payable', [tokens]);
+};
+
+const stakeLPWithEth = async (
+  account,
+  ethAmount,
+  decimals,
+  tokenAddress,
+) => {
+  const { exchangeRate } = await getSwapExchangeRate({ decimals });
+  await depositWETH(account, ethAmount);
+  await erc20Approve(
+    process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS,
+    account,
+    process.env.REACT_APP_THIRD_WEB_UNISWAP_ADDRESS,
+    ethAmount,
+  );
+  const [leftover, tokens] = await swapWETHForLP(
+    account,
+    ethAmount,
+    exchangeRate * ethAmount,
+    tokenAddress,
+  );
+  if (leftover > 0) {
+    await withdrawWETH(account, leftover);
+  }
+  if (tokens > 0) {
+    await stakeTokens(account, tokenAddress, tokens);
+  }
 };
 
 const claimRewards = async (account) => {
@@ -246,4 +328,6 @@ export {
   getERC20Balance,
   getAvailableWallets,
   withdrawTokens,
+  getSwapExchangeRate,
+  stakeLPWithEth,
 };

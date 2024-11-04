@@ -179,6 +179,7 @@ export default function* rootSaga() {
     ethSagas.tokenStakeAddressInfoWatcher(),
     ethSagas.erc20InfoWatcher(),
     ethSagas.erc20BalanceWatcher(),
+    ethSagas.getWethExchangeRateWatcher(),
 
     // FINANCES
     financesSagas.getFinancesWatcher(),
