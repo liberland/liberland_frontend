@@ -7,6 +7,7 @@ export const {
   getTokenStakeAddressInfo,
   getErc20Info,
   getErc20Balance,
+  getWethLpExchangeRate,
 } = createActions({
   GET_ETH_WALLET_OPTIONS: {
     call: undefined,
@@ -34,6 +35,11 @@ export const {
     failure: undefined,
   },
   GET_ERC20_BALANCE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_WETH_LP_EXCHANGE_RATE: {
     call: undefined,
     success: undefined,
     failure: undefined,
