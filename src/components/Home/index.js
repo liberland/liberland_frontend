@@ -20,6 +20,7 @@ import Congress from '../Congress';
 
 import Contracts from '../Contracts';
 import Senate from '../Senate';
+import ChangeRoute from './ChangeRouter';
 
 function Home() {
   const renderRoutes = [
@@ -55,6 +56,7 @@ function Home() {
 
   return (
     <div>
+      <ChangeRoute />
       <div className={styles.homeContentWrapper}>
         <HomeNavigation />
         <div className={styles.homeMain}>

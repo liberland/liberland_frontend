@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { blockchainSelectors, userSelectors } from '../../redux/selectors';
 import UnsupportedBrowserNoticeComponent from '../GuidedSetup/UnSupportedBrowserNoticeComponent';
-import NoWalletsDetectedInBrowser from '../GuidedSetup/NoWalletsDetectedInBrowser';
 import LoadingComponent from '../GuidedSetup/LoadingComponent';
 import { GuidedSetupWrapper } from '../GuidedSetup/Wrapper';
 import { blockchainActions } from '../../redux/actions';
@@ -49,7 +48,7 @@ export function CheckExtensionWalletProvider({ children }) {
     );
   }
 
-  if (!acceptedBrowser && isUnsupportedBrowser) {
+  if (!acceptedBrowser && isUnsupportedBrowser && walletAddress) {
     return (
       <GuidedSetupWrapper>
         <UnsupportedBrowserNoticeComponent
@@ -59,15 +58,7 @@ export function CheckExtensionWalletProvider({ children }) {
     );
   }
 
-  if (extensions.length === 0 || wallets.length === 0) {
-    return (
-      <GuidedSetupWrapper>
-        <NoWalletsDetectedInBrowser />
-      </GuidedSetupWrapper>
-    );
-  }
-
-  if (!walletAddress) {
+  if (!walletAddress && (userBlockchainAdressStorage || wallets[0]?.address)) {
     dispatch(blockchainActions.setUserWallet.success(userBlockchainAdressStorage || wallets[0].address));
   }
 
