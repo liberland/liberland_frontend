@@ -22,6 +22,7 @@ function TextInput({
   className,
   minLength,
   maxLength,
+  readOnly,
 }) {
   return (
     <div className={cx(styles.inputWrapper, className)}>
@@ -33,6 +34,7 @@ function TextInput({
         width={width}
         value={value}
         disabled={disabled}
+        readOnly={readOnly}
         onPaste={onPaste}
         {...register(
           name,
