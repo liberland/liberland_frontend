@@ -29,7 +29,7 @@ function NoWalletsDetectedInBrowser() {
       <br />
       <p>
         <a
-          href="https://liberland-1.gitbook.io/wiki/v/public-documents/blockchain/for-citizens/onboarding"
+          href="https://docs.liberland.org/public-documents/blockchain/for-citizens/onboarding"
         >
           Read the guide for details
         </a>

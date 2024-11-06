@@ -1,0 +1,34 @@
+@import "../../../../assets/base/variables";
+@import '../../../../assets/main.scss';
+@import '../../../../index.scss';
+
+.countdown {
+  font-size: 18px;
+  font-family: $playfairDisplay;
+  color: $black;
+  margin-top: 20px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    font-size: 22px;
+  }
+}
+
+.progressContainer { // https://css-tricks.com/html5-progress-element/
+  margin-top: 20px;
+  progress[value] {
+    -webkit-appearance: none;
+       -moz-appearance: none;
+            appearance: none;
+    border: none;
+    width: 100%;
+  }
+  progress[value]::-webkit-progress-value,
+  progress[value]::-moz-progress-bar {
+    background-image:
+       -webkit-linear-gradient(-45deg, transparent 33%, rgba(0, 0, 0, .1) 33%, rgba(0,0, 0, .1) 66%, transparent 66%),
+       -webkit-linear-gradient(top, rgba(255, 255, 255, .25), rgba(0, 0, 0, .25)),
+       -webkit-linear-gradient(left, rgb(21, 119, 198), rgb(247, 208, 52));
+      border-radius: 2px; 
+      background-size: 35px 20px, 100% 100%, 100% 100%;
+  }
+}

@@ -916,12 +916,14 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     getIdentityDataProper(runnersUpList),
   ]);
 
+  const electionsInfo = await api.derive.elections.info();
+
   /*
-   const electionsInfo = useCall<DeriveElectionsInfo>(api.derive.elections.info);
-   const allVotes = useCall<Record<string, AccountId[]>>(api.derive.council.votes, undefined, transformVotes);
-   */
+    const allVotes = useCall(api.derive.council.votes, undefined, transformVotes);
+  */
 
   return {
+    electionsInfo,
     runnersUp: runnersUpListIdentities,
     currentCongressMembers: crossReferencedCouncilMemberIdentities,
     candidates: crossReferencedCandidateIdentities,

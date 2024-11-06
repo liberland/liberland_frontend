@@ -27,3 +27,13 @@ export const generatePdf = async (companyId, pathName, blockNumber) => {
     throw new Error(err);
   }
 };
+
+export const getFinancialMetrics = async () => {
+  const middlewareApi = getMiddlewareApi();
+  try {
+    const response = await middlewareApi.get('/v1/lld-stats');
+    return response.data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
