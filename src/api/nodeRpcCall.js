@@ -415,6 +415,10 @@ const getEResidentAdditionals = () => [
   [{ Raw: 'eresident' }, { Raw: '1' }],
 ];
 
+const getCompanyAdditionals = () => [
+  [{ Raw: 'company' }, { Raw: '1' }],
+];
+
 const buildAdditionals = (values, blockNumber) => {
   const additionals = [];
 
@@ -426,6 +430,10 @@ const buildAdditionals = (values, blockNumber) => {
   } else if (values.onChainIdentity === 'eresident') {
     additionals.push(
       ...getEResidentAdditionals(),
+    );
+  } else if (values.onChainIdentity === 'company') {
+    additionals.push(
+      ...getCompanyAdditionals(),
     );
   }
 
