@@ -7,7 +7,7 @@ import truncate from '../../utils/truncate';
 import styles from './styles.module.scss';
 
 function CopyIconWithAddress({
-  address, name, isTruncate, legal,
+  address, name, isTruncate, legal, showAddress,
 }) {
   const notificationRef = useRef();
   const isBigScreen = useMediaQuery('(min-width: 1200px)');
@@ -26,7 +26,16 @@ function CopyIconWithAddress({
           {legal && truncate(legal, 20)}
         </span>
       ) : (
-        <span>{isTruncate ? truncate(address, isBigScreen ? 18 : 12) : address}</span>
+        <span>
+          {isTruncate ? truncate(address, isBigScreen ? 18 : 12) : address}
+        </span>
+      )}
+      {showAddress && (name || legal) && (
+        <span>
+          (
+            {isTruncate ? truncate(address, isBigScreen ? 18 : 12) : address}
+          )
+        </span>
       )}
       <CopyIcon
         className={styles.copyIcon}
@@ -42,6 +51,7 @@ CopyIconWithAddress.defaultProps = {
   address: null,
   isTruncate: true,
   legal: null,
+  showAddress: false,
 };
 
 CopyIconWithAddress.propTypes = {
@@ -49,6 +59,7 @@ CopyIconWithAddress.propTypes = {
   name: PropTypes.string,
   isTruncate: PropTypes.bool,
   legal: PropTypes.string,
+  showAddress: PropTypes.bool,
 };
 
 export default CopyIconWithAddress;
