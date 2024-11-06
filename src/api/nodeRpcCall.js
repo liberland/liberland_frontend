@@ -2566,10 +2566,19 @@ const getSenateMotions = async () => {
         [api.query.senate.voting, proposal],
         [api.query.senate.members],
       ]);
+      let votes;
+      const votingUnwrapped = voting.isSome ? voting.unwrap() : null;
+      if (votingUnwrapped) {
+        const ayes = votingUnwrapped.ayes.map((item) => item.toString());
+        const nays = votingUnwrapped.nays.map((item) => item.toString());
+        votes = ayes.concat(nays);
+      }
+
       return {
         proposal,
         proposalOf,
         voting,
+        votes,
         membersCount: members.length,
       };
     }),
