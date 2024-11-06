@@ -850,6 +850,38 @@ const submitProposal = async (
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+async function getIdentityDataProper(addressesIdentityData) {
+  const api = await getApi();
+  if (addressesIdentityData.length === 0) return [];
+  const identityQueries = addressesIdentityData.map((address) => [api.query.identity.identityOf, address]);
+  const identities = await api.queryMulti(identityQueries);
+  return addressesIdentityData.map((address, index) => {
+    const identity = identities[index];
+
+    const isIdentity = identity.isSome;
+
+    const addressString = address.toString();
+    let nameData;
+    let legalData;
+    let websiteData;
+    if (isIdentity) {
+      const identityData = identity.unwrap();
+      const { info } = identityData;
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal']);
+      nameData = decodedData?.display;
+      legalData = decodedData?.legal;
+      websiteData = decodedData?.web;
+    }
+    return {
+      name: nameData,
+      legal: legalData,
+      website: websiteData,
+      identityData: identity.isSome ? identity.unwrap().toJSON() : null,
+      rawIdentity: addressString,
+    };
+  });
+}
+
 const getCongressMembersWithIdentity = async (walletAddress) => {
   const api = await getApi();
   const [
@@ -865,38 +897,6 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     api.query.elections.runnersUp,
   ]);
 
-  async function getIdentityData(addresses) {
-    if (addresses.length === 0) return [];
-    const identityQueries = addresses.map((address) => [api.query.identity.identityOf, address]);
-    const identities = await api.queryMulti(identityQueries);
-    return addresses.map((address, index) => {
-      const identity = identities[index];
-
-      const isIdentity = identity.isSome;
-
-      const addressString = address.toString();
-      let nameData;
-      let legalData;
-      let websiteData;
-      if (isIdentity) {
-        const identityData = identity.unwrap();
-        const { info } = identityData;
-
-        const decodedData = decodeAndFilter(info, ['display', 'web', 'legal']);
-        nameData = decodedData?.display;
-        legalData = decodedData?.legal;
-        websiteData = decodedData?.web;
-      }
-      return {
-        name: nameData,
-        legal: legalData,
-        website: websiteData,
-        identityData: identity.isSome ? identity.unwrap().toJSON() : null,
-        rawIdentity: addressString,
-      };
-    });
-  }
-
   const councilMembersList = councilMembers.map((member) => member.toString());
   const candidatesList = candidates.map((candidate) => candidate[0].toString());
   const currentCandidateVotesByUser = !currentCandidateVotesByUserQuery.isEmpty
@@ -910,10 +910,10 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     crossReferencedCurrentCandidateVotesByUser,
     runnersUpListIdentities,
   ] = await Promise.all([
-    getIdentityData(councilMembersList),
-    getIdentityData(candidatesList),
-    getIdentityData(currentCandidateVotesByUser),
-    getIdentityData(runnersUpList),
+    getIdentityDataProper(councilMembersList),
+    getIdentityDataProper(candidatesList),
+    getIdentityDataProper(currentCandidateVotesByUser),
+    getIdentityDataProper(runnersUpList),
   ]);
 
   /*
