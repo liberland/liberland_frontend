@@ -1,5 +1,10 @@
 import {
-  createThirdwebClient, getContract, readContract, prepareContractCall, sendTransaction, waitForReceipt,
+  createThirdwebClient,
+  getContract,
+  readContract,
+  prepareContractCall,
+  sendTransaction,
+  waitForReceipt,
 } from 'thirdweb';
 import { getAllWalletsList, injectedProvider } from 'thirdweb/wallets';
 import { ethers5Adapter } from 'thirdweb/adapters/ethers5';
@@ -65,16 +70,27 @@ const resolveOperationFactory = (contractAddress, account) => async (methodName,
 };
 
 const getSwapExchangeRate = async ({ decimals }) => {
-  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_ADDRESS);
-  const [token0, token1] = await readContract({
-    contract,
-    method: 'function getReserves() view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast)',
-    params: [],
-  });
-  const dec = window.BigInt(decimals);
-  return {
-    exchangeRate: ((token0 * dec) / token1) / dec,
-  };
+  try {
+    const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_ADDRESS);
+    const [token0, token1] = await readContract({
+      contract,
+      method: 'function getReserves() view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast)',
+      params: [],
+    });
+    const dec = window.BigInt(decimals);
+    if (token1.toString() === '0') {
+      return {
+        exchangeRate: window.BigInt(0),
+      };
+    }
+    return {
+      exchangeRate: ((token0 * dec) / token1) / dec,
+    };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
 };
 
 const depositWETH = async (account, ethAmount) => {
@@ -99,6 +115,7 @@ const swapWETHForLP = async (
   ethAmount,
   desiredAmount,
   tokenAddress,
+  provider,
 ) => {
   try {
     const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_UNISWAP_ADDRESS, account);
@@ -108,9 +125,15 @@ const swapWETHForLP = async (
     ] = await resolveOperation(
       // eslint-disable-next-line max-len
       'function swapTokensForExactTokens(uint256 amountOut,uint256 amountInMax,address[] calldata path,address to,uint256 deadline) external returns (uint256[] memory amounts)',
-      [desiredAmount, ethAmount, [process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS, tokenAddress]],
+      [
+        desiredAmount,
+        ethAmount,
+        [process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS, tokenAddress],
+        await account.getAddress(),
+        await provider.getBlockNumber(),
+      ],
     );
-    return [leftover, tokens];
+    return [window.BigInt(leftover), window.BigInt(tokens)];
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -139,6 +162,7 @@ const stakeLPWithEth = async (
   ethAmount,
   decimals,
   tokenAddress,
+  provider,
 ) => {
   const { exchangeRate } = await getSwapExchangeRate({ decimals });
   await depositWETH(account, ethAmount);
@@ -151,8 +175,9 @@ const stakeLPWithEth = async (
   const [leftover, tokens] = await swapWETHForLP(
     account,
     ethAmount,
-    exchangeRate * ethAmount,
+    exchangeRate * window.BigInt(ethAmount),
     tokenAddress,
+    provider,
   );
   if (leftover > 0) {
     await withdrawWETH(account, leftover);
@@ -160,6 +185,7 @@ const stakeLPWithEth = async (
   if (tokens > 0) {
     await stakeTokens(account, tokenAddress, tokens);
   }
+  return [leftover, tokens];
 };
 
 const claimRewards = async (account) => {

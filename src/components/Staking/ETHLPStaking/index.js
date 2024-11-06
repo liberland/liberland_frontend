@@ -23,6 +23,7 @@ export default function ETHLPStaking() {
               you can get here.
             </a>
             <br />
+            {/* eslint-disable-next-line max-len */}
             <a href="https://docs.liberland.org/public-documents/blockchain/for-validators-nominators-and-stakers/liquidity-staking">
               Read the instructions for more details
             </a>
