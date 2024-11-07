@@ -5,7 +5,6 @@ import { useMediaQuery } from 'usehooks-ts';
 import RoleHOC from '../../hocs/RoleHOC';
 
 import styles from './styles.module.scss';
-
 // eslint-disable-next-line react/prop-types
 function Tabs({ navigationList }) {
   const isTablet = useMediaQuery('(min-width: 768px)');

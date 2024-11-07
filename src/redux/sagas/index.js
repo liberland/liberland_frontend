@@ -182,5 +182,16 @@ export default function* rootSaga() {
 
     // FINANCES
     financesSagas.getFinancesWatcher(),
+    nftsSagas.createCollectionWatcher(),
+    nftsSagas.mintNftWatcher(),
+    nftsSagas.destroyNftWatcher(),
+    nftsSagas.setMetadataWatcher(),
+    nftsSagas.setAttributesWatcher(),
+    nftsSagas.sellNftWatcher(),
+    nftsSagas.bidNftWatcher(),
+    nftsSagas.transferNftWatcher(),
+    nftsSagas.getUserCollectionstWatcher(),
+    nftsSagas.getNftsWatcher(),
+    nftsSagas.getNftsOnSaleWatcher(),
   ]);
 }

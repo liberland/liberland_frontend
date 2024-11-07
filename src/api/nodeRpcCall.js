@@ -15,6 +15,7 @@ import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
+import { decodeAndFilter } from '../utils/identityParser';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -381,12 +382,12 @@ const provideJudgementAndAssets = async ({
   return submitExtrinsic(finalCall, walletAddress, api);
 };
 
-const getLegalAdditionals = (legal) => {
+const getAdditionals = (itemData, key) => {
   const chunks = [];
-  for (let i = 0; i < legal.length; i += 32) {
+  for (let i = 0; i < itemData.length; i += 32) {
     chunks.push([
-      { Raw: 'legal' },
-      { Raw: legal.substr(i, 32) },
+      { Raw: key },
+      { Raw: itemData.substr(i, 32) },
     ]);
   }
   return chunks;
@@ -429,25 +430,32 @@ const buildAdditionals = (values, blockNumber) => {
     );
   }
 
-  if (values.legal) {
-    additionals.push(
-      ...getLegalAdditionals(values.legal),
-    );
-  }
+  const additionalItems = ['legal', 'web', 'display', 'email'];
+
+  additionalItems.map((item) => {
+    const itemData = values[item];
+    if (itemData && itemData.length > 32) {
+      additionals.push(
+        ...getAdditionals(itemData, item),
+      );
+    }
+    return null;
+  });
 
   return additionals;
 };
 
 const setIdentity = async (values, walletAddress) => {
   const asData = (v) => (v ? { Raw: v } : null);
+  const truncate = (v) => (v.length > 32 ? v.substring(0, 32) : v);
   const api = await getApi();
   const blockNumber = await api.derive.chain.bestNumber();
   const info = {
     additional: buildAdditionals(values, blockNumber.toNumber()),
-    display: asData(values.display),
-    legal: asData(null),
-    web: asData(values.web),
-    email: asData(values.email),
+    display: asData(truncate(values.display)),
+    legal: asData(truncate(values.legal)),
+    web: asData(truncate(values.web)),
+    email: asData(truncate(values.email)),
     riot: asData(null),
     image: asData(null),
     twitter: asData(null),
@@ -657,13 +665,15 @@ const getValidators = async () => {
 
   validatorsData.forEach((validatorData, index) => {
     const validatorHumanData = validatorData.toHuman();
+    const data = validatorData.isSome ? validatorData.unwrap() : null;
+    const decodedData = decodeAndFilter(data?.info, ['display']);
     const validatorWithBaseInfo = validatorsWithBaseInfo.validators[index];
     if (!validatorWithBaseInfo) return;
     const dataToAdd = {
       ...((validatorHumanData?.commission !== undefined) && { commission: validatorHumanData.commission }),
       ...((validatorHumanData?.blocked !== undefined) && { blocked: validatorHumanData.blocked }),
       // eslint-disable-next-line max-len
-      ...((validatorHumanData?.info?.display?.Raw !== undefined) && { displayName: validatorHumanData?.info?.display?.Raw }),
+      ...((decodedData?.display !== undefined) && { displayName: decodedData.display }),
       ...validatorWithBaseInfo,
       isWaiting: accountsToString(baseInfo.waitingIds).includes(validatorWithBaseInfo.key),
     };
@@ -672,6 +682,7 @@ const getValidators = async () => {
       ...dataToAdd,
     };
   });
+
   validators.sort((a, b) => {
     if (a.isWaiting && !b.isWaiting) return -1;
     if (!a.isWaiting && b.isWaiting) return 1;
@@ -744,7 +755,6 @@ const getDemocracyReferendums = async (address) => {
 
     const motions = (await api.query.council.proposals())
       .map((propose) => propose.toString());
-
     const centralizedReferendumsData = await centralizedBackend.getReferenda();
     const crossReferencedReferendumsData = crossReference(
       api,
@@ -845,7 +855,6 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
   const [
     councilMembers,
     candidates,
-    // eslint-disable-next-line prefer-const
     currentCandidateVotesByUserQuery,
     runnersUp,
   ] = await api.queryMulti([
@@ -861,13 +870,28 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     const identities = await api.queryMulti(identityQueries);
     return addresses.map((address, index) => {
       const identity = identities[index];
-      const displayName = identity.isSome && identity.unwrap().info.display.isRaw
-        ? identity.unwrap().info.display.asRaw.toUtf8()
-        : address.toString();
+
+      const isIdentity = identity.isSome;
+
+      const addressString = address.toString();
+      let nameData;
+      let legalData;
+      let websiteData;
+      if (isIdentity) {
+        const identityData = identity.unwrap();
+        const { info } = identityData;
+
+        const decodedData = decodeAndFilter(info, ['display', 'web', 'legal']);
+        nameData = decodedData?.display;
+        legalData = decodedData?.legal;
+        websiteData = decodedData?.web;
+      }
       return {
-        name: displayName,
+        name: nameData,
+        legal: legalData,
+        website: websiteData,
         identityData: identity.isSome ? identity.unwrap().toJSON() : null,
-        rawIdentity: address.toString(),
+        rawIdentity: addressString,
       };
     });
   };
@@ -1303,22 +1327,6 @@ const getBlockEvents = async (blockHash) => {
   }
 };
 
-const getIdentitiesNames = async (addresses) => {
-  const api = await getApi();
-  const raw = await api.query.identity.identityOf.multi(addresses);
-  const identities = {};
-  raw.map((identity, idx) => {
-    identities[addresses[idx]] = {};
-    const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
-    const nameHashed = unwrapIdentity?.display?.asRaw;
-    const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
-    identities[addresses[idx]].identity = name;
-
-    return null;
-  });
-  return identities;
-};
-
 const getMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.council.proposals();
@@ -1676,6 +1684,29 @@ const getIdentities = async (addresses) => {
     address: addresses[idx],
     identity: identity.isSome ? identity.unwrap().info : null,
   }));
+};
+
+const getIdentitiesNames = async (addresses) => {
+  const api = await getApi();
+  const raw = await api.query.identity.identityOf.multi(addresses);
+  const identities = {};
+  raw.map((identity, idx) => {
+    identities[addresses[idx]] = {};
+    const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
+
+    let nameData;
+    let legalData;
+
+    if (unwrapIdentity) {
+      const decodedData = decodeAndFilter(unwrapIdentity, ['display', 'legal']);
+      nameData = decodedData?.display;
+      legalData = decodedData?.legal;
+    }
+    identities[addresses[idx]].identity = { name: nameData, legal: legalData };
+
+    return null;
+  });
+  return identities;
 };
 
 const stakingChill = async (walletAddress) => {
@@ -2586,47 +2617,210 @@ const decodeRemark = async (dataToEncode) => {
   return remarkInfo;
 };
 
-const getUserNfts = async (walletAddress) => {
+const decoder = new TextDecoder();
+
+function processData(data) {
+  const decodedData = decoder.decode(data);
+  try {
+    return JSON.parse(decodedData);
+  } catch (e) {
+    return { name: decodedData };
+  }
+}
+const getIpfsHash = (ipfsUrl) => {
+  if (ipfsUrl.startsWith('ipfs://')) {
+    return ipfsUrl.split('/').pop();
+  }
+  return ipfsUrl;
+};
+
+async function processUrlData(ipfsUrl, json = true) {
+  try {
+    const ipfsHash = getIpfsHash(ipfsUrl);
+    const url = `https://${process.env.REACT_APP_PINATA_GATEWAY}/ipfs/${ipfsHash}`;
+    const response = await fetch(url, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch IPFS data: ${response.status} ${response.statusText}`);
+    }
+    return json ? await response.json() : response;
+  } catch (error) {
+    return null;
+  }
+}
+
+const getAllNfts = async (filterIsOnSale = false) => {
   const api = await getApi();
-  const nftEntries = await api.query.nfts.account.entries(walletAddress);
 
-  const collectionIds = [];
-  const nftIds = [];
+  const nftEntries = await api.query.nfts.item.entries();
 
-  nftEntries.forEach(([key]) => {
-    const [collectionId, nftId] = key.args.slice(1);
-    collectionIds.push(collectionId.toString());
-    nftIds.push(nftId.toString());
-  });
+  const collectionIds = nftEntries.map(([key]) => key.args[0].toString());
+  const nftIds = nftEntries.map(([key]) => key.args[1].toString());
 
   const [collectionMetadata, itemMetadata] = await Promise.all([
     api.query.nfts.collectionMetadataOf.multi(collectionIds),
     api.query.nfts.itemMetadataOf.multi(collectionIds.map((id, index) => [id, nftIds[index]])),
   ]);
 
-  const decoder = new TextDecoder();
+  const nftDetails = await Promise.all(
+    nftEntries.map(async ([key], index) => {
+      const [collectionId, nftId] = key.args;
 
-  function processData(data) {
-    const decodedData = decoder.decode(data);
-    return JSON.parse(decodedData);
-  }
-  const nftDetails = collectionIds.map((collectionId, index) => {
-    const collectionData = collectionMetadata[index].unwrap();
-    const itemData = itemMetadata[index].unwrap();
-    return {
-      collectionId,
-      nftId: nftIds[index],
-      collectionMetadata: {
-        data: processData(collectionData.data).name,
-      },
-      itemMetadata: {
-        data: processData(itemData.data).imageUrl,
-      },
-    };
+      const collectionDataOpt = collectionMetadata[index];
+      const collectionMetadataUnwrapped = collectionDataOpt.isNone ? null : collectionDataOpt.unwrap();
+
+      const itemDataOpt = itemMetadata[index];
+      const itemMetadataUnwrapped = itemDataOpt.isNone ? null : itemDataOpt.unwrap();
+      const processedItemData = itemMetadataUnwrapped
+        ? await processUrlData(decoder.decode(itemMetadataUnwrapped.data))
+        : null;
+      let itemPrice;
+      if (filterIsOnSale) {
+        const itemPriceOpt = await api.query.nfts.itemPriceOf(collectionId, nftId);
+        itemPrice = itemPriceOpt.isNone ? null : itemPriceOpt.unwrap()[0].toString();
+        const isOnSale = itemPrice && itemPrice > 0;
+
+        if (!isOnSale) {
+          return null;
+        }
+      }
+
+      const imageUrl = processedItemData?.image;
+      const image = imageUrl ? await processUrlData(imageUrl, false) : null;
+
+      return {
+        collectionId: collectionId.toString(),
+        nftId: nftId.toString(),
+        collectionMetadata: {
+          name: collectionMetadataUnwrapped?.name?.toString(),
+        },
+        itemMetadata: {
+          ...processedItemData,
+          image: image?.url || imageUrl,
+          itemPrice,
+        },
+      };
+    }),
+  );
+
+  return nftDetails.filter((detail) => detail !== null);
+};
+
+async function checkUserCollection(userAddress) {
+  const api = await getApi();
+  const collectionKeys = await api.query.nfts.account.entries(userAddress);
+  const collectionIds = [];
+  const nftIds = [];
+
+  collectionKeys.forEach(([key]) => {
+    const [collectionId, nftId] = key.args.slice(1);
+    collectionIds.push(collectionId.toString());
+    nftIds.push(nftId.toString());
   });
+  return [collectionIds, nftIds];
+}
+
+const getUserNfts = async (walletAddress) => {
+  const api = await getApi();
+
+  const [collectionIds, nftIds] = await checkUserCollection(walletAddress);
+
+  const [collectionMetadata, itemMetadata] = await Promise.all([
+    api.query.nfts.collectionMetadataOf.multi(collectionIds),
+    api.query.nfts.itemMetadataOf.multi(collectionIds.map((id, index) => [id, nftIds[index]])),
+  ]);
+
+  const nftDetails = await Promise.all(
+    collectionIds.map(async (collectionId, index) => {
+      const collectionDataOpt = collectionMetadata[index];
+      const itemDataOpt = itemMetadata[index];
+
+      const collectionData = collectionDataOpt.isNone ? null : collectionDataOpt.unwrap();
+      const itemData = itemDataOpt.isNone ? null : itemDataOpt.unwrap();
+      const processedCollectionData = collectionData ? processData(collectionData.data) : null;
+      const processedItemData = itemData ? await processUrlData(decoder.decode(itemData.data)) : null;
+      const imageUrl = processedItemData?.image;
+      const image = imageUrl ? await processUrlData(imageUrl, false) : null;
+      return {
+        collectionId,
+        nftId: nftIds[index],
+        collectionMetadata: {
+          name: processedCollectionData?.name,
+        },
+        itemMetadata: {
+          ...processedItemData,
+          image: image?.url || imageUrl,
+        },
+      };
+    }),
+  );
 
   return nftDetails;
 };
+
+async function getUserCollection(walletAddress) {
+  const api = await getApi();
+
+  const collectionKeys = await api.query.nfts.collectionAccount.keys(walletAddress);
+
+  const collections = collectionKeys.map(({ args: [address, collectionId] }) => ({
+    address: address.toString(),
+    collectionId: collectionId.toNumber(),
+  }));
+
+  return collections;
+}
+
+async function createCollectionNfts(admin, config, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.create(admin, config);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function mintNFT(collectionId, itemId, mintTo, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.mint(collectionId, itemId, mintTo, null);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function destroyNFT(collectionId, itemId, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.burn(collectionId, itemId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function setMetadata(collectionId, itemId, metadataCID, walletAddress) {
+  const api = await getApi();
+  const metadata = `ipfs://${metadataCID}`;
+  const extrinsic = api.tx.nfts.setMetadata(collectionId, itemId, metadata);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function setAttributes(collectionId, itemId, namespace, key, value, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.setAttribute(collectionId, itemId, namespace, key, value);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function sellNFT(collectionId, itemId, price, walletAddress) {
+  const api = await getApi();
+  const buyer = api.createType('Option<MultiAddress>', null);
+  const extrinsic = api.tx.nfts.setPrice(collectionId, itemId, price, buyer);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function bidNFT(collectionId, itemId, bidPrice, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.buyItem(collectionId, itemId, bidPrice);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function transferNFT(collectionId, itemId, newOwner, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.transfer(collectionId, itemId, newOwner);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
 
 export {
   getBalanceByAddress,
@@ -2759,4 +2953,14 @@ export {
   encodeRemark,
   decodeRemark,
   getUserNfts,
+  createCollectionNfts,
+  mintNFT,
+  destroyNFT,
+  setMetadata,
+  setAttributes,
+  sellNFT,
+  bidNFT,
+  transferNFT,
+  getAllNfts,
+  getUserCollection,
 };
