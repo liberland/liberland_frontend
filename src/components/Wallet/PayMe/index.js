@@ -28,13 +28,13 @@ function PayMe() {
   }, [search]);
 
   React.useEffect(() => {
-    if (linkData.recipient) {
+    if (linkData?.recipient) {
       dispatch(identityActions.getIdentity.call(linkData.recipient));
     }
   }, [dispatch, linkData]);
 
   const { info } = identity?.unwrap() || {};
-  const displayName = info?.display || linkData?.recipient || 'No name';
+  const displayName = info?.display?.toHuman()?.Raw || linkData?.recipient || 'No name';
 
   const payRecipient = () => {
     dispatch(walletActions.sendTransferLLM.call({
