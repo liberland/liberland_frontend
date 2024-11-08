@@ -3,15 +3,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import QRCode from 'react-qr-code';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
-import ModalRoot from '../../Modals/ModalRoot';
-import { TextInput } from '../../InputComponents';
-import Button from '../../Button/Button';
-import { identitySelectors } from '../../../redux/selectors';
-import { identityActions } from '../../../redux/actions';
-import { formatDollars } from '../../../utils/walletHelpers';
-import Table from '../../Table';
-import UploadIcon from '../../../assets/icons/upload.svg';
+import ModalRoot from '../../../Modals/ModalRoot';
+import { TextInput } from '../../../InputComponents';
+import Button from '../../../Button/Button';
+import { identitySelectors } from '../../../../redux/selectors';
+import { identityActions } from '../../../../redux/actions';
+import { formatDollars, parseDollars } from '../../../../utils/walletHelpers';
+import Table from '../../../Table';
+import { ReactComponent as DocumentsIcon } from '../../../../assets/icons/documents.svg';
+import router from '../../../../router';
 import styles from './styles.module.scss';
+import CopyLink from '../CopyLink';
 
 function WalletLinkFactory({
   onClose,
@@ -37,23 +39,28 @@ function WalletLinkFactory({
   const [linkData, setLinkData] = React.useState();
 
   React.useEffect(() => {
-    dispatch(identityActions.getIdentity.call(walletAddress));
+    if (walletAddress) {
+      dispatch(identityActions.getIdentity.call(walletAddress));
+    }
   }, [dispatch, walletAddress]);
 
   const onSubmit = async ({ amount, note }) => {
     try {
+      const realAmount = parseDollars(amount).toString();
       const data = window.btoa(JSON.stringify({
-        amount,
+        amount: realAmount,
         note,
-        walletAddress,
+        recipient: walletAddress,
       }));
-      const link = `${window.location.protocol}//${window.location.host}/pay-me?data=${data}`;
-      const subwalletLink = `https://mobile.subwallet.app/browser?url=${window.encodeURI(link)}`;
+      const link = `${window.location.protocol}//${window.location.host}${router.wallet.payMe}?data=${data}`;
+      const subwalletLink = `https://mobile.subwallet.app/browser?url=${window.encodeURIComponent(link)}`;
+      const edgeLink = `https://deep.edge.app/pay/liberland/${walletAddress}?amount=${realAmount}`;
       setLinkData({
-        amount,
+        amount: realAmount,
         note,
         link,
         subwalletLink,
+        edgeLink,
       });
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -70,7 +77,7 @@ function WalletLinkFactory({
   }
 
   const { info } = identity?.unwrap() || {};
-  const displayName = info?.display || walletAddress;
+  const displayName = info?.display?.toHuman()?.Raw || walletAddress || 'No name';
 
   return (
     <form
@@ -78,47 +85,57 @@ function WalletLinkFactory({
       className={styles.form}
     >
       {linkData && (
-        <Table
-          columns={[
-            {
-              Header: 'Link data',
-              accessor: 'name',
-            },
-            {
-              Header: '',
-              accessor: 'value',
-            },
-          ]}
-          data={[
-            {
-              name: 'Link',
-              value: linkData.link,
-            },
-            {
-              name: 'QR code',
-              value: <QRCode value={linkData.link} />,
-            },
-            {
-              name: 'Subwallet link',
-              value: linkData.subwalletLink,
-            },
-            {
-              name: 'QR code',
-              value: <QRCode value={linkData.subwalletLink} />,
-            },
-            {
-              name: 'Recipient',
-              value: displayName,
-            },
-            {
-              name: 'Amount',
-              value: `${formatDollars(linkData.amount)} LLD`,
-            },
-          ].concat(linkData.note ? [{
-            name: 'Note',
-            value: linkData.note,
-          }] : [])}
-        />
+        <div className={styles.tableContainer}>
+          <Table
+            columns={[
+              {
+                Header: 'Payment information',
+                accessor: 'name',
+              },
+              {
+                Header: '',
+                accessor: 'value',
+              },
+            ]}
+            data={[
+              {
+                name: 'Link',
+                value: <CopyLink link={linkData.link} />,
+              },
+              {
+                name: 'QR code',
+                value: <QRCode value={linkData.link} />,
+              },
+              {
+                name: 'Subwallet link',
+                value: <CopyLink link={linkData.subwalletLink} />,
+              },
+              {
+                name: 'Subwallet QR code',
+                value: <QRCode value={linkData.subwalletLink} />,
+              },
+              {
+                name: 'Edge link',
+                value: <CopyLink link={linkData.edgeLink} />,
+              },
+              {
+                name: 'Edge QR code',
+                value: <QRCode value={linkData.edgeLink} />,
+              },
+              {
+                name: 'Recipient',
+                value: displayName,
+              },
+              {
+                name: 'Amount',
+                value: `${formatDollars(linkData.amount, true)} LLD`,
+              },
+            ].concat(linkData.note ? [{
+              name: 'Note',
+              value: linkData.note,
+            }] : [])}
+          />
+        </div>
       )}
       <label className={styles.wrapper} htmlFor="amount">
         Requested payment amount in LLD
@@ -131,7 +148,7 @@ function WalletLinkFactory({
             value={amount}
             className={styles.input}
             onChange={(event) => setValue('amount', event.target.value)}
-            validate={(input) => (!input || /^-?\d*\.?\d+$/.test(input) ? undefined : 'Invalid amount')}
+            validate={(input) => (!input || /^\d*\.?\d+$/.test(input) ? undefined : 'Invalid amount')}
             disabled={isSubmitting}
             placeholder="LLD"
             required
@@ -186,18 +203,19 @@ WalletLinkFactory.propTypes = {
 function WalletLinkFactoryModalWrapper(props) {
   const [show, setShow] = React.useState();
   return (
-    <div className={styles.modal}>
-      <Button primary medium onClick={() => setShow(true)}>
-        <UploadIcon />
-        {' '}
-        Request payment
+    <>
+      <Button className={styles.button} primary small onClick={() => setShow(true)}>
+        <div className={styles.requestIcon}>
+          <DocumentsIcon />
+        </div>
+        REQUEST LLD
       </Button>
       {show && (
         <ModalRoot>
           <WalletLinkFactory {...props} onClose={() => setShow(false)} />
         </ModalRoot>
       )}
-    </div>
+    </>
   );
 }
 
