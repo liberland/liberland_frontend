@@ -58,14 +58,22 @@
   }
 }
 
+.listContainer,
 .tableContainer {
   box-shadow: 0px 2px 4px rgba(176, 183, 195, 0.9);
   margin-bottom: 20px;
+}
 
+.tableContainer {
   thead {
     tr {
       background-color: white;
       box-shadow: 0px 2px 4px rgba(176, 183, 195, 0.9);
+      th {
+        &:last-child {
+          padding: 14px 0 14px 14px;
+        }
+      }
     }
   }
 
@@ -77,10 +85,26 @@
   }
   
   td {
-    padding: 10px;
+    padding: 20px 10px;
 
     svg {
       max-width: 100%;
     }
+  }
+}
+
+.listContainer {
+  padding-bottom: 20px;
+
+  h2 {
+    padding: 10px;
+  }
+  button {
+    margin: 10px 0;
+  }
+  svg {
+    display: block;
+    margin: 10px 20px 10px 0;
+    max-width: 100%;
   }
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useMediaQuery } from 'usehooks-ts';
 import QRCode from 'react-qr-code';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
@@ -71,6 +72,7 @@ function WalletLinkFactory({
 
   const amount = watch('amount', '');
   const note = watch('note', '');
+  const isLargerThanTable = useMediaQuery('(min-width: 768px)');
 
   if (identityIsLoading) {
     return <div className={styles.form}>Loading...</div>;
@@ -85,56 +87,110 @@ function WalletLinkFactory({
       className={styles.form}
     >
       {linkData && (
-        <div className={styles.tableContainer}>
-          <Table
-            columns={[
-              {
-                Header: 'Payment information',
-                accessor: 'name',
-              },
-              {
-                Header: '',
-                accessor: 'value',
-              },
-            ]}
-            data={[
-              {
-                name: 'Link',
-                value: <CopyLink link={linkData.link} />,
-              },
-              {
-                name: 'QR code',
-                value: <QRCode value={linkData.link} />,
-              },
-              {
-                name: 'Subwallet link',
-                value: <CopyLink link={linkData.subwalletLink} />,
-              },
-              {
-                name: 'Subwallet QR code',
-                value: <QRCode value={linkData.subwalletLink} />,
-              },
-              {
-                name: 'Edge link',
-                value: <CopyLink link={linkData.edgeLink} />,
-              },
-              {
-                name: 'Edge QR code',
-                value: <QRCode value={linkData.edgeLink} />,
-              },
-              {
-                name: 'Recipient',
-                value: displayName,
-              },
-              {
-                name: 'Amount',
-                value: `${formatDollars(linkData.amount, true)} LLD`,
-              },
-            ].concat(linkData.note ? [{
-              name: 'Note',
-              value: linkData.note,
-            }] : [])}
-          />
+        <div>
+          {isLargerThanTable ? (
+            <div className={styles.tableContainer}>
+              <Table
+                columns={[
+                  {
+                    Header: 'Link',
+                    accessor: 'name',
+                  },
+                  {
+                    Header: '',
+                    accessor: 'value',
+                  },
+                  {
+                    Header: 'QR code',
+                    accessor: 'qr',
+                  },
+                ]}
+                data={[
+                  {
+                    name: 'Direct link',
+                    value: <CopyLink link={linkData.link} />,
+                    qr: <QRCode value={linkData.link} />,
+                  },
+                  {
+                    name: 'Subwallet link',
+                    value: <CopyLink link={linkData.subwalletLink} />,
+                    qr: <QRCode value={linkData.subwalletLink} />,
+                  },
+                  {
+                    name: 'Edge link',
+                    value: <CopyLink link={linkData.edgeLink} />,
+                    qr: <QRCode value={linkData.edgeLink} />,
+                  },
+                ]}
+              />
+            </div>
+          ) : (
+            <div className={styles.listContainer}>
+              <h2>Payment links</h2>
+              <ul>
+                <li>
+                  Direct:
+                  {' '}
+                  <CopyLink link={linkData.link} />
+                </li>
+                <li>
+                  Subwallet:
+                  {' '}
+                  <CopyLink link={linkData.subwalletLink} />
+                </li>
+                <li>
+                  Edge:
+                  {' '}
+                  <CopyLink link={linkData.edgeLink} />
+                </li>
+              </ul>
+              <h2>Payment QR codes</h2>
+              <ul>
+                <li>
+                  Direct:
+                  {' '}
+                  <QRCode value={linkData.link} />
+                </li>
+                <li>
+                  Subwallet:
+                  {' '}
+                  <QRCode value={linkData.subwalletLink} />
+                </li>
+                <li>
+                  Edge:
+                  {' '}
+                  <QRCode value={linkData.edgeLink} />
+                </li>
+              </ul>
+            </div>
+          )}
+          <div className={styles.tableContainer}>
+            <Table
+              columns={[
+                {
+                  Header: 'Payment information',
+                  accessor: 'name',
+                },
+                {
+                  Header: '',
+                  accessor: 'value',
+                },
+              ]}
+              data={[
+                {
+                  name: 'Recipient',
+                  value: displayName,
+                },
+                {
+                  name: 'Amount',
+                  value: `${formatDollars(linkData.amount, true)} LLD`,
+                },
+              ].concat(linkData.note ? [{
+                name: 'Note',
+                value: linkData.note,
+              }] : [])}
+            />
+          </div>
         </div>
       )}
       <label className={styles.wrapper} htmlFor="amount">
