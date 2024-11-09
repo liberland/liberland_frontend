@@ -22,6 +22,14 @@ function MotionsWrapper() {
   );
 }
 
+function ScheduledCongressSpendingWrapper() {
+  return (
+    <MotionProvider>
+      <ScheduledCongressSpending isVetoButton />
+    </MotionProvider>
+  );
+}
+
 function Senate() {
   return (
     <div className={stylesPage.sectionWrapper}>
@@ -39,7 +47,7 @@ function Senate() {
           <Route
             exact
             path={router.senate.scheduledCongressSpending}
-            render={() => <ScheduledCongressSpending isVetoButton />}
+            render={ScheduledCongressSpendingWrapper}
           />
           <Route
             exact
