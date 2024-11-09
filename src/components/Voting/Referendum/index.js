@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import cx from 'classnames';
@@ -11,9 +11,10 @@ import DispatchItem from './Items/DispatchItem';
 import {
   VoteOnReferendumModal, UndelegateModal,
 } from '../../Modals';
-import { democracyActions, congressActions } from '../../../redux/actions';
+import { democracyActions, congressActions, identityActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import stylesPage from '../../../utils/pagesBase.module.scss';
+import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 
 function Referendum() {
   const [isModalOpenVote, setIsModalOpenVote] = useState(false);
@@ -56,6 +57,15 @@ function Referendum() {
     if (referendum.allNay.map((v) => v.accountId.toString()).includes(userWalletAddress)) return 'Nay';
     return false;
   };
+  const dispatchRef = useRef(null);
+  const proposalRef = useRef(null);
+  const { motionIds } = useMotionContext();
+
+  useEffect(() => {
+    if (proposalRef.current || dispatchRef.current) {
+      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds))));
+    }
+  }, [motionIds, dispatch, proposalRef, dispatchRef]);
 
   return (
     <div className={cx(stylesPage.contentWrapper, styles.wrapper)}>
@@ -104,15 +114,23 @@ function Referendum() {
         <h3 className={styles.title}>Proposals</h3>
         <div className={styles.overViewCard}>
           { democracy.democracy?.crossReferencedProposalsData?.length > 0
-            ? democracy.democracy?.crossReferencedProposalsData.map((proposal) => (
-              <Card className={stylesPage.overviewWrapper} key={proposal.index}>
-                <ProposalItem
-                  centralizedDatas={proposal.centralizedDatas}
-                  boundedCall={proposal.boundedCall}
-                  blacklistMotion={proposal.blacklistMotion}
-                  userIsMember={userIsMember}
-                />
-              </Card>
+            ? democracy.democracy?.crossReferencedProposalsData.map((proposal, index) => (
+              <div
+                key={proposal.index}
+                // eslint-disable-next-line no-unsafe-optional-chaining
+                ref={democracy.democracy?.crossReferencedProposalsData?.length - 1 === index ? proposalRef : null}
+              >
+                <Card className={stylesPage.overviewWrapper}>
+                  <ProposalItem
+                    centralizedDatas={proposal.centralizedDatas}
+                    boundedCall={proposal.boundedCall}
+                    blacklistMotion={proposal.blacklistMotion}
+                    userIsMember={userIsMember}
+                  />
+                </Card>
+
+              </div>
+
             ))
             : 'There are no active Proposals'}
         </div>
@@ -121,15 +139,21 @@ function Referendum() {
         <h3 className={styles.title}>Dispatches</h3>
         <div className={styles.overViewCard}>
           {democracy.democracy?.scheduledCalls?.length > 0
-            ? democracy.democracy?.scheduledCalls.map((item) => (
-              <Card
-                className={cx(stylesPage.overviewWrapper, styles.itemWrapper)}
+            ? democracy.democracy?.scheduledCalls.map((item, index) => (
+              <div
+                // eslint-disable-next-line no-unsafe-optional-chaining
+                ref={democracy.democracy?.scheduledCalls?.length - 1 === index ? dispatchRef : null}
                 key={`${item.blockNumber.toString()}-${item.idx}`}
               >
-                <DispatchItem
-                  item={item}
-                />
-              </Card>
+                <Card
+                  className={cx(stylesPage.overviewWrapper, styles.itemWrapper)}
+                >
+                  <DispatchItem
+                    item={item}
+                  />
+                </Card>
+              </div>
+
             )) : 'There are no active Dispatches'}
         </div>
       </div>
