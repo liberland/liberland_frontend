@@ -10,6 +10,7 @@ import Table from '../../Table';
 import styles from './styles.module.scss';
 import { formatCustom } from '../../../utils/walletHelpers';
 import UpdateOrCreateAssetFormModalWrapper from './UpdateOrCreateAssetForm';
+import ActionsMenuModalWrapper from './ActionsMenu';
 
 function Assets() {
   const userWalletAddress = useSelector(
@@ -46,22 +47,25 @@ function Assets() {
       ...assetDetails[index]?.identity,
       supply: `${
         formatCustom(assetDetails[index]?.supply ?? '0', parseInt(asset.metadata.decimals))} ${asset.metadata.symbol}`,
-      update: assetDetails[index]?.owner === userWalletAddress
-        || assetDetails[index]?.admin === userWalletAddress
-        ? (
-          <UpdateOrCreateAssetFormModalWrapper
-            defaultValues={{
-              admin: assetDetails[index]?.admin,
-              balance: assetDetails[index]?.balance,
-              decimals: asset.metadata.decimals,
-              freezer: assetDetails[index]?.freezer,
-              id: asset.index,
-              issuer: assetDetails[index]?.issuer,
-              name: asset.metadata.name,
-              symbol: asset.metadata.symbol,
-            }}
-          />
-        ) : undefined,
+      actions: (
+        <ActionsMenuModalWrapper
+          isFreezer={assetDetails[index]?.freezer === userWalletAddress}
+          isAdmin={assetDetails[index]?.admin === userWalletAddress}
+          isOwner={assetDetails[index]?.freezer === userWalletAddress}
+          isIssuer={assetDetails[index]?.freezer === userWalletAddress}
+          assetId={asset.index}
+          defaultValues={{
+            admin: assetDetails[index]?.admin,
+            balance: assetDetails[index]?.balance,
+            decimals: asset.metadata.decimals,
+            freezer: assetDetails[index]?.freezer,
+            id: asset.index,
+            issuer: assetDetails[index]?.issuer,
+            name: asset.metadata.name,
+            symbol: asset.metadata.symbol,
+          }}
+        />
+      ),
     }
   ));
 
@@ -107,8 +111,8 @@ function Assets() {
                 accessor: 'supply',
               },
               {
-                Header: 'Update',
-                accessor: 'update',
+                Header: 'Actions',
+                accessor: 'actions',
               },
             ] : [
               {
@@ -120,8 +124,8 @@ function Assets() {
                 accessor: 'owner',
               },
               {
-                Header: 'Update',
-                accessor: 'update',
+                Header: 'Actions',
+                accessor: 'actions',
               },
             ]}
           />

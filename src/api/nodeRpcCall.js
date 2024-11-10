@@ -301,6 +301,55 @@ const createOrUpdateAsset = async ({
   }
 };
 
+const mintAsset = async ({
+  id,
+  beneficiary,
+  amount,
+  owner,
+}) => {
+  try {
+    const api = await getApi();
+    const mint = await api.tx.assets.mint(id, beneficiary, amount);
+    await submitExtrinsic(mint, owner, api);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const freezeAsset = async ({
+  id,
+  owner,
+  frozen,
+}) => {
+  try {
+    const api = await getApi();
+    const freeze = !frozen ? await api.tx.assets.freezeAsset(id) : api.tx.assets.freeze(id, frozen);
+    await submitExtrinsic(freeze, owner, api);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const thawAsset = async ({
+  id,
+  owner,
+  thaw,
+}) => {
+  try {
+    const api = await getApi();
+    const freeze = !thaw ? await api.tx.assets.thawAsset(id) : api.tx.assets.thaw(id, thaw);
+    await submitExtrinsic(freeze, owner, api);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
 const getLlmBalances = async (addresses) => {
   try {
     const api = await getApi();
@@ -2886,4 +2935,7 @@ export {
   createNewPool,
   getAssetDetails,
   createOrUpdateAsset,
+  mintAsset,
+  freezeAsset,
+  thawAsset,
 };

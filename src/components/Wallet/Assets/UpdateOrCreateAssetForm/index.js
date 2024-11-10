@@ -315,7 +315,7 @@ function UpdateOrCreateAssetFormModalWrapper({
   const [show, setShow] = React.useState();
   return (
     <div className={isCreate ? styles.modal : undefined}>
-      <Button primary nano={!isCreate} medium={isCreate} onClick={() => setShow(true)}>
+      <Button primary medium onClick={() => setShow(true)}>
         {isCreate ? 'Create asset' : 'Update'}
       </Button>
       {show && (
