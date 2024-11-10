@@ -167,12 +167,10 @@ export const getDefaultValuesFromDataObject = (formObject, editMode = false) => 
       fieldValues?.forEach((field) => {
         const encryptable = dynamicField.fields.find((v) => v.key === field.key)?.encryptable;
         if (editMode) {
-          defaultValuesForField[index][field.key] = encryptable
-            ? {
-              value: field.display,
-              isEncrypted: field.isEncrypted,
-            }
-            : field.display;
+          defaultValuesForField[index][field.key] = {
+            value: field.display,
+            isEncrypted: field.isEncrypted,
+          };
         } else {
           defaultValuesForField[index][field.key] = encryptable
             ? {

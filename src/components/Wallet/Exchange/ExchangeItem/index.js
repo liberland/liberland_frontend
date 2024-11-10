@@ -141,9 +141,30 @@ function ExchangeItem({ poolData, assetsPoolData }) {
                   {` = ${swapPriceTokensForExactTokens} `}
                   <span className={styles.bold}>{asset1ToShow}</span>
                 </span>
-
               </div>
               )}
+            {(assetData1?.name || assetData2?.name) && (
+              <div className={styles.exchangeName}>
+                <span>
+                  <span className={styles.bold}>
+                    {asset1ToShow}
+                  </span>
+                  {' '}
+                  name:
+                  {' '}
+                  {asset1 === 'Native' ? 'Liberland dollar' : assetData1.name}
+                </span>
+                <span>
+                  <span className={styles.bold}>
+                    {asset2ToShow}
+                  </span>
+                  {' '}
+                  name:
+                  {' '}
+                  {asset2 === 'Native' ? 'Liberland dollar' : assetData2.name}
+                </span>
+              </div>
+            )}
           </div>
           <div>
             <Button
@@ -177,7 +198,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
 }
 
 ExchangeItem.propTypes = {
-  poolData: ExchangeItemPropTypes.isRequired,
+  poolData: PropTypes.shape(ExchangeItemPropTypes).isRequired,
   assetsPoolData: PropTypes.shape({
     supply: PropTypes.string,
   }).isRequired,

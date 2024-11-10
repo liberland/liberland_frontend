@@ -317,19 +317,25 @@ const getTokenStakeContractInfo = async () => {
 };
 
 const connectWallet = async ({ walletId }) => {
-  const injected = injectedProvider(walletId);
+  try {
+    const injected = injectedProvider(walletId);
 
-  if (!injected) {
-    throw new Error(`${walletId} provider not found`);
+    if (!injected) {
+      throw new Error(`${walletId} provider not found`);
+    }
+
+    const provider = new providers.Web3Provider(injected);
+    await injected.request({ method: 'eth_requestAccounts' });
+
+    return {
+      provider,
+      accounts: await provider.listAccounts(),
+    };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
   }
-
-  const provider = new providers.Web3Provider(injected);
-  await injected.request({ method: 'eth_requestAccounts' });
-
-  return {
-    provider,
-    accounts: await provider.listAccounts(),
-  };
 };
 
 const getAvailableWallets = async () => {

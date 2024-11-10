@@ -9,6 +9,8 @@ import styles from './styles.module.scss';
 export default function ETHLPStaking() {
   const [selectedWallet, setSelectedWallet] = React.useState();
   const [selectedAccount, setSelectedAccount] = React.useState();
+  // eslint-disable-next-line max-len
+  const instructions = 'https://docs.liberland.org/public-documents/blockchain/for-validators-nominators-and-stakers/liquidity-staking';
   return (
     <div className={stylesPage.contentWrapper}>
       <div className={stylesPage.sectionWrapper}>
@@ -23,8 +25,7 @@ export default function ETHLPStaking() {
               you can get here.
             </a>
             <br />
-            {/* eslint-disable-next-line max-len */}
-            <a href="https://docs.liberland.org/public-documents/blockchain/for-validators-nominators-and-stakers/liquidity-staking">
+            <a href={instructions}>
               Read the instructions for more details
             </a>
             .
