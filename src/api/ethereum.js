@@ -81,31 +81,21 @@ const getERC20Balance = async ({ erc20Address, account }) => {
   };
 };
 
-/*
-  if (_totalSupply == 0) {
-    address migrator = IUniswapV2Factory(factory).migrator();
-    if (msg.sender == migrator) {
-        liquidity = IMigrator(migrator).desiredLiquidity();
-        require(liquidity > 0 && liquidity != uint256(-1), "Bad desired liquidity");
-    } else {
-        require(migrator == address(0), "Must not have migrator");
-        liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
-        _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
-    }
-  } else {
-      liquidity = Math.min(amount0.mul(_totalSupply) / _reserve0, amount1.mul(_totalSupply) / _reserve1);
-  }
-*/
-
-const getSwapExchangeRate = async ({ eth, tokenAmount }) => {
+const getSwapExchangeRate = async () => {
   try {
     const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_FACTORY_ADDRESS);
     const pair = await readContract({
       contract,
       method: 'function getPair(address token1, address token2) public returns (address pair)',
-      params: [eth, tokenAmount],
+      params: [
+        process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS,
+        process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+      ],
     });
-    const emptyLP = bigSqrt(window.BigInt(eth) * window.BigInt(tokenAmount)) - window.BigInt(1000);
+    const emptyLP = ({ eth, tokenAmount }) => bigSqrt(
+      window.BigInt(eth) * window.BigInt(tokenAmount),
+    ) - window.BigInt(1000);
+
     if (pair) {
       const { contract: pairContract } = getThirdWebContract(pair);
       const totalSupply = await readContract({
@@ -128,8 +118,10 @@ const getSwapExchangeRate = async ({ eth, tokenAmount }) => {
         params: [],
       });
 
+      const min = (aBigInt, bBigInt) => (aBigInt > bBigInt ? bBigInt : aBigInt);
+
       return {
-        exchangeRate: Math.min(
+        exchangeRate: ({ eth, tokenAmount }) => min(
           (window.BigInt(eth) * window.BigInt(totalSupply)) / window.BigInt(reserve0),
           (window.BigInt(tokenAmount) * window.BigInt(totalSupply)) / window.BigInt(reserve1),
         ),
@@ -165,20 +157,39 @@ const stakeTokens = async (account, erc20Address, tokens) => {
 const stakeLPWithEth = async (
   account,
   ethAmount,
-  tokenAddress,
+  ethAmountMin,
+  tokenAmount,
+  tokenAmountMin,
   provider,
 ) => {
   const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
-  await resolveOperation(
+  const [amountToken, amountEth, liquidity] = await resolveOperation(
     // eslint-disable-next-line max-len
     'function addLiquidityETH(address token, uint amountTokenDesired, uint amountTokenMin, uint amountETHMin, address to, uint deadline) external virtual override payable returns (uint amountToken, uint amountETH, uint liquidity)',
     [
-      tokenAddress,
+      process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+      tokenAmount,
+      tokenAmountMin,
+      ethAmountMin,
       await account.getAddress(),
       await provider.getBlockNumber(),
     ],
     ethAmount,
   );
+
+  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_FACTORY_ADDRESS);
+  const pair = await readContract({
+    contract,
+    method: 'function getPair(address token1, address token2) public returns (address pair)',
+    params: [
+      process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS,
+      process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+    ],
+  });
+
+  await stakeTokens(account, pair, liquidity);
+
+  return [amountToken, amountEth, liquidity];
 };
 
 const claimRewards = async (account) => {

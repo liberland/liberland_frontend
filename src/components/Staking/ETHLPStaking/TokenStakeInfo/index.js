@@ -130,12 +130,6 @@ function TokenStakeInfo({ selectedAccount }) {
             />
             <StakeEthForm
               account={selectedAccount}
-              stakingToken={{
-                ...stakingTokenInfo,
-                address: tokenStakeInfo.stakingToken,
-                balance: stakingTokenBalance.balance.toString(),
-                decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
-              }}
             />
           </>
         )}

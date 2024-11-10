@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
+import Slider from 'rc-slider';
 import PropTypes from 'prop-types';
 import ModalRoot from '../../../Modals/ModalRoot';
 import { ethSelectors } from '../../../../redux/selectors';
@@ -13,7 +14,6 @@ import styles from './styles.module.scss';
 
 function StakeEthForm({
   account,
-  stakingToken,
   onClose,
 }) {
   const {
@@ -31,36 +31,23 @@ function StakeEthForm({
     mode: 'onChange',
   });
 
-  const value = watch('stake', '');
-  const lp = watch('lp', '');
+  const [results, setResults] = React.useState([0, 0, 0]);
   const connected = useSelector(ethSelectors.selectorConnected);
-  const exchangeRate = useSelector(ethSelectors.selectorWethLpExchangeRate);
-  const exchangeRateLoading = useSelector(ethSelectors.selectorWethLpExchangeRateLoading);
-  const exchangeRateError = useSelector(ethSelectors.selectorWethLpExchangeRateError);
-  const dispatch = useDispatch();
-  const [results, setResults] = React.useState([0, 0]);
 
-  React.useEffect(() => {
-    dispatch(ethActions.getWethLpExchangeRate.call({ decimals: stakingToken.decimals }));
-  }, [dispatch, stakingToken.decimals]);
-
-  React.useEffect(() => {
-    if (value && exchangeRate) {
-      try {
-        const product = (window.BigInt(stakingToken.decimals) * exchangeRate.exchangeRate * window.BigInt(value))
-          / window.BigInt(stakingToken.decimals);
-        setValue('lp', formatCustom(product.toString(), stakingToken.decimals));
-      } catch (e) {
-        // eslint-disable-next-line no-console
-        console.error(e);
-      }
-    }
-  }, [exchangeRate, setValue, stakingToken.decimals, value]);
-
-  const onSubmit = async ({ stake }) => {
+  const onSubmit = async ({ stake, tokens, tolerance }) => {
     try {
       const signer = await connected.provider.getSigner(account);
-      setResults(await stakeLPWithEth(signer, stake, stakingToken.decimals, stakingToken.address, connected.provider));
+      const getAmountWithTolerance = (amount) => (
+        (window.BigInt(amount) * window.BigInt(tolerance)) / window.BigInt(100)
+      );
+      setResults(await stakeLPWithEth(
+        signer,
+        stake,
+        getAmountWithTolerance(stake),
+        tokens,
+        getAmountWithTolerance(tokens),
+        connected.provider,
+      ));
     } catch (e) {
       setError('stake', {
         message: 'Something went wrong',
@@ -71,6 +58,35 @@ function StakeEthForm({
       setValue('stake', '');
     }
   };
+
+  const stake = watch('stake', '');
+  const tokens = watch('tokens', '');
+  const tolerance = watch('tolerance', '90');
+  const exchangeRate = useSelector(ethSelectors.selectorWethLpExchangeRate);
+  const exchangeRateLoading = useSelector(ethSelectors.selectorWethLpExchangeRateLoading);
+  const exchangeRateError = useSelector(ethSelectors.selectorWethLpExchangeRateError);
+  const dispatch = useDispatch();
+
+  React.useEffect(() => {
+    dispatch(ethActions.getWethLpExchangeRate.call());
+  }, [dispatch]);
+
+  React.useEffect(() => {
+    if (stake && tokens && exchangeRate && !errors.stake && !errors.token) {
+      try {
+        setValue(
+          'lp',
+          formatCustom(exchangeRate.exchangeRate({
+            eth: window.BigInt(stake),
+            tokenAmount: window.BigInt(tokens),
+          }), 18),
+        );
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
+    }
+  }, [exchangeRate, setValue, stake, tokens, errors]);
 
   if (exchangeRateError) {
     return <div className={styles.form}>Something went wrong</div>;
@@ -93,7 +109,7 @@ function StakeEthForm({
             id="stake"
             name="stake"
             errorTitle="Stake"
-            value={value}
+            value={stake}
             className={styles.input}
             onChange={(event) => setValue('stake', event.target.value)}
             validate={(input) => (!input || /^\d*\.?\d+$/.test(input) ? undefined : 'Invalid stake')}
@@ -108,34 +124,53 @@ function StakeEthForm({
         </div>
         )}
         {isSubmitSuccessful && (
-        <div className={styles.success}>
-          Staked
-          {' '}
-          {formatCustom(results[1], stakingToken.decimals, true)}
-          {' '}
-          {stakingToken.symbol}
-          , returned:
-          {' '}
-          {formatCustom(results[0], 18, true)}
-          {' '}
-          WETH
-        </div>
+          <div className={styles.success}>
+            LLD staked:
+            {' '}
+            {formatCustom(results[0], 18, true)}
+            {', ETH staked: '}
+            {formatCustom(results[1], 18, true)}
+            {', LP staked: '}
+            {formatCustom(results[2], 18, true)}
+          </div>
         )}
       </label>
-      <label className={styles.wrapper} htmlFor="lp">
-        Staked LP based on ETH
+      <label className={styles.wrapper} htmlFor="tokens">
+        Stake your LLD through Uniswap
         <div className={styles.inputWrapper}>
           <TextInput
-            id="lp"
             register={register}
-            name="lp"
-            errorTitle="LP"
-            value={lp}
+            id="tokens"
+            name="tokens"
+            errorTitle="Tokens"
+            value={tokens}
             className={styles.input}
-            readOnly
-            placeholder={stakingToken.symbol}
+            onChange={(event) => setValue('tokens', event.target.value)}
+            validate={(input) => (!input || /^\d*\.?\d+$/.test(input) ? undefined : 'Invalid tokens')}
+            disabled={isSubmitting}
+            placeholder="LLD"
+            required
           />
         </div>
+        {errors.tokens && (
+          <div className={styles.error}>
+            {errors.tokens.message}
+          </div>
+        )}
+      </label>
+      <label className={styles.wrapper} htmlFor="tolerance">
+        Contract will fail if cannot stake specified percentage of ETH/LLD into LP
+        <Slider
+          min={0}
+          max={100}
+          value={parseInt(tolerance)}
+          onChange={(value) => setValue('tolerance', value.toString())}
+        />
+        {errors.tolerance && (
+          <div className={styles.error}>
+            {errors.tolerance.message}
+          </div>
+        )}
       </label>
       <div className={styles.buttonRow}>
         <div className={styles.closeForm}>
@@ -161,13 +196,6 @@ function StakeEthForm({
 StakeEthForm.propTypes = {
   account: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
-  stakingToken: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    symbol: PropTypes.string.isRequired,
-    address: PropTypes.string.isRequired,
-    balance: PropTypes.string.isRequired,
-    decimals: PropTypes.number.isRequired,
-  }).isRequired,
 };
 
 function StakeEthFormModalWrapper(props) {
