@@ -14,6 +14,17 @@
   width: 100%;
 }
 
+.textarea {
+  textarea {
+    width: 100%;
+    padding: 3px 10px;
+    margin-bottom: 3px;
+    margin-top: 10px;
+    min-height: 300px;
+  }
+  width: calc(100% - 22px);
+}
+
 .wrapper {
   margin-bottom: 20px;
   display: block;

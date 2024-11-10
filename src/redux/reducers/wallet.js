@@ -38,10 +38,15 @@ const initialState = {
   nominatorTargets: [],
   assetBalance: null,
   assetsBalance: [],
+  transferState: null,
 };
 
 const walletReducer = handleActions(
   {
+    [walletActions.sendTransfer.call]: (state) => ({
+      ...state,
+      transferState: null,
+    }),
     [combineActions(
       walletActions.getWallet.call,
       walletActions.getAssetsDetails.call,
@@ -141,6 +146,14 @@ const walletReducer = handleActions(
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,
+    }),
+    [walletActions.sendTransfer.success]: (state) => ({
+      ...state,
+      transferState: 'success',
+    }),
+    [walletActions.sendTransfer.failure]: (state) => ({
+      ...state,
+      transferState: 'failure',
     }),
   },
   initialState,

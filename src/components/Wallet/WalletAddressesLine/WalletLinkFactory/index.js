@@ -5,7 +5,7 @@ import QRCode from 'react-qr-code';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
 import ModalRoot from '../../../Modals/ModalRoot';
-import { TextInput } from '../../../InputComponents';
+import { TextInput, TextArea } from '../../../InputComponents';
 import Button from '../../../Button/Button';
 import { identitySelectors } from '../../../../redux/selectors';
 import { identityActions } from '../../../../redux/actions';
@@ -219,12 +219,12 @@ function WalletLinkFactory({
       <label className={styles.wrapper} htmlFor="note">
         Note (optional)
         <div className={styles.inputWrapper}>
-          <TextInput
+          <TextArea
             register={register}
             id="note"
             name="note"
             value={note}
-            className={styles.input}
+            className={styles.textarea}
             onChange={(event) => setValue('note', event.target.value)}
             disabled={isSubmitting}
           />

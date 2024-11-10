@@ -1,12 +1,14 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { identityActions, walletActions } from '../../../redux/actions';
-import { identitySelectors } from '../../../redux/selectors';
-import { formatDollars, parseMerits } from '../../../utils/walletHelpers';
+import { identitySelectors, walletSelectors } from '../../../redux/selectors';
+import { formatDollars } from '../../../utils/walletHelpers';
+import ModalRoot from '../../Modals/ModalRoot';
 import Card from '../../Card';
 import Table from '../../Table';
 import stylesPage from '../../../utils/pagesBase.module.scss';
+import routes from '../../../router';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
@@ -15,8 +17,10 @@ function PayMe() {
   const dispatch = useDispatch();
   const identity = useSelector(identitySelectors.selectorIdentity);
   const identityIsLoading = useSelector(identitySelectors.selectorIsLoading);
+  const transferState = useSelector(walletSelectors.selectorTransferState);
   const [linkData, setLinkData] = React.useState();
   const { search } = useLocation();
+  const history = useHistory();
 
   React.useEffect(() => {
     try {
@@ -37,10 +41,12 @@ function PayMe() {
   const displayName = info?.display?.toHuman()?.Raw || linkData?.recipient || 'No name';
 
   const payRecipient = () => {
-    dispatch(walletActions.sendTransferLLM.call({
-      recipient: linkData.recipient,
-      amount: parseMerits(linkData.amount),
-    }));
+    dispatch(
+      walletActions.sendTransfer.call({
+        recipient: linkData.recipient,
+        amount: linkData.amount,
+      }),
+    );
   };
 
   return (
@@ -87,6 +93,23 @@ function PayMe() {
           </div>
         </Card>
       </div>
+      {transferState === 'success' && (
+        <ModalRoot>
+          <div className={styles.successModal}>
+            <h2>Transfer successful!</h2>
+            <Button
+              primary
+              medium
+              green
+              onClick={() => {
+                history.push(routes.wallet.overView);
+              }}
+            >
+              Get back to wallet
+            </Button>
+          </div>
+        </ModalRoot>
+      )}
     </div>
   );
 }
