@@ -87,7 +87,9 @@ function StakeEthForm({
   }, [exchangeRate, stake, tokens, errors]);
 
   React.useEffect(() => {
-    setError('stake', { message: 'LP stake did not load correctly' });
+    if (exchangeRateError) {
+      setError('stake', { message: 'LP stake did not load correctly' });
+    }
   }, [setError, exchangeRateError]);
 
   if (exchangeRateLoading) {
