@@ -71,26 +71,24 @@ function StakeEthForm({
     dispatch(ethActions.getWethLpExchangeRate.call());
   }, [dispatch]);
 
-  React.useEffect(() => {
+  const liquidityPoolReward = React.useMemo(() => {
     if (stake && tokens && exchangeRate && !errors.stake && !errors.token) {
       try {
-        setValue(
-          'lp',
-          formatCustom(exchangeRate.exchangeRate({
-            eth: window.BigInt(stake),
-            tokenAmount: window.BigInt(tokens),
-          }), 18),
-        );
+        return `Receive ${formatCustom(exchangeRate.exchangeRate({
+          eth: window.BigInt(stake),
+          tokenAmount: window.BigInt(tokens),
+        }), 18)} LP tokens`;
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e);
       }
     }
-  }, [exchangeRate, setValue, stake, tokens, errors]);
+    return 'No reward calculated';
+  }, [exchangeRate, stake, tokens, errors]);
 
-  if (exchangeRateError) {
-    return <div className={styles.form}>Something went wrong</div>;
-  }
+  React.useEffect(() => {
+    setError('stake', { message: 'LP stake did not load correctly' });
+  }, [setError, exchangeRateError]);
 
   if (exchangeRateLoading) {
     return <div className={styles.form}>Loading...</div>;
@@ -172,6 +170,9 @@ function StakeEthForm({
           </div>
         )}
       </label>
+      <div>
+        {liquidityPoolReward}
+      </div>
       <div className={styles.buttonRow}>
         <div className={styles.closeForm}>
           <Button disabled={isSubmitting} medium onClick={onClose}>

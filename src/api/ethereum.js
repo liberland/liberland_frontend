@@ -82,6 +82,12 @@ const getERC20Balance = async ({ erc20Address, account }) => {
 };
 
 const getSwapExchangeRate = async () => {
+  const min = (aBigInt, bBigInt) => (aBigInt > bBigInt ? bBigInt : aBigInt);
+  const max = (aBigInt, bBigInt) => (aBigInt > bBigInt ? aBigInt : bBigInt);
+  const emptyLP = ({ eth, tokenAmount }) => max(0, bigSqrt(
+    window.BigInt(eth) * window.BigInt(tokenAmount),
+  ) - window.BigInt(1000));
+
   try {
     const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_FACTORY_ADDRESS);
     const pair = await readContract({
@@ -92,9 +98,6 @@ const getSwapExchangeRate = async () => {
         process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
       ],
     });
-    const emptyLP = ({ eth, tokenAmount }) => bigSqrt(
-      window.BigInt(eth) * window.BigInt(tokenAmount),
-    ) - window.BigInt(1000);
 
     if (pair) {
       const { contract: pairContract } = getThirdWebContract(pair);
@@ -118,8 +121,6 @@ const getSwapExchangeRate = async () => {
         params: [],
       });
 
-      const min = (aBigInt, bBigInt) => (aBigInt > bBigInt ? bBigInt : aBigInt);
-
       return {
         exchangeRate: ({ eth, tokenAmount }) => min(
           (window.BigInt(eth) * window.BigInt(totalSupply)) / window.BigInt(reserve0),
@@ -134,7 +135,9 @@ const getSwapExchangeRate = async () => {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
-    throw e;
+    return {
+      exchangeRate: emptyLP,
+    };
   }
 };
 
