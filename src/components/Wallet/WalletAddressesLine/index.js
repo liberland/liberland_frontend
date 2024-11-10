@@ -40,6 +40,10 @@ function WalletAddressesLine({ walletAddress }) {
       title: 'EXCHANGE',
     },
     {
+      route: router.wallet.assets,
+      title: 'ASSETS',
+    },
+    {
       route: router.wallet.bridge,
       title: 'BRIDGE',
     },

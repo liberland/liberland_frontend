@@ -267,6 +267,57 @@ const getIdentity = async (address) => {
   }
 };
 
+const createOrUpdateAsset = async ({
+  id,
+  name,
+  symbol,
+  decimals,
+  minBalance,
+  admin,
+  issuer,
+  freezer,
+  owner,
+  isCreate,
+  defaultValues,
+}) => {
+  try {
+    const api = await getApi();
+    if (isCreate) {
+      const create = await api.tx.assets.create(id, admin, minBalance);
+      await submitExtrinsic(create, owner, api);
+    }
+    if (defaultValues?.name !== name || defaultValues?.symbol !== symbol || defaultValues?.decimals !== decimals) {
+      const setMetadata = await api.tx.assets.setMetadata(id, name, symbol, decimals);
+      await submitExtrinsic(setMetadata, owner, api);
+    }
+    if (defaultValues?.issuer !== issuer || defaultValues?.admin !== admin || defaultValues?.freezer !== freezer) {
+      const setTeam = await api.tx.assets.setTeam(id, issuer, admin, freezer);
+      await submitExtrinsic(setTeam, owner, api);
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const mintAsset = async ({
+  id,
+  beneficiary,
+  amount,
+  owner,
+}) => {
+  try {
+    const api = await getApi();
+    const mint = await api.tx.assets.mint(id, beneficiary, amount);
+    await submitExtrinsic(mint, owner, api);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
 const getLlmBalances = async (addresses) => {
   try {
     const api = await getApi();
@@ -303,6 +354,54 @@ const getAssetData = async (asset, address) => {
       return data.balance;
     }
     return null;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const getAssetDetails = async (ids) => {
+  try {
+    const api = await getApi();
+    const details = (await api.query.assets.asset.multi(ids)).map((asset) => asset.toJSON());
+    const assetQueries = details.reduce((queries, detail) => {
+      queries.push([api.query.identity.identityOf, detail.admin]);
+      queries.push([api.query.identity.identityOf, detail.freezer]);
+      queries.push([api.query.identity.identityOf, detail.issuer]);
+      queries.push([api.query.identity.identityOf, detail.owner]);
+      return queries;
+    }, []);
+    const assetResults = await api.queryMulti([...assetQueries]);
+    const resolvedIdentity = assetResults.map((result) => {
+      const json = result.toJSON();
+      return Buffer.from(json.info.display.raw.slice(2), 'hex').toString('utf-8');
+    }).reduce((accumulator, item) => {
+      const lastItem = accumulator[accumulator.length - 1];
+      if (!lastItem) {
+        accumulator.push([item]);
+      } else if (lastItem.length < 4) {
+        lastItem.push(item);
+      } else {
+        accumulator.push([item]);
+      }
+      return accumulator;
+    }, []);
+
+    const resolvedDetails = details.map((detail, index) => ({
+      ...detail,
+      supply: detail.supply.toString().startsWith('0x')
+        ? window.BigInt(detail.supply).toString()
+        : detail.supply,
+      identity: {
+        admin: resolvedIdentity[index][0],
+        freezer: resolvedIdentity[index][1],
+        issuer: resolvedIdentity[index][2],
+        owner: resolvedIdentity[index][3],
+      },
+    }));
+
+    return resolvedDetails;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -2802,4 +2901,7 @@ export {
   getUserNfts,
   matchScheduledWithSenateMotions,
   createNewPool,
+  getAssetDetails,
+  createOrUpdateAsset,
+  mintAsset,
 };
