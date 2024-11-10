@@ -8,6 +8,7 @@ import { SendLLDModal, SendLLMModal, UnpoolModal } from '../../Modals';
 
 import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
+import WalletLinkFactoryModalWrapper from './WalletLinkFactory';
 
 import styles from './styles.module.scss';
 import router from '../../../router';
@@ -97,6 +98,7 @@ function WalletAddressesLine({ walletAddress }) {
             </div>
             SEND LLD
           </Button>
+          <WalletLinkFactoryModalWrapper walletAddress={walletAddress} />
         </div>
         {isModalOpen && (
           <SendLLDModal closeModal={handleModalOpen} />)}

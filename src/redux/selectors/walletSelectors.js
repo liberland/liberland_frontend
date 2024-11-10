@@ -105,6 +105,11 @@ const selectorAssetsBalance = createSelector(
   (reducer) => reducer.assetsBalance,
 );
 
+const selectorTransferState = createSelector(
+  walletReducer,
+  (reducer) => reducer.transferState,
+);
+
 export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
@@ -125,4 +130,5 @@ export {
   selectorAssetBalance,
   selectorAssetsBalance,
   selectorAssetsDetails,
+  selectorTransferState,
 };
