@@ -12,7 +12,7 @@ import { isValidSubstrateAddress } from '../../../../utils/walletHelpers';
 import InputSearch from '../../../InputComponents/InputSearchAddressName';
 import styles from './styles.module.scss';
 
-function MintAssetForm({ assetId, onClose }) {
+function MintAssetForm({ assetId, onClose, minimumBalance }) {
   const {
     handleSubmit,
     register,
@@ -79,13 +79,29 @@ function MintAssetForm({ assetId, onClose }) {
               value={amount}
               className={styles.input}
               onChange={(event) => setValue('amount', event.target.value)}
+              validate={(input) => {
+                if (!input) {
+                  return undefined;
+                }
+                if (!/^\d*\.?\d+$/.test(input)) {
+                  return 'Invalid amount';
+                }
+                try {
+                  const isEnough = window.BigInt(input) > window.BigInt(minimumBalance);
+                  return isEnough ? undefined : `Amount is smaller than minimum balance: ${minimumBalance}`;
+                } catch (e) {
+                  // eslint-disable-next-line no-console
+                  console.error(e);
+                  return 'Invalid amount';
+                }
+              }}
               disabled={isSubmitting}
               required
             />
           </div>
-          {errors.name && (
+          {errors.amount && (
             <div className={styles.error}>
-              {errors.name.message}
+              {errors.amount.message}
             </div>
           )}
           {isSubmitSuccessful && (
@@ -94,6 +110,8 @@ function MintAssetForm({ assetId, onClose }) {
             </div>
           )}
         </label>
+      </div>
+      <div className={styles.asset}>
         <label className={styles.wrapper} htmlFor="beneficiary">
           Beneficiary account
           <div className={styles.inputWrapper}>
@@ -140,19 +158,28 @@ function MintAssetForm({ assetId, onClose }) {
 MintAssetForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   assetId: PropTypes.number.isRequired,
+  minimumBalance: PropTypes.number.isRequired,
 };
 
-function MintAssetFormModalWrapper(props) {
+function MintAssetFormModalWrapper({
+  assetId,
+  minimumBalance,
+}) {
   const [show, setShow] = React.useState();
   return (
     <div>
-      <Button primary medium onClick={() => setShow(true)}>
+      <Button
+        primary
+        medium
+        onClick={() => setShow(true)}
+      >
         Mint asset
       </Button>
       {show && (
-        <ModalRoot>
+        <ModalRoot id="mint">
           <MintAssetForm
-            {...props}
+            assetId={assetId}
+            minimumBalance={minimumBalance}
             onClose={() => setShow(false)}
           />
         </ModalRoot>
@@ -163,6 +190,7 @@ function MintAssetFormModalWrapper(props) {
 
 MintAssetFormModalWrapper.propTypes = {
   assetId: PropTypes.number.isRequired,
+  minimumBalance: PropTypes.number.isRequired,
 };
 
 export default MintAssetFormModalWrapper;

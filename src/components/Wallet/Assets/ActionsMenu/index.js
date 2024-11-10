@@ -6,11 +6,8 @@ import Button from '../../../Button/Button';
 import UpdateOrCreateAssetFormModalWrapper from '../UpdateOrCreateAssetForm';
 import styles from './styles.module.scss';
 import MintAssetFormModalWrapper from '../MintAssetForm';
-import FreezeAssetFormModalWrapper from '../FreezeAssetForm';
-import ThawAssetFormModalWrapper from '../ThawAssetForm';
 
 function ActionsMenu({
-  isFreezer,
   isOwner,
   isAdmin,
   isIssuer,
@@ -24,13 +21,10 @@ function ActionsMenu({
         <UpdateOrCreateAssetFormModalWrapper defaultValues={defaultValues} />
       )}
       {isIssuer && (
-        <MintAssetFormModalWrapper assetId={assetId} />
-      )}
-      {isFreezer && (
-        <>
-          <FreezeAssetFormModalWrapper assetId={assetId} />
-          <ThawAssetFormModalWrapper assetId={assetId} />
-        </>
+        <MintAssetFormModalWrapper
+          assetId={assetId}
+          minimumBalance={defaultValues.balance}
+        />
       )}
       <Button medium onClick={onClose}>
         Close
@@ -44,14 +38,13 @@ const defaultValues = PropTypes.shape({
   name: PropTypes.string,
   symbol: PropTypes.string,
   decimals: PropTypes.string,
-  balance: PropTypes.string,
+  balance: PropTypes.number,
   admin: PropTypes.string,
   issuer: PropTypes.string,
   freezer: PropTypes.string,
 });
 
 ActionsMenu.propTypes = {
-  isFreezer: PropTypes.bool.isRequired,
   isOwner: PropTypes.bool.isRequired,
   isAdmin: PropTypes.bool.isRequired,
   isIssuer: PropTypes.bool.isRequired,
@@ -60,8 +53,18 @@ ActionsMenu.propTypes = {
   defaultValues,
 };
 
-function ActionsMenuModalWrapper(props) {
+function ActionsMenuModalWrapper({
+  isOwner,
+  isAdmin,
+  isIssuer,
+  assetId,
+  defaultValues: dV,
+}) {
   const [show, setShow] = React.useState();
+  if (!isOwner && !isIssuer && !isAdmin) {
+    return null;
+  }
+
   return (
     <div>
       <Button primary nano onClick={() => setShow(true)}>
@@ -70,7 +73,11 @@ function ActionsMenuModalWrapper(props) {
       {show && (
         <ModalRoot>
           <ActionsMenu
-            {...props}
+            assetId={assetId}
+            isAdmin={isAdmin}
+            isIssuer={isIssuer}
+            isOwner={isOwner}
+            defaultValues={dV}
             onClose={() => setShow(false)}
           />
         </ModalRoot>
@@ -78,5 +85,13 @@ function ActionsMenuModalWrapper(props) {
     </div>
   );
 }
+
+ActionsMenuModalWrapper.propTypes = {
+  isOwner: PropTypes.bool.isRequired,
+  isAdmin: PropTypes.bool.isRequired,
+  isIssuer: PropTypes.bool.isRequired,
+  assetId: PropTypes.number.isRequired,
+  defaultValues,
+};
 
 export default ActionsMenuModalWrapper;

@@ -49,14 +49,13 @@ function Assets() {
         formatCustom(assetDetails[index]?.supply ?? '0', parseInt(asset.metadata.decimals))} ${asset.metadata.symbol}`,
       actions: (
         <ActionsMenuModalWrapper
-          isFreezer={assetDetails[index]?.freezer === userWalletAddress}
           isAdmin={assetDetails[index]?.admin === userWalletAddress}
-          isOwner={assetDetails[index]?.freezer === userWalletAddress}
-          isIssuer={assetDetails[index]?.freezer === userWalletAddress}
+          isOwner={assetDetails[index]?.owner === userWalletAddress}
+          isIssuer={assetDetails[index]?.issuer === userWalletAddress}
           assetId={asset.index}
           defaultValues={{
             admin: assetDetails[index]?.admin,
-            balance: assetDetails[index]?.balance,
+            balance: assetDetails[index]?.minBalance,
             decimals: asset.metadata.decimals,
             freezer: assetDetails[index]?.freezer,
             id: asset.index,

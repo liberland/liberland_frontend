@@ -297,7 +297,7 @@ const defaultValues = PropTypes.shape({
   name: PropTypes.string,
   symbol: PropTypes.string,
   decimals: PropTypes.string,
-  balance: PropTypes.string,
+  balance: PropTypes.number,
   admin: PropTypes.string,
   issuer: PropTypes.string,
   freezer: PropTypes.string,
@@ -315,11 +315,15 @@ function UpdateOrCreateAssetFormModalWrapper({
   const [show, setShow] = React.useState();
   return (
     <div className={isCreate ? styles.modal : undefined}>
-      <Button primary medium onClick={() => setShow(true)}>
+      <Button
+        primary
+        medium
+        onClick={() => setShow(true)}
+      >
         {isCreate ? 'Create asset' : 'Update'}
       </Button>
       {show && (
-        <ModalRoot>
+        <ModalRoot id="create-or-update">
           <UpdateOrCreateAssetForm
             defaultValues={dV}
             isCreate={isCreate}

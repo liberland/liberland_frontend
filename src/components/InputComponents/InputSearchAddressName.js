@@ -104,7 +104,7 @@ InputSearch.propTypes = {
   placeholder: PropTypes.string.isRequired,
   validate: PropTypes.func.isRequired,
   setValue: PropTypes.func.isRequired,
-  isRequired: PropTypes.bool.isRequired,
+  isRequired: PropTypes.bool,
   trigger: PropTypes.func.isRequired,
   defaultValue: PropTypes.string,
 };
