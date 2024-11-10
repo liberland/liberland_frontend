@@ -10,6 +10,7 @@ import { getAllWalletsList, injectedProvider } from 'thirdweb/wallets';
 import { ethers5Adapter } from 'thirdweb/adapters/ethers5';
 import { defineChain } from 'thirdweb/chains';
 import { providers } from 'ethers';
+import bigSqrt from 'bigint-isqrt';
 import { resolveMappedPromises } from '../utils/promise';
 
 const getThirdWebContract = (contractAddress) => {
@@ -69,75 +70,79 @@ const resolveOperationFactory = (contractAddress, account) => async (methodName,
   });
 };
 
-const getSwapExchangeRate = async ({ decimals }) => {
-  try {
-    const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_ADDRESS);
-    const [token0, token1] = await readContract({
+const getERC20Balance = async ({ erc20Address, account }) => {
+  const { contract } = getThirdWebContract(erc20Address);
+  return {
+    balance: await readContract({
       contract,
-      method: 'function getReserves() view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast)',
-      params: [],
+      method: 'function balanceOf(address account) view returns (uint256)',
+      params: [account],
+    }),
+  };
+};
+
+/*
+  if (_totalSupply == 0) {
+    address migrator = IUniswapV2Factory(factory).migrator();
+    if (msg.sender == migrator) {
+        liquidity = IMigrator(migrator).desiredLiquidity();
+        require(liquidity > 0 && liquidity != uint256(-1), "Bad desired liquidity");
+    } else {
+        require(migrator == address(0), "Must not have migrator");
+        liquidity = Math.sqrt(amount0.mul(amount1)).sub(MINIMUM_LIQUIDITY);
+        _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
+    }
+  } else {
+      liquidity = Math.min(amount0.mul(_totalSupply) / _reserve0, amount1.mul(_totalSupply) / _reserve1);
+  }
+*/
+
+const getSwapExchangeRate = async ({ eth, tokenAmount }) => {
+  try {
+    const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_FACTORY_ADDRESS);
+    const pair = await readContract({
+      contract,
+      method: 'function getPair(address token1, address token2) public returns (address pair)',
+      params: [eth, tokenAmount],
     });
-    const dec = window.BigInt(decimals);
-    if (token1.toString() === '0') {
+    const emptyLP = bigSqrt(window.BigInt(eth) * window.BigInt(tokenAmount)) - window.BigInt(1000);
+    if (pair) {
+      const { contract: pairContract } = getThirdWebContract(pair);
+      const totalSupply = await readContract({
+        contract: pairContract,
+        method: 'function totalSupply() public view returns (uint totalSupply)',
+        params: [],
+      });
+      if (totalSupply === '0') {
+        return {
+          exchangeRate: emptyLP,
+        };
+      }
+      const [
+        reserve0,
+        reserve1,
+      ] = await readContract({
+        contract: pairContract,
+        // eslint-disable-next-line max-len
+        method: 'function getReserves() public view returns (uint112 _reserve0, uint112 _reserve1, uint32 _blockTimestampLast)',
+        params: [],
+      });
+
       return {
-        exchangeRate: window.BigInt(0),
+        exchangeRate: Math.min(
+          (window.BigInt(eth) * window.BigInt(totalSupply)) / window.BigInt(reserve0),
+          (window.BigInt(tokenAmount) * window.BigInt(totalSupply)) / window.BigInt(reserve1),
+        ),
       };
     }
+
     return {
-      exchangeRate: ((token0 * dec) / token1) / dec,
+      exchangeRate: emptyLP,
     };
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
     throw e;
-  }
-};
-
-const depositWETH = async (account, ethAmount) => {
-  const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS, account);
-  await resolveOperation(
-    'function deposit() public payable',
-    [],
-    ethAmount,
-  );
-};
-
-const withdrawWETH = async (account, ethAmount) => {
-  const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS, account);
-  await resolveOperation(
-    'function withdraw(uint256 wad)',
-    [ethAmount],
-  );
-};
-
-const swapWETHForLP = async (
-  account,
-  ethAmount,
-  desiredAmount,
-  tokenAddress,
-  provider,
-) => {
-  try {
-    const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_UNISWAP_ADDRESS, account);
-    const [
-      leftover,
-      tokens,
-    ] = await resolveOperation(
-      // eslint-disable-next-line max-len
-      'function swapTokensForExactTokens(uint256 amountOut,uint256 amountInMax,address[] calldata path,address to,uint256 deadline) external returns (uint256[] memory amounts)',
-      [
-        desiredAmount,
-        ethAmount,
-        [process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS, tokenAddress],
-        await account.getAddress(),
-        await provider.getBlockNumber(),
-      ],
-    );
-    return [window.BigInt(leftover), window.BigInt(tokens)];
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
-    return [ethAmount, 0];
   }
 };
 
@@ -160,32 +165,20 @@ const stakeTokens = async (account, erc20Address, tokens) => {
 const stakeLPWithEth = async (
   account,
   ethAmount,
-  decimals,
   tokenAddress,
   provider,
 ) => {
-  const { exchangeRate } = await getSwapExchangeRate({ decimals });
-  await depositWETH(account, ethAmount);
-  await erc20Approve(
-    process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS,
-    account,
-    process.env.REACT_APP_THIRD_WEB_UNISWAP_ADDRESS,
+  const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
+  await resolveOperation(
+    // eslint-disable-next-line max-len
+    'function addLiquidityETH(address token, uint amountTokenDesired, uint amountTokenMin, uint amountETHMin, address to, uint deadline) external virtual override payable returns (uint amountToken, uint amountETH, uint liquidity)',
+    [
+      tokenAddress,
+      await account.getAddress(),
+      await provider.getBlockNumber(),
+    ],
     ethAmount,
   );
-  const [leftover, tokens] = await swapWETHForLP(
-    account,
-    ethAmount,
-    exchangeRate * window.BigInt(ethAmount),
-    tokenAddress,
-    provider,
-  );
-  if (leftover > 0) {
-    await withdrawWETH(account, leftover);
-  }
-  if (tokens > 0) {
-    await stakeTokens(account, tokenAddress, tokens);
-  }
-  return [leftover, tokens];
 };
 
 const claimRewards = async (account) => {
@@ -206,17 +199,6 @@ const getTokenStakeAddressInfo = async ({ userEthAddress }) => {
       contract,
       method: 'function getStakeInfo(address userEthAddress) view returns (uint256 _tokensStaked, uint256 _rewards)',
       params: [userEthAddress],
-    }),
-  };
-};
-
-const getERC20Balance = async ({ erc20Address, account }) => {
-  const { contract } = getThirdWebContract(erc20Address);
-  return {
-    balance: await readContract({
-      contract,
-      method: 'function balanceOf(address account) view returns (uint256)',
-      params: [account],
     }),
   };
 };

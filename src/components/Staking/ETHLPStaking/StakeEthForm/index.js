@@ -96,7 +96,7 @@ function StakeEthForm({
             value={value}
             className={styles.input}
             onChange={(event) => setValue('stake', event.target.value)}
-            validate={(input) => (!input || /^-?\d*\.?\d+$/.test(input) ? undefined : 'Invalid stake')}
+            validate={(input) => (!input || /^\d*\.?\d+$/.test(input) ? undefined : 'Invalid stake')}
             disabled={isSubmitting}
             placeholder="ETH"
             required
