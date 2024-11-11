@@ -12,6 +12,7 @@ import stylesAnim from '../Voting/Referendum/Items/item.module.scss';
 import { formatAssets, formatDollars, formatMerits } from '../../utils/walletHelpers';
 import formatDate from '../../utils/formatDate';
 import { useAddIdToContext } from './useAddIdToContect.js';
+import CopyIconWithAddress from '../CopyIconWithAddress';
 /* eslint-disable react/forbid-prop-types */
 const ProposalProp = PropTypes.object;
 
@@ -298,13 +299,19 @@ function TransferLLD({ proposal }) {
   const formattedValue = formatDollars(value);
   const identity = names?.[accountId]?.identity;
   useAddIdToContext(accountId);
-
   return (
     <div>
       <b>Transfer</b>
       {` ${formattedValue} (LLD) `}
       <b>to</b>
-      {` ${identity ? `${identity} (${accountId})` : accountId}`}
+      {' '}
+      <CopyIconWithAddress
+        isTruncate
+        name={identity?.name}
+        legal={identity?.legal}
+        address={accountId}
+        showAddress
+      />
     </div>
   );
 }
@@ -324,7 +331,14 @@ function TransferLLM({ proposal }) {
       <b>Transfer</b>
       {` ${formattedValue} (${symbol}) `}
       <b>to</b>
-      {` ${identity ? `${identity} (${accountId})` : accountId}`}
+      {' '}
+      <CopyIconWithAddress
+        isTruncate
+        name={identity?.name}
+        legal={identity?.legal}
+        address={accountId}
+        showAddress
+      />
     </div>
   );
 }
@@ -352,7 +366,14 @@ function TransferAsset({ proposal }) {
       <b>Transfer</b>
       {` ${formattedValue} (${asset?.metadata?.symbol || assetId}) `}
       <b>to</b>
-      {` ${identity ? `${identity} (${target})` : target}`}
+      {' '}
+      <CopyIconWithAddress
+        isTruncate
+        name={identity?.name}
+        legal={identity?.legal}
+        address={target}
+        showAddress
+      />
     </div>
   );
 }

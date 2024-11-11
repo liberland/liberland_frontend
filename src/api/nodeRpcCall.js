@@ -15,6 +15,7 @@ import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
+import { decodeAndFilter } from '../utils/identityParser';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -267,6 +268,57 @@ const getIdentity = async (address) => {
   }
 };
 
+const createOrUpdateAsset = async ({
+  id,
+  name,
+  symbol,
+  decimals,
+  minBalance,
+  admin,
+  issuer,
+  freezer,
+  owner,
+  isCreate,
+  defaultValues,
+}) => {
+  try {
+    const api = await getApi();
+    if (isCreate) {
+      const create = await api.tx.assets.create(id, admin, minBalance);
+      await submitExtrinsic(create, owner, api);
+    }
+    if (defaultValues?.name !== name || defaultValues?.symbol !== symbol || defaultValues?.decimals !== decimals) {
+      const setMetadata = await api.tx.assets.setMetadata(id, name, symbol, decimals);
+      await submitExtrinsic(setMetadata, owner, api);
+    }
+    if (defaultValues?.issuer !== issuer || defaultValues?.admin !== admin || defaultValues?.freezer !== freezer) {
+      const setTeam = await api.tx.assets.setTeam(id, issuer, admin, freezer);
+      await submitExtrinsic(setTeam, owner, api);
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const mintAsset = async ({
+  id,
+  beneficiary,
+  amount,
+  owner,
+}) => {
+  try {
+    const api = await getApi();
+    const mint = await api.tx.assets.mint(id, beneficiary, amount);
+    await submitExtrinsic(mint, owner, api);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
 const getLlmBalances = async (addresses) => {
   try {
     const api = await getApi();
@@ -303,6 +355,54 @@ const getAssetData = async (asset, address) => {
       return data.balance;
     }
     return null;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const getAssetDetails = async (ids) => {
+  try {
+    const api = await getApi();
+    const details = (await api.query.assets.asset.multi(ids)).map((asset) => asset.toJSON());
+    const assetQueries = details.reduce((queries, detail) => {
+      queries.push([api.query.identity.identityOf, detail.admin]);
+      queries.push([api.query.identity.identityOf, detail.freezer]);
+      queries.push([api.query.identity.identityOf, detail.issuer]);
+      queries.push([api.query.identity.identityOf, detail.owner]);
+      return queries;
+    }, []);
+    const assetResults = await api.queryMulti([...assetQueries]);
+    const resolvedIdentity = assetResults.map((result) => {
+      const json = result.toJSON();
+      return Buffer.from(json.info.display.raw.slice(2), 'hex').toString('utf-8');
+    }).reduce((accumulator, item) => {
+      const lastItem = accumulator[accumulator.length - 1];
+      if (!lastItem) {
+        accumulator.push([item]);
+      } else if (lastItem.length < 4) {
+        lastItem.push(item);
+      } else {
+        accumulator.push([item]);
+      }
+      return accumulator;
+    }, []);
+
+    const resolvedDetails = details.map((detail, index) => ({
+      ...detail,
+      supply: detail.supply.toString().startsWith('0x')
+        ? window.BigInt(detail.supply).toString()
+        : detail.supply,
+      identity: {
+        admin: resolvedIdentity[index][0],
+        freezer: resolvedIdentity[index][1],
+        issuer: resolvedIdentity[index][2],
+        owner: resolvedIdentity[index][3],
+      },
+    }));
+
+    return resolvedDetails;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -381,12 +481,12 @@ const provideJudgementAndAssets = async ({
   return submitExtrinsic(finalCall, walletAddress, api);
 };
 
-const getLegalAdditionals = (legal) => {
+const getAdditionals = (itemData, key) => {
   const chunks = [];
-  for (let i = 0; i < legal.length; i += 32) {
+  for (let i = 0; i < itemData.length; i += 32) {
     chunks.push([
-      { Raw: 'legal' },
-      { Raw: legal.substr(i, 32) },
+      { Raw: key },
+      { Raw: itemData.substr(i, 32) },
     ]);
   }
   return chunks;
@@ -437,25 +537,32 @@ const buildAdditionals = (values, blockNumber) => {
     );
   }
 
-  if (values.legal) {
-    additionals.push(
-      ...getLegalAdditionals(values.legal),
-    );
-  }
+  const additionalItems = ['legal', 'web', 'display', 'email'];
+
+  additionalItems.map((item) => {
+    const itemData = values[item];
+    if (itemData && itemData.length > 32) {
+      additionals.push(
+        ...getAdditionals(itemData, item),
+      );
+    }
+    return null;
+  });
 
   return additionals;
 };
 
 const setIdentity = async (values, walletAddress) => {
   const asData = (v) => (v ? { Raw: v } : null);
+  const truncate = (v) => (v.length > 32 ? v.substring(0, 32) : v);
   const api = await getApi();
   const blockNumber = await api.derive.chain.bestNumber();
   const info = {
     additional: buildAdditionals(values, blockNumber.toNumber()),
-    display: asData(values.display),
-    legal: asData(null),
-    web: asData(values.web),
-    email: asData(values.email),
+    display: asData(truncate(values.display)),
+    legal: asData(truncate(values.legal)),
+    web: asData(truncate(values.web)),
+    email: asData(truncate(values.email)),
     riot: asData(null),
     image: asData(null),
     twitter: asData(null),
@@ -665,13 +772,15 @@ const getValidators = async () => {
 
   validatorsData.forEach((validatorData, index) => {
     const validatorHumanData = validatorData.toHuman();
+    const data = validatorData.isSome ? validatorData.unwrap() : null;
+    const decodedData = decodeAndFilter(data?.info, ['display']);
     const validatorWithBaseInfo = validatorsWithBaseInfo.validators[index];
     if (!validatorWithBaseInfo) return;
     const dataToAdd = {
       ...((validatorHumanData?.commission !== undefined) && { commission: validatorHumanData.commission }),
       ...((validatorHumanData?.blocked !== undefined) && { blocked: validatorHumanData.blocked }),
       // eslint-disable-next-line max-len
-      ...((validatorHumanData?.info?.display?.Raw !== undefined) && { displayName: validatorHumanData?.info?.display?.Raw }),
+      ...((decodedData?.display !== undefined) && { displayName: decodedData.display }),
       ...validatorWithBaseInfo,
       isWaiting: accountsToString(baseInfo.waitingIds).includes(validatorWithBaseInfo.key),
     };
@@ -680,6 +789,7 @@ const getValidators = async () => {
       ...dataToAdd,
     };
   });
+
   validators.sort((a, b) => {
     if (a.isWaiting && !b.isWaiting) return -1;
     if (!a.isWaiting && b.isWaiting) return 1;
@@ -752,7 +862,6 @@ const getDemocracyReferendums = async (address) => {
 
     const motions = (await api.query.council.proposals())
       .map((propose) => propose.toString());
-
     const centralizedReferendumsData = await centralizedBackend.getReferenda();
     const crossReferencedReferendumsData = crossReference(
       api,
@@ -848,6 +957,38 @@ const submitProposal = async (
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+async function getIdentityDataProper(addressesIdentityData) {
+  const api = await getApi();
+  if (addressesIdentityData.length === 0) return [];
+  const identityQueries = addressesIdentityData.map((address) => [api.query.identity.identityOf, address]);
+  const identities = await api.queryMulti(identityQueries);
+  return addressesIdentityData.map((address, index) => {
+    const identity = identities[index];
+
+    const isIdentity = identity.isSome;
+
+    const addressString = address.toString();
+    let nameData;
+    let legalData;
+    let websiteData;
+    if (isIdentity) {
+      const identityData = identity.unwrap();
+      const { info } = identityData;
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal']);
+      nameData = decodedData?.display;
+      legalData = decodedData?.legal;
+      websiteData = decodedData?.web;
+    }
+    return {
+      name: nameData,
+      legal: legalData,
+      website: websiteData,
+      identityData: identity.isSome ? identity.unwrap().toJSON() : null,
+      rawIdentity: addressString,
+    };
+  });
+}
+
 const getCongressMembersWithIdentity = async (walletAddress) => {
   const api = await getApi();
   const [
@@ -863,23 +1004,6 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     api.query.elections.runnersUp,
   ]);
 
-  const getIdentityData = async (addresses) => {
-    if (addresses.length === 0) return [];
-    const identityQueries = addresses.map((address) => [api.query.identity.identityOf, address]);
-    const identities = await api.queryMulti(identityQueries);
-    return addresses.map((address, index) => {
-      const identity = identities[index];
-      const displayName = identity.isSome && identity.unwrap().info.display.isRaw
-        ? identity.unwrap().info.display.asRaw.toUtf8()
-        : address.toString();
-      return {
-        name: displayName,
-        identityData: identity.isSome ? identity.unwrap().toJSON() : null,
-        rawIdentity: address.toString(),
-      };
-    });
-  };
-
   const councilMembersList = councilMembers.map((member) => member.toString());
   const candidatesList = candidates.map((candidate) => candidate[0].toString());
   const currentCandidateVotesByUser = !currentCandidateVotesByUserQuery.isEmpty
@@ -893,10 +1017,10 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     crossReferencedCurrentCandidateVotesByUser,
     runnersUpListIdentities,
   ] = await Promise.all([
-    getIdentityData(councilMembersList),
-    getIdentityData(candidatesList),
-    getIdentityData(currentCandidateVotesByUser),
-    getIdentityData(runnersUpList),
+    getIdentityDataProper(councilMembersList),
+    getIdentityDataProper(candidatesList),
+    getIdentityDataProper(currentCandidateVotesByUser),
+    getIdentityDataProper(runnersUpList),
   ]);
 
   const electionsInfo = await api.derive.elections.info();
@@ -1311,22 +1435,6 @@ const getBlockEvents = async (blockHash) => {
   }
 };
 
-const getIdentitiesNames = async (addresses) => {
-  const api = await getApi();
-  const raw = await api.query.identity.identityOf.multi(addresses);
-  const identities = {};
-  raw.map((identity, idx) => {
-    identities[addresses[idx]] = {};
-    const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
-    const nameHashed = unwrapIdentity?.display?.asRaw;
-    const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
-    identities[addresses[idx]].identity = name;
-
-    return null;
-  });
-  return identities;
-};
-
 const getMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.council.proposals();
@@ -1684,6 +1792,29 @@ const getIdentities = async (addresses) => {
     address: addresses[idx],
     identity: identity.isSome ? identity.unwrap().info : null,
   }));
+};
+
+const getIdentitiesNames = async (addresses) => {
+  const api = await getApi();
+  const raw = await api.query.identity.identityOf.multi(addresses);
+  const identities = {};
+  raw.map((identity, idx) => {
+    identities[addresses[idx]] = {};
+    const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
+
+    let nameData;
+    let legalData;
+
+    if (unwrapIdentity) {
+      const decodedData = decodeAndFilter(unwrapIdentity, ['display', 'legal']);
+      nameData = decodedData?.display;
+      legalData = decodedData?.legal;
+    }
+    identities[addresses[idx]].identity = { name: nameData, legal: legalData };
+
+    return null;
+  });
+  return identities;
 };
 
 const stakingChill = async (walletAddress) => {
@@ -2802,4 +2933,7 @@ export {
   getUserNfts,
   matchScheduledWithSenateMotions,
   createNewPool,
+  getAssetDetails,
+  createOrUpdateAsset,
+  mintAsset,
 };

@@ -38,14 +38,15 @@
 
 .buttonsWrapper{
   display: flex;
+  align-items: center;
   gap: 20px;
   width: 100%;
   @media screen and (min-width: map-get($breakpoints, 'desktop')){
     width: unset;
   }
 
-  @media screen and (min-width: map-get($breakpoints, 'widescreen')){
-    gap:75px
+  @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+    gap: 75px
   }
 }
 
@@ -54,17 +55,15 @@
   @media screen and (min-width: map-get($breakpoints, 'desktop')){
     width: unset;
   }
-   & > button {
+   & button {
     width: 100%;
     padding: 0 10px;
     min-height: 40px;
-    font-size: 14px;
     @media screen and (min-width: map-get($breakpoints, 'desktop')){
       width: unset;
       min-width: 150px;
       max-height: unset;
       min-height: 50px;
-      font-size: 17px;
     }
    }
 }
