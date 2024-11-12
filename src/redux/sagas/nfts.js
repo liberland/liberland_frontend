@@ -5,7 +5,7 @@ import {
   destroyNFT,
   getUserNfts,
   mintNFT,
-  setMetadata,
+  setMetadataNFT,
   setAttributes,
   sellNFT,
   bidNFT,
@@ -76,7 +76,7 @@ function* setMetadataWorker(action) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  yield call(setMetadata, collectionId, itemId, metadataCID, walletAddress);
+  yield call(setMetadataNFT, collectionId, itemId, metadataCID, walletAddress);
   yield put(nftsActions.setMetadataNft.success());
   yield put(nftsActions.getNfts.call(walletAddress));
 }

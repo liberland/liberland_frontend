@@ -13,12 +13,14 @@ import styles from './styles.module.scss';
 import stylesPage from '../../utils/pagesBase.module.scss';
 import WalletOverview from './WalletOverview';
 import WalletTransactionHistory from './WalletTransactionHistory';
+import Assets from './Assets';
 
 import Card from '../Card';
 import RoleHOC from '../../hocs/RoleHOC';
 import AssetOverview from './AssetOverview';
 import Exchange from './Exchange';
 import Bridge from './Bridge';
+import PayMe from './PayMe';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -79,6 +81,10 @@ function Wallet() {
               component={Exchange}
             />
             <Route
+              path={router.wallet.assets}
+              component={Assets}
+            />
+            <Route
               path={router.wallet.bridge}
               component={Bridge}
             />
@@ -90,6 +96,10 @@ function Wallet() {
                   <Redirect to={router.home.nfts} />
                 </RoleHOC>
               )}
+            />
+            <Route
+              path={router.wallet.payMe}
+              component={PayMe}
             />
             <Route
               exact

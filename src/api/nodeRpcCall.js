@@ -268,6 +268,57 @@ const getIdentity = async (address) => {
   }
 };
 
+const createOrUpdateAsset = async ({
+  id,
+  name,
+  symbol,
+  decimals,
+  minBalance,
+  admin,
+  issuer,
+  freezer,
+  owner,
+  isCreate,
+  defaultValues,
+}) => {
+  try {
+    const api = await getApi();
+    if (isCreate) {
+      const create = await api.tx.assets.create(id, admin, minBalance);
+      await submitExtrinsic(create, owner, api);
+    }
+    if (defaultValues?.name !== name || defaultValues?.symbol !== symbol || defaultValues?.decimals !== decimals) {
+      const setMetadata = await api.tx.assets.setMetadata(id, name, symbol, decimals);
+      await submitExtrinsic(setMetadata, owner, api);
+    }
+    if (defaultValues?.issuer !== issuer || defaultValues?.admin !== admin || defaultValues?.freezer !== freezer) {
+      const setTeam = await api.tx.assets.setTeam(id, issuer, admin, freezer);
+      await submitExtrinsic(setTeam, owner, api);
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const mintAsset = async ({
+  id,
+  beneficiary,
+  amount,
+  owner,
+}) => {
+  try {
+    const api = await getApi();
+    const mint = await api.tx.assets.mint(id, beneficiary, amount);
+    await submitExtrinsic(mint, owner, api);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
 const getLlmBalances = async (addresses) => {
   try {
     const api = await getApi();
@@ -304,6 +355,54 @@ const getAssetData = async (asset, address) => {
       return data.balance;
     }
     return null;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const getAssetDetails = async (ids) => {
+  try {
+    const api = await getApi();
+    const details = (await api.query.assets.asset.multi(ids)).map((asset) => asset.toJSON());
+    const assetQueries = details.reduce((queries, detail) => {
+      queries.push([api.query.identity.identityOf, detail.admin]);
+      queries.push([api.query.identity.identityOf, detail.freezer]);
+      queries.push([api.query.identity.identityOf, detail.issuer]);
+      queries.push([api.query.identity.identityOf, detail.owner]);
+      return queries;
+    }, []);
+    const assetResults = await api.queryMulti([...assetQueries]);
+    const resolvedIdentity = assetResults.map((result) => {
+      const json = result.toJSON();
+      return Buffer.from(json.info.display.raw.slice(2), 'hex').toString('utf-8');
+    }).reduce((accumulator, item) => {
+      const lastItem = accumulator[accumulator.length - 1];
+      if (!lastItem) {
+        accumulator.push([item]);
+      } else if (lastItem.length < 4) {
+        lastItem.push(item);
+      } else {
+        accumulator.push([item]);
+      }
+      return accumulator;
+    }, []);
+
+    const resolvedDetails = details.map((detail, index) => ({
+      ...detail,
+      supply: detail.supply.toString().startsWith('0x')
+        ? window.BigInt(detail.supply).toString()
+        : detail.supply,
+      identity: {
+        admin: resolvedIdentity[index][0],
+        freezer: resolvedIdentity[index][1],
+        issuer: resolvedIdentity[index][2],
+        owner: resolvedIdentity[index][3],
+      },
+    }));
+
+    return resolvedDetails;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -416,6 +515,10 @@ const getEResidentAdditionals = () => [
   [{ Raw: 'eresident' }, { Raw: '1' }],
 ];
 
+const getCompanyAdditionals = () => [
+  [{ Raw: 'company' }, { Raw: '1' }],
+];
+
 const buildAdditionals = (values, blockNumber) => {
   const additionals = [];
 
@@ -427,6 +530,10 @@ const buildAdditionals = (values, blockNumber) => {
   } else if (values.onChainIdentity === 'eresident') {
     additionals.push(
       ...getEResidentAdditionals(),
+    );
+  } else if (values.onChainIdentity === 'company') {
+    additionals.push(
+      ...getCompanyAdditionals(),
     );
   }
 
@@ -850,6 +957,38 @@ const submitProposal = async (
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+async function getIdentityDataProper(addressesIdentityData) {
+  const api = await getApi();
+  if (addressesIdentityData.length === 0) return [];
+  const identityQueries = addressesIdentityData.map((address) => [api.query.identity.identityOf, address]);
+  const identities = await api.queryMulti(identityQueries);
+  return addressesIdentityData.map((address, index) => {
+    const identity = identities[index];
+
+    const isIdentity = identity.isSome;
+
+    const addressString = address.toString();
+    let nameData;
+    let legalData;
+    let websiteData;
+    if (isIdentity) {
+      const identityData = identity.unwrap();
+      const { info } = identityData;
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal']);
+      nameData = decodedData?.display;
+      legalData = decodedData?.legal;
+      websiteData = decodedData?.web;
+    }
+    return {
+      name: nameData,
+      legal: legalData,
+      website: websiteData,
+      identityData: identity.isSome ? identity.unwrap().toJSON() : null,
+      rawIdentity: addressString,
+    };
+  });
+}
+
 const getCongressMembersWithIdentity = async (walletAddress) => {
   const api = await getApi();
   const [
@@ -864,38 +1003,6 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     api.query.elections.runnersUp,
   ]);
 
-  const getIdentityData = async (addresses) => {
-    if (addresses.length === 0) return [];
-    const identityQueries = addresses.map((address) => [api.query.identity.identityOf, address]);
-    const identities = await api.queryMulti(identityQueries);
-    return addresses.map((address, index) => {
-      const identity = identities[index];
-
-      const isIdentity = identity.isSome;
-
-      const addressString = address.toString();
-      let nameData;
-      let legalData;
-      let websiteData;
-      if (isIdentity) {
-        const identityData = identity.unwrap();
-        const { info } = identityData;
-
-        const decodedData = decodeAndFilter(info, ['display', 'web', 'legal']);
-        nameData = decodedData?.display;
-        legalData = decodedData?.legal;
-        websiteData = decodedData?.web;
-      }
-      return {
-        name: nameData,
-        legal: legalData,
-        website: websiteData,
-        identityData: identity.isSome ? identity.unwrap().toJSON() : null,
-        rawIdentity: addressString,
-      };
-    });
-  };
-
   const councilMembersList = councilMembers.map((member) => member.toString());
   const candidatesList = candidates.map((candidate) => candidate[0].toString());
   const currentCandidateVotesByUser = !currentCandidateVotesByUserQuery.isEmpty
@@ -909,10 +1016,10 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     crossReferencedCurrentCandidateVotesByUser,
     runnersUpListIdentities,
   ] = await Promise.all([
-    getIdentityData(councilMembersList),
-    getIdentityData(candidatesList),
-    getIdentityData(currentCandidateVotesByUser),
-    getIdentityData(runnersUpList),
+    getIdentityDataProper(councilMembersList),
+    getIdentityDataProper(candidatesList),
+    getIdentityDataProper(currentCandidateVotesByUser),
+    getIdentityDataProper(runnersUpList),
   ]);
 
   const electionsInfo = await api.derive.elections.info();
@@ -2140,7 +2247,6 @@ const getSectionType = (origin) => {
 const getScheduledCalls = async () => {
   const api = await getApi();
   const agendaEntries = await api.query.scheduler.agenda.entries();
-
   const agendaItems = agendaEntries
     .flatMap(([key, calls]) => calls
       .map((call, idx) => ({
@@ -2359,6 +2465,12 @@ const swapExactTokensForTokens = async (path, amountIn, amountOutMin, sendTo, wa
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+const createNewPool = async (aAsset, bAsset, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.assetConversion.createPool(aAsset, bAsset);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
 const swapTokensForExactTokens = async (path, amountOut, amountInMax, sendTo, walletAddress) => {
   const api = await getApi();
   const extrinsic = api.tx.assetConversion.swapTokensForExactTokens(path, amountOut, amountInMax, sendTo, true);
@@ -2560,23 +2672,51 @@ const getStakingData = async (walletAddress) => {
 const getSenateMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.senate.proposals();
-  const proposalsData = await Promise.all(
+
+  return Promise.all(
     proposals.map(async (proposal) => {
       const [proposalOf, voting, members] = await api.queryMulti([
         [api.query.senate.proposalOf, proposal],
         [api.query.senate.voting, proposal],
         [api.query.senate.members],
       ]);
+
+      const senateProposalHash = proposalOf.hash.toHex();
       return {
         proposal,
         proposalOf,
         voting,
+        hash: senateProposalHash,
         membersCount: members.length,
       };
     }),
-  );
+  ).then((motions) => motions.filter(Boolean));
+};
 
-  return proposalsData;
+const matchScheduledWithSenateMotions = async () => {
+  const [senateMotions, sheduledMotions] = await Promise.all([getSenateMotions(), getScheduledCalls()]);
+
+  const motions = senateMotions.map((motion) => {
+    const { proposalOf } = motion;
+
+    const unwrappedProposalOf = proposalOf.unwrap();
+    if (unwrappedProposalOf.method === 'cancel' && unwrappedProposalOf.section === 'scheduler') {
+      const blockNumber = proposalOf.value.args[0].toString();
+      const matchingScheduledCall = sheduledMotions.find(
+        (scheduled) => scheduled.blockNumber.toString() === blockNumber,
+      );
+      if (!matchingScheduledCall) {
+        return { ...motion, proposalOf: unwrappedProposalOf };
+      }
+      const proposalData = { method: unwrappedProposalOf.method, section: unwrappedProposalOf.section };
+      const proposalWithDetails = {
+        ...proposalData, args: matchingScheduledCall?.preimage || matchingScheduledCall?.proposal,
+      };
+      return { ...motion, proposalOf: proposalWithDetails };
+    }
+    return { ...motion, proposalOf: unwrappedProposalOf };
+  });
+  return motions;
 };
 
 const senateProposeCancel = async (walletAddress, idx, executionBlock) => {
@@ -2790,7 +2930,7 @@ async function destroyNFT(collectionId, itemId, walletAddress) {
   return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
-async function setMetadata(collectionId, itemId, metadataCID, walletAddress) {
+async function setMetadataNFT(collectionId, itemId, metadataCID, walletAddress) {
   const api = await getApi();
   const metadata = `ipfs://${metadataCID}`;
   const extrinsic = api.tx.nfts.setMetadata(collectionId, itemId, metadata);
@@ -2956,11 +3096,16 @@ export {
   createCollectionNfts,
   mintNFT,
   destroyNFT,
-  setMetadata,
+  setMetadataNFT,
   setAttributes,
   sellNFT,
   bidNFT,
   transferNFT,
   getAllNfts,
   getUserCollection,
+  matchScheduledWithSenateMotions,
+  createNewPool,
+  getAssetDetails,
+  createOrUpdateAsset,
+  mintAsset,
 };

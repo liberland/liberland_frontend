@@ -36,16 +36,20 @@ function OnchainIdentityModal({
   let identityCitizen = false;
   let eResident = false;
   let identityDOB = false;
+  let company = false;
 
   if (identity.isSome) {
     const { judgements, info } = identity.unwrap();
     identityCitizen = parseAdditionalFlag(info.additional, 'citizen');
     eResident = parseAdditionalFlag(info.additional, 'eresident');
+    company = parseAdditionalFlag(info.additional, 'company');
     let onChainIdentity;
     if (identityCitizen && eResident) {
       onChainIdentity = 'citizen';
     } else if (!identityCitizen && eResident) {
       onChainIdentity = 'eresident';
+    } else if (company) {
+      onChainIdentity = 'company';
     } else {
       onChainIdentity = 'neither';
     }
@@ -126,6 +130,7 @@ function OnchainIdentityModal({
         options={[
           { value: 'eresident', display: 'E-resident' },
           { value: 'citizen', display: 'Citizen' },
+          { value: 'company', display: 'Company' },
           { value: 'neither', display: 'Neither' },
         ]}
       />

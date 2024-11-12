@@ -5,6 +5,7 @@ import cx from 'classnames';
 import styles from './styles.module.scss';
 
 function TextArea({
+  id,
   register,
   watch,
   name,
@@ -19,6 +20,8 @@ function TextArea({
   value,
   disabled = false,
   onPaste,
+  onChange,
+  className,
 }) {
   const ref = useRef(null);
   const v = watch ? watch(name) : null;
@@ -30,12 +33,14 @@ function TextArea({
     textarea.style.height = 'inherit';
     const newHeight = Math.max(textarea.scrollHeight, Number.isNaN(oldHeight) ? 0 : oldHeight);
     textarea.style.height = `${newHeight}px`;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref.current, v]);
 
   return (
-    <div ref={ref} className={styles.inputWrapper}>
+    <div ref={ref} className={cx(styles.inputWrapper, className)}>
       {Icon && <Icon className={styles.inputIcon} />}
       <textarea
+        id={id}
         ref={ref}
         className={cx(styles.input, { [styles.withIcon]: Icon && withIcon })}
         name={name}
@@ -44,6 +49,7 @@ function TextArea({
         value={value}
         disabled={disabled}
         onPaste={onPaste}
+        onChange={onChange}
         {...register(name, {
           validate,
           pattern,

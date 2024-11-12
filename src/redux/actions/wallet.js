@@ -15,6 +15,7 @@ export const {
   getAdditionalAssets,
   sendAssetsTransfer,
   getAssetsBalance,
+  getAssetsDetails,
 } = createActions({
   GET_WALLET: {
     call: undefined,
@@ -97,6 +98,11 @@ export const {
     failure: undefined,
   },
   GET_ASSETS_BALANCE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_ASSETS_DETAILS: {
     call: undefined,
     success: undefined,
     failure: undefined,
