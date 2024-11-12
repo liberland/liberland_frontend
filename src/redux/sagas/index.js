@@ -181,6 +181,7 @@ export default function* rootSaga() {
     ethSagas.erc20InfoWatcher(),
     ethSagas.erc20BalanceWatcher(),
     ethSagas.getWethExchangeRateWatcher(),
+    ethSagas.getBalanceWatcher(),
 
     // FINANCES
     financesSagas.getFinancesWatcher(),

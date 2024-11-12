@@ -15,6 +15,8 @@ const initialState = {
   wethLpExchangeRate: null,
   wethLpExchangeRateLoading: false,
   wethLpExchangeRateError: null,
+  balance: null,
+  balanceLoading: false,
 };
 
 const ethReducer = handleActions(
@@ -49,6 +51,20 @@ const ethReducer = handleActions(
     [ethActions.getTokenStakeContractInfo.call]: (state) => ({
       ...state,
       tokenStakeContractInfoLoading: true,
+    }),
+    [ethActions.getBalance.call]: (state) => ({
+      ...state,
+      balanceLoading: true,
+    }),
+    [ethActions.getBalance.failure]: (state) => ({
+      ...state,
+      balance: 0,
+      balanceLoading: false,
+    }),
+    [ethActions.getBalance.success]: (state, action) => ({
+      ...state,
+      balance: action.payload.balance,
+      balanceLoading: false,
     }),
     [ethActions.getWethLpExchangeRate.call]: (state) => ({
       ...state,

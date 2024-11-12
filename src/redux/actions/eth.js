@@ -8,6 +8,7 @@ export const {
   getErc20Info,
   getErc20Balance,
   getWethLpExchangeRate,
+  getBalance,
 } = createActions({
   GET_ETH_WALLET_OPTIONS: {
     call: undefined,
@@ -40,6 +41,11 @@ export const {
     failure: undefined,
   },
   GET_WETH_LP_EXCHANGE_RATE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_BALANCE: {
     call: undefined,
     success: undefined,
     failure: undefined,

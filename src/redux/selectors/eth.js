@@ -62,6 +62,11 @@ const selectorERC20Info = createSelector(
   (reducer) => reducer.erc20Info,
 );
 
+const selectorBalance = createSelector(
+  ethReducer,
+  (reducer) => reducer.balance,
+);
+
 const selectorERC20Balance = createSelector(
   ethReducer,
   (reducer) => Object.entries(reducer.erc20Balance).reduce((accumulator, [key, value]) => {
@@ -88,4 +93,5 @@ export {
   selectorWethLpExchangeRate,
   selectorWethLpExchangeRateLoading,
   selectorWethLpExchangeRateError,
+  selectorBalance,
 };

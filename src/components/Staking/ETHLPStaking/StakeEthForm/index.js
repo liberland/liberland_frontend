@@ -8,7 +8,10 @@ import { ethSelectors } from '../../../../redux/selectors';
 import { ethActions } from '../../../../redux/actions';
 import { TextInput } from '../../../InputComponents';
 import Button from '../../../Button/Button';
-import { formatCustom } from '../../../../utils/walletHelpers';
+import {
+  formatCustom,
+  parseAssets,
+} from '../../../../utils/walletHelpers';
 import { stakeLPWithEth } from '../../../../api/ethereum';
 import styles from './styles.module.scss';
 
@@ -29,23 +32,29 @@ function StakeEthForm({
     },
   } = useForm({
     mode: 'onChange',
+    defaultValues: {
+      tolerance: '90',
+    },
   });
 
   const [results, setResults] = React.useState([0, 0, 0]);
   const connected = useSelector(ethSelectors.selectorConnected);
+  const balance = useSelector(ethSelectors.selectorBalance);
 
   const onSubmit = async ({ stake, tokens, tolerance }) => {
     try {
+      const realStake = parseAssets(stake, 18).toString();
+      const realTokens = parseAssets(tokens, 18).toString();
       const signer = await connected.provider.getSigner(account);
       const getAmountWithTolerance = (amount) => (
-        (window.BigInt(amount) * window.BigInt(tolerance)) / window.BigInt(100)
+        ((window.BigInt(amount) * window.BigInt(tolerance)) / window.BigInt(100)).toString()
       );
       setResults(await stakeLPWithEth(
         signer,
-        stake,
-        getAmountWithTolerance(stake),
-        tokens,
-        getAmountWithTolerance(tokens),
+        realStake,
+        getAmountWithTolerance(realStake),
+        realTokens,
+        getAmountWithTolerance(realTokens),
         connected.provider,
       ));
     } catch (e) {
@@ -65,19 +74,33 @@ function StakeEthForm({
   const exchangeRate = useSelector(ethSelectors.selectorWethLpExchangeRate);
   const exchangeRateLoading = useSelector(ethSelectors.selectorWethLpExchangeRateLoading);
   const exchangeRateError = useSelector(ethSelectors.selectorWethLpExchangeRateError);
+  const lldBalances = useSelector(ethSelectors.selectorERC20Balance)?.[process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS];
   const dispatch = useDispatch();
 
   React.useEffect(() => {
     dispatch(ethActions.getWethLpExchangeRate.call());
-  }, [dispatch]);
+    dispatch(ethActions.getBalance.call({ provider: connected.provider, address: account }));
+    dispatch(ethActions.getErc20Balance.call(
+      process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+      account,
+    ));
+  }, [account, dispatch, connected]);
+
+  const lldBalance = React.useMemo(
+    () => formatCustom(lldBalances?.[account]?.balance?.toString() || '0', 18, true),
+    [account, lldBalances],
+  );
+
+  const formattedBalance = formatCustom(balance || '0', 18, true);
 
   const liquidityPoolReward = React.useMemo(() => {
     if (stake && tokens && exchangeRate && !errors.stake && !errors.token) {
       try {
-        return `Receive ${formatCustom(exchangeRate.exchangeRate({
-          eth: window.BigInt(stake),
-          tokenAmount: window.BigInt(tokens),
-        }), 18)} LP tokens`;
+        const lpTokens = exchangeRate.exchangeRate({
+          eth: window.BigInt(parseAssets(stake, 18).toString()),
+          tokenAmount: window.BigInt(parseAssets(tokens, 18).toString()),
+        });
+        return `Receive ${formatCustom(lpTokens, 18, true)} LP tokens`;
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e);
@@ -102,7 +125,10 @@ function StakeEthForm({
       className={styles.form}
     >
       <label className={styles.wrapper} htmlFor="stake">
-        Stake your ETH through Uniswap
+        Stake your ETH through Uniswap (balance:
+        {' '}
+        {formattedBalance}
+        )
         <div className={styles.inputWrapper}>
           <TextInput
             register={register}
@@ -127,7 +153,7 @@ function StakeEthForm({
           <div className={styles.success}>
             LLD staked:
             {' '}
-            {formatCustom(results[0], 18, true)}
+            {parseAssets(results[0], 18, true)}
             {', ETH staked: '}
             {formatCustom(results[1], 18, true)}
             {', LP staked: '}
@@ -136,7 +162,10 @@ function StakeEthForm({
         )}
       </label>
       <label className={styles.wrapper} htmlFor="tokens">
-        Stake your LLD through Uniswap
+        Stake your LLD through Uniswap (balance:
+        {' '}
+        {lldBalance}
+        )
         <div className={styles.inputWrapper}>
           <TextInput
             register={register}
@@ -159,7 +188,10 @@ function StakeEthForm({
         )}
       </label>
       <label className={styles.wrapper} htmlFor="tolerance">
-        Contract will fail if cannot stake specified percentage of ETH/LLD into LP
+        Contract will fail if cannot stake
+        {' '}
+        {tolerance}
+        % of ETH/LLD into LP
         <Slider
           min={0}
           max={100}
@@ -172,7 +204,7 @@ function StakeEthForm({
           </div>
         )}
       </label>
-      <div>
+      <div className={styles.reward}>
         {liquidityPoolReward}
       </div>
       <div className={styles.buttonRow}>
@@ -188,7 +220,7 @@ function StakeEthForm({
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Loading...' : 'Stake ETH'}
+            {isSubmitting ? 'Loading...' : 'Stake ETH & LLD'}
           </Button>
         </div>
       </div>
@@ -206,7 +238,7 @@ function StakeEthFormModalWrapper(props) {
   return (
     <div className={styles.modal}>
       <Button primary medium onClick={() => setShow(true)}>
-        Stake ETH
+        Stake ETH & LLD
       </Button>
       {show && (
         <ModalRoot>

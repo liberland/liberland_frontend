@@ -84,9 +84,12 @@ const getERC20Balance = async ({ erc20Address, account }) => {
 const getSwapExchangeRate = async () => {
   const min = (aBigInt, bBigInt) => (aBigInt > bBigInt ? bBigInt : aBigInt);
   const max = (aBigInt, bBigInt) => (aBigInt > bBigInt ? aBigInt : bBigInt);
-  const emptyLP = ({ eth, tokenAmount }) => max(0, bigSqrt(
-    window.BigInt(eth) * window.BigInt(tokenAmount),
-  ) - window.BigInt(1000));
+  const emptyLP = ({ eth, tokenAmount }) => {
+    const multiply = window.BigInt(eth) * window.BigInt(tokenAmount);
+    const sqrt = bigSqrt(multiply);
+    const zeroOrGreater = max(0, sqrt - window.BigInt(1000));
+    return zeroOrGreater;
+  };
 
   try {
     const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_FACTORY_ADDRESS);
@@ -165,10 +168,16 @@ const stakeLPWithEth = async (
   tokenAmountMin,
   provider,
 ) => {
+  await erc20Approve(
+    process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+    account,
+    process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS,
+    tokenAmount,
+  );
   const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
   const [amountToken, amountEth, liquidity] = await resolveOperation(
     // eslint-disable-next-line max-len
-    'function addLiquidityETH(address token, uint amountTokenDesired, uint amountTokenMin, uint amountETHMin, address to, uint deadline) external virtual override payable returns (uint amountToken, uint amountETH, uint liquidity)',
+    'function addLiquidityETH(address token, uint256 amountTokenDesired, uint256 amountTokenMin, uint256 amountETHMin, address to, uint256 deadline) payable returns (uint256 amountToken, uint256 amountETH, uint256 liquidity)',
     [
       process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
       tokenAmount,
@@ -179,7 +188,6 @@ const stakeLPWithEth = async (
     ],
     ethAmount,
   );
-
   const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_FACTORY_ADDRESS);
   const pair = await readContract({
     contract,
@@ -334,6 +342,19 @@ const connectWallet = async ({ walletId }) => {
   }
 };
 
+const getBalance = async ({ provider, address }) => {
+  try {
+    const balance = (await provider.getBalance(address)).toString();
+    return {
+      balance,
+    };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
 const getAvailableWallets = async () => {
   const walletOptions = await getAllWalletsList();
   return walletOptions.filter(({ id }) => injectedProvider(id));
@@ -342,6 +363,7 @@ const getAvailableWallets = async () => {
 export {
   getThirdWebContract,
   connectWallet,
+  getBalance,
   getTokenStakeContractInfo,
   getTokenStakeAddressInfo,
   stakeTokens,
