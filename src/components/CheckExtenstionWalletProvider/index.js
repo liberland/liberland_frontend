@@ -40,6 +40,16 @@ export function CheckExtensionWalletProvider({ children }) {
     || wallets === null
     || isUnsupportedBrowser === null;
 
+  useEffect(() => {
+    if (!walletAddress && (userBlockchainAdressStorage || (wallets?.length > 0 && wallets[0]?.address))) {
+      dispatch(
+        blockchainActions.setUserWallet.success(
+          userBlockchainAdressStorage || wallets[0].address,
+        ),
+      );
+    }
+  }, [walletAddress, userBlockchainAdressStorage, wallets, dispatch]);
+
   if (isLoading) {
     return (
       <GuidedSetupWrapper>
@@ -56,10 +66,6 @@ export function CheckExtensionWalletProvider({ children }) {
         />
       </GuidedSetupWrapper>
     );
-  }
-
-  if (!walletAddress && (userBlockchainAdressStorage || wallets[0]?.address)) {
-    dispatch(blockchainActions.setUserWallet.success(userBlockchainAdressStorage || wallets[0].address));
   }
 
   return children;

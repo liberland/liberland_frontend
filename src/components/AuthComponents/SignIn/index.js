@@ -4,9 +4,7 @@ import { AuthContext } from 'react-oauth2-code-pkce';
 function SignIn() {
   const { login } = useContext(AuthContext);
   useEffect(() => {
-    if (login) {
-      login();
-    }
+    login?.();
   }, [login]);
   return null;
 }
