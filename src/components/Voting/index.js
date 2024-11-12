@@ -18,6 +18,15 @@ import Referendum from './Referendum';
 import { AddLegislation } from './Referendum/ProposalForms/AddLegislation/AddLegislation';
 import Button from '../Button/Button';
 import { userSelectors } from '../../redux/selectors';
+import { MotionProvider } from '../WalletCongresSenate/ContextMotions';
+
+function ReferendumWrapper() {
+  return (
+    <MotionProvider>
+      <Referendum />
+    </MotionProvider>
+  );
+}
 
 function Voting() {
   const location = useLocation();
@@ -55,7 +64,7 @@ function Voting() {
           />
           <Route
             path={router.voting.referendum}
-            component={Referendum}
+            component={ReferendumWrapper}
           />
           <Route
             path={router.voting.addLegislation}

@@ -90,6 +90,11 @@ const selectorAdditionalAssets = createSelector(
   (reducer) => reducer.additionalAssets,
 );
 
+const selectorAssetsDetails = createSelector(
+  walletReducer,
+  (reducer) => reducer.assetDetails,
+);
+
 const selectorAssetBalance = createSelector(
   walletReducer,
   (reducer) => reducer.assetBalance,
@@ -98,6 +103,11 @@ const selectorAssetBalance = createSelector(
 const selectorAssetsBalance = createSelector(
   walletReducer,
   (reducer) => reducer.assetsBalance,
+);
+
+const selectorTransferState = createSelector(
+  walletReducer,
+  (reducer) => reducer.transferState,
 );
 
 export {
@@ -119,4 +129,6 @@ export {
   selectorAdditionalAssets,
   selectorAssetBalance,
   selectorAssetsBalance,
+  selectorAssetsDetails,
+  selectorTransferState,
 };

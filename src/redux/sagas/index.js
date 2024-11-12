@@ -14,6 +14,8 @@ import * as dexSagas from './dex';
 import * as contractsSagas from './contracts';
 import * as senateSagas from './senate';
 import * as nftsSagas from './nfts';
+import * as ethSagas from './eth';
+import * as financesSagas from './finances';
 
 export default function* rootSaga() {
   yield all([
@@ -42,6 +44,7 @@ export default function* rootSaga() {
     walletSagas.getTransfersTxWatcher(),
     walletSagas.getAdditionalAssetsWatcher(),
     walletSagas.getAssetsBalanceWatcher(),
+    walletSagas.getAssetDetailsWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),
@@ -169,5 +172,16 @@ export default function* rootSaga() {
 
     // NFTS
     nftsSagas.getUserNftsWatcher(),
+
+    // ETH
+    ethSagas.getWalletOptionsWatcher(),
+    ethSagas.getWalletConnectingWatcher(),
+    ethSagas.tokenStakeContractInfoWatcher(),
+    ethSagas.tokenStakeAddressInfoWatcher(),
+    ethSagas.erc20InfoWatcher(),
+    ethSagas.erc20BalanceWatcher(),
+
+    // FINANCES
+    financesSagas.getFinancesWatcher(),
   ]);
 }

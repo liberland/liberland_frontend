@@ -38,6 +38,7 @@ const _parse = (value, decimals) => {
 
 export const formatMerits = (grains, withAll = false) => _format(grains, meritDecimals, withAll);
 export const formatDollars = (grains, withAll = false) => _format(grains, dollarDecimals, withAll);
+export const formatCustom = (grains, decimals, withAll = false) => _format(grains, decimals, withAll);
 export const parseMerits = (merits) => _parse(merits, meritDecimals);
 export const parseDollars = (dollars) => _parse(dollars, dollarDecimals);
 export const parseAssets = (assets, assetDecimals) => _parse(assets, assetDecimals);

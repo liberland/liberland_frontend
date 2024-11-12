@@ -44,10 +44,12 @@ export default {
   },
   wallet: {
     exchange: '/home/wallet/exchange',
+    assets: '/home/wallet/assets',
     allTransactions: '/home/wallet/all-transactions',
     overView: '/home/wallet/overview',
     bridge: '/home/wallet/bridge',
     nfts: '/home/wallet/nfts',
+    payMe: '/home/wallet/pay-me',
   },
   registries: {
     overview: '/home/registries/overview',
@@ -58,6 +60,7 @@ export default {
   },
   staking: {
     overview: '/home/staking/overview',
+    ethlpstaking: '/home/staking/ethlpstaking',
   },
   congress: {
     overview: '/home/congress/overview',

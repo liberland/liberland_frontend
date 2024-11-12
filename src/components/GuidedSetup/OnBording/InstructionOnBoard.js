@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
 
-const link = 'https://liberland-1.gitbook.io/wiki/v/public-documents/blockchain/for-citizens/claiming-residency';
+const link = 'https://docs.liberland.org/public-documents/blockchain/for-citizens/claiming-residency';
 
 function InstructionOnBoard({ setIsClicked }) {
   const onClick = () => {

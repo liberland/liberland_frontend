@@ -465,9 +465,19 @@ function RemarkInfo({ proposal }) {
 }
 RemarkInfo.propTypes = { proposal: ProposalProp.isRequired };
 
+function CancelScheduler({ proposal }) {
+  return (
+    <div>
+      <b>Senate veto cancel congress spending:</b>
+      <Proposal proposal={proposal.args} />
+    </div>
+  );
+}
+CancelScheduler.propTypes = { proposal: ProposalProp.isRequired };
 export function Proposal({ proposal, isDetailsHidden }) {
   const proposalMethod = proposal.method;
   const proposalSection = proposal.section;
+
   if (proposalMethod === 'repealLegislation') {
     return <RepealLegislation {...{ proposal }} />;
   } if (proposalMethod === 'repealLegislationSection') {
@@ -494,6 +504,8 @@ export function Proposal({ proposal, isDetailsHidden }) {
     return <TransferAsset {...{ proposal }} />;
   } if (proposalMethod === 'remark' && proposalSection === 'llm') {
     return <RemarkInfo {...{ proposal }} />;
+  } if (proposalMethod === 'cancel' && proposalSection === 'scheduler') {
+    return <CancelScheduler {...{ proposal }} />;
   }
 
   return <Raw {...{ proposal }} />;

@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { senateActions } from '../../../redux/actions';
+import { identityActions, senateActions } from '../../../redux/actions';
 import { senateSelectors } from '../../../redux/selectors';
 import { Proposal } from '../../Proposal';
 import Card from '../../Card';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
+import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 
 function ScheduledCongressSpending({ isVetoButton }) {
   const dispatch = useDispatch();
@@ -17,6 +18,15 @@ function ScheduledCongressSpending({ isVetoButton }) {
     dispatch(senateActions.senateGetCongressSpending.call());
   }, [dispatch]);
 
+  const { motionIds } = useMotionContext();
+  const divRef = useRef(null);
+
+  useEffect(() => {
+    if (divRef.current) {
+      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds))));
+    }
+  }, [motionIds, dispatch]);
+
   if (!scheduledCalls || scheduledCalls.length < 1) {
     return (<div>There are no open items</div>);
   }
@@ -25,7 +35,7 @@ function ScheduledCongressSpending({ isVetoButton }) {
     <>
       {scheduledCalls.map(({
         preimage, proposal, blockNumber, idx, sectionType,
-      }) => {
+      }, index) => {
         const proposalData = preimage || proposal;
         if (sectionType !== 'congress') return null;
 
@@ -35,7 +45,11 @@ function ScheduledCongressSpending({ isVetoButton }) {
           ));
         };
         return (
-          <Card className={stylesPage.overviewWrapper} key={proposalData}>
+          <Card
+            className={stylesPage.overviewWrapper}
+            key={proposalData}
+            ref={scheduledCalls.length - 1 === index ? divRef : null}
+          >
             {isVetoButton && (
             <div className={styles.button}>
               <Button onClick={onVetoClick} primary small>Veto</Button>
