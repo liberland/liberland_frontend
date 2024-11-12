@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans|Playfair+Display&display=swap');
+@import '../node_modules/rc-tooltip/assets/bootstrap';
 
 $openSans: 'Open Sans', sans-serif;
 $playfairDisplay: 'Playfair Display', serif;
@@ -15,7 +16,8 @@ p {
 }
 
 
-#modal-root {
+#modal-root,
+.modal-root {
   position: fixed;
   left: 0;
   top: 0;

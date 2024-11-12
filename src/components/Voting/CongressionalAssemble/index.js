@@ -11,6 +11,7 @@ import CurrentAssemble from './CurrentAssemble';
 import CandidateVoting from './CandidateVoting';
 import { democracyActions } from '../../../redux/actions';
 import AgreeDisagreeModal from '../../Modals/AgreeDisagreeModal';
+import CongressionalCountdown from './CongressionalCountdown';
 import ModalRoot from '../../Modals/ModalRoot';
 import stylesModal from '../../Modals/styles.module.scss';
 
@@ -158,6 +159,8 @@ function CongressionalAssemble() {
     dispatch(democracyActions.getDemocracy.call());
   }, [dispatch]);
 
+  const termDuration = democracy?.democracy?.electionsInfo?.termDuration;
+
   return (
     <>
       {isModalOpen
@@ -209,6 +212,9 @@ function CongressionalAssemble() {
           moveSelectedCandidate={moveSelectedCandidate}
           didChangeSelectedCandidates={didChangeSelectedCandidates}
         />
+        )}
+        {termDuration && (
+          <CongressionalCountdown termDuration={termDuration.toNumber()} />
         )}
       </div>
     </>

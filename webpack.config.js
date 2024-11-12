@@ -70,10 +70,16 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
+          test: /\.m?js$/,
+          resolve: {
+            fullySpecified: false
+          },
+        },
+        {
           test: /\.js$/,
           exclude: /node_modules/,
           resolve: {
-            fullySpecified: false,
+            fallback: { 'process/browser': require.resolve('process/browser'), }
           },
           use: {
             loader: 'babel-loader',

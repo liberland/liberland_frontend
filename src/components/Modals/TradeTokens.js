@@ -44,8 +44,8 @@ function TradeTokensModal({
 
   const reservesThisAssets = useMemo(() => {
     if (reserves && asset1 && asset2 && reserves[asset1][asset2]) {
-      const asset1Value = Number(reserves[asset1][asset2].asset1);
-      const asset2Value = Number(reserves[asset1][asset2].asset2);
+      const asset1Value = reserves[asset1][asset2].asset1;
+      const asset2Value = reserves[asset1][asset2].asset2;
       return { ...reserves[asset1][asset2], asset1: asset1Value, asset2: asset2Value };
     }
     return null;

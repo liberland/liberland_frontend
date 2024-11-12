@@ -14,7 +14,7 @@ import {
   getIdentitiesNames,
   getScheduledCalls,
   getSenateMembers,
-  getSenateMotions,
+  matchScheduledWithSenateMotions,
   senateProposeCancel,
   senateVoteAtMotions,
 } from '../../api/nodeRpcCall';
@@ -27,7 +27,7 @@ import { blockchainSelectors, officesSelectors, senateSelectors } from '../selec
 const isCongress = false;
 
 function* getMotionsWorker() {
-  const motions = yield call(getSenateMotions);
+  const motions = yield call(matchScheduledWithSenateMotions);
   yield put(senateActions.senateGetMotions.success(motions));
 }
 

@@ -82,7 +82,6 @@ export default function Overview() {
       <div className={styles.list}>
         <b><span>Congress Members:</span></b>
         <br />
-        <br />
         {userHasWalletCongressMember && !userIsMember && (
           <Button
             small

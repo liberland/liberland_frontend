@@ -108,6 +108,11 @@ function Profile({ className }) {
       isDataToShow: false,
     },
     {
+      dataFunction: () => parseAdditionalFlag(info?.additional, 'company'),
+      title: 'Company',
+      isDataToShow: false,
+    },
+    {
       dataFunction: () => parseCitizenshipJudgement(judgements),
       title: 'Identity confirmed',
       isDataToShow: false,

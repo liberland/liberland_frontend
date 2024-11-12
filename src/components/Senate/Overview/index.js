@@ -28,7 +28,6 @@ function Overview() {
       <b>
         <span>Senate Members:</span>
         <br />
-        <br />
         {userHasWalletSenateMember && !userIsMember && (
           <Button
             small
