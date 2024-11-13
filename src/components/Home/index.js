@@ -1,8 +1,6 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import router from '../../router';
-import HomeHeader from './HomeHeader';
-import HomeNavigation from './HomeNavigation';
 import Wallet from '../Wallet';
 import RoleHOC from '../../hocs/RoleHOC';
 import Profile from '../Profile';
@@ -15,11 +13,11 @@ import Staking from '../Staking';
 import Registries from '../Registries';
 import Companies from '../Companies';
 import AllTransactions from '../Wallet/AllTransactions';
-import styles from './styles.module.scss';
 import Congress from '../Congress';
 
 import Contracts from '../Contracts';
 import Senate from '../Senate';
+import Layout from '../Layout';
 
 function Home() {
   const renderRoutes = [
@@ -54,15 +52,9 @@ function Home() {
   ];
 
   return (
-    <div>
-      <div className={styles.homeContentWrapper}>
-        <HomeNavigation />
-        <div className={styles.homeMain}>
-          <HomeHeader />
-          <Switch>{renderRoutes}</Switch>
-        </div>
-      </div>
-    </div>
+    <Layout>
+      <Switch>{renderRoutes}</Switch>
+    </Layout>
   );
 }
 

@@ -121,5 +121,10 @@
     "*.{js, jsx}": [
       "node_modules/.bin/eslint --max-warnings=0"
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run precommit"
+    }
   }
 }

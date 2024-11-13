@@ -1,6 +1,7 @@
 import React from 'react';
+import { useHistory, useRouteMatch } from 'react-router-dom';
 import {
-  Header,
+  Header as HeaderInternal,
   Layout as LayoutInternal,
   Content,
   Footer,
@@ -10,10 +11,26 @@ import Sider from 'antd/es/layout/Sider';
 import ConfigProvider from 'antd/es/config-provider';
 import PropTypes from 'prop-types';
 
-import HomeHeader from '../Home/HomeHeader';
+import ChangeWallet from '../Home/ChangeWallet';
 import styles from './styles.module.scss';
+import Header from '../AuthComponents/Header';
+import { footerLinks, navigationList } from '../../constants/navigationList';
 
 function Layout({ children }) {
+  const history = useHistory();
+  const createMenu = (navigation) => ({
+    icon: navigation.icon,
+    dashed: navigation.isDiscouraged,
+    label: [navigation.title[0], ...navigation.title.slice(1).map((c) => c.toLowerCase())].join(''),
+    key: navigation.route,
+    children: Object.entries(navigation.subLinks).map(([name, link]) => ({
+      label: name,
+      onClick: () => history.push(link),
+    })),
+  });
+
+  const { path } = useRouteMatch();
+
   return (
     <ConfigProvider
       theme={{
@@ -34,37 +51,55 @@ function Layout({ children }) {
       }}
     >
       <LayoutInternal>
-        <Header className={styles.header}>
-          <HomeHeader />
-          <Menu
-            theme="dark"
-            mode="horizontal"
-            defaultSelectedKeys={['2']}
-            items={items1}
-            className={styles.menu}
-          />
-        </Header>
+        <HeaderInternal className={styles.header}>
+          <Header />
+          <div className={styles.version}>
+            Blockchain
+            <br />
+            Dashboard 2.0
+          </div>
+          <ChangeWallet />
+        </HeaderInternal>
         <LayoutInternal>
           <Sider width={200} breakpoint="md">
             <Menu
               mode="inline"
-              defaultSelectedKeys={['1']}
-              defaultOpenKeys={['sub1']}
-              style={{ height: '100%', borderRight: 0 }}
-              items={items2}
+              className={styles.sider}
+              selectedKeys={[path]}
+              items={[
+                {
+                  label: 'For Citizens',
+                  children: navigationList.filter(({ isGovt }) => !isGovt).map(createMenu),
+                },
+                {
+                  label: 'For State Officials',
+                  children: navigationList.filter(({ isGovt }) => isGovt).map(createMenu),
+                },
+              ]}
             />
           </Sider>
-          <LayoutInternal style={{ padding: '30px 35px' }}>
-            <Content
-              style={{
-                margin: 0,
-                minHeight: 280,
-              }}
-            >
+          <LayoutInternal className={styles.contentContainer}>
+            <Content className={styles.content}>
               {children}
             </Content>
-            <Footer style={{ textAlign: 'center' }}>
-              About
+            <Footer className={styles.footer}>
+              {Object.entries(footerLinks).map(([title, links], index) => (
+                <div key={title}>
+                  <label className={styles.footerTitle} htmlFor={`footer-${index}`}>
+                    {title}
+                  </label>
+                  <Menu
+                    id={`footer-${index}`}
+                    mode="inline"
+                    items={Object.entries(links).map(([name, url]) => ({
+                      label: name,
+                      onClick: () => {
+                        window.location.href = url;
+                      },
+                    }))}
+                  />
+                </div>
+              ))}
             </Footer>
           </LayoutInternal>
         </LayoutInternal>

@@ -87,7 +87,10 @@ export const navigationList = [
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED,
     subLinks: {
-
+      Companies: router.companies.home,
+      Create: router.companies.create,
+      'Edit company': router.companies.edit,
+      'All companies': router.companies.allCompanies,
     },
   },
   {
@@ -96,6 +99,13 @@ export const navigationList = [
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED,
+    subLinks: {
+      Overview: router.registries.overview,
+      'All companies': router.registries.allCompanies,
+      Land: router.registries.land,
+      Assets: router.registries.assets,
+      Other: router.registries.other,
+    },
   },
   {
     route: router.home.staking,
@@ -103,6 +113,10 @@ export const navigationList = [
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
+    subLinks: {
+      Overview: router.staking.overview,
+      'ETH LP Staking': router.staking.ethlpstaking,
+    },
   },
   {
     route: router.home.congress,
@@ -111,6 +125,14 @@ export const navigationList = [
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
     isGovt: true,
+    subLinks: {
+      Overview: router.congress.overview,
+      Motions: router.congress.motions,
+      Treasury: router.congress.treasury,
+      'Add legislation': router.congress.addLegislation,
+      'Add legislation via referendum': router.congress.addLegislationViaReferendum,
+      Wallet: router.congress.wallet,
+    },
   },
   {
     route: router.home.senate,
@@ -119,5 +141,50 @@ export const navigationList = [
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
     isGovt: true,
+    subLinks: {
+      Motions: router.senate.motions,
+      'Scheduled Congress Spending': router.senate.scheduledCongressSpending,
+      Wallet: router.senate.wallet,
+    },
   },
 ];
+
+export const footerLinks = {
+  About: {
+    About: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/about`,
+    FAQ: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/faq`,
+    Blockchain: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/blockchain`,
+    Contributions: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/contribution`,
+    Contacts: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/contact`,
+    'Space programme': 'https://app.charmverse.io/liberland-space-program/liberland-space-program-7985497939281838',
+  },
+  Legal: {
+    Constitution: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/constitution`,
+    Laws: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/laws`,
+    'Terms & conditions': `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/terms-and-conditions`,
+    'Company terms & conditions': `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/company-terms-and-conditions`,
+    'Gift agreement (CZ)': `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/gift-agreement?country=cz`,
+    'Gift agreement (SC)': `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/gift-agreement?country=sc`,
+    'Privacy policy': `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/privacy-policy`,
+  },
+  Government: {
+    Cabinet: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/government#president`,
+    Congress: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/government#congress`,
+    Elections: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/elections`,
+    'Overseas Missions': `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/government#overseas-missions`,
+    'Liberland Gazette': `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/gazette`,
+  },
+  Media: {
+    News: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/news`,
+    Podcast: 'https://www.facebook.com/LiberlandShow/',
+    YouTube: 'https://www.youtube.com/@LiberlandOfficial',
+    'X/Twitter': 'https://twitter.com/liberland_org',
+    'Liberland Press': 'https://liberlandpress.com',
+  },
+  Culture: {
+    'Visit Liberland': 'https://visit.ll.land',
+    Anniversary: 'https://anniversary.ll.land',
+    'Floating Man Festival': 'https://floatingman.ll.land',
+    'Diaspora villages': `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}/diaspora-villages`,
+  },
+};
