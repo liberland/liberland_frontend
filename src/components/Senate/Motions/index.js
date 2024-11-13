@@ -18,7 +18,8 @@ function Motions() {
 
   useEffect(() => {
     if (divRef.current) {
-      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds))));
+      const votes = motions.map((item) => item.votes);
+      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds.concat(votes.flat())))));
     }
   }, [motions, motionIds, dispatch]);
 

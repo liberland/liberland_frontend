@@ -10,9 +10,38 @@ import stylesPage from '../../../utils/pagesBase.module.scss';
 // REDUX
 import {
   blockchainSelectors,
+  identitySelectors,
 } from '../../../redux/selectors';
 import { Proposal } from '../../Proposal';
 import { walletAddress } from '../../../redux/selectors/congress';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
+
+function Voters({ voting }) {
+  const names = useSelector(identitySelectors.selectorIdentityMotions);
+  return (
+    <ul className={styles.list}>
+      {voting.map((item) => {
+        const id = item.toString();
+        const identity = names?.[id]?.identity;
+        return (
+          <li key={id}>
+            <CopyIconWithAddress
+              isTruncate
+              name={identity?.name}
+              legal={identity?.legal}
+              address={id}
+              showAddress
+            />
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+Voters.propTypes = {
+  voting: PropTypes.arrayOf(PropTypes.string).isRequired,
+};
 
 export default function Motion({
   proposal, proposalOf, voting, voteMotion, closeMotion, membersCount, userIsMember,
@@ -36,7 +65,6 @@ export default function Motion({
     };
     dispatch(voteMotion(voteMotionData));
   };
-
   return (
     <div className={stylesPage.stakingWrapper}>
       <Card className={stylesPage.overviewWrapper}>
@@ -55,6 +83,7 @@ export default function Motion({
                 {threshold}
               </b>
             </p>
+            <Voters voting={voting.ayes} />
             <p>
               Nay
               {' '}
@@ -64,6 +93,7 @@ export default function Motion({
                 {threshold}
               </b>
             </p>
+            <Voters voting={voting.nays} />
           </span>
         </div>
 
