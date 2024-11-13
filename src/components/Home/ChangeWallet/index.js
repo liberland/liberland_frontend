@@ -21,7 +21,7 @@ function ChangeWallet({ setIsMenuOpen }) {
     dispatch(validatorActions.getInfo.call());
     dispatch(walletActions.getWallet.call());
     dispatch(democracyActions.getDemocracy.call());
-    // localStorage.setItem('BlockchainAdress', address);
+    localStorage.setItem('BlockchainAdress', address);
   };
 
   const onChangeSelect = (e) => {
