@@ -8,18 +8,15 @@ import { useMediaQuery } from 'usehooks-ts';
 import { AuthContext } from 'react-oauth2-code-pkce';
 import NavigationLink from '../NavigationLink';
 import RoleHOC from '../../../hocs/RoleHOC';
-import router from '../../../router';
 import Header from '../../AuthComponents/Header';
 import GetCitizenshipCard from '../Cards/GetCitizenshipCard';
 import ChangeWallet from '../ChangeWallet';
+import router from '../../../router';
 
 // ASSETS
 import styles from './styles.module.scss';
 import DocumentsIcon from '../../../assets/icons/documents.svg';
-import FeedIcon from '../../../assets/icons/feed.svg';
-import WalletIcon from '../../../assets/icons/wallet.svg';
-import VotingIcon from '../../../assets/icons/voting.svg';
-import ConstitutionIcon from '../../../assets/icons/constitution.svg';
+
 import OpenMenuIcon from '../../../assets/icons/menu.svg';
 import CloseMenuIcon from '../../../assets/icons/close.svg';
 
@@ -39,6 +36,7 @@ import {
 } from '../../../redux/actions';
 import LogoutModal from '../../Modals/LogoutModal';
 import Button from '../../Button/Button';
+import { navigationList } from '../../../constants/navigationList';
 
 function HomeNavigation() {
   const { logOut, login } = useContext(AuthContext);
@@ -87,102 +85,29 @@ function HomeNavigation() {
     }
   };
 
-  const navigationList = [
-    {
-      route: router.home.profile,
-      title: homeTitle,
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      // eslint-disable-next-line react/no-unstable-nested-components
-      icon: () => (
-        <Avatar
-          name={fullName}
-          color="#FDF4E0"
-          fgColor="#F1C823"
-          round
-          size="41px"
-        />
-      ),
-      description: `${formatMerits(totalBalance)} LLM`,
-      isDiscouraged: false,
-    },
-    {
-      route: router.home.feed,
-      title: 'FEED',
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      icon: FeedIcon,
-      isDiscouraged: process.env.REACT_APP_IS_FEED_DISCOURAGED,
-    },
-    {
-      route: router.home.wallet,
-      title: 'WALLET',
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      icon: WalletIcon,
-      isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
-    },
-    {
-      route: router.home.voting,
-      title: 'VOTING',
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      icon: VotingIcon,
-      isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED,
-    },
-    {
-      route: router.home.contracts,
-      title: 'CONTRACTS',
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      icon: DocumentsIcon,
-      isDiscouraged: process.env.REACT_APP_IS_CONTRACTS_DISCOURAGED,
-    },
-    {
-      route: router.home.legislation,
-      title: 'LEGISLATION',
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      icon: ConstitutionIcon,
-      isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED,
-    },
-    {
-      route: router.home.offices,
-      title: 'OFFICES',
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      icon: ConstitutionIcon,
-      isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED,
-    },
-    {
-      route: router.home.companies,
-      title: 'COMPANIES',
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      icon: DocumentsIcon,
-      isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED,
-    },
-    {
-      route: router.home.registries,
-      title: 'REGISTRIES',
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      icon: DocumentsIcon,
-      isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED,
-    },
-    {
-      route: router.home.staking,
-      title: 'STAKING',
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      icon: DocumentsIcon,
-      isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
-    },
-    {
-      route: router.home.congress,
-      title: 'CONGRESS',
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      icon: DocumentsIcon,
-      isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
-    },
-    {
-      route: router.home.senate,
-      title: 'SENATE',
-      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
-      icon: DocumentsIcon,
-      isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
-    },
+  const homeIcon = {
+    route: router.home.profile,
+    title: homeTitle,
+    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
+    // eslint-disable-next-line react/no-unstable-nested-components
+    icon: () => (
+      <Avatar
+        name={fullName}
+        color="#FDF4E0"
+        fgColor="#F1C823"
+        round
+        size="41px"
+      />
+    ),
+    description: `${formatMerits(totalBalance)} LLM`,
+    isDiscouraged: false,
+  };
+
+  const navigation = [
+    homeIcon,
+    ...navigationList,
   ];
+
   const desktopNavbar = (
     <div className={`${styles.navigationWrapper}`}>
       <div className={styles.navigationContent}>
@@ -190,7 +115,7 @@ function HomeNavigation() {
           <Header />
         </div>
         {roles
-          && navigationList.map(
+          && navigation.map(
             ({
               route,
               icon,
@@ -282,7 +207,7 @@ function HomeNavigation() {
           </div>
         </div>
         <div className={styles.navigationContent}>
-          {navigationList.map(
+          {navigation.map(
             (
               {
                 route,
