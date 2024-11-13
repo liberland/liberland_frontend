@@ -14,7 +14,13 @@ export const {
   senateGetCongressSpending,
   senateProposeCongressMotionClose,
   senateProposeCloseMotion,
+  senateGetMembers,
 } = createActions({
+  SENATE_GET_MEMBERS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
   SENATE_GET_CONGRESS_SPENDING: {
     call: undefined,
     success: undefined,

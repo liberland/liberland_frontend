@@ -153,9 +153,11 @@ export default function Treasury() {
           </p>
         </div>
         <div className={congressStyles.rowEnd}>
-          <Button primary medium onClick={handleSpendingModalOpen}>
-            Propose spend
-          </Button>
+          {userIsMember && (
+            <Button primary medium onClick={handleSpendingModalOpen}>
+              Propose spend
+            </Button>
+          )}
         </div>
       </div>
       <div>

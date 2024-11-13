@@ -13,6 +13,7 @@ import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 function ScheduledCongressSpending({ isVetoButton }) {
   const dispatch = useDispatch();
   const scheduledCalls = useSelector(senateSelectors.scheduledCalls);
+  const userIsMember = useSelector(senateSelectors.userIsMember);
 
   useEffect(() => {
     dispatch(senateActions.senateGetCongressSpending.call());
@@ -50,7 +51,7 @@ function ScheduledCongressSpending({ isVetoButton }) {
             key={proposalData}
             ref={scheduledCalls.length - 1 === index ? divRef : null}
           >
-            {isVetoButton && (
+            {isVetoButton && userIsMember && (
             <div className={styles.button}>
               <Button onClick={onVetoClick} primary small>Veto</Button>
             </div>
@@ -63,7 +64,6 @@ function ScheduledCongressSpending({ isVetoButton }) {
         );
       })}
     </>
-
   );
 }
 

@@ -2720,6 +2720,11 @@ const matchScheduledWithSenateMotions = async () => {
   return motions;
 };
 
+const getSenateMembers = async () => {
+  const api = await getApi();
+  return api.query.senate.members();
+};
+
 const senateProposeCancel = async (walletAddress, idx, executionBlock) => {
   const api = await getApi();
   const threshold = await senateMajorityThreshold();
@@ -2923,6 +2928,7 @@ export {
   congressSenateSendLlmToPolitipool,
   congressSenateSendAssets,
   getSenateMotions,
+  getSenateMembers,
   senateVoteAtMotions,
   closeSenateMotion,
   senateProposeCancel,
