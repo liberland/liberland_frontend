@@ -35,7 +35,6 @@ function Motions() {
           <div ref={isLastItem ? divRef : null} key={proposal}>
             <Motion
               membersCount={membersCount}
-              key={proposal}
               proposal={proposal.toString()}
               proposalOf={proposalOf}
               voting={voting.unwrap()}
