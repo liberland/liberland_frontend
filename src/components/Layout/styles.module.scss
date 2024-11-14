@@ -5,6 +5,8 @@
 .header {
   display: flex;
   align-items: center;
+  height: 50px;
+  border-top: solid 3px #F3CB28;
 }
 .menu {
   flex: 1;
@@ -22,7 +24,14 @@
   padding: 30px 35px;
 }
 .version {
-  color: #ACBDC5;
+  font-family: Open Sans;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 12px;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;  
+  margin-right: 20px;
 }
 .footerTitle {
   color: #ACBDC5;
@@ -36,11 +45,25 @@
 }
 .footer {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')) {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
   }
+}
+
+.icon {
+  width: 25px;
+  height: 25px;
+}
+
+.logo {
+  width: 136px;
+  margin: 10px 20px 10px 10px;
+}
+
+.user {
+  margin-left: auto;
+  margin-right: 35px;
 }

@@ -1,8 +1,7 @@
 import React from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
-import {
+import LayoutInternal, {
   Header as HeaderInternal,
-  Layout as LayoutInternal,
   Content,
   Footer,
 } from 'antd/es/layout/layout';
@@ -13,15 +12,15 @@ import PropTypes from 'prop-types';
 
 import ChangeWallet from '../Home/ChangeWallet';
 import styles from './styles.module.scss';
-import Header from '../AuthComponents/Header';
 import { footerLinks, navigationList } from '../../constants/navigationList';
+import LiberlandLettermark from '../../assets/icons/Liberland_Lettermark.svg';
 
 function Layout({ children }) {
   const history = useHistory();
   const createMenu = (navigation) => ({
-    icon: navigation.icon,
+    icon: <img src={navigation.icon} alt="icon" className={styles.icon} />,
     dashed: navigation.isDiscouraged,
-    label: [navigation.title[0], ...navigation.title.slice(1).map((c) => c.toLowerCase())].join(''),
+    label: navigation.title,
     key: navigation.route,
     children: Object.entries(navigation.subLinks).map(([name, link]) => ({
       label: name,
@@ -52,27 +51,31 @@ function Layout({ children }) {
     >
       <LayoutInternal>
         <HeaderInternal className={styles.header}>
-          <Header />
+          <img alt="logo" src={LiberlandLettermark} className={styles.logo} />
           <div className={styles.version}>
             Blockchain
             <br />
             Dashboard 2.0
           </div>
-          <ChangeWallet />
+          <div className={styles.user}>
+            <ChangeWallet />
+          </div>
         </HeaderInternal>
         <LayoutInternal>
-          <Sider width={200} breakpoint="md">
+          <Sider width={250} breakpoint="md">
             <Menu
               mode="inline"
               className={styles.sider}
-              selectedKeys={[path]}
+              openKeys={['citizen', 'state', path]}
               items={[
                 {
                   label: 'For Citizens',
+                  key: 'citizen',
                   children: navigationList.filter(({ isGovt }) => !isGovt).map(createMenu),
                 },
                 {
                   label: 'For State Officials',
+                  key: 'state',
                   children: navigationList.filter(({ isGovt }) => isGovt).map(createMenu),
                 },
               ]}
