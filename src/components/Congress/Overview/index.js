@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import cx from 'classnames';
 import Button from '../../Button/Button';
 // REDUX
-import { congressActions } from '../../../redux/actions';
+import { blockchainActions, congressActions, validatorActions } from '../../../redux/actions';
 import {
   congressSelectors,
 } from '../../../redux/selectors';
@@ -11,6 +11,7 @@ import styles from '../styles.module.scss';
 import ProposeLegislationButton from '../ProposeLegislationButton';
 import ProposeLegislationViaReferendumButton from '../ProposeLegislationViaReferendumButton';
 import ProposeBudgetButton from '../ProposeBudgetButton';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
 
 export default function Overview() {
   const dispatch = useDispatch();
@@ -18,7 +19,8 @@ export default function Overview() {
   const userIsMember = useSelector(congressSelectors.userIsMember);
   const userIsRunnersUp = useSelector(congressSelectors.userIsRunnersUp);
   const userIsCandidate = useSelector(congressSelectors.userIsCandidate);
-
+  const userHasWalletCongressMember = useSelector(congressSelectors.userHasWalletCongressMember);
+  const members = useSelector(congressSelectors.members);
   useEffect(() => {
     dispatch(congressActions.getCandidates.call());
     dispatch(congressActions.getMembers.call());
@@ -29,6 +31,12 @@ export default function Overview() {
   if (userIsMember) userStatus = 'Member';
   else if (userIsCandidate) userStatus = 'Candidate';
   else if (userIsRunnersUp) userStatus = 'RunnerUp';
+
+  const switchWallet = (walletAddress) => {
+    dispatch(blockchainActions.setUserWallet.success(walletAddress));
+    dispatch(validatorActions.getInfo.call());
+    localStorage.removeItem('BlockchainAdress');
+  };
 
   return (
     <div className={styles.congressWrapper}>
@@ -69,6 +77,38 @@ export default function Overview() {
             </Button>
           )}
         </div>
+      </div>
+      <br />
+      <div className={styles.list}>
+        <b><span>Congress Members:</span></b>
+        <br />
+        {userHasWalletCongressMember && !userIsMember && (
+          <Button
+            small
+            primary
+            onClick={
+            () => switchWallet(userHasWalletCongressMember)
+          }
+          >
+            Switch wallet to Congress Member
+          </Button>
+        )}
+        <br />
+        <ul>
+          {members && members.map((item, index) => {
+            const { member, identity } = item;
+            return (
+              // eslint-disable-next-line react/no-array-index-key
+              <li key={member + index}>
+                <CopyIconWithAddress
+                  address={member}
+                  name={identity.identity?.name}
+                  legal={identity.identity?.legal}
+                />
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </div>
   );

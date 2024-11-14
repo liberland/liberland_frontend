@@ -2681,12 +2681,20 @@ const getSenateMotions = async () => {
         [api.query.senate.voting, proposal],
         [api.query.senate.members],
       ]);
+      let votes;
+      const votingUnwrapped = voting.isSome ? voting.unwrap() : null;
+      if (votingUnwrapped) {
+        const ayes = votingUnwrapped.ayes.map((item) => item.toString());
+        const nays = votingUnwrapped.nays.map((item) => item.toString());
+        votes = ayes.concat(nays);
+      }
 
       const senateProposalHash = proposalOf.hash.toHex();
       return {
         proposal,
         proposalOf,
         voting,
+        votes,
         hash: senateProposalHash,
         membersCount: members.length,
       };
@@ -2718,6 +2726,11 @@ const matchScheduledWithSenateMotions = async () => {
     return { ...motion, proposalOf: unwrappedProposalOf };
   });
   return motions;
+};
+
+const getSenateMembers = async () => {
+  const api = await getApi();
+  return api.query.senate.members();
 };
 
 const senateProposeCancel = async (walletAddress, idx, executionBlock) => {
@@ -2923,6 +2936,7 @@ export {
   congressSenateSendLlmToPolitipool,
   congressSenateSendAssets,
   getSenateMotions,
+  getSenateMembers,
   senateVoteAtMotions,
   closeSenateMotion,
   senateProposeCancel,

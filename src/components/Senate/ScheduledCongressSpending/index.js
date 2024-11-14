@@ -13,6 +13,7 @@ import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 function ScheduledCongressSpending({ isVetoButton }) {
   const dispatch = useDispatch();
   const scheduledCalls = useSelector(senateSelectors.scheduledCalls);
+  const userIsMember = useSelector(senateSelectors.userIsMember);
 
   useEffect(() => {
     dispatch(senateActions.senateGetCongressSpending.call());
@@ -46,15 +47,12 @@ function ScheduledCongressSpending({ isVetoButton }) {
         };
         const isLastItem = scheduledCalls.length - 1 === index;
         return (
-          <div ref={isLastItem ? divRef : null}>
-            <Card
-              className={stylesPage.overviewWrapper}
-              key={proposalData}
-            >
-              {isVetoButton && (
-              <div className={styles.button}>
-                <Button onClick={onVetoClick} primary small>Veto</Button>
-              </div>
+          <div ref={isLastItem ? divRef : null} key={proposalData}>
+            <Card className={stylesPage.overviewWrapper}>
+              {isVetoButton && userIsMember && (
+                <div className={styles.button}>
+                  <Button onClick={onVetoClick} primary small>Veto</Button>
+                </div>
               )}
 
               <Proposal
@@ -65,7 +63,6 @@ function ScheduledCongressSpending({ isVetoButton }) {
         );
       })}
     </>
-
   );
 }
 

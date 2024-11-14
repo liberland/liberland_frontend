@@ -13,6 +13,7 @@ import { formatAssets, formatDollars, formatMerits } from '../../utils/walletHel
 import formatDate from '../../utils/formatDate';
 import { useAddIdToContext } from './useAddIdToContect.js';
 import CopyIconWithAddress from '../CopyIconWithAddress';
+import CouncilMotionCountdown from '../Congress/MotionCountDown';
 /* eslint-disable react/forbid-prop-types */
 const ProposalProp = PropTypes.object;
 
@@ -280,12 +281,15 @@ CouncilSenateExecute.propTypes = { proposal: ProposalProp.isRequired };
 
 function Schedule({ proposal }) {
   const { args } = proposal;
+  const when = args[0];
   return (
     <div>
-      Schedule call to be made on
+      Schedule call to be made on:
       {' '}
-      {args[0].toString()}
+      {when.toString()}
       :
+      <CouncilMotionCountdown motionEndBlockNumber={when} />
+      <br />
       <Proposal proposal={args[3]} />
     </div>
   );

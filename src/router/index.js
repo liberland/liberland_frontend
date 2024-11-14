@@ -75,6 +75,7 @@ export default {
     motions: '/home/senate/motions',
     scheduledCongressSpending: '/home/senate/scheduled-congress-spending',
     wallet: '/home/senate/wallet',
+    overview: '/home/senate/overview',
   },
   contracts: {
     overview: '/home/contracts/overview',
