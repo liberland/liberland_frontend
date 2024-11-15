@@ -7,7 +7,6 @@ import { NavLink, useLocation } from 'react-router-dom/cjs/react-router-dom.min'
 
 import { useSelector } from 'react-redux';
 import { AuthContext } from 'react-oauth2-code-pkce';
-import VotingHeader from './VotingHeader';
 import RoleHOC from '../../hocs/RoleHOC';
 import router from '../../router';
 
@@ -36,7 +35,6 @@ function Voting() {
     <div className={stylesPage.sectionWrapper}>
       <div className={stylesPage.menuAddressWrapper}>
         <div className={styles.votingHeaderWrapper}>
-          <VotingHeader />
           {location.pathname === router.voting.referendum && (
           <NavLink
             className={styles.linkButton}

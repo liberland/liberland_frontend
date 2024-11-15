@@ -1,14 +1,19 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import PropTypes from 'prop-types';
+import { useMediaQuery } from 'usehooks-ts';
+import Dropdown from 'antd/es/dropdown/dropdown';
+import DownOutlined from '@ant-design/icons/DownOutlined';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
 import {
   blockchainActions, democracyActions, validatorActions, walletActions,
 } from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
 import truncate from '../../../utils/truncate';
+import Polkadot from '../../../assets/icons/polkadot.svg';
 import styles from './styles.module.scss';
 
-function ChangeWallet({ setIsMenuOpen }) {
+function ChangeWallet() {
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 576px)');
   const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const walletAdressSelector = useSelector(
     blockchainSelectors.userWalletAddressSelector,
@@ -16,50 +21,75 @@ function ChangeWallet({ setIsMenuOpen }) {
 
   const dispatch = useDispatch();
   const onWalletAdresssChange = (address) => {
-    if (!address) return;
-    dispatch(blockchainActions.setUserWallet.success(address));
-    dispatch(validatorActions.getInfo.call());
-    dispatch(walletActions.getWallet.call());
-    dispatch(democracyActions.getDemocracy.call());
-    localStorage.setItem('BlockchainAdress', address);
-  };
-
-  const onChangeSelect = (e) => {
-    onWalletAdresssChange(e.target.value);
-    if (setIsMenuOpen) {
-      setIsMenuOpen((prevValue) => !prevValue);
+    if (address) {
+      dispatch(blockchainActions.setUserWallet.success(address));
+      dispatch(validatorActions.getInfo.call());
+      dispatch(walletActions.getWallet.call());
+      dispatch(democracyActions.getDemocracy.call());
+      localStorage.setItem('BlockchainAdress', address);
     }
   };
 
-  if (!wallets || wallets.length < 2) return null;
+  React.useEffect(() => {
+    if (wallets?.length === 1 && !walletAdressSelector) {
+      onWalletAdresssChange(wallets[0].address);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walletAdressSelector, wallets]);
+
+  const displaySelected = React.useMemo(() => {
+    const found = wallets.find(({ address }) => walletAdressSelector === address);
+    if (found) {
+      const { meta, address } = found;
+      const copy = (
+        <CopyIconWithAddress
+          address={address}
+          noDetails
+        />
+      );
+      return meta?.name
+        ? (
+          <>
+            {meta?.name}
+            {' '}
+            (
+            {truncate(address, 10)}
+            )
+            {copy}
+          </>
+        )
+        : (
+          <>
+            {truncate(address, 24)}
+            {copy}
+          </>
+        );
+    }
+    return 'No address selected';
+  }, [walletAdressSelector, wallets]);
+
   return (
-    <div className={styles.selectWrapper}>
-      <select
-        value={walletAdressSelector}
-        className={styles.select}
-        onChange={onChangeSelect}
-      >
-        {wallets.map((wallet) => {
-          const metaName = wallet?.meta?.name;
-          const { address } = wallet;
-          const addressToShow = metaName ? `${metaName} (${truncate(address, 10)})` : truncate(address, 24);
-          return (
-            <option key={wallet.address} value={wallet.address}>
-              {addressToShow}
-            </option>
-          );
-        })}
-      </select>
-    </div>
+    <Dropdown
+      menu={{
+        items: wallets.map(({ meta, address }) => ({
+          key: address,
+          label: meta?.name ? `${meta?.name} (${truncate(address, 10)})` : truncate(address, 24),
+        })),
+        selectedKeys: [walletAdressSelector],
+        onSelect: ({ selectedKeys }) => onWalletAdresssChange(selectedKeys[0]),
+      }}
+      className={styles.dropdown}
+    >
+      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+      <a href="#" onClick={(e) => e.preventDefault()} className={styles.dropdownLink}>
+        {isBiggerThanSmallScreen && (
+          <img src={Polkadot} className={styles.polkadot} alt="Polkadot icon" />
+        )}
+        {displaySelected}
+        <DownOutlined />
+      </a>
+    </Dropdown>
   );
 }
-
-ChangeWallet.defaultProps = {
-  setIsMenuOpen: null,
-};
-
-ChangeWallet.propTypes = {
-  setIsMenuOpen: PropTypes.func,
-};
 
 export default ChangeWallet;

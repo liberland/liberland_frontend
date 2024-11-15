@@ -27,10 +27,10 @@ export const navigationList = [
     icon: WalletIcon,
     isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
     subLinks: {
+      Overview: router.wallet.overView,
       Exchange: router.wallet.exchange,
       Assets: router.wallet.assets,
       'All transactions': router.wallet.allTransactions,
-      Overview: router.wallet.overView,
       Bridge: router.wallet.bridge,
       NFTs: router.wallet.nfts,
     },

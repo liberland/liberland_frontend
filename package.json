@@ -4,6 +4,7 @@
   "private": true,
   "packageManager": "yarn@1.22.19",
   "dependencies": {
+    "@ant-design/icons": "^5.5.1",
     "@braintree/sanitize-url": "^7.0.0",
     "@emotion/core": "^10.0.27",
     "@fortawesome/fontawesome-svg-core": "^1.2.28",

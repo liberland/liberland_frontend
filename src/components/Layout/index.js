@@ -14,6 +14,7 @@ import List from 'antd/es/list';
 import Title from 'antd/es/typography/Title';
 import Tabs from 'antd/es/tabs';
 import Spin from 'antd/es/spin';
+import MenuIcon from '@ant-design/icons/MenuOutlined';
 import { useMediaQuery } from 'usehooks-ts';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -87,6 +88,17 @@ function Layout({ children }) {
   }, [matchedSubLink, pathname]);
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 576px)');
+
+  const getMenuKey = () => {
+    if (isBiggerThanDesktop) {
+      return 'large';
+    }
+    if (isBiggerThanSmallScreen) {
+      return 'desktop';
+    }
+    return 'small';
+  };
 
   return (
     <ConfigProvider
@@ -135,40 +147,51 @@ function Layout({ children }) {
             itemColor: '#ACBDC5',
             itemHoverColor: '#243F5F',
           },
+          Collapse: {
+            contentPadding: '16px 0',
+            headerBg: 'white',
+            headerPadding: '8px 0',
+            colorBorder: 'white',
+          },
         },
       }}
     >
       <LayoutInternal>
         <HeaderInternal className={styles.header}>
           <img alt="logo" src={LiberlandLettermark} className={styles.logo} />
-          <div className={styles.version}>
-            Blockchain
-            <br />
-            Dashboard 2.0
-          </div>
+          {isBiggerThanSmallScreen && (
+            <div className={styles.version}>
+              Blockchain
+              <br />
+              Dashboard 2.0
+            </div>
+          )}
           <div className={styles.user}>
             <ChangeWallet />
           </div>
         </HeaderInternal>
         <LayoutInternal>
-          <Sider width={250} breakpoint="md" collapsedWidth="100px">
+          <Sider width={250} breakpoint="md" collapsedWidth="60px">
             <Menu
               mode="inline"
               className={styles.sider}
               defaultOpenKeys={isBiggerThanDesktop ? Object.keys(openKeys) : undefined}
               selectedKeys={[pathname]}
+              key={getMenuKey()}
               items={[
                 {
-                  label: 'For Citizens',
+                  label: isBiggerThanSmallScreen ? 'For Citizens' : 'Menu',
+                  icon: isBiggerThanSmallScreen ? undefined : React.createElement(MenuIcon),
                   key: 'citizen',
-                  children: navigationList.filter(({ isGovt }) => !isGovt).map(createMenu),
+                  children: navigationList.filter(({ isGovt }) => !isBiggerThanSmallScreen || !isGovt).map(createMenu),
                 },
+              ].concat(isBiggerThanSmallScreen ? [
                 {
                   label: 'For State Officials',
                   key: 'state',
                   children: navigationList.filter(({ isGovt }) => isGovt).map(createMenu),
                 },
-              ]}
+              ] : [])}
             />
           </Sider>
           <LayoutInternal>

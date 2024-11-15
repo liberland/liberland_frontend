@@ -10,6 +10,7 @@ import styles from './styles.module.scss';
 import { walletSelectors } from '../../redux/selectors';
 import { valueToBN, formatMerits } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
+import { ReactComponent as GraphIcon } from '../../assets/icons/graph.svg';
 
 function UnpoolModal({
   closeModal,
@@ -75,11 +76,22 @@ UnpoolModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
-function UnpoolModalWrapper(props) {
+function UnpoolModalWrapper() {
+  const [open, setOpen] = React.useState(false);
   return (
-    <ModalRoot>
-      <UnpoolModal {...props} />
-    </ModalRoot>
+    <>
+      <Button small secondary className={styles.button} onClick={() => setOpen(true)}>
+        <div className={styles.icon}>
+          <GraphIcon />
+        </div>
+        UNPOOL
+      </Button>
+      {open && (
+        <ModalRoot>
+          <UnpoolModal closeModal={() => setOpen(false)} />
+        </ModalRoot>
+      )}
+    </>
   );
 }
 

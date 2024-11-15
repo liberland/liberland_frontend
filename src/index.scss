@@ -63,3 +63,23 @@ p {
     transform: translate(-50%, 0%);
   }
 }
+
+// ANTD overrides
+
+.ant-btn-primary {
+  background: #EDC007!important;
+}
+
+.ant-collapse-header-text {
+  font-family: Open Sans;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 21.79px;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+  color: #243F5F !important;
+}
+.ant-tabs-tab-btn[aria-selected="true"] {
+  color: #243F5F !important;
+}

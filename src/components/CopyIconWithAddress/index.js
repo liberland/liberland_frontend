@@ -7,7 +7,7 @@ import truncate from '../../utils/truncate';
 import styles from './styles.module.scss';
 
 function CopyIconWithAddress({
-  address, name, isTruncate, legal, showAddress,
+  address, name, isTruncate, legal, showAddress, noDetails,
 }) {
   const notificationRef = useRef();
   const isBigScreen = useMediaQuery('(min-width: 1200px)');
@@ -15,6 +15,19 @@ function CopyIconWithAddress({
     navigator.clipboard.writeText(dataToCoppy);
     notificationRef.current.addSuccess({ text: 'Address was copied' });
   };
+
+  if (noDetails) {
+    return (
+      <>
+        <NotificationPortal ref={notificationRef} />
+        <CopyIcon
+          className={styles.copyIcon}
+          name="walletAddress"
+          onClick={() => handleCopyClick(address)}
+        />
+      </>
+    );
+  }
 
   return (
     <div className={styles.copyIconWithAdress}>
@@ -52,6 +65,7 @@ CopyIconWithAddress.defaultProps = {
   isTruncate: true,
   legal: null,
   showAddress: false,
+  noDetails: false,
 };
 
 CopyIconWithAddress.propTypes = {
@@ -60,6 +74,7 @@ CopyIconWithAddress.propTypes = {
   isTruncate: PropTypes.bool,
   legal: PropTypes.string,
   showAddress: PropTypes.bool,
+  noDetails: PropTypes.bool,
 };
 
 export default CopyIconWithAddress;

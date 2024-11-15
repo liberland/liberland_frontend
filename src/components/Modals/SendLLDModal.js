@@ -16,6 +16,7 @@ import styles from './styles.module.scss';
 import { parseDollars, parseMerits, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
 import { walletSelectors } from '../../redux/selectors';
+import { ReactComponent as UploadIcon } from '../../assets/icons/upload.svg';
 
 function SendLLDModal({ closeModal }) {
   const dispatch = useDispatch();
@@ -117,11 +118,22 @@ SendLLDModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
-function SendLLDModalWrapper(props) {
+function SendLLDModalWrapper() {
+  const [open, setOpen] = React.useState(false);
   return (
-    <ModalRoot>
-      <SendLLDModal {...props} />
-    </ModalRoot>
+    <>
+      <Button small primary className={styles.button} onClick={setOpen(true)}>
+        <div className={styles.icon}>
+          <UploadIcon />
+        </div>
+        SEND LLD
+      </Button>
+      {open && (
+        <ModalRoot>
+          <SendLLDModal closeModal={() => setOpen(false)} />
+        </ModalRoot>
+      )}
+    </>
   );
 }
 
