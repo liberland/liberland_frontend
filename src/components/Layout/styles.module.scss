@@ -20,6 +20,11 @@
 .content {
   min-height: 280px;
   margin: 0;
+  padding: 10px 25px;
+
+  @media screen and (min-width: map-get($breakpoints, 'desktop')) {
+    padding: 10px 50px;
+  }
 }
 .version {
   font-family: Open Sans;
@@ -85,4 +90,20 @@
 
 .center {
   align-content: center;
+}
+
+.ant-btn-primary {
+  background: #EDC007!important;
+}
+
+.pageTitle {
+  font-family: Playfair Display;
+  font-size: 30px !important;
+  font-weight: 600 !important;
+  line-height: 33px !important;
+  letter-spacing: -0.5px;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+  color: #243F5F !important;
 }

@@ -11,6 +11,9 @@ import ConfigProvider from 'antd/es/config-provider';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Button from 'antd/es/button';
 import List from 'antd/es/list';
+import Title from 'antd/es/typography/Title';
+import Tabs from 'antd/es/tabs';
+import Spin from 'antd/es/spin';
 import { useMediaQuery } from 'usehooks-ts';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -40,16 +43,48 @@ function Layout({ children }) {
   };
 
   const { pathname } = useLocation();
+  const matchedSubLink = React.useMemo(() => navigationList.find(
+    ({ subLinks }) => (
+      Object.values(subLinks).some((sub) => sub === pathname)
+        || Object.values(subLinks).some((sub) => pathname.startsWith(sub))
+    ),
+  ), [pathname]);
+  const matchedRoute = React.useMemo(
+    () => navigationList.find(({ route }) => route === pathname)
+      || navigationList.find(({ route }) => pathname.startsWith(route)),
+    [pathname],
+  );
+
+  const pageTitle = React.useMemo(() => {
+    if (matchedSubLink && !matchedSubLink.hideTitle) {
+      return matchedSubLink.title;
+    }
+    if (matchedRoute && !matchedRoute.hideTitle) {
+      return matchedRoute.title;
+    }
+    return '';
+  }, [matchedSubLink, matchedRoute]);
+
+  const tabs = React.useMemo(() => {
+    if (matchedSubLink) {
+      return Object.entries(matchedSubLink.subLinks);
+    }
+    if (matchedRoute) {
+      return Object.entries(matchedRoute.subLinks);
+    }
+    return [];
+  }, [matchedSubLink, matchedRoute]);
+
+  const hasTab = tabs.find(([_, url]) => url === pathname);
+
   const openKeys = React.useMemo(() => {
-    const matchOpen = navigationList.find(
-      ({ subLinks }) => Object.values(subLinks).some((sub) => sub === pathname),
-    );
+    const matchOpen = matchedSubLink;
     return {
       citizen: true,
       state: true,
       [matchOpen ? matchOpen.route : pathname]: true,
     };
-  }, [pathname]);
+  }, [matchedSubLink, pathname]);
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
 
@@ -80,6 +115,26 @@ function Layout({ children }) {
             groupTitleColor: '#ACBDC5',
             subMenuItemBorderRadius: '0',
           },
+          Button: {
+            defaultActiveBorderColor: '#243F5F',
+            defaultBg: 'white',
+            defaultBorderColor: '#ECEBF0',
+            defaultHoverBorderColor: '#243F5F',
+            defaultHoverColor: '243F5F',
+            defaultShadow: '0',
+            primaryColor: 'white',
+            primaryShadow: '0',
+          },
+          Typography: {
+            colorText: '#243F5F',
+            titleMarginBottom: '20px',
+          },
+          Tabs: {
+            inkBarColor: '#243F5F',
+            itemActiveColor: '#243F5F',
+            itemColor: '#ACBDC5',
+            itemHoverColor: '#243F5F',
+          },
         },
       }}
     >
@@ -101,7 +156,7 @@ function Layout({ children }) {
               mode="inline"
               className={styles.sider}
               defaultOpenKeys={isBiggerThanDesktop ? Object.keys(openKeys) : undefined}
-              defaultSelectedKeys={[pathname]}
+              selectedKeys={[pathname]}
               items={[
                 {
                   label: 'For Citizens',
@@ -118,7 +173,22 @@ function Layout({ children }) {
           </Sider>
           <LayoutInternal>
             <Content className={styles.content}>
-              {children}
+              {pageTitle && (
+                <Title level={1} className={styles.pageTitle}>{pageTitle}</Title>
+              )}
+              {tabs?.length && hasTab ? (
+                <Tabs
+                  activeKey={pathname}
+                  onChange={(activeKey) => {
+                    history.push(activeKey);
+                  }}
+                  items={tabs.map(([title, url]) => ({
+                    key: url,
+                    label: title,
+                    children: pathname === url ? children : <Spin size="large" />,
+                  }))}
+                />
+              ) : children}
             </Content>
             <Footer className={styles.footer}>
               <div className={styles.footerItem}>

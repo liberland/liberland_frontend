@@ -18,6 +18,7 @@ export const navigationList = [
     icon: FeedIcon,
     isDiscouraged: process.env.REACT_APP_IS_FEED_DISCOURAGED,
     subLinks: {},
+    hideTitle: true,
   },
   {
     route: router.home.wallet,
