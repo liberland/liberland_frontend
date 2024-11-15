@@ -3,6 +3,11 @@ import WalletIcon from '../assets/icons/wallet.svg';
 import VotingIcon from '../assets/icons/voting.svg';
 import ConstitutionIcon from '../assets/icons/constitution.svg';
 import DocumentsIcon from '../assets/icons/documents.svg';
+import LinkedIn from '../assets/icons/linkedin.svg';
+import Meta from '../assets/icons/meta.svg';
+import X from '../assets/icons/x.svg';
+import YouTube from '../assets/icons/youtube.svg';
+import Telegram from '../assets/icons/telegram.svg';
 import router from '../router';
 
 export const navigationList = [
@@ -27,7 +32,6 @@ export const navigationList = [
       Overview: router.wallet.overView,
       Bridge: router.wallet.bridge,
       NFTs: router.wallet.nfts,
-      Payment: router.wallet.payMe,
     },
   },
   {
@@ -51,7 +55,6 @@ export const navigationList = [
     subLinks: {
       Overview: router.contracts.overview,
       'My contracts': router.contracts.myContracts,
-      Contract: router.contracts.item,
     },
   },
   {
@@ -60,9 +63,7 @@ export const navigationList = [
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: ConstitutionIcon,
     isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED,
-    subLinks: {
-      Legislation: router.legislation.view,
-    },
+    subLinks: {},
   },
   {
     route: router.home.offices,
@@ -74,7 +75,6 @@ export const navigationList = [
     subLinks: {
       Identity: router.offices.identity,
       'Company registry': router.offices.companyRegistry.home,
-      'Company registry edit': router.offices.companyRegistry.edit,
       'Land registry': router.offices.landRegistry,
       Finances: router.offices.finances,
       'Scheduled Congress Spending': router.offices.scheduledCongressSpending,
@@ -89,7 +89,6 @@ export const navigationList = [
     subLinks: {
       Companies: router.companies.home,
       Create: router.companies.create,
-      'Edit company': router.companies.edit,
       'All companies': router.companies.allCompanies,
     },
   },
@@ -146,6 +145,34 @@ export const navigationList = [
       'Scheduled Congress Spending': router.senate.scheduledCongressSpending,
       Wallet: router.senate.wallet,
     },
+  },
+];
+
+export const socials = [
+  {
+    icon: LinkedIn,
+    label: 'LinkedIn link',
+    href: 'https://www.linkedin.com/company/liberland/',
+  },
+  {
+    icon: Meta,
+    label: 'Meta link',
+    href: 'https://www.facebook.com/liberland/',
+  },
+  {
+    icon: X,
+    label: 'X/Twitter link',
+    href: 'https://twitter.com/liberland_org',
+  },
+  {
+    icon: YouTube,
+    label: 'Youtube link',
+    href: 'https://www.youtube.com/c/LiberlandOfficial',
+  },
+  {
+    icon: Telegram,
+    label: 'Telegram link',
+    href: 'https://t.me/liberlanders',
   },
 ];
 

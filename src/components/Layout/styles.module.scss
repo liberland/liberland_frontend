@@ -7,6 +7,7 @@
   align-items: center;
   height: 50px;
   border-top: solid 3px #F3CB28;
+  border-bottom: 1px solid #ECEBF0;
 }
 .menu {
   flex: 1;
@@ -14,14 +15,11 @@
 }
 .sider {
   height: 100%;
-  border-right: 0;
+  border-right: 1px solid #ECEBF0;
 }
 .content {
   min-height: 280px;
   margin: 0;
-}
-.contentContainer {
-  padding: 30px 35px;
 }
 .version {
   font-family: Open Sans;
@@ -33,23 +31,35 @@
   text-decoration-skip-ink: none;  
   margin-right: 20px;
 }
-.footerTitle {
-  color: #ACBDC5;
-  leading-trim: both;
-  text-edge: cap;
-  font-family: "Open Sans";
-  font-size: 10px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: normal;
-}
+
 .footer {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
+  border-top: 1px solid #ECEBF0;
 
-  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
+  @media screen and (min-width: map-get($breakpoints, 'desktop')) {
     flex-direction: row;
+  }
+}
+
+.footerItem {
+  width: 100%;
+
+  &:first-child {
+    margin-bottom: 50px;
+  }
+
+  @media screen and (min-width: map-get($breakpoints, 'desktop')) {
+    width: auto;
+    min-width: 250px;
+
+    &:first-child {
+      margin-bottom: 0;
+      min-width: 0;
+      max-width: 206px;
+      margin-right: auto;
+    }
   }
 }
 
@@ -66,4 +76,13 @@
 .user {
   margin-left: auto;
   margin-right: 35px;
+}
+
+.social {
+  width: 15px;
+  height: 15px;
+}
+
+.center {
+  align-content: center;
 }
