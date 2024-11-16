@@ -18,7 +18,7 @@ import { formatAssets, parseAssets, sanitizeValue } from '../../utils/walletHelp
 import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } from '../../api/nodeRpcCall';
 
 function AddLiquidityModal({
-  handleModal, assets, isReservedDataEmpty,
+  closeModal, assets, isReservedDataEmpty,
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -73,7 +73,7 @@ function AddLiquidityModal({
       walletAddress,
       mintTo,
     }));
-    handleModal();
+    closeModal();
   };
 
   const validate = (v, assetBalance, decimals, asset) => {
@@ -224,7 +224,7 @@ function AddLiquidityModal({
       </div>
 
       <div className={styles.buttonWrapper}>
-        <Button medium onClick={handleModal}>
+        <Button medium onClick={closeModal}>
           Cancel
         </Button>
         <Button primary medium type="submit">
@@ -236,17 +236,37 @@ function AddLiquidityModal({
 }
 
 AddLiquidityModal.propTypes = {
-  handleModal: PropsTypes.func.isRequired,
+  closeModal: PropsTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
   isReservedDataEmpty: PropsTypes.bool.isRequired,
 };
 
-function AddLiquidityModalWrapper(props) {
+function AddLiquidityModalWrapper({
+  assets,
+  isReservedDataEmpty,
+}) {
+  const [show, setShow] = React.useState(false);
   return (
-    <ModalRoot>
-      <AddLiquidityModal {...props} />
-    </ModalRoot>
+    <>
+      <Button small green onClick={() => setShow(true)}>
+        Add liquidity
+      </Button>
+      {show && (
+        <ModalRoot>
+          <AddLiquidityModal
+            assets={assets}
+            closeModal={() => setShow(false)}
+            isReservedDataEmpty={isReservedDataEmpty}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+AddLiquidityModalWrapper.propTypes = {
+  assets: AssetsPropTypes.isRequired,
+  isReservedDataEmpty: PropsTypes.bool.isRequired,
+};
 
 export default AddLiquidityModalWrapper;

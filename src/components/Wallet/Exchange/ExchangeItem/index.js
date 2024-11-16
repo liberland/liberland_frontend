@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import Card from 'antd/es/card';
 import { getDecimalsForAsset, getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormatter';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
 import AddLiquidityModalWrapper from '../../../Modals/AddLiquidityModal';
@@ -10,17 +11,8 @@ import { ExchangeItemPropTypes } from '../proptypes';
 import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
 
 function ExchangeItem({ poolData, assetsPoolData }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isBuyTrade, setIsBuyTrade] = useState(false);
   const [isShowMoreOpen, setIsShowMoreOpen] = useState(false);
-  const [isOpenLiquidityModal, setIsOpenLiquidityModal] = useState(false);
-  const [isModalRemoveLiquidityOpen, setIsModalRemoveLiquidityOpen] = useState(false);
-  const handleModalLiquidity = () => setIsOpenLiquidityModal(
-    (prevValue) => !prevValue,
-  );
 
-  const handleModal = () => setIsModalOpen((prevValue) => !prevValue);
-  const handleModalLiquidityRemove = () => setIsModalRemoveLiquidityOpen((prevValue) => !prevValue);
   const {
     asset1,
     asset2,
@@ -32,6 +24,8 @@ function ExchangeItem({ poolData, assetsPoolData }) {
   } = poolData;
   const asset1ToShow = useMemo(() => makeAssetToShow(asset1, assetData1?.symbol), [assetData1, asset1]);
   const asset2ToShow = useMemo(() => makeAssetToShow(asset2, assetData2?.symbol), [assetData2, asset2]);
+  const asset1Name = asset1 === 'Native' ? 'Liberland dollar' : assetData1.name;
+  const asset2Name = asset2 === 'Native' ? 'Liberland dollar' : assetData2.name;
   const assets = {
     asset1,
     asset2,
@@ -45,13 +39,13 @@ function ExchangeItem({ poolData, assetsPoolData }) {
   const decimals1 = getDecimalsForAsset(asset1, assetData1?.decimals);
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
 
-  const swapPriceTokensForExactTokens = getExchangeRate(
+  const asset1AmountForAsset2 = getExchangeRate(
     reserved?.asset1,
     reserved?.asset2,
     decimals1,
     decimals2,
   );
-  const swapPriceExactTokensForTokens = getExchangeRate(
+  const asset2AmountForAsset1 = getExchangeRate(
     reserved?.asset2,
     reserved?.asset1,
     decimals2,
@@ -63,82 +57,56 @@ function ExchangeItem({ poolData, assetsPoolData }) {
   const isReservedDataEmpty = reserved ? (reserved?.asset2?.isEmpty || reserved?.asset1?.isEmpty) : true;
 
   return (
-    <>
-      {isModalOpen && (
-        <TradeTokensModalWrapper
-          handleModal={handleModal}
-          assets={assets}
-          isBuy={isBuyTrade}
-        />
+    <Card
+      title={`${asset1ToShow} / ${asset2ToShow}`}
+      extra={(
+        <>
+          <span className={styles.liquidity}>
+
+          </span>
+          <span className={styles.liquidityValues}>
+
+          </span>
+        </>
       )}
-      {isOpenLiquidityModal && (
-        <AddLiquidityModalWrapper
-          handleModal={handleModalLiquidity}
-          assets={assets}
-          isReservedDataEmpty={isReservedDataEmpty}
-        />
-      )}
-      {isModalRemoveLiquidityOpen && (
-        <RemoveLiquidityModalWrapper
-          handleModal={handleModalLiquidityRemove}
-          assets={assets}
-          reserved={reserved}
-          lpTokensBalance={lpTokensBalance}
-          liquidity={liquidity}
-        />
-      )}
+    >
+      <TradeTokensModalWrapper
+        assets={assets}
+        asset1ToShow={asset1ToShow}
+        asset2ToShow={asset2ToShow}
+        isBuy
+      />
+      <TradeTokensModalWrapper
+        assets={assets}
+        asset1ToShow={asset1ToShow}
+        asset2ToShow={asset2ToShow}
+      />
+      <AddLiquidityModalWrapper
+        assets={assets}
+        isReservedDataEmpty={isReservedDataEmpty}
+      />
+      <RemoveLiquidityModalWrapper
+        assets={assets}
+        reserved={reserved}
+        lpTokensBalance={lpTokensBalance}
+        liquidity={liquidity}
+      />
       <div className={styles.item}>
         <div className={styles.buttons}>
           <div className={styles.buttonsWithRate}>
-            <div className={styles.transactionButtons}>
-              <Button
-                disabled={!reserved}
-                small
-                primary
-                onClick={() => {
-                  handleModal();
-                  setIsBuyTrade(false);
-                }}
-              >
-                SELL
-                {' '}
-                {asset1ToShow}
-                {' '}
-                FOR
-                {' '}
-                {asset2ToShow}
-              </Button>
-              <Button
-                disabled={!reserved}
-                small
-                primary
-                onClick={() => {
-                  handleModal();
-                  setIsBuyTrade(true);
-                }}
-              >
-                BUY
-                {' '}
-                {asset1ToShow}
-                {' '}
-                FOR
-                {' '}
-                {asset2ToShow}
-              </Button>
-            </div>
-            {swapPriceTokensForExactTokens
-            && swapPriceExactTokensForTokens
+            {asset1AmountForAsset2
+            && asset2AmountForAsset1
               && (
               <div className={styles.exchangeRate}>
                 <span>
                   <span className={styles.bold}>{asset1ToShow}</span>
-                  {` = ${swapPriceExactTokensForTokens} `}
+                  {` = ${asset2AmountForAsset1} `}
                   <span className={styles.bold}>{asset2ToShow}</span>
                 </span>
 
                 <span>
                   <span className={styles.bold}>{asset2ToShow}</span>
-                  {` = ${swapPriceTokensForExactTokens} `}
+                  {` = ${asset1AmountForAsset2} `}
                   <span className={styles.bold}>{asset1ToShow}</span>
                 </span>
               </div>
@@ -178,8 +146,6 @@ function ExchangeItem({ poolData, assetsPoolData }) {
         </div>
         {isShowMoreOpen && (
         <ExchangeShowMore
-          handleModalLiquidityRemove={handleModalLiquidityRemove}
-          handleModalLiquidity={handleModalLiquidity}
           asset1={asset1}
           asset2={asset2}
           asset1ToShow={asset1ToShow}
@@ -193,7 +159,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
         />
         )}
       </div>
-    </>
+    </Card>
   );
 }
 

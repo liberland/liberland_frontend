@@ -14,6 +14,7 @@ import List from 'antd/es/list';
 import Title from 'antd/es/typography/Title';
 import Tabs from 'antd/es/tabs';
 import Spin from 'antd/es/spin';
+import Collapse from 'antd/es/collapse';
 import MenuIcon from '@ant-design/icons/MenuOutlined';
 import { useMediaQuery } from 'usehooks-ts';
 import PropTypes from 'prop-types';
@@ -23,6 +24,7 @@ import ChangeWallet from '../Home/ChangeWallet';
 import styles from './styles.module.scss';
 import { footerLinks, navigationList, socials } from '../../constants/navigationList';
 import LiberlandLettermark from '../../assets/icons/Liberland_Lettermark.svg';
+import LiberlandLettermarkMobile from '../../assets/icons/Liberland_Lettermark_Mobile.svg';
 import LiberlandSeal from '../../assets/icons/seal.svg';
 
 function Layout({ children }) {
@@ -100,6 +102,34 @@ function Layout({ children }) {
     return 'small';
   };
 
+  const footerList = Object.entries(footerLinks);
+
+  const urlMenu = (
+    <Sider width={250} breakpoint="md" collapsedWidth="60px">
+      <Menu
+        mode="inline"
+        className={styles.sider}
+        defaultOpenKeys={isBiggerThanDesktop ? Object.keys(openKeys) : undefined}
+        selectedKeys={[pathname]}
+        key={getMenuKey()}
+        items={[
+          {
+            label: isBiggerThanSmallScreen ? 'For Citizens' : 'Menu',
+            icon: isBiggerThanSmallScreen ? undefined : React.createElement(MenuIcon),
+            key: 'citizen',
+            children: navigationList.filter(({ isGovt }) => !isBiggerThanSmallScreen || !isGovt).map(createMenu),
+          },
+        ].concat(isBiggerThanSmallScreen ? [
+          {
+            label: 'For State Officials',
+            key: 'state',
+            children: navigationList.filter(({ isGovt }) => isGovt).map(createMenu),
+          },
+        ] : [])}
+      />
+    </Sider>
+  );
+
   return (
     <ConfigProvider
       theme={{
@@ -158,42 +188,27 @@ function Layout({ children }) {
     >
       <LayoutInternal>
         <HeaderInternal className={styles.header}>
-          <img alt="logo" src={LiberlandLettermark} className={styles.logo} />
-          {isBiggerThanSmallScreen && (
-            <div className={styles.version}>
-              Blockchain
-              <br />
-              Dashboard 2.0
-            </div>
+          {isBiggerThanSmallScreen ? (
+            <>
+              <img alt="logo" src={LiberlandLettermark} className={styles.logo} />
+              <div className={styles.version}>
+                Blockchain
+                <br />
+                Dashboard 2.0
+              </div>
+            </>
+          ) : (
+            <>
+              {urlMenu}
+              <img alt="logo" src={LiberlandLettermarkMobile} className={styles.mobileLogo} />
+            </>
           )}
           <div className={styles.user}>
             <ChangeWallet />
           </div>
         </HeaderInternal>
         <LayoutInternal>
-          <Sider width={250} breakpoint="md" collapsedWidth="60px">
-            <Menu
-              mode="inline"
-              className={styles.sider}
-              defaultOpenKeys={isBiggerThanDesktop ? Object.keys(openKeys) : undefined}
-              selectedKeys={[pathname]}
-              key={getMenuKey()}
-              items={[
-                {
-                  label: isBiggerThanSmallScreen ? 'For Citizens' : 'Menu',
-                  icon: isBiggerThanSmallScreen ? undefined : React.createElement(MenuIcon),
-                  key: 'citizen',
-                  children: navigationList.filter(({ isGovt }) => !isBiggerThanSmallScreen || !isGovt).map(createMenu),
-                },
-              ].concat(isBiggerThanSmallScreen ? [
-                {
-                  label: 'For State Officials',
-                  key: 'state',
-                  children: navigationList.filter(({ isGovt }) => isGovt).map(createMenu),
-                },
-              ] : [])}
-            />
-          </Sider>
+          {isBiggerThanSmallScreen && urlMenu}
           <LayoutInternal>
             <Content className={styles.content}>
               {pageTitle && (
@@ -234,15 +249,42 @@ function Layout({ children }) {
                   )}
                 />
               </div>
+              <List
+                grid={{ gutter: 10, column: footerList.length }}
+                dataSource={footerList}
+                renderItem={([title, links]) => (
+                  <Collapse
+                    key={title}
+                    expandIcon={isBiggerThanSmallScreen ? () => null : undefined}
+                    activeKey={isBiggerThanSmallScreen ? [title] : undefined}
+                    dataSource={[{
+                      key: title,
+                      label: title,
+                      children: (
+                        <Menu
+                          mode="inline"
+                          items={Object.entries(links).map(([name, url]) => ({
+                            label: name,
+                            key: name,
+                            onClick: () => {
+                              window.location.href = url;
+                            },
+                          }))}
+                        />
+                      ),
+                    }]}
+                  />
+                )}
+              />
               {Object.entries(footerLinks).map(([title, links]) => (
                 <div key={title} className={styles.footerItem}>
                   <Menu
                     mode="inline"
-                    openKeys={isBiggerThanDesktop ? [title] : undefined}
+                    openKeys={isBiggerThanSmallScreen ? [title] : undefined}
                     items={[{
                       label: title,
                       key: title,
-                      expandIcon: isBiggerThanDesktop ? () => null : undefined,
+                      expandIcon: isBiggerThanSmallScreen ? () => null : undefined,
                       children: Object.entries(links).map(([name, url]) => ({
                         label: name,
                         key: name,
@@ -258,10 +300,13 @@ function Layout({ children }) {
             <Footer className={styles.footer}>
               <div className={styles.footerItem}>
                 ©2023 Liberland. All right reserved.
+                {!isBiggerThanSmallScreen && <div className={styles.slogan}>To Live and let Live</div>}
               </div>
-              <div className={classNames(styles.footerItem, styles.center)}>
-                To Live and let Live
-              </div>
+              {isBiggerThanSmallScreen && (
+                <div className={classNames(styles.footerItem, styles.center, styles.slogan)}>
+                  To Live and let Live
+                </div>
+              )}
               <div className={styles.footerItem}>
                 <Button href="https://liberland.org/contribution">
                   Donate to Liberland

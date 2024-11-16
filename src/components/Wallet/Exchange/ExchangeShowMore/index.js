@@ -2,14 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { BN, BN_HUNDRED } from '@polkadot/util';
 import { calculatePooled, getDecimalsForAsset } from '../../../../utils/dexFormatter';
-import Button from '../../../Button/Button';
 import styles from '../styles.module.scss';
 import { ReservedAssetPropTypes } from '../proptypes';
 import { formatAssets } from '../../../../utils/walletHelpers';
 
 function ExchangeShowMore({
-  handleModalLiquidity,
-  handleModalLiquidityRemove,
   asset1,
   asset2,
   liquidity,
@@ -76,18 +73,6 @@ function ExchangeShowMore({
             )}
 
         </div>
-        <div className={styles.liquidityButtons}>
-          {!isReservedDataEmpty && (!lpTokensBalance.isZero() || !liquidity)
-            && (
-            <Button small green onClick={handleModalLiquidityRemove}>
-              Remove Liquidity
-            </Button>
-            )}
-
-          <Button small green onClick={handleModalLiquidity}>
-            Add liquidity
-          </Button>
-        </div>
       </div>
     </div>
   );
@@ -103,8 +88,6 @@ ExchangeShowMore.defaultProps = {
 
 ExchangeShowMore.propTypes = {
   reserved: ReservedAssetPropTypes,
-  handleModalLiquidity: PropTypes.func.isRequired,
-  handleModalLiquidityRemove: PropTypes.func.isRequired,
   asset1: PropTypes.string.isRequired,
   asset2: PropTypes.string.isRequired,
   // eslint-disable-next-line react/forbid-prop-types

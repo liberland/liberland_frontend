@@ -1,17 +1,15 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import cx from 'classnames';
+import Alert from 'antd/es/alert';
+import Collapse from 'antd/es/collapse';
+import List from 'antd/es/list';
 import { blockchainSelectors, dexSelectors } from '../../../../redux/selectors';
 import { dexActions } from '../../../../redux/actions';
-import Button from '../../../Button/Button';
-import stylesPage from '../../../../utils/pagesBase.module.scss';
-import styles from '../styles.module.scss';
 import ExchangeItem from '../ExchangeItem';
 import AddAssetForm from '../AddAssetForm';
 
 function ExchangeList() {
   const dispatch = useDispatch();
-  const [showLowLiq, setShowLoqLiq] = React.useState(false);
   const dexs = useSelector(dexSelectors.selectorDex);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
@@ -40,46 +38,57 @@ function ExchangeList() {
 
   if (!highLiquidity.length && !lowLiquidity.length) {
     return (
-      <div>There is no any pool...</div>
+      <Alert type="error" message="No pools were found" />
     );
   }
 
   return (
-    <div className={cx(stylesPage.overViewCard, styles.list)}>
-      {highLiquidity?.map((pool, index) => (
-        <ExchangeItem
-          poolData={pool}
-          assetsPoolData={assetsPoolData}
-          // eslint-disable-next-line react/no-array-index-key
-          key={index + pool.asset1 + pool.asset2}
+    <>
+      {highLiquidity.length > 0 && (
+        <Collapse
+          defaultActiveKey={['highliq']}
+          items={[
+            {
+              key: 'highliq',
+              label: 'Exchange pairs',
+              children: (
+                <List
+                  dataSource={highLiquidity}
+                  renderItem={(pool) => (
+                    <ExchangeItem
+                      poolData={pool}
+                      assetsPoolData={assetsPoolData}
+                    />
+                  )}
+                />
+              ),
+            },
+          ]}
         />
-      ))}
-      {showLowLiq && (
-        <>
-          <h4 className={styles.lowLiqTitle}>
-            Low liquidity pools
-          </h4>
-          {lowLiquidity?.map((pool, index) => (
-            <ExchangeItem
-              poolData={pool}
-              assetsPoolData={assetsPoolData}
-              // eslint-disable-next-line react/no-array-index-key
-              key={index + pool.asset1 + pool.asset2}
-            />
-          ))}
-        </>
       )}
-      <div className={styles.showLowLiq}>
-        <Button
-          small
-          green
-          onClick={() => setShowLoqLiq(!showLowLiq)}
-        >
-          {!showLowLiq ? 'Show low liquidity pools' : 'Hide low liquidity pools'}
-        </Button>
-      </div>
+      {lowLiquidity.length > 0 && (
+        <Collapse
+          items={[
+            {
+              key: 'lowliq',
+              label: 'Low liquidity exchange pairs',
+              children: (
+                <List
+                  dataSource={lowLiquidity}
+                  renderItem={(pool) => (
+                    <ExchangeItem
+                      poolData={pool}
+                      assetsPoolData={assetsPoolData}
+                    />
+                  )}
+                />
+              ),
+            },
+          ]}
+        />
+      )}
       <AddAssetForm poolsData={poolsData} />
-    </div>
+    </>
   );
 }
 

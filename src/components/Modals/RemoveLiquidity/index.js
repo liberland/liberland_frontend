@@ -17,7 +17,7 @@ import { calculateAmountMin, formatAssets } from '../../../utils/walletHelpers';
 const listPercent = [25, 50, 75, 100];
 
 function RemoveLiquidityModal({
-  handleModal,
+  closeModal,
   assets,
   reserved,
   lpTokensBalance,
@@ -73,7 +73,7 @@ function RemoveLiquidityModal({
         withdrawTo,
       },
     ));
-    handleModal();
+    closeModal();
   };
 
   const handleChangeRange = async (e) => {
@@ -161,7 +161,7 @@ function RemoveLiquidityModal({
       </div>
 
       <div className={stylesModal.buttonWrapper}>
-        <Button medium onClick={handleModal}>
+        <Button medium onClick={closeModal}>
           Cancel
         </Button>
         <Button disabled={isPercentZero} primary medium type="submit">
@@ -173,7 +173,7 @@ function RemoveLiquidityModal({
 }
 
 RemoveLiquidityModal.propTypes = {
-  handleModal: PropsTypes.func.isRequired,
+  closeModal: PropsTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
   reserved: ReservedAssetPropTypes.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
@@ -182,12 +182,40 @@ RemoveLiquidityModal.propTypes = {
   liquidity: PropsTypes.object.isRequired,
 };
 
-function RemoveLiquidityModalWrapper(props) {
+function RemoveLiquidityModalWrapper({
+  assets,
+  reserved,
+  lpTokensBalance,
+  liquidity,
+}) {
+  const [show, setShow] = React.useState();
   return (
-    <ModalRoot>
-      <RemoveLiquidityModal {...props} />
-    </ModalRoot>
+    <>
+      <Button small green onClick={() => setShow(true)}>
+        Remove Liquidity
+      </Button>
+      {show && (
+        <ModalRoot>
+          <RemoveLiquidityModal
+            assets={assets}
+            closeModal={() => setShow(false)}
+            liquidity={liquidity}
+            lpTokensBalance={lpTokensBalance}
+            reserved={reserved}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+RemoveLiquidityModalWrapper.propTypes = {
+  assets: AssetsPropTypes.isRequired,
+  reserved: ReservedAssetPropTypes.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  lpTokensBalance: PropsTypes.object.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  liquidity: PropsTypes.object.isRequired,
+};
 
 export default RemoveLiquidityModalWrapper;
