@@ -4,19 +4,19 @@ import { useMediaQuery } from 'usehooks-ts';
 import QRCode from 'react-qr-code';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
-import ModalRoot from '../../../Modals/ModalRoot';
-import { TextInput, TextArea } from '../../../InputComponents';
-import Button from '../../../Button/Button';
-import { identitySelectors } from '../../../../redux/selectors';
-import { identityActions } from '../../../../redux/actions';
-import { formatDollars, parseDollars } from '../../../../utils/walletHelpers';
-import Table from '../../../Table';
-import { ReactComponent as DocumentsIcon } from '../../../../assets/icons/documents.svg';
-import router from '../../../../router';
+import ModalRoot from '../ModalRoot';
+import { TextInput, TextArea } from '../../InputComponents';
+import Button from '../../Button/Button';
+import { identitySelectors } from '../../../redux/selectors';
+import { identityActions } from '../../../redux/actions';
+import { formatDollars, parseDollars } from '../../../utils/walletHelpers';
+import Table from '../../Table';
+import { ReactComponent as DocumentsIcon } from '../../../assets/icons/documents.svg';
+import router from '../../../router';
 import styles from './styles.module.scss';
-import CopyLink from '../CopyLink';
+import CopyLink from './CopyLink';
 
-function WalletLinkFactory({
+function RequestLLDModal({
   onClose,
   walletAddress,
 }) {
@@ -251,12 +251,12 @@ function WalletLinkFactory({
   );
 }
 
-WalletLinkFactory.propTypes = {
+RequestLLDModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   walletAddress: PropTypes.string.isRequired,
 };
 
-function WalletLinkFactoryModalWrapper(props) {
+function RequestLLDModalWrapper(props) {
   const [show, setShow] = React.useState();
   return (
     <>
@@ -268,11 +268,11 @@ function WalletLinkFactoryModalWrapper(props) {
       </Button>
       {show && (
         <ModalRoot>
-          <WalletLinkFactory {...props} onClose={() => setShow(false)} />
+          <RequestLLDModal {...props} onClose={() => setShow(false)} />
         </ModalRoot>
       )}
     </>
   );
 }
 
-export default WalletLinkFactoryModalWrapper;
+export default RequestLLDModalWrapper;

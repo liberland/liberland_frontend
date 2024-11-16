@@ -204,17 +204,49 @@ SendAssetModal.defaultProps = {
 SendAssetModal.propTypes = {
   isCongress: PropTypes.bool,
   isRemarkNeeded: PropTypes.bool,
+  // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
+  assetData: PropTypes.any,
   closeModal: PropTypes.func.isRequired,
+};
+
+function SendAssetModalWrapper({
+  isCongress,
+  isRemarkNeeded,
+  assetData,
+}) {
+  const [show, setShow] = React.useState(false);
+  return (
+    <>
+      <Button
+        className={styles.button}
+        small
+        primary
+        onClick={() => setShow(true)}
+      >
+        SEND
+        <span>
+          {assetData.metadata.symbol}
+        </span>
+      </Button>
+      {show && (
+        <ModalRoot>
+          <SendAssetModal
+            closeModal={() => setShow(false)}
+            assetData={assetData}
+            isCongress={isCongress}
+            isRemarkNeeded={isRemarkNeeded}
+          />
+        </ModalRoot>
+      )}
+    </>
+  );
+}
+
+SendAssetModalWrapper.propTypes = {
+  isCongress: PropTypes.bool,
+  isRemarkNeeded: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
   assetData: PropTypes.any,
 };
-
-function SendAssetModalWrapper(props) {
-  return (
-    <ModalRoot>
-      <SendAssetModal {...props} />
-    </ModalRoot>
-  );
-}
 
 export default SendAssetModalWrapper;

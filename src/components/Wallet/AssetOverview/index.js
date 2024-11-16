@@ -1,75 +1,49 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '../../Card';
+import List from 'antd/es/list';
+import Card from 'antd/es/card';
 
-import styles from './styles.module.scss';
 import { formatAssets } from '../../../utils/walletHelpers';
-import SendAssetModal from '../../Modals/SendAssetModal';
-import Button from '../../Button/Button';
+import SendAssetModalWrapper from '../../Modals/SendAssetModal';
 
 function AssetOverview({
   additionalAssets,
   isRemarkNeeded,
   isCongress,
 }) {
-  const [whichModalOpen, setWhichModalOpen] = useState(null);
-  const handleModalOpenAssets = (symbol) => setWhichModalOpen(symbol);
-  const handleModalCloseAssets = () => setWhichModalOpen(null);
-  if (additionalAssets.length === 0) { return <div />; }
-  // Show only assets that the user owns
-  const filteredAssets = additionalAssets.filter((asset) => asset?.balance?.balance > 0);
-  return (
-    <Card className={styles.assetOverviewWrapper} title="Additional assets">
-      <div className={styles.assetOverViewCard}>
-        {
-          filteredAssets.map((assetInfo) => (
-            <div
-              className={styles.assetCardInfo}
-              key={assetInfo.metadata.symbol}
-            >
-              <p className={styles.assetCardInfoAmount}>
-                {assetInfo?.balance ? formatAssets(assetInfo.balance.balance, assetInfo.metadata.decimals) : 0}
-              </p>
-              <p className={styles.assetCardInfoTitle}>
-                {assetInfo.metadata.name}
-                {' '}
-                <span>
-                  (
-                  {assetInfo.metadata.symbol}
-                  )
-                </span>
+  const filteredAssets = React.useMemo(
+    () => additionalAssets?.filter((asset) => asset?.balance?.balance > 0) || [],
+    [additionalAssets],
+  );
 
-              </p>
-              <Button
-                className={styles.button}
-                small
-                primary
-                onClick={() => handleModalOpenAssets(assetInfo.metadata.symbol)}
-              >
-                <>
-                  SEND
-                  <span>
-                    {assetInfo.metadata.symbol}
-                  </span>
-                </>
-              </Button>
-              {whichModalOpen === assetInfo.metadata.symbol
-              && (
-              <SendAssetModal
-                assetData={assetInfo}
-                closeModal={handleModalCloseAssets}
-                isRemarkNeeded={isRemarkNeeded}
-                isCongress={isCongress}
-              />
-              )}
-            </div>
-          ))
+  const renderItem = (assetData) => (
+    <Card
+      actions={[
+        <SendAssetModalWrapper
+          isRemarkNeeded={isRemarkNeeded}
+          isCongress={isCongress}
+          assetData={assetData}
+        />,
+      ]}
+    >
+      <Card.Meta
+        title={assetData.metadata.name}
+        description={
+          `${formatAssets(assetData.balance, assetData.metadata.decimals, true)} ${assetData.metadata.symbol}`
         }
-      </div>
-
+      />
     </Card>
   );
+
+  return (
+    <List
+      dataSource={filteredAssets}
+      grid={{ gutter: 10, column: filteredAssets.length }}
+      renderItem={renderItem}
+    />
+  );
 }
+
 AssetOverview.defaultProps = {
   additionalAssets: [],
   isRemarkNeeded: false,
