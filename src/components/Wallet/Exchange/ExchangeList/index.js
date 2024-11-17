@@ -7,11 +7,15 @@ import { blockchainSelectors, dexSelectors } from '../../../../redux/selectors';
 import { dexActions } from '../../../../redux/actions';
 import ExchangeItem from '../ExchangeItem';
 import AddAssetForm from '../AddAssetForm';
+import { sortByMap } from '../ExchangeSort/utils';
+import ExchangeSort from '../ExchangeSort';
 
 function ExchangeList() {
   const dispatch = useDispatch();
   const dexs = useSelector(dexSelectors.selectorDex);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const [highLiquiditySort, setHighLiquiditySort] = React.useState(Object.keys(sortByMap)[0]);
+  const [lowLiquiditySort, setLowLiquiditySort] = React.useState(Object.keys(sortByMap)[0]);
 
   React.useEffect(() => {
     dispatch(dexActions.getPools.call());
@@ -51,9 +55,12 @@ function ExchangeList() {
             {
               key: 'highliq',
               label: 'Exchange pairs',
+              extra: <ExchangeSort onSort={setHighLiquiditySort} sortBy={highLiquiditySort} />,
               children: (
                 <List
-                  dataSource={highLiquidity}
+                  dataSource={highLiquidity.sort(
+                    (aPool, bPool) => sortByMap[highLiquiditySort](aPool, assetsPoolData, bPool, assetsPoolData),
+                  )}
                   renderItem={(pool) => (
                     <ExchangeItem
                       poolData={pool}
@@ -72,9 +79,12 @@ function ExchangeList() {
             {
               key: 'lowliq',
               label: 'Low liquidity exchange pairs',
+              extra: <ExchangeSort onSort={setLowLiquiditySort} sortBy={lowLiquiditySort} />,
               children: (
                 <List
-                  dataSource={lowLiquidity}
+                  dataSource={lowLiquidity.sort(
+                    (aPool, bPool) => sortByMap[lowLiquiditySort](aPool, assetsPoolData, bPool, assetsPoolData),
+                  )}
                   renderItem={(pool) => (
                     <ExchangeItem
                       poolData={pool}

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
-
+import ButtonInternal from 'antd/es/button';
 import styles from './styles.module.scss';
 
 function Button({
@@ -9,7 +9,6 @@ function Button({
   type = 'button',
   primary,
   onClick = () => { },
-  medium,
   large,
   little,
   small,
@@ -22,29 +21,46 @@ function Button({
   whiteRed,
   disabled,
 }) {
+  const getColor = () => {
+    if (primary) {
+      return 'primary';
+    }
+    if (red) {
+      return 'danger';
+    }
+    return 'default';
+  };
+
+  const getSize = () => {
+    if (large) {
+      return 'large';
+    }
+    if (small) {
+      return 'small';
+    }
+    return 'middle';
+  };
+
   return (
-    <button
+    <ButtonInternal
       disabled={disabled}
       onClick={onClick}
       type={type}
+      color={getColor()}
+      size={getSize()}
       className={
-      cx(styles.button, className, {
-        [styles.primary]: primary,
-        [styles.secondary]: secondary,
-        [styles.medium]: medium,
-        [styles.large]: large,
-        [styles.little]: little,
-        [styles.small]: small,
-        [styles.nano]: nano,
-        [styles.green]: green,
-        [styles.grey]: grey,
-        [styles.red]: red,
-        [styles.whiteRed]: whiteRed,
-      })
-    }
+        cx(className, {
+          [styles.secondary]: secondary,
+          [styles.little]: little,
+          [styles.nano]: nano,
+          [styles.green]: green,
+          [styles.grey]: grey,
+          [styles.whiteRed]: whiteRed,
+        })
+      }
     >
       {children}
-    </button>
+    </ButtonInternal>
   );
 }
 
@@ -52,7 +68,6 @@ Button.defaultProps = {
   type: 'button',
   primary: false,
   onClick: () => {},
-  medium: false,
   large: false,
   little: false,
   small: false,
@@ -71,7 +86,6 @@ Button.propTypes = {
   type: PropTypes.string,
   primary: PropTypes.bool,
   onClick: PropTypes.func,
-  medium: PropTypes.bool,
   large: PropTypes.bool,
   little: PropTypes.bool,
   small: PropTypes.bool,
