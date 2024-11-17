@@ -70,6 +70,7 @@ function ChangeWallet() {
 
   return (
     <Dropdown
+      trigger={['click']}
       menu={{
         items: wallets.map(({ meta, address }) => ({
           key: address,

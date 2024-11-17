@@ -1,18 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Card from 'antd/es/card';
+import Flex from 'antd/es/flex';
 import { getDecimalsForAsset, getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormatter';
+import { formatAssets } from '../../../../utils/walletHelpers';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
 import AddLiquidityModalWrapper from '../../../Modals/AddLiquidityModal';
 import styles from '../styles.module.scss';
-import Button from '../../../Button/Button';
-import ExchangeShowMore from '../ExchangeShowMore';
 import { ExchangeItemPropTypes } from '../proptypes';
 import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
 
 function ExchangeItem({ poolData, assetsPoolData }) {
-  const [isShowMoreOpen, setIsShowMoreOpen] = useState(false);
-
   const {
     asset1,
     asset2,
@@ -22,8 +20,8 @@ function ExchangeItem({ poolData, assetsPoolData }) {
     reserved,
     lpToken,
   } = poolData;
-  const asset1ToShow = useMemo(() => makeAssetToShow(asset1, assetData1?.symbol), [assetData1, asset1]);
-  const asset2ToShow = useMemo(() => makeAssetToShow(asset2, assetData2?.symbol), [assetData2, asset2]);
+  const asset1ToShow = React.useMemo(() => makeAssetToShow(asset1, assetData1?.symbol), [assetData1, asset1]);
+  const asset2ToShow = React.useMemo(() => makeAssetToShow(asset2, assetData2?.symbol), [assetData2, asset2]);
   const asset1Name = asset1 === 'Native' ? 'Liberland dollar' : assetData1.name;
   const asset2Name = asset2 === 'Native' ? 'Liberland dollar' : assetData2.name;
   const assets = {
@@ -61,104 +59,66 @@ function ExchangeItem({ poolData, assetsPoolData }) {
       title={`${asset1ToShow} / ${asset2ToShow}`}
       extra={(
         <>
-          <span className={styles.liquidity}>
-
+          <span className={styles.description}>
+            Liquidity pool
           </span>
-          <span className={styles.liquidityValues}>
-
+          <span className={styles.values}>
+            {formatAssets(reserved.asset1, decimals1, { symbol: asset1ToShow, withAll: true })}
+            {' / '}
+            {formatAssets(reserved.asset2, decimals2, { symbol: asset2ToShow, withAll: true })}
           </span>
         </>
       )}
     >
-      <TradeTokensModalWrapper
-        assets={assets}
-        asset1ToShow={asset1ToShow}
-        asset2ToShow={asset2ToShow}
-        isBuy
-      />
-      <TradeTokensModalWrapper
-        assets={assets}
-        asset1ToShow={asset1ToShow}
-        asset2ToShow={asset2ToShow}
-      />
-      <AddLiquidityModalWrapper
-        assets={assets}
-        isReservedDataEmpty={isReservedDataEmpty}
-      />
-      <RemoveLiquidityModalWrapper
-        assets={assets}
-        reserved={reserved}
-        lpTokensBalance={lpTokensBalance}
-        liquidity={liquidity}
-      />
-      <div className={styles.item}>
-        <div className={styles.buttons}>
-          <div className={styles.buttonsWithRate}>
-            {asset1AmountForAsset2
-            && asset2AmountForAsset1
-              && (
-              <div className={styles.exchangeRate}>
-                <span>
-                  <span className={styles.bold}>{asset1ToShow}</span>
-                  {` = ${asset2AmountForAsset1} `}
-                  <span className={styles.bold}>{asset2ToShow}</span>
-                </span>
-
-                <span>
-                  <span className={styles.bold}>{asset2ToShow}</span>
-                  {` = ${asset1AmountForAsset2} `}
-                  <span className={styles.bold}>{asset1ToShow}</span>
-                </span>
-              </div>
-              )}
-            {(assetData1?.name || assetData2?.name) && (
-              <div className={styles.exchangeName}>
-                <span>
-                  <span className={styles.bold}>
-                    {asset1ToShow}
-                  </span>
-                  {' '}
-                  name:
-                  {' '}
-                  {asset1 === 'Native' ? 'Liberland dollar' : assetData1.name}
-                </span>
-                <span>
-                  <span className={styles.bold}>
-                    {asset2ToShow}
-                  </span>
-                  {' '}
-                  name:
-                  {' '}
-                  {asset2 === 'Native' ? 'Liberland dollar' : assetData2.name}
-                </span>
-              </div>
-            )}
-          </div>
+      <Flex>
+        <Flex>
+          <TradeTokensModalWrapper
+            assets={assets}
+            asset1ToShow={asset1ToShow}
+            asset2ToShow={asset2ToShow}
+            isBuy
+          />
           <div>
-            <Button
-              small
-              green
-              onClick={() => setIsShowMoreOpen((prevState) => !prevState)}
-            >
-              {isShowMoreOpen ? 'Show less' : 'Show more'}
-            </Button>
+            <div className={styles.description}>
+              {'1 '}
+              {asset1Name}
+            </div>
+            <div className={styles.values}>
+              {asset2AmountForAsset1}
+              {' '}
+              {asset2Name}
+            </div>
           </div>
-        </div>
-        {isShowMoreOpen && (
-        <ExchangeShowMore
-          asset1={asset1}
-          asset2={asset2}
-          asset1ToShow={asset1ToShow}
-          asset2ToShow={asset2ToShow}
-          liquidity={liquidity}
-          reserved={reserved}
-          lpTokensBalance={lpTokensBalance}
-          asset1Decimals={assetData1?.decimals}
-          asset2Decimals={assetData2?.decimals}
+        </Flex>
+        <Flex>
+          <TradeTokensModalWrapper
+            assets={assets}
+            asset1ToShow={asset1ToShow}
+            asset2ToShow={asset2ToShow}
+          />
+          <div>
+            <div className={styles.description}>
+              {'1 '}
+              {asset2Name}
+            </div>
+            <div className={styles.values}>
+              {asset1AmountForAsset2}
+              {' '}
+              {asset1Name}
+            </div>
+          </div>
+        </Flex>
+        <AddLiquidityModalWrapper
+          assets={assets}
           isReservedDataEmpty={isReservedDataEmpty}
         />
-        )}
-      </div>
+        <RemoveLiquidityModalWrapper
+          assets={assets}
+          reserved={reserved}
+          lpTokensBalance={lpTokensBalance}
+          liquidity={liquidity}
+        />
+      </Flex>
     </Card>
   );
 }
