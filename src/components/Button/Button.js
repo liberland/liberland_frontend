@@ -49,7 +49,7 @@ function Button({
       color={getColor()}
       size={getSize()}
       className={
-        cx(className, {
+        cx(styles.button, className, {
           [styles.secondary]: secondary,
           [styles.little]: little,
           [styles.nano]: nano,
