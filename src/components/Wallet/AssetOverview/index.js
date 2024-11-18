@@ -1,9 +1,11 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import List from 'antd/es/list';
 import Card from 'antd/es/card';
 
 import { formatAssets } from '../../../utils/walletHelpers';
+import { senateSelectors } from '../../../redux/selectors';
 import SendAssetModalWrapper from '../../Modals/SendAssetModal';
 
 function AssetOverview({
@@ -15,16 +17,17 @@ function AssetOverview({
     () => additionalAssets?.filter((asset) => asset?.balance?.balance > 0) || [],
     [additionalAssets],
   );
+  const userIsMember = useSelector(senateSelectors.userIsMember);
 
   const renderItem = (assetData) => (
     <Card
-      actions={[
+      actions={userIsMember ? [
         <SendAssetModalWrapper
           isRemarkNeeded={isRemarkNeeded}
           isCongress={isCongress}
           assetData={assetData}
         />,
-      ]}
+      ] : undefined}
     >
       <Card.Meta
         title={assetData.metadata.name}

@@ -11,6 +11,7 @@ export function MotionProvider({ children }) {
   const addNewId = (newId) => {
     setMotionIds((prevValue) => [...prevValue, newId]);
   };
+
   const value = useMemo(() => ({ motionIds, addNewId }), [motionIds]);
   return (
     <MotionContext.Provider value={value}>

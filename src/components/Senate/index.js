@@ -9,6 +9,7 @@ import Motions from './Motions';
 import Wallet from './Wallet';
 import ScheduledCongressSpending from './ScheduledCongressSpending';
 import { MotionProvider } from '../WalletCongresSenate/ContextMotions';
+import Overview from './Overview';
 
 function MotionsWrapper() {
   return (
@@ -31,6 +32,11 @@ function Senate() {
     <Switch>
       <Route
         exact
+        path={router.senate.overview}
+        component={Overview}
+      />
+      <Route
+        exact
         path={router.senate.motions}
         component={MotionsWrapper}
       />
@@ -43,7 +49,7 @@ function Senate() {
       <Route
         exact
         path={router.home.senate}
-        render={() => <Redirect to={router.senate.wallet} />}
+        render={() => <Redirect to={router.senate.overview} />}
       />
     </Switch>
   );

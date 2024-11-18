@@ -8,6 +8,7 @@ import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 function Motions() {
   const dispatch = useDispatch();
   const motions = useSelector(senateSelectors.motions);
+  const userIsMember = useSelector(senateSelectors.userIsMember);
   const { motionIds } = useMotionContext();
   const divRef = useRef(null);
 
@@ -17,7 +18,8 @@ function Motions() {
 
   useEffect(() => {
     if (divRef.current) {
-      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds))));
+      const votes = motions.map((item) => item.votes);
+      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds.concat(votes.flat())))));
     }
   }, [motions, motionIds, dispatch]);
 
@@ -34,6 +36,7 @@ function Motions() {
         return (
           <div ref={isLastItem ? divRef : null} key={proposal}>
             <Motion
+              userIsMember={userIsMember}
               membersCount={membersCount}
               key={proposal}
               proposal={proposal.toString()}

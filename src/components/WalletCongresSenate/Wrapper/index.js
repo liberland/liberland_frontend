@@ -22,6 +22,7 @@ export default function WalletCongresSenateWrapper({
   onSendFunctions,
   balances,
   isCongress,
+  userIsMember,
 }) {
   const { LLD, LLM, LLMPolitipool } = onSendFunctions;
   const balanceLLD = new BN(balances?.liquidAmount?.amount ?? 0);
@@ -64,24 +65,28 @@ export default function WalletCongresSenateWrapper({
             styles.walletButtonsWrapper,
           )}
         >
-          <Button small primary className={walletStyles.button} onClick={toggleModalPolitipoolLLMSpendOpen}>
-            <div className={walletStyles.icon}>
-              <GraphIcon />
-            </div>
-            SPEND LLM (POLITIPOOL)
-          </Button>
-          <Button small primary className={walletStyles.button} onClick={toggleModalLLMSpendOpen}>
-            <div className={walletStyles.icon}>
-              <UploadIcon />
-            </div>
-            SPEND LLM
-          </Button>
-          <Button small primary className={walletStyles.button} onClick={toggleModalLLDSpendOpen}>
-            <div className={walletStyles.icon}>
-              <UploadIcon />
-            </div>
-            SPEND LLD
-          </Button>
+          {userIsMember && (
+          <>
+            <Button small primary className={walletStyles.button} onClick={toggleModalPolitipoolLLMSpendOpen}>
+              <div className={walletStyles.icon}>
+                <GraphIcon />
+              </div>
+              SPEND LLM (POLITIPOOL)
+            </Button>
+            <Button small primary className={walletStyles.button} onClick={toggleModalLLMSpendOpen}>
+              <div className={walletStyles.icon}>
+                <UploadIcon />
+              </div>
+              SPEND LLM
+            </Button>
+            <Button small primary className={walletStyles.button} onClick={toggleModalLLDSpendOpen}>
+              <div className={walletStyles.icon}>
+                <UploadIcon />
+              </div>
+              SPEND LLD
+            </Button>
+          </>
+          )}
         </div>
       </div>
 
@@ -158,4 +163,5 @@ WalletCongresSenateWrapper.propTypes = {
     liquidAmount: PropTypes.shape({ amount: PropTypes.object.isRequired }),
     liquidMerits: PropTypes.shape({ amount: PropTypes.string.isRequired }),
   }).isRequired,
+  userIsMember: PropTypes.bool.isRequired,
 };
