@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { identitySelectors, walletSelectors } from '../../../redux/selectors';
 import { walletActions } from '../../../redux/actions';
@@ -18,7 +18,7 @@ function useTransferAsset(proposal) {
   const formattedValue = asset ? formatAssets(value, asset?.metadata?.decimals) : value;
   const identity = names?.[target]?.identity;
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(walletActions.getAdditionalAssets.call(true));
   }, [dispatch]);
 

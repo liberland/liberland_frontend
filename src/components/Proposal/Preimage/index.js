@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { blockchainActions } from '../../../redux/actions';
@@ -12,11 +12,11 @@ function Preimage({
   children,
 }) {
   const dispatch = useDispatch();
-  const [call, setCall] = React.useState(null);
+  const [call, setCall] = useState(null);
   const preimages = useSelector(blockchainSelectors.preimages);
   const preimage = preimages[hash.toString()];
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!preimage) {
       dispatch(blockchainActions.fetchPreimage.call({
         hash,
@@ -25,7 +25,7 @@ function Preimage({
     }
   }, [dispatch, preimage, hash, len]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     (async () => {
       if (preimage && preimage.isSome && !call) {
         setCall(await decodeCall(preimage.unwrap()));

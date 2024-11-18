@@ -1,22 +1,31 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import formatDate from '../../../utils/formatDate';
 import { decodeRemark } from '../../../api/nodeRpcCall';
 
 function useRemark(proposal) {
-  const [data, setData] = React.useState(null);
+  const [data, setData] = useState(null);
   const bytes = proposal.get('args').data;
 
-  React.useEffect(() => {
-    decodeRemark(bytes).then((item) => {
+  useEffect(() => {
+    decodeRemark(bytes).then(({
+      currency,
+      date,
+      amountInUSDAtDateOfPayment,
+      category,
+      project,
+      supplier,
+      description,
+      finalDestination,
+    }) => {
       setData({
-        currency: item.currency,
-        date: item.date,
-        amountInUsd: item.amountInUSDAtDateOfPayment,
-        category: item.category,
-        project: item.project,
-        supplier: item.supplier,
-        description: item.description,
-        finalDestination: item.finalDestination,
+        currency,
+        date,
+        amountInUsd: amountInUSDAtDateOfPayment,
+        category,
+        project,
+        supplier,
+        description,
+        finalDestination,
       });
     });
   }, [bytes, proposal]);

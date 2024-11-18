@@ -1,14 +1,20 @@
-import React from 'react';
+import React, {
+  createContext,
+  useState,
+  useCallback,
+  useMemo,
+  useContext,
+} from 'react';
 import PropTypes from 'prop-types';
 import ProposalLink from '../ProposalLink';
 
-const ProposalContext = React.createContext({ data: {} });
+const ProposalContext = createContext({ data: {} });
 
 export function ProposalProvider({
   children,
 }) {
-  const [tabledProposals, setTabledProposals] = React.useState({});
-  const addTabledProposal = React.useCallback(
+  const [tabledProposals, setTabledProposals] = useState({});
+  const addTabledProposal = useCallback(
     (type, identifier, values) => (
       <ProposalLink
         identifier={identifier}
@@ -20,7 +26,7 @@ export function ProposalProvider({
     ),
     [tabledProposals],
   );
-  const context = React.useMemo(() => ({
+  const context = useMemo(() => ({
     data: tabledProposals,
     addTabledProposal,
   }), [
@@ -34,7 +40,7 @@ export function ProposalProvider({
   );
 }
 
-export const useProposalContext = () => React.useContext(ProposalContext);
+export const useProposalContext = () => useContext(ProposalContext);
 
 ProposalProvider.propTypes = {
   children: PropTypes.node.isRequired,

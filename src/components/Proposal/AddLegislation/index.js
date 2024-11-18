@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import cx from 'classnames';
 import PropTypes from 'prop-types';
@@ -27,13 +27,13 @@ function AddLegislation({ proposal, isDetailsHidden }) {
       <div className={cx(stylesAnim.anim, !isDetailsHidden ? stylesAnim.shown : stylesAnim.hidden)}>
         {sections.map((section, idx) => (
         // eslint-disable-next-line react/no-array-index-key
-          <React.Fragment key={idx}>
+          <Fragment key={idx}>
             <p>
               Section #
               {idx}
             </p>
             <p className={styles.legislationContent}>{new TextDecoder('utf-8').decode(section)}</p>
-          </React.Fragment>
+          </Fragment>
         ))}
       </div>
 

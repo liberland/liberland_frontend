@@ -19,9 +19,9 @@ function TransferWithRemark({
     project,
     supplier,
   } = useRemark(remark);
-  const proposals = useProposalContext();
+  const { addTabledProposal } = useProposalContext();
 
-  return proposals.addTabledProposal('remarkedTransfer', id, [
+  return addTabledProposal('remarkedTransfer', id, [
     formattedRow[0],
     amountInUsd,
     category,

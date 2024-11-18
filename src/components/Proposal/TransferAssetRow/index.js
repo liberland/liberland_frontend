@@ -7,9 +7,9 @@ function TransferAssetRow({ proposal, id }) {
     formattedRow,
   } = useTransferAsset(proposal);
 
-  const proposals = useProposalContext();
+  const { addTabledProposal } = useProposalContext();
 
-  return proposals.addTabledProposal('transferAsset', id, formattedRow);
+  return addTabledProposal('transferAsset', id, formattedRow);
 }
 
 TransferAssetRow.propTypes = {

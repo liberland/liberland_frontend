@@ -4,7 +4,7 @@ import { useProposalContext } from '../ProposalContext';
 
 function RemarkRow({ proposal, id }) {
   const remark = useRemark(proposal);
-  const proposals = useProposalContext();
+  const { addTabledProposal } = useProposalContext();
 
   const {
     amountInUsd,
@@ -17,7 +17,7 @@ function RemarkRow({ proposal, id }) {
     supplier,
   } = remark;
 
-  return proposals.addTabledProposal('remarks', id, [
+  return addTabledProposal('remarks', id, [
     category,
     project,
     supplier,

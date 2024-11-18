@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import objectHash from 'object-hash';
 import { useProposalContext } from '../ProposalContext';
@@ -8,7 +8,7 @@ import styles from '../../Table/styles.module.scss';
 import Card from '../../Card';
 
 function ProposalTable({ type }) {
-  const headings = React.useMemo(
+  const headings = useMemo(
     () => proposalTableHeadings(type),
     [type],
   );

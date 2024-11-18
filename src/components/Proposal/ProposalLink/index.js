@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import objectHash from 'object-hash';
 import { proposalHeading } from '../utils';
@@ -11,7 +11,7 @@ function ProposalLink({
   values,
   setTabledProposals,
 }) {
-  React.useEffect(() => {
+  useEffect(() => {
     const fromType = tabledProposals[type] || {};
     const fromKey = fromType[identifier] || [];
     const hasStateChanged = values.length !== fromKey.length || values.some((v, i) => v !== fromKey[i]);
@@ -24,8 +24,7 @@ function ProposalLink({
         },
       }));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identifier, type, values]);
+  }, [identifier, setTabledProposals, tabledProposals, type, values]);
 
   return (
     <Button
