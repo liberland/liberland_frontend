@@ -105,3 +105,17 @@ p {
   text-decoration-skip-ink: none;
   color: #243F5F;  
 }
+
+.ant-card {
+  border-color: #ECEBF0!important;
+}
+
+.ant-card-actions {
+  border-top: none!important;
+}
+
+.ant-col {
+  .ant-card {
+    height: 100%;
+  }
+}

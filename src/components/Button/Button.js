@@ -28,7 +28,7 @@ function Button({
     if (red) {
       return 'danger';
     }
-    return 'default';
+    return undefined;
   };
 
   const getSize = () => {
@@ -38,14 +38,14 @@ function Button({
     if (small) {
       return 'small';
     }
-    return 'middle';
+    return undefined;
   };
 
   return (
     <ButtonInternal
       disabled={disabled}
       onClick={onClick}
-      type={type}
+      htmlType={type}
       color={getColor()}
       size={getSize()}
       className={

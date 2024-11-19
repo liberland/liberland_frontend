@@ -21,7 +21,6 @@ import WalletOverview from './WalletOverview';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-
   return (
     (userWalletAddress !== undefined) ? (
       <Switch>

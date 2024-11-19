@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import Collapse from 'antd/es/collapse';
 import Dropdown from 'antd/es/dropdown';
+import uniqBy from 'lodash/uniqBy';
 import BalanceOverview from '../BalanceOverview';
 import WalletTransactionHistory from '../WalletTransactionHistory';
 import AssetOverview from '../AssetOverview';
@@ -77,7 +78,7 @@ function WalletOverview() {
               <Dropdown.Button
                 menu={{
                   items: [{ key: undefined, label: 'All transaction types' }]
-                    .concat(transactionHistoryTranslated.map(({ typeText }) => ({
+                    .concat(uniqBy(transactionHistoryTranslated, ({ typeText }) => typeText).map(({ typeText }) => ({
                       key: typeText,
                       label: typeText,
                     }))),

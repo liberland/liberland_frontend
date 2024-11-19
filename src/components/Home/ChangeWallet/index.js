@@ -77,7 +77,7 @@ function ChangeWallet() {
           label: meta?.name ? `${meta?.name} (${truncate(address, 10)})` : truncate(address, 24),
         })),
         selectedKeys: [walletAdressSelector],
-        onSelect: ({ selectedKeys }) => onWalletAdresssChange(selectedKeys[0]),
+        onClick: ({ key }) => onWalletAdresssChange(key),
       }}
       className={styles.dropdown}
     >

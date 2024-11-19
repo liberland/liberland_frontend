@@ -32,7 +32,11 @@ function AssetOverview({
       <Card.Meta
         title={assetData.metadata.name}
         description={
-          `${formatAssets(assetData.balance, assetData.metadata.decimals, true)} ${assetData.metadata.symbol}`
+          `${formatAssets(
+            assetData.balance?.balance || '0',
+            assetData.metadata.decimals,
+            true,
+          )} ${assetData.metadata.symbol}`
         }
       />
     </Card>

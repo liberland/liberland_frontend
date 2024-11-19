@@ -80,7 +80,7 @@ function UnpoolModalWrapper() {
   const [open, setOpen] = React.useState(false);
   return (
     <>
-      <Button small secondary className={styles.button} onClick={() => setOpen(true)}>
+      <Button className={styles.button} onClick={() => setOpen(true)}>
         <div className={styles.icon}>
           <GraphIcon />
         </div>

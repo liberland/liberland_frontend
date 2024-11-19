@@ -260,7 +260,7 @@ function RequestLLDModalWrapper(props) {
   const [show, setShow] = React.useState();
   return (
     <>
-      <Button className={styles.button} primary small onClick={() => setShow(true)}>
+      <Button className={styles.button} primary onClick={() => setShow(true)}>
         <div className={styles.requestIcon}>
           <DocumentsIcon />
         </div>

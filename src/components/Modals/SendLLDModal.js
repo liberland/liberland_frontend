@@ -122,7 +122,7 @@ function SendLLDModalWrapper() {
   const [open, setOpen] = React.useState(false);
   return (
     <>
-      <Button small primary className={styles.button} onClick={setOpen(true)}>
+      <Button primary className={styles.button} onClick={() => setOpen(true)}>
         <div className={styles.icon}>
           <UploadIcon />
         </div>

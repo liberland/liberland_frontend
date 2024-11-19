@@ -86,11 +86,6 @@
     @media screen and (min-width: map-get($breakpoints, "tablet")) {
       gap: 15px;
     }
-
-    .button {
-      flex: 1;
-      color: $clearBlack;
-    }
   }
 
   & .lawText {
@@ -309,19 +304,6 @@
   }
 
   .button {
-    font-size: 13px;
-    font-weight: 700;
-    color: $clearBlack;
-    flex: 1;
-    padding: 15px 0;
-    letter-spacing: 0.7px;
-
-    @media screen and (min-width: map-get($breakpoints, "tablet")) {
-      padding: 5px 16px;
-      font-size: 14px;
-      flex: unset;
-    }
-
     .icon {
       width: 18px;
       height: 18px;
@@ -341,19 +323,6 @@
 }
 
 .button {
-  font-size: 13px;
-  font-weight: 700;
-  color: $clearBlack;
-  flex: 1;
-  padding: 15px 0;
-  letter-spacing: 0.7px;
-
-  @media screen and (min-width: map-get($breakpoints, "tablet")) {
-    padding: 5px 16px;
-    font-size: 14px;
-    flex: unset;
-  }
-
   .icon {
     width: 18px;
     height: 18px;

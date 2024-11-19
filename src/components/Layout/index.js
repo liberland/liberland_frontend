@@ -15,6 +15,7 @@ import List from 'antd/es/list';
 import Title from 'antd/es/typography/Title';
 import Tabs from 'antd/es/tabs';
 import Spin from 'antd/es/spin';
+import Flex from 'antd/es/flex';
 import Collapse from 'antd/es/collapse';
 import MenuIcon from '@ant-design/icons/MenuOutlined';
 import { useMediaQuery } from 'usehooks-ts';
@@ -38,9 +39,9 @@ function Layout({ children }) {
   React.useEffect(() => {
     dispatch(walletActions.getWallet.call());
   }, [dispatch]);
-  const navigationList = React.useCallback(
-    () => navigationListComplete.filter((link) => (roles[link.access] && roles[link.access] !== 'guest')
-      || link.roles.some((role) => roles.includes(role))),
+  const navigationList = React.useMemo(
+    () => navigationListComplete.filter(({ access }) => (roles[access] && roles[access] !== 'guest')
+      || access.some((role) => roles.includes(role))),
     [roles],
   );
   const createMenu = (navigation) => {
@@ -197,6 +198,10 @@ function Layout({ children }) {
             headerPadding: '8px 0',
             colorBorder: 'white',
           },
+          Card: {
+            extraColor: '#243F5F',
+            colorText: '#243F5F',
+          },
         },
       }}
     >
@@ -219,8 +224,10 @@ function Layout({ children }) {
             </>
           )}
           <div className={styles.user}>
-            <ChangeWallet />
-            {isBiggerThanSmallScreen && <UserMenu />}
+            <Flex gap="20px" align="center" justify="center">
+              <ChangeWallet />
+              {isBiggerThanSmallScreen && <UserMenu />}
+            </Flex>
           </div>
         </HeaderInternal>
         <LayoutInternal>

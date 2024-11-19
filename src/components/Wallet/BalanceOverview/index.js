@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import List from 'antd/es/list';
+import Row from 'antd/es/row';
+import Col from 'antd/es/col';
 import Card from 'antd/es/card';
+import { useMediaQuery } from 'usehooks-ts';
 
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import SendLLDModalWrapper from '../../Modals/SendLLDModal';
@@ -21,15 +23,13 @@ function BalanceOverview({
         currency: 'LLM',
         actions: [
           <UnpoolLLMModalWrapper />,
+          <div />,
         ],
       },
       {
         amount: formatDollars(balances.polkastake.amount),
         title: 'Validator Staked',
         currency: 'LLD',
-        actions: [
-
-        ],
       },
     ]
     : []).concat([
@@ -53,21 +53,23 @@ function BalanceOverview({
     },
   ]), [balances.liberstake.amount, balances.liquidAmount.amount, balances.polkastake.amount, liquidMerits, showStaked]);
 
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
+
   return (
-    <List
-      grid={{ gutter: 10, column: overviewInfo.length }}
-      dataSource={overviewInfo}
-      renderItem={({
+    <Row gutter={[16, 16]}>
+      {overviewInfo.map(({
         actions,
         amount,
         currency,
         title,
       }) => (
-        <Card actions={actions}>
-          <Card.Meta title={title} description={`${amount} ${currency}`} />
-        </Card>
-      )}
-    />
+        <Col span={isBiggerThanDesktop ? 6 : 24} key={title}>
+          <Card actions={actions}>
+            <Card.Meta title={title} description={`${amount} ${currency}`} />
+          </Card>
+        </Col>
+      ))}
+    </Row>
   );
 }
 
