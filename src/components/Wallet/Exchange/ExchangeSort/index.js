@@ -1,5 +1,9 @@
 import React from 'react';
 import Dropdown from 'antd/es/dropdown';
+import Flex from 'antd/es/flex';
+import Button from 'antd/es/button';
+import Space from 'antd/es/space';
+import DownOutlined from '@ant-design/icons/DownOutlined';
 import PropTypes from 'prop-types';
 import { sortByMap } from './utils';
 import styles from './styles.module.scss';
@@ -9,11 +13,11 @@ function ExchangeSort({
   sortBy,
 }) {
   return (
-    <>
+    <Flex align="center" justify="center" gap="15px" onClick={(e) => e.stopPropagation()}>
       <span className={styles.description}>
         Sort
       </span>
-      <Dropdown.Button
+      <Dropdown
         menu={{
           items: Object.keys(sortByMap).map((key) => ({
             key,
@@ -24,9 +28,15 @@ function ExchangeSort({
           },
         }}
       >
+        <Button>
+          <Space>
+            {sortBy}
+            <DownOutlined />
+          </Space>
+        </Button>
         {sortBy}
-      </Dropdown.Button>
-    </>
+      </Dropdown>
+    </Flex>
   );
 }
 

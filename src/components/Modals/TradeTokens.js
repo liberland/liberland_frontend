@@ -10,6 +10,7 @@ import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
 import { dexSelectors, walletSelectors, blockchainSelectors } from '../../redux/selectors';
+import PlusIcon from '../../assets/icons/plus.svg';
 import {
   convertTransferData,
   convertToEnumDex,
@@ -353,7 +354,6 @@ function TradeTokensModalWrapper({
   return (
     <>
       <Button
-        small
         primary
         onClick={() => {
           setShow(true);
@@ -364,6 +364,7 @@ function TradeTokensModalWrapper({
         {asset1ToShow}
         {' for '}
         {asset2ToShow}
+        <img src={PlusIcon} className={cx(styles.arrowIcon, styles.whiten)} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>

@@ -2,13 +2,15 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'antd/es/alert';
 import Collapse from 'antd/es/collapse';
-import List from 'antd/es/list';
+import Row from 'antd/es/row';
+import Col from 'antd/es/col';
 import { blockchainSelectors, dexSelectors } from '../../../../redux/selectors';
 import { dexActions } from '../../../../redux/actions';
 import ExchangeItem from '../ExchangeItem';
 import AddAssetForm from '../AddAssetForm';
 import { sortByMap } from '../ExchangeSort/utils';
 import ExchangeSort from '../ExchangeSort';
+import styles from '../styles.module.scss';
 
 function ExchangeList() {
   const dispatch = useDispatch();
@@ -34,6 +36,10 @@ function ExchangeList() {
     return [highLiq, lowLiq];
   }, [[], []]) || [[], []], [poolsData]);
 
+  const sortPool = (pool, type) => pool.sort(
+    (aPool, bPool) => sortByMap[type](aPool, assetsPoolData, bPool, assetsPoolData),
+  );
+
   if (!dexs) {
     return (
       <div>Loading...</div>
@@ -51,23 +57,23 @@ function ExchangeList() {
       {highLiquidity.length > 0 && (
         <Collapse
           defaultActiveKey={['highliq']}
+          className={styles.exchangePairs}
           items={[
             {
               key: 'highliq',
               label: 'Exchange pairs',
               extra: <ExchangeSort onSort={setHighLiquiditySort} sortBy={highLiquiditySort} />,
               children: (
-                <List
-                  dataSource={highLiquidity.sort(
-                    (aPool, bPool) => sortByMap[highLiquiditySort](aPool, assetsPoolData, bPool, assetsPoolData),
-                  )}
-                  renderItem={(pool) => (
-                    <ExchangeItem
-                      poolData={pool}
-                      assetsPoolData={assetsPoolData}
-                    />
-                  )}
-                />
+                <Row>
+                  {sortPool(highLiquidity, highLiquiditySort).map((pool) => (
+                    <Col span={24}>
+                      <ExchangeItem
+                        poolData={pool}
+                        assetsPoolData={assetsPoolData}
+                      />
+                    </Col>
+                  ))}
+                </Row>
               ),
             },
           ]}
@@ -81,17 +87,16 @@ function ExchangeList() {
               label: 'Low liquidity exchange pairs',
               extra: <ExchangeSort onSort={setLowLiquiditySort} sortBy={lowLiquiditySort} />,
               children: (
-                <List
-                  dataSource={lowLiquidity.sort(
-                    (aPool, bPool) => sortByMap[lowLiquiditySort](aPool, assetsPoolData, bPool, assetsPoolData),
-                  )}
-                  renderItem={(pool) => (
-                    <ExchangeItem
-                      poolData={pool}
-                      assetsPoolData={assetsPoolData}
-                    />
-                  )}
-                />
+                <Row>
+                  {sortPool(lowLiquidity, lowLiquiditySort).map((pool) => (
+                    <Col span={24}>
+                      <ExchangeItem
+                        poolData={pool}
+                        assetsPoolData={assetsPoolData}
+                      />
+                    </Col>
+                  ))}
+                </Row>
               ),
             },
           ]}

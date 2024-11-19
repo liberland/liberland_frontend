@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
+import { useMediaQuery } from 'usehooks-ts';
 import { getDecimalsForAsset, getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormatter';
 import { formatAssets } from '../../../../utils/walletHelpers';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
@@ -54,24 +55,28 @@ function ExchangeItem({ poolData, assetsPoolData }) {
 
   const isReservedDataEmpty = reserved ? (reserved?.asset2?.isEmpty || reserved?.asset1?.isEmpty) : true;
 
+  const liqPoolDescription = (
+    <div>
+      <span className={styles.description}>
+        Liquidity pool
+      </span>
+      <span className={styles.values}>
+        {formatAssets(reserved?.asset1 || '0', decimals1, { symbol: asset1ToShow, withAll: true })}
+        {' / '}
+        {formatAssets(reserved?.asset2 || '0', decimals2, { symbol: asset2ToShow, withAll: true })}
+      </span>
+    </div>
+  );
+
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
+
   return (
     <Card
       title={`${asset1ToShow} / ${asset2ToShow}`}
-      extra={(
-        <>
-          <span className={styles.description}>
-            Liquidity pool
-          </span>
-          <span className={styles.values}>
-            {formatAssets(reserved.asset1, decimals1, { symbol: asset1ToShow, withAll: true })}
-            {' / '}
-            {formatAssets(reserved.asset2, decimals2, { symbol: asset2ToShow, withAll: true })}
-          </span>
-        </>
-      )}
+      extra={isBiggerThanDesktop ? liqPoolDescription : undefined}
     >
-      <Flex>
-        <Flex>
+      <Flex wrap>
+        <Flex wrap>
           <TradeTokensModalWrapper
             assets={assets}
             asset1ToShow={asset1ToShow}
@@ -90,7 +95,8 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             </div>
           </div>
         </Flex>
-        <Flex>
+        {!isBiggerThanDesktop && liqPoolDescription}
+        <Flex wrap>
           <TradeTokensModalWrapper
             assets={assets}
             asset1ToShow={asset1ToShow}

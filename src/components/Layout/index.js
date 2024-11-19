@@ -262,24 +262,28 @@ function Layout({ children }) {
             </Content>
             <Footer className={styles.footer}>
               <div className={styles.footerItem}>
-                <img src={LiberlandSeal} alt="seal of liberland" className={styles.seal} />
-                <Paragraph>
-                  Free Republic of Liberland is a sovereign state & constitutional
-                  republic with elements of direct democracy.
-                </Paragraph>
-                <List
-                  grid={{ gutter: 10, column: 5 }}
-                  dataSource={socials}
-                  renderItem={({
-                    icon,
-                    label,
-                    href,
-                  }) => (
-                    <a href={href} aria-label={label}>
-                      <img src={icon} alt="icon" className={styles.social} />
-                    </a>
-                  )}
-                />
+                <Flex vertical={!isBiggerThanSmallScreen}>
+                  <img src={LiberlandSeal} alt="seal of liberland" className={styles.seal} />
+                  <div>
+                    <Paragraph>
+                      Free Republic of Liberland is a sovereign state & constitutional
+                      republic with elements of direct democracy.
+                    </Paragraph>
+                    <List
+                      grid={{ column: socials.length }}
+                      dataSource={socials}
+                      renderItem={({
+                        icon,
+                        label,
+                        href,
+                      }) => (
+                        <a href={href} aria-label={label}>
+                          <img src={icon} alt="icon" className={styles.social} />
+                        </a>
+                      )}
+                    />
+                  </div>
+                </Flex>
               </div>
               <List
                 grid={{ gutter: 10, column: footerList.length }}
@@ -341,7 +345,7 @@ function Layout({ children }) {
               )}
               <div className={styles.footerItem}>
                 <Button href="https://liberland.org/contribution">
-                  Donate to Liberland
+                  {isBiggerThanSmallScreen ? 'Donate to Liberland' : 'Donate'}
                 </Button>
               </div>
             </Footer>

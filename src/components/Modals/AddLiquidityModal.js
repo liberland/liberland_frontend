@@ -10,6 +10,7 @@ import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
 import { blockchainSelectors, walletSelectors } from '../../redux/selectors';
+import PlusIcon from '../../assets/icons/plus.svg';
 import {
   convertLiquidityData, convertToEnumDex, getDecimalsForAsset,
 } from '../../utils/dexFormatter';
@@ -248,8 +249,9 @@ function AddLiquidityModalWrapper({
   const [show, setShow] = React.useState(false);
   return (
     <>
-      <Button small green onClick={() => setShow(true)}>
+      <Button onClick={() => setShow(true)}>
         Add liquidity
+        <img src={PlusIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>

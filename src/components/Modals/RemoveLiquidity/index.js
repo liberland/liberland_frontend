@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import ModalRoot from '../ModalRoot';
 import stylesModal from '../styles.module.scss';
 import Button from '../../Button/Button';
+import MinusIcon from '../../../assets/icons/plus.svg';
 import { calculatePooled, getDecimalsForAsset } from '../../../utils/dexFormatter';
 import { AssetsPropTypes, ReservedAssetPropTypes } from '../../Wallet/Exchange/proptypes';
 import ProgressBar from './ProgressBar';
@@ -191,8 +192,9 @@ function RemoveLiquidityModalWrapper({
   const [show, setShow] = React.useState();
   return (
     <>
-      <Button small green onClick={() => setShow(true)}>
+      <Button onClick={() => setShow(true)}>
         Remove Liquidity
+        <img src={MinusIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>
