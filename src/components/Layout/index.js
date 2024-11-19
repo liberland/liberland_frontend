@@ -105,7 +105,7 @@ function Layout({ children }) {
   }, [matchedSubLink, pathname]);
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
-  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 576px)');
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
 
   const getMenuKey = () => {
     if (isBiggerThanDesktop) {
@@ -120,34 +120,34 @@ function Layout({ children }) {
   const footerList = Object.entries(footerLinks);
 
   const urlMenu = (
-    <Sider width={250} breakpoint="md" collapsedWidth="60px">
-      <Menu
-        mode="inline"
-        className={styles.sider}
-        defaultOpenKeys={isBiggerThanDesktop ? Object.keys(openKeys) : undefined}
-        selectedKeys={[pathname]}
-        key={getMenuKey()}
-        items={[
-          {
-            label: isBiggerThanSmallScreen ? 'For Citizens' : 'Menu',
-            icon: isBiggerThanSmallScreen ? undefined : React.createElement(MenuIcon),
-            key: 'citizen',
-            children: navigationList.filter(({ isGovt }) => !isBiggerThanSmallScreen || !isGovt).map(createMenu),
-          },
-        ].concat(isBiggerThanSmallScreen ? [
-          {
-            label: 'For State Officials',
-            key: 'state',
-            children: navigationList.filter(({ isGovt }) => isGovt).map(createMenu),
-          },
-        ] : [])}
-      />
-    </Sider>
+    <Menu
+      mode={isBiggerThanSmallScreen ? 'inline' : 'horizontal'}
+      className={styles.sider}
+      defaultOpenKeys={isBiggerThanDesktop ? Object.keys(openKeys) : undefined}
+      selectedKeys={isBiggerThanDesktop ? [pathname] : undefined}
+      key={getMenuKey()}
+      overflowedIndicator={isBiggerThanSmallScreen ? undefined : <MenuIcon />}
+      items={isBiggerThanSmallScreen ? [
+        {
+          label: 'For Citizens',
+          key: 'citizen',
+          children: navigationList.filter(({ isGovt }) => !isBiggerThanSmallScreen || !isGovt).map(createMenu),
+        },
+        {
+          label: 'For State Officials',
+          key: 'state',
+          children: navigationList.filter(({ isGovt }) => isGovt).map(createMenu),
+        },
+      ] : navigationList.map(createMenu)}
+    />
   );
 
   return (
     <ConfigProvider
       theme={{
+        token: {
+          colorText: '#243F5F',
+        },
         components: {
           Layout: {
             bodyBg: 'white',
@@ -171,6 +171,8 @@ function Layout({ children }) {
             itemActiveBg: '#F2F2F2',
             groupTitleColor: '#ACBDC5',
             subMenuItemBorderRadius: '0',
+            horizontalItemHoverColor: '#F2F2F2',
+            horizontalItemSelectedColor: 'transparent',
           },
           Button: {
             defaultActiveBorderColor: '#243F5F',
@@ -200,7 +202,6 @@ function Layout({ children }) {
           },
           Card: {
             extraColor: '#243F5F',
-            colorText: '#243F5F',
           },
         },
       }}
@@ -220,18 +221,26 @@ function Layout({ children }) {
             <>
               {urlMenu}
               <img alt="logo" src={LiberlandLettermarkMobile} className={styles.mobileLogo} />
-              <UserMenu />
+              <div className={styles.mobileUser}>
+                <UserMenu />
+              </div>
             </>
           )}
-          <div className={styles.user}>
-            <Flex gap="20px" align="center" justify="center">
-              <ChangeWallet />
-              {isBiggerThanSmallScreen && <UserMenu />}
-            </Flex>
-          </div>
+          {isBiggerThanSmallScreen && (
+            <div className={styles.user}>
+              <Flex gap="20px" align="center" justify="center">
+                <ChangeWallet />
+                <UserMenu />
+              </Flex>
+            </div>
+          )}
         </HeaderInternal>
         <LayoutInternal>
-          {isBiggerThanSmallScreen && urlMenu}
+          {isBiggerThanSmallScreen && (
+            <Sider width={250} breakpoint="md" collapsedWidth="60px">
+              {urlMenu}
+            </Sider>
+          )}
           <LayoutInternal>
             <Content className={styles.content}>
               {pageTitle && (

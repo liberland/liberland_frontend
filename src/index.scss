@@ -9,6 +9,7 @@ body {
   font-family: $openSans;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: #243F5F;
 }
 
 p {
@@ -78,7 +79,6 @@ p {
   text-align: left;
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
-  color: #243F5F !important;
 }
 .ant-tabs-tab-btn[aria-selected="true"] {
   color: #243F5F !important;
@@ -103,7 +103,6 @@ p {
   text-align: left;
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
-  color: #243F5F;  
 }
 
 .ant-card {
@@ -118,4 +117,8 @@ p {
   .ant-card {
     height: 100%;
   }
+}
+
+.ant-table-wrapper {
+  overflow-x: auto;
 }

@@ -16,7 +16,7 @@ import styles from './styles.module.scss';
 import { walletActions } from '../../redux/actions';
 import { parseMerits, valueToBN, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import { walletSelectors } from '../../redux/selectors';
-import { ReactComponent as UploadIcon } from '../../assets/icons/upload.svg';
+import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 
 function SendLLMModal({
   closeModal,
@@ -113,11 +113,9 @@ function SendLLMModalWrapper() {
   const [open, setOpen] = React.useState(false);
   return (
     <>
-      <Button primary className={styles.button} onClick={() => setOpen(true)}>
-        <div className={styles.icon}>
-          <UploadIcon />
-        </div>
-        SEND LLM
+      <Button className={styles.button} onClick={() => setOpen(true)}>
+        Send LLM
+        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {open && (
         <ModalRoot>

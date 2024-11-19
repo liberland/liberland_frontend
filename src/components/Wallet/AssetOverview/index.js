@@ -1,8 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import List from 'antd/es/list';
+import Row from 'antd/es/row';
+import Col from 'antd/es/col';
 import Card from 'antd/es/card';
+import { useMediaQuery } from 'usehooks-ts';
 
 import { formatAssets } from '../../../utils/walletHelpers';
 import { senateSelectors } from '../../../redux/selectors';
@@ -42,12 +44,19 @@ function AssetOverview({
     </Card>
   );
 
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
+
   return (
-    <List
-      dataSource={filteredAssets}
-      grid={{ gutter: 10, column: filteredAssets.length }}
-      renderItem={renderItem}
-    />
+    <Row gutter={[16, 16]}>
+      {filteredAssets.map((assetData) => (
+        <Col
+          span={isBiggerThanDesktop ? Math.floor(Math.max(1, 24 / filteredAssets.length)) : 24}
+          key={assetData.metadata.name}
+        >
+          {renderItem(assetData)}
+        </Col>
+      ))}
+    </Row>
   );
 }
 

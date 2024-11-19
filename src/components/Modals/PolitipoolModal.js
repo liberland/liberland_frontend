@@ -12,7 +12,7 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { walletActions } from '../../redux/actions';
 import { parseMerits, valueToBN } from '../../utils/walletHelpers';
-import { ReactComponent as GraphIcon } from '../../assets/icons/graph.svg';
+import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 import { walletSelectors } from '../../redux/selectors';
 
 function PolitipoolModal({ closeModal }) {
@@ -90,11 +90,9 @@ function PolitipoolModalWrapper() {
   const [open, setOpen] = React.useState(false);
   return (
     <>
-      <Button className={styles.button} onClick={() => setOpen(true)}>
-        <div className={styles.icon}>
-          <GraphIcon />
-        </div>
-        POLITIPOOL
+      <Button className={styles.button} primary onClick={() => setOpen(true)}>
+        Politipool
+        <img src={ButtonArrowIcon} className={cx(styles.arrowIcon, styles.whiten)} alt="button icon" />
       </Button>
       {open && (
         <ModalRoot>

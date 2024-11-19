@@ -21,16 +21,6 @@ function Button({
   whiteRed,
   disabled,
 }) {
-  const getColor = () => {
-    if (primary) {
-      return 'primary';
-    }
-    if (red) {
-      return 'danger';
-    }
-    return undefined;
-  };
-
   const getSize = () => {
     if (large) {
       return 'large';
@@ -46,7 +36,8 @@ function Button({
       disabled={disabled}
       onClick={onClick}
       htmlType={type}
-      color={getColor()}
+      type={primary ? 'primary' : undefined}
+      color={red ? 'danger' : undefined}
       size={getSize()}
       className={
         cx(styles.button, className, {

@@ -3,13 +3,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import Collapse from 'antd/es/collapse';
 import Dropdown from 'antd/es/dropdown';
+import Flex from 'antd/es/flex';
+import Space from 'antd/es/space';
 import uniqBy from 'lodash/uniqBy';
+import DownOutlined from '@ant-design/icons/DownOutlined';
 import BalanceOverview from '../BalanceOverview';
 import WalletTransactionHistory from '../WalletTransactionHistory';
 import AssetOverview from '../AssetOverview';
 import { walletActions } from '../../../redux/actions';
 import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
 import router from '../../../router';
+import Button from '../../Button/Button';
 import { transactionHistoryProcessorFactory } from '../WalletTransactionHistory/utils';
 import styles from './styles.module.scss';
 
@@ -71,13 +75,15 @@ function WalletOverview() {
           key: 'WalletTransactionHistory',
           label: 'Transaction history',
           extra: (
-            <>
+            <Flex align="center" justify="center" gap="15px" onClick={(e) => e.stopPropagation()}>
               <span className={styles.description}>
                 Show
               </span>
-              <Dropdown.Button
+              <Dropdown
+                trigger={['click']}
+                arrow={false}
                 menu={{
-                  items: [{ key: undefined, label: 'All transaction types' }]
+                  items: [{ key: '', label: 'All transaction types' }]
                     .concat(uniqBy(transactionHistoryTranslated, ({ typeText }) => typeText).map(({ typeText }) => ({
                       key: typeText,
                       label: typeText,
@@ -87,9 +93,14 @@ function WalletOverview() {
                   },
                 }}
               >
-                {filterTransactionsBy || 'All transaction types'}
-              </Dropdown.Button>
-            </>
+                <Button>
+                  <Space>
+                    {filterTransactionsBy || 'All transaction types'}
+                    <DownOutlined />
+                  </Space>
+                </Button>
+              </Dropdown>
+            </Flex>
           ),
           children: (
             <WalletTransactionHistory

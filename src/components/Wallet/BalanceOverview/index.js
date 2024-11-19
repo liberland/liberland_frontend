@@ -19,7 +19,7 @@ function BalanceOverview({
     ? [
       {
         amount: formatMerits(balances.liberstake.amount),
-        title: 'PolitiPooled',
+        title: 'PolitiPooled LLM',
         currency: 'LLM',
         actions: [
           <UnpoolLLMModalWrapper />,
@@ -28,14 +28,14 @@ function BalanceOverview({
       },
       {
         amount: formatDollars(balances.polkastake.amount),
-        title: 'Validator Staked',
+        title: 'Validator Staked LLD',
         currency: 'LLD',
       },
     ]
     : []).concat([
     {
       amount: formatMerits(liquidMerits),
-      title: 'Liquid',
+      title: 'Liquid LLM',
       currency: 'LLM',
       actions: [
         <SendLLMModalWrapper />,
@@ -44,7 +44,7 @@ function BalanceOverview({
     },
     {
       amount: formatDollars(balances.liquidAmount.amount),
-      title: 'Liquid',
+      title: 'Liquid LLD',
       currency: 'LLD',
       actions: [
         <SendLLDModalWrapper />,

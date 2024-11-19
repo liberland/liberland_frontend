@@ -3,6 +3,7 @@
 import React from 'react';
 
 import Table from 'antd/es/table';
+import Flex from 'antd/es/flex';
 
 import Status from '../../Status';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
@@ -17,11 +18,12 @@ function WalletTransactionHistory({ failure, transactionHistory, filterTransacti
           dataIndex: 'typeText',
           key: 'typeText',
           render: (value, record) => (
-            <>
+            <Flex gap="20px" align="center">
               <img src={record.iconType} alt={record.imgAlt} />
-              {' '}
-              {value}
-            </>
+              <span>
+                {value}
+              </span>
+            </Flex>
           ),
         },
         {
