@@ -45,12 +45,16 @@ export const parseAssets = (assets, assetDecimals) => _parse(assets, assetDecima
 
 const defaultFormatAssetsSettings = {
   withAll: false,
+  optionalAll: false,
   symbol: null,
 };
 export const formatAssets = (assets, assetDecimals, settingsProps = defaultFormatAssetsSettings) => {
   const settings = { ...defaultFormatAssetsSettings, ...settingsProps };
-  const { withAll, symbol } = settings;
+  const { withAll, optionalAll, symbol } = settings;
   const formatedValue = _format(assets, Number(assetDecimals), withAll);
+  if (optionalAll && formatedValue === '0' && !withAll) {
+    return formatAssets(assets, assetDecimals, { symbol, withAll: true });
+  }
   const returnValue = symbol ? `${formatedValue} ${symbol}` : formatedValue;
   return returnValue;
 };

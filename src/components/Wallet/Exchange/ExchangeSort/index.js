@@ -34,7 +34,6 @@ function ExchangeSort({
             <DownOutlined />
           </Space>
         </Button>
-        {sortBy}
       </Dropdown>
     </Flex>
   );

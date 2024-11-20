@@ -1,1 +1,19 @@
-@import '../../../../index';
+@import '../styles.module.scss';
+
+.liquidityWrapper {
+    margin-left: auto;
+    margin-right: auto;
+
+    @media screen and (min-width: map-get($breakpoints, 'desktop')) {
+        margin-left: auto;
+        margin-right: 0;
+    }
+}
+
+.liquidityPool {
+    margin-bottom: 20px;
+
+    @media screen and (min-width: map-get($breakpoints, 'large-screen')) {
+        margin-bottom: 0;
+    }
+}

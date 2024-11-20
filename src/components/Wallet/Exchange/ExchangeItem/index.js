@@ -7,7 +7,7 @@ import { getDecimalsForAsset, getExchangeRate, makeAssetToShow } from '../../../
 import { formatAssets } from '../../../../utils/walletHelpers';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
 import AddLiquidityModalWrapper from '../../../Modals/AddLiquidityModal';
-import styles from '../styles.module.scss';
+import styles from './styles.module.scss';
 import { ExchangeItemPropTypes } from '../proptypes';
 import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
 
@@ -56,14 +56,15 @@ function ExchangeItem({ poolData, assetsPoolData }) {
   const isReservedDataEmpty = reserved ? (reserved?.asset2?.isEmpty || reserved?.asset1?.isEmpty) : true;
 
   const liqPoolDescription = (
-    <div>
+    <div className={styles.liquidityPool}>
       <span className={styles.description}>
         Liquidity pool
       </span>
+      &nbsp;
       <span className={styles.values}>
-        {formatAssets(reserved?.asset1 || '0', decimals1, { symbol: asset1ToShow, withAll: true })}
+        {formatAssets(reserved?.asset1 || '0', decimals1, { symbol: asset1ToShow, optionalAll: true })}
         {' / '}
-        {formatAssets(reserved?.asset2 || '0', decimals2, { symbol: asset2ToShow, withAll: true })}
+        {formatAssets(reserved?.asset2 || '0', decimals2, { symbol: asset2ToShow, optionalAll: true })}
       </span>
     </div>
   );
@@ -75,8 +76,9 @@ function ExchangeItem({ poolData, assetsPoolData }) {
       title={`${asset1ToShow} / ${asset2ToShow}`}
       extra={isBiggerThanDesktop ? liqPoolDescription : undefined}
     >
-      <Flex wrap>
-        <Flex wrap>
+      {!isBiggerThanDesktop && liqPoolDescription}
+      <Flex wrap gap="15px">
+        <Flex wrap gap="15px">
           <TradeTokensModalWrapper
             assets={assets}
             asset1ToShow={asset1ToShow}
@@ -95,8 +97,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             </div>
           </div>
         </Flex>
-        {!isBiggerThanDesktop && liqPoolDescription}
-        <Flex wrap>
+        <Flex wrap gap="15px">
           <TradeTokensModalWrapper
             assets={assets}
             asset1ToShow={asset1ToShow}
@@ -114,16 +115,20 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             </div>
           </div>
         </Flex>
-        <AddLiquidityModalWrapper
-          assets={assets}
-          isReservedDataEmpty={isReservedDataEmpty}
-        />
-        <RemoveLiquidityModalWrapper
-          assets={assets}
-          reserved={reserved}
-          lpTokensBalance={lpTokensBalance}
-          liquidity={liquidity}
-        />
+        <div className={styles.liquidityWrapper}>
+          <Flex gap="15px">
+            <AddLiquidityModalWrapper
+              assets={assets}
+              isReservedDataEmpty={isReservedDataEmpty}
+            />
+            <RemoveLiquidityModalWrapper
+              assets={assets}
+              reserved={reserved}
+              lpTokensBalance={lpTokensBalance}
+              liquidity={liquidity}
+            />
+          </Flex>
+        </div>
       </Flex>
     </Card>
   );

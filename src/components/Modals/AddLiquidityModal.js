@@ -10,7 +10,7 @@ import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
 import { blockchainSelectors, walletSelectors } from '../../redux/selectors';
-import PlusIcon from '../../assets/icons/plus.svg';
+import PlusIcon from '../../assets/icons/plus-dark.svg';
 import {
   convertLiquidityData, convertToEnumDex, getDecimalsForAsset,
 } from '../../utils/dexFormatter';

@@ -64,9 +64,9 @@ function ExchangeList() {
               label: 'Exchange pairs',
               extra: <ExchangeSort onSort={setHighLiquiditySort} sortBy={highLiquiditySort} />,
               children: (
-                <Row>
+                <Row gutter={[16, 16]}>
                   {sortPool(highLiquidity, highLiquiditySort).map((pool) => (
-                    <Col span={24}>
+                    <Col span={24} key={pool.asset1 + pool.asset2}>
                       <ExchangeItem
                         poolData={pool}
                         assetsPoolData={assetsPoolData}
@@ -87,9 +87,9 @@ function ExchangeList() {
               label: 'Low liquidity exchange pairs',
               extra: <ExchangeSort onSort={setLowLiquiditySort} sortBy={lowLiquiditySort} />,
               children: (
-                <Row>
+                <Row gutter={[16, 16]}>
                   {sortPool(lowLiquidity, lowLiquiditySort).map((pool) => (
-                    <Col span={24}>
+                    <Col span={24} key={pool.asset1 + pool.asset2}>
                       <ExchangeItem
                         poolData={pool}
                         assetsPoolData={assetsPoolData}

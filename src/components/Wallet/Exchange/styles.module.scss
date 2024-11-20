@@ -1,5 +1,6 @@
 @import '../../../assets/base/variables';
 @import '../../../assets/main';
+@import '../../../index';
 
 .list{
   margin-top: 20px;
@@ -111,6 +112,7 @@
 
 .add {
   margin-top: 15px;
+  margin-bottom: 25px;
   padding-left: 15px;
   max-width: 400px;
 }
