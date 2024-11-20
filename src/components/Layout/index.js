@@ -183,6 +183,9 @@ function Layout({ children }) {
             defaultShadow: '0',
             primaryColor: 'white',
             primaryShadow: '0',
+            contentFontSize: '12px',
+            paddingBlock: '10px',
+            paddingInline: '5px',
           },
           Typography: {
             colorText: '#243F5F',
@@ -262,9 +265,9 @@ function Layout({ children }) {
             </Content>
             <Footer className={styles.footer}>
               <div className={styles.footerItem}>
-                <Flex vertical={!isBiggerThanSmallScreen}>
+                <Flex vertical={isBiggerThanSmallScreen}>
                   <img src={LiberlandSeal} alt="seal of liberland" className={styles.seal} />
-                  <div>
+                  <div className={styles.nextToSeal}>
                     <Paragraph>
                       Free Republic of Liberland is a sovereign state & constitutional
                       republic with elements of direct democracy.
@@ -333,21 +336,23 @@ function Layout({ children }) {
                 </div>
               ))}
             </Footer>
-            <Footer className={styles.footer}>
-              <div className={styles.footerItem}>
-                ©2023 Liberland. All right reserved.
-                {!isBiggerThanSmallScreen && <div className={styles.slogan}>To Live and let Live</div>}
-              </div>
-              {isBiggerThanSmallScreen && (
-                <div className={classNames(styles.footerItem, styles.center, styles.slogan)}>
-                  To Live and let Live
+            <Footer>
+              <Flex>
+                <div>
+                  ©2023 Liberland. All rights reserved.
+                  {!isBiggerThanSmallScreen && <div className={styles.slogan}>To Live and let Live</div>}
                 </div>
-              )}
-              <div className={styles.footerItem}>
-                <Button href="https://liberland.org/contribution">
-                  {isBiggerThanSmallScreen ? 'Donate to Liberland' : 'Donate'}
-                </Button>
-              </div>
+                {isBiggerThanSmallScreen && (
+                  <div className={classNames(styles.center, styles.slogan)}>
+                    To Live and let Live
+                  </div>
+                )}
+                <div className={styles.donate}>
+                  <Button href="https://liberland.org/contribution">
+                    {isBiggerThanSmallScreen ? 'Donate to Liberland' : 'Donate'}
+                  </Button>
+                </div>
+              </Flex>
             </Footer>
           </LayoutInternal>
         </LayoutInternal>

@@ -194,7 +194,7 @@ function RemoveLiquidityModalWrapper({
     <>
       <Button onClick={() => setShow(true)}>
         Remove Liquidity
-        <img src={MinusIcon} className={styles.arrowIcon} alt="button icon" />
+        <img src={MinusIcon} className={styles.backIcon} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>

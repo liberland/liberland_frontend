@@ -4,8 +4,8 @@ import React from 'react';
 
 import Table from 'antd/es/table';
 import Flex from 'antd/es/flex';
+import Tag from 'antd/es/tag';
 
-import Status from '../../Status';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 
 function WalletTransactionHistory({ failure, transactionHistory, filterTransactionsBy }) {
@@ -50,11 +50,9 @@ function WalletTransactionHistory({ failure, transactionHistory, filterTransacti
           title: 'Status',
           dataIndex: 'status',
           render: () => (
-            <Status
-              status="success"
-              completed
-              declined={false}
-            />
+            <Tag color="#79BF2E">
+              Successful
+            </Tag>
           ),
         },
       ]}
