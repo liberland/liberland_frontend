@@ -49,6 +49,8 @@ export default {
     overView: '/home/wallet/overview',
     bridge: '/home/wallet/bridge',
     nfts: '/home/wallet/nfts',
+    nftsList: '/home/wallet/nfts/list',
+    prime: '/home/wallet/nfts/prime',
     payMe: '/home/wallet/pay-me',
   },
   registries: {

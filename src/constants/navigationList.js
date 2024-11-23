@@ -32,7 +32,8 @@ export const navigationList = [
       Assets: router.wallet.assets,
       'All transactions': router.wallet.allTransactions,
       Bridge: router.wallet.bridge,
-      NFTs: router.wallet.nfts,
+      NFTs: router.wallet.nftsList,
+      'NFT Prime': router.wallet.prime,
     },
   },
   {
