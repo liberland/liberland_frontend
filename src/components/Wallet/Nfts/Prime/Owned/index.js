@@ -12,21 +12,20 @@ function Owned({ address }) {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const owned = useSelector(nftsSelectors.ownNftPrimesSelector);
+  const count = useSelector(nftsSelectors.ownNftPrimesCountSelector);
   const loading = useSelector(nftsSelectors.ownNftPrimesLoadingSelector);
   const imageRefs = React.useRef({});
 
   useEffect(() => {
     dispatch(nftsActions.getOwnNftPrimeCount.call({
-      from: 0,
-      to: 5,
-      address,
+      account: address,
     }));
     setPage(1);
   }, [dispatch, address]);
 
   return (
     <Table
-      dataSource={owned}
+      dataSource={owned?.[address] || []}
       loading={loading}
       columns={[
         {
@@ -69,11 +68,13 @@ function Owned({ address }) {
         pageSize: 5,
         current: page,
         onChange: (currentPage, pageSize) => {
-          dispatch(nftsActions.getOwnNftPrimes.call({
-            from: (currentPage - 1) * pageSize,
-            to: currentPage * pageSize,
-            address,
-          }));
+          if (count?.[address] > 0) {
+            dispatch(nftsActions.getOwnNftPrimes.call({
+              from: (currentPage - 1) * pageSize,
+              to: Math.min(count, currentPage * pageSize),
+              account: address,
+            }));
+          }
           setPage(currentPage);
         },
       }}

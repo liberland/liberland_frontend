@@ -17,6 +17,16 @@ export const nftPrimesSelector = createSelector(
   (reducer) => reducer.nftPrimes,
 );
 
+export const ownNftPrimesCountSelector = createSelector(
+  nftsReducer,
+  (reducer) => reducer.ownNftPrimesCount,
+);
+
+export const nftPrimesCountSelector = createSelector(
+  nftsReducer,
+  (reducer) => reducer.nftPrimesCount,
+);
+
 export const ownNftPrimesLoadingSelector = createSelector(
   nftsReducer,
   (reducer) => reducer.ownNftPrimeLoading,

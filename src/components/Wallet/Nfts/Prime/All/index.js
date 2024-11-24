@@ -9,19 +9,17 @@ import styles from '../styles.module.scss';
 function All() {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
-  const owned = useSelector(nftsSelectors.ownNftPrimesSelector);
-  const loading = useSelector(nftsSelectors.ownNftPrimesLoadingSelector);
+  const all = useSelector(nftsSelectors.nftPrimesSelector);
+  const count = useSelector(nftsSelectors.nftPrimesCountSelector);
+  const loading = useSelector(nftsSelectors.nftPrimesLoadingSelector);
 
   useEffect(() => {
-    dispatch(nftsActions.getNftPrimesCount.call({
-      from: 0,
-      to: 5,
-    }));
+    dispatch(nftsActions.getNftPrimesCount.call());
   }, [dispatch]);
 
   return (
     <Table
-      dataSource={owned}
+      dataSource={all || []}
       loading={loading}
       columns={[
         {
@@ -46,10 +44,12 @@ function All() {
         pageSize: 5,
         current: page,
         onChange: (currentPage, pageSize) => {
-          dispatch(nftsActions.getOwnNftPrimes.call({
-            from: (currentPage - 1) * pageSize,
-            to: currentPage * pageSize,
-          }));
+          if (count > 0) {
+            dispatch(nftsActions.getNftPrimes.call({
+              from: (currentPage - 1) * pageSize,
+              to: Math.min(currentPage * pageSize, all.length),
+            }));
+          }
           setPage(currentPage);
         },
       }}

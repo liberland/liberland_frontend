@@ -46,7 +46,7 @@ const getStyleLoaders = (cssOptions) => {
 module.exports = (env, argv) => {
   return {
     context: __dirname,
-    entry: ['babel-polyfill', './src/index.js', './src/worker.js'],
+    entry: ['babel-polyfill', './src/index.js'],
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].[contenthash].js',

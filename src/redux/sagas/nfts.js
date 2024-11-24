@@ -25,9 +25,9 @@ function* getUserNftsWorker(action) {
 function* getOwnNftPrimeCountWorker(action) {
   try {
     const nfts = yield call(getOwnNftPrimeCount, action.payload);
-    yield put(nftsActions.getNftPrimesCount.success(nfts));
+    yield put(nftsActions.getOwnNftPrimeCount.success(nfts));
   } catch (e) {
-    yield put(nftsActions.getNftPrimesCount.failure(e));
+    yield put(nftsActions.getOwnNftPrimeCount.failure(e));
   }
 }
 

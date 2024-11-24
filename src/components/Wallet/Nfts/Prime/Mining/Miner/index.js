@@ -52,7 +52,7 @@ function Miner({ processes, account, isActive }) {
       )}
       <Table
         dataSource={data}
-        loading={!data.length}
+        loading={!data.length && isActive}
         locale={{
           emptyText: () => (isActive ? 'Minting...' : 'Click on minting switch to start!'),
         }}

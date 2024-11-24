@@ -8,7 +8,9 @@ const initialState = {
   ownNftPrimesError: null,
   nftPrimesError: null,
   ownNftPrimes: {},
+  ownNftPrimesCount: {},
   nftPrimes: [],
+  nftPrimesCount: [],
   userNfts: [],
 };
 
@@ -33,6 +35,7 @@ const nftsReducer = handleActions({
   )]: (state) => ({
     ...state,
     nftPrimeLoading: true,
+    nftPrimesError: null,
   }),
   [combineActions(
     nftsActions.getOwnNftPrimes.call,
@@ -40,6 +43,7 @@ const nftsReducer = handleActions({
   )]: (state) => ({
     ...state,
     ownNftPrimeLoading: true,
+    ownNftPrimesError: null,
   }),
   [nftsActions.getNfts.success]: (state, action) => ({
     ...state,
@@ -48,7 +52,15 @@ const nftsReducer = handleActions({
   [nftsActions.getNftPrimesCount.success]: (state, action) => ({
     ...state,
     nftPrimeLoading: false,
-    nftPrimes: new Array(action.payload.length).fill(undefined),
+    nftPrimesCount: action.payload.length,
+  }),
+  [nftsActions.getOwnNftPrimeCount.success]: (state, action) => ({
+    ...state,
+    ownNftPrimeLoading: false,
+    ownNftPrimesCount: {
+      ...state.ownNftPrimesCount,
+      [action.payload.address]: action.payload.length,
+    },
   }),
   [nftsActions.getOwnNftPrimes.success]: (state, action) => ({
     ...state,
@@ -65,7 +77,7 @@ const nftsReducer = handleActions({
   }),
   [nftsActions.getOwnNftPrimes.success]: (state, action) => ({
     ...state,
-    nftPrimeLoading: false,
+    ownNftPrimeLoading: false,
     ownNftPrimes: {
       ...state.ownNftPrimes,
       [action.payload.address]: combineArrays(

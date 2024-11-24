@@ -1,140 +1,17 @@
-import random from 'random-bigint';
-import Worker from 'web-worker';
 import objectHash from 'object-hash';
 import tinygradient from 'tinygradient';
 import html2canvas from 'html2canvas';
 import FileSaver from 'file-saver';
-
-// Javascript program Miller-Rabin primality test
-// based on JavaScript code found at https://www.geeksforgeeks.org/primality-test-set-3-miller-rabin/
-
-// Utility function to do
-// modular exponentiation.
-// It returns (x^y) % p
-function power(x, y, p) {
-  // Initialize result
-  // (JML- all literal integers converted to use n suffix denoting BigInt)
-  let res = 1n;
-
-  // Update x if it is more than or
-  // equal to p
-  x %= p;
-  while (y > 0n) {
-    // If y is odd, multiply
-    // x with result
-    // eslint-disable-next-line no-bitwise
-    if (y & 1n) res = (res * x) % p;
-
-    // y must be even now
-    y /= 2n; // (JML- original code used a shift operator, but division is clearer)
-    x = (x * x) % p;
-  }
-  return res;
-}
-
-// This function is called
-// for all k trials. It returns
-// false if n is composite and
-// returns false if n is
-// probably prime. d is an odd
-// number such that d*2<sup>r</sup> = n-1
-// for some r >= 1
-function millerTest(d, n) {
-  // (JML- all literal integers converted to use n suffix denoting BigInt)
-
-  // Pick a random number in [2..n-2]
-  // Corner cases make sure that n > 4
-  /*
-    JML- I can't mix the Number returned by Math.random with
-    operations involving BigInt. The workaround is to create a random integer
-    with precision 6 and convert it to a BigInt.
-  */
-  const r = window.BigInt(Math.floor(Math.random() * 100_000));
-  // JML- now I have to divide by the multiplier used above (BigInt version)
-  const y = (r * (n - 2n)) / 100_000n;
-  const a = 2n + (y % (n - 4n));
-
-  // Compute a^d % n
-  let x = power(a, d, n);
-
-  if (x === 1n || x === n - 1n) return true;
-
-  // Keep squaring x while one
-  // of the following doesn't
-  // happen
-  // (i) d does not reach n-1
-  // (ii) (x^2) % n is not 1
-  // (iii) (x^2) % n is not n-1
-  while (d !== n - 1n) {
-    x = (x * x) % n;
-    d *= 2n;
-
-    if (x === 1n) return false;
-    if (x === n - 1n) return true;
-  }
-
-  // Return composite
-  return false;
-}
-
-// It returns false if n is
-// composite and returns true if n
-// is probably prime. k is an
-// input parameter that determines
-// accuracy level. Higher value of
-// k indicates more accuracy.
-export function isPrime(n, k = 14) {
-  // (JML- all literal integers converted to use n suffix denoting BigInt)
-  // Corner cases
-  if (n <= 1n || n === 4n) return [false, 0, 0];
-  if (n <= 3n) return [true, 0, 0];
-
-  // Find r such that n =
-  // 2^d * r + 1 for some r >= 1
-  let d = n - 1n;
-  let s = 0;
-  while (d % 2n === 0n) {
-    d /= 2n;
-    s += 1;
-  }
-
-  // Iterate given nber of 'k' times
-  for (let i = 0; i < k; i += 1) {
-    if (!millerTest(d, n)) {
-      return [false, d, s];
-    }
-  }
-
-  return [true, d, s];
-}
-
-export async function primeFinder(cancel, found) {
-  const minBits = parseInt(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_MIN_BYTES) * 8;
-  let randomStart = random(minBits);
-  while (!cancel()) {
-    const handler = async (n) => {
-      const [foundPrime, d, s] = isPrime(n);
-      if (foundPrime) {
-        found({ n, d, s });
-      }
-    };
-    await handler(randomStart);
-    randomStart += 1n;
-  }
-}
 
 export function webWorkerPrimeFinder(amount, onChange) {
   const workers = [];
   const results = {};
 
   for (let i = 0; i < amount; i += 1) {
-    const url = new URL('./worker.js', import.meta.url);
-    const worker = new Worker(url);
+    const worker = new Worker(new URL('./worker.js', import.meta.url));
     worker.addEventListener('message', ({ data }) => {
-      data.forEach((value) => {
-        results[objectHash(value)] = value;
-      });
-      onChange(Object.values(data));
+      results[objectHash(data)] = data;
+      onChange(Object.values(results));
     });
     workers.push(worker);
   }
@@ -149,13 +26,14 @@ export function webWorkerPrimeFinder(amount, onChange) {
 export function createGradient(number) {
   const colors = window.BigInt(number).toString(16).split('').reduce((accumulator, byte) => {
     const lastColor = accumulator[accumulator.length - 1];
-    if (lastColor.length === 7) { // example: #ababab
+    if (lastColor?.length === 7) { // example: #ababab
       accumulator.push(`#${byte}`);
     } else {
       accumulator[accumulator.length - 1] = `${accumulator[accumulator.length - 1]}${byte}`;
     }
     return accumulator;
   }, []);
+
   return tinygradient(colors).css();
 }
 

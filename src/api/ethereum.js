@@ -70,60 +70,88 @@ const resolveOperationFactory = (contractAddress, account) => async (methodName,
 };
 
 const getOwnNftPrimeCount = async ({ account }) => {
-  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
-  const address = typeof account === 'string' ? account : await account.getAddress();
-  return {
-    length: await readContract({
-      contract,
-      method: 'function balanceOf(address owner) view returns (uint256)',
-      params: [address],
-    }),
-    address,
-  };
+  try {
+    const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
+    const address = typeof account === 'string' ? account : await account.getAddress();
+    return {
+      length: await readContract({
+        contract,
+        method: 'function balanceOf(address owner) view returns (uint256)',
+        params: [address],
+      }),
+      address,
+    };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    return {
+      length: 0,
+    };
+  }
 };
 
 const getOwnNftPrimes = async ({ account, from, to }) => {
-  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
-  const address = typeof account === 'string' ? account : await account.getAddress();
-  const [primes, ids] = await readContract({
-    contract,
-    // eslint-disable-next-line max-len
-    method: 'function getPrimesOwnedBy(address owner, uint256 from, uint256 to) view returns(BigNumber[] memory,uint256[] memory)',
-    params: [address, from, to],
-  });
+  try {
+    const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
+    const address = typeof account === 'string' ? account : await account.getAddress();
+    const [primes, ids] = await readContract({
+      contract,
+      // eslint-disable-next-line max-len
+      method: 'function getPrimesOwnedBy(address owner, uint256 from, uint256 to) view returns(BigNumber[] memory,uint256[] memory)',
+      params: [address, from, to],
+    });
 
-  return {
-    primes: primes.map((p, i) => ({
-      ...p,
-      id: ids[i],
-    })),
-    from,
-    to,
-    address,
-  };
+    return {
+      primes: primes.map((p, i) => ({
+        ...p,
+        id: ids[i],
+      })),
+      from,
+      to,
+      address,
+    };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
 };
 
 const getNftPrimesCount = async () => {
-  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
-  const length = await readContract({
-    contract,
-    method: 'function getPrimesCount() view returns(uint256)',
-    params: [],
-  });
-  return { length };
+  try {
+    const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
+    const length = await readContract({
+      contract,
+      method: 'function getPrimesCount() view returns(uint256)',
+      params: [],
+    });
+    return { length };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    return {
+      length: 0,
+    };
+  }
 };
 
 const getNftPrimes = async ({ from, to }) => {
-  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
-  return {
-    primes: await readContract({
-      contract,
-      method: 'function getPrimes(uint256 from, uint256 to) view returns (BigNumber[] memory)',
-      params: [from, to],
-    }),
-    from,
-    to,
-  };
+  try {
+    const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
+    return {
+      primes: await readContract({
+        contract,
+        method: 'function getPrimes(uint256 from, uint256 to) view returns (BigNumber[] memory)',
+        params: [from, to],
+      }),
+      from,
+      to,
+    };
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
 };
 
 const mintNft = async ({
