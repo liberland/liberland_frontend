@@ -1,5 +1,10 @@
 import {
-  createThirdwebClient, getContract, readContract, prepareContractCall, sendTransaction, waitForReceipt,
+  createThirdwebClient,
+  getContract,
+  readContract,
+  prepareContractCall,
+  sendTransaction,
+  waitForReceipt,
 } from 'thirdweb';
 import { getAllWalletsList, injectedProvider } from 'thirdweb/wallets';
 import { ethers5Adapter } from 'thirdweb/adapters/ethers5';
@@ -62,6 +67,86 @@ const resolveOperationFactory = (contractAddress, account) => async (methodName,
     transactionHash,
     maxBlocksWaitTime: 20,
   });
+};
+
+const getOwnNftPrimeCount = async ({ account }) => {
+  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
+  const address = await account.getAddress();
+  return {
+    length: await readContract({
+      contract,
+      method: 'function balanceOf(address owner) view returns (uint256)',
+      params: [address],
+    }),
+    address,
+  };
+};
+
+const getOwnNftPrimes = async ({ account, from, to }) => {
+  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
+  const address = await account.getAddress();
+  const [primes, ids] = await readContract({
+    contract,
+    // eslint-disable-next-line max-len
+    method: 'function getPrimesOwnedBy(address owner, uint256 from, uint256 to) view returns(BigNumber[] memory,uint256[] memory)',
+    params: [address, from, to],
+  });
+
+  return {
+    primes: primes.map((p, i) => ({
+      ...p,
+      id: ids[i],
+    })),
+    from,
+    to,
+    address,
+  };
+};
+
+const getNftPrimesCount = async () => {
+  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
+  const length = await readContract({
+    contract,
+    method: 'function getPrimesCount() view returns(uint256)',
+    params: [],
+  });
+  return { length };
+};
+
+const getNftPrimes = async ({ from, to }) => {
+  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
+  return {
+    primes: await readContract({
+      contract,
+      method: 'function getPrimes(uint256 from, uint256 to) view returns (BigNumber[] memory)',
+      params: [from, to],
+    }),
+    from,
+    to,
+  };
+};
+
+const mintNft = async ({
+  account,
+  number,
+  d,
+  s,
+}) => {
+  const resolveFactory = resolveOperationFactory(
+    process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS,
+    account,
+  );
+  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
+  const fee = await readContract({
+    contract,
+    method: 'function getFee() view returns(uint256)',
+    params: [],
+  });
+  await resolveFactory(
+    'function mint(bytes calldata number, bytes calldata d, uint256 s) payable',
+    [number, d, s],
+    fee,
+  );
 };
 
 const erc20Approve = async (erc20Address, account, spender, value) => {
@@ -246,4 +331,9 @@ export {
   getERC20Balance,
   getAvailableWallets,
   withdrawTokens,
+  getOwnNftPrimeCount,
+  getOwnNftPrimes,
+  getNftPrimesCount,
+  getNftPrimes,
+  mintNft,
 };

@@ -173,6 +173,10 @@ export default function* rootSaga() {
 
     // NFTS
     nftsSagas.getUserNftsWatcher(),
+    nftsSagas.getOwnNftPrimeCountWatcher(),
+    nftsSagas.getOwnNftPrimesWatcher(),
+    nftsSagas.getNftPrimesWatcher(),
+    nftsSagas.getNftPrimesCountWatcher(),
 
     // ETH
     ethSagas.getWalletOptionsWatcher(),
