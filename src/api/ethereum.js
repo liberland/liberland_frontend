@@ -71,7 +71,7 @@ const resolveOperationFactory = (contractAddress, account) => async (methodName,
 
 const getOwnNftPrimeCount = async ({ account }) => {
   const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
-  const address = await account.getAddress();
+  const address = typeof account === 'string' ? account : await account.getAddress();
   return {
     length: await readContract({
       contract,
@@ -84,7 +84,7 @@ const getOwnNftPrimeCount = async ({ account }) => {
 
 const getOwnNftPrimes = async ({ account, from, to }) => {
   const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
-  const address = await account.getAddress();
+  const address = typeof account === 'string' ? account : await account.getAddress();
   const [primes, ids] = await readContract({
     contract,
     // eslint-disable-next-line max-len

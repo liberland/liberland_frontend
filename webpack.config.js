@@ -1,3 +1,4 @@
+/* eslint-disable */
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const Dotenv = require('dotenv-webpack');
@@ -45,7 +46,7 @@ const getStyleLoaders = (cssOptions) => {
 module.exports = (env, argv) => {
   return {
     context: __dirname,
-    entry: ['babel-polyfill', './src/index.js'],
+    entry: ['babel-polyfill', './src/index.js', './src/worker.js'],
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].[contenthash].js',
@@ -137,6 +138,7 @@ module.exports = (env, argv) => {
               importLoaders: 2,
               modules: true,
             },
+            // eslint-disable-next-line comma-dangle
             'sass-loader'
           ),
         },
