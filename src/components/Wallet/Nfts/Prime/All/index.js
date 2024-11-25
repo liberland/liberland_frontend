@@ -4,7 +4,7 @@ import Table from 'antd/es/table';
 import Spin from 'antd/es/spin';
 import { nftsSelectors } from '../../../../../redux/selectors';
 import { nftsActions } from '../../../../../redux/actions';
-import { createGradient } from '../Mining/utils';
+import Gradient from '../Gradient';
 
 function Lookup() {
   const dispatch = useDispatch();
@@ -36,13 +36,13 @@ function Lookup() {
           dataIndex: 'val',
           key: 'val',
           title: 'NFT',
-          render: (val) => (val ? (<div style={createGradient(val)} />) : <Spin />),
+          render: (val) => (val ? <Gradient val={val} /> : <Spin />),
         },
         {
           dataIndex: 'bitlen',
           key: 'bitlen',
           title: 'Size in bytes',
-          render: (val) => (val ? `${parseInt(val) / 8}B` : <Spin />),
+          render: (val) => (val ? `${Math.ceil(parseInt(val) / 8)}B` : <Spin />),
         },
       ]}
       pagination={{
@@ -53,7 +53,7 @@ function Lookup() {
           if (count > 0) {
             dispatch(nftsActions.getNftPrimes.call({
               from: (currentPage - 1) * pageSize,
-              to: Math.min(currentPage * pageSize, all.length),
+              to: Math.min(currentPage * pageSize, count),
             }));
           }
           setPage(currentPage);

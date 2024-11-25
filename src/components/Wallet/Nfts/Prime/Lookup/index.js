@@ -59,7 +59,7 @@ function Lookup() {
           <InputNumber placeholder="ID" />
         </Form.Item>
         <Form.Item>
-          <Button type="submit" primary disabled={loading}>
+          <Button type="submit" disabled={loading}>
             {loading ? 'Loading...' : 'Show NFT'}
           </Button>
         </Form.Item>

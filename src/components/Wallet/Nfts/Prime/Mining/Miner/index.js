@@ -8,10 +8,12 @@ import { nftsActions } from '../../../../../../redux/actions';
 import Button from '../../../../../Button/Button';
 import { mintNft } from '../../../../../../api/ethereum';
 import styles from '../../styles.module.scss';
-import { createGradient, webWorkerPrimeFinder } from '../utils';
+import { webWorkerPrimeFinder } from '../utils';
+import Gradient from '../../Gradient';
 
 function Miner({ processes, account, isActive }) {
   const dispatch = useDispatch();
+  const [mined, setMined] = React.useState({});
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
@@ -33,8 +35,8 @@ function Miner({ processes, account, isActive }) {
       });
       setSuccess(true);
       dispatch(nftsActions.getNftPrimesCount.call());
-      dispatch(nftsActions.getOwnNftPrimeCount.call({ address: account }));
-      setData((prevData) => prevData.filter(({ n: prevN }) => prevN !== n));
+      dispatch(nftsActions.getOwnNftPrimeCount.call({ account }));
+      setMined((prevMined) => ({ ...prevMined, [n.toString()]: true }));
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -68,18 +70,26 @@ function Miner({ processes, account, isActive }) {
             dataIndex: 'n',
             label: 'NFT image',
             render: (value) => (
-              <div style={createGradient(value)} className={styles.gradient} />
+              <Gradient val={value} />
             ),
           },
           {
             key: 'mint',
             dataIndex: 'd',
             label: 'Mint',
-            render: (_, toMint) => (
-              <Button onClick={onMintFactory(toMint)}>
-                {loading ? 'Loading...' : 'Mint NFT Prime!'}
-              </Button>
-            ),
+            render: (_, toMint) => {
+              const isMined = mined[toMint.n.toString()];
+              if (isMined) {
+                return (
+                  <Button disabled>Already mined</Button>
+                );
+              }
+              return (
+                <Button onClick={onMintFactory(toMint)}>
+                  {loading ? 'Loading...' : 'Mint NFT Prime!'}
+                </Button>
+              );
+            },
           },
         ]}
         pagination={{ pageSize: 5 }}

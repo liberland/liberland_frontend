@@ -15,6 +15,10 @@ function Prime() {
   const [selectedWallet, setSelectedWallet] = React.useState();
   const [selectedAccount, setSelectedAccount] = React.useState();
 
+  const alert = (
+    <Alert className={styles.noAccount} type="info" message="Select your wallet provider and ETH wallet first" />
+  );
+
   return (
     <div className={styles.screen}>
       <Paragraph>
@@ -40,36 +44,33 @@ function Prime() {
           selectedAccount={selectedAccount}
         />
       </Flex>
-      {!selectedAccount ? (
-        <Alert className={styles.noAccount} type="info" message="Select your wallet provider and ETH wallet first" />
-      ) : (
-        <Collapse
-          defaultActiveKey={['lookup', 'mine', 'owned', 'score']}
-          className={styles.operations}
-          items={[
-            {
-              key: 'mine',
-              label: 'Mining options',
-              children: <Mining account={selectedAccount} />,
-            },
-            {
-              key: 'lookup',
-              label: 'Lookup NFT by ID',
-              children: <Lookup />,
-            },
-            {
-              key: 'owned',
-              label: 'Your NFT Primes',
-              children: <Owned address={selectedAccount} />,
-            },
-            {
-              key: 'score',
-              label: 'All NFT Primes',
-              children: <All />,
-            },
-          ]}
-        />
-      )}
+      <Collapse
+        defaultActiveKey={selectedAccount ? ['mine', 'all'] : ['all']}
+        className={styles.operations}
+        key={selectedAccount ? 'init' : 'idle'}
+        items={[
+          {
+            key: 'mine',
+            label: 'Mining options',
+            children: !selectedAccount ? alert : <Mining account={selectedAccount} />,
+          },
+          {
+            key: 'lookup',
+            label: 'Lookup NFT by ID',
+            children: <Lookup />,
+          },
+          {
+            key: 'owned',
+            label: 'Your NFT Primes',
+            children: !selectedAccount ? alert : <Owned address={selectedAccount} />,
+          },
+          {
+            key: 'all',
+            label: 'All NFT Primes',
+            children: <All />,
+          },
+        ]}
+      />
     </div>
   );
 }

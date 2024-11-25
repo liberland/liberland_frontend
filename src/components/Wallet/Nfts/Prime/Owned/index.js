@@ -5,7 +5,7 @@ import Table from 'antd/es/table';
 import Spin from 'antd/es/spin';
 import { nftsSelectors } from '../../../../../redux/selectors';
 import { nftsActions } from '../../../../../redux/actions';
-import { createGradient } from '../Mining/utils';
+import Gradient from '../Gradient';
 import ImageDownload from './ImageDownload';
 
 function Owned({ address }) {
@@ -45,8 +45,8 @@ function Owned({ address }) {
           title: 'NFT',
           render: (val, { id }) => (
             val ? (
-              <div
-                style={createGradient(val)}
+              <Gradient
+                val={val}
                 ref={(div) => {
                   imageRefs.current[id] = div;
                 }}
@@ -64,7 +64,7 @@ function Owned({ address }) {
           dataIndex: 'bitlen',
           key: 'bitlen',
           title: 'Size in bytes',
-          render: (val) => (val ? `${parseInt(val) / 8}B` : <Spin />),
+          render: (val) => (val ? `${Math.ceil(parseInt(val) / 8)}B` : <Spin />),
         },
         {
           dataIndex: 'id',

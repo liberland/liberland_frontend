@@ -105,18 +105,25 @@ export function isPrime(n, k = 14) {
 }
 
 async function primeFinder() {
-  const minBits = parseInt(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_MIN_BYTES) * 8;
-  let n = random(minBits);
-  if (n % 2n === 0n) {
-    n += 1n;
-  }
+  const getRandom = () => {
+    const minBits = parseInt(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_MIN_BYTES) * 8;
+    let n = random(minBits);
+    if (n % 2n === 0n) {
+      n += 1n;
+    }
+    return n;
+  };
+  let n = getRandom();
+
   // eslint-disable-next-line no-constant-condition
   while (true) {
     const [foundPrime, d, s] = isPrime(n);
     if (foundPrime) {
       postMessage({ n, d, s });
+      n = getRandom();
+    } else {
+      n += 2n;
     }
-    n += 2n;
   }
 }
 
