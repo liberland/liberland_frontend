@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
 import Card from '../../Card';
 
 import styles from './styles.module.scss';
 import { formatAssets } from '../../../utils/walletHelpers';
 import SendAssetModal from '../../Modals/SendAssetModal';
 import Button from '../../Button/Button';
-import { senateSelectors } from '../../../redux/selectors';
 
 function AssetOverview({
   additionalAssets,
@@ -17,7 +15,6 @@ function AssetOverview({
   const [whichModalOpen, setWhichModalOpen] = useState(null);
   const handleModalOpenAssets = (symbol) => setWhichModalOpen(symbol);
   const handleModalCloseAssets = () => setWhichModalOpen(null);
-  const userIsMember = useSelector(senateSelectors.userIsMember);
 
   if (additionalAssets.length === 0) { return <div />; }
   // Show only assets that the user owns
@@ -44,8 +41,6 @@ function AssetOverview({
                 </span>
 
               </p>
-              {userIsMember
-              && (
               <Button
                 className={styles.button}
                 small
@@ -59,7 +54,6 @@ function AssetOverview({
                   </span>
                 </>
               </Button>
-              )}
               {whichModalOpen === assetInfo.metadata.symbol
               && (
               <SendAssetModal
