@@ -470,10 +470,22 @@ function RemarkInfo({ proposal }) {
 RemarkInfo.propTypes = { proposal: ProposalProp.isRequired };
 
 function CancelScheduler({ proposal }) {
+  const isArray = Array.isArray(proposal.args);
+  const [when, index] = proposal.args;
   return (
     <div>
       <b>Senate veto cancel congress spending:</b>
-      <Proposal proposal={proposal.args} />
+      {isArray ? (
+        <div>
+          when:
+          {' '}
+          {when.toString()}
+          {' '}
+          index:
+          {' '}
+          {index.toString()}
+        </div>
+      ) : <Proposal proposal={proposal.args} />}
     </div>
   );
 }
