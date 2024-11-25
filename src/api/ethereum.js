@@ -156,6 +156,38 @@ const getNftPrimesCount = async () => {
   }
 };
 
+const getNftPrime = async ({ id }) => {
+  try {
+    const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
+    return await readContract({
+      contract,
+      method: {
+        type: 'function',
+        name: 'getPrime',
+        inputs: [{ name: 'tokenId', type: 'uint256', internalType: 'uint256' }],
+        outputs: [
+          {
+            name: '',
+            type: 'tuple',
+            internalType: 'struct BigNumber',
+            components: [
+              { name: 'val', type: 'bytes', internalType: 'bytes' },
+              { name: 'neg', type: 'bool', internalType: 'bool' },
+              { name: 'bitlen', type: 'uint256', internalType: 'uint256' },
+            ],
+          },
+        ],
+        stateMutability: 'view',
+      },
+      params: [id],
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
 const getNftPrimes = async ({ from, to }) => {
   try {
     const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
@@ -408,5 +440,6 @@ export {
   getOwnNftPrimes,
   getNftPrimesCount,
   getNftPrimes,
+  getNftPrime,
   mintNft,
 };

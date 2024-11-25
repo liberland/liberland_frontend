@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import root from 'react-shadow';
 import PropTypes from 'prop-types';
 import Table from 'antd/es/table';
+import Spin from 'antd/es/spin';
 import { nftsSelectors } from '../../../../../redux/selectors';
 import { nftsActions } from '../../../../../redux/actions';
 import { createGradient } from '../Mining/utils';
@@ -44,39 +44,41 @@ function Owned({ address }) {
           key: 'val',
           title: 'NFT',
           render: (val, { id }) => (
-            <root.div open={false}>
+            val ? (
               <div
                 style={createGradient(val)}
                 ref={(div) => {
                   imageRefs.current[id] = div;
                 }}
               />
-            </root.div>
+            ) : <Spin />
           ),
         },
         {
           dataIndex: 'id',
           key: 'id',
           title: 'Id',
+          render: (id) => (typeof id !== 'undefined' ? id.toString() : <Spin />),
         },
         {
           dataIndex: 'bitlen',
           key: 'bitlen',
           title: 'Size in bytes',
-          render: (val) => `${parseInt(val) / 8}B`,
+          render: (val) => (val ? `${parseInt(val) / 8}B` : <Spin />),
         },
         {
           dataIndex: 'id',
           key: 'download',
           title: 'Download image',
           render: (id) => (
-            <ImageDownload id={id} imageRefs={imageRefs} />
+            typeof id !== 'undefined' ? <ImageDownload id={id.toString()} imageRefs={imageRefs} /> : <Spin />
           ),
         },
       ]}
       pagination={{
         pageSize: 5,
         current: page,
+        total: count,
         onChange: (currentPage, pageSize) => {
           if (count > 0) {
             dispatch(nftsActions.getOwnNftPrimes.call({

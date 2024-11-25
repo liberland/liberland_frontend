@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Table from 'antd/es/table';
+import Spin from 'antd/es/spin';
 import { nftsSelectors } from '../../../../../redux/selectors';
 import { nftsActions } from '../../../../../redux/actions';
 import { createGradient } from '../Mining/utils';
 
-function All() {
+function Lookup() {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const all = useSelector(nftsSelectors.nftPrimesSelector);
@@ -35,22 +36,19 @@ function All() {
           dataIndex: 'val',
           key: 'val',
           title: 'NFT',
-          render: (val) => (
-            <div
-              style={createGradient(val)}
-            />
-          ),
+          render: (val) => (val ? (<div style={createGradient(val)} />) : <Spin />),
         },
         {
           dataIndex: 'bitlen',
           key: 'bitlen',
           title: 'Size in bytes',
-          render: (val) => `${parseInt(val) / 8}B`,
+          render: (val) => (val ? `${parseInt(val) / 8}B` : <Spin />),
         },
       ]}
       pagination={{
         pageSize: 5,
         current: page,
+        total: count,
         onChange: (currentPage, pageSize) => {
           if (count > 0) {
             dispatch(nftsActions.getNftPrimes.call({
@@ -65,4 +63,4 @@ function All() {
   );
 }
 
-export default All;
+export default Lookup;

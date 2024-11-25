@@ -32,9 +32,7 @@ function ImageDownload({
 }
 
 ImageDownload.propTypes = {
-  id: PropTypes.oneOf(
-    [PropTypes.string.isRequired, PropTypes.number.isRequired],
-  ).isRequired,
+  id: PropTypes.string.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   imageRefs: PropTypes.object.isRequired,
 };

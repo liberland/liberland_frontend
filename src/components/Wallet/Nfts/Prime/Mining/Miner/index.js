@@ -82,6 +82,7 @@ function Miner({ processes, account, isActive }) {
             ),
           },
         ]}
+        pagination={{ pageSize: 5 }}
       />
     </>
   );

@@ -8,6 +8,7 @@ import EthereumSelectorWallet from '../../EthereumSelectorWallet';
 import Mining from './Mining';
 import Owned from './Owned';
 import All from './All';
+import Lookup from './Lookup';
 import styles from './styles.module.scss';
 
 function Prime() {
@@ -43,13 +44,18 @@ function Prime() {
         <Alert className={styles.noAccount} type="info" message="Select your wallet provider and ETH wallet first" />
       ) : (
         <Collapse
-          defaultActiveKey={['mine', 'owned', 'score']}
+          defaultActiveKey={['lookup', 'mine', 'owned', 'score']}
           className={styles.operations}
           items={[
             {
               key: 'mine',
               label: 'Mining options',
               children: <Mining account={selectedAccount} />,
+            },
+            {
+              key: 'lookup',
+              label: 'Lookup NFT by ID',
+              children: <Lookup />,
             },
             {
               key: 'owned',
