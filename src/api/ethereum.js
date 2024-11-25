@@ -9,7 +9,7 @@ import {
 import { getAllWalletsList, injectedProvider } from 'thirdweb/wallets';
 import { ethers5Adapter } from 'thirdweb/adapters/ethers5';
 import { defineChain } from 'thirdweb/chains';
-import { providers } from 'ethers';
+import { providers, utils } from 'ethers';
 import { resolveMappedPromises } from '../utils/promise';
 
 const getThirdWebContract = (contractAddress) => {
@@ -74,11 +74,11 @@ const getOwnNftPrimeCount = async ({ account }) => {
     const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_ADDRESS);
     const address = typeof account === 'string' ? account : await account.getAddress();
     return {
-      length: await readContract({
+      length: parseInt(await readContract({
         contract,
         method: 'function balanceOf(address owner) view returns (uint256)',
         params: [address],
-      }),
+      })),
       address,
     };
   } catch (e) {
@@ -96,8 +96,29 @@ const getOwnNftPrimes = async ({ account, from, to }) => {
     const address = typeof account === 'string' ? account : await account.getAddress();
     const [primes, ids] = await readContract({
       contract,
-      // eslint-disable-next-line max-len
-      method: 'function getPrimesOwnedBy(address owner, uint256 from, uint256 to) view returns(BigNumber[] memory,uint256[] memory)',
+      method: {
+        type: 'function',
+        name: 'getPrimesOwnedBy',
+        inputs: [
+          { name: 'owner', type: 'address', internalType: 'address' },
+          { name: 'from', type: 'uint256', internalType: 'uint256' },
+          { name: 'to', type: 'uint256', internalType: 'uint256' },
+        ],
+        outputs: [
+          {
+            name: '',
+            type: 'tuple[]',
+            internalType: 'struct BigNumber[]',
+            components: [
+              { name: 'val', type: 'bytes', internalType: 'bytes' },
+              { name: 'neg', type: 'bool', internalType: 'bool' },
+              { name: 'bitlen', type: 'uint256', internalType: 'uint256' },
+            ],
+          },
+          { name: '', type: 'uint256[]', internalType: 'uint256[]' },
+        ],
+        stateMutability: 'view',
+      },
       params: [address, from, to],
     });
 
@@ -125,7 +146,7 @@ const getNftPrimesCount = async () => {
       method: 'function getPrimesCount() view returns(uint256)',
       params: [],
     });
-    return { length };
+    return { length: parseInt(length) };
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -141,7 +162,27 @@ const getNftPrimes = async ({ from, to }) => {
     return {
       primes: await readContract({
         contract,
-        method: 'function getPrimes(uint256 from, uint256 to) view returns (BigNumber[] memory)',
+        method: {
+          type: 'function',
+          name: 'getPrimes',
+          inputs: [
+            { name: 'from', type: 'uint256', internalType: 'uint256' },
+            { name: 'to', type: 'uint256', internalType: 'uint256' },
+          ],
+          outputs: [
+            {
+              name: '',
+              type: 'tuple[]',
+              internalType: 'struct BigNumber[]',
+              components: [
+                { name: 'val', type: 'bytes', internalType: 'bytes' },
+                { name: 'neg', type: 'bool', internalType: 'bool' },
+                { name: 'bitlen', type: 'uint256', internalType: 'uint256' },
+              ],
+            },
+          ],
+          stateMutability: 'view',
+        },
         params: [from, to],
       }),
       from,
@@ -172,7 +213,11 @@ const mintNft = async ({
   });
   await resolveFactory(
     'function mint(bytes calldata number, bytes calldata d, uint256 s) payable',
-    [number, d, s],
+    [
+      utils.hexlify(window.BigInt(number)),
+      utils.hexlify(window.BigInt(d)),
+      s,
+    ],
     fee,
   );
 };

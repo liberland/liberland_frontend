@@ -62,18 +62,10 @@ const nftsReducer = handleActions({
       [action.payload.address]: action.payload.length,
     },
   }),
-  [nftsActions.getOwnNftPrimes.success]: (state, action) => ({
-    ...state,
-    ownNftPrimeLoading: false,
-    ownNftPrimes: {
-      ...state.ownNftPrimes,
-      [action.payload.address]: new Array(action.payload.length).fill(undefined),
-    },
-  }),
   [nftsActions.getNftPrimes.success]: (state, action) => ({
     ...state,
     nftPrimeLoading: false,
-    nftPrimes: combineArrays(state.nftPrimes, action.primes, action.from, action.to),
+    nftPrimes: combineArrays(state.nftPrimes, action.payload.primes, action.payload.from, action.payload.to),
   }),
   [nftsActions.getOwnNftPrimes.success]: (state, action) => ({
     ...state,

@@ -4,7 +4,6 @@ import Table from 'antd/es/table';
 import { nftsSelectors } from '../../../../../redux/selectors';
 import { nftsActions } from '../../../../../redux/actions';
 import { createGradient } from '../Mining/utils';
-import styles from '../styles.module.scss';
 
 function All() {
   const dispatch = useDispatch();
@@ -17,10 +16,20 @@ function All() {
     dispatch(nftsActions.getNftPrimesCount.call());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (count > 0) {
+      dispatch(nftsActions.getNftPrimes.call({
+        from: 0,
+        to: Math.min(count, 5),
+      }));
+    }
+  }, [dispatch, count]);
+
   return (
     <Table
       dataSource={all || []}
       loading={loading}
+      rowKey="val"
       columns={[
         {
           dataIndex: 'val',
@@ -29,7 +38,6 @@ function All() {
           render: (val) => (
             <div
               style={createGradient(val)}
-              className={styles.gradient}
             />
           ),
         },

@@ -29,7 +29,7 @@ function Prime() {
         blending cutting-edge technology with the pursuit of freedom and progress.
         Join NFT Prime to turn numbers into art and innovation into impact.
       </Paragraph>
-      <Flex gap="15px">
+      <Flex gap="15px" wrap>
         <EthereumSelectorWallet
           onWalletSelected={setSelectedWallet}
         />

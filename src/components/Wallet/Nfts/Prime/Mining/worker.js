@@ -45,9 +45,9 @@ function millerTest(d, n) {
     with precision 6 and convert it to a BigInt.
   */
   // eslint-disable-next-line no-undef
-  const r = BigInt(Math.floor(Math.random() * 100_000));
+  const r = random(parseInt(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_MIN_BYTES) * 8);
   // JML- now I have to divide by the multiplier used above (BigInt version)
-  const y = (r * (n - 2n)) / 100_000n;
+  const y = (r * (n - 2n));
   const a = 2n + (y % (n - 4n));
 
   // Compute a^d % n
@@ -104,18 +104,19 @@ export function isPrime(n, k = 14) {
   return [true, d, s];
 }
 
-async function primeFinder(cancel, found) {
+async function primeFinder() {
   const minBits = parseInt(process.env.REACT_APP_THIRD_WEB_NFT_PRIME_MIN_BYTES) * 8;
-  let randomStart = random(minBits);
-  while (!cancel()) {
-    const handler = async (n) => {
-      const [foundPrime, d, s] = isPrime(n);
-      if (foundPrime) {
-        found({ n, d, s });
-      }
-    };
-    await handler(randomStart);
-    randomStart += 1n;
+  let n = random(minBits);
+  if (n % 2n === 0n) {
+    n += 1n;
+  }
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const [foundPrime, d, s] = isPrime(n);
+    if (foundPrime) {
+      postMessage({ n, d, s });
+    }
+    n += 2n;
   }
 }
 
@@ -123,23 +124,12 @@ async function primeFinder(cancel, found) {
 // eslint-disable-next-line no-undef
 BigInt.prototype.toJSON = function toJSON() { return this.toString(); };
 
-let stopPrimeFinder = false;
-
 // eslint-disable-next-line no-restricted-globals
 self.onmessage = ({ data }) => {
   // eslint-disable-next-line default-case
   switch (data) {
     case 'prime start':
-      stopPrimeFinder = false;
-      primeFinder(
-        () => stopPrimeFinder,
-        (prime) => {
-          postMessage(prime);
-        },
-      );
-      break;
-    case 'prime stop':
-      stopPrimeFinder = true;
+      primeFinder();
       break;
   }
 };

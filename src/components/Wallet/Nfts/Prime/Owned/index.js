@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import root from 'react-shadow';
 import PropTypes from 'prop-types';
 import Table from 'antd/es/table';
 import { nftsSelectors } from '../../../../../redux/selectors';
 import { nftsActions } from '../../../../../redux/actions';
-import { createGradient, downloadImage } from '../Mining/utils';
-import Button from '../../../../Button/Button';
-import styles from '../styles.module.scss';
+import { createGradient } from '../Mining/utils';
+import ImageDownload from './ImageDownload';
 
 function Owned({ address }) {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const owned = useSelector(nftsSelectors.ownNftPrimesSelector);
-  const count = useSelector(nftsSelectors.ownNftPrimesCountSelector);
+  const count = useSelector(nftsSelectors.ownNftPrimesCountSelector)?.[address];
   const loading = useSelector(nftsSelectors.ownNftPrimesLoadingSelector);
   const imageRefs = React.useRef({});
 
@@ -23,29 +23,41 @@ function Owned({ address }) {
     setPage(1);
   }, [dispatch, address]);
 
+  useEffect(() => {
+    if (count > 0) {
+      dispatch(nftsActions.getOwnNftPrimes.call({
+        account: address,
+        from: 0,
+        to: Math.min(count, 5),
+      }));
+    }
+  }, [dispatch, address, count]);
+
   return (
     <Table
       dataSource={owned?.[address] || []}
       loading={loading}
+      rowKey="id"
       columns={[
-        {
-          dataIndex: 'id',
-          key: 'id',
-          title: 'Id',
-        },
         {
           dataIndex: 'val',
           key: 'val',
           title: 'NFT',
           render: (val, { id }) => (
-            <div
-              style={createGradient(val)}
-              className={styles.gradient}
-              ref={(div) => {
-                imageRefs.current[id] = div;
-              }}
-            />
+            <root.div open={false}>
+              <div
+                style={createGradient(val)}
+                ref={(div) => {
+                  imageRefs.current[id] = div;
+                }}
+              />
+            </root.div>
           ),
+        },
+        {
+          dataIndex: 'id',
+          key: 'id',
+          title: 'Id',
         },
         {
           dataIndex: 'bitlen',
@@ -58,9 +70,7 @@ function Owned({ address }) {
           key: 'download',
           title: 'Download image',
           render: (id) => (
-            <Button primary onClick={() => downloadImage(id, imageRefs.current[id])}>
-              Download
-            </Button>
+            <ImageDownload id={id} imageRefs={imageRefs} />
           ),
         },
       ]}
@@ -68,7 +78,7 @@ function Owned({ address }) {
         pageSize: 5,
         current: page,
         onChange: (currentPage, pageSize) => {
-          if (count?.[address] > 0) {
+          if (count > 0) {
             dispatch(nftsActions.getOwnNftPrimes.call({
               from: (currentPage - 1) * pageSize,
               to: Math.min(count, currentPage * pageSize),

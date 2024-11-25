@@ -1,6 +1,6 @@
 import objectHash from 'object-hash';
 import tinygradient from 'tinygradient';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import FileSaver from 'file-saver';
 
 export function webWorkerPrimeFinder(amount, onChange) {
@@ -18,7 +18,7 @@ export function webWorkerPrimeFinder(amount, onChange) {
 
   workers.forEach((worker) => worker.postMessage('prime start'));
   return () => {
-    workers.forEach((worker) => worker.postMessage('prime stop'));
+    workers.forEach((worker) => worker.terminate());
     return Object.values(results);
   };
 }
@@ -26,21 +26,33 @@ export function webWorkerPrimeFinder(amount, onChange) {
 export function createGradient(number) {
   const colors = window.BigInt(number).toString(16).split('').reduce((accumulator, byte) => {
     const lastColor = accumulator[accumulator.length - 1];
-    if (lastColor?.length === 7) { // example: #ababab
+    if (!lastColor || lastColor.length === 7) { // example: #ababab
       accumulator.push(`#${byte}`);
     } else {
       accumulator[accumulator.length - 1] = `${accumulator[accumulator.length - 1]}${byte}`;
     }
     return accumulator;
   }, []);
-
-  return tinygradient(colors).css();
+  const lastColor = colors[colors.length - 1];
+  if (lastColor.length < 7) {
+    const firstColor = colors[0].split('#')[1];
+    colors[colors.length - 1] += firstColor;
+    colors[colors.length - 1] = colors[colors.length - 1].slice(0, 7);
+  }
+  colors.push(...Array(40).fill('#ffffff'));
+  const css = tinygradient(colors).css('radial');
+  return {
+    background: css, // Styling must be internal to allow for print!
+    width: '200px',
+    height: '200px',
+    minWidth: '200px',
+    minHeight: '200px',
+  };
 }
 
 export async function downloadImage(id, htmlElement) {
   if (htmlElement) {
-    const canvas = await html2canvas(htmlElement);
-    const blob = new Blob(canvas.toBlob(), { type: 'image/png' });
-    FileSaver.saveAs(blob, `nft-prime-${id}.png`);
+    const url = await toPng(htmlElement);
+    FileSaver.saveAs(url, `nft-prime-${id}.png`);
   }
 }
