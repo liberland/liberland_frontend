@@ -38,7 +38,6 @@ function Motions() {
             <Motion
               userIsMember={userIsMember}
               membersCount={membersCount}
-              key={proposal}
               proposal={proposal.toString()}
               proposalOf={proposalOf}
               voting={voting.unwrap()}
