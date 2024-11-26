@@ -1,34 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
+import Input from 'antd/es/input';
+import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
 import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
 import { walletActions } from '../../../../redux/actions';
 import { createOrUpdateAsset } from '../../../../api/nodeRpcCall';
 import ModalRoot from '../../../Modals/ModalRoot';
-import { TextInput } from '../../../InputComponents';
 import Button from '../../../Button/Button';
-import { isValidSubstrateAddress } from '../../../../utils/walletHelpers';
 import InputSearch from '../../../InputComponents/InputSearchAddressName';
 import styles from './styles.module.scss';
+import { useStockContext } from '../../StockContext';
 
-function UpdateOrCreateAssetForm({ onClose, isCreate, defaultValues }) {
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    watch,
-    setError,
-    trigger,
-    formState: {
-      errors,
-      isSubmitting,
-      isSubmitSuccessful,
-    },
-  } = useForm({
-    mode: 'onChange',
-    defaultValues,
-  });
+function UpdateOrCreateAssetForm({
+  onClose,
+  isCreate,
+  isStock,
+  defaultValues,
+}) {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
@@ -44,6 +37,8 @@ function UpdateOrCreateAssetForm({ onClose, isCreate, defaultValues }) {
     issuer,
     freezer,
   }) => {
+    setLoading(true);
+    setSuccess(false);
     try {
       const nextId = isCreate ? (
         additionalAssets.map((asset) => asset.index)
@@ -63,217 +58,128 @@ function UpdateOrCreateAssetForm({ onClose, isCreate, defaultValues }) {
         owner: userWalletAddress,
         isCreate,
         defaultValues,
+        isStock,
       });
       dispatch(walletActions.getAdditionalAssets.call());
+      setSuccess(true);
     } catch {
-      setError('name', { message: 'Something went wrong' });
+      form.setFields([
+        {
+          name: 'name',
+          errors: 'Something went wrong',
+        },
+      ]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const name = watch('name', '');
-  const symbol = watch('symbol', '');
-  const decimals = watch('decimals', '');
-  const balance = watch('balance', '');
-
-  const submitButtonText = isCreate ? 'Create asset (~200 LLD)' : 'Update asset';
-
-  const validateAddress = (v) => (
-    !isValidSubstrateAddress(v)
-      ? 'Invalid Address'
-      : undefined
-  );
+  const type = isStock ? 'stock' : 'asset';
+  const typeCapitalized = isStock ? 'Stock' : 'Asset';
+  const submitButtonText = isCreate ? `Create ${type} (~200 LLD)` : `Update ${type}`;
 
   if (!userWalletAddress || !additionalAssets) {
     return <div>Loading...</div>;
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
+    <Form
+      onFinish={onSubmit}
+      form={form}
       className={styles.form}
     >
       <div className={styles.asset}>
-        <label className={styles.wrapper}>
-          Asset name
-          <div className={styles.inputWrapper}>
-            <TextInput
-              register={register}
-              minLength={{
-                value: 3,
-                message: 'Name must be longer than 2 characters',
-              }}
-              name="name"
-              errorTitle="Name"
-              value={name}
-              className={styles.input}
-              onChange={(event) => setValue('name', event.target.value)}
-              disabled={isSubmitting}
-              placeholder="Name"
-              required
-            />
+        <div className={styles.inputWrapper}>
+          <Form.Item
+            name="name"
+            rules={[
+              { required: true },
+              { min: 3, message: 'Name must be longer than 2 characters' },
+            ]}
+            label={`${typeCapitalized} name`}
+          >
+            <Input placeholder="Name" />
+          </Form.Item>
+        </div>
+        {success && (
+          <div className={styles.success}>
+            {typeCapitalized}
+            {' '}
+            {isCreate ? 'created' : 'updated'}
+            {' '}
+            successfully
           </div>
-          {errors.name && (
-            <div className={styles.error}>
-              {errors.name.message}
-            </div>
-          )}
-          {isSubmitSuccessful && (
-            <div className={styles.success}>
-              Asset
-              {' '}
-              {isCreate ? 'created' : 'updated'}
-              {' '}
-              successfully
-            </div>
-          )}
-        </label>
-        <label className={styles.wrapper}>
-          Asset symbol
-          <div className={styles.inputWrapper}>
-            <TextInput
-              register={register}
-              name="symbol"
-              minLength={{
-                value: 3,
-                message: 'Symbol must be longer than 2 characters',
-              }}
-              errorTitle="Symbol"
-              value={symbol}
-              className={styles.input}
-              onChange={(event) => setValue('symbol', event.target.value)}
-              disabled={isSubmitting}
-              placeholder="Symbol"
-              required
-            />
-          </div>
-          {errors.symbol && (
-            <div className={styles.error}>
-              {errors.symbol.message}
-            </div>
-          )}
-        </label>
+        )}
+        <Form.Item
+          name="symbol"
+          rules={[
+            { required: true },
+            { min: 3, message: 'Symbol must be longer than 2 characters' },
+          ]}
+          label={`${typeCapitalized} symbol`}
+        >
+          <Input placeholder="symbol" />
+        </Form.Item>
       </div>
       <div className={styles.asset}>
-        <label className={styles.wrapper}>
-          Decimals
-          <div className={styles.inputWrapper}>
-            <TextInput
-              register={register}
-              name="decimals"
-              errorTitle="Decimals"
-              value={decimals}
-              className={styles.input}
-              onChange={(event) => setValue('decimals', event.target.value)}
-              validate={(input) => (!input || /^\d+$/.test(input) ? undefined : 'Invalid decimals')}
-              disabled={isSubmitting}
-              placeholder="Decimals"
-              required
-            />
-          </div>
-          {errors.decimals && (
-            <div className={styles.error}>
-              {errors.decimals.message}
-            </div>
-          )}
-        </label>
+        <Form.Item
+          name="decimals"
+          rules={[
+            { required: true },
+            { type: 'number', message: 'Must be a number' },
+          ]}
+          label="Decimals"
+        >
+          <InputNumber controls={false} />
+        </Form.Item>
         {isCreate && (
-          <label className={styles.wrapper}>
-            Minimal balance
-            <div className={styles.inputWrapper}>
-              <TextInput
-                register={register}
-                name="balance"
-                errorTitle="Balance"
-                value={balance}
-                className={styles.input}
-                onChange={(event) => setValue('balance', event.target.value)}
-                validate={(input) => (!input || /^\d*\.?\d+$/.test(input) ? undefined : 'Invalid balance')}
-                disabled={isSubmitting}
-                placeholder="Balance"
-                required
-              />
-            </div>
-            {errors.balance && (
-              <div className={styles.error}>
-                {errors.balance.message}
-              </div>
-            )}
-          </label>
+          <Form.Item
+            name="balance"
+            rules={[
+              { required: true },
+              { type: 'number', message: 'Must be a number' },
+            ]}
+            label="Minimal balance"
+          >
+            <InputNumber controls={false} />
+          </Form.Item>
         )}
       </div>
       <hr className={styles.divider} />
       <div className={styles.asset}>
-        <label className={styles.wrapper} htmlFor="admin">
-          Admin account
-          <div className={styles.inputWrapper}>
-            <InputSearch
-              id="admin"
-              errorTitle="Admin account"
-              register={register}
-              name="admin"
-              placeholder="Admin"
-              isRequired
-              trigger={trigger}
-              setValue={setValue}
-              validate={validateAddress}
-              defaultValue={defaultValues?.admin}
-            />
-          </div>
-          {errors.admin && (
-            <div className={styles.error}>
-              {errors.admin.message}
-            </div>
-          )}
-        </label>
-        <label className={styles.wrapper} htmlFor="issuer">
-          Issuer account
-          <div className={styles.inputWrapper}>
-            <InputSearch
-              id="issuer"
-              errorTitle="Issuer"
-              register={register}
-              name="issuer"
-              placeholder="Issuer"
-              isRequired
-              trigger={trigger}
-              setValue={setValue}
-              validate={validateAddress}
-              defaultValue={defaultValues?.issuer}
-            />
-          </div>
-          {errors.issuer && (
-            <div className={styles.error}>
-              {errors.issuer.message}
-            </div>
-          )}
-        </label>
-        <label className={styles.wrapper} htmlFor="freezer">
-          Freezer account
-          <div className={styles.inputWrapper}>
-            <InputSearch
-              id="freezer"
-              errorTitle="Freezer"
-              register={register}
-              name="freezer"
-              placeholder="Freezer"
-              isRequired
-              trigger={trigger}
-              setValue={setValue}
-              validate={validateAddress}
-              defaultValue={defaultValues?.freezer}
-            />
-          </div>
-          {errors.freezer && (
-            <div className={styles.error}>
-              {errors.freezer.message}
-            </div>
-          )}
-        </label>
+        <Form.Item
+          rules={[{ required: true }]}
+          name="admin"
+          label="Admin account"
+        >
+          <InputSearch />
+        </Form.Item>
+        <Form.Item
+          rules={[{ required: true }]}
+          name="issuer"
+          label="Issuer account"
+        >
+          <InputSearch />
+        </Form.Item>
+        <Form.Item
+          rules={[{ required: true }]}
+          name="issuer"
+          label="Issuer account"
+        >
+          <InputSearch />
+        </Form.Item>
+        <Form.Item
+          rules={[{ required: true }]}
+          name="freezer"
+          label="Freezer account"
+        >
+          <InputSearch />
+        </Form.Item>
       </div>
       <hr className={styles.divider} />
       <div className={styles.buttonRow}>
         <div className={styles.closeForm}>
-          <Button disabled={isSubmitting} medium onClick={onClose}>
+          <Button disabled={loading} medium onClick={onClose}>
             Close
           </Button>
         </div>
@@ -282,13 +188,13 @@ function UpdateOrCreateAssetForm({ onClose, isCreate, defaultValues }) {
             primary
             medium
             type="submit"
-            disabled={isSubmitting}
+            disabled={loading}
           >
-            {isSubmitting ? 'Loading...' : submitButtonText}
+            {loading ? 'Loading...' : submitButtonText}
           </Button>
         </div>
       </div>
-    </form>
+    </Form>
   );
 }
 
@@ -306,6 +212,7 @@ const defaultValues = PropTypes.shape({
 UpdateOrCreateAssetForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   isCreate: PropTypes.bool,
+  isStock: PropTypes.bool,
   defaultValues,
 };
 
@@ -313,6 +220,7 @@ function UpdateOrCreateAssetFormModalWrapper({
   isCreate, defaultValues: dV,
 }) {
   const [show, setShow] = React.useState();
+  const { isStock } = useStockContext();
   return (
     <div className={isCreate ? styles.modal : undefined}>
       <Button
@@ -320,7 +228,7 @@ function UpdateOrCreateAssetFormModalWrapper({
         medium
         onClick={() => setShow(true)}
       >
-        {isCreate ? 'Create asset' : 'Update'}
+        {isCreate ? `Create ${isStock ? 'stock' : 'asset'}` : 'Update'}
       </Button>
       {show && (
         <ModalRoot id="create-or-update">
@@ -328,6 +236,7 @@ function UpdateOrCreateAssetFormModalWrapper({
             defaultValues={dV}
             isCreate={isCreate}
             onClose={() => setShow(false)}
+            isStock={isStock}
           />
         </ModalRoot>
       )}

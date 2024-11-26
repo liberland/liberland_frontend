@@ -44,7 +44,9 @@ export default {
   },
   wallet: {
     exchange: '/home/wallet/exchange',
+    stockExchange: '/home/wallet/stock-exchange',
     assets: '/home/wallet/assets',
+    stocks: '/home/wallet/stocks',
     allTransactions: '/home/wallet/all-transactions',
     overView: '/home/wallet/overview',
     bridge: '/home/wallet/bridge',

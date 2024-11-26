@@ -256,6 +256,12 @@ const submitExtrinsic = async (extrinsic, walletAddress, api) => {
   });
 };
 
+const submitExtrinsics = async (extrinsics, walletAddress, api) => submitExtrinsic(
+  api.tx.utility.batch(extrinsics),
+  walletAddress,
+  api,
+);
+
 const getIdentity = async (address) => {
   try {
     const api = await getApi();
@@ -279,22 +285,29 @@ const createOrUpdateAsset = async ({
   freezer,
   owner,
   isCreate,
+  isStock,
   defaultValues,
 }) => {
   try {
     const api = await getApi();
+    const extrinsics = [];
     if (isCreate) {
       const create = await api.tx.assets.create(id, admin, minBalance);
-      await submitExtrinsic(create, owner, api);
+      extrinsics.push(create);
     }
     if (defaultValues?.name !== name || defaultValues?.symbol !== symbol || defaultValues?.decimals !== decimals) {
       const setMetadata = await api.tx.assets.setMetadata(id, name, symbol, decimals);
-      await submitExtrinsic(setMetadata, owner, api);
+      extrinsics.push(setMetadata);
     }
     if (defaultValues?.issuer !== issuer || defaultValues?.admin !== admin || defaultValues?.freezer !== freezer) {
       const setTeam = await api.tx.assets.setTeam(id, issuer, admin, freezer);
-      await submitExtrinsic(setTeam, owner, api);
+      extrinsics.push(setTeam);
     }
+    if (isStock && isCreate) {
+      const params = await api.tx.assets.setParameters({ eresidencyRequired: true });
+      extrinsics.push(params);
+    }
+    submitExtrinsics(extrinsics, owner, api);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -373,7 +386,9 @@ const getAssetDetails = async (ids) => {
       queries.push([api.query.identity.identityOf, detail.owner]);
       return queries;
     }, []);
-    const assetResults = await api.queryMulti([...assetQueries]);
+    const parametersQueries = details.map((_, index) => api.query.assets.parameters(ids[index]));
+    const parametersResults = await api.queryMulti(parametersQueries);
+    const assetResults = await api.queryMulti(assetQueries);
     const resolvedIdentity = assetResults.map((result) => {
       const json = result.toJSON();
       return Buffer.from(json.info.display.raw.slice(2), 'hex').toString('utf-8');
@@ -400,6 +415,7 @@ const getAssetDetails = async (ids) => {
         issuer: resolvedIdentity[index][2],
         owner: resolvedIdentity[index][3],
       },
+      isStock: parametersResults[index].eresidencyRequired,
     }));
 
     return resolvedDetails;
