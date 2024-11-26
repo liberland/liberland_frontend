@@ -20,6 +20,8 @@ function TextInput({
   disabled = false,
   onPaste,
   onChange,
+  onFocus,
+  onBlur,
   className,
   minLength,
   maxLength,
@@ -38,6 +40,8 @@ function TextInput({
         disabled={disabled}
         readOnly={readOnly}
         onPaste={onPaste}
+        onFocus={onFocus}
+        onBlur={onBlur}
         {...register(
           name,
           {

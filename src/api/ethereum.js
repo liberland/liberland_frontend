@@ -90,6 +90,12 @@ const getSwapExchangeRate = async () => {
     const zeroOrGreater = max(0, sqrt - window.BigInt(1000));
     return zeroOrGreater;
   };
+  const emptyToken = (rate) => rate;
+  const emptyOperation = {
+    rewardRate: emptyLP,
+    tokenRate: emptyToken,
+    ethRate: emptyToken,
+  };
 
   try {
     const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_FACTORY_ADDRESS);
@@ -101,7 +107,6 @@ const getSwapExchangeRate = async () => {
         process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
       ],
     });
-
     if (pair) {
       const { contract: pairContract } = getThirdWebContract(pair);
       const totalSupply = await readContract({
@@ -110,9 +115,7 @@ const getSwapExchangeRate = async () => {
         params: [],
       });
       if (totalSupply === '0') {
-        return {
-          exchangeRate: emptyLP,
-        };
+        return emptyOperation;
       }
       const [
         reserve0,
@@ -125,22 +128,20 @@ const getSwapExchangeRate = async () => {
       });
 
       return {
-        exchangeRate: ({ eth, tokenAmount }) => min(
+        rewardRate: ({ eth, tokenAmount }) => min(
           (window.BigInt(eth) * window.BigInt(totalSupply)) / window.BigInt(reserve0),
           (window.BigInt(tokenAmount) * window.BigInt(totalSupply)) / window.BigInt(reserve1),
         ),
+        tokenRate: (amount) => (window.BigInt(amount) * window.BigInt(reserve1)) / window.BigInt(reserve0),
+        ethRate: (amount) => (window.BigInt(amount) * window.BigInt(reserve0)) / window.BigInt(reserve1),
       };
     }
 
-    return {
-      exchangeRate: emptyLP,
-    };
+    return emptyOperation;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
-    return {
-      exchangeRate: emptyLP,
-    };
+    return emptyOperation;
   }
 };
 
@@ -174,7 +175,12 @@ const stakeLPWithEth = async (
     process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS,
     tokenAmount,
   );
-  const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
+  const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_UNISWAP_ROUTER_ADDRESS, account);
+  const { timestamp } = await provider.getBlock();
+  const dateFromTimestamp = new Date(timestamp * 1000);
+  dateFromTimestamp.setMinutes(dateFromTimestamp.getMinutes() + 2);
+  const deadline = dateFromTimestamp.getTime() / 1000;
+
   const [amountToken, amountEth, liquidity] = await resolveOperation(
     // eslint-disable-next-line max-len
     'function addLiquidityETH(address token, uint256 amountTokenDesired, uint256 amountTokenMin, uint256 amountETHMin, address to, uint256 deadline) payable returns (uint256 amountToken, uint256 amountETH, uint256 liquidity)',
@@ -184,7 +190,7 @@ const stakeLPWithEth = async (
       tokenAmountMin,
       ethAmountMin,
       await account.getAddress(),
-      await provider.getBlockNumber(),
+      deadline,
     ],
     ethAmount,
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import Slider from 'rc-slider';
@@ -37,7 +37,7 @@ function StakeEthForm({
     },
   });
 
-  const [results, setResults] = React.useState([0, 0, 0]);
+  const [results, setResults] = useState([0, 0, 0]);
   const connected = useSelector(ethSelectors.selectorConnected);
   const balance = useSelector(ethSelectors.selectorBalance);
 
@@ -70,6 +70,8 @@ function StakeEthForm({
 
   const stake = watch('stake', '');
   const tokens = watch('tokens', '');
+  const [stakeFocused, setStakeFocused] = useState(false);
+  const [tokensFocused, setTokensFocused] = useState(false);
   const tolerance = watch('tolerance', '90');
   const exchangeRate = useSelector(ethSelectors.selectorWethLpExchangeRate);
   const exchangeRateLoading = useSelector(ethSelectors.selectorWethLpExchangeRateLoading);
@@ -96,7 +98,7 @@ function StakeEthForm({
   const liquidityPoolReward = React.useMemo(() => {
     if (stake && tokens && exchangeRate && !errors.stake && !errors.token) {
       try {
-        const lpTokens = exchangeRate.exchangeRate({
+        const lpTokens = exchangeRate.rewardRate({
           eth: window.BigInt(parseAssets(stake, 18).toString()),
           tokenAmount: window.BigInt(parseAssets(tokens, 18).toString()),
         });
@@ -114,6 +116,26 @@ function StakeEthForm({
       setError('stake', { message: 'LP stake did not load correctly' });
     }
   }, [setError, exchangeRateError]);
+
+  React.useEffect(() => {
+    if (stake && exchangeRate && stakeFocused) {
+      setValue(
+        'tokens',
+        formatCustom(exchangeRate.tokenRate(window.BigInt(parseAssets(stake, 18).toString())), 18),
+        { shouldValidate: true },
+      );
+    }
+  }, [stake, exchangeRate, setValue, stakeFocused]);
+
+  React.useEffect(() => {
+    if (tokens && exchangeRate && tokensFocused) {
+      setValue(
+        'stake',
+        formatCustom(exchangeRate.ethRate(window.BigInt(parseAssets(tokens, 18).toString())), 18),
+        { shouldValidate: true },
+      );
+    }
+  }, [tokens, exchangeRate, setValue, tokensFocused]);
 
   if (exchangeRateLoading) {
     return <div className={styles.form}>Loading...</div>;
@@ -135,6 +157,8 @@ function StakeEthForm({
             id="stake"
             name="stake"
             errorTitle="Stake"
+            onFocus={() => setStakeFocused(true)}
+            onBlur={() => setStakeFocused(false)}
             value={stake}
             className={styles.input}
             onChange={(event) => setValue('stake', event.target.value)}
@@ -172,6 +196,8 @@ function StakeEthForm({
             id="tokens"
             name="tokens"
             errorTitle="Tokens"
+            onFocus={() => setTokensFocused(true)}
+            onBlur={() => setTokensFocused(false)}
             value={tokens}
             className={styles.input}
             onChange={(event) => setValue('tokens', event.target.value)}
