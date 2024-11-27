@@ -41,7 +41,6 @@
     "postcss-normalize": "^10.0.1",
     "postcss-preset-env": "^7.4.3",
     "process": "^0.11.10",
-    "rc-slider": "^11.1.7",
     "rc-tooltip": "^6.2.1",
     "react": "^17.0.2",
     "react-avatar": "^3.10.0",

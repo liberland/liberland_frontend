@@ -161,6 +161,29 @@ const stakeTokens = async (account, erc20Address, tokens) => {
   await resolveOperation('function stake(uint256 _amount) payable', [tokens]);
 };
 
+const tryGetPairAndBalance = async (account) => {
+  try {
+    const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_FACTORY_ADDRESS);
+    const pair = await readContract({
+      contract,
+      method: 'function getPair(address token1, address token2) public returns (address pair)',
+      params: [
+        process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS,
+        process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+      ],
+    });
+    const { balance } = await getERC20Balance({
+      erc20Address: pair,
+      account: await account.getAddress(),
+    });
+    return [pair, balance];
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    return [false, 0];
+  }
+};
+
 const stakeLPWithEth = async (
   account,
   ethAmount,
@@ -172,16 +195,16 @@ const stakeLPWithEth = async (
   await erc20Approve(
     process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
     account,
-    process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS,
+    process.env.REACT_APP_THIRD_WEB_UNISWAP_ROUTER_ADDRESS,
     tokenAmount,
   );
   const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_UNISWAP_ROUTER_ADDRESS, account);
   const { timestamp } = await provider.getBlock();
   const dateFromTimestamp = new Date(timestamp * 1000);
-  dateFromTimestamp.setMinutes(dateFromTimestamp.getMinutes() + 2);
+  dateFromTimestamp.setMinutes(dateFromTimestamp.getMinutes() + 20);
   const deadline = dateFromTimestamp.getTime() / 1000;
-
-  const [amountToken, amountEth, liquidity] = await resolveOperation(
+  const balance = (await tryGetPairAndBalance(account))[1];
+  await resolveOperation(
     // eslint-disable-next-line max-len
     'function addLiquidityETH(address token, uint256 amountTokenDesired, uint256 amountTokenMin, uint256 amountETHMin, address to, uint256 deadline) payable returns (uint256 amountToken, uint256 amountETH, uint256 liquidity)',
     [
@@ -194,19 +217,11 @@ const stakeLPWithEth = async (
     ],
     ethAmount,
   );
-  const { contract } = getThirdWebContract(process.env.REACT_APP_THIRD_WEB_UNISWAP_FACTORY_ADDRESS);
-  const pair = await readContract({
-    contract,
-    method: 'function getPair(address token1, address token2) public returns (address pair)',
-    params: [
-      process.env.REACT_APP_THIRD_WEB_WETH_ADDRESS,
-      process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
-    ],
-  });
-
+  const [pair, balance1] = await tryGetPairAndBalance(account);
+  const liquidity = window.BigInt(balance1) - window.BigInt(balance);
   await stakeTokens(account, pair, liquidity);
 
-  return [amountToken, amountEth, liquidity];
+  return liquidity;
 };
 
 const claimRewards = async (account) => {

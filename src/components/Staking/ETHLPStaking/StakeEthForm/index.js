@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import Slider from 'rc-slider';
 import PropTypes from 'prop-types';
 import ModalRoot from '../../../Modals/ModalRoot';
 import { ethSelectors } from '../../../../redux/selectors';
 import { ethActions } from '../../../../redux/actions';
 import { TextInput } from '../../../InputComponents';
 import Button from '../../../Button/Button';
+import ProgressBar from '../../../InputComponents/ProgressBar';
 import {
   formatCustom as formatCustomUnsafe,
   parseAssets as parseAssetsUnsafe,
@@ -59,7 +59,8 @@ function StakeEthForm({
     },
   });
 
-  const [results, setResults] = useState([0, 0, 0]);
+  const dispatch = useDispatch();
+  const [results, setResults] = useState(0);
   const connected = useSelector(ethSelectors.selectorConnected);
   const balance = useSelector(ethSelectors.selectorBalance);
 
@@ -79,14 +80,18 @@ function StakeEthForm({
         getAmountWithTolerance(realTokens),
         connected.provider,
       ));
+      dispatch(ethActions.getWethLpExchangeRate.call());
+      dispatch(ethActions.getBalance.call({ provider: connected.provider, address: account }));
+      dispatch(ethActions.getErc20Balance.call(
+        process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+        account,
+      ));
     } catch (e) {
       setError('stake', {
         message: 'Something went wrong',
       });
       // eslint-disable-next-line no-console
       console.error(e);
-    } finally {
-      setValue('stake', '');
     }
   };
 
@@ -99,7 +104,6 @@ function StakeEthForm({
   const exchangeRateLoading = useSelector(ethSelectors.selectorWethLpExchangeRateLoading);
   const exchangeRateError = useSelector(ethSelectors.selectorWethLpExchangeRateError);
   const lldBalances = useSelector(ethSelectors.selectorERC20Balance)?.[process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS];
-  const dispatch = useDispatch();
 
   React.useEffect(() => {
     dispatch(ethActions.getWethLpExchangeRate.call());
@@ -199,13 +203,9 @@ function StakeEthForm({
         )}
         {isSubmitSuccessful && (
           <div className={styles.success}>
-            LLD staked:
+            LP staked:
             {' '}
-            {parseAssets(results[0])}
-            {', ETH staked: '}
-            {formatCustom(results[1])}
-            {', LP staked: '}
-            {formatCustom(results[2])}
+            {formatCustom(results)}
           </div>
         )}
       </label>
@@ -242,11 +242,11 @@ function StakeEthForm({
         {' '}
         {tolerance}
         % of ETH/LLD into LP
-        <Slider
-          min={0}
-          max={100}
+        <ProgressBar
           value={parseInt(tolerance)}
-          onChange={(value) => setValue('tolerance', value.toString())}
+          handleChange={(event) => setValue('tolerance', event.target.value.toString())}
+          register={register}
+          name="tolerance"
         />
         {errors.tolerance && (
           <div className={styles.error}>
@@ -256,6 +256,10 @@ function StakeEthForm({
       </label>
       <div className={styles.reward}>
         {liquidityPoolReward}
+      </div>
+      <div className={styles.reward}>
+        Will ask you to sign 4 transactions.
+        Close the form after and click on refresh after to see all current information.
       </div>
       <div className={styles.buttonRow}>
         <div className={styles.closeForm}>
