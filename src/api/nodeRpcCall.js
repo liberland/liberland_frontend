@@ -386,8 +386,6 @@ const getAssetDetails = async (ids) => {
       queries.push([api.query.identity.identityOf, detail.owner]);
       return queries;
     }, []);
-    const parametersQueries = details.map((_, index) => api.query.assets.parameters(ids[index]));
-    const parametersResults = await api.queryMulti(parametersQueries);
     const assetResults = await api.queryMulti(assetQueries);
     const resolvedIdentity = assetResults.map((result) => {
       const json = result.toJSON();
@@ -415,7 +413,6 @@ const getAssetDetails = async (ids) => {
         issuer: resolvedIdentity[index][2],
         owner: resolvedIdentity[index][3],
       },
-      isStock: parametersResults[index].eresidencyRequired,
     }));
 
     return resolvedDetails;
@@ -437,11 +434,13 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
     }));
     const indexedFilteredAssets = [];
     const assetQueries = [];
+    const parametersQueries = [];
     processedMetadatas.forEach((asset) => {
       // Disregard LLM, asset of ID 1 because it has special treatment already
       const isLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
       if (isLLM) {
         assetQueries.push([api.query.assets.account, [asset.index, address]]);
+        parametersQueries.push(api.query.assets.parameters, [asset.index]);
         if (isIndexNeed) {
           indexedFilteredAssets[asset.index] = asset;
         } else {
@@ -454,10 +453,14 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
     }
 
     if (assetQueries.length !== 0) {
-      const assetResults = await api.queryMulti([...assetQueries]);
+      const assetResults = await api.queryMulti(assetQueries);
+      const parametersResults = await api.queryMulti(parametersQueries);
 
       assetResults.forEach((assetResult, index) => {
         indexedFilteredAssets[index].balance = assetResult.toJSON() || '0';
+      });
+      parametersResults.forEach(({ eresidencyRequired }, index) => {
+        indexedFilteredAssets[index].isStock = eresidencyRequired;
       });
       return indexedFilteredAssets;
     }
@@ -2449,6 +2452,7 @@ const getDexPools = async (walletAddress) => {
         lpToken: lpTokenTransform,
         lpTokensBalance: lpTokensValue?.balance || BN_ZERO,
         reserved,
+        isStock: assetData1?.isStock || assetData2?.isStock || false,
       };
     }));
     return { poolsData, assetsPoolData };

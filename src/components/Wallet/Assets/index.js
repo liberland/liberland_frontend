@@ -35,36 +35,39 @@ function Assets() {
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1025px)');
   const { isStock } = useStockContext();
 
-  const formatted = useMemo(() => additionalAssets?.map((asset, index) => (
-    {
-      ...asset,
-      ...asset.metadata,
-      ...assetDetails[index]?.identity,
-      supply: `${
-        formatCustom(
-          assetDetails?.[index]?.supply ?? '0',
-          parseInt(asset.metadata.decimals),
-        )} ${asset.metadata.symbol}`,
-      actions: (
-        <ActionsMenuModalWrapper
-          isAdmin={assetDetails?.[index]?.admin === userWalletAddress}
-          isOwner={assetDetails?.[index]?.owner === userWalletAddress}
-          isIssuer={assetDetails?.[index]?.issuer === userWalletAddress}
-          assetId={asset.index}
-          defaultValues={{
-            admin: assetDetails?.[index]?.admin,
-            balance: assetDetails?.[index]?.minBalance,
-            decimals: asset.metadata.decimals,
-            freezer: assetDetails?.[index]?.freezer,
-            id: asset.index,
-            issuer: assetDetails?.[index]?.issuer,
-            name: asset.metadata.name,
-            symbol: asset.metadata.symbol,
-          }}
-        />
-      ),
-    }
-  )) || [], [additionalAssets, assetDetails, userWalletAddress]);
+  const formatted = useMemo(
+    () => additionalAssets?.map((asset, index) => (
+      {
+        ...asset,
+        ...asset.metadata,
+        ...assetDetails[index]?.identity,
+        supply: `${
+          formatCustom(
+            assetDetails?.[index]?.supply ?? '0',
+            parseInt(asset.metadata.decimals),
+          )} ${asset.metadata.symbol}`,
+        actions: (
+          <ActionsMenuModalWrapper
+            isAdmin={assetDetails?.[index]?.admin === userWalletAddress}
+            isOwner={assetDetails?.[index]?.owner === userWalletAddress}
+            isIssuer={assetDetails?.[index]?.issuer === userWalletAddress}
+            assetId={asset.index}
+            defaultValues={{
+              admin: assetDetails?.[index]?.admin,
+              balance: assetDetails?.[index]?.minBalance,
+              decimals: asset.metadata.decimals,
+              freezer: assetDetails?.[index]?.freezer,
+              id: asset.index,
+              issuer: assetDetails?.[index]?.issuer,
+              name: asset.metadata.name,
+              symbol: asset.metadata.symbol,
+            }}
+          />
+        ),
+      }
+    )).filter(({ isStock: assetIsStock }) => assetIsStock === isStock) || [],
+    [additionalAssets, assetDetails, userWalletAddress, isStock],
+  );
 
   if (!assetDetails || !additionalAssets || !userWalletAddress) {
     return <div>Loading...</div>;
