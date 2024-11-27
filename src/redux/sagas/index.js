@@ -45,6 +45,7 @@ export default function* rootSaga() {
     walletSagas.getAdditionalAssetsWatcher(),
     walletSagas.getAssetsBalanceWatcher(),
     walletSagas.getAssetDetailsWatcher(),
+    walletSagas.sendTransferWithRemarkWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),

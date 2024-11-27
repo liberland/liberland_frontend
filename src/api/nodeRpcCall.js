@@ -135,6 +135,10 @@ const getApi = async () => {
           date: 'u64',
           currency: 'Text',
         },
+        RemarkInfoUser: {
+          id: 'u64',
+          description: 'Text',
+        },
       },
       runtime: {
         AssetConversionApi: [
@@ -451,6 +455,31 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
     console.error(e);
     throw e;
   }
+};
+
+const makeTransferExtrinsic = (api, trasferData) => {
+  const { index, balance, recipient } = trasferData;
+  let transferExtrinsic;
+  if (index === IndexHelper.LLD) {
+    transferExtrinsic = api.tx.balances.transfer(recipient, balance);
+  } else if (index === IndexHelper.POLITIPOOL_LLM) {
+    transferExtrinsic = api.tx.llm.sendLlmToPolitipool(recipient, balance);
+  } else {
+    transferExtrinsic = api.tx.assets.transfer(parseInt(index), recipient, balance);
+  }
+  return transferExtrinsic;
+};
+
+const makeRemarkExtrinsic = (api, remarkInfo) => api.tx.llm.remark(remarkInfo);
+
+const transferWithRemark = async (remarkInfo, transfer, walletAddress) => {
+  const api = await getApi();
+  const remark = makeRemarkExtrinsic(api, remarkInfo);
+  const transferExtrinsic = makeTransferExtrinsic(api, transfer);
+
+  const call = [transferExtrinsic, remark];
+  const extrinsic = api.tx.utility.batch(call);
+  return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
 const provideJudgementAndAssets = async ({
@@ -2755,6 +2784,12 @@ const closeSenateMotion = async (proposalHash, index, walletAddress) => {
   return submitExtrinsic(api.tx.senate.close(proposalHash, index, weightBound, lengthBound), walletAddress, api);
 };
 
+const encodeRemarkUser = async (dataToEncode) => {
+  const api = await getApi();
+  const data = api.createType('RemarkInfoUser', dataToEncode);
+  return u8aToHex(pako.deflate(data.toU8a()));
+};
+
 const encodeRemark = async (dataToEncode) => {
   const api = await getApi();
   const data = api.createType('RemarkInfo', dataToEncode);
@@ -2950,4 +2985,6 @@ export {
   getAssetDetails,
   createOrUpdateAsset,
   mintAsset,
+  transferWithRemark,
+  encodeRemarkUser,
 };

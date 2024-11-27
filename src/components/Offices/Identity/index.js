@@ -19,6 +19,7 @@ import { parseLegal } from '../../../utils/identityParser';
 import { isValidSubstrateAddress } from '../../../utils/walletHelpers';
 import { fetchPendingIdentities } from '../../../api/nodeRpcCall';
 import identityJudgementEnums from '../../../constants/identityJudgementEnums';
+import WrapperTransferWithRemark from '../WrapperTransferWithRemark';
 
 function FetchedItem({ address }) {
   const dispatch = useDispatch();
@@ -82,6 +83,7 @@ function IdentityForm() {
         >
           Fetch pending additional merits
         </Button>
+        <WrapperTransferWithRemark />
       </div>
 
       <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
