@@ -129,11 +129,11 @@ const getSwapExchangeRate = async () => {
 
       return {
         rewardRate: ({ eth, tokenAmount }) => min(
-          (window.BigInt(eth) * window.BigInt(totalSupply)) / window.BigInt(reserve0),
-          (window.BigInt(tokenAmount) * window.BigInt(totalSupply)) / window.BigInt(reserve1),
+          (window.BigInt(eth) * window.BigInt(totalSupply)) / window.BigInt(reserve1),
+          (window.BigInt(tokenAmount) * window.BigInt(totalSupply)) / window.BigInt(reserve0),
         ),
-        tokenRate: (amount) => (window.BigInt(amount) * window.BigInt(reserve1)) / window.BigInt(reserve0),
-        ethRate: (amount) => (window.BigInt(amount) * window.BigInt(reserve0)) / window.BigInt(reserve1),
+        tokenRate: (amount) => (window.BigInt(amount) * window.BigInt(reserve0)) / window.BigInt(reserve1),
+        ethRate: (amount) => (window.BigInt(amount) * window.BigInt(reserve1)) / window.BigInt(reserve0),
       };
     }
 

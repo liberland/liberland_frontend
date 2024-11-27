@@ -41,7 +41,6 @@ function TextInput({
         readOnly={readOnly}
         onPaste={onPaste}
         onFocus={onFocus}
-        onBlur={onBlur}
         {...register(
           name,
           {
@@ -51,6 +50,7 @@ function TextInput({
             onChange,
             minLength,
             maxLength,
+            onBlur,
           },
         )}
       />

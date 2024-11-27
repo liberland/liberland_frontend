@@ -9,11 +9,33 @@ import { ethActions } from '../../../../redux/actions';
 import { TextInput } from '../../../InputComponents';
 import Button from '../../../Button/Button';
 import {
-  formatCustom,
-  parseAssets,
+  formatCustom as formatCustomUnsafe,
+  parseAssets as parseAssetsUnsafe,
 } from '../../../../utils/walletHelpers';
 import { stakeLPWithEth } from '../../../../api/ethereum';
 import styles from './styles.module.scss';
+
+const formatCustom = (value) => {
+  try {
+    return formatCustomUnsafe(value, 18, true)
+      .toString()
+      .replace(/,/g, '');
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    return '0';
+  }
+};
+
+const parseAssets = (value) => {
+  try {
+    return parseAssetsUnsafe(value, 18, true).toString();
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    return '0';
+  }
+};
 
 function StakeEthForm({
   account,
@@ -43,8 +65,8 @@ function StakeEthForm({
 
   const onSubmit = async ({ stake, tokens, tolerance }) => {
     try {
-      const realStake = parseAssets(stake, 18).toString();
-      const realTokens = parseAssets(tokens, 18).toString();
+      const realStake = parseAssets(stake);
+      const realTokens = parseAssets(tokens);
       const signer = await connected.provider.getSigner(account);
       const getAmountWithTolerance = (amount) => (
         ((window.BigInt(amount) * window.BigInt(tolerance)) / window.BigInt(100)).toString()
@@ -89,20 +111,20 @@ function StakeEthForm({
   }, [account, dispatch, connected]);
 
   const lldBalance = React.useMemo(
-    () => formatCustom(lldBalances?.[account]?.balance?.toString() || '0', 18, true),
+    () => formatCustom(lldBalances?.[account]?.balance?.toString() || '0'),
     [account, lldBalances],
   );
 
-  const formattedBalance = formatCustom(balance || '0', 18, true);
+  const formattedBalance = formatCustom(balance || '0');
 
   const liquidityPoolReward = React.useMemo(() => {
     if (stake && tokens && exchangeRate && !errors.stake && !errors.token) {
       try {
         const lpTokens = exchangeRate.rewardRate({
-          eth: window.BigInt(parseAssets(stake, 18).toString()),
-          tokenAmount: window.BigInt(parseAssets(tokens, 18).toString()),
+          eth: window.BigInt(parseAssets(stake)),
+          tokenAmount: window.BigInt(parseAssets(tokens)),
         });
-        return `Receive ${formatCustom(lpTokens, 18, true)} LP tokens`;
+        return `Receive ${formatCustom(lpTokens)} LP tokens`;
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(e);
@@ -118,24 +140,26 @@ function StakeEthForm({
   }, [setError, exchangeRateError]);
 
   React.useEffect(() => {
-    if (stake && exchangeRate && stakeFocused) {
+    if (stake && exchangeRate && stakeFocused && !tokensFocused) {
       setValue(
         'tokens',
-        formatCustom(exchangeRate.tokenRate(window.BigInt(parseAssets(stake, 18).toString())), 18),
+        formatCustom(exchangeRate.tokenRate(window.BigInt(parseAssets(stake)))),
         { shouldValidate: true },
       );
     }
-  }, [stake, exchangeRate, setValue, stakeFocused]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stake, exchangeRate]);
 
   React.useEffect(() => {
-    if (tokens && exchangeRate && tokensFocused) {
+    if (tokens && exchangeRate && tokensFocused && !stakeFocused) {
       setValue(
         'stake',
-        formatCustom(exchangeRate.ethRate(window.BigInt(parseAssets(tokens, 18).toString())), 18),
+        formatCustom(exchangeRate.ethRate(window.BigInt(parseAssets(tokens)))),
         { shouldValidate: true },
       );
     }
-  }, [tokens, exchangeRate, setValue, tokensFocused]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokens, exchangeRate]);
 
   if (exchangeRateLoading) {
     return <div className={styles.form}>Loading...</div>;
@@ -177,11 +201,11 @@ function StakeEthForm({
           <div className={styles.success}>
             LLD staked:
             {' '}
-            {parseAssets(results[0], 18, true)}
+            {parseAssets(results[0])}
             {', ETH staked: '}
-            {formatCustom(results[1], 18, true)}
+            {formatCustom(results[1])}
             {', LP staked: '}
-            {formatCustom(results[2], 18, true)}
+            {formatCustom(results[2])}
           </div>
         )}
       </label>
