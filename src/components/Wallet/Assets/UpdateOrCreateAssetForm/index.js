@@ -88,94 +88,86 @@ function UpdateOrCreateAssetForm({
       form={form}
       className={styles.form}
     >
-      <div className={styles.asset}>
-        <div className={styles.inputWrapper}>
-          <Form.Item
-            name="name"
-            rules={[
-              { required: true },
-              { min: 3, message: 'Name must be longer than 2 characters' },
-            ]}
-            label={`${typeCapitalized} name`}
-          >
-            <Input placeholder="Name" />
-          </Form.Item>
+      <Form.Item
+        name="name"
+        rules={[
+          { required: true },
+          { min: 3, message: 'Name must be longer than 2 characters' },
+        ]}
+        label={`${typeCapitalized} name`}
+      >
+        <Input placeholder="Name" />
+      </Form.Item>
+      {success && (
+        <div className={styles.success}>
+          {typeCapitalized}
+          {' '}
+          {isCreate ? 'created' : 'updated'}
+          {' '}
+          successfully
         </div>
-        {success && (
-          <div className={styles.success}>
-            {typeCapitalized}
-            {' '}
-            {isCreate ? 'created' : 'updated'}
-            {' '}
-            successfully
-          </div>
-        )}
+      )}
+      <Form.Item
+        name="symbol"
+        rules={[
+          { required: true },
+          { min: 3, message: 'Symbol must be longer than 2 characters' },
+        ]}
+        label={`${typeCapitalized} symbol`}
+      >
+        <Input placeholder="symbol" />
+      </Form.Item>
+      <Form.Item
+        name="decimals"
+        rules={[
+          { required: true },
+          { type: 'number', message: 'Must be a number' },
+        ]}
+        label="Decimals"
+      >
+        <InputNumber controls={false} />
+      </Form.Item>
+      {isCreate && (
         <Form.Item
-          name="symbol"
-          rules={[
-            { required: true },
-            { min: 3, message: 'Symbol must be longer than 2 characters' },
-          ]}
-          label={`${typeCapitalized} symbol`}
-        >
-          <Input placeholder="symbol" />
-        </Form.Item>
-      </div>
-      <div className={styles.asset}>
-        <Form.Item
-          name="decimals"
+          name="balance"
           rules={[
             { required: true },
             { type: 'number', message: 'Must be a number' },
           ]}
-          label="Decimals"
+          label="Minimal balance"
         >
           <InputNumber controls={false} />
         </Form.Item>
-        {isCreate && (
-          <Form.Item
-            name="balance"
-            rules={[
-              { required: true },
-              { type: 'number', message: 'Must be a number' },
-            ]}
-            label="Minimal balance"
-          >
-            <InputNumber controls={false} />
-          </Form.Item>
-        )}
-      </div>
+      )}
       <hr className={styles.divider} />
-      <div className={styles.asset}>
-        <Form.Item
-          rules={[{ required: true }]}
-          name="admin"
-          label="Admin account"
-        >
-          <InputSearch />
-        </Form.Item>
-        <Form.Item
-          rules={[{ required: true }]}
-          name="issuer"
-          label="Issuer account"
-        >
-          <InputSearch />
-        </Form.Item>
-        <Form.Item
-          rules={[{ required: true }]}
-          name="issuer"
-          label="Issuer account"
-        >
-          <InputSearch />
-        </Form.Item>
-        <Form.Item
-          rules={[{ required: true }]}
-          name="freezer"
-          label="Freezer account"
-        >
-          <InputSearch />
-        </Form.Item>
-      </div>
+      <Form.Item
+        rules={[{ required: true }]}
+        name="admin"
+        label="Admin account"
+      >
+        <InputSearch />
+      </Form.Item>
+      <Form.Item
+        rules={[{ required: true }]}
+        name="issuer"
+        label="Issuer account"
+      >
+        <InputSearch />
+      </Form.Item>
+      <Form.Item
+        rules={[{ required: true }]}
+        name="issuer"
+        label="Issuer account"
+      >
+        <InputSearch />
+      </Form.Item>
+      <Form.Item
+        rules={[{ required: true }]}
+        name="freezer"
+        label="Freezer account"
+      >
+        <InputSearch />
+      </Form.Item>
       <hr className={styles.divider} />
       <div className={styles.buttonRow}>
         <div className={styles.closeForm}>

@@ -34,7 +34,6 @@ function Assets() {
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1025px)');
   const { isStock } = useStockContext();
-
   const formatted = useMemo(
     () => additionalAssets?.map((asset, index) => (
       {

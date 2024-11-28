@@ -440,7 +440,7 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
       const isLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
       if (isLLM) {
         assetQueries.push([api.query.assets.account, [asset.index, address]]);
-        parametersQueries.push(api.query.assets.parameters, [asset.index]);
+        parametersQueries.push([api.query.assets.parameters, [asset.index]]);
         if (isIndexNeed) {
           indexedFilteredAssets[asset.index] = asset;
         } else {
@@ -460,7 +460,7 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
         indexedFilteredAssets[index].balance = assetResult.toJSON() || '0';
       });
       parametersResults.forEach(({ eresidencyRequired }, index) => {
-        indexedFilteredAssets[index].isStock = eresidencyRequired;
+        indexedFilteredAssets[index].isStock = eresidencyRequired?.valueOf() || false;
       });
       return indexedFilteredAssets;
     }

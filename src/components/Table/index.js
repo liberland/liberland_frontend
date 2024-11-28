@@ -1,12 +1,11 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import TableInternal from 'antd/es/table';
-import objectHash from 'object-hash';
 
 function Table({ columns, data }) {
   const identityData = useMemo(() => data?.map((d) => ({
     ...d,
-    hash: objectHash(d),
+    hash: Object.values(d).map((val) => val.toString()).join('|'),
   })) || [], [data]);
   return (
     <TableInternal
