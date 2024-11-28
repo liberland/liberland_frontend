@@ -364,7 +364,7 @@ function TradeTokensModalWrapper({
         {asset1ToShow}
         {' for '}
         {asset2ToShow}
-        <img src={PlusIcon} className={cx(styles.backIcon, styles.whiten)} alt="button icon" />
+        <img src={PlusIcon} className={cx(styles.primaryIcon, styles.whiten)} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>

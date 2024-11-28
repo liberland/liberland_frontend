@@ -19,6 +19,7 @@ function Button({
   grey,
   red,
   whiteRed,
+  flex,
   disabled,
 }) {
   const getSize = () => {
@@ -47,6 +48,7 @@ function Button({
           [styles.green]: green,
           [styles.grey]: grey,
           [styles.whiteRed]: whiteRed,
+          [styles.flex]: flex,
         })
       }
     >
@@ -70,6 +72,7 @@ Button.defaultProps = {
   red: false,
   whiteRed: false,
   disabled: false,
+  flex: false,
 };
 
 Button.propTypes = {
@@ -88,6 +91,7 @@ Button.propTypes = {
   red: PropTypes.bool,
   whiteRed: PropTypes.bool,
   disabled: PropTypes.bool,
+  flex: PropTypes.bool,
 };
 
 export default Button;

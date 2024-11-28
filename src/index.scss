@@ -68,7 +68,13 @@ p {
 // ANTD overrides
 
 .ant-btn-primary {
-  background: #EDC007!important;
+  background: linear-gradient(135deg, #d4ab06, #cca508);
+  transition: all 0.3s;
+  font-weight: 600;
+
+  &:focus,&:active,&:hover {
+    background: linear-gradient(135deg, #cca508, #d4ab06)!important;
+  }
 }
 
 .ant-collapse-header-text {

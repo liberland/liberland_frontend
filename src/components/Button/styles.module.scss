@@ -32,4 +32,8 @@
     border: 2px solid $red;
     color: $red;
   }
+  &.flex {
+    flex-grow: 1;
+    width: 100%;
+  }
 }

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Input from 'antd/es/input';
+import message from 'antd/es/message';
+import Flex from 'antd/es/flex';
 import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
 import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
@@ -20,13 +22,14 @@ function UpdateOrCreateAssetForm({
   defaultValues,
 }) {
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
+  const type = isStock ? 'stock' : 'asset';
+  const typeCapitalized = isStock ? 'Stock' : 'Asset';
 
   const onSubmit = async ({
     name,
@@ -38,7 +41,6 @@ function UpdateOrCreateAssetForm({
     freezer,
   }) => {
     setLoading(true);
-    setSuccess(false);
     try {
       const nextId = isCreate ? (
         additionalAssets.map((asset) => asset.index)
@@ -61,7 +63,7 @@ function UpdateOrCreateAssetForm({
         isStock,
       });
       dispatch(walletActions.getAdditionalAssets.call());
-      setSuccess(true);
+      message.success(`${typeCapitalized}  ${isCreate ? 'created' : 'updated'} successfully`);
     } catch {
       form.setFields([
         {
@@ -74,8 +76,6 @@ function UpdateOrCreateAssetForm({
     }
   };
 
-  const type = isStock ? 'stock' : 'asset';
-  const typeCapitalized = isStock ? 'Stock' : 'Asset';
   const submitButtonText = isCreate ? `Create ${type} (~200 LLD)` : `Update ${type}`;
 
   if (!userWalletAddress || !additionalAssets) {
@@ -88,104 +88,95 @@ function UpdateOrCreateAssetForm({
       form={form}
       className={styles.form}
     >
-      <Form.Item
-        name="name"
-        rules={[
-          { required: true },
-          { min: 3, message: 'Name must be longer than 2 characters' },
-        ]}
-        label={`${typeCapitalized} name`}
-      >
-        <Input placeholder="Name" />
-      </Form.Item>
-      {success && (
-        <div className={styles.success}>
-          {typeCapitalized}
-          {' '}
-          {isCreate ? 'created' : 'updated'}
-          {' '}
-          successfully
-        </div>
-      )}
-      <Form.Item
-        name="symbol"
-        rules={[
-          { required: true },
-          { min: 3, message: 'Symbol must be longer than 2 characters' },
-        ]}
-        label={`${typeCapitalized} symbol`}
-      >
-        <Input placeholder="symbol" />
-      </Form.Item>
-      <Form.Item
-        name="decimals"
-        rules={[
-          { required: true },
-          { type: 'number', message: 'Must be a number' },
-        ]}
-        label="Decimals"
-      >
-        <InputNumber controls={false} />
-      </Form.Item>
-      {isCreate && (
+      <Flex wrap gap="15px">
         <Form.Item
-          name="balance"
+          name="name"
+          rules={[
+            { required: true },
+            { min: 3, message: 'Name must be longer than 2 characters' },
+          ]}
+          label={`${typeCapitalized} name`}
+        >
+          <Input placeholder="Name" />
+        </Form.Item>
+        <Form.Item
+          name="symbol"
+          rules={[
+            { required: true },
+            { min: 3, message: 'Symbol must be longer than 2 characters' },
+          ]}
+          label={`${typeCapitalized} symbol`}
+        >
+          <Input placeholder="symbol" />
+        </Form.Item>
+        <Form.Item
+          name="decimals"
           rules={[
             { required: true },
             { type: 'number', message: 'Must be a number' },
           ]}
-          label="Minimal balance"
+          label="Decimals"
         >
           <InputNumber controls={false} />
         </Form.Item>
-      )}
-      <hr className={styles.divider} />
-      <Form.Item
-        rules={[{ required: true }]}
-        name="admin"
-        label="Admin account"
-      >
-        <InputSearch />
-      </Form.Item>
-      <Form.Item
-        rules={[{ required: true }]}
-        name="issuer"
-        label="Issuer account"
-      >
-        <InputSearch />
-      </Form.Item>
-      <Form.Item
-        rules={[{ required: true }]}
-        name="issuer"
-        label="Issuer account"
-      >
-        <InputSearch />
-      </Form.Item>
-      <Form.Item
-        rules={[{ required: true }]}
-        name="freezer"
-        label="Freezer account"
-      >
-        <InputSearch />
-      </Form.Item>
-      <hr className={styles.divider} />
-      <div className={styles.buttonRow}>
-        <div className={styles.closeForm}>
-          <Button disabled={loading} medium onClick={onClose}>
-            Close
-          </Button>
-        </div>
-        <div>
-          <Button
-            primary
-            medium
-            type="submit"
-            disabled={loading}
+        {isCreate && (
+          <Form.Item
+            name="balance"
+            rules={[
+              { required: true },
+              { type: 'number', message: 'Must be a number' },
+            ]}
+            label="Minimal balance"
           >
-            {loading ? 'Loading...' : submitButtonText}
-          </Button>
-        </div>
-      </div>
+            <InputNumber controls={false} />
+          </Form.Item>
+        )}
+      </Flex>
+      <hr className={styles.divider} />
+      <Flex wrap gap="15px">
+        <Form.Item
+          rules={[{ required: true }]}
+          name="admin"
+          label="Admin account"
+        >
+          <InputSearch />
+        </Form.Item>
+        <Form.Item
+          rules={[{ required: true }]}
+          name="issuer"
+          label="Issuer account"
+        >
+          <InputSearch />
+        </Form.Item>
+        <Form.Item
+          rules={[{ required: true }]}
+          name="issuer"
+          label="Issuer account"
+        >
+          <InputSearch />
+        </Form.Item>
+        <Form.Item
+          rules={[{ required: true }]}
+          name="freezer"
+          label="Freezer account"
+        >
+          <InputSearch />
+        </Form.Item>
+      </Flex>
+      <hr className={styles.divider} />
+      <Flex wrap gap="15px">
+        <Button disabled={loading} medium onClick={onClose}>
+          Close
+        </Button>
+        <Button
+          primary
+          medium
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? 'Loading...' : submitButtonText}
+        </Button>
+      </Flex>
     </Form>
   );
 }
@@ -213,17 +204,18 @@ function UpdateOrCreateAssetFormModalWrapper({
 }) {
   const [show, setShow] = React.useState();
   const { isStock } = useStockContext();
-  return (
-    <div className={isCreate ? styles.modal : undefined}>
+  const modal = (
+    <>
       <Button
         primary
         medium
+        flex
         onClick={() => setShow(true)}
       >
         {isCreate ? `Create ${isStock ? 'stock' : 'asset'}` : 'Update'}
       </Button>
       {show && (
-        <ModalRoot id="create-or-update">
+        <ModalRoot>
           <UpdateOrCreateAssetForm
             defaultValues={dV}
             isCreate={isCreate}
@@ -232,8 +224,12 @@ function UpdateOrCreateAssetFormModalWrapper({
           />
         </ModalRoot>
       )}
-    </div>
+    </>
   );
+  if (isCreate) {
+    return <div className={styles.modal}>{modal}</div>;
+  }
+  return modal;
 }
 
 UpdateOrCreateAssetFormModalWrapper.propTypes = {
