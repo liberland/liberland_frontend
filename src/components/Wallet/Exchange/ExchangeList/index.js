@@ -52,7 +52,7 @@ function ExchangeList() {
 
   if (!highLiquidity.length && !lowLiquidity.length) {
     return (
-      <Alert type="error" message="No pools were found" />
+      <Alert type="error" className={styles.noneFound} message="No pools were found" />
     );
   }
 

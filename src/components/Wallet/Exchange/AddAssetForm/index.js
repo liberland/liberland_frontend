@@ -111,7 +111,7 @@ function AddAssetFormDisplay({
     }
   };
 
-  const firstAsset = Form.useWatch(['firstAsset'], form);
+  const firstAsset = Form.useWatch('firstAsset', form);
 
   if (!filtered) {
     return <div>Loading...</div>;
@@ -158,12 +158,12 @@ function AddAssetFormDisplay({
                     ? 'Liberland dollar'
                     : value[1].metadata.symbol;
                   return (
-                    <option
+                    <Select.Option
                       value={key}
                       key={key}
                     >
                       {humanReadableName}
-                    </option>
+                    </Select.Option>
                   );
                 })}
             </Select>
