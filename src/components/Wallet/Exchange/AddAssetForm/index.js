@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Select from 'antd/es/select';
-import message from 'antd/es/message';
+import useNotification from 'antd/es/notification/useNotification';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { createNewPool } from '../../../../api/nodeRpcCall';
@@ -23,6 +23,7 @@ function AddAssetFormDisplay({
   const dispatch = useDispatch();
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const [api, handle] = useNotification();
 
   React.useEffect(() => {
     dispatch(walletActions.getWallet.call());
@@ -96,7 +97,7 @@ function AddAssetFormDisplay({
       );
       await createNewPool(getAssetId(aAsset), getAssetId(bAsset), walletAddress);
       dispatch(dexActions.getPools.call());
-      message.success('Pool successfully created');
+      api.success({ message: 'Pool successfully created' });
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -118,7 +119,8 @@ function AddAssetFormDisplay({
   }
 
   return (
-    <Form form={form} className={styles.form} onFinish={onSubmit}>
+    <Form layout="vertical" form={form} className={styles.form} onFinish={onSubmit}>
+      {handle}
       <Flex gap="15px" wrap>
         <Form.Item
           label="Select first pool asset"

@@ -206,6 +206,20 @@ function Layout({ children }) {
           Card: {
             extraColor: '#243F5F',
           },
+          InputNumber: {
+            controlWidth: '100%',
+            activeBorderColor: '#243F5F',
+            hoverBorderColor: '#243F5F',
+            colorText: '#243F5F',
+          },
+          Input: {
+            activeBorderColor: '#243F5F',
+            hoverBorderColor: '#243F5F',
+            colorText: '#243F5F',
+          },
+          Message: {
+            margin: 'auto 0',
+          },
         },
       }}
     >

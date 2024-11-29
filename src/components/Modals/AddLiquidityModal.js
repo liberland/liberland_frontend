@@ -3,8 +3,8 @@ import PropsTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
+import useNotification from 'antd/es/notification/useNotification';
 import Title from 'antd/es/typography/Title';
-import message from 'antd/es/message';
 import InputNumber from 'antd/es/input-number';
 import Checkbox from 'antd/es/checkbox';
 import { BN } from '@polkadot/util';
@@ -43,6 +43,7 @@ function AddLiquidityModal({
 
   const decimals1 = getDecimalsForAsset(asset1, assetData1?.decimals);
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
+  const [api, handle] = useNotification();
 
   const onSubmit = async (data) => {
     setLoading(true);
@@ -71,7 +72,9 @@ function AddLiquidityModal({
         walletAddress,
         mintTo,
       }));
-      message.success('Liquidity added successfully');
+      api.success({
+        message: 'Liquidity added successfully',
+      });
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -155,7 +158,9 @@ function AddLiquidityModal({
     <Form
       className={styles.getCitizenshipModal}
       onSubmit={onSubmit}
+      layout="vertical"
     >
+      {handle}
       <Title level={3}>
         Add liquidity for pair
         {' '}
@@ -187,11 +192,14 @@ function AddLiquidityModal({
         rules={[
           { required: true },
           {
-            validator: (_, v, callback) => {
-              const validated = validate(v, assetsBalance[0], decimals1, asset1);
-              if (validated) {
-                callback(validated);
+            validator: (_, v) => {
+              if (v) {
+                const validated = validate(v, assetsBalance[0], decimals1, asset1);
+                if (validated) {
+                  return Promise.reject(validated);
+                }
               }
+              return Promise.resolve;
             },
           },
         ]}
@@ -228,11 +236,14 @@ function AddLiquidityModal({
         rules={[
           { required: true },
           {
-            validator: (_, v, callback) => {
-              const validated = validate(v, assetsBalance[1], decimals2, asset2);
-              if (validated) {
-                callback(validated);
+            validator: (_, v) => {
+              if (v) {
+                const validated = validate(v, assetsBalance[1], decimals2, asset2);
+                if (validate) {
+                  return Promise.reject(validated);
+                }
               }
+              return Promise.resolve();
             },
           },
         ]}

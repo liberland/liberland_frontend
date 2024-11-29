@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Input from 'antd/es/input';
-import message from 'antd/es/message';
 import Flex from 'antd/es/flex';
+import useNotification from 'antd/es/notification/useNotification';
 import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
 import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
@@ -30,6 +30,7 @@ function UpdateOrCreateAssetForm({
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const type = isStock ? 'stock' : 'asset';
   const typeCapitalized = isStock ? 'Stock' : 'Asset';
+  const [api, handle] = useNotification();
 
   const onSubmit = async ({
     name,
@@ -63,7 +64,9 @@ function UpdateOrCreateAssetForm({
         isStock,
       });
       dispatch(walletActions.getAdditionalAssets.call());
-      message.success(`${typeCapitalized}  ${isCreate ? 'created' : 'updated'} successfully`);
+      api.success({
+        message: `${typeCapitalized} ${isCreate ? 'created' : 'updated'} successfully`,
+      });
     } catch {
       form.setFields([
         {
@@ -86,84 +89,74 @@ function UpdateOrCreateAssetForm({
     <Form
       onFinish={onSubmit}
       form={form}
+      initialValues={defaultValues}
       className={styles.form}
+      layout="vertical"
     >
-      <Flex wrap gap="15px">
+      {handle}
+      <Form.Item
+        name="name"
+        rules={[
+          { required: true },
+          { min: 3, message: 'Name must be longer than 2 characters' },
+        ]}
+        label={`${typeCapitalized} name`}
+      >
+        <Input placeholder="Name" />
+      </Form.Item>
+      <Form.Item
+        name="symbol"
+        rules={[
+          { required: true },
+          { min: 3, message: 'Symbol must be longer than 2 characters' },
+        ]}
+        label={`${typeCapitalized} symbol`}
+      >
+        <Input placeholder="symbol" />
+      </Form.Item>
+      <Form.Item
+        name="decimals"
+        rules={[
+          { required: true },
+          { type: 'number', message: 'Must be a number' },
+        ]}
+        label="Decimals"
+      >
+        <InputNumber controls={false} />
+      </Form.Item>
+      {isCreate && (
         <Form.Item
-          name="name"
-          rules={[
-            { required: true },
-            { min: 3, message: 'Name must be longer than 2 characters' },
-          ]}
-          label={`${typeCapitalized} name`}
-        >
-          <Input placeholder="Name" />
-        </Form.Item>
-        <Form.Item
-          name="symbol"
-          rules={[
-            { required: true },
-            { min: 3, message: 'Symbol must be longer than 2 characters' },
-          ]}
-          label={`${typeCapitalized} symbol`}
-        >
-          <Input placeholder="symbol" />
-        </Form.Item>
-        <Form.Item
-          name="decimals"
+          name="balance"
           rules={[
             { required: true },
             { type: 'number', message: 'Must be a number' },
           ]}
-          label="Decimals"
+          label="Minimal balance"
         >
           <InputNumber controls={false} />
         </Form.Item>
-        {isCreate && (
-          <Form.Item
-            name="balance"
-            rules={[
-              { required: true },
-              { type: 'number', message: 'Must be a number' },
-            ]}
-            label="Minimal balance"
-          >
-            <InputNumber controls={false} />
-          </Form.Item>
-        )}
-      </Flex>
-      <hr className={styles.divider} />
-      <Flex wrap gap="15px">
-        <Form.Item
-          rules={[{ required: true }]}
-          name="admin"
-          label="Admin account"
-        >
-          <InputSearch />
-        </Form.Item>
-        <Form.Item
-          rules={[{ required: true }]}
-          name="issuer"
-          label="Issuer account"
-        >
-          <InputSearch />
-        </Form.Item>
-        <Form.Item
-          rules={[{ required: true }]}
-          name="issuer"
-          label="Issuer account"
-        >
-          <InputSearch />
-        </Form.Item>
-        <Form.Item
-          rules={[{ required: true }]}
-          name="freezer"
-          label="Freezer account"
-        >
-          <InputSearch />
-        </Form.Item>
-      </Flex>
-      <hr className={styles.divider} />
+      )}
+      <Form.Item
+        rules={[{ required: true }]}
+        name="admin"
+        label="Admin account"
+      >
+        <InputSearch />
+      </Form.Item>
+      <Form.Item
+        rules={[{ required: true }]}
+        name="issuer"
+        label="Issuer account"
+      >
+        <InputSearch />
+      </Form.Item>
+      <Form.Item
+        rules={[{ required: true }]}
+        name="freezer"
+        label="Freezer account"
+      >
+        <InputSearch />
+      </Form.Item>
       <Flex wrap gap="15px">
         <Button disabled={loading} medium onClick={onClose}>
           Close
@@ -209,7 +202,7 @@ function UpdateOrCreateAssetFormModalWrapper({
       <Button
         primary
         medium
-        flex
+        flex={!isCreate}
         onClick={() => setShow(true)}
       >
         {isCreate ? `Create ${isStock ? 'stock' : 'asset'}` : 'Update'}

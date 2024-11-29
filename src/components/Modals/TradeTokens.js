@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
+import Flex from 'antd/es/flex';
+import Title from 'antd/es/typography/Title';
+import InputNumber from 'antd/es/input-number';
+import Checkbox from 'antd/es/checkbox/Checkbox';
 import cx from 'classnames';
 import { BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
-import { TextInput } from '../InputComponents';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
@@ -27,9 +30,7 @@ function TradeTokensModal({
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
   const reserves = useSelector(dexSelectors.selectorReserves);
-  const [isChecked, setIsChecked] = useState(false);
   const [isAsset1State, setIsAsset1State] = useState(false);
-  const isDisplayNone = isChecked ? null : styles.displayNone;
   const [formatedValue, setFormatedValue] = useState({});
 
   const {
@@ -52,23 +53,14 @@ function TradeTokensModal({
     return null;
   }, [asset1, asset2, reserves]);
 
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    trigger,
-    setError,
-    formState: { errors },
-  } = useForm({
-    mode: 'onChange',
-    // reValidateMode: 'onChange',
-    defaultValues: {
-      amountIn1: '',
-      amountIn2: '',
-    },
-  });
+  const [loading, setLoading] = useState();
+  const [amount1Focused, setAmount1Focused] = useState();
+  const [amount2Focused, setAmount2Focused] = useState();
+  const [form] = Form.useForm();
+  const details = Form.useWatch('details', form);
 
   const onSubmit = async (data) => {
+    setLoading(true);
     try {
       const { amountIn1, amountIn2, minAmountPercent } = data;
       const amountOut = minAmountPercent.length > 0 ? minAmountPercent : undefined;
@@ -108,11 +100,12 @@ function TradeTokensModal({
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleInputChange = async (event, asset) => {
-    const term = event?.target?.value;
+  const handleInputChange = async (term, asset) => {
     try {
       setFormatedValue({});
       const isAsset1 = asset1 === asset;
@@ -157,16 +150,16 @@ function TradeTokensModal({
         decimalsOut,
       ) : '';
       const sanitizedValue = sanitizeValue(formatedValueData);
-      setValue('amountIn1', isAsset1 ? term : sanitizedValue);
-      setValue('amountIn2', isAsset1 ? sanitizedValue : term);
-      await trigger();
+      form.setFieldValue('amountIn1', isAsset1 ? term : sanitizedValue);
+      form.setFieldValue('amountIn2', isAsset1 ? sanitizedValue : term);
+      form.validateFields();
 
       if (!tradeData) {
         const msg = `No trade data from api for ${asset}`;
-        setError(
-          !isAsset1 ? 'amountIn1' : 'amountIn2',
-          { type: 'custom', message: msg },
-        );
+        form.setFields([{
+          name: !isAsset1 ? 'amountIn1' : 'amountIn2',
+          errors: [msg],
+        }]);
         setFormatedValue({ [asset]: { value: tradeData, msg } });
       }
 
@@ -174,10 +167,10 @@ function TradeTokensModal({
 
       if (priceBN.gte(new BN(reserve.toString()))) {
         const msg = `Input value exceeds reserves max ${showReserve}`;
-        setError(
-          !isAsset1 ? 'amountIn1' : 'amountIn2',
-          { type: 'custom', message: msg },
-        );
+        form.setFields([{
+          name: !isAsset1 ? 'amountIn1' : 'amountIn2',
+          errors: [msg],
+        }]);
         setFormatedValue({ [asset]: { value: tradeData, msg } });
       }
     } catch (err) {
@@ -219,6 +212,23 @@ function TradeTokensModal({
     return true;
   };
 
+  const amount1In = Form.useWatch('amount1In', form);
+  const amount2In = Form.useWatch('amount2In', form);
+
+  useEffect(() => {
+    if (amount1In && amount1Focused) {
+      handleInputChange(amount1In, asset1);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amount1In]);
+
+  useEffect(() => {
+    if (amount2In && amount2Focused) {
+      handleInputChange(amount2In, asset2);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amount2In]);
+
   useEffect(() => {
     dispatch(dexActions.getDexReserves.call({ asset1, asset2 }));
   }, [dispatch, asset1, asset2]);
@@ -228,11 +238,13 @@ function TradeTokensModal({
   }, [dispatch, asset1, asset2]);
 
   return (
-    <form
+    <Form
       className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={onSubmit}
+      form={form}
+      layout="vertical"
     >
-      <h3 className={styles.h3}>
+      <Title level={3} className={styles.h3}>
         {isBuy ? 'BUY' : 'SELL'}
         {' '}
         {asset1ToShow}
@@ -240,101 +252,123 @@ function TradeTokensModal({
         FOR
         {' '}
         {asset2ToShow}
-      </h3>
-
-      <div className={cx(styles.title, styles.titleFlex)}>
-        <span>
-          Amount In (
-          {isBuy ? asset2ToShow : asset1ToShow}
-          )
-        </span>
-        <span>
-          Balance
-          {' '}
-          {(assetsBalance && assetsBalance.length > 0)
-            ? formatAssets(
-              isBuy ? assetsBalance[1] : assetsBalance[0],
-              isBuy ? decimals2 : decimals1,
-              { symbol: isBuy ? asset2ToShow : asset1ToShow, withAll: true },
-            ) : 0}
-        </span>
-      </div>
-      <TextInput
-        required
-        onChange={(v) => handleInputChange(v, asset1)}
-        validate={(v) => (isBuy
-          ? validate(v, assetsBalance[1], decimals2, asset2)
-          : validate(v, assetsBalance[0], decimals1, asset1))}
-        errorTitle={`Amount In ${asset1ToShow}`}
-        register={register}
-        name="amountIn1"
-      />
-      {errors?.amountIn1 && (
-        <div className={styles.error}>{errors.amountIn1.message}</div>
-      )}
-      <div className={cx(styles.title, styles.titleFlex)}>
-        <span>
-          Amount Out (
-          {!isBuy ? asset2ToShow : asset1ToShow}
-          )
-        </span>
-        <span>
-          Balance
-          {' '}
-          {assetsBalance && assetsBalance.length > 0 ? formatAssets(
-            isBuy ? assetsBalance[0] : assetsBalance[1],
-            isBuy ? decimals1 : decimals2,
-            { symbol: isBuy ? asset1ToShow : asset2ToShow, withAll: true },
-          ) : 0}
-        </span>
-      </div>
-      <TextInput
-        required
-        onChange={(v) => handleInputChange(v, asset2)}
-        validate={(v) => (!isBuy
-          ? validate(v, assetsBalance[1], decimals2, asset2)
-          : validate(v, assetsBalance[0], decimals1, asset1))}
-        errorTitle={`Amount In 2 ${asset2ToShow}`}
-        register={register}
+      </Title>
+      <Form.Item
+        name="assetIn1"
+        label={(
+          <>
+            <span>
+              Amount In (
+              {isBuy ? asset2ToShow : asset1ToShow}
+              )
+            </span>
+            <span>
+              Balance
+              {' '}
+              {(assetsBalance && assetsBalance.length > 0)
+                ? formatAssets(
+                  isBuy ? assetsBalance[1] : assetsBalance[0],
+                  isBuy ? decimals2 : decimals1,
+                  { symbol: isBuy ? asset2ToShow : asset1ToShow, withAll: true },
+                ) : 0}
+            </span>
+          </>
+        )}
+        rules={[
+          { required: true },
+          {
+            validator: (_, v) => {
+              if (v) {
+                const validated = isBuy
+                  ? validate(v, assetsBalance[1], decimals2, asset2)
+                  : validate(v, assetsBalance[0], decimals1, asset1);
+                if (validated) {
+                  return Promise.reject(validated);
+                }
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <InputNumber
+          stringMode
+          controls={false}
+          onFocus={() => setAmount1Focused(true)}
+          onBlur={() => setAmount1Focused(false)}
+        />
+      </Form.Item>
+      <Form.Item
         name="amountIn2"
-      />
-      {errors?.amountIn2 && (
-        <div className={styles.error}>{errors.amountIn2.message}</div>
-      )}
-      <div className={cx(styles.title, isDisplayNone)}>
-        Max Slippage (in percent %)
-      </div>
-      <TextInput
-        className={cx(isDisplayNone)}
-        validate={(v) => (!v ? true : !Number.isNaN(parseInt(v)) || 'Not a valid number')}
-        errorTitle="Amount Percent"
-        register={register}
+        label={(
+          <>
+            <span>
+              Amount Out (
+              {!isBuy ? asset2ToShow : asset1ToShow}
+              )
+            </span>
+            <span>
+              Balance
+              {' '}
+              {assetsBalance && assetsBalance.length > 0 ? formatAssets(
+                isBuy ? assetsBalance[0] : assetsBalance[1],
+                isBuy ? decimals1 : decimals2,
+                { symbol: isBuy ? asset1ToShow : asset2ToShow, withAll: true },
+              ) : 0}
+            </span>
+          </>
+        )}
+        rules={[
+          { required: true },
+          {
+            validator: (_, v) => {
+              if (v) {
+                const validated = !isBuy
+                  ? validate(v, assetsBalance[1], decimals2, asset2)
+                  : validate(v, assetsBalance[0], decimals1, asset1);
+                if (validated) {
+                  return Promise.reject(validated);
+                }
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <InputNumber
+          stringMode
+          controls={false}
+          onFocus={() => setAmount2Focused(true)}
+          onBlur={() => setAmount2Focused(false)}
+        />
+      </Form.Item>
+      <Form.Item
+        label="Max Slippage (in percent %)"
         name="minAmountPercent"
-        placeholder="Default max slippage is 0.5%"
-      />
-      {errors?.amountOutMin && (
-        <div className={cx(styles.error, isDisplayNone)}>{errors.amountOutMin.message}</div>
-      )}
-      <div className={styles.checkbox}>
-        <label>
-          <input
-            type="checkbox"
-            checked={isChecked}
-            onChange={() => setIsChecked((prevValue) => !prevValue)}
-          />
-          Additional Settings
-        </label>
-      </div>
-
-      <div className={styles.buttonWrapper}>
-        <Button medium onClick={closeModal}>
+        rules={[
+          { required: true },
+          { type: 'number' },
+        ]}
+        hidden={details}
+      >
+        <InputNumber controls={false} />
+      </Form.Item>
+      <Form.Item
+        label="Additional Settings"
+        name="details"
+        valuePropName="checked"
+      >
+        <Checkbox />
+      </Form.Item>
+      <Flex gap="15" wrap>
+        <Button medium onClick={closeModal} disabled={loading}>
           Cancel
         </Button>
-        <Button primary medium type="submit">
-          Exchange Tokens
+        <Button primary medium type="submit" disabled={loading}>
+          {loading ? 'Loading...' : 'Exchange Tokens'}
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 

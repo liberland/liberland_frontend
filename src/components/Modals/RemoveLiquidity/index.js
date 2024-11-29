@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import PropsTypes from 'prop-types';
 import Slider from 'antd/es/slider';
-import message from 'antd/es/message';
 import { BN, BN_HUNDRED, BN_MILLION } from '@polkadot/util';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
+import useNotification from 'antd/es/notification/useNotification';
 import ModalRoot from '../ModalRoot';
 import stylesModal from '../styles.module.scss';
 import Button from '../../Button/Button';
@@ -54,6 +54,7 @@ function RemoveLiquidityModal({
     const asset2Data = calculatedAmount2.sub(calculatedAmount2.mul(fee).div(BN_MILLION));
     return { asset1Data, asset2Data };
   }, [liquidity, lpTokensBalance, reserved.asset1, reserved.asset2, withdrawalFee]);
+  const [api, handle] = useNotification();
 
   const onSubmit = async () => {
     setLoading(true);
@@ -72,7 +73,9 @@ function RemoveLiquidityModal({
           withdrawTo,
         },
       ));
-      message.success('Liquidity removed!');
+      api.success({
+        message: 'Liquidity removed!',
+      });
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -107,7 +110,9 @@ function RemoveLiquidityModal({
       className={stylesModal.getCitizenshipModal}
       onFinish={onSubmit}
       form={form}
+      layout="vertical"
     >
+      {handle}
       <Form.Item
         name="lpTokenBurn"
         label="Remove liquidity for pair"

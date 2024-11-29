@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import InputNumber from 'antd/es/input-number';
-import message from 'antd/es/message';
 import Flex from 'antd/es/flex';
+import useNotification from 'antd/es/notification/useNotification';
 import PropTypes from 'prop-types';
 import { blockchainSelectors } from '../../../../redux/selectors';
 import { walletActions } from '../../../../redux/actions';
@@ -18,6 +18,7 @@ function MintAssetForm({ assetId, onClose, minimumBalance }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState();
   const { isStock } = useStockContext();
+  const [api, handle] = useNotification();
 
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
@@ -37,8 +38,12 @@ function MintAssetForm({ assetId, onClose, minimumBalance }) {
         owner: userWalletAddress,
       });
       dispatch(walletActions.getAdditionalAssets.call());
-      message.success(`${isStock ? 'Shares' : 'Assets'} minted successfully`);
+      api.success({
+        message: `${isStock ? 'Shares' : 'Assets'} minted successfully`,
+      });
     } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
       form.setFields([
         {
           name: 'amount',
@@ -59,39 +64,42 @@ function MintAssetForm({ assetId, onClose, minimumBalance }) {
       form={form}
       onFinish={onSubmit}
       className={styles.form}
+      layout="vertical"
     >
-      <Flex wrap gap="15px">
-        <Form.Item
-          name="amount"
-          label="Mint amount"
-          rules={[
-            { required: true },
-            {
-              validator: (_, input, callback) => {
+      {handle}
+      <Form.Item
+        name="amount"
+        label="Mint amount"
+        rules={[
+          { required: true },
+          {
+            validator: (_, input) => {
+              if (input) {
                 try {
                   const isEnough = window.BigInt(input) > window.BigInt(minimumBalance);
                   if (!isEnough) {
-                    callback(`Amount is smaller than minimum balance: ${minimumBalance}`);
+                    return Promise.reject(`Amount is smaller than minimum balance: ${minimumBalance}`);
                   }
                 } catch (e) {
                   // eslint-disable-next-line no-console
                   console.error(e);
-                  callback('Amount is invalid');
+                  return Promise.reject('Amount is invalid');
                 }
-              },
+              }
+              return Promise.resolve();
             },
-          ]}
-        >
-          <InputNumber stringMode controls={false} />
-        </Form.Item>
-        <Form.Item
-          name="beneficiary"
-          label="Beneficiary amount"
-          rules={[{ required: true }]}
-        >
-          <InputSearch />
-        </Form.Item>
-      </Flex>
+          },
+        ]}
+      >
+        <InputNumber stringMode controls={false} />
+      </Form.Item>
+      <Form.Item
+        name="beneficiary"
+        label="Beneficiary amount"
+        rules={[{ required: true }]}
+      >
+        <InputSearch />
+      </Form.Item>
       <Flex wrap gap="15px">
         <Button disabled={loading} medium onClick={onClose}>
           Close
