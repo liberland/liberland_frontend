@@ -45,13 +45,11 @@ function AddLiquidityModal({
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
   const [api, handle] = useNotification();
 
-  const onSubmit = async (data) => {
+  const onSubmit = async ({
+    amount1Desired, amount2Desired, minAmountPercent,
+  }) => {
     setLoading(true);
     try {
-      const {
-        amount1Desired, amount2Desired, minAmountPercent,
-      } = data;
-
       const {
         amount1, amount2, amount1Min, amount2Min,
       } = convertLiquidityData(
@@ -101,7 +99,7 @@ function AddLiquidityModal({
     if (inputBN.gt(assetBN)) {
       return 'Input greater than balance';
     }
-    return true;
+    return undefined;
   };
   const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
 
@@ -127,8 +125,11 @@ function AddLiquidityModal({
     const decimalsOut = isAsset1 ? decimals2 : decimals1;
     const formatedValue = formatAssets(tradeData, decimalsOut);
     const sanitizedValue = sanitizeValue(formatedValue.toString());
-    form.setFieldValue('amount1Desired', isAsset1 ? value : sanitizedValue);
-    form.setFieldValue('amount2Desired', isAsset1 ? sanitizedValue : value);
+    if (isAsset1) {
+      form.setFieldValue('amount2Desired', sanitizedValue);
+    } else {
+      form.setFieldValue('amount1Desired', sanitizedValue);
+    }
     form.validateFields();
   };
 
@@ -157,8 +158,9 @@ function AddLiquidityModal({
   return (
     <Form
       className={styles.getCitizenshipModal}
-      onSubmit={onSubmit}
+      onFinish={onSubmit}
       layout="vertical"
+      form={form}
     >
       {handle}
       <Title level={3}>
@@ -171,7 +173,7 @@ function AddLiquidityModal({
       <Form.Item
         name="amount1Desired"
         label={(
-          <>
+          <Flex gap="15px">
             <span>
               Amount
               {' '}
@@ -187,7 +189,7 @@ function AddLiquidityModal({
                 ? formatAssets(assetsBalance[0], decimals1, { symbol: asset1ToShow, withAll: true }) : 0}
             </span>
             )}
-          </>
+          </Flex>
         )}
         rules={[
           { required: true },
@@ -199,7 +201,7 @@ function AddLiquidityModal({
                   return Promise.reject(validated);
                 }
               }
-              return Promise.resolve;
+              return Promise.resolve();
             },
           },
         ]}
@@ -214,7 +216,7 @@ function AddLiquidityModal({
       <Form.Item
         name="amount2Desired"
         label={(
-          <>
+          <Flex gap="15px">
             <span>
               Amount
               {' '}
@@ -231,7 +233,7 @@ function AddLiquidityModal({
                 ? formatAssets(assetsBalance[1], decimals2, { symbol: asset2ToShow, withAll: true }) : 0}
             </span>
             )}
-          </>
+          </Flex>
         )}
         rules={[
           { required: true },
@@ -239,7 +241,7 @@ function AddLiquidityModal({
             validator: (_, v) => {
               if (v) {
                 const validated = validate(v, assetsBalance[1], decimals2, asset2);
-                if (validate) {
+                if (validated) {
                   return Promise.reject(validated);
                 }
               }
@@ -255,17 +257,18 @@ function AddLiquidityModal({
           onBlur={() => setAsset2Focused(false)}
         />
       </Form.Item>
-      <Form.Item
-        label="Max Slippage (in percent %)"
-        name="minAmountPercent"
-        rules={[
-          { required: true },
-          { type: 'number' },
-        ]}
-        hidden={details}
-      >
-        <InputNumber controls={false} />
-      </Form.Item>
+      {details && (
+        <Form.Item
+          label="Max Slippage (in percent %)"
+          name="minAmountPercent"
+          rules={[
+            { required: true },
+            { type: 'number' },
+          ]}
+        >
+          <InputNumber controls={false} />
+        </Form.Item>
+      )}
       <Form.Item
         label="Additional Settings"
         name="details"

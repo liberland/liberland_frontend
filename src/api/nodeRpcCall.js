@@ -256,12 +256,6 @@ const submitExtrinsic = async (extrinsic, walletAddress, api) => {
   });
 };
 
-const submitExtrinsics = async (extrinsics, walletAddress, api) => submitExtrinsic(
-  api.tx.utility.batch(extrinsics),
-  walletAddress,
-  api,
-);
-
 const getIdentity = async (address) => {
   try {
     const api = await getApi();
@@ -290,24 +284,22 @@ const createOrUpdateAsset = async ({
 }) => {
   try {
     const api = await getApi();
-    const extrinsics = [];
     if (isCreate) {
       const create = await api.tx.assets.create(id, admin, minBalance);
-      extrinsics.push(create);
+      await submitExtrinsic(create, owner, api);
     }
     if (defaultValues?.name !== name || defaultValues?.symbol !== symbol || defaultValues?.decimals !== decimals) {
       const setMetadata = await api.tx.assets.setMetadata(id, name, symbol, decimals);
-      extrinsics.push(setMetadata);
+      await submitExtrinsic(setMetadata, owner, api);
     }
     if (defaultValues?.issuer !== issuer || defaultValues?.admin !== admin || defaultValues?.freezer !== freezer) {
       const setTeam = await api.tx.assets.setTeam(id, issuer, admin, freezer);
-      extrinsics.push(setTeam);
+      await submitExtrinsic(setTeam, owner, api);
     }
     if (isStock && isCreate) {
-      const params = await api.tx.assets.setParameters({ eresidencyRequired: true });
-      extrinsics.push(params);
+      const params = await api.tx.assets.setParameters(id, { eresidencyRequired: true });
+      await submitExtrinsic(params, owner, api);
     }
-    await submitExtrinsics(extrinsics, owner, api);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -436,7 +428,7 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
       index: parseInt(rawEntry[0].toHuman()[0].replace(/,/g, '')),
       metadata: rawEntry[1].toHuman(),
     }));
-    const indexedFilteredAssets = [];
+    const assets = [];
     const assetQueries = [];
     const parametersQueries = [];
     processedMetadatas.forEach((asset) => {
@@ -445,30 +437,33 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
       if (isLLM) {
         assetQueries.push([api.query.assets.account, [asset.index, address]]);
         parametersQueries.push([api.query.assets.parameters, [asset.index]]);
-        if (isIndexNeed) {
-          indexedFilteredAssets[asset.index] = asset;
-        } else {
-          indexedFilteredAssets.push(asset);
-        }
+        assets.push(asset);
       }
     });
-    if (isIndexNeed) {
-      return indexedFilteredAssets;
-    }
 
     if (assetQueries.length !== 0) {
       const assetResults = await api.queryMulti(assetQueries);
-      const parametersResults = await api.queryMulti(parametersQueries);
 
       assetResults.forEach((assetResult, index) => {
-        indexedFilteredAssets[index].balance = assetResult.toJSON() || '0';
+        assets[index].balance = assetResult.toJSON() || '0';
       });
-      parametersResults.forEach(({ eresidencyRequired }, index) => {
-        indexedFilteredAssets[index].isStock = eresidencyRequired?.valueOf() || false;
-      });
-      return indexedFilteredAssets;
     }
-    return [];
+
+    if (parametersQueries.length !== 0) {
+      const parametersResults = await api.queryMulti(parametersQueries);
+      parametersResults.forEach(({ eresidencyRequired }, index) => {
+        assets[index].isStock = eresidencyRequired?.valueOf() || false;
+      });
+    }
+
+    if (isIndexNeed) {
+      return assets.reduce((acc, asset) => {
+        acc[asset.index] = asset;
+        return acc;
+      }, {});
+    }
+
+    return assets;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);

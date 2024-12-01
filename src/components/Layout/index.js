@@ -144,6 +144,11 @@ function Layout({ children }) {
 
   return (
     <ConfigProvider
+      form={{
+        validateMessages: {
+          required: 'Enter a value',
+        },
+      }}
       theme={{
         token: {
           colorText: '#243F5F',

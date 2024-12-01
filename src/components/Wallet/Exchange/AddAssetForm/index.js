@@ -5,6 +5,7 @@ import Select from 'antd/es/select';
 import useNotification from 'antd/es/notification/useNotification';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
+import { useStockContext } from '../../StockContext';
 import { createNewPool } from '../../../../api/nodeRpcCall';
 import Button from '../../../Button/Button';
 import ModalRoot from '../../../Modals/ModalRoot';
@@ -30,17 +31,28 @@ function AddAssetFormDisplay({
     dispatch(walletActions.getAdditionalAssets.call());
   }, [dispatch]);
 
+  const { isStock } = useStockContext();
   const filtered = React.useMemo(() => {
-    const allOptions = additionalAssets?.reduce((pairings, aAsset, index) => {
-      pairings.push(['Native', aAsset]);
-      additionalAssets.slice(index + 1).forEach((bAsset) => {
-        pairings.push([
-          aAsset,
-          bAsset,
-        ]);
-      });
-      return pairings;
-    }, []);
+    const allOptions = additionalAssets
+      ?.reduce((pairings, aAsset, index) => {
+        if (isStock === aAsset.isStock) {
+          pairings.push(['Native', aAsset]);
+        }
+        additionalAssets.slice(index + 1).forEach((bAsset) => {
+          if (isStock && (aAsset.isStock || bAsset.isStock)) {
+            pairings.push([
+              aAsset,
+              bAsset,
+            ]);
+          } else if (!isStock && (!aAsset.isStock && !bAsset.isStock)) {
+            pairings.push([
+              aAsset,
+              bAsset,
+            ]);
+          }
+        });
+        return pairings;
+      }, []);
 
     const usedPairings = poolsData.map(({
       asset1,
@@ -84,7 +96,7 @@ function AddAssetFormDisplay({
       }
       return mappedOptions;
     }, {});
-  }, [poolsData, additionalAssets]);
+  }, [additionalAssets, poolsData, isStock]);
 
   const onSubmit = async ({ firstAsset: firstAssetKey, secondAsset: secondAssetKey }) => {
     setLoading(true);
@@ -150,7 +162,9 @@ function AddAssetFormDisplay({
           <Form.Item
             label="Select second pool asset"
             name="secondAsset"
-            rules={[{ required: true }]}
+            rules={[
+              { required: true },
+            ]}
           >
             <Select>
               <Select.Option value="" />

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Input from 'antd/es/input';
 import Flex from 'antd/es/flex';
+import Paragraph from 'antd/es/typography/Paragraph';
 import useNotification from 'antd/es/notification/useNotification';
 import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
@@ -71,7 +72,7 @@ function UpdateOrCreateAssetForm({
       form.setFields([
         {
           name: 'name',
-          errors: 'Something went wrong',
+          errors: ['Something went wrong'],
         },
       ]);
     } finally {
@@ -157,6 +158,9 @@ function UpdateOrCreateAssetForm({
       >
         <InputSearch />
       </Form.Item>
+      <Paragraph>
+        May ask you to sign up to 4 transactions
+      </Paragraph>
       <Flex wrap gap="15px">
         <Button disabled={loading} medium onClick={onClose}>
           Close
@@ -202,7 +206,6 @@ function UpdateOrCreateAssetFormModalWrapper({
       <Button
         primary
         medium
-        flex={!isCreate}
         onClick={() => setShow(true)}
       >
         {isCreate ? `Create ${isStock ? 'stock' : 'asset'}` : 'Update'}

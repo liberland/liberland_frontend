@@ -50,14 +50,11 @@ function ExchangeList() {
     );
   }
 
-  if (!highLiquidity.length && !lowLiquidity.length) {
-    return (
-      <Alert type="error" className={styles.noneFound} message="No pools were found" />
-    );
-  }
-
   return (
     <>
+      {!highLiquidity.length && !lowLiquidity.length && (
+        <Alert type="error" className={styles.noneFound} message="No pools were found" />
+      )}
       {highLiquidity.length > 0 && (
         <Collapse
           defaultActiveKey={['highliq']}

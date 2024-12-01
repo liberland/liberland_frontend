@@ -22,6 +22,7 @@ import {
 import { AssetsPropTypes } from '../Wallet/Exchange/proptypes';
 import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } from '../../api/nodeRpcCall';
 import { formatAssets, parseAssets, sanitizeValue } from '../../utils/walletHelpers';
+import { useStockContext } from '../Wallet/StockContext';
 
 function TradeTokensModal({
   closeModal, assets, isBuy,
@@ -58,21 +59,22 @@ function TradeTokensModal({
   const [amount2Focused, setAmount2Focused] = useState();
   const [form] = Form.useForm();
   const details = Form.useWatch('details', form);
+  const { isStock } = useStockContext();
 
-  const onSubmit = async (data) => {
+  const onSubmit = async ({
+    amount1In, amountIn2, minAmountPercent,
+  }) => {
     setLoading(true);
     try {
-      const { amountIn1, amountIn2, minAmountPercent } = data;
-      const amountOut = minAmountPercent.length > 0 ? minAmountPercent : undefined;
       const { amount, amountMin } = await convertTransferData(
         asset1,
         decimals1,
         asset2,
         decimals2,
-        amountIn1,
+        amount1In,
         amountIn2,
         isBuy,
-        amountOut,
+        minAmountPercent || '0',
         isAsset1State,
       );
 
@@ -150,8 +152,12 @@ function TradeTokensModal({
         decimalsOut,
       ) : '';
       const sanitizedValue = sanitizeValue(formatedValueData);
-      form.setFieldValue('amountIn1', isAsset1 ? term : sanitizedValue);
-      form.setFieldValue('amountIn2', isAsset1 ? sanitizedValue : term);
+      if (isAsset1) {
+        form.setFieldValue('amountIn2', sanitizedValue);
+      } else {
+        form.setFieldValue('amountIn1', sanitizedValue);
+      }
+
       form.validateFields();
 
       if (!tradeData) {
@@ -179,7 +185,7 @@ function TradeTokensModal({
     }
   };
 
-  const validate = async (v, assetBalance, decimals, asset) => {
+  const validate = (v, assetBalance, decimals, asset) => {
     if (!v) {
       return 'Required';
     }
@@ -209,7 +215,7 @@ function TradeTokensModal({
         return 'Input greater than balance';
       }
     }
-    return true;
+    return undefined;
   };
 
   const amount1In = Form.useWatch('amount1In', form);
@@ -237,26 +243,28 @@ function TradeTokensModal({
     dispatch(walletActions.getAssetsBalance.call([asset1, asset2]));
   }, [dispatch, asset1, asset2]);
 
+  const submitText = isStock ? 'Trade stock' : 'Exchange tokens';
+
   return (
     <Form
       className={styles.getCitizenshipModal}
-      onSubmit={onSubmit}
+      onFinish={onSubmit}
       form={form}
       layout="vertical"
     >
-      <Title level={3} className={styles.h3}>
-        {isBuy ? 'BUY' : 'SELL'}
+      <Title level={3}>
+        {isBuy ? 'Buy' : 'Sell'}
         {' '}
         {asset1ToShow}
         {' '}
-        FOR
+        for
         {' '}
         {asset2ToShow}
       </Title>
       <Form.Item
-        name="assetIn1"
+        name="amount1In"
         label={(
-          <>
+          <Flex gap="15px">
             <span>
               Amount In (
               {isBuy ? asset2ToShow : asset1ToShow}
@@ -272,7 +280,7 @@ function TradeTokensModal({
                   { symbol: isBuy ? asset2ToShow : asset1ToShow, withAll: true },
                 ) : 0}
             </span>
-          </>
+          </Flex>
         )}
         rules={[
           { required: true },
@@ -301,7 +309,7 @@ function TradeTokensModal({
       <Form.Item
         name="amountIn2"
         label={(
-          <>
+          <Flex gap="15px">
             <span>
               Amount Out (
               {!isBuy ? asset2ToShow : asset1ToShow}
@@ -316,7 +324,7 @@ function TradeTokensModal({
                 { symbol: isBuy ? asset1ToShow : asset2ToShow, withAll: true },
               ) : 0}
             </span>
-          </>
+          </Flex>
         )}
         rules={[
           { required: true },
@@ -342,17 +350,18 @@ function TradeTokensModal({
           onBlur={() => setAmount2Focused(false)}
         />
       </Form.Item>
-      <Form.Item
-        label="Max Slippage (in percent %)"
-        name="minAmountPercent"
-        rules={[
-          { required: true },
-          { type: 'number' },
-        ]}
-        hidden={details}
-      >
-        <InputNumber controls={false} />
-      </Form.Item>
+      {details && (
+        <Form.Item
+          label="Max Slippage (in percent %)"
+          name="minAmountPercent"
+          rules={[
+            { required: true },
+            { type: 'number' },
+          ]}
+        >
+          <InputNumber controls={false} />
+        </Form.Item>
+      )}
       <Form.Item
         label="Additional Settings"
         name="details"
@@ -360,12 +369,12 @@ function TradeTokensModal({
       >
         <Checkbox />
       </Form.Item>
-      <Flex gap="15" wrap>
+      <Flex gap="15px" wrap>
         <Button medium onClick={closeModal} disabled={loading}>
           Cancel
         </Button>
         <Button primary medium type="submit" disabled={loading}>
-          {loading ? 'Loading...' : 'Exchange Tokens'}
+          {loading ? 'Loading...' : submitText}
         </Button>
       </Flex>
     </Form>

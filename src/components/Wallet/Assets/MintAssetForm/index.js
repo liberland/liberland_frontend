@@ -14,10 +14,14 @@ import InputSearch from '../../../InputComponents/InputSearchAddressName';
 import styles from './styles.module.scss';
 import { useStockContext } from '../../StockContext';
 
-function MintAssetForm({ assetId, onClose, minimumBalance }) {
+function MintAssetForm({
+  assetId,
+  onClose,
+  minimumBalance,
+  isStock,
+}) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState();
-  const { isStock } = useStockContext();
   const [api, handle] = useNotification();
 
   const dispatch = useDispatch();
@@ -59,6 +63,8 @@ function MintAssetForm({ assetId, onClose, minimumBalance }) {
     return <div>Loading...</div>;
   }
 
+  const submitText = isStock ? 'Issue stock' : 'Mint assets';
+
   return (
     <Form
       form={form}
@@ -69,7 +75,7 @@ function MintAssetForm({ assetId, onClose, minimumBalance }) {
       {handle}
       <Form.Item
         name="amount"
-        label="Mint amount"
+        label={`${isStock ? 'Issue' : 'Mint'} amount`}
         rules={[
           { required: true },
           {
@@ -110,7 +116,7 @@ function MintAssetForm({ assetId, onClose, minimumBalance }) {
           type="submit"
           disabled={loading}
         >
-          {loading ? 'Minting...' : 'Mint assets'}
+          {loading ? 'Minting...' : submitText}
         </Button>
       </Flex>
     </Form>
@@ -121,6 +127,7 @@ MintAssetForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   assetId: PropTypes.number.isRequired,
   minimumBalance: PropTypes.number.isRequired,
+  isStock: PropTypes.bool,
 };
 
 function MintAssetFormModalWrapper({
@@ -128,15 +135,15 @@ function MintAssetFormModalWrapper({
   minimumBalance,
 }) {
   const [show, setShow] = React.useState();
+  const { isStock } = useStockContext();
   return (
     <>
       <Button
         primary
         medium
-        flex
         onClick={() => setShow(true)}
       >
-        Mint asset
+        {isStock ? 'Issue stock' : 'Mint asset'}
       </Button>
       {show && (
         <ModalRoot>
@@ -144,6 +151,7 @@ function MintAssetFormModalWrapper({
             assetId={assetId}
             minimumBalance={minimumBalance}
             onClose={() => setShow(false)}
+            isStock={isStock}
           />
         </ModalRoot>
       )}

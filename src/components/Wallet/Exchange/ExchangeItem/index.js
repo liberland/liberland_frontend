@@ -121,12 +121,14 @@ function ExchangeItem({ poolData, assetsPoolData }) {
               assets={assets}
               isReservedDataEmpty={isReservedDataEmpty}
             />
-            <RemoveLiquidityModalWrapper
-              assets={assets}
-              reserved={reserved}
-              lpTokensBalance={lpTokensBalance}
-              liquidity={liquidity}
-            />
+            {reserved && (
+              <RemoveLiquidityModalWrapper
+                assets={assets}
+                reserved={reserved}
+                lpTokensBalance={lpTokensBalance}
+                liquidity={liquidity}
+              />
+            )}
           </Flex>
         </div>
       </Flex>

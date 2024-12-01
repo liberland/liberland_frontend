@@ -99,10 +99,12 @@ function RemoveLiquidityModal({
   }, [dispatch]);
 
   useEffect(() => {
-    setPercentBurnTokens(lpTokenBurn);
-    const { asset1Data, asset2Data } = calculateAssetToBurn(lpTokenBurn);
-    setAsset1Amount(asset1Data);
-    setAsset2Amount(asset2Data);
+    if (lpTokenBurn) {
+      setPercentBurnTokens(lpTokenBurn);
+      const { asset1Data, asset2Data } = calculateAssetToBurn(lpTokenBurn);
+      setAsset1Amount(asset1Data);
+      setAsset2Amount(asset2Data);
+    }
   }, [calculateAssetToBurn, lpTokenBurn]);
 
   return (
@@ -118,7 +120,7 @@ function RemoveLiquidityModal({
         label="Remove liquidity for pair"
         initialValue={0}
         rules={[
-          { required: true },
+          { required: true, message: 'Enter a value' },
           { type: 'number' },
         ]}
       >
@@ -138,6 +140,7 @@ function RemoveLiquidityModal({
         <div className={styles.assetToBurn}>
           <span>
             Pooled
+            {' '}
           </span>
           <span>
             {formatAssets(
@@ -150,6 +153,7 @@ function RemoveLiquidityModal({
         <div className={styles.assetToBurn}>
           <span>
             Pooled
+            {' '}
           </span>
           <span>
             {formatAssets(
@@ -178,7 +182,7 @@ function RemoveLiquidityModal({
 RemoveLiquidityModal.propTypes = {
   closeModal: PropsTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
-  reserved: ReservedAssetPropTypes.isRequired,
+  reserved: ReservedAssetPropTypes,
   // eslint-disable-next-line react/forbid-prop-types
   lpTokensBalance: PropsTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
@@ -215,7 +219,7 @@ function RemoveLiquidityModalWrapper({
 
 RemoveLiquidityModalWrapper.propTypes = {
   assets: AssetsPropTypes.isRequired,
-  reserved: ReservedAssetPropTypes.isRequired,
+  reserved: ReservedAssetPropTypes,
   // eslint-disable-next-line react/forbid-prop-types
   lpTokensBalance: PropsTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
