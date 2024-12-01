@@ -120,10 +120,8 @@ async function primeFinder() {
     const [foundPrime, d, s] = isPrime(n);
     if (foundPrime) {
       postMessage({ n, d, s });
-      n = getRandom();
-    } else {
-      n += 2n;
     }
+    n += 2n;
   }
 }
 

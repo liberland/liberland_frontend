@@ -138,13 +138,17 @@ module.exports = (env, argv) => {
               importLoaders: 2,
               modules: true,
             },
-            // eslint-disable-next-line comma-dangle
             'sass-loader'
           ),
         },
       ],
     },
-    devtool: argv.mode === 'development' ? 'eval-source-map' : undefined,
+    devtool: argv.mode === 'development' ? 'eval-cheap-module-source-map' : undefined,
+    cache: argv.mode === 'development' ? {
+      type: 'filesystem',
+      compression: 'gzip',
+      allowCollectingMemory: true,
+    } : undefined,
     plugins: [
       new HtmlWebPackPlugin({
         template: path.resolve(__dirname, 'public/index.html'),

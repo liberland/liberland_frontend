@@ -40,28 +40,32 @@ export function createGradient(number) {
     colors[colors.length - 1] += firstColor;
     colors[colors.length - 1] = colors[colors.length - 1].slice(0, 7);
   }
-  const gradientPart = parseInt(colors[5][1], 16) % 3;
+  const hash = objectHash(colors).split('').map((byte) => parseInt(byte, 16));
+  const gradientPart = hash[0] % 3;
   if (gradientPart === 1) {
     colors.push(...Array(40).fill('rgba(0, 0, 0, 0)'));
   }
+  const combineNumbers = (...numbers) => numbers
+    .map((n, i) => n * (16 ** i))
+    .reduce((p, c) => p + c, 0);
   const css = tinygradient(colors).css(gradientPart === 1 ? 'radial' : 'linear');
-  const [x, y, z] = colors[0].split('#')[1].split('').map((n) => parseInt(n, 16));
-  const shadow = colors[1];
-  const sepia = parseInt(colors[2][1], 16) % 2 ? ` sepia(${parseInt(colors[2][1] + colors[2][2], 16) % 100}%)` : '';
-  const contrast = parseInt(colors[3][1], 16) % 2
-    ? ` contrast(${parseInt(colors[3][1] + colors[3][2], 16)}%)`
+  const [x, y, z] = hash.slice(1, 4);
+  const shadow = `#${hash.slice(4, 10).map((toBytes) => toBytes.toString(16)).join('')}`;
+  const sepia = hash[10] % 2 ? ` sepia(${combineNumbers(hash[11], hash[12]) % 100}%)` : '';
+  const contrast = hash[13] % 2
+    ? ` contrast(${combineNumbers(hash[14], hash[15])}%)`
     : '';
-  const saturate = parseInt(colors[4][1], 16) % 2
-    ? ` saturate(${parseInt(colors[4][2], 16)})`
+  const saturate = hash[16] % 2
+    ? ` saturate(${hash[17]})`
     : '';
-  const brightness = parseInt(colors[6][1], 16) % 2
-    ? ` brightness(${parseInt(colors[6][2] + colors[6][3], 16)}%)`
+  const brightness = hash[18] % 2
+    ? ` brightness(${combineNumbers(hash[19], hash[20])}%)`
     : '';
-  const rotateHue = parseInt(colors[7][1], 16) % 2
-    ? ` hue-rotate(${parseInt(colors[7][2] + colors[7][3] + colors[7][4], 16) % 360}deg)`
+  const rotateHue = hash[21] % 2
+    ? ` hue-rotate(${combineNumbers(hash[22], hash[23], hash[24]) % 360}deg)`
     : '';
 
-  return {
+  const styles = {
     background: gradientPart === 2
       ? css.replace('linear-gradient(to right, ', 'conic-gradient(') // Library doesn't support conic gradient :-(
       : css, // Styling must be internal to allow for print!
@@ -71,13 +75,15 @@ export function createGradient(number) {
     minHeight: '170px',
     borderRadius: gradientPart === 2 ? '50%' : undefined,
     filter: `drop-shadow(${
-      Math.max(-10, Math.min(10, x * (x % 2 ? -1 : 1)))
+      x * (hash[25] % 2 ? -1 : 1)
     }px ${
-      Math.max(-10, Math.min(10, y * (y % 2 ? -1 : 1)))
+      y * (hash[26] % 2 ? -1 : 1)
     }px ${
       Math.min(10, z + 3)
     }px ${shadow})${sepia}${contrast}${saturate}${brightness}${rotateHue}`,
   };
+
+  return styles;
 }
 
 export async function downloadImage(id, htmlElement) {

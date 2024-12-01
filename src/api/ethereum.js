@@ -61,12 +61,15 @@ const resolveOperationFactory = (contractAddress, account) => async (methodName,
     transaction,
     account: adaptedAccount,
   });
-  await waitForReceipt({
+  const receipt = await waitForReceipt({
     chain,
     client,
     transactionHash,
     maxBlocksWaitTime: 20,
   });
+  if (receipt.status === 'reverted') {
+    throw receipt;
+  }
 };
 
 const getOwnNftPrimeCount = async ({ account }) => {
