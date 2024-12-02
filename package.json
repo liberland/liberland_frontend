@@ -21,6 +21,7 @@
     "antd": "^5.22.0",
     "axios": "^0.19.0",
     "babel-plugin-named-asset-import": "^0.3.8",
+    "bigint-isqrt": "^0.3.2",
     "buffer": "^6.0.3",
     "classnames": "^2.3.1",
     "crypto-browserify": "^3.12.0",
