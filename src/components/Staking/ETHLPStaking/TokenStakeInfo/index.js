@@ -8,6 +8,7 @@ import { formatCustom } from '../../../../utils/walletHelpers';
 import Table from '../../../Table';
 import Button from '../../../Button/Button';
 import StakeForm from '../StakeForm';
+import StakeEthForm from '../StakeEthForm';
 import ClaimReward from '../ClaimReward';
 import WithdrawForm from '../WithdrawForm';
 import styles from './styles.module.scss';
@@ -115,28 +116,35 @@ function TokenStakeInfo({ selectedAccount }) {
 
   return (
     <div>
-      {selectedAccount && stakingTokenInfo && stakingTokenBalance && (
-        <StakeForm
-          account={selectedAccount}
-          stakingToken={{
-            ...stakingTokenInfo,
-            address: tokenStakeInfo.stakingToken,
-            balance: stakingTokenBalance.balance.toString(),
-            decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
-          }}
-        />
-      )}
-      {selectedAccount && stakingTokenInfo && addressInfo && (
-        <WithdrawForm
-          account={selectedAccount}
-          stakingToken={{
-            ...stakingTokenInfo,
-            address: tokenStakeInfo.stakingToken,
-            balance: addressInfo.stake[0].toString(),
-            decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
-          }}
-        />
-      )}
+      <div className={styles.stakingContainer}>
+        {selectedAccount && stakingTokenInfo && stakingTokenBalance && (
+          <>
+            <StakeForm
+              account={selectedAccount}
+              stakingToken={{
+                ...stakingTokenInfo,
+                address: tokenStakeInfo.stakingToken,
+                balance: stakingTokenBalance.balance.toString(),
+                decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
+              }}
+            />
+            <StakeEthForm
+              account={selectedAccount}
+            />
+          </>
+        )}
+        {selectedAccount && stakingTokenInfo && addressInfo && (
+          <WithdrawForm
+            account={selectedAccount}
+            stakingToken={{
+              ...stakingTokenInfo,
+              address: tokenStakeInfo.stakingToken,
+              balance: addressInfo.stake[0].toString(),
+              decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
+            }}
+          />
+        )}
+      </div>
       <div className={styles.detailContainer}>
         <div className={styles.tableContainer}>
           <Table

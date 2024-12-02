@@ -128,3 +128,7 @@ p {
 .ant-table-wrapper {
   overflow-x: auto;
 }
+
+th.ant-table-cell {
+  word-break: keep-all;
+}

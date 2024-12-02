@@ -52,8 +52,7 @@ function Layout({ children }) {
     }));
     return {
       icon: <img src={navigation.icon} alt="icon" className={styles.icon} />,
-      dashed: navigation.isDiscouraged,
-      label: navigation.title,
+      label: <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>{navigation.title}</span>,
       key: navigation.route,
       onClick: subs.length ? undefined : () => history.push(navigation.route),
       children: subs.length ? subs : undefined,
@@ -141,6 +140,7 @@ function Layout({ children }) {
       ] : navigationList.map(createMenu)}
     />
   );
+  const isEResident = roles?.['e-resident'] === 'e-resident';
 
   return (
     <ConfigProvider
@@ -244,7 +244,7 @@ function Layout({ children }) {
               {urlMenu}
               <img alt="logo" src={LiberlandLettermarkMobile} className={styles.mobileLogo} />
               <div className={styles.mobileUser}>
-                <UserMenu />
+                <UserMenu isEResident={isEResident} />
               </div>
             </>
           )}
@@ -252,7 +252,7 @@ function Layout({ children }) {
             <div className={styles.user}>
               <Flex gap="20px" align="center" justify="center">
                 <ChangeWallet />
-                <UserMenu />
+                <UserMenu isEResident={isEResident} />
               </Flex>
             </div>
           )}

@@ -8,10 +8,30 @@ import {
   getERC20Info,
   getERC20Balance,
   getAvailableWallets,
+  getSwapExchangeRate,
+  getBalance,
 } from '../../api/ethereum';
 import { ethActions } from '../actions';
 
 // WORKERS
+
+function* getWethExchangeRateWorker(action) {
+  try {
+    const wallets = yield call(getSwapExchangeRate, action.payload);
+    yield put(ethActions.getWethLpExchangeRate.success(wallets));
+  } catch (e) {
+    yield put(ethActions.getWethLpExchangeRate.failure(e));
+  }
+}
+
+function* getBalanceWorker(action) {
+  try {
+    const balance = yield call(getBalance, action.payload);
+    yield put(ethActions.getBalance.success(balance));
+  } catch (e) {
+    yield put(ethActions.getBalance.failure(e));
+  }
+}
 
 function* getWalletOptionsWorker(action) {
   try {
@@ -87,6 +107,22 @@ function* erc20BalanceWorker(action) {
 
 // WATCHERS
 
+function* getBalanceWatcher() {
+  try {
+    yield takeLatest(ethActions.getBalance.call, getBalanceWorker);
+  } catch (e) {
+    yield put(ethActions.getBalance.failure(e));
+  }
+}
+
+function* getWethExchangeRateWatcher() {
+  try {
+    yield takeLatest(ethActions.getWethLpExchangeRate.call, getWethExchangeRateWorker);
+  } catch (e) {
+    yield put(ethActions.getWethLpExchangeRate.failure(e));
+  }
+}
+
 function* tokenStakeContractInfoWatcher() {
   try {
     yield takeLatest(ethActions.getTokenStakeContractInfo.call, tokenStakeContractInfoWorker);
@@ -136,10 +172,12 @@ function* getWalletConnectingWatcher() {
 }
 
 export {
+  getWethExchangeRateWatcher,
   getWalletOptionsWatcher,
   getWalletConnectingWatcher,
   tokenStakeContractInfoWatcher,
   tokenStakeAddressInfoWatcher,
   erc20InfoWatcher,
   erc20BalanceWatcher,
+  getBalanceWatcher,
 };
