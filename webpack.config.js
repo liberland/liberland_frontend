@@ -1,3 +1,4 @@
+/* eslint-disable */
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const Dotenv = require('dotenv-webpack');
