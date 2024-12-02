@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import { useHistory } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
@@ -11,8 +12,11 @@ import { userSelectors } from '../../redux/selectors';
 import { authActions } from '../../redux/actions';
 import ChangeWallet from '../Home/ChangeWallet';
 import styles from './styles.module.scss';
+import GetCitizenshipCard from '../Home/Cards/GetCitizenshipCard';
 
-function UserMenu() {
+function UserMenu({
+  isEResident,
+}) {
   const { logOut, login } = React.useContext(AuthContext);
   const history = useHistory();
   const user = useSelector(userSelectors.selectUser);
@@ -27,6 +31,11 @@ function UserMenu() {
     label: 'Login',
   };
 
+  const eResidentAction = {
+    key: 'eresident',
+    label: <GetCitizenshipCard />,
+  };
+
   return (
     <Dropdown
       menu={{
@@ -35,7 +44,7 @@ function UserMenu() {
         ].concat(isBiggerThanSmallScreen ? [] : [{
           key: 'wallets',
           label: <ChangeWallet />,
-        }]),
+        }]).concat(isEResident ? [eResidentAction] : []),
         onClick: ({ key }) => {
           if (key === 'login') {
             login();
@@ -57,5 +66,9 @@ function UserMenu() {
     </Dropdown>
   );
 }
+
+UserMenu.propTypes = {
+  isEResident: PropTypes.bool,
+};
 
 export default UserMenu;

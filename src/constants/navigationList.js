@@ -16,7 +16,7 @@ export const navigationList = [
     title: 'FEED',
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: FeedIcon,
-    isDiscouraged: process.env.REACT_APP_IS_FEED_DISCOURAGED,
+    isDiscouraged: process.env.REACT_APP_IS_FEED_DISCOURAGED === 'true',
     subLinks: {},
     hideTitle: true,
   },
@@ -25,7 +25,7 @@ export const navigationList = [
     title: 'WALLET',
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: WalletIcon,
-    isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
+    isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED === 'true',
     subLinks: {
       Overview: router.wallet.overView,
       Exchange: router.wallet.exchange,
@@ -40,7 +40,7 @@ export const navigationList = [
     title: 'VOTING',
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: VotingIcon,
-    isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED,
+    isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED === 'true',
     subLinks: {
       'Congressional Assemble': router.voting.congressionalAssemble,
       Referendum: router.voting.referendum,
@@ -52,7 +52,7 @@ export const navigationList = [
     title: 'CONTRACTS',
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
-    isDiscouraged: process.env.REACT_APP_IS_CONTRACTS_DISCOURAGED,
+    isDiscouraged: process.env.REACT_APP_IS_CONTRACTS_DISCOURAGED === 'true',
     subLinks: {
       Overview: router.contracts.overview,
       'My contracts': router.contracts.myContracts,
@@ -63,7 +63,7 @@ export const navigationList = [
     title: 'LEGISLATION',
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: ConstitutionIcon,
-    isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED,
+    isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED === 'true',
     subLinks: {},
   },
   {
@@ -71,7 +71,7 @@ export const navigationList = [
     title: 'OFFICES',
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: ConstitutionIcon,
-    isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED,
+    isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
       Identity: router.offices.identity,
@@ -86,7 +86,7 @@ export const navigationList = [
     title: 'COMPANIES',
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
-    isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED,
+    isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED === 'true',
     subLinks: {
       Companies: router.companies.home,
       Create: router.companies.create,
@@ -98,7 +98,7 @@ export const navigationList = [
     title: 'REGISTRIES',
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
-    isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED,
+    isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED === 'true',
     subLinks: {
       Overview: router.registries.overview,
       'All companies': router.registries.allCompanies,
@@ -112,7 +112,7 @@ export const navigationList = [
     title: 'STAKING',
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
-    isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED,
+    isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED === 'true',
     subLinks: {
       Overview: router.staking.overview,
       'ETH LP Staking': router.staking.ethlpstaking,
@@ -123,7 +123,7 @@ export const navigationList = [
     title: 'CONGRESS',
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
-    isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
+    isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
       Overview: router.congress.overview,
@@ -139,7 +139,7 @@ export const navigationList = [
     title: 'SENATE',
     access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
-    isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED,
+    isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
       Motions: router.senate.motions,
