@@ -43,7 +43,7 @@ export default function WalletCongresSenateWrapper({
       <div
         className={cx(stylesPage.menuAddressWrapper, styles.walletMenuWrapper)}
       >
-        <div className={walletStyles.walletAddressLineWrapper}>
+        <div className={cx(walletStyles.walletAddressLineWrapper, styles.walletAddressWrapper)}>
           <div className={walletStyles.navWallet}>
             <div className={walletStyles.addressesWrapper}>
               <div className={walletStyles.singleAddressWrapper}>
@@ -90,17 +90,21 @@ export default function WalletCongresSenateWrapper({
         </div>
       </div>
 
-      <BalanceOverview
-        totalBalance={totalBalance}
-        balances={balances}
-        liquidMerits={liquidMerits}
-        showStaked={false}
-      />
-      <AssetOverview
-        additionalAssets={additionalAssets}
-        isRemarkNeeded
-        isCongress={isCongress}
-      />
+      <div className={styles.balanceWrapper}>
+        <BalanceOverview
+          totalBalance={totalBalance}
+          balances={balances}
+          liquidMerits={liquidMerits}
+          showStaked={false}
+        />
+      </div>
+      <div className={styles.assetsWrapper}>
+        <AssetOverview
+          additionalAssets={additionalAssets}
+          isRemarkNeeded
+          isCongress={isCongress}
+        />
+      </div>
       {isModalOpenLLDSpend && (
       <SpendModalWrapper
         isCongress={isCongress}

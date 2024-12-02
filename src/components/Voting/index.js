@@ -42,7 +42,6 @@ function Voting() {
           >
             <Button
               onClick={() => !user && login()}
-              small
               primary
             >
               {user ? 'Propose' : 'Log in to propose referenda'}
