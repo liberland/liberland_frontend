@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sider as SiderInternal } from 'antd/es/layout/layout';
+import SiderInternal from 'antd/es/layout/Sider';
 import { useMediaQuery } from 'usehooks-ts';
 import UrlMenu from '../UrlMenu';
 

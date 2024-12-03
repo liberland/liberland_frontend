@@ -1,11 +1,11 @@
 import React from 'react';
 import classNames from 'classnames';
-import { Menu } from 'antd/es/layout/layout';
+import Menu from 'antd/es/menu';
+import MenuIcon from '@ant-design/icons/MenuOutlined';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
 import styles from '../styles.module.scss';
 import { useNavigationList } from '../hooks';
-import MenuIcon from '../../../assets/icons/menu.svg';
 
 function UrlMenu() {
   const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
