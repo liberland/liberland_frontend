@@ -1,9 +1,9 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
 import router from '../../router';
-import HomeContract from './Home';
-import Contract from './Contract';
-import MyContracts from './MyContracts';
+import { loaderFactory } from '../../utils/loader';
+
+const loader = loaderFactory(__dirname);
 
 export default function Contracts() {
   return (
@@ -11,14 +11,14 @@ export default function Contracts() {
       <Route
         exact
         path={router.contracts.overview}
-        component={HomeContract}
+        component={loader('./Home')}
       />
       <Route
         exact
         path={router.contracts.myContracts}
-        component={MyContracts}
+        component={loader('./MyContracts')}
       />
-      <Route path={router.contracts.item} component={Contract} />
+      <Route path={router.contracts.item} component={loader('./Contract')} />
       <Route
         exact
         path={router.home.contracts}

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import PropTypes from 'prop-types';
 import Avatar from 'react-avatar';
 import cx from 'classnames';
 
@@ -28,7 +27,7 @@ import {
   decodeAndFilter,
 } from '../../utils/identityParser';
 
-function Profile({ className }) {
+function Profile() {
   const userName = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
   const walletAddress = useSelector(
@@ -126,7 +125,7 @@ function Profile({ className }) {
 
   return (
     <div className={styles.wrapper}>
-      <Card className={cx(styles.profile, className)} isNotBackground>
+      <Card className={cx(styles.profile, styles.withoutMargin)} isNotBackground>
         <div className={cx('left-column', styles.column)}>
           <div className={styles.wrapperBlock}>
             <div className={styles.avatar}>
@@ -253,13 +252,5 @@ function Profile({ className }) {
     </div>
   );
 }
-
-Profile.defaultProps = {
-  className: '',
-};
-
-Profile.propTypes = {
-  className: PropTypes.string,
-};
 
 export default Profile;

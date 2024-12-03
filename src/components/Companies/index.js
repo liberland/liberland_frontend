@@ -1,10 +1,9 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import router from '../../router';
-import CompaniesOverview from './CompaniesOverview';
-import CreateCompany from './CompaniesOverview/CreateCompany';
-import EditCompany from './CompaniesOverview/EditCompany';
-import AllCompanies from './AllCompanies';
+import { loaderFactory } from '../../utils/loader';
+
+const loader = loaderFactory(__dirname);
 
 function Companies() {
   return (
@@ -12,22 +11,22 @@ function Companies() {
       <Route
         exact
         path={router.companies.home}
-        component={CompaniesOverview}
+        component={loader('./CompaniesOverview')}
       />
       <Route
         exact
         path={router.companies.create}
-        component={CreateCompany}
+        component={loader('./CompaniesOverview/CreateCompany')}
       />
       <Route
         exact
         path={router.companies.edit}
-        component={EditCompany}
+        component={loader('./CompaniesOverview/EditCompany')}
       />
       <Route
         exact
         path={router.companies.allCompanies}
-        component={AllCompanies}
+        component={loader('./AllCompanies')}
       />
     </Switch>
   );

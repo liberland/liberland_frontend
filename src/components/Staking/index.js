@@ -2,19 +2,20 @@ import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import router from '../../router';
 import RoleHOC from '../../hocs/RoleHOC';
-import StakingOverview from './Overview';
-import ETHLPStaking from './ETHLPStaking';
+import { loaderFactory } from '../../utils/loader';
+
+const loader = loaderFactory(__dirname);
 
 export default function Staking() {
   return (
     <Switch>
       <Route
         path={router.staking.overview}
-        component={StakingOverview}
+        component={loader('./Overview')}
       />
       <Route
         path={router.staking.ethlpstaking}
-        component={ETHLPStaking}
+        component={loader('./ETHLPStaking')}
       />
       <Route
         exact

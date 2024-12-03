@@ -12,8 +12,6 @@ import {
 import routes from './router';
 
 // COMPONENTS
-import SignUp from './components/AuthComponents/SignUp';
-import Home from './components/Home';
 import Loader from './components/Loader';
 
 // REDUX
@@ -21,7 +19,9 @@ import { userSelectors } from './redux/selectors';
 import { authActions } from './redux/actions';
 import GuidedSetup from './components/GuidedSetup';
 import { CheckExtensionWalletProvider } from './components/CheckExtenstionWalletProvider';
-import SignIn from './components/AuthComponents/SignIn';
+import { loaderFactory } from './utils/loader';
+
+const loader = loaderFactory(__dirname);
 
 function App() {
   const dispatch = useDispatch();
@@ -33,9 +33,9 @@ function App() {
 
   const appRouter = (
     <Switch>
-      <Route path={routes.signUp} component={SignUp} />
-      <Route path={routes.home.index} component={Home} />
-      <Route key={routes.signIn} path={routes.signIn} component={SignIn} />
+      <Route path={routes.signUp} component={loader('./components/AuthComponents/SignUp')} />
+      <Route path={routes.home.index} component={loader('./components/Home')} />
+      <Route key={routes.signIn} path={routes.signIn} component={loader('./components/AuthComponents/SignIn')} />
       <Route path="*" render={() => <Redirect to={routes.home.index} />} />
     </Switch>
   );

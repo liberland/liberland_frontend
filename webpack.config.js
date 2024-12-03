@@ -1,7 +1,7 @@
 /* eslint-disable */
 const HtmlWebPackPlugin = require('html-webpack-plugin');
-const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const Dotenv = require('dotenv-webpack');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const webpack = require('webpack');
 
@@ -11,8 +11,6 @@ const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
 const postcssNormalize = require('postcss-normalize');
-// const postcssNormalize = require('postcss-flexbugs-fixes');
-// const postcssNormalize = require('postcss-preset-env');
 
 const getStyleLoaders = (cssOptions) => {
   const loaders = [
@@ -57,13 +55,15 @@ module.exports = (env, argv) => {
     },
     optimization: {
       moduleIds: 'deterministic',
-      runtimeChunk: 'single',
       splitChunks: {
+        maxSize: 51200,
+        maxAsyncSize: 51200,
         cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
+          style: {
+            name: "style",
+            type: "css/mini-extract",
+            chunks: "all",
+            enforce: true,
           },
         },
       },
@@ -154,6 +154,9 @@ module.exports = (env, argv) => {
       }),
       new webpack.ProvidePlugin({
         process: 'process/browser',
+      }),
+      new MiniCssExtractPlugin({
+        filename: "style.css",
       }),
       new Dotenv(),
       // new InterpolateHtmlPlugin({PUBLIC_URL: 'static' }),

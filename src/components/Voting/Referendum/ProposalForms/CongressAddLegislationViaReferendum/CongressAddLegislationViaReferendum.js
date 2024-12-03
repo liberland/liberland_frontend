@@ -14,7 +14,7 @@ import { congressActions } from '../../../../../redux/actions';
 import FastTrackForm, { FastTrackDefaults } from '../../../../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../ProposalDiscussionFields';
 
-export function CongressAddLegislationViaReferendum() {
+function CongressAddLegislationViaReferendum() {
   const dispatch = useDispatch();
   const isLoading = useSelector(congressSelectors.isLoading);
   const [shouldRedirect, setShouldRedirect] = useState(false);
@@ -123,3 +123,5 @@ export function CongressAddLegislationViaReferendum() {
     </form>
   );
 }
+
+export default CongressAddLegislationViaReferendum;

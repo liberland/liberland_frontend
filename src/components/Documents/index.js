@@ -2,17 +2,16 @@ import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import RoleHOC from '../../hocs/RoleHOC';
 import router from '../../router';
-import Profile from '../Profile';
+import { loaderFactory } from '../../utils/loader';
 
-import styles from './styles.module.scss';
+const loader = loaderFactory(__dirname);
 
 function Documents() {
   return (
     <Switch>
       <Route
         path={router.documents.myAccount}
-        // eslint-disable-next-line react/no-unstable-nested-components
-        component={() => <Profile className={styles.withoutMargin} />}
+        component={loader('../Profile')}
       />
       <Route
         path={router.documents.citizenshipHistory}

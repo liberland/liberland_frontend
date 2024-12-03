@@ -1,8 +1,10 @@
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import router from '../../../router';
-import CongressionalAssemble from '../CongressionalAssemble';
 import RoleHOC from '../../../hocs/RoleHOC';
+import { loaderFactory } from '../../../utils/loader';
+
+const loader = loaderFactory(__dirname);
 
 function TabsVoting() {
   return (
@@ -10,10 +12,11 @@ function TabsVoting() {
       <Switch>
         <Route
           path={router.voting.congressionalAssemble}
-          component={() => <CongressionalAssemble title="Congressional assembly" />}
+          component={loader('../CongressionalAssemble')}
         />
         <Route
           path={router.voting.referendum}
+          // eslint-disable-next-line react/no-unstable-nested-components
           component={() => <div>Referendum</div>}
         />
         <Route

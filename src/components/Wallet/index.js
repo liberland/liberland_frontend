@@ -4,20 +4,13 @@ import {
   Redirect, Route, Switch,
 } from 'react-router-dom';
 import router from '../../router';
-
 import { blockchainSelectors } from '../../redux/selectors';
-
 import styles from './styles.module.scss';
-import Assets from './Assets';
-
 import Card from '../Card';
 import RoleHOC from '../../hocs/RoleHOC';
+import { loaderFactory } from '../../utils/loader';
 
-import Exchange from './Exchange';
-import Bridge from './Bridge';
-import NftsComponent from './Nfts';
-import PayMe from './PayMe';
-import WalletOverview from './WalletOverview';
+const loader = loaderFactory(__dirname);
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -26,27 +19,27 @@ function Wallet() {
       <Switch>
         <Route
           path={router.wallet.overView}
-          component={WalletOverview}
+          component={loader('./WalletOverview')}
         />
         <Route
           path={router.wallet.exchange}
-          component={Exchange}
+          component={loader('./Exchange')}
         />
         <Route
           path={router.wallet.assets}
-          component={Assets}
+          component={loader('./Assets')}
         />
         <Route
           path={router.wallet.bridge}
-          component={Bridge}
+          component={loader('./Bridge')}
         />
         <Route
           path={router.wallet.nfts}
-          component={NftsComponent}
+          component={loader('./Nfts')}
         />
         <Route
           path={router.wallet.payMe}
-          component={PayMe}
+          component={loader('./PayMe')}
         />
         <Route
           exact
