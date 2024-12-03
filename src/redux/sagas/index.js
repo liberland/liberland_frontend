@@ -16,7 +16,6 @@ import * as senateSagas from './senate';
 import * as nftsSagas from './nfts';
 import * as ethSagas from './eth';
 import * as financesSagas from './finances';
-import * as routeSagas from './route';
 
 export default function* rootSaga() {
   yield all([
@@ -183,8 +182,5 @@ export default function* rootSaga() {
 
     // FINANCES
     financesSagas.getFinancesWatcher(),
-
-    // ROUTE
-    routeSagas.changeRouteWatcher(),
   ]);
 }

@@ -1,7 +1,7 @@
 import {
   put, select, takeEvery, takeLatest,
 } from 'redux-saga/effects';
-import { blockchainActions, routeActions } from '../actions';
+import { blockchainActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 
 function errorHandler(onFailure, worker) {
@@ -10,13 +10,11 @@ function errorHandler(onFailure, worker) {
     try {
       yield* worker(action);
     } catch (e) {
-      // eslint-disable-next-line no-console
-      if (!walletAddress) {
-        yield put(routeActions.changeRoute.call('/liberland-login'));
-      }
       yield put(onFailure(e));
       yield put(blockchainActions.setError.success(
-        !walletAddress ? { details: 'No wallet detected, you need to login.' } : e?.errorData || { details: e.message },
+        !walletAddress
+          ? { details: 'No wallet detected, you need to login.', type: 'LOGIN_ERROR' }
+          : e?.errorData || { details: e.message, type: 'LOGIN_ERROR' },
       ));
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
     }
