@@ -2,9 +2,7 @@ import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import router from '../../../router';
 import RoleHOC from '../../../hocs/RoleHOC';
-import { loaderFactory } from '../../../utils/loader';
-
-const loader = loaderFactory(__dirname);
+import { loader } from '../../../utils/loader';
 
 function TabsVoting() {
   return (
@@ -12,7 +10,7 @@ function TabsVoting() {
       <Switch>
         <Route
           path={router.voting.congressionalAssemble}
-          component={loader('../CongressionalAssemble')}
+          component={loader(() => import('../CongressionalAssemble'))}
         />
         <Route
           path={router.voting.referendum}

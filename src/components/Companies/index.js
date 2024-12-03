@@ -1,9 +1,7 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
 import router from '../../router';
-import { loaderFactory } from '../../utils/loader';
-
-const loader = loaderFactory(__dirname);
+import { loader } from '../../utils/loader';
 
 function Companies() {
   return (
@@ -11,22 +9,22 @@ function Companies() {
       <Route
         exact
         path={router.companies.home}
-        component={loader('./CompaniesOverview')}
+        component={loader(() => import('./CompaniesOverview'))}
       />
       <Route
         exact
         path={router.companies.create}
-        component={loader('./CompaniesOverview/CreateCompany')}
+        component={loader(() => import('./CompaniesOverview/CreateCompany'))}
       />
       <Route
         exact
         path={router.companies.edit}
-        component={loader('./CompaniesOverview/EditCompany')}
+        component={loader(() => import('./CompaniesOverview/EditCompany'))}
       />
       <Route
         exact
         path={router.companies.allCompanies}
-        component={loader('./AllCompanies')}
+        component={loader(() => import('./AllCompanies'))}
       />
     </Switch>
   );

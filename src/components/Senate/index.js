@@ -6,14 +6,13 @@ import {
 } from 'react-router-dom/cjs/react-router-dom.min';
 import router from '../../router';
 import { MotionProvider } from '../WalletCongresSenate/ContextMotions';
-import { loaderFactory } from '../../utils/loader';
-
-const loader = loaderFactory(__dirname);
+import { loader } from '../../utils/loader';
 
 function MotionsWrapper() {
+  const Motions = loader(() => import('./Motions'));
   return (
     <MotionProvider>
-      {loader('./Motions')}
+      <Motions />
     </MotionProvider>
   );
 }
@@ -24,18 +23,18 @@ function Senate() {
       <Route
         exact
         path={router.senate.overview}
-        component={loader('./Overview')}
+        component={loader(() => import('./Overview'))}
       />
       <Route
         exact
         path={router.senate.motions}
         component={MotionsWrapper}
       />
-      <Route exact path={router.senate.wallet} component={loader('./Wallet')} />
+      <Route exact path={router.senate.wallet} component={loader(() => import('./Wallet'))} />
       <Route
         exact
         path={router.senate.scheduledCongressSpending}
-        render={loader('./ScheduledCongressSpendingWrapper')}
+        render={loader(() => import('./ScheduledCongressSpendingWrapper'))}
       />
       <Route
         exact

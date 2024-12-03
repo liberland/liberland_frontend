@@ -1,9 +1,7 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import router from '../../router';
-import { loaderFactory } from '../../utils/loader';
-
-const loader = loaderFactory(__dirname);
+import { loader } from '../../utils/loader';
 
 function Registries() {
   return (
@@ -11,7 +9,7 @@ function Registries() {
       <Route
         exact
         path={router.registries.overview}
-        component={loader('./RegistriesOverview')}
+        component={loader(() => import('./RegistriesOverview'))}
       />
       <Route
         exact
@@ -23,17 +21,17 @@ function Registries() {
       <Route
         exact
         path={router.registries.land}
-        component={loader('./RegistriesLand')}
+        component={loader(() => import('./RegistriesLand'))}
       />
       <Route
         exact
         path={router.registries.assets}
-        component={loader('./RegistriesAssets')}
+        component={loader(() => import('./RegistriesAssets'))}
       />
       <Route
         exact
         path={router.registries.other}
-        component={loader('./RegistriesOther')}
+        component={loader(() => import('./RegistriesOther'))}
       />
     </Switch>
   );

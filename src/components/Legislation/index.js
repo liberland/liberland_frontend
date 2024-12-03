@@ -4,9 +4,7 @@ import {
 } from 'react-router-dom';
 
 import router from '../../router';
-import { loaderFactory } from '../../utils/loader';
-
-const loader = loaderFactory(__dirname);
+import { loader } from '../../utils/loader';
 
 function Legislation() {
   return (
@@ -14,7 +12,7 @@ function Legislation() {
       <Route
         exact
         path={router.legislation.view}
-        component={loader('./LegislationView')}
+        component={loader(() => import('./LegislationView'))}
       />
       <Route
         exact

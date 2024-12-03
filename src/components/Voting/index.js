@@ -15,14 +15,13 @@ import stylesPage from '../../utils/pagesBase.module.scss';
 import Button from '../Button/Button';
 import { userSelectors } from '../../redux/selectors';
 import { MotionProvider } from '../WalletCongresSenate/ContextMotions';
-import { loaderFactory } from '../../utils/loader';
-
-const loader = loaderFactory(__dirname);
+import { loader } from '../../utils/loader';
 
 function ReferendumWrapper() {
+  const Referendum = loader(() => import('./Referendum'));
   return (
     <MotionProvider>
-      {loader('./Referendum')}
+      <Referendum />
     </MotionProvider>
   );
 }
@@ -57,7 +56,7 @@ function Voting() {
           <Route
             exact
             path={router.voting.congressionalAssemble}
-            component={loader('./CongressionalAssemble')}
+            component={loader(() => import('./CongressionalAssemble'))}
           />
           <Route
             path={router.voting.referendum}
@@ -65,7 +64,7 @@ function Voting() {
           />
           <Route
             path={router.voting.addLegislation}
-            component={loader('./Referendum/ProposalForms/AddLegislation/AddLegislation')}
+            component={loader(() => import('./Referendum/ProposalForms/AddLegislation/AddLegislation'))}
           />
           <Route
             exact

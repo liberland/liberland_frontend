@@ -4,9 +4,7 @@ import {
 } from 'react-router-dom';
 
 import router from '../../router';
-import { loaderFactory } from '../../utils/loader';
-
-const loader = loaderFactory(__dirname);
+import { loader } from '../../utils/loader';
 
 function Offices() {
   return (
@@ -14,17 +12,17 @@ function Offices() {
       <Route
         exact
         path={router.offices.identity}
-        component={loader('./Identity')}
+        component={loader(() => import('./Identity'))}
       />
       <Route
         exact
         path={router.offices.companyRegistry.home}
-        component={loader('./CompanyRegistry')}
+        component={loader(() => import('./CompanyRegistry'))}
       />
       <Route
         exact
         path={router.offices.companyRegistry.edit}
-        component={loader('./CompanyRegistry/EditCompany')}
+        component={loader(() => import('./CompanyRegistry/EditCompany'))}
       />
       <Route
         exact
@@ -36,17 +34,17 @@ function Offices() {
       <Route
         exact
         path={router.offices.landRegistry}
-        component={loader('./LandRegistry')}
+        component={loader(() => import('./LandRegistry'))}
       />
       <Route
         exact
         path={router.offices.finances}
-        component={loader('./Finances')}
+        component={loader(() => import('./Finances'))}
       />
       <Route
         exact
         path={router.offices.scheduledCongressSpending}
-        component={loader('./ScheduledCongressSpendingWrapper')}
+        component={loader(() => import('./ScheduledCongressSpendingWrapper'))}
       />
     </Switch>
   );

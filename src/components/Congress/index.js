@@ -4,14 +4,13 @@ import { useDispatch } from 'react-redux';
 import router from '../../router';
 import { congressActions } from '../../redux/actions';
 import { MotionProvider } from '../WalletCongresSenate/ContextMotions';
-import { loaderFactory } from '../../utils/loader';
-
-const loader = loaderFactory(__dirname);
+import { loader } from '../../utils/loader';
 
 function MotionsWrapper() {
+  const Motions = loader(() => import('./Motions'));
   return (
     <MotionProvider>
-      {loader('./Motions')}
+      <Motions />
     </MotionProvider>
   );
 }
@@ -25,20 +24,24 @@ function Congress() {
 
   return (
     <Switch>
-      <Route exact path={router.congress.overview} component={loader('./Overview')} />
+      <Route exact path={router.congress.overview} component={loader(() => import('./Overview'))} />
       <Route exact path={router.congress.motions} component={MotionsWrapper} />
-      <Route exact path={router.congress.treasury} component={loader('./Treasury')} />
-      <Route exact path={router.congress.wallet} component={loader('./Wallet')} />
+      <Route exact path={router.congress.treasury} component={loader(() => import('./Treasury'))} />
+      <Route exact path={router.congress.wallet} component={loader(() => import('./Wallet'))} />
       <Route
         exact
         path={router.congress.addLegislation}
-        component={loader('../Voting/Referendum/ProposalForms/CongressAddLegislation/CongressAddLegislation')}
+        component={loader(
+          () => import('../Voting/Referendum/ProposalForms/CongressAddLegislation/CongressAddLegislation'),
+        )}
       />
       <Route
         exact
         path={router.congress.addLegislationViaReferendum}
         component={loader(
-          '../Voting/Referendum/ProposalForms/CongressAddLegislationViaReferendum/CongressAddLegislationViaReferendum',
+          () => import(
+            '../Voting/Referendum/ProposalForms/CongressAddLegislationViaReferendum/CongressAddLegislationViaReferendum'
+          ),
         )}
       />
       <Route

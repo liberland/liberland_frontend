@@ -2,16 +2,14 @@ import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import RoleHOC from '../../hocs/RoleHOC';
 import router from '../../router';
-import { loaderFactory } from '../../utils/loader';
-
-const loader = loaderFactory(__dirname);
+import { loader } from '../../utils/loader';
 
 function Documents() {
   return (
     <Switch>
       <Route
         path={router.documents.myAccount}
-        component={loader('../Profile')}
+        component={loader(() => import('../Profile'))}
       />
       <Route
         path={router.documents.citizenshipHistory}

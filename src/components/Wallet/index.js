@@ -8,9 +8,7 @@ import { blockchainSelectors } from '../../redux/selectors';
 import styles from './styles.module.scss';
 import Card from '../Card';
 import RoleHOC from '../../hocs/RoleHOC';
-import { loaderFactory } from '../../utils/loader';
-
-const loader = loaderFactory(__dirname);
+import { loader } from '../../utils/loader';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -19,27 +17,27 @@ function Wallet() {
       <Switch>
         <Route
           path={router.wallet.overView}
-          component={loader('./WalletOverview')}
+          component={loader(() => import('./WalletOverview'))}
         />
         <Route
           path={router.wallet.exchange}
-          component={loader('./Exchange')}
+          component={loader(() => import('./Exchange'))}
         />
         <Route
           path={router.wallet.assets}
-          component={loader('./Assets')}
+          component={loader(() => import('./Assets'))}
         />
         <Route
           path={router.wallet.bridge}
-          component={loader('./Bridge')}
+          component={loader(() => import('./Bridge'))}
         />
         <Route
           path={router.wallet.nfts}
-          component={loader('./Nfts')}
+          component={loader(() => import('./Nfts'))}
         />
         <Route
           path={router.wallet.payMe}
-          component={loader('./PayMe')}
+          component={loader(() => import('./PayMe'))}
         />
         <Route
           exact

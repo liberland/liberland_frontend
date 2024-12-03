@@ -1,7 +1,6 @@
 /* eslint-disable */
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const webpack = require('webpack');
 
@@ -58,14 +57,6 @@ module.exports = (env, argv) => {
       splitChunks: {
         maxSize: 51200,
         maxAsyncSize: 51200,
-        cacheGroups: {
-          style: {
-            name: "style",
-            type: "css/mini-extract",
-            chunks: "all",
-            enforce: true,
-          },
-        },
       },
     },
     module: {
@@ -154,9 +145,6 @@ module.exports = (env, argv) => {
       }),
       new webpack.ProvidePlugin({
         process: 'process/browser',
-      }),
-      new MiniCssExtractPlugin({
-        filename: "style.css",
       }),
       new Dotenv(),
       // new InterpolateHtmlPlugin({PUBLIC_URL: 'static' }),
