@@ -182,14 +182,14 @@ function Layout({ children }) {
           Button: {
             defaultActiveBorderColor: '#243F5F',
             defaultBg: 'white',
-            defaultBorderColor: '#ECEBF0',
+            defaultBorderColor: '#ACBDC5',
             defaultHoverBorderColor: '#243F5F',
-            defaultHoverColor: '243F5F',
+            defaultHoverColor: '#243F5F',
             defaultShadow: '0',
-            primaryColor: 'white',
+            primaryColor: '#243F5F',
             primaryShadow: '0',
-            paddingBlock: '10px',
-            paddingInline: '5px',
+            paddingBlock: '18px',
+            paddingInline: '12px',
           },
           Typography: {
             colorText: '#243F5F',
@@ -209,6 +209,7 @@ function Layout({ children }) {
           },
           Card: {
             extraColor: '#243F5F',
+            actionsLiMargin: '12px 5px',
           },
         },
       }}

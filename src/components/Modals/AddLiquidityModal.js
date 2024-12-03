@@ -251,7 +251,7 @@ function AddLiquidityModalWrapper({
     <>
       <Button onClick={() => setShow(true)}>
         Add liquidity
-        <img src={PlusIcon} className={styles.backIcon} alt="button icon" />
+        <img src={PlusIcon} className={cx(styles.backIcon, styles.darken)} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>

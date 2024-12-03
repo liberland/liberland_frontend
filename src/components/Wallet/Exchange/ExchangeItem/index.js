@@ -116,7 +116,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
           </div>
         </Flex>
         <div className={styles.liquidityWrapper}>
-          <Flex gap="15px">
+          <Flex gap="15px" wrap>
             <AddLiquidityModalWrapper
               assets={assets}
               isReservedDataEmpty={isReservedDataEmpty}

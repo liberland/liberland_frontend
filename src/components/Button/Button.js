@@ -37,7 +37,7 @@ function Button({
       onClick={onClick}
       htmlType={type}
       type={primary ? 'primary' : undefined}
-      color={red ? 'danger' : undefined}
+      danger={red}
       size={getSize()}
       className={
         cx(styles.button, className, {

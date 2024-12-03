@@ -92,7 +92,7 @@ function PolitipoolModalWrapper() {
     <>
       <Button className={styles.button} primary onClick={() => setOpen(true)}>
         Politipool
-        <img src={ButtonArrowIcon} className={cx(styles.arrowIcon, styles.whiten)} alt="button icon" />
+        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {open && (
         <ModalRoot>
