@@ -2,7 +2,6 @@ import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import router from '../../router';
 import Wallet from '../Wallet';
-import RoleHOC from '../../hocs/RoleHOC';
 import Profile from '../Profile';
 import Documents from '../Documents';
 import Voting from '../Voting';
@@ -44,9 +43,7 @@ function Home() {
       key={router.home.index}
       path={router.home.index}
       render={() => (
-        <RoleHOC>
-          <Redirect to={router.home.feed} />
-        </RoleHOC>
+        <Redirect to={router.home.feed} />
       )}
     />,
   ];

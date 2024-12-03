@@ -19,6 +19,7 @@ import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { encodeRemark } from '../../api/nodeRpcCall';
+import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 
 // TODO add validation
 function SendAssetModal({
@@ -219,14 +220,12 @@ function SendAssetModalWrapper({
     <>
       <Button
         className={styles.button}
-        small
-        primary
         onClick={() => setShow(true)}
       >
-        SEND
-        <span>
-          {assetData.metadata.symbol}
-        </span>
+        Send
+        {' '}
+        {assetData.metadata.symbol}
+        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>

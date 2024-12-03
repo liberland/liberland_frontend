@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import LayoutInternal, {
@@ -36,13 +36,17 @@ function Layout({ children }) {
   const history = useHistory();
   const dispatch = useDispatch();
   const roles = useSelector(userSelectors.selectUserRole);
+  const rolesMap = useMemo(() => roles?.reduce((map, role) => {
+    map[role] = true;
+    return map;
+  }, {}) || {}, [roles]);
   React.useEffect(() => {
     dispatch(walletActions.getWallet.call());
   }, [dispatch]);
   const navigationList = React.useMemo(
-    () => navigationListComplete.filter(({ access }) => (roles[access] && roles[access] !== 'guest')
-      || access.some((role) => roles.includes(role))),
-    [roles],
+    () => navigationListComplete.filter(({ access }) => (rolesMap[access] && rolesMap[access] !== 'guest')
+      || access.some((role) => rolesMap[role])),
+    [rolesMap],
   );
   const createMenu = (navigation) => {
     const subs = Object.entries(navigation.subLinks).map(([name, link]) => ({
@@ -147,6 +151,7 @@ function Layout({ children }) {
       theme={{
         token: {
           colorText: '#243F5F',
+          fontSize: 15,
         },
         components: {
           Layout: {
@@ -183,7 +188,6 @@ function Layout({ children }) {
             defaultShadow: '0',
             primaryColor: 'white',
             primaryShadow: '0',
-            contentFontSize: '12px',
             paddingBlock: '10px',
             paddingInline: '5px',
           },

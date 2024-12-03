@@ -68,6 +68,7 @@ function WalletOverview() {
           children: (
             <AssetOverview
               additionalAssets={additionalAssets}
+              isCongress={false}
             />
           ),
         },

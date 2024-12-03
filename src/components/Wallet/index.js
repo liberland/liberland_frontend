@@ -4,15 +4,10 @@ import {
   Redirect, Route, Switch,
 } from 'react-router-dom';
 import router from '../../router';
-
 import { blockchainSelectors } from '../../redux/selectors';
-
 import styles from './styles.module.scss';
 import Assets from './Assets';
-
 import Card from '../Card';
-import RoleHOC from '../../hocs/RoleHOC';
-
 import Exchange from './Exchange';
 import Bridge from './Bridge';
 import NftsComponent from './Nfts';
@@ -52,9 +47,7 @@ function Wallet() {
           exact
           path={router.home.wallet}
           render={() => (
-            <RoleHOC>
-              <Redirect to={router.wallet.overView} />
-            </RoleHOC>
+            <Redirect to={router.wallet.overView} />
           )}
         />
       </Switch>

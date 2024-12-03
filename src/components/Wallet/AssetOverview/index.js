@@ -23,12 +23,13 @@ function AssetOverview({
 
   const renderItem = (assetData) => (
     <Card
-      actions={userIsMember ? [
+      actions={userIsMember || !isCongress ? [
         <SendAssetModalWrapper
           isRemarkNeeded={isRemarkNeeded}
           isCongress={isCongress}
           assetData={assetData}
         />,
+        <div />,
       ] : undefined}
     >
       <Card.Meta

@@ -428,30 +428,37 @@ function LegislationView() {
 
   if (!legislation[tier]) return 'Loading...';
 
-  return (
-    <div className={cx(stylesPage.contentWrapper, styles.contentWrapper)}>
-      {Object.entries(legislation[tier]).flatMap(([year, legislations]) => (
-        Object.entries(legislations).map(([index, {
-          id,
-          sections,
+  const items = Object.entries(legislation[tier]).flatMap(([year, legislations]) => (
+    Object.entries(legislations).map(([index, {
+      id,
+      sections,
+      mainRepealMotion,
+      mainRepealReferendum,
+      mainRepealProposal,
+    }]) => (
+      <LegislationItem
+        year={year}
+        index={index}
+        tier={tier}
+        id={id}
+        sections={sections}
+        mainRepealProposalReferendum={{
           mainRepealMotion,
           mainRepealReferendum,
           mainRepealProposal,
-        }]) => (
-          <LegislationItem
-            year={year}
-            index={index}
-            tier={tier}
-            id={id}
-            sections={sections}
-            mainRepealProposalReferendum={{
-              mainRepealMotion,
-              mainRepealReferendum,
-              mainRepealProposal,
-            }}
-            key={`${year}-${index}`}
-          />
-        ))))}
+        }}
+        key={`${year}-${index}`}
+      />
+    ))));
+
+  return (
+    <div className={cx(stylesPage.contentWrapper, styles.contentWrapper)}>
+      {items}
+      {!items.length && (
+        <div>
+          No legislation found
+        </div>
+      )}
     </div>
   );
 }

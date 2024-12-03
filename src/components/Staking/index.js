@@ -1,7 +1,6 @@
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import router from '../../router';
-import RoleHOC from '../../hocs/RoleHOC';
 import StakingOverview from './Overview';
 import ETHLPStaking from './ETHLPStaking';
 
@@ -20,9 +19,7 @@ export default function Staking() {
         exact
         path={router.home.staking}
         render={() => (
-          <RoleHOC>
-            <Redirect to={router.staking.overview} />
-          </RoleHOC>
+          <Redirect to={router.staking.overview} />
         )}
       />
     </Switch>
