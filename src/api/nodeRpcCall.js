@@ -376,7 +376,11 @@ const getAssetDetails = async (ids) => {
     const assetResults = await api.queryMulti([...assetQueries]);
     const resolvedIdentity = assetResults.map((result) => {
       const json = result.toJSON();
-      return Buffer.from(json.info.display.raw.slice(2), 'hex').toString('utf-8');
+      const raw = json?.info?.display?.raw?.slice(2);
+      if (!raw) {
+        return '';
+      }
+      return Buffer.from(raw, 'hex').toString('utf-8');
     }).reduce((accumulator, item) => {
       const lastItem = accumulator[accumulator.length - 1];
       if (!lastItem) {
@@ -395,10 +399,10 @@ const getAssetDetails = async (ids) => {
         ? window.BigInt(detail.supply).toString()
         : detail.supply,
       identity: {
-        admin: resolvedIdentity[index][0],
-        freezer: resolvedIdentity[index][1],
-        issuer: resolvedIdentity[index][2],
-        owner: resolvedIdentity[index][3],
+        admin: resolvedIdentity[index][0] || detail.admin,
+        freezer: resolvedIdentity[index][1] || detail.freezer,
+        issuer: resolvedIdentity[index][2] || detail.issuer,
+        owner: resolvedIdentity[index][3] || detail.owner,
       },
     }));
 
