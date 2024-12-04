@@ -376,8 +376,11 @@ const getAssetDetails = async (ids) => {
     const assetResults = await api.queryMulti([...assetQueries]);
     const resolvedIdentity = assetResults.map((result) => {
       const json = result.toJSON();
-      const identity = json.info?.display?.raw?.slice(2);
-      return identity ? Buffer.from(identity, 'hex').toString('utf-8') : '';
+      const raw = json?.info?.display?.raw?.slice(2);
+      if (!raw) {
+        return '';
+      }
+      return Buffer.from(raw, 'hex').toString('utf-8');
     }).reduce((accumulator, item) => {
       const lastItem = accumulator[accumulator.length - 1];
       if (!lastItem) {

@@ -80,6 +80,7 @@ function RequestLLDModal({
 
   const { info } = identity?.unwrap() || {};
   const displayName = info?.display?.toHuman()?.Raw || walletAddress || 'No name';
+  const submitText = linkData ? 'Update payment link' : 'Create payment link';
 
   return (
     <form
@@ -243,7 +244,7 @@ function RequestLLDModal({
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Loading...' : 'Create payment link'}
+            {isSubmitting ? 'Loading...' : submitText}
           </Button>
         </div>
       </div>
