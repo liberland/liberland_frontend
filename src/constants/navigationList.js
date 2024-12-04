@@ -14,7 +14,6 @@ export const navigationList = [
   {
     route: router.home.feed,
     title: 'Feed',
-    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: FeedIcon,
     isDiscouraged: process.env.REACT_APP_IS_FEED_DISCOURAGED === 'true',
     subLinks: {},
@@ -23,7 +22,6 @@ export const navigationList = [
   {
     route: router.home.wallet,
     title: 'Wallet',
-    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: WalletIcon,
     isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED === 'true',
     subLinks: {
@@ -38,7 +36,6 @@ export const navigationList = [
   {
     route: router.home.voting,
     title: 'Voting',
-    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: VotingIcon,
     isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED === 'true',
     subLinks: {
@@ -50,7 +47,6 @@ export const navigationList = [
   {
     route: router.home.contracts,
     title: 'Contracts',
-    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONTRACTS_DISCOURAGED === 'true',
     subLinks: {
@@ -61,7 +57,6 @@ export const navigationList = [
   {
     route: router.home.legislation,
     title: 'Legislation',
-    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: ConstitutionIcon,
     isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED === 'true',
     subLinks: {
@@ -77,7 +72,6 @@ export const navigationList = [
   {
     route: router.home.offices,
     title: 'Offices',
-    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: ConstitutionIcon,
     isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED === 'true',
     isGovt: true,
@@ -92,7 +86,6 @@ export const navigationList = [
   {
     route: router.home.companies,
     title: 'Companies',
-    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED === 'true',
     subLinks: {
@@ -104,7 +97,6 @@ export const navigationList = [
   {
     route: router.home.registries,
     title: 'Registries',
-    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED === 'true',
     subLinks: {
@@ -118,7 +110,6 @@ export const navigationList = [
   {
     route: router.home.staking,
     title: 'Staking',
-    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED === 'true',
     subLinks: {
@@ -129,7 +120,6 @@ export const navigationList = [
   {
     route: router.home.congress,
     title: 'Congress',
-    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED === 'true',
     isGovt: true,
@@ -145,7 +135,6 @@ export const navigationList = [
   {
     route: router.home.senate,
     title: 'Senate',
-    access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED === 'true',
     isGovt: true,

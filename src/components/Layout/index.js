@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import LayoutInternal, {
   Header as HeaderInternal,
   Content,
@@ -23,7 +23,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import ChangeWallet from '../Home/ChangeWallet';
-import { userSelectors } from '../../redux/selectors';
 import { walletActions } from '../../redux/actions';
 import styles from './styles.module.scss';
 import { footerLinks, navigationList as navigationListComplete, socials } from '../../constants/navigationList';
@@ -35,19 +34,10 @@ import UserMenu from '../UserMenu';
 function Layout({ children }) {
   const history = useHistory();
   const dispatch = useDispatch();
-  const roles = useSelector(userSelectors.selectUserRole);
-  const rolesMap = useMemo(() => roles?.reduce((map, role) => {
-    map[role] = true;
-    return map;
-  }, {}) || {}, [roles]);
   React.useEffect(() => {
     dispatch(walletActions.getWallet.call());
   }, [dispatch]);
-  const navigationList = React.useMemo(
-    () => navigationListComplete.filter(({ access }) => (rolesMap[access] && rolesMap[access] !== 'guest')
-      || access.some((role) => rolesMap[role])),
-    [rolesMap],
-  );
+  const navigationList = navigationListComplete;
   const createMenu = (navigation) => {
     const subs = Object.entries(navigation.subLinks).map(([name, link]) => ({
       label: name,
@@ -144,7 +134,6 @@ function Layout({ children }) {
       ] : navigationList.map(createMenu)}
     />
   );
-  const isEResident = roles?.['e-resident'] === 'e-resident';
 
   return (
     <ConfigProvider
@@ -230,7 +219,7 @@ function Layout({ children }) {
               {urlMenu}
               <img alt="logo" src={LiberlandLettermarkMobile} className={styles.mobileLogo} />
               <div className={styles.mobileUser}>
-                <UserMenu isEResident={isEResident} />
+                <UserMenu />
               </div>
             </>
           )}
@@ -238,7 +227,7 @@ function Layout({ children }) {
             <div className={styles.user}>
               <Flex gap="20px" align="center" justify="center">
                 <ChangeWallet />
-                <UserMenu isEResident={isEResident} />
+                <UserMenu />
               </Flex>
             </div>
           )}

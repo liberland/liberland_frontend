@@ -1,4 +1,3 @@
-import GetCitizenshipModal from './GetCitizenshipModal';
 import SendLLDModal from './SendLLDModal';
 import SendLLMModal from './SendLLMModal';
 import VoteOnReferendumModal from './VoteOnReferendumModal';
@@ -14,7 +13,6 @@ import PayoutStakingModal from './PayoutStakingModal';
 import UnpoolModal from './UnpoolModal';
 
 export {
-  GetCitizenshipModal,
   SendLLDModal,
   SendLLMModal,
   VoteOnReferendumModal,
