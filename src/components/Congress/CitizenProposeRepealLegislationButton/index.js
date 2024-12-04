@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../../Button/Button';
 import CitizenRepealLegislationModal from '../../Modals/CitizenRepealLegislationModal';
 
 export default function CitizenProposeRepealLegislationButton({ tier, id, section }) {
@@ -9,9 +8,10 @@ export default function CitizenProposeRepealLegislationButton({ tier, id, sectio
 
   return (
     <>
-      <Button small primary onClick={handleModalOpen}>
+      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+      <a href="#" onClick={handleModalOpen}>
         PROPOSE CITIZEN REFERENDUM TO REPEAL
-      </Button>
+      </a>
       {isModalOpen && (
         <CitizenRepealLegislationModal
           closeModal={handleModalOpen}

@@ -4,6 +4,8 @@ import React, {
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import Space from 'antd/es/space';
+import DownOutlined from '@ant-design/icons/DownOutlined';
 import cx from 'classnames';
 import { useMediaQuery } from 'usehooks-ts';
 import { congressActions, legislationActions } from '../../../redux/actions';
@@ -124,7 +126,6 @@ function ActionButtons({
       <div>
         {vetos.map((v) => v.toString()).includes(userWalletAddress) ? (
           <Button
-            small
             red
             onClick={() => dispatch(
               legislationActions.revertVeto.call({ tier, id, section }),
@@ -134,7 +135,6 @@ function ActionButtons({
           </Button>
         ) : (
           <Button
-            small
             primary
             onClick={() => dispatch(
               legislationActions.castVeto.call({ tier, id, section }),
@@ -148,7 +148,6 @@ function ActionButtons({
       {isProposeButtonHasOpption && (
       <div className={styles.dropdownWrapper}>
         <Button
-          small
           primary
           onClick={() => {
             setAmendOpen(false);
@@ -156,8 +155,8 @@ function ActionButtons({
           }}
         >
           PROPOSE
-          {' '}
-          <span>&#x2304;</span>
+          <Space />
+          <DownOutlined />
         </Button>
         {isProposeOpen && (
         <div className={styles.dropdown} ref={dropdownRefPropose}>
@@ -179,7 +178,6 @@ function ActionButtons({
       && (
       <div className={styles.dropdownWrapper}>
         <Button
-          small
           primary
           onClick={() => setAmendOpen((prevValue) => !prevValue)}
         >
@@ -370,13 +368,12 @@ function LegislationItem({
                 />
                 <div className={styles.dropdownWrapper}>
                   <Button
-                    small
                     primary
                     onClick={() => setAddOpen((prevValue) => !prevValue)}
                   >
                     ADD
-                    {' '}
-                    <span>&#x2304;</span>
+                    <Space />
+                    <DownOutlined />
                   </Button>
                   {isAddOpen
                     && (

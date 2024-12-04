@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import CongressAmendLegislationViaReferendumModal from '../../Modals/CongressAmendLegislationViaReferendumModal';
-import Button from '../../Button/Button';
 import { congressSelectors } from '../../../redux/selectors';
 
 export default function CongressAmendLegislationViaReferendumButton({
@@ -18,11 +17,12 @@ export default function CongressAmendLegislationViaReferendumButton({
   };
   return (
     <>
-      <Button small primary onClick={toggle}>
+      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+      <a href="#" onClick={toggle}>
         { add
           ? 'PROPOSE ADD SECTION REFERENDUM AS CONGRESS'
           : 'PROPOSE AMEND REFERENDUM AS CONGRESS'}
-      </Button>
+      </a>
       {isOpen
         && (
         <CongressAmendLegislationViaReferendumModal
