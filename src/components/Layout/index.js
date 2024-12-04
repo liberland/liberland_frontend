@@ -25,7 +25,7 @@ import classNames from 'classnames';
 import ChangeWallet from '../Home/ChangeWallet';
 import { walletActions } from '../../redux/actions';
 import styles from './styles.module.scss';
-import { footerLinks, navigationList as navigationListComplete, socials } from '../../constants/navigationList';
+import { footerLinks, navigationList, socials } from '../../constants/navigationList';
 import LiberlandLettermark from '../../assets/icons/Liberland_Lettermark.svg';
 import LiberlandLettermarkMobile from '../../assets/icons/Liberland_Lettermark_Mobile.svg';
 import LiberlandSeal from '../../assets/icons/seal.svg';
@@ -37,7 +37,6 @@ function Layout({ children }) {
   React.useEffect(() => {
     dispatch(walletActions.getWallet.call());
   }, [dispatch]);
-  const navigationList = navigationListComplete;
   const createMenu = (navigation) => {
     const subs = Object.entries(navigation.subLinks).map(([name, link]) => ({
       label: name,
@@ -59,11 +58,11 @@ function Layout({ children }) {
       Object.values(subLinks).some((sub) => sub === pathname)
         || Object.values(subLinks).some((sub) => pathname.startsWith(sub))
     ),
-  ), [navigationList, pathname]);
+  ), [pathname]);
   const matchedRoute = React.useMemo(
     () => navigationList.find(({ route }) => route === pathname)
       || navigationList.find(({ route }) => pathname.startsWith(route)),
-    [navigationList, pathname],
+    [pathname],
   );
 
   const pageTitle = React.useMemo(() => {
