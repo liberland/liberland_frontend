@@ -8,8 +8,8 @@ import Dropdown from 'antd/es/dropdown';
 import { useDispatch, useSelector } from 'react-redux';
 import { AuthContext } from 'react-oauth2-code-pkce';
 import UserIcon from '../../assets/icons/user.svg';
-import { userSelectors } from '../../redux/selectors';
-import { authActions } from '../../redux/actions';
+import { blockchainSelectors, userSelectors } from '../../redux/selectors';
+import { authActions, blockchainActions, validatorActions } from '../../redux/actions';
 import ChangeWallet from '../Home/ChangeWallet';
 import { GetCitizenshipModal } from '../Modals';
 import styles from './styles.module.scss';
@@ -20,9 +20,19 @@ function UserMenu({
   const { logOut, login } = React.useContext(AuthContext);
   const history = useHistory();
   const user = useSelector(userSelectors.selectUser);
+  const walletAddress = useSelector(userSelectors.selectWalletAddress);
   const dispatch = useDispatch();
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 576px)');
   const [isCitizenshipModalOpen, setCitizenshipModalOpen] = useState();
+  const isWalletAdressSame = useSelector(
+    blockchainSelectors.isUserWalletAddressSameAsUserAdress,
+  );
+
+  const switchToRegisteredWallet = () => {
+    dispatch(blockchainActions.setUserWallet.success(walletAddress));
+    dispatch(validatorActions.getInfo.call());
+    localStorage.removeItem('BlockchainAdress');
+  };
 
   const logAction = user ? {
     key: 'logout',
@@ -37,6 +47,11 @@ function UserMenu({
     label: 'Get a Liberland Citizenship!',
   };
 
+  const switchToRegisteredAction = {
+    key: 'registered',
+    label: 'Switch to registered wallet',
+  };
+
   return (
     <>
       <Dropdown
@@ -46,7 +61,11 @@ function UserMenu({
           ].concat(isBiggerThanSmallScreen ? [] : [{
             key: 'wallets',
             label: <ChangeWallet />,
-          }]).concat(isEResident ? [eResidentAction] : []),
+          }]).concat(
+            isEResident ? [eResidentAction] : [],
+          ).concat(
+            user && !isWalletAdressSame ? [switchToRegisteredAction] : [],
+          ),
           onClick: ({ key }) => {
             if (key === 'login') {
               login();
@@ -57,6 +76,8 @@ function UserMenu({
                 process.env.REACT_APP_SSO_API}/logout?redirect=${process.env.REACT_APP_FRONTEND_REDIRECT}`;
             } else if (key === 'eresident') {
               setCitizenshipModalOpen(true);
+            } else if (key === 'registered') {
+              switchToRegisteredWallet();
             }
           },
         }}
