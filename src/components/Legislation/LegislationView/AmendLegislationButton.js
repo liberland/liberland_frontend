@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import ProposeAmendLegislationModal from '../../Modals/ProposeAmendLegislationModal';
-import Button from '../../Button/Button';
 
 export default function AmendLegislationButton({
   tier, id, section, add,
@@ -12,7 +11,8 @@ export default function AmendLegislationButton({
   };
   return (
     <>
-      <Button small primary onClick={toggle}>{ add ? 'ADD SECTION' : 'AMEND'}</Button>
+      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+      <a href="#" onClick={toggle}>{ add ? 'ADD SECTION' : 'AMEND'}</a>
       {isOpen && <ProposeAmendLegislationModal closeModal={toggle} {...{ tier, id, section }} />}
     </>
   );
