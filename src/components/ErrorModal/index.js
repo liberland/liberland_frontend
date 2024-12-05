@@ -38,7 +38,7 @@ function ErrorModal({ children }) {
                     secondary
                     onClick={() => dispatch(blockchainActions.setErrorExistsAndUnacknowledgedByUser.call(false))}
                   >
-                    Canel
+                    Cancel
                   </Button>
                   <Button primary onClick={login}>Login</Button>
                 </div>
