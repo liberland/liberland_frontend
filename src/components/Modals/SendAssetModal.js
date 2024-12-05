@@ -13,12 +13,15 @@ import Button from '../Button/Button';
 // STYLES
 import styles from './styles.module.scss';
 import { parseAssets, isValidSubstrateAddress } from '../../utils/walletHelpers';
-import { congressActions, senateActions, walletActions } from '../../redux/actions';
+import {
+  congressActions, ministryFinanceActions, senateActions, walletActions,
+} from '../../redux/actions';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { encodeRemark } from '../../api/nodeRpcCall';
+import { OfficeType } from '../../utils/officeTypeEnum';
 
 // TODO add validation
 function SendAssetModal({
@@ -71,12 +74,12 @@ function SendAssetModal({
         assetData,
         remarkInfo: encodedRemark,
       };
-      if (officeType === 'congress') {
+      if (officeType === OfficeType.CONGRESS) {
         dispatch(congressActions.congressSendAssets.call({ ...data, executionBlock, officeType }));
-      } else if (officeType === 'senate') {
+      } else if (officeType === OfficeType.SENATE) {
         dispatch(senateActions.senateSendAssets.call({ ...data, officeType }));
-      } else if (officeType === 'ministryFinance') {
-        //
+      } else if (officeType === OfficeType.MINISTRY_FINANCE) {
+        dispatch(ministryFinanceActions.sendAssets.call({ ...data, officeType }));
       }
     }
     closeModal();

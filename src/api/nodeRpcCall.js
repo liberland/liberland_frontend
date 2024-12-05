@@ -1683,16 +1683,8 @@ const congressSenateSendAssets = async ({
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.assets.transfer(parseInt(assetData.index), transferToAddress, transferAmount);
+  const proposeSend = await getProperProposal(officeType);
 
-  let proposeSend = null;
-  if (officeType === 'congress') {
-    proposeSend = congressProposeSpend;
-  } else if (officeType === 'senate') {
-    proposeSend = senateProposeSpend;
-  } else if (officeType === 'ministryOffice') {
-    //
-  }
-  if (!proposeSend) return null;
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
   });
