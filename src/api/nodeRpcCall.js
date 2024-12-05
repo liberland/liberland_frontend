@@ -16,6 +16,7 @@ import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
 import { decodeAndFilter } from '../utils/identityParser';
+import { OfficeType } from '../utils/officeTypeEnum';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -1607,12 +1608,40 @@ const senateProposeSpend = async ({
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+const getAdminMinistryFinance = async () => {
+  const api = await getApi();
+  return api.query.ministryOfFinanceOffice.admin();
+};
+
+const ministryFinanceProposeSpend = async ({
+  walletAddress, spendProposal, remarkInfo,
+}) => {
+  const api = await getApi();
+
+  const remark = api.tx.llm.remark(remarkInfo);
+  const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
+  const extrinsic = api.tx.ministryOfFinanceOffice.execute(transferAndRemark);
+
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getProperProposal = async (officeType) => {
+  if (officeType === OfficeType.CONGRESS) {
+    return congressProposeSpend;
+  } if (officeType === OfficeType.SENATE) {
+    return senateProposeSpend;
+  } if (officeType === OfficeType.MINISTRY_FINANCE) {
+    return ministryFinanceProposeSpend;
+  }
+  return null;
+};
+
 const congressSenateSendLlm = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1620,11 +1649,11 @@ const congressSenateSendLlm = async ({
 };
 
 const congressSenateSendLld = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.balances.transfer(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1632,11 +1661,11 @@ const congressSenateSendLld = async ({
 };
 
 const congressSenateSendLlmToPolitipool = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1650,12 +1679,20 @@ const congressSenateSendAssets = async ({
   assetData,
   remarkInfo,
   executionBlock,
-  isCongress = true,
+  officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.assets.transfer(parseInt(assetData.index), transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
 
+  let proposeSend = null;
+  if (officeType === 'congress') {
+    proposeSend = congressProposeSpend;
+  } else if (officeType === 'senate') {
+    proposeSend = senateProposeSpend;
+  } else if (officeType === 'ministryOffice') {
+    //
+  }
+  if (!proposeSend) return null;
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
   });
@@ -2987,4 +3024,5 @@ export {
   mintAsset,
   transferWithRemark,
   encodeRemarkUser,
+  getAdminMinistryFinance,
 };

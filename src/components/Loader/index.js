@@ -16,6 +16,7 @@ import {
   dexSelectors,
   contractsSelectors,
   senateSelectors,
+  ministryFinanceSelector,
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
 import BackgroundBlocker from '../BackgroundBlocker';
@@ -34,6 +35,7 @@ function Loader({ children }) {
   const isLoadingDex = useSelector(dexSelectors.selectorIsLoading);
   const isLoadingContracts = useSelector(contractsSelectors.selectorIsContractsLoading);
   const isLoadingSenate = useSelector(senateSelectors.isLoading);
+  const isLoadingMinistryFinance = useSelector(ministryFinanceSelector.isLoading);
 
   const isLoading = [
     isLoadingContracts,
@@ -47,6 +49,7 @@ function Loader({ children }) {
     isGetRegistries,
     isLoadingDex,
     isLoadingSenate,
+    isLoadingMinistryFinance,
   ].some((isFetching) => isFetching);
 
   return (

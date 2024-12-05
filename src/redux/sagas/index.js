@@ -16,6 +16,7 @@ import * as senateSagas from './senate';
 import * as nftsSagas from './nfts';
 import * as ethSagas from './eth';
 import * as financesSagas from './finances';
+import * as ministryFinanceSagas from './ministryFinance';
 
 export default function* rootSaga() {
   yield all([
@@ -185,5 +186,13 @@ export default function* rootSaga() {
 
     // FINANCES
     financesSagas.getFinancesWatcher(),
+
+    // MINISTRY FINANCE
+    ministryFinanceSagas.getWalletWatcher(),
+    ministryFinanceSagas.getAdditionalAssetsWatcher(),
+    ministryFinanceSagas.sendAssetsTransferWatcher(),
+    ministryFinanceSagas.sendLldWatcher(),
+    ministryFinanceSagas.sendLlmToPolitipoolWatcher(),
+    ministryFinanceSagas.sendLlmWatcher(),
   ]);
 }

@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
 import Card from '../../Card';
 
 import styles from './styles.module.scss';
 import { formatAssets } from '../../../utils/walletHelpers';
 import SendAssetModal from '../../Modals/SendAssetModal';
 import Button from '../../Button/Button';
-import { senateSelectors } from '../../../redux/selectors';
 
 function AssetOverview({
   additionalAssets,
   isRemarkNeeded,
-  isCongress,
+  officeType,
+  userIsMember,
 }) {
   const [whichModalOpen, setWhichModalOpen] = useState(null);
   const handleModalOpenAssets = (symbol) => setWhichModalOpen(symbol);
   const handleModalCloseAssets = () => setWhichModalOpen(null);
-  const userIsMember = useSelector(senateSelectors.userIsMember);
 
   if (additionalAssets.length === 0) { return <div />; }
   // Show only assets that the user owns
@@ -66,7 +64,7 @@ function AssetOverview({
                 assetData={assetInfo}
                 closeModal={handleModalCloseAssets}
                 isRemarkNeeded={isRemarkNeeded}
-                isCongress={isCongress}
+                officeType={officeType}
               />
               )}
             </div>
@@ -80,11 +78,12 @@ function AssetOverview({
 AssetOverview.defaultProps = {
   additionalAssets: [],
   isRemarkNeeded: false,
-  isCongress: true,
+  userIsMember: false,
 };
 
 AssetOverview.propTypes = {
-  isCongress: PropTypes.bool,
+  userIsMember: PropTypes.bool,
+  officeType: PropTypes.string.isRequired,
   isRemarkNeeded: PropTypes.bool,
   additionalAssets: PropTypes.arrayOf(PropTypes.shape({
     metadata: {

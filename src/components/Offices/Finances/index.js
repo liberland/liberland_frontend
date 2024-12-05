@@ -17,6 +17,10 @@ const DEFAULT_ACCOUNTS = [
     // source: frame/llm/src/lib.rs
     palletId: 'lltreasu',
   },
+  {
+    name: 'Ministry of Finance',
+    palletId: 'off/fina',
+  },
 ];
 
 const DYNAMIC_ACCOUNTS = [
