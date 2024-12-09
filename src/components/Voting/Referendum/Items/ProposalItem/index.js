@@ -59,7 +59,7 @@ function ProposalItem({
     hash = blake2AsHex(hexToU8a(boundedCall.inline));
   }
 
-  const [isProposalHidden, setIsProposalHidden] = useState(true);
+  const [isProposalHidden, setIsProposalHidden] = useState(false);
   const notificationRef = useRef();
 
   return (
