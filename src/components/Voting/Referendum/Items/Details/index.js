@@ -5,7 +5,7 @@ import { Proposal, Preimage } from '../../../../Proposal';
 import Button from '../../../../Button/Button';
 
 function Details({ proposal, isProposal }) {
-  const [isDetailsHidden, setIsDetailsHidden] = useState(true);
+  const [isDetailsHidden, setIsDetailsHidden] = useState(false);
   return (
     <div className={stylesItem.greyWrapper}>
       <div className={stylesItem.smallHeader}>
