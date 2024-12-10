@@ -89,15 +89,6 @@ function Wallet() {
               component={Bridge}
             />
             <Route
-              exact
-              path={router.wallet.nfts}
-              render={() => (
-                <RoleHOC>
-                  <Redirect to={router.home.nfts} />
-                </RoleHOC>
-              )}
-            />
-            <Route
               path={router.wallet.payMe}
               component={PayMe}
             />

@@ -1,21 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { nftsActions } from '../../../../redux/actions';
-import {
-  blockchainSelectors,
-  nftsSelectors,
-} from '../../../../redux/selectors';
+import { nftsActions } from '../../../redux/actions';
+import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import styles from '../Overview/styles.module.scss';
-import Card from '../../../Card';
-import stylesPage from '../../../../utils/pagesBase.module.scss';
-import Button from '../../../Button/Button';
-import CreateEditCollectionModalWrapper from '../../../Modals/Nfts/CreateEditCollection';
+import Card from '../../Card';
+import stylesPage from '../../../utils/pagesBase.module.scss';
+import Button from '../../Button/Button';
+import CreateEditCollectionModalWrapper from '../../Modals/Nfts/CreateEditCollection';
 
 function Collections() {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const userCollections = useSelector(nftsSelectors.userCollections);
-  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const userWalletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
 
   useEffect(() => {
     dispatch(nftsActions.getUserCollections.call(userWalletAddress));

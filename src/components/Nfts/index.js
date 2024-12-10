@@ -1,35 +1,17 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import router from '../../../router';
+import router from '../../router';
+import stylesPage from '../../utils/pagesBase.module.scss';
 
-import { blockchainSelectors } from '../../../redux/selectors';
-import { walletActions } from '../../../redux/actions';
-
-import stylesPage from '../../../utils/pagesBase.module.scss';
-
-import RoleHOC from '../../../hocs/RoleHOC';
-import Tabs from '../../Tabs';
+import RoleHOC from '../../hocs/RoleHOC';
+import Tabs from '../Tabs';
 import NftsComponent from './Overview';
 import OwnedNfts from './OwnedNfts';
 import Collections from './Collections';
 import OnSale from './OnSale';
 
 function NFTS() {
-  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(walletActions.getWallet.call());
-    dispatch(walletActions.getAdditionalAssets.call());
-    dispatch(walletActions.getTxTransfers.call());
-  }, [dispatch, userWalletAddress]);
-
   const navigationList = [
-    {
-      route: router.home.wallet,
-      title: 'WALLET',
-    },
     {
       route: router.nfts.overview,
       title: 'OVERVIEW',

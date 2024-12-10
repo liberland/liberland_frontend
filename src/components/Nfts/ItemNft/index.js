@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
-import { nftsActions } from '../../../../redux/actions';
-import FillAddressWrapper from '../../../Modals/FillAddress';
-import FillNumberWrapper from '../../../Modals/FillNumber';
-import Button from '../../../Button/Button';
+import cx from 'classnames';
+import { useHistory, useLocation } from 'react-router-dom/cjs/react-router-dom.min';
+import { nftsActions } from '../../../redux/actions';
+import FillAddressWrapper from '../../Modals/FillAddress';
+import FillNumberWrapper from '../../Modals/FillNumber';
+import Button from '../../Button/Button';
 import styles from '../Overview/styles.module.scss';
-import CreateEditNFTModalWrapper from '../../../Modals/Nfts/CreateEditNft';
-import SetAttributeModalWrapper from '../../../Modals/Nfts/SetAttribiute';
+import CreateEditNFTModalWrapper from '../../Modals/Nfts/CreateEditNft';
+import SetAttributeModalWrapper from '../../Modals/Nfts/SetAttribiute';
+import { ReactComponent as FullScreenIcon } from '../../../assets/icons/fullScreen.svg';
+import { ReactComponent as OpenNewTabIcon } from '../../../assets/icons/openNewTab.svg';
+import { ReactComponent as MenuIcon } from '../../../assets/icons/menu.svg';
+
+import FullImageWrapper from '../../Modals/Nfts/FullImage';
+import { formatDollars, parseDollars } from '../../../utils/walletHelpers';
+import router from '../../../router';
 
 function ItemNft({
   itemMetadata,
@@ -17,23 +26,22 @@ function ItemNft({
   isOwnItem,
   isOnSaleItem,
 }) {
+  const location = useLocation();
   const dispatch = useDispatch();
+  const history = useHistory();
   const {
     image, name, description, itemPrice,
   } = itemMetadata;
-  const [isHovered, setIsHovered] = useState(false);
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isSetPriceModalOpen, setIsSetPriceModalOpen] = useState(false);
   const [isSetMedatadaOpen, setIsSetMedatadaOpen] = useState(false);
   const [isSetAttribiutesOpen, setIsSetAttribiutesOpen] = useState(false);
+  const [isImageOpen, setIsImageOpen] = useState(false);
 
-  // Handlers for mouse events
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
+  const handleMenuOpen = () => {
+    setIsMenuOpen((prevValue) => !prevValue);
   };
 
   const onBurn = () => {
@@ -75,8 +83,6 @@ function ItemNft({
     },
   };
 
-  if (!name && !isOwnItem) return null;
-
   return (
     <>
       {isSetAttribiutesOpen && (
@@ -112,21 +118,24 @@ function ItemNft({
       {isSetPriceModalOpen && (
         <FillNumberWrapper
           closeModal={() => setIsSetPriceModalOpen(false)}
-          textData={textData}
+          textData={{ ...textData, submitButtonText: 'Set Price' }}
           onAccept={(amount) => {
             dispatch(
               nftsActions.sellNft.call({
                 collectionId,
                 itemId: Number(nftId),
-                price: Number(amount),
+                price: parseDollars(amount),
               }),
             );
             setIsSetPriceModalOpen(false);
           }}
         />
       )}
+      {isImageOpen && (
+        <FullImageWrapper closeModal={() => setIsImageOpen(false)} image={image} />
+      )}
 
-      <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <div>
         <p>
           <b>Collection Id:</b>
           {' '}
@@ -156,13 +165,41 @@ function ItemNft({
         </p>
 
         <br />
-        <div className={styles.imageWrapper}>
+        <div
+          className={styles.imageWrapper}
+        >
+          <div
+            className={cx(styles.showImage, styles.price)}
+            onClick={() => {
+              if (location.pathname !== router.nfts.shop && itemPrice) {
+                history.push(router.nfts.shop);
+              }
+            }}
+          >
+            {itemPrice ? `${formatDollars(itemPrice)} LLD` : 'Not for sale'}
+          </div>
+          {isOwnItem && (
+          <div className={cx(styles.showImage, styles.menu)} onClick={handleMenuOpen}>
+            <MenuIcon className={styles.icon} />
+          </div>
+          )}
+          {image
+            && (
+            <>
+              <div className={styles.showImage} onClick={() => setIsImageOpen(true)}>
+                <FullScreenIcon className={styles.icon} />
+              </div>
+              <a href={image} target="blank" className={cx(styles.showImage, styles.openNewTab)}>
+                <OpenNewTabIcon className={styles.icon} />
+              </a>
+            </>
+            )}
           {image ? (
             <img src={image} alt={name} className={styles.image} />
           ) : (
             <div className={styles.image} />
           )}
-          {isHovered && name && isOwnItem && (
+          {isMenuOpen && isOwnItem && (
             <div className={styles.buttonContainer}>
               <Button
                 small
@@ -201,7 +238,7 @@ function ItemNft({
               </Button>
             </div>
           )}
-          {isHovered && isOnSaleItem && (
+          {isOnSaleItem && itemPrice && (
             <div className={styles.buttonContainer}>
               <Button
                 small
@@ -211,19 +248,9 @@ function ItemNft({
               >
                 Buy for
                 {' '}
-                {itemPrice}
-              </Button>
-            </div>
-          )}
-          {!name && isOwnItem && (
-            <div className={styles.buttonContainer}>
-              <Button
-                small
-                onClick={() => setIsSetMedatadaOpen(true)}
-                primary
-                className={styles.button}
-              >
-                Set Metadata
+                {formatDollars(itemPrice)}
+                {' '}
+                LLD
               </Button>
             </div>
           )}

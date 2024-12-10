@@ -7,7 +7,7 @@ import ModalRoot from '../ModalRoot';
 import Button from '../../Button/Button';
 import { TextInput } from '../../InputComponents';
 import { blockchainSelectors } from '../../../redux/selectors';
-import stylesNfts from '../../Wallet/Nfts/Overview/styles.module.scss';
+import stylesNfts from '../../Nfts/Overview/styles.module.scss';
 import { nftsActions } from '../../../redux/actions';
 
 function CreatEditNFTModal({

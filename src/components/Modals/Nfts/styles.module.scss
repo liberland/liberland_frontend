@@ -1,0 +1,24 @@
+@import '/src/assets/main.scss';
+.imageWrapper{
+  padding: 15px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')){
+    padding: 15px 35px 40px 35px;
+  }
+
+  .image{
+    max-width: 100%;
+  }
+
+  .iconWrapper{
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: flex-end;
+
+    .icon{
+      cursor: pointer;
+      width: 30px;
+      height: 30px;
+    }
+  }
+}

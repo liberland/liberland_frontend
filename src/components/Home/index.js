@@ -20,7 +20,7 @@ import Congress from '../Congress';
 
 import Contracts from '../Contracts';
 import Senate from '../Senate';
-import NFTS from '../Wallet/Nfts';
+import NFTS from '../Nfts';
 
 function Home() {
   const renderRoutes = [

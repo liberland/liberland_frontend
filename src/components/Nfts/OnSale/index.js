@@ -1,22 +1,21 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import stylesPage from '../../../../utils/pagesBase.module.scss';
-import Card from '../../../Card';
+import stylesPage from '../../../utils/pagesBase.module.scss';
+import Card from '../../Card';
 import styles from '../Overview/styles.module.scss';
-import { nftsActions } from '../../../../redux/actions';
-import {
-  blockchainSelectors,
-  nftsSelectors,
-} from '../../../../redux/selectors';
+import { nftsActions } from '../../../redux/actions';
+import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import ItemNft from '../ItemNft';
 
 function OnSale() {
   const dispatch = useDispatch();
-  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const userWalletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
   const nftsOnSale = useSelector(nftsSelectors.nftsOnSale);
 
   useEffect(() => {
-    dispatch(nftsActions.getNftsOnSale.call());
+    dispatch(nftsActions.getNftsOnSale.call(userWalletAddress));
   }, [dispatch, userWalletAddress]);
 
   return (

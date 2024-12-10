@@ -120,6 +120,13 @@ function HomeNavigation() {
       isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
     },
     {
+      route: router.home.nfts,
+      title: 'NFTS',
+      access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],
+      icon: DocumentsIcon,
+      isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
+    },
+    {
       route: router.home.voting,
       title: 'VOTING',
       access: ['citizen', 'assemblyMember', 'non_citizen', 'guest'],

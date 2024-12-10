@@ -1,24 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Button from '../../../Button/Button';
-import stylesPage from '../../../../utils/pagesBase.module.scss';
-import Card from '../../../Card';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import routes from '../../../router';
+import Button from '../../Button/Button';
+import stylesPage from '../../../utils/pagesBase.module.scss';
+import Card from '../../Card';
 import styles from './styles.module.scss';
 import stylesNft from '../Overview/styles.module.scss';
-import FillNumberWrapper from '../../../Modals/FillNumber';
-import { nftsActions } from '../../../../redux/actions';
-import {
-  blockchainSelectors,
-  nftsSelectors,
-} from '../../../../redux/selectors';
+import FillNumberWrapper from '../../Modals/FillNumber';
+import { nftsActions } from '../../../redux/actions';
+import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import ItemNft from '../ItemNft';
 
 function OwnedNfts() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const userCollections = useSelector(nftsSelectors.userCollections);
-  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const userWalletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
   const nfts = useSelector(nftsSelectors.userNftsSelector);
 
   useEffect(() => {
@@ -43,7 +45,16 @@ function OwnedNfts() {
               </Button>
             </div>
             {!nfts || nfts.length < 1 ? (
-              <div>You dont have any NFTs</div>
+              <div className={styles.noNfts}>
+                <span>You dont have any NFTs</span>
+                <Button
+                  primary
+                  small
+                  onClick={() => history.push(routes.nfts.overview)}
+                >
+                  buy some or browse NFTs
+                </Button>
+              </div>
             ) : (
               <div className={stylesPage.overViewCard}>
                 <div className={stylesNft.nfts}>

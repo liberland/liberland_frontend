@@ -2771,12 +2771,20 @@ const getIpfsHash = (ipfsUrl) => {
   if (ipfsUrl.startsWith('ipfs://')) {
     return ipfsUrl.split('/').pop();
   }
-  return ipfsUrl;
+  return null;
+};
+
+const getMetadataWithoutPinata = (ipfsUrl) => {
+  const decoded = JSON.parse(ipfsUrl);
+  return decoded;
 };
 
 async function processUrlData(ipfsUrl, json = true) {
   try {
     const ipfsHash = getIpfsHash(ipfsUrl);
+    if (!ipfsHash) {
+      return getMetadataWithoutPinata(ipfsUrl);
+    }
     const url = `https://${process.env.REACT_APP_PINATA_GATEWAY}/ipfs/${ipfsHash}`;
     const response = await fetch(url, {
       method: 'GET',
@@ -2790,13 +2798,28 @@ async function processUrlData(ipfsUrl, json = true) {
   }
 }
 
-const getAllNfts = async (filterIsOnSale = false) => {
+async function checkUserCollection(userAddress) {
   const api = await getApi();
+  const collectionKeys = await api.query.nfts.account.entries(userAddress);
+  const collectionIds = [];
+  const nftIds = [];
 
+  collectionKeys.forEach(([key]) => {
+    const [collectionId, nftId] = key.args.slice(1);
+    collectionIds.push(collectionId.toString());
+    nftIds.push(nftId.toString());
+  });
+  return [collectionIds, nftIds];
+}
+
+const getAllNfts = async (walletAddress, onlyForSale) => {
+  const api = await getApi();
   const nftEntries = await api.query.nfts.item.entries();
 
   const collectionIds = nftEntries.map(([key]) => key.args[0].toString());
   const nftIds = nftEntries.map(([key]) => key.args[1].toString());
+
+  const [userCollectionIds, userNftIds] = await checkUserCollection(walletAddress);
 
   const [collectionMetadata, itemMetadata] = await Promise.all([
     api.query.nfts.collectionMetadataOf.multi(collectionIds),
@@ -2815,23 +2838,23 @@ const getAllNfts = async (filterIsOnSale = false) => {
       const processedItemData = itemMetadataUnwrapped
         ? await processUrlData(decoder.decode(itemMetadataUnwrapped.data))
         : null;
-      let itemPrice;
-      if (filterIsOnSale) {
-        const itemPriceOpt = await api.query.nfts.itemPriceOf(collectionId, nftId);
-        itemPrice = itemPriceOpt.isNone ? null : itemPriceOpt.unwrap()[0].toString();
-        const isOnSale = itemPrice && itemPrice > 0;
 
-        if (!isOnSale) {
-          return null;
-        }
+      const itemPriceOpt = await api.query.nfts.itemPriceOf(collectionId, nftId);
+      const itemPrice = itemPriceOpt.isNone ? null : itemPriceOpt.unwrap()[0].toString();
+      const imageUrl = processedItemData?.image || processedItemData?.imageUrl;
+      const image = imageUrl ? await processUrlData(imageUrl, false) : null;
+
+      if (onlyForSale && !itemPrice) {
+        return null;
       }
 
-      const imageUrl = processedItemData?.image;
-      const image = imageUrl ? await processUrlData(imageUrl, false) : null;
+      const isUserNft = userCollectionIds.includes(collectionId.toString())
+                        && userNftIds.includes(nftId.toString());
 
       return {
         collectionId: collectionId.toString(),
         nftId: nftId.toString(),
+        isUserNft,
         collectionMetadata: {
           name: collectionMetadataUnwrapped?.name?.toString(),
         },
@@ -2847,20 +2870,6 @@ const getAllNfts = async (filterIsOnSale = false) => {
   return nftDetails.filter((detail) => detail !== null);
 };
 
-async function checkUserCollection(userAddress) {
-  const api = await getApi();
-  const collectionKeys = await api.query.nfts.account.entries(userAddress);
-  const collectionIds = [];
-  const nftIds = [];
-
-  collectionKeys.forEach(([key]) => {
-    const [collectionId, nftId] = key.args.slice(1);
-    collectionIds.push(collectionId.toString());
-    nftIds.push(nftId.toString());
-  });
-  return [collectionIds, nftIds];
-}
-
 const getUserNfts = async (walletAddress) => {
   const api = await getApi();
 
@@ -2875,13 +2884,15 @@ const getUserNfts = async (walletAddress) => {
     collectionIds.map(async (collectionId, index) => {
       const collectionDataOpt = collectionMetadata[index];
       const itemDataOpt = itemMetadata[index];
-
       const collectionData = collectionDataOpt.isNone ? null : collectionDataOpt.unwrap();
       const itemData = itemDataOpt.isNone ? null : itemDataOpt.unwrap();
       const processedCollectionData = collectionData ? processData(collectionData.data) : null;
       const processedItemData = itemData ? await processUrlData(decoder.decode(itemData.data)) : null;
-      const imageUrl = processedItemData?.image;
+      const imageUrl = processedItemData?.image || processedItemData?.imageUrl;
       const image = imageUrl ? await processUrlData(imageUrl, false) : null;
+
+      const itemPriceOpt = await api.query.nfts.itemPriceOf(collectionId, nftIds[index]);
+      const itemPrice = itemPriceOpt.isNone ? null : itemPriceOpt.unwrap()[0].toString();
       return {
         collectionId,
         nftId: nftIds[index],
@@ -2891,6 +2902,7 @@ const getUserNfts = async (walletAddress) => {
         itemMetadata: {
           ...processedItemData,
           image: image?.url || imageUrl,
+          itemPrice,
         },
       };
     }),

@@ -30,14 +30,16 @@ function* getUserCollectionsWorker(action) {
   yield put(nftsActions.getUserCollections.success(collection));
 }
 
-function* getNftsWorker() {
-  const nfts = yield call(getAllNfts);
-  yield put(nftsActions.getAllNfts.success(nfts));
+function* getNftsWorker(action) {
+  const nfts = yield call(getAllNfts, action.payload);
+  const hasUserNft = nfts.some((nft) => nft.isUserNft === true);
+  yield put(nftsActions.getAllNfts.success({ hasUserNft, nfts }));
 }
 
-function* getNftsOnSaleWorker() {
-  const nfts = yield call(getAllNfts, true);
-  yield put(nftsActions.getNftsOnSale.success(nfts));
+function* getNftsOnSaleWorker(action) {
+  const nfts = yield call(getAllNfts, action.payload, true);
+  const filteredNfts = nfts.filter((nft) => !nft.isUserNft);
+  yield put(nftsActions.getNftsOnSale.success(filteredNfts));
 }
 
 function* createCollectionWorker(action) {
