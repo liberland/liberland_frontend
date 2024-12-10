@@ -1,39 +1,39 @@
 import { createActions } from 'redux-actions';
 
 export const {
-  getWallet,
-  getAdditionalAssets,
-  sendLld,
-  sendLlm,
-  sendAssets,
-  sendLlmToPolitipool,
+  ministryFinanceGetWallet,
+  ministryFinanceGetAdditionalAssets,
+  ministryFinanceSendLld,
+  ministryFinanceSendLlm,
+  ministryFinanceSendAssets,
+  ministryFinanceSendLlmToPolitipool,
 } = createActions({
-  GET_WALLET: {
+  MINISTRY_FINANCE_GET_WALLET: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  GET_ADDITIONAL_ASSETS: {
+  MINISTRY_FINANCE_GET_ADDITIONAL_ASSETS: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  SEND_LLD: {
+  MINISTRY_FINANCE_SEND_LLD: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  SEND_LLM: {
+  MINISTRY_FINANCE_SEND_LLM: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  SEND_ASSETS: {
+  MINISTRY_FINANCE_SEND_ASSETS: {
     call: undefined,
     success: undefined,
     failure: undefined,
   },
-  SEND_LLM_TO_POLITIPOOL: {
+  MINISTRY_FINANCE_SEND_LLM_TO_POLITIPOOL: {
     call: undefined,
     success: undefined,
     failure: undefined,

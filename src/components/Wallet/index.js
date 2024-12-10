@@ -53,6 +53,7 @@ function Wallet() {
 
       <AssetOverview
         additionalAssets={additionalAssets}
+        userIsMember
       />
 
       <WalletTransactionHistory

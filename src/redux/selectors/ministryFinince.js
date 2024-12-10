@@ -27,9 +27,9 @@ export const balances = createSelector(
   (reducer) => reducer.balances,
 );
 
-export const adminMinistryFinance = createSelector(
+export const clerksMinistryFinance = createSelector(
   walletInfo,
-  (reducer) => reducer.admin,
+  (reducer) => reducer.clerksIds,
 );
 
 export const additionalAssets = createSelector(

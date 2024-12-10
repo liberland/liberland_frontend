@@ -14,26 +14,26 @@ export default function Wallet() {
   const ministryFinanceWallet = useSelector(ministryFinanceSelector.walletAddress);
   const additionalAssets = useSelector(ministryFinanceSelector.additionalAssets);
   const balances = useSelector(ministryFinanceSelector.balances);
-  const adminAddress = useSelector(ministryFinanceSelector.adminMinistryFinance);
+  const clerksIds = useSelector(ministryFinanceSelector.clerksMinistryFinance);
 
   useEffect(() => {
     dispatch(officesActions.getPalletIds.call());
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(ministryFinanceActions.getWallet.call());
+    dispatch(ministryFinanceActions.ministryFinanceGetWallet.call());
   }, [dispatch, pallets]);
 
   useEffect(() => {
-    dispatch(ministryFinanceActions.getAdditionalAssets.call());
+    dispatch(ministryFinanceActions.ministryFinanceGetAdditionalAssets.call());
   }, [dispatch, ministryFinanceWallet]);
 
   if (!ministryFinanceWallet) return null;
-
+  const userIsMember = clerksIds.includes(walletAddress);
   return (
     <div>
       <WalletCongresSenateWrapper
-        userIsMember={walletAddress === adminAddress.toString()}
+        userIsMember={userIsMember}
         totalBalance={totalBalance}
         congresAccountAddress={ministryFinanceWallet}
         liquidMerits={liquidMerits}
@@ -41,9 +41,9 @@ export default function Wallet() {
         balances={balances}
         officeType={OfficeType.MINISTRY_FINANCE}
         onSendFunctions={{
-          LLD: (data) => ministryFinanceActions.sendLld.call(data),
-          LLM: (data) => ministryFinanceActions.sendLlm.call(data),
-          LLMPolitipool: (data) => ministryFinanceActions.sendLlmToPolitipool.call(data),
+          LLD: (data) => ministryFinanceActions.ministryFinanceSendLld.call(data),
+          LLM: (data) => ministryFinanceActions.ministryFinanceSendLlm.call(data),
+          LLMPolitipool: (data) => ministryFinanceActions.ministryFinanceSendLlmToPolitipool.call(data),
         }}
       />
     </div>

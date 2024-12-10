@@ -79,7 +79,7 @@ function SendAssetModal({
       } else if (officeType === OfficeType.SENATE) {
         dispatch(senateActions.senateSendAssets.call({ ...data, officeType }));
       } else if (officeType === OfficeType.MINISTRY_FINANCE) {
-        dispatch(ministryFinanceActions.sendAssets.call({ ...data, officeType }));
+        dispatch(ministryFinanceActions.ministryFinanceSendAssets.call({ ...data, officeType }));
       }
     }
     closeModal();

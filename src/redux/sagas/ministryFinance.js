@@ -4,7 +4,7 @@ import {
   congressSenateSendLld,
   congressSenateSendLlm,
   congressSenateSendLlmToPolitipool,
-  getAdditionalAssets, getAdminMinistryFinance, getBalanceByAddress,
+  getAdditionalAssets, getClerksMinistryFinance, getBalanceByAddress,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { palletIdToAddress } from '../../utils/pallet';
@@ -19,24 +19,24 @@ function* getWalletWorker() {
   const pallets = yield select(officesSelectors.selectorPallets);
 
   if (!pallets) {
-    yield put(ministryFinanceActions.getWallet.failure());
+    yield put(ministryFinanceActions.ministryFinanceGetWallet.failure());
     return;
   }
   const { palletId } = pallets.find((e) => e.palletName === codeName);
   const walletAddress = palletIdToAddress(palletId);
   const balances = yield call(getBalanceByAddress, walletAddress);
-  const admin = yield call(getAdminMinistryFinance, walletAddress);
-  yield put(ministryFinanceActions.getWallet.success({ balances, walletAddress, admin }));
+  const clerksIds = yield call(getClerksMinistryFinance, walletAddress);
+  yield put(ministryFinanceActions.ministryFinanceGetWallet.success({ balances, walletAddress, clerksIds }));
 }
 
 export function* getWalletWatcher() {
-  yield* blockchainWatcher(ministryFinanceActions.getWallet, getWalletWorker);
+  yield* blockchainWatcher(ministryFinanceActions.ministryFinanceGetWallet, getWalletWorker);
 }
 
 function* getAdditionalAssetsWorker() {
   const ministryFinanceWallet = yield select(ministryFinanceSelector.walletAddress);
   if (!ministryFinanceWallet) {
-    yield put(ministryFinanceActions.getAdditionalAssets.failure());
+    yield put(ministryFinanceActions.ministryFinanceGetAdditionalAssets.failure());
     return;
   }
 
@@ -44,12 +44,12 @@ function* getAdditionalAssetsWorker() {
     getAdditionalAssets,
     ministryFinanceWallet,
   );
-  yield put(ministryFinanceActions.getAdditionalAssets.success(additionalAssets));
+  yield put(ministryFinanceActions.ministryFinanceGetAdditionalAssets.success(additionalAssets));
 }
 
 export function* getAdditionalAssetsWatcher() {
   yield* blockchainWatcher(
-    ministryFinanceActions.getAdditionalAssets,
+    ministryFinanceActions.ministryFinanceGetAdditionalAssets,
     getAdditionalAssetsWorker,
   );
 }
@@ -70,12 +70,12 @@ function* sendLlmToPolitipoolWorker({
     executionBlock,
     officeType,
   });
-  yield put(ministryFinanceActions.sendLlmToPolitipool.success());
+  yield put(ministryFinanceActions.ministryFinanceSendLlmToPolitipool.success());
 }
 
 export function* sendLlmToPolitipoolWatcher() {
   yield* blockchainWatcher(
-    ministryFinanceActions.sendLlmToPolitipool,
+    ministryFinanceActions.ministryFinanceSendLlmToPolitipool,
     sendLlmToPolitipoolWorker,
   );
 }
@@ -95,12 +95,12 @@ function* sendLlmWorker({
     remarkInfo,
     officeType,
   });
-  yield put(ministryFinanceActions.sendLlm.success());
+  yield put(ministryFinanceActions.ministryFinanceSendLlm.success());
 }
 
 export function* sendLlmWatcher() {
   yield* blockchainWatcher(
-    ministryFinanceActions.sendLlm,
+    ministryFinanceActions.ministryFinanceSendLlm,
     sendLlmWorker,
   );
 }
@@ -121,12 +121,12 @@ function* sendLldWorker({
     executionBlock,
     officeType,
   });
-  yield put(ministryFinanceActions.sendLld.success());
+  yield put(ministryFinanceActions.ministryFinanceSendLld.success());
 }
 
 export function* sendLldWatcher() {
   yield* blockchainWatcher(
-    ministryFinanceActions.sendLld,
+    ministryFinanceActions.ministryFinanceSendLld,
     sendLldWorker,
   );
 }
@@ -148,12 +148,12 @@ function* sendAssetsTransfer({
     executionBlock,
     officeType,
   });
-  yield put(ministryFinanceActions.sendAssets.success());
+  yield put(ministryFinanceActions.ministryFinanceSendAssets.success());
 }
 
 export function* sendAssetsTransferWatcher() {
   yield* blockchainWatcher(
-    ministryFinanceActions.sendAssets,
+    ministryFinanceActions.ministryFinanceSendAssets,
     sendAssetsTransfer,
   );
 }

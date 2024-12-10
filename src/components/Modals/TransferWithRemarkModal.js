@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
 
 import { BN } from '@polkadot/util';
+import cx from 'classnames';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
@@ -59,6 +60,9 @@ function TransferWithRemarkModal({
     watch,
   } = useForm({
     mode: 'onChange',
+    defaultValues: {
+      id: 0,
+    },
   });
 
   const getFieldStateSelect = watch('select') || 'LLD';
@@ -82,8 +86,7 @@ function TransferWithRemarkModal({
 
   return (
     <form
-      className={styles.getCitizenshipModal}
-      style={{ width: '88%' }}
+      className={cx(styles.getCitizenshipModal, styles.transferWithRemarkWidth)}
       onSubmit={handleSubmit(((value) => {
         if (!isValid) return;
         submit(value, options);

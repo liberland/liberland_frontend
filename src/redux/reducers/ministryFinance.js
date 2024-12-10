@@ -28,6 +28,7 @@ const initialState = {
       },
       electionLock: 0,
     },
+    clerksIds: null,
   },
   scheduledCalls: [],
 };
@@ -35,26 +36,26 @@ const initialState = {
 const ministryFinanceReducer = handleActions(
   {
     [combineActions(
-      ministryFinanceActions.getAdditionalAssets.call,
-      ministryFinanceActions.getWallet.call,
+      ministryFinanceActions.ministryFinanceGetAdditionalAssets.call,
+      ministryFinanceActions.ministryFinanceGetWallet.call,
     )]: (state) => ({
       ...state,
       loading: true,
     }),
     [combineActions(
-      ministryFinanceActions.getAdditionalAssets.success,
-      ministryFinanceActions.getAdditionalAssets.failure,
-      ministryFinanceActions.getWallet.failure,
-      ministryFinanceActions.getWallet.success,
+      ministryFinanceActions.ministryFinanceGetAdditionalAssets.success,
+      ministryFinanceActions.ministryFinanceGetAdditionalAssets.failure,
+      ministryFinanceActions.ministryFinanceGetWallet.failure,
+      ministryFinanceActions.ministryFinanceGetWallet.success,
     )]: (state) => ({
       ...state,
       loading: false,
     }),
-    [ministryFinanceActions.getAdditionalAssets.success]: (state, action) => ({
+    [ministryFinanceActions.ministryFinanceGetAdditionalAssets.success]: (state, action) => ({
       ...state,
       additionalAssets: action.payload,
     }),
-    [ministryFinanceActions.getWallet.success]: (state, action) => ({
+    [ministryFinanceActions.ministryFinanceGetWallet.success]: (state, action) => ({
       ...state,
       walletInfo: action.payload,
     }),

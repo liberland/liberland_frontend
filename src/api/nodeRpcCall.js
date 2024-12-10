@@ -1608,12 +1608,16 @@ const senateProposeSpend = async ({
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
-const getAdminMinistryFinance = async () => {
+const getClerksMinistryFinance = async () => {
   const api = await getApi();
-  return api.query.ministryOfFinanceOffice.admin();
+  const keys = await api.query.ministryOfFinanceOffice.clerks.keys();
+  if (keys.length < 1) {
+    return null;
+  }
+  return keys.map((item) => item.args.toString());
 };
 
-const ministryFinanceProposeSpend = async ({
+const ministryFinanceSpend = async ({
   walletAddress, spendProposal, remarkInfo,
 }) => {
   const api = await getApi();
@@ -1631,7 +1635,7 @@ const getProperProposal = async (officeType) => {
   } if (officeType === OfficeType.SENATE) {
     return senateProposeSpend;
   } if (officeType === OfficeType.MINISTRY_FINANCE) {
-    return ministryFinanceProposeSpend;
+    return ministryFinanceSpend;
   }
   return null;
 };
@@ -3016,5 +3020,5 @@ export {
   mintAsset,
   transferWithRemark,
   encodeRemarkUser,
-  getAdminMinistryFinance,
+  getClerksMinistryFinance,
 };
