@@ -1469,6 +1469,14 @@ const getBlockEvents = async (blockHash) => {
   }
 };
 
+const getVotesList = (voting) => {
+  const votingUnwrapped = voting.isSome ? voting.unwrap() : null;
+  if (!votingUnwrapped) return null;
+  const ayes = votingUnwrapped.ayes.map((item) => item.toString());
+  const nays = votingUnwrapped.nays.map((item) => item.toString());
+  return ayes.concat(nays);
+};
+
 const getMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.council.proposals();
@@ -1480,10 +1488,13 @@ const getMotions = async () => {
         [api.query.council.voting, proposal],
         [api.query.council.members],
       ]);
+
+      const votes = getVotesList(voting);
       return {
         proposal,
         proposalOf,
         voting,
+        votes,
         membersCount: members.length,
       };
     }),
@@ -2747,13 +2758,7 @@ const getSenateMotions = async () => {
         [api.query.senate.voting, proposal],
         [api.query.senate.members],
       ]);
-      let votes;
-      const votingUnwrapped = voting.isSome ? voting.unwrap() : null;
-      if (votingUnwrapped) {
-        const ayes = votingUnwrapped.ayes.map((item) => item.toString());
-        const nays = votingUnwrapped.nays.map((item) => item.toString());
-        votes = ayes.concat(nays);
-      }
+      const votes = getVotesList(voting);
 
       const senateProposalHash = proposalOf.hash.toHex();
       return {
