@@ -4,6 +4,7 @@ import {
 import { decodeAddress, encodeAddress } from '@polkadot/keyring';
 import { ethers } from 'ethers';
 import { parseInt } from 'lodash';
+import { IndexHelper } from './council/councilEnum';
 
 const meritDecimals = 12;
 const dollarDecimals = 12;
@@ -148,4 +149,13 @@ export const calculateAmountMin = (
   );
   const amountBN = new BN(amount);
   return slippage.isZero() ? amountBN : new BN(amount).sub(slippage);
+};
+
+export const calculateProperBalance = (balance, index, decimals) => {
+  if (index === IndexHelper.LLD) {
+    return parseDollars(balance);
+  } if (index === IndexHelper.POLITIPOOL_LLM) {
+    return parseMerits(balance);
+  }
+  return parseAssets(balance, decimals);
 };

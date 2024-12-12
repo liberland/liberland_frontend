@@ -16,6 +16,7 @@ import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
 import { decodeAndFilter } from '../utils/identityParser';
+import { OfficeType } from '../utils/officeTypeEnum';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -134,6 +135,10 @@ const getApi = async () => {
           amountInUSDAtDateOfPayment: 'u64',
           date: 'u64',
           currency: 'Text',
+        },
+        RemarkInfoUser: {
+          id: 'u64',
+          description: 'Text',
         },
       },
       runtime: {
@@ -455,6 +460,31 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
     console.error(e);
     throw e;
   }
+};
+
+const makeTransferExtrinsic = (api, trasferData) => {
+  const { index, balance, recipient } = trasferData;
+  let transferExtrinsic;
+  if (index === IndexHelper.LLD) {
+    transferExtrinsic = api.tx.balances.transfer(recipient, balance);
+  } else if (index === IndexHelper.POLITIPOOL_LLM) {
+    transferExtrinsic = api.tx.llm.sendLlmToPolitipool(recipient, balance);
+  } else {
+    transferExtrinsic = api.tx.assets.transfer(parseInt(index), recipient, balance);
+  }
+  return transferExtrinsic;
+};
+
+const makeRemarkExtrinsic = (api, remarkInfo) => api.tx.llm.remark(remarkInfo);
+
+const transferWithRemark = async (remarkInfo, transfer, walletAddress) => {
+  const api = await getApi();
+  const remark = makeRemarkExtrinsic(api, remarkInfo);
+  const transferExtrinsic = makeTransferExtrinsic(api, transfer);
+
+  const call = [transferExtrinsic, remark];
+  const extrinsic = api.tx.utility.batch(call);
+  return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
 const provideJudgementAndAssets = async ({
@@ -1582,12 +1612,44 @@ const senateProposeSpend = async ({
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+const getClerksMinistryFinance = async () => {
+  const api = await getApi();
+  const keys = await api.query.ministryOfFinanceOffice.clerks.keys();
+  if (keys.length < 1) {
+    return null;
+  }
+  return keys.map((item) => item.args.toString());
+};
+
+const ministryFinanceSpend = async ({
+  walletAddress, spendProposal, remarkInfo,
+}) => {
+  const api = await getApi();
+
+  const remark = api.tx.llm.remark(remarkInfo);
+  const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
+  const extrinsic = api.tx.ministryOfFinanceOffice.execute(transferAndRemark);
+
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getProperProposal = async (officeType) => {
+  if (officeType === OfficeType.CONGRESS) {
+    return congressProposeSpend;
+  } if (officeType === OfficeType.SENATE) {
+    return senateProposeSpend;
+  } if (officeType === OfficeType.MINISTRY_FINANCE) {
+    return ministryFinanceSpend;
+  }
+  return null;
+};
+
 const congressSenateSendLlm = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1595,11 +1657,11 @@ const congressSenateSendLlm = async ({
 };
 
 const congressSenateSendLld = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.balances.transfer(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1607,11 +1669,11 @@ const congressSenateSendLld = async ({
 };
 
 const congressSenateSendLlmToPolitipool = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1625,11 +1687,11 @@ const congressSenateSendAssets = async ({
   assetData,
   remarkInfo,
   executionBlock,
-  isCongress = true,
+  officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.assets.transfer(parseInt(assetData.index), transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -2759,6 +2821,12 @@ const closeSenateMotion = async (proposalHash, index, walletAddress) => {
   return submitExtrinsic(api.tx.senate.close(proposalHash, index, weightBound, lengthBound), walletAddress, api);
 };
 
+const encodeRemarkUser = async (dataToEncode) => {
+  const api = await getApi();
+  const data = api.createType('RemarkInfoUser', dataToEncode);
+  return u8aToHex(pako.deflate(data.toU8a()));
+};
+
 const encodeRemark = async (dataToEncode) => {
   const api = await getApi();
   const data = api.createType('RemarkInfo', dataToEncode);
@@ -2954,4 +3022,7 @@ export {
   getAssetDetails,
   createOrUpdateAsset,
   mintAsset,
+  transferWithRemark,
+  encodeRemarkUser,
+  getClerksMinistryFinance,
 };

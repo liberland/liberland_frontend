@@ -17,6 +17,7 @@ import * as senateActions from './senate';
 import * as nftsActions from './nfts';
 import * as ethActions from './eth';
 import * as financesActions from './finances';
+import * as ministryFinanceActions from './ministryFinance';
 
 export {
   authActions,
@@ -38,4 +39,5 @@ export {
   nftsActions,
   ethActions,
   financesActions,
+  ministryFinanceActions,
 };

@@ -13,16 +13,19 @@ import Button from '../Button/Button';
 // STYLES
 import styles from './styles.module.scss';
 import { parseAssets, isValidSubstrateAddress } from '../../utils/walletHelpers';
-import { congressActions, senateActions, walletActions } from '../../redux/actions';
+import {
+  congressActions, ministryFinanceActions, senateActions, walletActions,
+} from '../../redux/actions';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { encodeRemark } from '../../api/nodeRpcCall';
+import { OfficeType } from '../../utils/officeTypeEnum';
 
 // TODO add validation
 function SendAssetModal({
-  closeModal, assetData, isRemarkNeeded, isCongress,
+  closeModal, assetData, isRemarkNeeded, officeType,
 }) {
   const dispatch = useDispatch();
   const {
@@ -71,10 +74,12 @@ function SendAssetModal({
         assetData,
         remarkInfo: encodedRemark,
       };
-      if (isCongress) {
-        dispatch(congressActions.congressSendAssets.call({ ...data, executionBlock }));
-      } else {
-        dispatch(senateActions.senateSendAssets.call({ ...data, isCongress }));
+      if (officeType === OfficeType.CONGRESS) {
+        dispatch(congressActions.congressSendAssets.call({ ...data, executionBlock, officeType }));
+      } else if (officeType === OfficeType.SENATE) {
+        dispatch(senateActions.senateSendAssets.call({ ...data, officeType }));
+      } else if (officeType === OfficeType.MINISTRY_FINANCE) {
+        dispatch(ministryFinanceActions.ministryFinanceSendAssets.call({ ...data, officeType }));
       }
     }
     closeModal();
@@ -136,17 +141,17 @@ function SendAssetModal({
         <>
           <RemarkForm errors={errors} register={register} watch={watch} setValue={setValue} />
 
-          {isCongress && (
+          {officeType === 'congress' && (
           <>
             <div className={styles.title}>
-              {isCongress ? 'Congress' : 'Senate'}
+              Congress
               {' '}
               voting time in days
             </div>
             <div className={styles.description}>
               How long will it take
               {' '}
-              {isCongress ? 'Congress' : 'Senate'}
+              Congress
               {' '}
               to close the motion?
             </div>
@@ -198,11 +203,10 @@ function SendAssetModal({
 
 SendAssetModal.defaultProps = {
   isRemarkNeeded: false,
-  isCongress: true,
 };
 
 SendAssetModal.propTypes = {
-  isCongress: PropTypes.bool,
+  officeType: PropTypes.string.isRequired,
   isRemarkNeeded: PropTypes.bool,
   closeModal: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types, react/require-default-props

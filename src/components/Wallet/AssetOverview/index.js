@@ -10,7 +10,8 @@ import Button from '../../Button/Button';
 function AssetOverview({
   additionalAssets,
   isRemarkNeeded,
-  isCongress,
+  officeType,
+  userIsMember,
 }) {
   const [whichModalOpen, setWhichModalOpen] = useState(null);
   const handleModalOpenAssets = (symbol) => setWhichModalOpen(symbol);
@@ -60,7 +61,7 @@ function AssetOverview({
                 assetData={assetInfo}
                 closeModal={handleModalCloseAssets}
                 isRemarkNeeded={isRemarkNeeded}
-                isCongress={isCongress}
+                officeType={officeType}
               />
               )}
             </div>
@@ -74,11 +75,12 @@ function AssetOverview({
 AssetOverview.defaultProps = {
   additionalAssets: [],
   isRemarkNeeded: false,
-  isCongress: true,
+  userIsMember: false,
 };
 
 AssetOverview.propTypes = {
-  isCongress: PropTypes.bool,
+  userIsMember: PropTypes.bool,
+  officeType: PropTypes.string.isRequired,
   isRemarkNeeded: PropTypes.bool,
   additionalAssets: PropTypes.arrayOf(PropTypes.shape({
     metadata: {
