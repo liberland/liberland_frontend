@@ -15,6 +15,8 @@ import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
+import { decodeAndFilter } from '../utils/identityParser';
+import { OfficeType } from '../utils/officeTypeEnum';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -133,6 +135,10 @@ const getApi = async () => {
           amountInUSDAtDateOfPayment: 'u64',
           date: 'u64',
           currency: 'Text',
+        },
+        RemarkInfoUser: {
+          id: 'u64',
+          description: 'Text',
         },
       },
       runtime: {
@@ -267,6 +273,57 @@ const getIdentity = async (address) => {
   }
 };
 
+const createOrUpdateAsset = async ({
+  id,
+  name,
+  symbol,
+  decimals,
+  minBalance,
+  admin,
+  issuer,
+  freezer,
+  owner,
+  isCreate,
+  defaultValues,
+}) => {
+  try {
+    const api = await getApi();
+    if (isCreate) {
+      const create = await api.tx.assets.create(id, admin, minBalance);
+      await submitExtrinsic(create, owner, api);
+    }
+    if (defaultValues?.name !== name || defaultValues?.symbol !== symbol || defaultValues?.decimals !== decimals) {
+      const setMetadata = await api.tx.assets.setMetadata(id, name, symbol, decimals);
+      await submitExtrinsic(setMetadata, owner, api);
+    }
+    if (defaultValues?.issuer !== issuer || defaultValues?.admin !== admin || defaultValues?.freezer !== freezer) {
+      const setTeam = await api.tx.assets.setTeam(id, issuer, admin, freezer);
+      await submitExtrinsic(setTeam, owner, api);
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const mintAsset = async ({
+  id,
+  beneficiary,
+  amount,
+  owner,
+}) => {
+  try {
+    const api = await getApi();
+    const mint = await api.tx.assets.mint(id, beneficiary, amount);
+    await submitExtrinsic(mint, owner, api);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
 const getLlmBalances = async (addresses) => {
   try {
     const api = await getApi();
@@ -303,6 +360,58 @@ const getAssetData = async (asset, address) => {
       return data.balance;
     }
     return null;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const getAssetDetails = async (ids) => {
+  try {
+    const api = await getApi();
+    const details = (await api.query.assets.asset.multi(ids)).map((asset) => asset.toJSON());
+    const assetQueries = details.reduce((queries, detail) => {
+      queries.push([api.query.identity.identityOf, detail.admin]);
+      queries.push([api.query.identity.identityOf, detail.freezer]);
+      queries.push([api.query.identity.identityOf, detail.issuer]);
+      queries.push([api.query.identity.identityOf, detail.owner]);
+      return queries;
+    }, []);
+    const assetResults = await api.queryMulti([...assetQueries]);
+    const resolvedIdentity = assetResults.map((result) => {
+      const json = result.toJSON();
+      const raw = json?.info?.display?.raw?.slice(2);
+      if (!raw) {
+        return '';
+      }
+      return Buffer.from(raw, 'hex').toString('utf-8');
+    }).reduce((accumulator, item) => {
+      const lastItem = accumulator[accumulator.length - 1];
+      if (!lastItem) {
+        accumulator.push([item]);
+      } else if (lastItem.length < 4) {
+        lastItem.push(item);
+      } else {
+        accumulator.push([item]);
+      }
+      return accumulator;
+    }, []);
+
+    const resolvedDetails = details.map((detail, index) => ({
+      ...detail,
+      supply: detail.supply.toString().startsWith('0x')
+        ? window.BigInt(detail.supply).toString()
+        : detail.supply,
+      identity: {
+        admin: resolvedIdentity[index][0] || detail.admin,
+        freezer: resolvedIdentity[index][1] || detail.freezer,
+        issuer: resolvedIdentity[index][2] || detail.issuer,
+        owner: resolvedIdentity[index][3] || detail.owner,
+      },
+    }));
+
+    return resolvedDetails;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -353,6 +462,31 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
   }
 };
 
+const makeTransferExtrinsic = (api, trasferData) => {
+  const { index, balance, recipient } = trasferData;
+  let transferExtrinsic;
+  if (index === IndexHelper.LLD) {
+    transferExtrinsic = api.tx.balances.transfer(recipient, balance);
+  } else if (index === IndexHelper.POLITIPOOL_LLM) {
+    transferExtrinsic = api.tx.llm.sendLlmToPolitipool(recipient, balance);
+  } else {
+    transferExtrinsic = api.tx.assets.transfer(parseInt(index), recipient, balance);
+  }
+  return transferExtrinsic;
+};
+
+const makeRemarkExtrinsic = (api, remarkInfo) => api.tx.llm.remark(remarkInfo);
+
+const transferWithRemark = async (remarkInfo, transfer, walletAddress) => {
+  const api = await getApi();
+  const remark = makeRemarkExtrinsic(api, remarkInfo);
+  const transferExtrinsic = makeTransferExtrinsic(api, transfer);
+
+  const call = [transferExtrinsic, remark];
+  const extrinsic = api.tx.utility.batch(call);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
 const provideJudgementAndAssets = async ({
   address, hash, walletAddress, merits, dollars, judgementType = identityJudgementEnums.KNOWNGOOD,
 }) => {
@@ -381,12 +515,12 @@ const provideJudgementAndAssets = async ({
   return submitExtrinsic(finalCall, walletAddress, api);
 };
 
-const getLegalAdditionals = (legal) => {
+const getAdditionals = (itemData, key) => {
   const chunks = [];
-  for (let i = 0; i < legal.length; i += 32) {
+  for (let i = 0; i < itemData.length; i += 32) {
     chunks.push([
-      { Raw: 'legal' },
-      { Raw: legal.substr(i, 32) },
+      { Raw: key },
+      { Raw: itemData.substr(i, 32) },
     ]);
   }
   return chunks;
@@ -415,6 +549,10 @@ const getEResidentAdditionals = () => [
   [{ Raw: 'eresident' }, { Raw: '1' }],
 ];
 
+const getCompanyAdditionals = () => [
+  [{ Raw: 'company' }, { Raw: '1' }],
+];
+
 const buildAdditionals = (values, blockNumber) => {
   const additionals = [];
 
@@ -427,27 +565,38 @@ const buildAdditionals = (values, blockNumber) => {
     additionals.push(
       ...getEResidentAdditionals(),
     );
-  }
-
-  if (values.legal) {
+  } else if (values.onChainIdentity === 'company') {
     additionals.push(
-      ...getLegalAdditionals(values.legal),
+      ...getCompanyAdditionals(),
     );
   }
+
+  const additionalItems = ['legal', 'web', 'display', 'email'];
+
+  additionalItems.map((item) => {
+    const itemData = values[item];
+    if (itemData && itemData.length > 32) {
+      additionals.push(
+        ...getAdditionals(itemData, item),
+      );
+    }
+    return null;
+  });
 
   return additionals;
 };
 
 const setIdentity = async (values, walletAddress) => {
   const asData = (v) => (v ? { Raw: v } : null);
+  const truncate = (v) => (v.length > 32 ? v.substring(0, 32) : v);
   const api = await getApi();
   const blockNumber = await api.derive.chain.bestNumber();
   const info = {
     additional: buildAdditionals(values, blockNumber.toNumber()),
-    display: asData(values.display),
-    legal: asData(null),
-    web: asData(values.web),
-    email: asData(values.email),
+    display: asData(truncate(values.display)),
+    legal: asData(truncate(values.legal)),
+    web: asData(truncate(values.web)),
+    email: asData(truncate(values.email)),
     riot: asData(null),
     image: asData(null),
     twitter: asData(null),
@@ -657,13 +806,15 @@ const getValidators = async () => {
 
   validatorsData.forEach((validatorData, index) => {
     const validatorHumanData = validatorData.toHuman();
+    const data = validatorData.isSome ? validatorData.unwrap() : null;
+    const decodedData = decodeAndFilter(data?.info, ['display']);
     const validatorWithBaseInfo = validatorsWithBaseInfo.validators[index];
     if (!validatorWithBaseInfo) return;
     const dataToAdd = {
       ...((validatorHumanData?.commission !== undefined) && { commission: validatorHumanData.commission }),
       ...((validatorHumanData?.blocked !== undefined) && { blocked: validatorHumanData.blocked }),
       // eslint-disable-next-line max-len
-      ...((validatorHumanData?.info?.display?.Raw !== undefined) && { displayName: validatorHumanData?.info?.display?.Raw }),
+      ...((decodedData?.display !== undefined) && { displayName: decodedData.display }),
       ...validatorWithBaseInfo,
       isWaiting: accountsToString(baseInfo.waitingIds).includes(validatorWithBaseInfo.key),
     };
@@ -672,6 +823,7 @@ const getValidators = async () => {
       ...dataToAdd,
     };
   });
+
   validators.sort((a, b) => {
     if (a.isWaiting && !b.isWaiting) return -1;
     if (!a.isWaiting && b.isWaiting) return 1;
@@ -744,7 +896,6 @@ const getDemocracyReferendums = async (address) => {
 
     const motions = (await api.query.council.proposals())
       .map((propose) => propose.toString());
-
     const centralizedReferendumsData = await centralizedBackend.getReferenda();
     const crossReferencedReferendumsData = crossReference(
       api,
@@ -840,6 +991,38 @@ const submitProposal = async (
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+async function getIdentityDataProper(addressesIdentityData) {
+  const api = await getApi();
+  if (addressesIdentityData.length === 0) return [];
+  const identityQueries = addressesIdentityData.map((address) => [api.query.identity.identityOf, address]);
+  const identities = await api.queryMulti(identityQueries);
+  return addressesIdentityData.map((address, index) => {
+    const identity = identities[index];
+
+    const isIdentity = identity.isSome;
+
+    const addressString = address.toString();
+    let nameData;
+    let legalData;
+    let websiteData;
+    if (isIdentity) {
+      const identityData = identity.unwrap();
+      const { info } = identityData;
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal']);
+      nameData = decodedData?.display;
+      legalData = decodedData?.legal;
+      websiteData = decodedData?.web;
+    }
+    return {
+      name: nameData,
+      legal: legalData,
+      website: websiteData,
+      identityData: identity.isSome ? identity.unwrap().toJSON() : null,
+      rawIdentity: addressString,
+    };
+  });
+}
+
 const getCongressMembersWithIdentity = async (walletAddress) => {
   const api = await getApi();
   const [
@@ -855,23 +1038,6 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     api.query.elections.runnersUp,
   ]);
 
-  const getIdentityData = async (addresses) => {
-    if (addresses.length === 0) return [];
-    const identityQueries = addresses.map((address) => [api.query.identity.identityOf, address]);
-    const identities = await api.queryMulti(identityQueries);
-    return addresses.map((address, index) => {
-      const identity = identities[index];
-      const displayName = identity.isSome && identity.unwrap().info.display.isRaw
-        ? identity.unwrap().info.display.asRaw.toUtf8()
-        : address.toString();
-      return {
-        name: displayName,
-        identityData: identity.isSome ? identity.unwrap().toJSON() : null,
-        rawIdentity: address.toString(),
-      };
-    });
-  };
-
   const councilMembersList = councilMembers.map((member) => member.toString());
   const candidatesList = candidates.map((candidate) => candidate[0].toString());
   const currentCandidateVotesByUser = !currentCandidateVotesByUserQuery.isEmpty
@@ -885,10 +1051,10 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
     crossReferencedCurrentCandidateVotesByUser,
     runnersUpListIdentities,
   ] = await Promise.all([
-    getIdentityData(councilMembersList),
-    getIdentityData(candidatesList),
-    getIdentityData(currentCandidateVotesByUser),
-    getIdentityData(runnersUpList),
+    getIdentityDataProper(councilMembersList),
+    getIdentityDataProper(candidatesList),
+    getIdentityDataProper(currentCandidateVotesByUser),
+    getIdentityDataProper(runnersUpList),
   ]);
 
   const electionsInfo = await api.derive.elections.info();
@@ -1303,20 +1469,12 @@ const getBlockEvents = async (blockHash) => {
   }
 };
 
-const getIdentitiesNames = async (addresses) => {
-  const api = await getApi();
-  const raw = await api.query.identity.identityOf.multi(addresses);
-  const identities = {};
-  raw.map((identity, idx) => {
-    identities[addresses[idx]] = {};
-    const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
-    const nameHashed = unwrapIdentity?.display?.asRaw;
-    const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
-    identities[addresses[idx]].identity = name;
-
-    return null;
-  });
-  return identities;
+const getVotesList = (voting) => {
+  const votingUnwrapped = voting.isSome ? voting.unwrap() : null;
+  if (!votingUnwrapped) return null;
+  const ayes = votingUnwrapped.ayes.map((item) => item.toString());
+  const nays = votingUnwrapped.nays.map((item) => item.toString());
+  return ayes.concat(nays);
 };
 
 const getMotions = async () => {
@@ -1330,10 +1488,13 @@ const getMotions = async () => {
         [api.query.council.voting, proposal],
         [api.query.council.members],
       ]);
+
+      const votes = getVotesList(voting);
       return {
         proposal,
         proposalOf,
         voting,
+        votes,
         membersCount: members.length,
       };
     }),
@@ -1462,12 +1623,44 @@ const senateProposeSpend = async ({
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+const getClerksMinistryFinance = async () => {
+  const api = await getApi();
+  const keys = await api.query.ministryOfFinanceOffice.clerks.keys();
+  if (keys.length < 1) {
+    return null;
+  }
+  return keys.map((item) => item.args.toString());
+};
+
+const ministryFinanceSpend = async ({
+  walletAddress, spendProposal, remarkInfo,
+}) => {
+  const api = await getApi();
+
+  const remark = api.tx.llm.remark(remarkInfo);
+  const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
+  const extrinsic = api.tx.ministryOfFinanceOffice.execute(transferAndRemark);
+
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getProperProposal = async (officeType) => {
+  if (officeType === OfficeType.CONGRESS) {
+    return congressProposeSpend;
+  } if (officeType === OfficeType.SENATE) {
+    return senateProposeSpend;
+  } if (officeType === OfficeType.MINISTRY_FINANCE) {
+    return ministryFinanceSpend;
+  }
+  return null;
+};
+
 const congressSenateSendLlm = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1475,11 +1668,11 @@ const congressSenateSendLlm = async ({
 };
 
 const congressSenateSendLld = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.balances.transfer(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1487,11 +1680,11 @@ const congressSenateSendLld = async ({
 };
 
 const congressSenateSendLlmToPolitipool = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1505,11 +1698,11 @@ const congressSenateSendAssets = async ({
   assetData,
   remarkInfo,
   executionBlock,
-  isCongress = true,
+  officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.assets.transfer(parseInt(assetData.index), transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1676,6 +1869,29 @@ const getIdentities = async (addresses) => {
     address: addresses[idx],
     identity: identity.isSome ? identity.unwrap().info : null,
   }));
+};
+
+const getIdentitiesNames = async (addresses) => {
+  const api = await getApi();
+  const raw = await api.query.identity.identityOf.multi(addresses);
+  const identities = {};
+  raw.map((identity, idx) => {
+    identities[addresses[idx]] = {};
+    const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
+
+    let nameData;
+    let legalData;
+
+    if (unwrapIdentity) {
+      const decodedData = decodeAndFilter(unwrapIdentity, ['display', 'legal']);
+      nameData = decodedData?.display;
+      legalData = decodedData?.legal;
+    }
+    identities[addresses[idx]].identity = { name: nameData, legal: legalData };
+
+    return null;
+  });
+  return identities;
 };
 
 const stakingChill = async (walletAddress) => {
@@ -2109,7 +2325,6 @@ const getSectionType = (origin) => {
 const getScheduledCalls = async () => {
   const api = await getApi();
   const agendaEntries = await api.query.scheduler.agenda.entries();
-
   const agendaItems = agendaEntries
     .flatMap(([key, calls]) => calls
       .map((call, idx) => ({
@@ -2328,6 +2543,12 @@ const swapExactTokensForTokens = async (path, amountIn, amountOutMin, sendTo, wa
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+const createNewPool = async (aAsset, bAsset, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.assetConversion.createPool(aAsset, bAsset);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
 const swapTokensForExactTokens = async (path, amountOut, amountInMax, sendTo, walletAddress) => {
   const api = await getApi();
   const extrinsic = api.tx.assetConversion.swapTokensForExactTokens(path, amountOut, amountInMax, sendTo, true);
@@ -2529,23 +2750,58 @@ const getStakingData = async (walletAddress) => {
 const getSenateMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.senate.proposals();
-  const proposalsData = await Promise.all(
+
+  return Promise.all(
     proposals.map(async (proposal) => {
       const [proposalOf, voting, members] = await api.queryMulti([
         [api.query.senate.proposalOf, proposal],
         [api.query.senate.voting, proposal],
         [api.query.senate.members],
       ]);
+      const votes = getVotesList(voting);
+
+      const senateProposalHash = proposalOf.hash.toHex();
       return {
         proposal,
         proposalOf,
         voting,
+        votes,
+        hash: senateProposalHash,
         membersCount: members.length,
       };
     }),
-  );
+  ).then((motions) => motions.filter(Boolean));
+};
 
-  return proposalsData;
+const matchScheduledWithSenateMotions = async () => {
+  const [senateMotions, sheduledMotions] = await Promise.all([getSenateMotions(), getScheduledCalls()]);
+
+  const motions = senateMotions.map((motion) => {
+    const { proposalOf } = motion;
+
+    const unwrappedProposalOf = proposalOf.unwrap();
+    if (unwrappedProposalOf.method === 'cancel' && unwrappedProposalOf.section === 'scheduler') {
+      const blockNumber = proposalOf.value.args[0].toString();
+      const matchingScheduledCall = sheduledMotions.find(
+        (scheduled) => scheduled.blockNumber.toString() === blockNumber,
+      );
+      if (!matchingScheduledCall) {
+        return { ...motion, proposalOf: unwrappedProposalOf };
+      }
+      const proposalData = { method: unwrappedProposalOf.method, section: unwrappedProposalOf.section };
+      const proposalWithDetails = {
+        ...proposalData, args: matchingScheduledCall?.preimage || matchingScheduledCall?.proposal,
+      };
+      return { ...motion, proposalOf: proposalWithDetails };
+    }
+    return { ...motion, proposalOf: unwrappedProposalOf };
+  });
+  return motions;
+};
+
+const getSenateMembers = async () => {
+  const api = await getApi();
+  return api.query.senate.members();
 };
 
 const senateProposeCancel = async (walletAddress, idx, executionBlock) => {
@@ -2568,6 +2824,12 @@ const closeSenateMotion = async (proposalHash, index, walletAddress) => {
   const { weight: weightBound } = await api.tx(proposal.unwrap()).paymentInfo(walletAddress);
   const lengthBound = proposal.unwrap().toU8a().length;
   return submitExtrinsic(api.tx.senate.close(proposalHash, index, weightBound, lengthBound), walletAddress, api);
+};
+
+const encodeRemarkUser = async (dataToEncode) => {
+  const api = await getApi();
+  const data = api.createType('RemarkInfoUser', dataToEncode);
+  return u8aToHex(pako.deflate(data.toU8a()));
 };
 
 const encodeRemark = async (dataToEncode) => {
@@ -2751,6 +3013,7 @@ export {
   congressSenateSendLlmToPolitipool,
   congressSenateSendAssets,
   getSenateMotions,
+  getSenateMembers,
   senateVoteAtMotions,
   closeSenateMotion,
   senateProposeCancel,
@@ -2759,4 +3022,12 @@ export {
   encodeRemark,
   decodeRemark,
   getUserNfts,
+  matchScheduledWithSenateMotions,
+  createNewPool,
+  getAssetDetails,
+  createOrUpdateAsset,
+  mintAsset,
+  transferWithRemark,
+  encodeRemarkUser,
+  getClerksMinistryFinance,
 };

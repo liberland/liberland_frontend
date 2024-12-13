@@ -13,6 +13,16 @@ export const candidates = createSelector(
   (reducer) => reducer.candidates,
 );
 
+export const userHasWalletCongressMember = createSelector(
+  congressReducer,
+  blockchainReducer,
+  (congressState, blockchainState) => {
+    const memberAddresses = congressState.members.map((member) => member.member);
+    const matchedWallet = blockchainState.allWallets.find((wallet) => memberAddresses.includes(wallet.address));
+    return matchedWallet?.address || null;
+  },
+);
+
 export const userIsCandidate = createSelector(
   congressReducer,
   blockchainReducer,
@@ -35,7 +45,7 @@ export const userIsMember = createSelector(
   congressReducer,
   blockchainReducer,
   (congressState, blockchainState) => congressState.members
-    .map((m) => m.toString())
+    .map((m) => m.member.toString())
     .includes(blockchainState.userWalletAddress),
 );
 

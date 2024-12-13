@@ -12,6 +12,11 @@ const initialState = {
   tokenStakeAddressInfo: {},
   erc20Info: {},
   erc20Balance: {},
+  wethLpExchangeRate: null,
+  wethLpExchangeRateLoading: false,
+  wethLpExchangeRateError: null,
+  balance: null,
+  balanceLoading: false,
 };
 
 const ethReducer = handleActions(
@@ -47,6 +52,26 @@ const ethReducer = handleActions(
       ...state,
       tokenStakeContractInfoLoading: true,
     }),
+    [ethActions.getBalance.call]: (state) => ({
+      ...state,
+      balanceLoading: true,
+    }),
+    [ethActions.getBalance.failure]: (state) => ({
+      ...state,
+      balance: 0,
+      balanceLoading: false,
+    }),
+    [ethActions.getBalance.success]: (state, action) => ({
+      ...state,
+      balance: action.payload.balance,
+      balanceLoading: false,
+    }),
+    [ethActions.getWethLpExchangeRate.call]: (state) => ({
+      ...state,
+      wethLpExchangeRateLoading: true,
+      wethLpExchangeRateError: null,
+      wethLpExchangeRate: null,
+    }),
     [ethActions.getEthWalletOptions.call]: (state) => ({
       ...state,
       loading: true,
@@ -67,6 +92,14 @@ const ethReducer = handleActions(
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
+    }),
+
+    [combineActions(
+      ethActions.getWethLpExchangeRate.success,
+      ethActions.getWethLpExchangeRate.failure,
+    )]: (state) => ({
+      ...state,
+      wethLpExchangeRateLoading: initialState.wethLpExchangeRateLoading,
     }),
 
     [combineActions(
@@ -154,6 +187,16 @@ const ethReducer = handleActions(
     [ethActions.getTokenStakeContractInfo.failure]: (state, action) => ({
       ...state,
       tokenStakeContractInfo: { error: action.payload },
+    }),
+
+    [ethActions.getWethLpExchangeRate.success]: (state, action) => ({
+      ...state,
+      wethLpExchangeRate: action.payload,
+    }),
+
+    [ethActions.getWethLpExchangeRate.failure]: (state, action) => ({
+      ...state,
+      wethLpExchangeRateError: action,
     }),
 
     [ethActions.getEthWalletOptions.success]: (state, action) => ({

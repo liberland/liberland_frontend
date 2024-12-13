@@ -5,6 +5,7 @@ import cx from 'classnames';
 import styles from './styles.module.scss';
 
 function TextInput({
+  id,
   register,
   name,
   placeholder,
@@ -19,21 +20,27 @@ function TextInput({
   disabled = false,
   onPaste,
   onChange,
+  onFocus,
+  onBlur,
   className,
   minLength,
   maxLength,
+  readOnly,
 }) {
   return (
     <div className={cx(styles.inputWrapper, className)}>
       {Icon && <Icon className={styles.inputIcon} />}
       <input
         className={cx(styles.input, { [styles.withIcon]: Icon && withIcon })}
+        id={id}
         name={name}
         placeholder={placeholder}
         width={width}
         value={value}
         disabled={disabled}
+        readOnly={readOnly}
         onPaste={onPaste}
+        onFocus={onFocus}
         {...register(
           name,
           {
@@ -43,6 +50,7 @@ function TextInput({
             onChange,
             minLength,
             maxLength,
+            onBlur,
           },
         )}
       />

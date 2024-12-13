@@ -8,7 +8,7 @@ import stylesModal from '../styles.module.scss';
 import Button from '../../Button/Button';
 import { calculatePooled, getDecimalsForAsset } from '../../../utils/dexFormatter';
 import { AssetsPropTypes, ReservedAssetPropTypes } from '../../Wallet/Exchange/proptypes';
-import ProgressBar from './ProgressBar';
+import ProgressBar from '../../InputComponents/ProgressBar';
 import styles from './styles.module.scss';
 import { dexActions } from '../../../redux/actions';
 import { blockchainSelectors, dexSelectors } from '../../../redux/selectors';

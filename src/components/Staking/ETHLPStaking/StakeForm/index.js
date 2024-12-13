@@ -6,7 +6,7 @@ import ModalRoot from '../../../Modals/ModalRoot';
 import { ethSelectors } from '../../../../redux/selectors';
 import { TextInput } from '../../../InputComponents';
 import Button from '../../../Button/Button';
-import { formatCustom } from '../../../../utils/walletHelpers';
+import { formatCustom, parseAssets } from '../../../../utils/walletHelpers';
 import { stakeTokens } from '../../../../api/ethereum';
 import styles from './styles.module.scss';
 
@@ -35,7 +35,7 @@ function StakeForm({
   const onSubmit = async ({ stake }) => {
     try {
       const signer = await connected.provider.getSigner(account);
-      await stakeTokens(signer, stakingToken.address, stake);
+      await stakeTokens(signer, stakingToken.address, parseAssets(stake, stakingToken.decimals));
     } catch (e) {
       setError('stake', {
         message: 'Something went wrong',
@@ -93,7 +93,7 @@ function StakeForm({
             medium
             type="button"
             disabled={isSubmitting}
-            onClick={() => setValue('stake', stakingToken.balance)}
+            onClick={() => setValue('stake', formatCustom(stakingToken.balance, stakingToken.balance))}
           >
             Stake all
             {' '}
@@ -133,7 +133,7 @@ function StakeFormModalWrapper(props) {
   return (
     <div className={styles.modal}>
       <Button primary medium onClick={() => setShow(true)}>
-        Stake tokens
+        Stake LP tokens
       </Button>
       {show && (
         <ModalRoot>

@@ -21,7 +21,8 @@ export default function WalletCongresSenateWrapper({
   additionalAssets,
   onSendFunctions,
   balances,
-  isCongress,
+  officeType,
+  userIsMember,
 }) {
   const { LLD, LLM, LLMPolitipool } = onSendFunctions;
   const balanceLLD = new BN(balances?.liquidAmount?.amount ?? 0);
@@ -64,24 +65,28 @@ export default function WalletCongresSenateWrapper({
             styles.walletButtonsWrapper,
           )}
         >
-          <Button small primary className={walletStyles.button} onClick={toggleModalPolitipoolLLMSpendOpen}>
-            <div className={walletStyles.icon}>
-              <GraphIcon />
-            </div>
-            SPEND LLM (POLITIPOOL)
-          </Button>
-          <Button small primary className={walletStyles.button} onClick={toggleModalLLMSpendOpen}>
-            <div className={walletStyles.icon}>
-              <UploadIcon />
-            </div>
-            SPEND LLM
-          </Button>
-          <Button small primary className={walletStyles.button} onClick={toggleModalLLDSpendOpen}>
-            <div className={walletStyles.icon}>
-              <UploadIcon />
-            </div>
-            SPEND LLD
-          </Button>
+          {userIsMember && (
+          <>
+            <Button small primary className={walletStyles.button} onClick={toggleModalPolitipoolLLMSpendOpen}>
+              <div className={walletStyles.icon}>
+                <GraphIcon />
+              </div>
+              SPEND LLM (POLITIPOOL)
+            </Button>
+            <Button small primary className={walletStyles.button} onClick={toggleModalLLMSpendOpen}>
+              <div className={walletStyles.icon}>
+                <UploadIcon />
+              </div>
+              SPEND LLM
+            </Button>
+            <Button small primary className={walletStyles.button} onClick={toggleModalLLDSpendOpen}>
+              <div className={walletStyles.icon}>
+                <UploadIcon />
+              </div>
+              SPEND LLD
+            </Button>
+          </>
+          )}
         </div>
       </div>
 
@@ -94,11 +99,12 @@ export default function WalletCongresSenateWrapper({
       <AssetOverview
         additionalAssets={additionalAssets}
         isRemarkNeeded
-        isCongress={isCongress}
+        officeType={officeType}
+        userIsMember={userIsMember}
       />
       {isModalOpenLLDSpend && (
       <SpendModalWrapper
-        isCongress={isCongress}
+        officeType={officeType}
         closeModal={toggleModalLLDSpendOpen}
         onSend={LLD}
         spendData={{
@@ -110,7 +116,7 @@ export default function WalletCongresSenateWrapper({
       {isModalOpenLLMSpend
       && (
       <SpendModalWrapper
-        isCongress={isCongress}
+        officeType={officeType}
         closeModal={toggleModalLLMSpendOpen}
         onSend={LLM}
         spendData={{
@@ -121,7 +127,7 @@ export default function WalletCongresSenateWrapper({
       )}
       {isModalOpenPolitipoolLLMSpend && (
       <SpendModalWrapper
-        isCongress={isCongress}
+        officeType={officeType}
         closeModal={toggleModalPolitipoolLLMSpendOpen}
         spendData={{
           name: 'LLM to politipool',
@@ -137,12 +143,8 @@ export default function WalletCongresSenateWrapper({
   );
 }
 
-WalletCongresSenateWrapper.defaultProps = {
-  isCongress: true,
-};
-
 WalletCongresSenateWrapper.propTypes = {
-  isCongress: PropTypes.bool,
+  officeType: PropTypes.string.isRequired,
   totalBalance: PropTypes.oneOfType([PropTypes.number.isRequired, PropTypes.string.isRequired]).isRequired,
   congresAccountAddress: PropTypes.string.isRequired,
   liquidMerits: PropTypes.string.isRequired,
@@ -158,4 +160,5 @@ WalletCongresSenateWrapper.propTypes = {
     liquidAmount: PropTypes.shape({ amount: PropTypes.object.isRequired }),
     liquidMerits: PropTypes.shape({ amount: PropTypes.string.isRequired }),
   }).isRequired,
+  userIsMember: PropTypes.bool.isRequired,
 };

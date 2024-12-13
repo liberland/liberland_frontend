@@ -26,6 +26,7 @@ const initialState = {
     },
   },
   additionalAssets: [],
+  assetDetails: [],
   gettingWalletInfo: false,
   transfersTxHistory: {
     transfersTxHistory: [],
@@ -37,12 +38,18 @@ const initialState = {
   nominatorTargets: [],
   assetBalance: null,
   assetsBalance: [],
+  transferState: null,
 };
 
 const walletReducer = handleActions(
   {
+    [walletActions.sendTransfer.call]: (state) => ({
+      ...state,
+      transferState: null,
+    }),
     [combineActions(
       walletActions.getWallet.call,
+      walletActions.getAssetsDetails.call,
       walletActions.getAdditionalAssets.call,
       walletActions.stakeToPolka.call,
       walletActions.stakeToLiberland.call,
@@ -55,6 +62,7 @@ const walletReducer = handleActions(
       walletActions.unpool.call,
       walletActions.getTxTransfers.call,
       walletActions.getAssetsBalance.call,
+      walletActions.sendTransferRemark.call,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
@@ -88,6 +96,10 @@ const walletReducer = handleActions(
       ...state,
       additionalAssets: action.payload,
     }),
+    [walletActions.getAssetsDetails.success]: (state, action) => ({
+      ...state,
+      assetDetails: action.payload,
+    }),
     [walletActions.getAssetsBalance.success]: (state, action) => ({
       ...state,
       assetsBalance: action.payload,
@@ -109,6 +121,8 @@ const walletReducer = handleActions(
       walletActions.getWallet.failure,
       walletActions.getAdditionalAssets.failure,
       walletActions.getAdditionalAssets.success,
+      walletActions.getAssetsDetails.failure,
+      walletActions.getAssetsDetails.success,
       walletActions.stakeToPolka.success,
       walletActions.stakeToLiberland.success,
       walletActions.stakeToPolka.failure,
@@ -130,9 +144,19 @@ const walletReducer = handleActions(
       walletActions.getTxTransfers.failure,
       walletActions.getAssetsBalance.success,
       walletActions.getAssetsBalance.failure,
+      walletActions.sendTransferRemark.success,
+      walletActions.sendTransferRemark.failure,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,
+    }),
+    [walletActions.sendTransfer.success]: (state) => ({
+      ...state,
+      transferState: 'success',
+    }),
+    [walletActions.sendTransfer.failure]: (state) => ({
+      ...state,
+      transferState: 'failure',
     }),
   },
   initialState,

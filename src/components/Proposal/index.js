@@ -12,6 +12,8 @@ import stylesAnim from '../Voting/Referendum/Items/item.module.scss';
 import { formatAssets, formatDollars, formatMerits } from '../../utils/walletHelpers';
 import formatDate from '../../utils/formatDate';
 import { useAddIdToContext } from './useAddIdToContect.js';
+import CopyIconWithAddress from '../CopyIconWithAddress';
+import CouncilMotionCountdown from '../Congress/MotionCountDown';
 /* eslint-disable react/forbid-prop-types */
 const ProposalProp = PropTypes.object;
 
@@ -279,12 +281,15 @@ CouncilSenateExecute.propTypes = { proposal: ProposalProp.isRequired };
 
 function Schedule({ proposal }) {
   const { args } = proposal;
+  const when = args[0];
   return (
     <div>
-      Schedule call to be made on
+      Schedule call to be made on:
       {' '}
-      {args[0].toString()}
+      {when.toString()}
       :
+      <CouncilMotionCountdown motionEndBlockNumber={when} />
+      <br />
       <Proposal proposal={args[3]} />
     </div>
   );
@@ -298,13 +303,19 @@ function TransferLLD({ proposal }) {
   const formattedValue = formatDollars(value);
   const identity = names?.[accountId]?.identity;
   useAddIdToContext(accountId);
-
   return (
     <div>
       <b>Transfer</b>
       {` ${formattedValue} (LLD) `}
       <b>to</b>
-      {` ${identity ? `${identity} (${accountId})` : accountId}`}
+      {' '}
+      <CopyIconWithAddress
+        isTruncate
+        name={identity?.name}
+        legal={identity?.legal}
+        address={accountId}
+        showAddress
+      />
     </div>
   );
 }
@@ -324,7 +335,14 @@ function TransferLLM({ proposal }) {
       <b>Transfer</b>
       {` ${formattedValue} (${symbol}) `}
       <b>to</b>
-      {` ${identity ? `${identity} (${accountId})` : accountId}`}
+      {' '}
+      <CopyIconWithAddress
+        isTruncate
+        name={identity?.name}
+        legal={identity?.legal}
+        address={accountId}
+        showAddress
+      />
     </div>
   );
 }
@@ -352,7 +370,14 @@ function TransferAsset({ proposal }) {
       <b>Transfer</b>
       {` ${formattedValue} (${asset?.metadata?.symbol || assetId}) `}
       <b>to</b>
-      {` ${identity ? `${identity} (${target})` : target}`}
+      {' '}
+      <CopyIconWithAddress
+        isTruncate
+        name={identity?.name}
+        legal={identity?.legal}
+        address={target}
+        showAddress
+      />
     </div>
   );
 }
@@ -444,9 +469,31 @@ function RemarkInfo({ proposal }) {
 }
 RemarkInfo.propTypes = { proposal: ProposalProp.isRequired };
 
+function CancelScheduler({ proposal }) {
+  const isArray = Array.isArray(proposal.args);
+  const [when, index] = proposal.args;
+  return (
+    <div>
+      <b>Senate veto cancel congress spending:</b>
+      {isArray ? (
+        <div>
+          when:
+          {' '}
+          {when.toString()}
+          {' '}
+          index:
+          {' '}
+          {index.toString()}
+        </div>
+      ) : <Proposal proposal={proposal.args} />}
+    </div>
+  );
+}
+CancelScheduler.propTypes = { proposal: ProposalProp.isRequired };
 export function Proposal({ proposal, isDetailsHidden }) {
   const proposalMethod = proposal.method;
   const proposalSection = proposal.section;
+
   if (proposalMethod === 'repealLegislation') {
     return <RepealLegislation {...{ proposal }} />;
   } if (proposalMethod === 'repealLegislationSection') {
@@ -473,6 +520,8 @@ export function Proposal({ proposal, isDetailsHidden }) {
     return <TransferAsset {...{ proposal }} />;
   } if (proposalMethod === 'remark' && proposalSection === 'llm') {
     return <RemarkInfo {...{ proposal }} />;
+  } if (proposalMethod === 'cancel' && proposalSection === 'scheduler') {
+    return <CancelScheduler {...{ proposal }} />;
   }
 
   return <Raw {...{ proposal }} />;

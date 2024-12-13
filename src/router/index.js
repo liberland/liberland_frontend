@@ -27,6 +27,7 @@ export default {
     landRegistry: '/home/offices/land_registry',
     finances: '/home/offices/finances',
     scheduledCongressSpending: '/home/offices/scheduled-congress-spending',
+    ministryOfFinance: '/home/offices/ministry-of-finance',
   },
   documents: {
     myAccount: '/home/documents/my-account',
@@ -44,10 +45,12 @@ export default {
   },
   wallet: {
     exchange: '/home/wallet/exchange',
+    assets: '/home/wallet/assets',
     allTransactions: '/home/wallet/all-transactions',
     overView: '/home/wallet/overview',
     bridge: '/home/wallet/bridge',
     nfts: '/home/wallet/nfts',
+    payMe: '/home/wallet/pay-me',
   },
   registries: {
     overview: '/home/registries/overview',
@@ -73,6 +76,7 @@ export default {
     motions: '/home/senate/motions',
     scheduledCongressSpending: '/home/senate/scheduled-congress-spending',
     wallet: '/home/senate/wallet',
+    overview: '/home/senate/overview',
   },
   contracts: {
     overview: '/home/contracts/overview',

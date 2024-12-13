@@ -8,18 +8,21 @@ import { SendLLDModal, SendLLMModal, UnpoolModal } from '../../Modals';
 
 import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
+import WalletLinkFactoryModalWrapper from './WalletLinkFactory';
 
 import styles from './styles.module.scss';
 import router from '../../../router';
 import Tabs from '../../Tabs';
 import PolitipoolModal from '../../Modals/PolitipoolModal';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
+import RemarkTransferWrapper from '../RemarkTransferWrapper';
 
 function WalletAddressesLine({ walletAddress }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalOpenPolitipool, setIsModalOpenPolitipool] = useState(false);
   const [isModalOpenUnpool, setIsModalOpenUnpool] = useState(false);
   const [isModalOpenLLM, setIsModalOpenLLM] = useState(false);
+  const [isModalOpenTransferRemark, setIsModalOpenTransferRemark] = useState(false);
   const notificationRef = useRef();
   const addresses = {
     walletAddress,
@@ -29,6 +32,7 @@ function WalletAddressesLine({ walletAddress }) {
   const handleModalLLMOpen = () => setIsModalOpenLLM(!isModalOpenLLM);
   const handleModalOpenPolitipool = () => setIsModalOpenPolitipool(!isModalOpenPolitipool);
   const handleModalOpenUnpool = () => setIsModalOpenUnpool(!isModalOpenUnpool);
+  const handleModalOpenTransferRemark = () => setIsModalOpenTransferRemark((prevValue) => !prevValue);
 
   const navigationList = [
     {
@@ -38,6 +42,10 @@ function WalletAddressesLine({ walletAddress }) {
     {
       route: router.wallet.exchange,
       title: 'EXCHANGE',
+    },
+    {
+      route: router.wallet.assets,
+      title: 'ASSETS',
     },
     {
       route: router.wallet.bridge,
@@ -93,7 +101,16 @@ function WalletAddressesLine({ walletAddress }) {
             </div>
             SEND LLD
           </Button>
+          <WalletLinkFactoryModalWrapper walletAddress={walletAddress} />
+          <Button small primary className={styles.button} onClick={handleModalOpenTransferRemark}>
+            <div className={styles.icon}>
+              <UploadIcon />
+            </div>
+            TRANSFER REMARK
+          </Button>
         </div>
+        {isModalOpenTransferRemark && (
+          <RemarkTransferWrapper closeModal={handleModalOpenTransferRemark} />)}
         {isModalOpen && (
           <SendLLDModal closeModal={handleModalOpen} />)}
         {isModalOpenLLM && (
