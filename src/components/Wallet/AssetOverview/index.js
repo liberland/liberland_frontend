@@ -10,11 +10,13 @@ import Button from '../../Button/Button';
 function AssetOverview({
   additionalAssets,
   isRemarkNeeded,
-  isCongress,
+  officeType,
+  userIsMember,
 }) {
   const [whichModalOpen, setWhichModalOpen] = useState(null);
   const handleModalOpenAssets = (symbol) => setWhichModalOpen(symbol);
   const handleModalCloseAssets = () => setWhichModalOpen(null);
+
   if (additionalAssets.length === 0) { return <div />; }
   // Show only assets that the user owns
   const filteredAssets = additionalAssets.filter((asset) => asset?.balance?.balance > 0);
@@ -40,6 +42,7 @@ function AssetOverview({
                 </span>
 
               </p>
+              {userIsMember && (
               <Button
                 className={styles.button}
                 small
@@ -53,13 +56,14 @@ function AssetOverview({
                   </span>
                 </>
               </Button>
+              )}
               {whichModalOpen === assetInfo.metadata.symbol
               && (
               <SendAssetModal
                 assetData={assetInfo}
                 closeModal={handleModalCloseAssets}
                 isRemarkNeeded={isRemarkNeeded}
-                isCongress={isCongress}
+                officeType={officeType}
               />
               )}
             </div>
@@ -73,11 +77,12 @@ function AssetOverview({
 AssetOverview.defaultProps = {
   additionalAssets: [],
   isRemarkNeeded: false,
-  isCongress: true,
+  userIsMember: false,
 };
 
 AssetOverview.propTypes = {
-  isCongress: PropTypes.bool,
+  userIsMember: PropTypes.bool,
+  officeType: PropTypes.string.isRequired,
   isRemarkNeeded: PropTypes.bool,
   additionalAssets: PropTypes.arrayOf(PropTypes.shape({
     metadata: {

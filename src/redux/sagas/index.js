@@ -16,6 +16,7 @@ import * as senateSagas from './senate';
 import * as nftsSagas from './nfts';
 import * as ethSagas from './eth';
 import * as financesSagas from './finances';
+import * as ministryFinanceSagas from './ministryFinance';
 
 export default function* rootSaga() {
   yield all([
@@ -45,6 +46,7 @@ export default function* rootSaga() {
     walletSagas.getAdditionalAssetsWatcher(),
     walletSagas.getAssetsBalanceWatcher(),
     walletSagas.getAssetDetailsWatcher(),
+    walletSagas.sendTransferWithRemarkWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),
@@ -169,6 +171,7 @@ export default function* rootSaga() {
     senateSagas.voteAtMotionsWatcher(),
     senateSagas.getScheduledCongressSpendingWatcher(),
     senateSagas.proposeCloseMotionWatcher(),
+    senateSagas.getSenateMembersWatcher(),
 
     // NFTS
     nftsSagas.getUserNftsWatcher(),
@@ -180,6 +183,8 @@ export default function* rootSaga() {
     ethSagas.tokenStakeAddressInfoWatcher(),
     ethSagas.erc20InfoWatcher(),
     ethSagas.erc20BalanceWatcher(),
+    ethSagas.getWethExchangeRateWatcher(),
+    ethSagas.getBalanceWatcher(),
 
     // FINANCES
     financesSagas.getFinancesWatcher(),
@@ -194,5 +199,13 @@ export default function* rootSaga() {
     nftsSagas.getUserCollectionstWatcher(),
     nftsSagas.getNftsWatcher(),
     nftsSagas.getNftsOnSaleWatcher(),
+
+    // MINISTRY FINANCE
+    ministryFinanceSagas.getWalletWatcher(),
+    ministryFinanceSagas.getAdditionalAssetsWatcher(),
+    ministryFinanceSagas.sendAssetsTransferWatcher(),
+    ministryFinanceSagas.sendLldWatcher(),
+    ministryFinanceSagas.sendLlmToPolitipoolWatcher(),
+    ministryFinanceSagas.sendLlmWatcher(),
   ]);
 }

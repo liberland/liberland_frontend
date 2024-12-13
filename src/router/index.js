@@ -34,6 +34,7 @@ export default {
     landRegistry: '/home/offices/land_registry',
     finances: '/home/offices/finances',
     scheduledCongressSpending: '/home/offices/scheduled-congress-spending',
+    ministryOfFinance: '/home/offices/ministry-of-finance',
   },
   documents: {
     myAccount: '/home/documents/my-account',
@@ -82,6 +83,7 @@ export default {
     motions: '/home/senate/motions',
     scheduledCongressSpending: '/home/senate/scheduled-congress-spending',
     wallet: '/home/senate/wallet',
+    overview: '/home/senate/overview',
   },
   contracts: {
     overview: '/home/contracts/overview',

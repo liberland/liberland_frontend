@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, Fragment } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { identityActions, senateActions } from '../../../redux/actions';
@@ -13,6 +13,7 @@ import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 function ScheduledCongressSpending({ isVetoButton }) {
   const dispatch = useDispatch();
   const scheduledCalls = useSelector(senateSelectors.scheduledCalls);
+  const userIsMember = useSelector(senateSelectors.userIsMember);
 
   useEffect(() => {
     dispatch(senateActions.senateGetCongressSpending.call());
@@ -23,9 +24,10 @@ function ScheduledCongressSpending({ isVetoButton }) {
 
   useEffect(() => {
     if (divRef.current) {
-      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds))));
+      const votes = scheduledCalls.map((item) => item.votes);
+      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds.concat(votes.flat())))));
     }
-  }, [motionIds, dispatch]);
+  }, [motionIds, dispatch, scheduledCalls]);
 
   if (!scheduledCalls || scheduledCalls.length < 1) {
     return (<div>There are no open items</div>);
@@ -44,26 +46,24 @@ function ScheduledCongressSpending({ isVetoButton }) {
             { executionBlock: blockNumber, idx },
           ));
         };
+        const isLastItem = scheduledCalls.length - 1 === index;
         return (
-          <Card
-            className={stylesPage.overviewWrapper}
-            key={proposalData}
-            ref={scheduledCalls.length - 1 === index ? divRef : null}
-          >
-            {isVetoButton && (
-            <div className={styles.button}>
-              <Button onClick={onVetoClick} primary small>Veto</Button>
-            </div>
-            )}
+          <div ref={isLastItem ? divRef : null} key={proposalData}>
+            <Card className={stylesPage.overviewWrapper}>
+              {isVetoButton && userIsMember && (
+                <div className={styles.button}>
+                  <Button onClick={onVetoClick} primary small>Veto</Button>
+                </div>
+              )}
 
-            <Proposal
-              proposal={proposalData}
-            />
-          </Card>
+              <Proposal
+                proposal={proposalData}
+              />
+            </Card>
+          </div>
         );
       })}
     </>
-
   );
 }
 

@@ -16,6 +16,7 @@ export const {
   sendAssetsTransfer,
   getAssetsBalance,
   getAssetsDetails,
+  sendTransferRemark,
 } = createActions({
   GET_WALLET: {
     call: undefined,
@@ -88,6 +89,11 @@ export const {
     failure: undefined,
   },
   SEND_ASSETS_TRANSFER: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SEND_TRANSFER_REMARK: {
     call: undefined,
     success: undefined,
     failure: undefined,

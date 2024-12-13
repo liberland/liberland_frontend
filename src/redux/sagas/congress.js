@@ -40,13 +40,16 @@ import {
   congressSenateSendLlm,
   congressProposeBudget,
   getPalletIds,
+  getIdentitiesNames,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { daysToBlocks } from '../../utils/nodeRpcCall';
 import { palletIdToAddress } from '../../utils/pallet';
 import { formatMerits } from '../../utils/walletHelpers';
 import { IndexHelper } from '../../utils/council/councilEnum';
-// WORKERS
+import { OfficeType } from '../../utils/officeTypeEnum';
+
+const officeType = OfficeType.CONGRESS;
 
 function* getWalletWorker() {
   const codeName = yield select(congressSelectors.codeName);
@@ -119,6 +122,7 @@ function* congressSendLlmWorker({
     transferAmount,
     remarkInfo,
     executionBlock,
+    officeType,
   });
   yield put(congressActions.congressSendLlm.success());
 }
@@ -137,6 +141,7 @@ function* congressSendLldWorker({
     transferAmount,
     remarkInfo,
     executionBlock,
+    officeType,
   });
   yield put(congressActions.congressSendLld.success());
 }
@@ -156,6 +161,7 @@ function* congressSendAssetsTransfer({
     assetData,
     remarkInfo,
     executionBlock,
+    officeType,
   });
   yield put(congressActions.congressSendAssets.success());
 }
@@ -174,13 +180,20 @@ function* congressSendLlmToPolitipoolWorker({
     transferAmount,
     remarkInfo,
     executionBlock,
+    officeType,
   });
   yield put(congressActions.congressSendLlmToPolitipool.success());
 }
 
 function* getMembersWorker() {
   const members = yield call(getCongressMembers);
-  yield put(congressActions.getMembers.success(members));
+  const membersUnique = members.map((item) => item.toString());
+  const identities = yield call(getIdentitiesNames, membersUnique);
+  const membersWithIdentities = membersUnique.map((member) => ({
+    member,
+    identity: identities[member] || null,
+  }));
+  yield put(congressActions.getMembers.success(membersWithIdentities));
 }
 
 function* getRunnersUpWorker() {

@@ -73,7 +73,11 @@ function Assets() {
       <div className={stylesPage.sectionWrapper}>
         <Card className={cx(stylesPage.overviewWrapper, styles.cardWrapper)} title="Info">
           <p>
-            Here lies assets description
+            Assets and stocks on the Liberland blockchain.
+            {' '}
+            <a href="https://docs.liberland.org/public-documents/blockchain/for-citizens/assets-and-stocks">
+              Learn more
+            </a>
           </p>
         </Card>
         <br />

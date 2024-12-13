@@ -13,6 +13,7 @@ import { formatAssets, formatDollars, formatMerits } from '../../utils/walletHel
 import formatDate from '../../utils/formatDate';
 import { useAddIdToContext } from './useAddIdToContect.js';
 import CopyIconWithAddress from '../CopyIconWithAddress';
+import CouncilMotionCountdown from '../Congress/MotionCountDown';
 /* eslint-disable react/forbid-prop-types */
 const ProposalProp = PropTypes.object;
 
@@ -280,12 +281,15 @@ CouncilSenateExecute.propTypes = { proposal: ProposalProp.isRequired };
 
 function Schedule({ proposal }) {
   const { args } = proposal;
+  const when = args[0];
   return (
     <div>
-      Schedule call to be made on
+      Schedule call to be made on:
       {' '}
-      {args[0].toString()}
+      {when.toString()}
       :
+      <CouncilMotionCountdown motionEndBlockNumber={when} />
+      <br />
       <Proposal proposal={args[3]} />
     </div>
   );
@@ -466,10 +470,22 @@ function RemarkInfo({ proposal }) {
 RemarkInfo.propTypes = { proposal: ProposalProp.isRequired };
 
 function CancelScheduler({ proposal }) {
+  const isArray = Array.isArray(proposal.args);
+  const [when, index] = proposal.args;
   return (
     <div>
       <b>Senate veto cancel congress spending:</b>
-      <Proposal proposal={proposal.args} />
+      {isArray ? (
+        <div>
+          when:
+          {' '}
+          {when.toString()}
+          {' '}
+          index:
+          {' '}
+          {index.toString()}
+        </div>
+      ) : <Proposal proposal={proposal.args} />}
     </div>
   );
 }

@@ -23,6 +23,7 @@ function SetAttributeModal({ closeModal, collectionId, itemId }) {
     dispatch(nftsActions.setAttributesNft.call({
       collectionId, itemId, namespace, key, value, walletAddress,
     }));
+    closeModal();
   };
 
   return (

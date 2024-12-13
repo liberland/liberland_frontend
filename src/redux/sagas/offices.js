@@ -145,6 +145,7 @@ function* getPendingAdditionalMeritsWorker() {
   const pendingAdditionalMertis = yield call(backend.fetchPendingAdditionalMerits);
   yield put(officesActions.getPendingAdditionalMerits.success(pendingAdditionalMertis));
 }
+
 // WATCHERS
 
 function* getPendingAdditionalMeritsWatcher() {

@@ -11,35 +11,37 @@ export const objectToHex = (object) => {
   return hexString;
 };
 
+export const extractItemFromObject = async (obj, assetsData, key) => {
+  const assetInfo = assetsData.find((item) => item.value === obj[key]);
+  const remark = {
+    currency: obj[key],
+    project: obj[`project${key.slice(-1)}`],
+    description: obj[`description${key.slice(-1)}`],
+    category: obj[`category${key.slice(-1)}`],
+    supplier: obj[`supplier${key.slice(-1)}`],
+    date: Date.now(),
+    finalDestination: obj[`finalDestination${key.slice(-1)}`],
+    amountInUSDAtDateOfPayment: obj[`amountInUsd${key.slice(-1)}`],
+  };
+  const encodedRemark = await encodeRemark(remark);
+  return {
+    transfer: {
+      asset: obj[key],
+      balance: parseAssets(
+        obj[`transfer${key.slice(-1)}`],
+        assetInfo.decimals,
+      ),
+      recipient: obj[`recipient${key.slice(-1)}`],
+      index: assetInfo.index,
+    },
+    remark: encodedRemark,
+  };
+};
+
 export const extractItemsFromObject = async (obj, assetsData) => {
   const selectKeys = Object.keys(obj).filter((key) => key.startsWith('select'));
   const resultArray = await Promise.all(
-    selectKeys.map(async (key) => {
-      const assetInfo = assetsData.find((item) => item.value === obj[key]);
-      const remark = {
-        currency: obj[key],
-        project: obj[`project${key.slice(-1)}`],
-        description: obj[`description${key.slice(-1)}`],
-        category: obj[`category${key.slice(-1)}`],
-        supplier: obj[`supplier${key.slice(-1)}`],
-        date: Date.now(),
-        finalDestination: obj[`finalDestination${key.slice(-1)}`],
-        amountInUSDAtDateOfPayment: obj[`amountInUsd${key.slice(-1)}`],
-      };
-      const encodedRemark = await encodeRemark(remark);
-      return {
-        transfer: {
-          asset: obj[key],
-          balance: parseAssets(
-            obj[`transfer${key.slice(-1)}`],
-            assetInfo.decimals,
-          ),
-          recipient: obj[`recipient${key.slice(-1)}`],
-          index: assetInfo.index,
-        },
-        remark: encodedRemark,
-      };
-    }),
+    selectKeys.map(async (key) => extractItemFromObject(obj, assetsData, key)),
   );
   return resultArray;
 };

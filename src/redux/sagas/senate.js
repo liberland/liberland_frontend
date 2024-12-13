@@ -11,7 +11,9 @@ import {
   congressSenateSendLlmToPolitipool,
   getAdditionalAssets,
   getBalanceByAddress,
+  getIdentitiesNames,
   getScheduledCalls,
+  getSenateMembers,
   matchScheduledWithSenateMotions,
   senateProposeCancel,
   senateVoteAtMotions,
@@ -21,8 +23,9 @@ import { senateActions } from '../actions';
 import { blockchainWatcher } from './base';
 import { palletIdToAddress } from '../../utils/pallet';
 import { blockchainSelectors, officesSelectors, senateSelectors } from '../selectors';
+import { OfficeType } from '../../utils/officeTypeEnum';
 
-const isCongress = false;
+const officeType = OfficeType.SENATE;
 
 function* getMotionsWorker() {
   const motions = yield call(matchScheduledWithSenateMotions);
@@ -33,6 +36,24 @@ export function* getSenateMotionsWatcher() {
   yield* blockchainWatcher(
     senateActions.senateGetMotions,
     getMotionsWorker,
+  );
+}
+
+function* getMembersWorker() {
+  const members = yield call(getSenateMembers);
+  const membersUnique = members.map((item) => item.toString());
+  const identities = yield call(getIdentitiesNames, membersUnique);
+  const membersWithIdentities = membersUnique.map((member) => ({
+    member,
+    identity: identities[member] || null,
+  }));
+  yield put(senateActions.senateGetMembers.success(membersWithIdentities));
+}
+
+export function* getSenateMembersWatcher() {
+  yield* blockchainWatcher(
+    senateActions.senateGetMembers,
+    getMembersWorker,
   );
 }
 
@@ -88,7 +109,7 @@ function* senateSendLlmWorker({
     transferToAddress,
     transferAmount,
     remarkInfo,
-    isCongress,
+    officeType,
   });
   yield put(senateActions.senateSendLlm.success());
 }
@@ -114,7 +135,7 @@ function* senateSendLldWorker({
     transferAmount,
     remarkInfo,
     executionBlock,
-    isCongress,
+    officeType,
   });
   yield put(senateActions.senateSendLld.success());
 }
@@ -141,7 +162,7 @@ function* senateSendAssetsTransfer({
     assetData,
     remarkInfo,
     executionBlock,
-    isCongress,
+    officeType,
   });
   yield put(senateActions.senateSendAssets.success());
 }
@@ -167,7 +188,7 @@ function* senateSendLlmToPolitipoolWorker({
     transferAmount,
     remarkInfo,
     executionBlock,
-    isCongress,
+    officeType,
   });
   yield put(senateActions.senateSendLlmToPolitipool.success());
 }
