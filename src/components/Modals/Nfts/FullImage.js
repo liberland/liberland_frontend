@@ -6,8 +6,8 @@ import { ReactComponent as CloseIcon } from '../../../assets/icons/close.svg';
 
 function FullImageModal({ closeModal, image }) {
   return (
-    <div className={styles.imageWrapper} onClick={closeModal}>
-      <div className={styles.iconWrapper} onClick={closeModal}><CloseIcon className={styles.icon} /></div>
+    <div className={styles.imageWrapper}>
+      <div className={styles.iconWrapper}><CloseIcon className={styles.icon} onClick={closeModal} /></div>
       <img className={styles.image} src={image} alt="nft" />
     </div>
   );
@@ -19,11 +19,23 @@ FullImageModal.propTypes = {
 };
 
 function FullImageWrapper(props) {
+  const { closeModal } = props;
   return (
-    <ModalRoot>
+    <ModalRoot closeModal={closeModal}>
       <FullImageModal {...props} />
     </ModalRoot>
   );
 }
 
 export default FullImageWrapper;
+
+FullImageWrapper.propTypes = {
+  closeModal: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.oneOf([null]), // Allows null explicitly
+  ]),
+};
+
+FullImageWrapper.defaultProps = {
+  closeModal: null,
+};
