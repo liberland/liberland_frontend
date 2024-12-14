@@ -51,10 +51,6 @@ function WalletAddressesLine({ walletAddress }) {
       route: router.wallet.bridge,
       title: 'BRIDGE',
     },
-    {
-      route: router.wallet.nfts,
-      title: 'NFTS',
-    },
   ];
 
   return (

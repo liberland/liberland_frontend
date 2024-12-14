@@ -16,6 +16,13 @@ export default {
     contracts: '/home/contracts',
     companies: '/home/companies',
     senate: '/home/senate',
+    nfts: '/home/nfts',
+  },
+  nfts: {
+    overview: '/home/nfts/overview',
+    ownedNfts: '/home/nfts/owned-nfts',
+    collections: '/home/nfts/collections',
+    shop: '/home/nfts/on-sale',
   },
   guidedSetup: '/guided-setup',
   offices: {

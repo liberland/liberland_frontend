@@ -42,6 +42,7 @@ function AssetOverview({
                 </span>
 
               </p>
+              {userIsMember && (
               <Button
                 className={styles.button}
                 small
@@ -55,6 +56,7 @@ function AssetOverview({
                   </span>
                 </>
               </Button>
+              )}
               {whichModalOpen === assetInfo.metadata.symbol
               && (
               <SendAssetModal

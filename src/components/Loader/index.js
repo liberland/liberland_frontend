@@ -16,6 +16,7 @@ import {
   dexSelectors,
   contractsSelectors,
   senateSelectors,
+  nftsSelectors,
   ministryFinanceSelector,
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
@@ -35,6 +36,7 @@ function Loader({ children }) {
   const isLoadingDex = useSelector(dexSelectors.selectorIsLoading);
   const isLoadingContracts = useSelector(contractsSelectors.selectorIsContractsLoading);
   const isLoadingSenate = useSelector(senateSelectors.isLoading);
+  const isLoadingNfts = useSelector(nftsSelectors.isLoading);
   const isLoadingMinistryFinance = useSelector(ministryFinanceSelector.isLoading);
 
   const isLoading = [
@@ -49,6 +51,7 @@ function Loader({ children }) {
     isGetRegistries,
     isLoadingDex,
     isLoadingSenate,
+    isLoadingNfts,
     isLoadingMinistryFinance,
   ].some((isFetching) => isFetching);
 
