@@ -8,6 +8,7 @@ import stylesPage from '../../../../utils/pagesBase.module.scss';
 import styles from '../styles.module.scss';
 import ExchangeItem from '../ExchangeItem';
 import AddAssetForm from '../AddAssetForm';
+import { valueToBN } from '../../../../utils/walletHelpers';
 
 function ExchangeList() {
   const dispatch = useDispatch();
@@ -22,8 +23,8 @@ function ExchangeList() {
   const { poolsData, assetsPoolData } = dexs || {};
 
   const [highLiquidity, lowLiquidity] = React.useMemo(() => poolsData?.reduce(([highLiq, lowLiq], pool) => {
-    const asset1Liquidity = pool.reserved?.asset1.toNumber() || 0;
-    const asset2Liquidity = pool.reserved?.asset2.toNumber() || 0;
+    const asset1Liquidity = valueToBN(pool.reserved?.asset1 || 0);
+    const asset2Liquidity = valueToBN(pool.reserved?.asset2 || 0);
     if (asset1Liquidity > 1 && asset2Liquidity > 1) {
       highLiq.push(pool);
     } else {
