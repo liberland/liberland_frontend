@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import NotificationPortal from '../../../NotificationPortal';
 import Button from '../../../Button/Button';
@@ -6,7 +6,7 @@ import Button from '../../../Button/Button';
 function CopyLink({
   link,
 }) {
-  const notificationRef = React.useRef();
+  const notificationRef = useRef();
 
   const handleCopyClick = () => {
     navigator.clipboard.writeText(link);

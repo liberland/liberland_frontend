@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -63,7 +63,7 @@ RemarkTransferWrapper.propTypes = {
 };
 
 function RemarkTransferModalWrapper() {
-  const [show, setShow] = React.useState(false);
+  const [show, setShow] = useState(false);
   return (
     <>
       <Button

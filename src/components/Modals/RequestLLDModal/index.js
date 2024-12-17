@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
 import QRCode from 'react-qr-code';
@@ -37,9 +37,9 @@ function RequestLLDModal({
   const dispatch = useDispatch();
   const identity = useSelector(identitySelectors.selectorIdentity);
   const identityIsLoading = useSelector(identitySelectors.selectorIsLoading);
-  const [linkData, setLinkData] = React.useState();
+  const [linkData, setLinkData] = useState();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (walletAddress) {
       dispatch(identityActions.getIdentity.call(walletAddress));
     }
@@ -258,7 +258,7 @@ RequestLLDModal.propTypes = {
 };
 
 function RequestLLDModalWrapper(props) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
   return (
     <>
       <Button className={styles.button} onClick={() => setShow(true)}>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
@@ -129,7 +129,7 @@ StakeForm.propTypes = {
 };
 
 function StakeFormModalWrapper(props) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
   return (
     <div className={styles.modal}>
       <Button primary medium onClick={() => setShow(true)}>

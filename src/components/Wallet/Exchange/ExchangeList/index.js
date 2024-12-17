@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'antd/es/alert';
 import Collapse from 'antd/es/collapse';
@@ -17,16 +17,16 @@ function ExchangeList() {
   const dispatch = useDispatch();
   const dexs = useSelector(dexSelectors.selectorDex);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const [highLiquiditySort, setHighLiquiditySort] = React.useState(Object.keys(sortByMap)[0]);
-  const [lowLiquiditySort, setLowLiquiditySort] = React.useState(Object.keys(sortByMap)[0]);
+  const [highLiquiditySort, setHighLiquiditySort] = useState(Object.keys(sortByMap)[0]);
+  const [lowLiquiditySort, setLowLiquiditySort] = useState(Object.keys(sortByMap)[0]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(dexActions.getPools.call());
   }, [dispatch, walletAddress]);
 
   const { poolsData, assetsPoolData } = dexs || {};
 
-  const [highLiquidity, lowLiquidity] = React.useMemo(() => poolsData?.reduce(([highLiq, lowLiq], pool) => {
+  const [highLiquidity, lowLiquidity] = useMemo(() => poolsData?.reduce(([highLiq, lowLiq], pool) => {
     const asset1Liquidity = valueToBN(pool.reserved?.asset1 || 0);
     const asset2Liquidity = valueToBN(pool.reserved?.asset2 || 0);
     if (asset1Liquidity > 1 && asset2Liquidity > 1) {

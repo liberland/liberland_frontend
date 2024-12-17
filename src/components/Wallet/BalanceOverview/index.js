@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
@@ -16,7 +16,7 @@ import RemarkTransferModalWrapper from '../RemarkTransferWrapper';
 function BalanceOverview({
   balances, liquidMerits, showStaked,
 }) {
-  const overviewInfo = React.useMemo(() => (showStaked
+  const overviewInfo = useMemo(() => (showStaked
     ? [
       {
         amount: formatMerits(balances.liberstake.amount),

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import { useHistory } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
@@ -13,7 +13,7 @@ import ChangeWallet from '../Home/ChangeWallet';
 import styles from './styles.module.scss';
 
 function UserMenu() {
-  const { logOut, login } = React.useContext(AuthContext);
+  const { logOut, login } = useContext(AuthContext);
   const history = useHistory();
   const user = useSelector(userSelectors.selectUser);
   const walletAddress = useSelector(userSelectors.selectWalletAddress);

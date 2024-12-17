@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
 import Dropdown from 'antd/es/dropdown/dropdown';
@@ -30,14 +30,14 @@ function ChangeWallet() {
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (wallets?.length === 1 && !walletAdressSelector) {
       onWalletAdresssChange(wallets[0].address);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletAdressSelector, wallets]);
 
-  const displaySelected = React.useMemo(() => {
+  const displaySelected = useMemo(() => {
     const found = wallets.find(({ address }) => walletAdressSelector === address);
     if (found) {
       const { meta, address } = found;

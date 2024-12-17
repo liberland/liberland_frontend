@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
@@ -21,8 +21,8 @@ function ExchangeItem({ poolData, assetsPoolData }) {
     reserved,
     lpToken,
   } = poolData;
-  const asset1ToShow = React.useMemo(() => makeAssetToShow(asset1, assetData1?.symbol), [assetData1, asset1]);
-  const asset2ToShow = React.useMemo(() => makeAssetToShow(asset2, assetData2?.symbol), [assetData2, asset2]);
+  const asset1ToShow = useMemo(() => makeAssetToShow(asset1, assetData1?.symbol), [assetData1, asset1]);
+  const asset2ToShow = useMemo(() => makeAssetToShow(asset2, assetData2?.symbol), [assetData2, asset2]);
   const asset1Name = asset1 === 'Native' ? 'Liberland dollar' : assetData1.name;
   const asset2Name = asset2 === 'Native' ? 'Liberland dollar' : assetData2.name;
   const assets = {

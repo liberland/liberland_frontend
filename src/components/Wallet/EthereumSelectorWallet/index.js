@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { ethSelectors } from '../../../redux/selectors';
@@ -8,7 +8,7 @@ import styles from './styles.module.scss';
 function EthereumSelectorWallet({ onWalletSelected }) {
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(ethActions.getEthWalletOptions.call());
   }, [dispatch]);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
@@ -15,7 +15,7 @@ function AssetOverview({
   userIsMember,
   isCongress,
 }) {
-  const filteredAssets = React.useMemo(
+  const filteredAssets = useMemo(
     () => additionalAssets?.filter((asset) => asset?.balance?.balance > 0) || [],
     [additionalAssets],
   );

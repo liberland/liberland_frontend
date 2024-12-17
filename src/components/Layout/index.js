@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import LayoutInternal, {
@@ -34,7 +34,7 @@ import UserMenu from '../UserMenu';
 function Layout({ children }) {
   const history = useHistory();
   const dispatch = useDispatch();
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(walletActions.getWallet.call());
   }, [dispatch]);
   const createMenu = (navigation) => {
@@ -54,19 +54,19 @@ function Layout({ children }) {
   };
 
   const { pathname } = useLocation();
-  const matchedSubLink = React.useMemo(() => navigationList.find(
+  const matchedSubLink = useMemo(() => navigationList.find(
     ({ subLinks }) => (
       Object.values(subLinks).some((sub) => sub === pathname)
         || Object.values(subLinks).some((sub) => pathname.startsWith(sub))
     ),
   ), [pathname]);
-  const matchedRoute = React.useMemo(
+  const matchedRoute = useMemo(
     () => navigationList.find(({ route }) => route === pathname)
       || navigationList.find(({ route }) => pathname.startsWith(route)),
     [pathname],
   );
 
-  const pageTitle = React.useMemo(() => {
+  const pageTitle = useMemo(() => {
     if (matchedSubLink && !matchedSubLink.hideTitle) {
       return matchedSubLink.title;
     }
@@ -76,7 +76,7 @@ function Layout({ children }) {
     return '';
   }, [matchedSubLink, matchedRoute]);
 
-  const tabs = React.useMemo(() => {
+  const tabs = useMemo(() => {
     if (matchedSubLink) {
       return Object.entries(matchedSubLink.subLinks);
     }
@@ -88,7 +88,7 @@ function Layout({ children }) {
 
   const hasTab = tabs.find(([_, url]) => url === pathname);
 
-  const openKeys = React.useMemo(() => {
+  const openKeys = useMemo(() => {
     const matchOpen = matchedSubLink;
     return {
       citizen: true,

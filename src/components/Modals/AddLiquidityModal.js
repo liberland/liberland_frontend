@@ -246,7 +246,7 @@ function AddLiquidityModalWrapper({
   assets,
   isReservedDataEmpty,
 }) {
-  const [show, setShow] = React.useState(false);
+  const [show, setShow] = useState(false);
   return (
     <>
       <Button onClick={() => setShow(true)}>

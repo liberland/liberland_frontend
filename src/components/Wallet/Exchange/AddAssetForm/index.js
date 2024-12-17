@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -36,12 +36,12 @@ function AddAssetFormDisplay({
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(walletActions.getWallet.call());
     dispatch(walletActions.getAdditionalAssets.call());
   }, [dispatch]);
 
-  const filtered = React.useMemo(() => {
+  const filtered = useMemo(() => {
     const allOptions = additionalAssets?.reduce((pairings, aAsset, index) => {
       pairings.push(['Native', aAsset]);
       additionalAssets.slice(index + 1).forEach((bAsset) => {
@@ -240,7 +240,7 @@ AddAssetFormDisplay.propTypes = {
 };
 
 function AddAssetForm(props) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
   return (
     <div className={styles.add}>
       <Button primary medium onClick={() => setShow(true)}>

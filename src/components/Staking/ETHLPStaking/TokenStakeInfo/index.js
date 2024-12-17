@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Tooltip from 'rc-tooltip';
@@ -62,17 +62,17 @@ function TokenStakeInfo({ selectedAccount }) {
     return mapped;
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     getTokenStake();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAddressRelated();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAccount, tokenStakeInfo]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (tokenStakeInfo && !tokenStakeInfo.error) {
       getERC20Info(tokenStakeInfo.rewardToken);
       getERC20Info(tokenStakeInfo.stakingToken);

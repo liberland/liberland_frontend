@@ -1,5 +1,5 @@
 // LIBS
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
@@ -119,7 +119,7 @@ SendLLDModal.propTypes = {
 };
 
 function SendLLDModalWrapper() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   return (
     <>
       <Button className={styles.button} onClick={() => setOpen(true)}>

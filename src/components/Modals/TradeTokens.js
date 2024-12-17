@@ -350,7 +350,7 @@ function TradeTokensModalWrapper({
   asset1ToShow,
   asset2ToShow,
 }) {
-  const [show, setShow] = React.useState(false);
+  const [show, setShow] = useState(false);
   return (
     <>
       <Button

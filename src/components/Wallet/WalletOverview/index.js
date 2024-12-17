@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Collapse from 'antd/es/collapse';
 import Dropdown from 'antd/es/dropdown';
@@ -16,7 +16,7 @@ import { transactionHistoryProcessorFactory } from '../WalletTransactionHistory/
 import styles from './styles.module.scss';
 
 function WalletOverview() {
-  const [filterTransactionsBy, setFilterTransactionsBy] = React.useState();
+  const [filterTransactionsBy, setFilterTransactionsBy] = useState();
 
   const balances = useSelector(walletSelectors.selectorBalances);
   const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
@@ -30,12 +30,12 @@ function WalletOverview() {
 
   const dispatch = useDispatch();
 
-  const transactionHistoryTranslated = React.useMemo(
+  const transactionHistoryTranslated = useMemo(
     () => transactionHistory?.map(transactionHistoryProcessorFactory(userWalletAddress)) || [],
     [transactionHistory, userWalletAddress],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(walletActions.getWallet.call());
     dispatch(walletActions.getAdditionalAssets.call());
     dispatch(walletActions.getTxTransfers.call());
