@@ -38,23 +38,38 @@ const ministryFinanceReducer = handleActions(
     [combineActions(
       ministryFinanceActions.ministryFinanceGetAdditionalAssets.call,
       ministryFinanceActions.ministryFinanceGetWallet.call,
+      ministryFinanceActions.ministryFinanceSendLld.call,
+      ministryFinanceActions.ministryFinanceSendLlm.call,
+      ministryFinanceActions.ministryFinanceSendAssets.call,
+      ministryFinanceActions.ministryFinanceSendLlmToPolitipool.call,
     )]: (state) => ({
       ...state,
       loading: true,
     }),
+
     [combineActions(
       ministryFinanceActions.ministryFinanceGetAdditionalAssets.success,
       ministryFinanceActions.ministryFinanceGetAdditionalAssets.failure,
-      ministryFinanceActions.ministryFinanceGetWallet.failure,
       ministryFinanceActions.ministryFinanceGetWallet.success,
+      ministryFinanceActions.ministryFinanceGetWallet.failure,
+      ministryFinanceActions.ministryFinanceSendLld.success,
+      ministryFinanceActions.ministryFinanceSendLld.failure,
+      ministryFinanceActions.ministryFinanceSendLlm.success,
+      ministryFinanceActions.ministryFinanceSendLlm.failure,
+      ministryFinanceActions.ministryFinanceSendAssets.success,
+      ministryFinanceActions.ministryFinanceSendAssets.failure,
+      ministryFinanceActions.ministryFinanceSendLlmToPolitipool.success,
+      ministryFinanceActions.ministryFinanceSendLlmToPolitipool.failure,
     )]: (state) => ({
       ...state,
       loading: false,
     }),
+
     [ministryFinanceActions.ministryFinanceGetAdditionalAssets.success]: (state, action) => ({
       ...state,
       additionalAssets: action.payload,
     }),
+
     [ministryFinanceActions.ministryFinanceGetWallet.success]: (state, action) => ({
       ...state,
       walletInfo: action.payload,
