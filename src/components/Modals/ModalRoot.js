@@ -14,32 +14,30 @@ const modalContainer = (id) => {
   return existing;
 };
 
-function ModalRoot({ children, id, closeModal }) {
+function ModalRoot({ children, id }) {
   const root = useRef(modalContainer(id));
-  useEffect(() => {
-    root.current.classList.add('active');
-    document.body.style.overflow = 'hidden';
-    return () => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      root.current.classList.remove('active');
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
 
   useEffect(() => {
-    if (!closeModal) return null;
-    const rootElement = root.current;
-    const handleClick = (event) => {
-      if (event.target === rootElement) {
-        closeModal();
+    const rootCurrent = root.current;
+    const handleBackgroundClick = (event) => {
+      if (event.target === rootCurrent) {
+        if (children.props.closeModal) {
+          children.props.closeModal();
+        }
       }
     };
 
-    rootElement.addEventListener('click', handleClick);
+    rootCurrent.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    rootCurrent.addEventListener('click', handleBackgroundClick);
+
     return () => {
-      rootElement.removeEventListener('click', handleClick);
+      rootCurrent.classList.remove('active');
+      document.body.style.overflow = 'unset';
+      rootCurrent.removeEventListener('click', handleBackgroundClick);
     };
-  }, [closeModal]);
+  }, [children.props]);
 
   const customChildren = React.Children.map(children, (child) => {
     const props = { root };
@@ -49,7 +47,7 @@ function ModalRoot({ children, id, closeModal }) {
   const content = (
     <div className={children.props.proposal?.proposalModalShown ? 'modal-wrapper modal-text-wrapper' : 'modal-wrapper'}>
       <div>
-        { customChildren }
+        {customChildren}
       </div>
     </div>
   );
@@ -63,7 +61,6 @@ function ModalRoot({ children, id, closeModal }) {
 ModalRoot.propTypes = {
   id: PropTypes.string,
   children: PropTypes.node,
-  closeModal: PropTypes.func,
 };
 
 ModalRoot.defaultProps = {

@@ -19,23 +19,11 @@ FullImageModal.propTypes = {
 };
 
 function FullImageWrapper(props) {
-  const { closeModal } = props;
   return (
-    <ModalRoot closeModal={closeModal}>
+    <ModalRoot>
       <FullImageModal {...props} />
     </ModalRoot>
   );
 }
 
 export default FullImageWrapper;
-
-FullImageWrapper.propTypes = {
-  closeModal: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.oneOf([null]), // Allows null explicitly
-  ]),
-};
-
-FullImageWrapper.defaultProps = {
-  closeModal: null,
-};
