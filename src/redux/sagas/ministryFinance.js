@@ -71,6 +71,7 @@ function* sendLlmToPolitipoolWorker({
     officeType,
   });
   yield put(ministryFinanceActions.ministryFinanceSendLlmToPolitipool.success());
+  yield call(getWalletWorker);
 }
 
 export function* sendLlmToPolitipoolWatcher() {
@@ -96,6 +97,7 @@ function* sendLlmWorker({
     officeType,
   });
   yield put(ministryFinanceActions.ministryFinanceSendLlm.success());
+  yield call(getWalletWorker);
 }
 
 export function* sendLlmWatcher() {
@@ -122,6 +124,7 @@ function* sendLldWorker({
     officeType,
   });
   yield put(ministryFinanceActions.ministryFinanceSendLld.success());
+  yield call(getWalletWorker);
 }
 
 export function* sendLldWatcher() {
@@ -149,6 +152,7 @@ function* sendAssetsTransfer({
     officeType,
   });
   yield put(ministryFinanceActions.ministryFinanceSendAssets.success());
+  yield call(getAdditionalAssetsWorker);
 }
 
 export function* sendAssetsTransferWatcher() {
