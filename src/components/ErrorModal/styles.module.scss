@@ -34,6 +34,16 @@
       & > button{
         padding: 5px 7%;
       }
+
+      .buttons{
+        display: flex;
+        gap: 10px;
+        width: 100%;
+
+        & > button{
+          width: 100%;
+        }
+      }
     }
   }
 }

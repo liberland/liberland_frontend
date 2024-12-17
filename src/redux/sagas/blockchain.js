@@ -66,7 +66,7 @@ export function* subscribeWalletsSaga() {
       const wallets = await web3Accounts();
       emitter({ extensions, wallets });
     };
-    updateWallets();
+    setTimeout(updateWallets, 500);
     const interval = setInterval(updateWallets, 5000);
     setTimeout(() => clearInterval(interval), 120000);
     return () => clearInterval(interval);
