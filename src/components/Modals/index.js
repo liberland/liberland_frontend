@@ -1,7 +1,6 @@
 import GetCitizenshipModal from './GetCitizenshipModal';
 import SendLLDModal from './SendLLDModal';
 import SendLLMModal from './SendLLMModal';
-import VoteOnReferendumModal from './VoteOnReferendumModal';
 import OnchainIdentityModal from './OnchainIdentityModal';
 import DelegateModal from './DelegateModal';
 import UndelegateModal from './UndelegateModal';
@@ -17,7 +16,6 @@ export {
   GetCitizenshipModal,
   SendLLDModal,
   SendLLMModal,
-  VoteOnReferendumModal,
   OnchainIdentityModal,
   DelegateModal,
   UndelegateModal,
