@@ -16,6 +16,13 @@ export default {
     contracts: '/home/contracts',
     companies: '/home/companies',
     senate: '/home/senate',
+    nfts: '/home/nfts',
+  },
+  nfts: {
+    overview: '/home/nfts/overview',
+    ownedNfts: '/home/nfts/owned-nfts',
+    collections: '/home/nfts/collections',
+    shop: '/home/nfts/on-sale',
   },
   guidedSetup: '/guided-setup',
   offices: {
@@ -27,6 +34,7 @@ export default {
     landRegistry: '/home/offices/land_registry',
     finances: '/home/offices/finances',
     scheduledCongressSpending: '/home/offices/scheduled-congress-spending',
+    ministryOfFinance: '/home/offices/ministry-of-finance',
   },
   documents: {
     myAccount: '/home/documents/my-account',

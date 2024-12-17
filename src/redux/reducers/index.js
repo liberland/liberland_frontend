@@ -19,6 +19,7 @@ import senateReducer from './senate';
 import nftsReducer from './nfts';
 import ethReducer from './eth';
 import financesReducer from './finances';
+import ministryFinanceReducer from './ministryFinance';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -41,6 +42,7 @@ const rootReducer = combineReducers({
   nfts: nftsReducer,
   eth: ethReducer,
   finances: financesReducer,
+  ministryFinance: ministryFinanceReducer,
 });
 
 export default rootReducer;

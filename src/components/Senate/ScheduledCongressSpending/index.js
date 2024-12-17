@@ -24,7 +24,8 @@ function ScheduledCongressSpending({ isVetoButton }) {
 
   useEffect(() => {
     if (divRef.current) {
-      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds))));
+      const votes = scheduledCalls.map((item) => item.votes);
+      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds.concat(votes.flat())))));
     }
   }, [motionIds, dispatch, scheduledCalls]);
 

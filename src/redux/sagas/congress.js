@@ -47,7 +47,9 @@ import { daysToBlocks } from '../../utils/nodeRpcCall';
 import { palletIdToAddress } from '../../utils/pallet';
 import { formatMerits } from '../../utils/walletHelpers';
 import { IndexHelper } from '../../utils/council/councilEnum';
-// WORKERS
+import { OfficeType } from '../../utils/officeTypeEnum';
+
+const officeType = OfficeType.CONGRESS;
 
 function* getWalletWorker() {
   const codeName = yield select(congressSelectors.codeName);
@@ -120,6 +122,7 @@ function* congressSendLlmWorker({
     transferAmount,
     remarkInfo,
     executionBlock,
+    officeType,
   });
   yield put(congressActions.congressSendLlm.success());
 }
@@ -138,6 +141,7 @@ function* congressSendLldWorker({
     transferAmount,
     remarkInfo,
     executionBlock,
+    officeType,
   });
   yield put(congressActions.congressSendLld.success());
 }
@@ -157,6 +161,7 @@ function* congressSendAssetsTransfer({
     assetData,
     remarkInfo,
     executionBlock,
+    officeType,
   });
   yield put(congressActions.congressSendAssets.success());
 }
@@ -175,6 +180,7 @@ function* congressSendLlmToPolitipoolWorker({
     transferAmount,
     remarkInfo,
     executionBlock,
+    officeType,
   });
   yield put(congressActions.congressSendLlmToPolitipool.success());
 }

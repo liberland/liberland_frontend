@@ -21,10 +21,10 @@ import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 function SendLLDModal({ closeModal }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
-  const maxUnbond = BN.max(
+  const maxUnbond = balances?.liquidAmount?.amount !== '0x0' ? BN.max(
     BN_ZERO,
     new BN(balances?.liquidAmount?.amount ?? 0).sub(parseDollars('2')), // leave at least 2 liquid LLD...
-  );
+  ) : 0;
 
   const {
     handleSubmit,

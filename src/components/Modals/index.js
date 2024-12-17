@@ -1,6 +1,5 @@
 import SendLLDModal from './SendLLDModal';
 import SendLLMModal from './SendLLMModal';
-import VoteOnReferendumModal from './VoteOnReferendumModal';
 import OnchainIdentityModal from './OnchainIdentityModal';
 import DelegateModal from './DelegateModal';
 import UndelegateModal from './UndelegateModal';
@@ -15,7 +14,6 @@ import UnpoolModal from './UnpoolModal';
 export {
   SendLLDModal,
   SendLLMModal,
-  VoteOnReferendumModal,
   OnchainIdentityModal,
   DelegateModal,
   UndelegateModal,

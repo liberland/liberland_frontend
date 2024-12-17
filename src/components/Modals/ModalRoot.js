@@ -14,19 +14,32 @@ const modalContainer = (id) => {
   return existing;
 };
 
-function ModalRoot({ children, id }) {
+function ModalRoot({ children, id, closeModal }) {
   const root = useRef(modalContainer(id));
-
   useEffect(() => {
     root.current.classList.add('active');
     document.body.style.overflow = 'hidden';
-
     return () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
       root.current.classList.remove('active');
       document.body.style.overflow = 'unset';
     };
   }, []);
+
+  useEffect(() => {
+    if (!closeModal) return null;
+    const rootElement = root.current;
+    const handleClick = (event) => {
+      if (event.target === rootElement) {
+        closeModal();
+      }
+    };
+
+    rootElement.addEventListener('click', handleClick);
+    return () => {
+      rootElement.removeEventListener('click', handleClick);
+    };
+  }, [closeModal]);
 
   const customChildren = React.Children.map(children, (child) => {
     const props = { root };
@@ -50,6 +63,7 @@ function ModalRoot({ children, id }) {
 ModalRoot.propTypes = {
   id: PropTypes.string,
   children: PropTypes.node,
+  closeModal: PropTypes.func,
 };
 
 ModalRoot.defaultProps = {

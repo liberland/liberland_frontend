@@ -177,7 +177,7 @@ function ReferendumItem({
   blacklistMotion,
   userIsMember,
 }) {
-  const [isReferendumHidden, setIsReferendumHidden] = useState(true);
+  const [isReferendumHidden, setIsReferendumHidden] = useState(false);
   const { yayVotes, nayVotes, votedTotal } = voted;
   const progressBarRatio = yayVotes.gt(BN_ZERO)
     ? `${yayVotes.mul(new BN('100'))

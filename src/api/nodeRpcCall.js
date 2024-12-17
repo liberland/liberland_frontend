@@ -16,6 +16,7 @@ import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
 import { decodeAndFilter } from '../utils/identityParser';
+import { OfficeType } from '../utils/officeTypeEnum';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -134,6 +135,10 @@ const getApi = async () => {
           amountInUSDAtDateOfPayment: 'u64',
           date: 'u64',
           currency: 'Text',
+        },
+        RemarkInfoUser: {
+          id: 'u64',
+          description: 'Text',
         },
       },
       runtime: {
@@ -455,6 +460,31 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
     console.error(e);
     throw e;
   }
+};
+
+const makeTransferExtrinsic = (api, trasferData) => {
+  const { index, balance, recipient } = trasferData;
+  let transferExtrinsic;
+  if (index === IndexHelper.LLD) {
+    transferExtrinsic = api.tx.balances.transfer(recipient, balance);
+  } else if (index === IndexHelper.POLITIPOOL_LLM) {
+    transferExtrinsic = api.tx.llm.sendLlmToPolitipool(recipient, balance);
+  } else {
+    transferExtrinsic = api.tx.assets.transfer(parseInt(index), recipient, balance);
+  }
+  return transferExtrinsic;
+};
+
+const makeRemarkExtrinsic = (api, remarkInfo) => api.tx.llm.remark(remarkInfo);
+
+const transferWithRemark = async (remarkInfo, transfer, walletAddress) => {
+  const api = await getApi();
+  const remark = makeRemarkExtrinsic(api, remarkInfo);
+  const transferExtrinsic = makeTransferExtrinsic(api, transfer);
+
+  const call = [transferExtrinsic, remark];
+  const extrinsic = api.tx.utility.batch(call);
+  return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
 const provideJudgementAndAssets = async ({
@@ -998,7 +1028,6 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
   const [
     councilMembers,
     candidates,
-    // eslint-disable-next-line prefer-const
     currentCandidateVotesByUserQuery,
     runnersUp,
   ] = await api.queryMulti([
@@ -1439,6 +1468,14 @@ const getBlockEvents = async (blockHash) => {
   }
 };
 
+const getVotesList = (voting) => {
+  const votingUnwrapped = voting.isSome ? voting.unwrap() : null;
+  if (!votingUnwrapped) return null;
+  const ayes = votingUnwrapped.ayes.map((item) => item.toString());
+  const nays = votingUnwrapped.nays.map((item) => item.toString());
+  return ayes.concat(nays);
+};
+
 const getMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.council.proposals();
@@ -1450,10 +1487,13 @@ const getMotions = async () => {
         [api.query.council.voting, proposal],
         [api.query.council.members],
       ]);
+
+      const votes = getVotesList(voting);
       return {
         proposal,
         proposalOf,
         voting,
+        votes,
         membersCount: members.length,
       };
     }),
@@ -1582,12 +1622,44 @@ const senateProposeSpend = async ({
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+const getClerksMinistryFinance = async () => {
+  const api = await getApi();
+  const keys = await api.query.ministryOfFinanceOffice.clerks.keys();
+  if (keys.length < 1) {
+    return null;
+  }
+  return keys.map((item) => item.args.toString());
+};
+
+const ministryFinanceSpend = async ({
+  walletAddress, spendProposal, remarkInfo,
+}) => {
+  const api = await getApi();
+
+  const remark = api.tx.llm.remark(remarkInfo);
+  const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
+  const extrinsic = api.tx.ministryOfFinanceOffice.execute(transferAndRemark);
+
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getProperProposal = async (officeType) => {
+  if (officeType === OfficeType.CONGRESS) {
+    return congressProposeSpend;
+  } if (officeType === OfficeType.SENATE) {
+    return senateProposeSpend;
+  } if (officeType === OfficeType.MINISTRY_FINANCE) {
+    return ministryFinanceSpend;
+  }
+  return null;
+};
+
 const congressSenateSendLlm = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1595,11 +1667,11 @@ const congressSenateSendLlm = async ({
 };
 
 const congressSenateSendLld = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.balances.transfer(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1607,11 +1679,11 @@ const congressSenateSendLld = async ({
 };
 
 const congressSenateSendLlmToPolitipool = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, isCongress = true,
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -1625,11 +1697,11 @@ const congressSenateSendAssets = async ({
   assetData,
   remarkInfo,
   executionBlock,
-  isCongress = true,
+  officeType,
 }) => {
   const api = await getApi();
   const spendProposal = api.tx.assets.transfer(parseInt(assetData.index), transferToAddress, transferAmount);
-  const proposeSend = isCongress ? congressProposeSpend : senateProposeSpend;
+  const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
     walletAddress, spendProposal, remarkInfo, executionBlock,
@@ -2685,13 +2757,7 @@ const getSenateMotions = async () => {
         [api.query.senate.voting, proposal],
         [api.query.senate.members],
       ]);
-      let votes;
-      const votingUnwrapped = voting.isSome ? voting.unwrap() : null;
-      if (votingUnwrapped) {
-        const ayes = votingUnwrapped.ayes.map((item) => item.toString());
-        const nays = votingUnwrapped.nays.map((item) => item.toString());
-        votes = ayes.concat(nays);
-      }
+      const votes = getVotesList(voting);
 
       const senateProposalHash = proposalOf.hash.toHex();
       return {
@@ -2759,6 +2825,12 @@ const closeSenateMotion = async (proposalHash, index, walletAddress) => {
   return submitExtrinsic(api.tx.senate.close(proposalHash, index, weightBound, lengthBound), walletAddress, api);
 };
 
+const encodeRemarkUser = async (dataToEncode) => {
+  const api = await getApi();
+  const data = api.createType('RemarkInfoUser', dataToEncode);
+  return u8aToHex(pako.deflate(data.toU8a()));
+};
+
 const encodeRemark = async (dataToEncode) => {
   const api = await getApi();
   const data = api.createType('RemarkInfo', dataToEncode);
@@ -2775,47 +2847,222 @@ const decodeRemark = async (dataToEncode) => {
   return remarkInfo;
 };
 
-const getUserNfts = async (walletAddress) => {
-  const api = await getApi();
-  const nftEntries = await api.query.nfts.account.entries(walletAddress);
+const decoder = new TextDecoder();
 
+function processData(data) {
+  const decodedData = decoder.decode(data);
+  try {
+    return JSON.parse(decodedData);
+  } catch (e) {
+    return { name: decodedData };
+  }
+}
+const getIpfsHash = (ipfsUrl) => {
+  if (ipfsUrl.startsWith('ipfs://')) {
+    return ipfsUrl.split('/').pop();
+  }
+  return null;
+};
+
+const getMetadataWithoutPinata = (ipfsUrl) => {
+  const decoded = JSON.parse(ipfsUrl);
+  return decoded;
+};
+
+async function processUrlData(ipfsUrl, json = true) {
+  try {
+    const ipfsHash = getIpfsHash(ipfsUrl);
+    if (!ipfsHash) {
+      return getMetadataWithoutPinata(ipfsUrl);
+    }
+    const url = `https://${process.env.REACT_APP_PINATA_GATEWAY}/ipfs/${ipfsHash}`;
+    const response = await fetch(url, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch IPFS data: ${response.status} ${response.statusText}`);
+    }
+    return json ? await response.json() : response;
+  } catch (error) {
+    return null;
+  }
+}
+
+async function checkUserCollection(userAddress) {
+  const api = await getApi();
+  const collectionKeys = await api.query.nfts.account.entries(userAddress);
   const collectionIds = [];
   const nftIds = [];
 
-  nftEntries.forEach(([key]) => {
+  collectionKeys.forEach(([key]) => {
     const [collectionId, nftId] = key.args.slice(1);
     collectionIds.push(collectionId.toString());
     nftIds.push(nftId.toString());
   });
+  return [collectionIds, nftIds];
+}
+
+const getAllNfts = async (walletAddress, onlyForSale) => {
+  const api = await getApi();
+  const nftEntries = await api.query.nfts.item.entries();
+
+  const collectionIds = nftEntries.map(([key]) => key.args[0].toString());
+  const nftIds = nftEntries.map(([key]) => key.args[1].toString());
+
+  const [userCollectionIds, userNftIds] = await checkUserCollection(walletAddress);
 
   const [collectionMetadata, itemMetadata] = await Promise.all([
     api.query.nfts.collectionMetadataOf.multi(collectionIds),
     api.query.nfts.itemMetadataOf.multi(collectionIds.map((id, index) => [id, nftIds[index]])),
   ]);
 
-  const decoder = new TextDecoder();
+  const nftDetails = await Promise.all(
+    nftEntries.map(async ([key], index) => {
+      const [collectionId, nftId] = key.args;
 
-  function processData(data) {
-    const decodedData = decoder.decode(data);
-    return JSON.parse(decodedData);
-  }
-  const nftDetails = collectionIds.map((collectionId, index) => {
-    const collectionData = collectionMetadata[index].unwrap();
-    const itemData = itemMetadata[index].unwrap();
-    return {
-      collectionId,
-      nftId: nftIds[index],
-      collectionMetadata: {
-        data: processData(collectionData.data).name,
-      },
-      itemMetadata: {
-        data: processData(itemData.data).imageUrl,
-      },
-    };
-  });
+      const collectionDataOpt = collectionMetadata[index];
+      const collectionMetadataUnwrapped = collectionDataOpt.isNone ? null : collectionDataOpt.unwrap();
+
+      const itemDataOpt = itemMetadata[index];
+      const itemMetadataUnwrapped = itemDataOpt.isNone ? null : itemDataOpt.unwrap();
+      const processedItemData = itemMetadataUnwrapped
+        ? await processUrlData(decoder.decode(itemMetadataUnwrapped.data))
+        : null;
+
+      const itemPriceOpt = await api.query.nfts.itemPriceOf(collectionId, nftId);
+      const itemPrice = itemPriceOpt.isNone ? null : itemPriceOpt.unwrap()[0].toString();
+      const imageUrl = processedItemData?.image || processedItemData?.imageUrl;
+      const image = imageUrl ? await processUrlData(imageUrl, false) : null;
+
+      if (onlyForSale && !itemPrice) {
+        return null;
+      }
+
+      const isUserNft = userCollectionIds.includes(collectionId.toString())
+                        && userNftIds.includes(nftId.toString());
+
+      return {
+        collectionId: collectionId.toString(),
+        nftId: nftId.toString(),
+        isUserNft,
+        collectionMetadata: {
+          name: collectionMetadataUnwrapped?.name?.toString(),
+        },
+        itemMetadata: {
+          ...processedItemData,
+          image: image?.url || imageUrl,
+          itemPrice,
+        },
+      };
+    }),
+  );
+
+  return nftDetails.filter((detail) => detail !== null);
+};
+
+const getUserNfts = async (walletAddress) => {
+  const api = await getApi();
+
+  const [collectionIds, nftIds] = await checkUserCollection(walletAddress);
+
+  const [collectionMetadata, itemMetadata] = await Promise.all([
+    api.query.nfts.collectionMetadataOf.multi(collectionIds),
+    api.query.nfts.itemMetadataOf.multi(collectionIds.map((id, index) => [id, nftIds[index]])),
+  ]);
+
+  const nftDetails = await Promise.all(
+    collectionIds.map(async (collectionId, index) => {
+      const collectionDataOpt = collectionMetadata[index];
+      const itemDataOpt = itemMetadata[index];
+      const collectionData = collectionDataOpt.isNone ? null : collectionDataOpt.unwrap();
+      const itemData = itemDataOpt.isNone ? null : itemDataOpt.unwrap();
+      const processedCollectionData = collectionData ? processData(collectionData.data) : null;
+      const processedItemData = itemData ? await processUrlData(decoder.decode(itemData.data)) : null;
+      const imageUrl = processedItemData?.image || processedItemData?.imageUrl;
+      const image = imageUrl ? await processUrlData(imageUrl, false) : null;
+
+      const itemPriceOpt = await api.query.nfts.itemPriceOf(collectionId, nftIds[index]);
+      const itemPrice = itemPriceOpt.isNone ? null : itemPriceOpt.unwrap()[0].toString();
+      return {
+        collectionId,
+        nftId: nftIds[index],
+        collectionMetadata: {
+          name: processedCollectionData?.name,
+        },
+        itemMetadata: {
+          ...processedItemData,
+          image: image?.url || imageUrl,
+          itemPrice,
+        },
+      };
+    }),
+  );
 
   return nftDetails;
 };
+
+async function getUserCollection(walletAddress) {
+  const api = await getApi();
+
+  const collectionKeys = await api.query.nfts.collectionAccount.keys(walletAddress);
+
+  const collections = collectionKeys.map(({ args: [address, collectionId] }) => ({
+    address: address.toString(),
+    collectionId: collectionId.toNumber(),
+  }));
+
+  return collections;
+}
+
+async function createCollectionNfts(admin, config, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.create(admin, config);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function mintNFT(collectionId, itemId, mintTo, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.mint(collectionId, itemId, mintTo, null);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function destroyNFT(collectionId, itemId, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.burn(collectionId, itemId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function setMetadataNFT(collectionId, itemId, metadataCID, walletAddress) {
+  const api = await getApi();
+  const metadata = `ipfs://${metadataCID}`;
+  const extrinsic = api.tx.nfts.setMetadata(collectionId, itemId, metadata);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function setAttributes(collectionId, itemId, namespace, key, value, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.setAttribute(collectionId, itemId, namespace, key, value);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function sellNFT(collectionId, itemId, price, walletAddress) {
+  const api = await getApi();
+  const buyer = api.createType('Option<MultiAddress>', null);
+  const extrinsic = api.tx.nfts.setPrice(collectionId, itemId, price, buyer);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function bidNFT(collectionId, itemId, bidPrice, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.buyItem(collectionId, itemId, bidPrice);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function transferNFT(collectionId, itemId, newOwner, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.transfer(collectionId, itemId, newOwner);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
 
 export {
   getBalanceByAddress,
@@ -2949,9 +3196,22 @@ export {
   encodeRemark,
   decodeRemark,
   getUserNfts,
+  createCollectionNfts,
+  mintNFT,
+  destroyNFT,
+  setMetadataNFT,
+  setAttributes,
+  sellNFT,
+  bidNFT,
+  transferNFT,
+  getAllNfts,
+  getUserCollection,
   matchScheduledWithSenateMotions,
   createNewPool,
   getAssetDetails,
   createOrUpdateAsset,
   mintAsset,
+  transferWithRemark,
+  encodeRemarkUser,
+  getClerksMinistryFinance,
 };

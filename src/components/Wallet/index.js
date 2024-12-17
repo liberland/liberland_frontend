@@ -10,7 +10,6 @@ import Assets from './Assets';
 import Card from '../Card';
 import Exchange from './Exchange';
 import Bridge from './Bridge';
-import NftsComponent from './Nfts';
 import PayMe from './PayMe';
 import WalletOverview from './WalletOverview';
 
@@ -34,10 +33,6 @@ function Wallet() {
         <Route
           path={router.wallet.bridge}
           component={Bridge}
-        />
-        <Route
-          path={router.wallet.nfts}
-          component={NftsComponent}
         />
         <Route
           path={router.wallet.payMe}

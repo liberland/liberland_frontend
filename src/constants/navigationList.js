@@ -30,8 +30,13 @@ export const navigationList = [
       Assets: router.wallet.assets,
       'All transactions': router.wallet.allTransactions,
       Bridge: router.wallet.bridge,
-      NFTs: router.wallet.nfts,
     },
+  },
+  {
+    route: router.home.nfts,
+    title: 'NFTS',
+    icon: DocumentsIcon,
+    isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED,
   },
   {
     route: router.home.voting,
@@ -81,6 +86,7 @@ export const navigationList = [
       'Land registry': router.offices.landRegistry,
       Finances: router.offices.finances,
       'Scheduled Congress Spending': router.offices.scheduledCongressSpending,
+      'Ministry Of Finance': router.offices.ministryOfFinance,
     },
   },
   {
