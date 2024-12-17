@@ -60,7 +60,6 @@ export default {
   wallet: {
     exchange: '/home/wallet/exchange',
     assets: '/home/wallet/assets',
-    allTransactions: '/home/wallet/all-transactions',
     overView: '/home/wallet/overview',
     bridge: '/home/wallet/bridge',
     nfts: '/home/wallet/nfts',

@@ -28,7 +28,6 @@ export const navigationList = [
       Overview: router.wallet.overView,
       Exchange: router.wallet.exchange,
       Assets: router.wallet.assets,
-      'All transactions': router.wallet.allTransactions,
       Bridge: router.wallet.bridge,
     },
   },

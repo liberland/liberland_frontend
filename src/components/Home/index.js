@@ -11,7 +11,6 @@ import Offices from '../Offices';
 import Staking from '../Staking';
 import Registries from '../Registries';
 import Companies from '../Companies';
-import AllTransactions from '../Wallet/AllTransactions';
 import Congress from '../Congress';
 
 import Contracts from '../Contracts';
@@ -91,11 +90,6 @@ function Home() {
       key={router.home.legislation}
       path={router.home.legislation}
       component={Legislation}
-    />,
-    <Route
-      key={router.wallet.allTransactions}
-      path={router.wallet.allTransactions}
-      component={AllTransactions}
     />,
     <Route
       key={router.home.congress}

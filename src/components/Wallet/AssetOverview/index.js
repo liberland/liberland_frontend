@@ -13,6 +13,7 @@ function AssetOverview({
   isRemarkNeeded,
   officeType,
   userIsMember,
+  isCongress,
 }) {
   const filteredAssets = React.useMemo(
     () => additionalAssets?.filter((asset) => asset?.balance?.balance > 0) || [],
@@ -21,7 +22,7 @@ function AssetOverview({
 
   const renderItem = (assetData) => (
     <Card
-      actions={userIsMember ? [
+      actions={!isCongress || userIsMember ? [
         <SendAssetModalWrapper
           isRemarkNeeded={isRemarkNeeded}
           assetData={assetData}
@@ -67,7 +68,8 @@ AssetOverview.defaultProps = {
 
 AssetOverview.propTypes = {
   userIsMember: PropTypes.bool,
-  officeType: PropTypes.string.isRequired,
+  isCongress: PropTypes.bool,
+  officeType: PropTypes.string,
   isRemarkNeeded: PropTypes.bool,
   additionalAssets: PropTypes.arrayOf(PropTypes.shape({
     metadata: {

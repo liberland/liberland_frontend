@@ -101,6 +101,7 @@ export default function WalletCongresSenateWrapper({
         isRemarkNeeded
         officeType={officeType}
         userIsMember={userIsMember}
+        isCongress
       />
       {isModalOpenLLDSpend && (
       <SpendModalWrapper

@@ -207,7 +207,7 @@ SendAssetModal.defaultProps = {
 };
 
 SendAssetModal.propTypes = {
-  officeType: PropTypes.string.isRequired,
+  officeType: PropTypes.string,
   isRemarkNeeded: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
   assetData: PropTypes.any,
@@ -249,7 +249,7 @@ SendAssetModalWrapper.propTypes = {
   isRemarkNeeded: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
   assetData: PropTypes.any,
-  officeType: PropTypes.string.isRequired,
+  officeType: PropTypes.string,
 };
 
 export default SendAssetModalWrapper;
