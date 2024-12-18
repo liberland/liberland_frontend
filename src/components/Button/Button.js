@@ -21,6 +21,9 @@ function Button({
   whiteRed,
   flex,
   disabled,
+  multiline,
+  href,
+  link,
 }) {
   const getSize = () => {
     if (large) {
@@ -32,13 +35,24 @@ function Button({
     return undefined;
   };
 
+  const getType = () => {
+    if (primary) {
+      return 'primary';
+    }
+    if (href || link) {
+      return 'link';
+    }
+    return undefined;
+  };
+
   return (
     <ButtonInternal
       disabled={disabled}
       onClick={onClick}
       htmlType={type}
-      type={primary ? 'primary' : undefined}
-      color={red ? 'danger' : undefined}
+      type={getType()}
+      href={href}
+      danger={red}
       size={getSize()}
       className={
         cx(styles.button, className, {
@@ -49,6 +63,7 @@ function Button({
           [styles.grey]: grey,
           [styles.whiteRed]: whiteRed,
           [styles.flex]: flex,
+          [styles.multiline]: multiline,
         })
       }
     >
@@ -73,6 +88,8 @@ Button.defaultProps = {
   whiteRed: false,
   disabled: false,
   flex: false,
+  multiline: false,
+  link: false,
 };
 
 Button.propTypes = {
@@ -92,6 +109,9 @@ Button.propTypes = {
   whiteRed: PropTypes.bool,
   disabled: PropTypes.bool,
   flex: PropTypes.bool,
+  href: PropTypes.string,
+  multiline: PropTypes.bool,
+  link: PropTypes.bool,
 };
 
 export default Button;

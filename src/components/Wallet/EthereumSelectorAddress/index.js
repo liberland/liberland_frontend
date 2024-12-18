@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { ethSelectors } from '../../../redux/selectors';
@@ -12,12 +12,12 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
   const connecting = useSelector(ethSelectors.selectorConnecting);
   const error = useSelector(ethSelectors.selectorConnectError);
 
-  React.useEffect(() => {
+  useEffect(() => {
     onAccountSelected(undefined);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (selectedWallet) {
       dispatch(
         ethActions.getConnectedEthWallet.call({

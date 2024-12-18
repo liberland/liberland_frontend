@@ -21,7 +21,8 @@ export default function Motions() {
 
   useEffect(() => {
     if (divRef.current && motionIds.length > 0) {
-      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds))));
+      const votes = motions.map((item) => item.votes);
+      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds.concat(votes.flat())))));
     }
   }, [motions, motionIds, dispatch]);
 

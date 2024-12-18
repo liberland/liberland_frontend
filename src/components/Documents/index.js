@@ -1,6 +1,5 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
-import RoleHOC from '../../hocs/RoleHOC';
 import router from '../../router';
 import Profile from '../Profile';
 
@@ -33,9 +32,7 @@ function Documents() {
         exact
         path={router.home.documents}
         render={() => (
-          <RoleHOC>
-            <Redirect to={router.documents.myAccount} />
-          </RoleHOC>
+          <Redirect to={router.documents.myAccount} />
         )}
       />
     </Switch>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
@@ -11,11 +11,12 @@ import SendLLMModalWrapper from '../../Modals/SendLLMModal';
 import RequestLLDModalWrapper from '../../Modals/RequestLLDModal';
 import UnpoolLLMModalWrapper from '../../Modals/UnpoolModal';
 import PolitipoolLLMModalWrapper from '../../Modals/PolitipoolModal';
+import RemarkTransferModalWrapper from '../RemarkTransferWrapper';
 
 function BalanceOverview({
   balances, liquidMerits, showStaked,
 }) {
-  const overviewInfo = React.useMemo(() => (showStaked
+  const overviewInfo = useMemo(() => (showStaked
     ? [
       {
         amount: formatMerits(balances.liberstake.amount),
@@ -23,7 +24,7 @@ function BalanceOverview({
         currency: 'LLM',
         actions: [
           <UnpoolLLMModalWrapper />,
-          <div />,
+          <RemarkTransferModalWrapper />,
         ],
       },
       {

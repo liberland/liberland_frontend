@@ -1,5 +1,4 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
@@ -7,28 +6,29 @@ import Card from 'antd/es/card';
 import { useMediaQuery } from 'usehooks-ts';
 
 import { formatAssets } from '../../../utils/walletHelpers';
-import { senateSelectors } from '../../../redux/selectors';
 import SendAssetModalWrapper from '../../Modals/SendAssetModal';
 
 function AssetOverview({
   additionalAssets,
   isRemarkNeeded,
+  officeType,
+  userIsMember,
   isCongress,
 }) {
-  const filteredAssets = React.useMemo(
+  const filteredAssets = useMemo(
     () => additionalAssets?.filter((asset) => asset?.balance?.balance > 0) || [],
     [additionalAssets],
   );
-  const userIsMember = useSelector(senateSelectors.userIsMember);
 
   const renderItem = (assetData) => (
     <Card
-      actions={userIsMember ? [
+      actions={!isCongress || userIsMember ? [
         <SendAssetModalWrapper
           isRemarkNeeded={isRemarkNeeded}
-          isCongress={isCongress}
           assetData={assetData}
+          officeType={officeType}
         />,
+        <div />,
       ] : undefined}
     >
       <Card.Meta
@@ -63,11 +63,13 @@ function AssetOverview({
 AssetOverview.defaultProps = {
   additionalAssets: [],
   isRemarkNeeded: false,
-  isCongress: true,
+  userIsMember: false,
 };
 
 AssetOverview.propTypes = {
+  userIsMember: PropTypes.bool,
   isCongress: PropTypes.bool,
+  officeType: PropTypes.string,
   isRemarkNeeded: PropTypes.bool,
   additionalAssets: PropTypes.arrayOf(PropTypes.shape({
     metadata: {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -87,12 +87,12 @@ PolitipoolModal.propTypes = {
 };
 
 function PolitipoolModalWrapper() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   return (
     <>
       <Button className={styles.button} primary onClick={() => setOpen(true)}>
         Politipool
-        <img src={ButtonArrowIcon} className={cx(styles.arrowIcon, styles.whiten)} alt="button icon" />
+        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {open && (
         <ModalRoot>

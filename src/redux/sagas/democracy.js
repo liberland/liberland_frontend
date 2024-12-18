@@ -13,7 +13,6 @@ import {
   proposeAmendLegislation,
   citizenProposeRepealLegislation,
   getScheduledCalls,
-  getIdentitiesNames,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors } from '../selectors';

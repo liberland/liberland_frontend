@@ -3,6 +3,7 @@ import PropsTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
+import cx from 'classnames';
 import useNotification from 'antd/es/notification/useNotification';
 import Title from 'antd/es/typography/Title';
 import InputNumber from 'antd/es/input-number';
@@ -298,12 +299,12 @@ function AddLiquidityModalWrapper({
   assets,
   isReservedDataEmpty,
 }) {
-  const [show, setShow] = React.useState(false);
+  const [show, setShow] = useState(false);
   return (
     <>
       <Button onClick={() => setShow(true)}>
         Add liquidity
-        <img src={PlusIcon} className={styles.backIcon} alt="button icon" />
+        <img src={PlusIcon} className={cx(styles.backIcon, styles.darken)} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>

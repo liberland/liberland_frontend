@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
 import ModalRoot from '../../../Modals/ModalRoot';
@@ -59,7 +59,7 @@ function ActionsMenuModalWrapper({
   assetId,
   defaultValues: dV,
 }) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
   if (!isOwner && !isIssuer && !isAdmin) {
     return null;
   }

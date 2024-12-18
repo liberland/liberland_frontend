@@ -16,6 +16,8 @@ import * as senateSelectors from './senate';
 import * as nftsSelectors from './nfts';
 import * as ethSelectors from './eth';
 import * as financesSelectors from './finances';
+import * as routeSelectors from './route';
+import * as ministryFinanceSelector from './ministryFinince';
 
 export {
   errorsSelectors,
@@ -36,4 +38,6 @@ export {
   nftsSelectors,
   ethSelectors,
   financesSelectors,
+  routeSelectors,
+  ministryFinanceSelector,
 };

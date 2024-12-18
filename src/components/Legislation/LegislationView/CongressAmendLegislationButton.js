@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import CongressAmendLegislationModal from '../../Modals/CongressAmendLegislationModal';
-import Button from '../../Button/Button';
 import { congressSelectors } from '../../../redux/selectors';
 
 export default function CongressAmendLegislationButton({
@@ -18,7 +17,8 @@ export default function CongressAmendLegislationButton({
   };
   return (
     <>
-      <Button small primary onClick={toggle}>{ add ? 'ADD SECTION AS CONGRESS' : 'AMEND AS CONGRESS' }</Button>
+      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+      <a href="#" onClick={toggle}>{ add ? 'ADD SECTION AS CONGRESS' : 'AMEND AS CONGRESS' }</a>
       {isOpen && <CongressAmendLegislationModal closeModal={toggle} {...{ tier, id, section }} />}
     </>
   );

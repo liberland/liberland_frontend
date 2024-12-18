@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { ethSelectors } from '../../../../redux/selectors';
@@ -9,9 +9,9 @@ import styles from './styles.module.scss';
 function ClaimReward({
   account,
 }) {
-  const [success, setSuccess] = React.useState();
-  const [loading, setLoading] = React.useState();
-  const [error, setError] = React.useState();
+  const [success, setSuccess] = useState();
+  const [loading, setLoading] = useState();
+  const [error, setError] = useState();
   const connected = useSelector(ethSelectors.selectorConnected);
 
   return (

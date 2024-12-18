@@ -199,7 +199,7 @@ UpdateOrCreateAssetForm.propTypes = {
 function UpdateOrCreateAssetFormModalWrapper({
   isCreate, defaultValues: dV,
 }) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
   const { isStock } = useStockContext();
   const modal = (
     <>

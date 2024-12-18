@@ -7,7 +7,6 @@ import { NavLink, useLocation } from 'react-router-dom/cjs/react-router-dom.min'
 
 import { useSelector } from 'react-redux';
 import { AuthContext } from 'react-oauth2-code-pkce';
-import RoleHOC from '../../hocs/RoleHOC';
 import router from '../../router';
 
 import CongressionalAssemble from './CongressionalAssemble';
@@ -71,9 +70,7 @@ function Voting() {
             exact
             path={router.home.voting}
             render={() => (
-              <RoleHOC>
-                <Redirect to={router.voting.congressionalAssemble} />
-              </RoleHOC>
+              <Redirect to={router.voting.congressionalAssemble} />
             )}
           />
         </Switch>

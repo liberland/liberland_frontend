@@ -68,20 +68,28 @@ p {
 // ANTD overrides
 
 .ant-btn-primary {
-  background: linear-gradient(135deg, #d4ab06, #cca508);
+  background: linear-gradient(135deg, #e4d6a0, #EDC007,#e4d6a0);
   transition: all 0.3s;
-  font-weight: 600;
 
   &:focus,&:active,&:hover {
-    background: linear-gradient(135deg, #cca508, #d4ab06)!important;
+    background: linear-gradient(135deg, #e4d6a0, #EDC007,#e4d6a0)!important;
+    filter: brightness(120%);
+  }
+}
+
+.ant-btn-dangerous {
+  background: #ff4d4f!important;
+  color: white!important;
+
+  &:focus,&:active,&:hover {
+    background: white!important;
+    color: black!important;
+    filter: brightness(120%);
   }
 }
 
 .ant-collapse-header-text {
   font-family: Open Sans;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 21.79px;
   text-align: left;
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
@@ -92,9 +100,7 @@ p {
 
 .description {
   font-family: Open Sans;
-  font-size: 12px;
   font-weight: 600;
-  line-height: 16.34px;
   text-align: left;
   text-underline-position: from-font;
   text-decoration-skip-ink: none;
@@ -103,9 +109,6 @@ p {
 
 .values {
   font-family: Open Sans;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 16.34px;
   text-align: left;
   text-underline-position: from-font;
   text-decoration-skip-ink: none;

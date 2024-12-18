@@ -195,7 +195,7 @@ function RemoveLiquidityModalWrapper({
   lpTokensBalance,
   liquidity,
 }) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
   return (
     <>
       <Button onClick={() => setShow(true)}>

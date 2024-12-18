@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import LayoutInternal, {
   Header as HeaderInternal,
   Content,
@@ -23,10 +23,9 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
 import ChangeWallet from '../Home/ChangeWallet';
-import { userSelectors } from '../../redux/selectors';
 import { walletActions } from '../../redux/actions';
 import styles from './styles.module.scss';
-import { footerLinks, navigationList as navigationListComplete, socials } from '../../constants/navigationList';
+import { footerLinks, navigationList, socials } from '../../constants/navigationList';
 import LiberlandLettermark from '../../assets/icons/Liberland_Lettermark.svg';
 import LiberlandLettermarkMobile from '../../assets/icons/Liberland_Lettermark_Mobile.svg';
 import LiberlandSeal from '../../assets/icons/seal.svg';
@@ -35,15 +34,9 @@ import UserMenu from '../UserMenu';
 function Layout({ children }) {
   const history = useHistory();
   const dispatch = useDispatch();
-  const roles = useSelector(userSelectors.selectUserRole);
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(walletActions.getWallet.call());
   }, [dispatch]);
-  const navigationList = React.useMemo(
-    () => navigationListComplete.filter(({ access }) => (roles[access] && roles[access] !== 'guest')
-      || access.some((role) => roles.includes(role))),
-    [roles],
-  );
   const createMenu = (navigation) => {
     const subs = Object.entries(navigation.subLinks).map(([name, link]) => ({
       label: name,
@@ -55,24 +48,25 @@ function Layout({ children }) {
       label: <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>{navigation.title}</span>,
       key: navigation.route,
       onClick: subs.length ? undefined : () => history.push(navigation.route),
+      onTitleClick: !subs.length ? undefined : () => history.push(navigation.route),
       children: subs.length ? subs : undefined,
     };
   };
 
   const { pathname } = useLocation();
-  const matchedSubLink = React.useMemo(() => navigationList.find(
+  const matchedSubLink = useMemo(() => navigationList.find(
     ({ subLinks }) => (
       Object.values(subLinks).some((sub) => sub === pathname)
         || Object.values(subLinks).some((sub) => pathname.startsWith(sub))
     ),
-  ), [navigationList, pathname]);
-  const matchedRoute = React.useMemo(
+  ), [pathname]);
+  const matchedRoute = useMemo(
     () => navigationList.find(({ route }) => route === pathname)
       || navigationList.find(({ route }) => pathname.startsWith(route)),
-    [navigationList, pathname],
+    [pathname],
   );
 
-  const pageTitle = React.useMemo(() => {
+  const pageTitle = useMemo(() => {
     if (matchedSubLink && !matchedSubLink.hideTitle) {
       return matchedSubLink.title;
     }
@@ -82,7 +76,7 @@ function Layout({ children }) {
     return '';
   }, [matchedSubLink, matchedRoute]);
 
-  const tabs = React.useMemo(() => {
+  const tabs = useMemo(() => {
     if (matchedSubLink) {
       return Object.entries(matchedSubLink.subLinks);
     }
@@ -94,7 +88,7 @@ function Layout({ children }) {
 
   const hasTab = tabs.find(([_, url]) => url === pathname);
 
-  const openKeys = React.useMemo(() => {
+  const openKeys = useMemo(() => {
     const matchOpen = matchedSubLink;
     return {
       citizen: true,
@@ -140,7 +134,6 @@ function Layout({ children }) {
       ] : navigationList.map(createMenu)}
     />
   );
-  const isEResident = roles?.['e-resident'] === 'e-resident';
 
   return (
     <ConfigProvider
@@ -152,6 +145,7 @@ function Layout({ children }) {
       theme={{
         token: {
           colorText: '#243F5F',
+          fontSize: 15,
         },
         components: {
           Layout: {
@@ -182,15 +176,14 @@ function Layout({ children }) {
           Button: {
             defaultActiveBorderColor: '#243F5F',
             defaultBg: 'white',
-            defaultBorderColor: '#ECEBF0',
+            defaultBorderColor: '#ACBDC5',
             defaultHoverBorderColor: '#243F5F',
-            defaultHoverColor: '243F5F',
+            defaultHoverColor: '#243F5F',
             defaultShadow: '0',
-            primaryColor: 'white',
+            primaryColor: '#243F5F',
             primaryShadow: '0',
-            contentFontSize: '12px',
-            paddingBlock: '10px',
-            paddingInline: '5px',
+            paddingBlock: '18px',
+            paddingInline: '12px',
           },
           Typography: {
             colorText: '#243F5F',
@@ -210,6 +203,7 @@ function Layout({ children }) {
           },
           Card: {
             extraColor: '#243F5F',
+            actionsLiMargin: '12px 5px',
           },
           InputNumber: {
             controlWidth: '100%',
@@ -244,7 +238,7 @@ function Layout({ children }) {
               {urlMenu}
               <img alt="logo" src={LiberlandLettermarkMobile} className={styles.mobileLogo} />
               <div className={styles.mobileUser}>
-                <UserMenu isEResident={isEResident} />
+                <UserMenu />
               </div>
             </>
           )}
@@ -252,7 +246,7 @@ function Layout({ children }) {
             <div className={styles.user}>
               <Flex gap="20px" align="center" justify="center">
                 <ChangeWallet />
-                <UserMenu isEResident={isEResident} />
+                <UserMenu />
               </Flex>
             </div>
           )}

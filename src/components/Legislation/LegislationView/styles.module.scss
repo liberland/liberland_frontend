@@ -160,38 +160,10 @@
         }
     }
 
-    & > div > button {
-        width: 100%;
-    }
-
     .dropdownWrapper{
-        font-size: 14px;
         position: relative;
 
-
-        @media screen and (min-width: map-get($breakpoints, 'tablet')){
-            font-size: 16px;
-        }
-
-        & > button{
-            display: flex;
-            align-items: center;
-
-            @-moz-document url-prefix() {
-                gap: 5px;
-            }
-
-            & > span {
-                align-self: flex-start;
-                font-size: 30px;
-
-                @-moz-document url-prefix() {
-                    margin-top: -5px;
-                }
-            }
-        }
-
-        .dropdown{
+        .dropdown {
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -199,7 +171,6 @@
             position: absolute;
             right: 0;
             left: 0;
-            max-width: 100%;
             margin: auto;
             top: 110%;
 
@@ -209,11 +180,7 @@
             background: $bg4;
             border: 1px solid $grey;
             border-radius: 6px;
-
-            & > button{
-                min-width: unset;
-                padding: 10px;
-            }
+            min-width: 150px;
         }
 
         .overlay {

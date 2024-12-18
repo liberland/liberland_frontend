@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Select from 'antd/es/select';
@@ -26,13 +26,13 @@ function AddAssetFormDisplay({
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const [api, handle] = useNotification();
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(walletActions.getWallet.call());
     dispatch(walletActions.getAdditionalAssets.call());
   }, [dispatch]);
 
   const { isStock } = useStockContext();
-  const filtered = React.useMemo(() => {
+  const filtered = useMemo(() => {
     const allOptions = additionalAssets
       ?.reduce((pairings, aAsset, index) => {
         if (isStock === aAsset.isStock) {
@@ -206,7 +206,7 @@ AddAssetFormDisplay.propTypes = {
 };
 
 function AddAssetForm(props) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
   return (
     <div className={styles.add}>
       <Button primary medium onClick={() => setShow(true)}>

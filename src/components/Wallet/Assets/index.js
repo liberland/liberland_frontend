@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useSelector, useDispatch } from 'react-redux';
@@ -17,7 +17,7 @@ function Assets() {
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const assetDetails = useSelector(walletSelectors.selectorAssetsDetails);
   const dispatch = useDispatch();
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(walletActions.getAdditionalAssets.call());
   }, [dispatch]);
 
@@ -26,7 +26,7 @@ function Assets() {
     [additionalAssets],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (ids?.length) {
       dispatch(walletActions.getAssetsDetails.call(ids));
     }
@@ -75,7 +75,15 @@ function Assets() {
   return (
     <>
       <Paragraph>
-        {isStock ? 'Here lies stock description' : 'Here lies asset description'}
+        <p>
+          {isStock ? 'Stocks' : 'Assets'}
+          {' '}
+          on the Liberland blockchain.
+          {' '}
+          <a href="https://docs.liberland.org/blockchain/for-citizens/assets-and-stocks">
+            Learn more
+          </a>
+        </p>
       </Paragraph>
       <Table
         data={formatted}

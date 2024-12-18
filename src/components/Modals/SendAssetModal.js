@@ -1,5 +1,5 @@
 // LIBS
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
@@ -13,16 +13,20 @@ import Button from '../Button/Button';
 // STYLES
 import styles from './styles.module.scss';
 import { parseAssets, isValidSubstrateAddress } from '../../utils/walletHelpers';
-import { congressActions, senateActions, walletActions } from '../../redux/actions';
+import {
+  congressActions, ministryFinanceActions, senateActions, walletActions,
+} from '../../redux/actions';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { encodeRemark } from '../../api/nodeRpcCall';
+import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
+import { OfficeType } from '../../utils/officeTypeEnum';
 
 // TODO add validation
 function SendAssetModal({
-  closeModal, assetData, isRemarkNeeded, isCongress,
+  closeModal, assetData, isRemarkNeeded, officeType,
 }) {
   const dispatch = useDispatch();
   const {
@@ -71,10 +75,12 @@ function SendAssetModal({
         assetData,
         remarkInfo: encodedRemark,
       };
-      if (isCongress) {
-        dispatch(congressActions.congressSendAssets.call({ ...data, executionBlock }));
-      } else {
-        dispatch(senateActions.senateSendAssets.call({ ...data, isCongress }));
+      if (officeType === OfficeType.CONGRESS) {
+        dispatch(congressActions.congressSendAssets.call({ ...data, executionBlock, officeType }));
+      } else if (officeType === OfficeType.SENATE) {
+        dispatch(senateActions.senateSendAssets.call({ ...data, officeType }));
+      } else if (officeType === OfficeType.MINISTRY_FINANCE) {
+        dispatch(ministryFinanceActions.ministryFinanceSendAssets.call({ ...data, officeType }));
       }
     }
     closeModal();
@@ -136,17 +142,17 @@ function SendAssetModal({
         <>
           <RemarkForm errors={errors} register={register} watch={watch} setValue={setValue} />
 
-          {isCongress && (
+          {officeType === 'congress' && (
           <>
             <div className={styles.title}>
-              {isCongress ? 'Congress' : 'Senate'}
+              Congress
               {' '}
               voting time in days
             </div>
             <div className={styles.description}>
               How long will it take
               {' '}
-              {isCongress ? 'Congress' : 'Senate'}
+              Congress
               {' '}
               to close the motion?
             </div>
@@ -198,11 +204,10 @@ function SendAssetModal({
 
 SendAssetModal.defaultProps = {
   isRemarkNeeded: false,
-  isCongress: true,
 };
 
 SendAssetModal.propTypes = {
-  isCongress: PropTypes.bool,
+  officeType: PropTypes.string,
   isRemarkNeeded: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
   assetData: PropTypes.any,
@@ -210,31 +215,29 @@ SendAssetModal.propTypes = {
 };
 
 function SendAssetModalWrapper({
-  isCongress,
   isRemarkNeeded,
   assetData,
+  officeType,
 }) {
-  const [show, setShow] = React.useState(false);
+  const [show, setShow] = useState(false);
   return (
     <>
       <Button
         className={styles.button}
-        small
-        primary
         onClick={() => setShow(true)}
       >
-        SEND
-        <span>
-          {assetData.metadata.symbol}
-        </span>
+        Send
+        {' '}
+        {assetData.metadata.symbol}
+        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>
           <SendAssetModal
             closeModal={() => setShow(false)}
             assetData={assetData}
-            isCongress={isCongress}
             isRemarkNeeded={isRemarkNeeded}
+            officeType={officeType}
           />
         </ModalRoot>
       )}
@@ -243,10 +246,10 @@ function SendAssetModalWrapper({
 }
 
 SendAssetModalWrapper.propTypes = {
-  isCongress: PropTypes.bool,
   isRemarkNeeded: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
   assetData: PropTypes.any,
+  officeType: PropTypes.string,
 };
 
 export default SendAssetModalWrapper;

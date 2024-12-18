@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { officesActions, senateActions } from '../../../redux/actions';
 import { officesSelectors, senateSelectors } from '../../../redux/selectors';
 import WalletCongresSenateWrapper from '../../WalletCongresSenate/Wrapper';
+import { OfficeType } from '../../../utils/officeTypeEnum';
 
 export default function Wallet() {
   const dispatch = useDispatch();
@@ -38,7 +39,7 @@ export default function Wallet() {
         liquidMerits={liquidMerits}
         additionalAssets={additionalAssets}
         balances={balances}
-        isCongress={false}
+        officeType={OfficeType.SENATE}
         onSendFunctions={{
           LLD: (data) => senateActions.senateSendLld.call(data),
           LLM: (data) => senateActions.senateSendLlm.call(data),

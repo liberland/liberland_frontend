@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 import Collapse from 'antd/es/collapse';
 import Dropdown from 'antd/es/dropdown';
 import Flex from 'antd/es/flex';
@@ -11,19 +10,13 @@ import BalanceOverview from '../BalanceOverview';
 import WalletTransactionHistory from '../WalletTransactionHistory';
 import AssetOverview from '../AssetOverview';
 import { walletActions } from '../../../redux/actions';
-import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
-import router from '../../../router';
+import { walletSelectors, blockchainSelectors, congressSelectors } from '../../../redux/selectors';
 import Button from '../../Button/Button';
 import { transactionHistoryProcessorFactory } from '../WalletTransactionHistory/utils';
 import styles from './styles.module.scss';
 
 function WalletOverview() {
-  const history = useHistory();
-  const redirectToViewAllTx = () => {
-    history.push(router.wallet.allTransactions);
-  };
-
-  const [filterTransactionsBy, setFilterTransactionsBy] = React.useState();
+  const [filterTransactionsBy, setFilterTransactionsBy] = useState();
 
   const balances = useSelector(walletSelectors.selectorBalances);
   const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
@@ -31,17 +24,18 @@ function WalletOverview() {
   const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
   const historyFetchFailed = useSelector(walletSelectors.selectorTxHistoryFailed);
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
+  const userIsMember = useSelector(congressSelectors.userIsMember);
 
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   const dispatch = useDispatch();
 
-  const transactionHistoryTranslated = React.useMemo(
+  const transactionHistoryTranslated = useMemo(
     () => transactionHistory?.map(transactionHistoryProcessorFactory(userWalletAddress)) || [],
     [transactionHistory, userWalletAddress],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(walletActions.getWallet.call());
     dispatch(walletActions.getAdditionalAssets.call());
     dispatch(walletActions.getTxTransfers.call());
@@ -68,6 +62,7 @@ function WalletOverview() {
           children: (
             <AssetOverview
               additionalAssets={additionalAssets}
+              userIsMember={userIsMember}
             />
           ),
         },
@@ -106,8 +101,6 @@ function WalletOverview() {
             <WalletTransactionHistory
               failure={historyFetchFailed}
               transactionHistory={transactionHistoryTranslated}
-              textForBtn="View All Transactions"
-              bottomButtonOnclick={redirectToViewAllTx}
               filterTransactionsBy={filterTransactionsBy}
             />
           ),

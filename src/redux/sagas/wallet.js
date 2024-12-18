@@ -13,6 +13,7 @@ import {
   unpool, getAdditionalAssets, sendAssetTransfer,
   getAssetData,
   getAssetDetails,
+  transferWithRemark,
 } from '../../api/nodeRpcCall';
 import { getHistoryTransfers } from '../../api/explorer';
 
@@ -137,7 +138,20 @@ function* getTransfersTxWorker() {
   }
 }
 
+function* sendTransferRemarkkWorker(action) {
+  const { transferData, remarkInfo } = action.payload;
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+  yield call(transferWithRemark, remarkInfo, transferData, walletAddress);
+  yield put(walletActions.sendTransferRemark.success());
+}
+
 // WATCHERS
+
+function* sendTransferWithRemarkWatcher() {
+  yield* blockchainWatcher(walletActions.sendTransferRemark, sendTransferRemarkkWorker);
+}
 
 function* getWalletWatcher() {
   yield* blockchainWatcher(walletActions.getWallet, getWalletWorker);
@@ -209,4 +223,5 @@ export {
   unpoolWatcher,
   getAssetsBalanceWatcher,
   getAssetDetailsWatcher,
+  sendTransferWithRemarkWatcher,
 };

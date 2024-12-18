@@ -11,6 +11,7 @@ import Finances from './Finances';
 import router from '../../router';
 
 import ScheduledCongressSpendingWrapper from './ScheduledCongressSpendingWrapper';
+import Wallet from './MinistryOfFinance';
 
 function Offices() {
   return (
@@ -51,6 +52,11 @@ function Offices() {
         exact
         path={router.offices.scheduledCongressSpending}
         component={ScheduledCongressSpendingWrapper}
+      />
+      <Route
+        exact
+        path={router.offices.ministryOfFinance}
+        component={Wallet}
       />
     </Switch>
   );

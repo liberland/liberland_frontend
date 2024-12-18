@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { congressActions } from '../../../redux/actions';
 import { congressSelectors } from '../../../redux/selectors';
 import WalletCongresSenateWrapper from '../../WalletCongresSenate/Wrapper';
+import { OfficeType } from '../../../utils/officeTypeEnum';
 
 export default function Wallet() {
   const totalBalance = useSelector(congressSelectors.totalBalance);
@@ -11,7 +12,6 @@ export default function Wallet() {
   const additionalAssets = useSelector(congressSelectors.additionalAssets);
   const userIsMember = useSelector(congressSelectors.userIsMember);
   const balances = useSelector(congressSelectors.balances);
-
   if (!congresAccountAddress || !balances) return null;
 
   return (
@@ -23,6 +23,7 @@ export default function Wallet() {
         liquidMerits={liquidMerits}
         additionalAssets={additionalAssets}
         balances={balances}
+        officeType={OfficeType.CONGRESS}
         onSendFunctions={{
           LLD: (data) => congressActions.congressSendLld.call(data),
           LLM: (data) => congressActions.congressSendLlm.call(data),

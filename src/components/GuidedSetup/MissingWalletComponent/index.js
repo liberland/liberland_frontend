@@ -34,9 +34,9 @@ function MissingWalletComponent() {
       </p>
       <br />
       {showWallets && (
-      <div style={{ width: '100%' }}>
-        <WalletListComponent />
-      </div>
+        <div style={{ width: '100%' }}>
+          <WalletListComponent />
+        </div>
       )}
     </div>
   );

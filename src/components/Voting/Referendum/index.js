@@ -8,20 +8,15 @@ import Card from '../../Card';
 import styles from './styles.module.scss';
 import ReferendumItem from './Items/ReferendumItem';
 import DispatchItem from './Items/DispatchItem';
-import {
-  VoteOnReferendumModal, UndelegateModal,
-} from '../../Modals';
+import { UndelegateModal } from '../../Modals';
 import { democracyActions, congressActions, identityActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 
 function Referendum() {
-  const [isModalOpenVote, setIsModalOpenVote] = useState(false);
   const [isModalOpenUndelegate, setIsModalOpenUndelegate] = useState(false);
-  const [selectedReferendumInfo, setSelectedReferendumInfo] = useState({ name: 'Referendum' });
-  const [selectedVoteType, setSelectedVoteType] = useState('Nay');
-  const { handleSubmit, register } = useForm();
+  const { handleSubmit } = useForm();
   const dispatch = useDispatch();
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -35,17 +30,11 @@ function Referendum() {
     dispatch(congressActions.getMembers.call());
   }, [dispatch]);
 
-  const handleModalOpenVote = (voteType, referendumInfo) => {
-    setIsModalOpenVote(!isModalOpenVote);
-    setSelectedReferendumInfo(referendumInfo);
-    setSelectedVoteType(voteType);
+  const handleSubmitVoteForm = (voteType, referendumInfo) => {
+    dispatch(democracyActions.voteOnReferendum.call({ ...referendumInfo, voteType }));
   };
   const handleModalOpenUndelegate = () => {
     setIsModalOpenUndelegate(!isModalOpenUndelegate);
-  };
-  const handleSubmitVoteForm = (values) => {
-    dispatch(democracyActions.voteOnReferendum.call({ ...values, voteType: selectedVoteType }));
-    handleModalOpenVote();
   };
   const handleSubmitUndelegate = () => {
     dispatch(democracyActions.undelegate.call({ userWalletAddress }));
@@ -100,7 +89,7 @@ function Referendum() {
                   delegating={delegatingTo !== undefined}
                   alreadyVoted={alreadyVoted(referendum)}
                   proposal={referendum.image.proposal}
-                  buttonVoteCallback={handleModalOpenVote}
+                  buttonVoteCallback={handleSubmitVoteForm}
                   referendumIndex={parseInt(referendum.index)}
                   blacklistMotion={referendum.blacklistMotion}
                   userIsMember={userIsMember}
@@ -157,16 +146,6 @@ function Referendum() {
             )) : 'There are no active Dispatches'}
         </div>
       </div>
-      {isModalOpenVote && (
-        <VoteOnReferendumModal
-          closeModal={handleModalOpenVote}
-          handleSubmit={handleSubmit}
-          register={register}
-          referendumInfo={selectedReferendumInfo}
-          voteType={selectedVoteType}
-          onSubmitVote={handleSubmitVoteForm}
-        />
-      )}
       {isModalOpenUndelegate && (
         <UndelegateModal
           closeModal={handleModalOpenUndelegate}
