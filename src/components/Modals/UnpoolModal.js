@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN } from '@polkadot/util';
@@ -10,6 +10,7 @@ import styles from './styles.module.scss';
 import { walletSelectors } from '../../redux/selectors';
 import { valueToBN, formatMerits } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
+import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 
 function UnpoolModal({
   closeModal,
@@ -75,11 +76,20 @@ UnpoolModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
-function UnpoolModalWrapper(props) {
+function UnpoolModalWrapper() {
+  const [open, setOpen] = useState(false);
   return (
-    <ModalRoot>
-      <UnpoolModal {...props} />
-    </ModalRoot>
+    <>
+      <Button className={styles.button} onClick={() => setOpen(true)}>
+        Unpool
+        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
+      </Button>
+      {open && (
+        <ModalRoot>
+          <UnpoolModal closeModal={() => setOpen(false)} />
+        </ModalRoot>
+      )}
+    </>
   );
 }
 

@@ -9,10 +9,10 @@ import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import styles from './styles.module.scss';
-import WalletOverview from '../../Wallet/WalletOverview';
 import AssetOverview from '../../Wallet/AssetOverview';
 import SpendModalWrapper from '../../Modals/SpendModal';
 import { valueToBN } from '../../../utils/walletHelpers';
+import BalanceOverview from '../../Wallet/BalanceOverview';
 
 export default function WalletCongresSenateWrapper({
   totalBalance,
@@ -43,7 +43,7 @@ export default function WalletCongresSenateWrapper({
       <div
         className={cx(stylesPage.menuAddressWrapper, styles.walletMenuWrapper)}
       >
-        <div className={walletStyles.walletAddressLineWrapper}>
+        <div className={cx(walletStyles.walletAddressLineWrapper, styles.walletAddressWrapper)}>
           <div className={walletStyles.navWallet}>
             <div className={walletStyles.addressesWrapper}>
               <div className={walletStyles.singleAddressWrapper}>
@@ -90,7 +90,7 @@ export default function WalletCongresSenateWrapper({
         </div>
       </div>
 
-      <WalletOverview
+      <BalanceOverview
         totalBalance={totalBalance}
         balances={balances}
         liquidMerits={liquidMerits}
@@ -101,6 +101,7 @@ export default function WalletCongresSenateWrapper({
         isRemarkNeeded
         officeType={officeType}
         userIsMember={userIsMember}
+        isCongress
       />
       {isModalOpenLLDSpend && (
       <SpendModalWrapper

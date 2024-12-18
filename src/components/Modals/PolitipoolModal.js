@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -12,6 +12,7 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { walletActions } from '../../redux/actions';
 import { parseMerits, valueToBN } from '../../utils/walletHelpers';
+import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 import { walletSelectors } from '../../redux/selectors';
 
 function PolitipoolModal({ closeModal }) {
@@ -85,11 +86,20 @@ PolitipoolModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
-function PolitipoolModalWrapper(props) {
+function PolitipoolModalWrapper() {
+  const [open, setOpen] = useState(false);
   return (
-    <ModalRoot>
-      <PolitipoolModal {...props} />
-    </ModalRoot>
+    <>
+      <Button className={styles.button} primary onClick={() => setOpen(true)}>
+        Politipool
+        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
+      </Button>
+      {open && (
+        <ModalRoot>
+          <PolitipoolModal closeModal={() => setOpen(false)} />
+        </ModalRoot>
+      )}
+    </>
   );
 }
 

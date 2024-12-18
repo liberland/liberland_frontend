@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import CongressHeader from './CongressHeader';
-import stylesPage from '../../utils/pagesBase.module.scss';
 import Overview from './Overview';
 import Motions from './Motions';
 import router from '../../router';
@@ -31,32 +29,25 @@ function Congress() {
   }, [dispatch]);
 
   return (
-    <div className={stylesPage.sectionWrapper}>
-      <div className={stylesPage.menuAddressWrapper}>
-        <CongressHeader />
-      </div>
-      <div className={stylesPage.contentWrapper}>
-        <Switch>
-          <Route exact path={router.congress.overview} component={Overview} />
-          <Route exact path={router.congress.motions} component={MotionsWrapper} />
-          <Route exact path={router.congress.treasury} component={Treasury} />
-          <Route exact path={router.congress.wallet} component={Wallet} />
-          <Route exact path={router.congress.addLegislation} component={CongressAddLegislation} />
-          <Route
-            exact
-            path={router.congress.addLegislationViaReferendum}
-            component={CongressAddLegislationViaReferendum}
-          />
-          <Route
-            exact
-            path={router.home.congress}
-            render={() => (
-              <Redirect to={router.congress.overview} />
-            )}
-          />
-        </Switch>
-      </div>
-    </div>
+    <Switch>
+      <Route exact path={router.congress.overview} component={Overview} />
+      <Route exact path={router.congress.motions} component={MotionsWrapper} />
+      <Route exact path={router.congress.treasury} component={Treasury} />
+      <Route exact path={router.congress.wallet} component={Wallet} />
+      <Route exact path={router.congress.addLegislation} component={CongressAddLegislation} />
+      <Route
+        exact
+        path={router.congress.addLegislationViaReferendum}
+        component={CongressAddLegislationViaReferendum}
+      />
+      <Route
+        exact
+        path={router.home.congress}
+        render={() => (
+          <Redirect to={router.congress.overview} />
+        )}
+      />
+    </Switch>
   );
 }
 

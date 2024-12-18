@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
@@ -312,7 +312,7 @@ UpdateOrCreateAssetForm.propTypes = {
 function UpdateOrCreateAssetFormModalWrapper({
   isCreate, defaultValues: dV,
 }) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
   return (
     <div className={isCreate ? styles.modal : undefined}>
       <Button

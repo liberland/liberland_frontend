@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 import { useSelector, useDispatch } from 'react-redux';
 import cx from 'classnames';
@@ -19,16 +19,16 @@ function Assets() {
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const assetDetails = useSelector(walletSelectors.selectorAssetsDetails);
   const dispatch = useDispatch();
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(walletActions.getAdditionalAssets.call());
   }, [dispatch]);
 
-  const ids = React.useMemo(
+  const ids = useMemo(
     () => additionalAssets?.map((asset) => asset.index),
     [additionalAssets],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (ids?.length) {
       dispatch(walletActions.getAssetsDetails.call(ids));
     }

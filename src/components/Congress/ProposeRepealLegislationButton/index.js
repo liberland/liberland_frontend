@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import Button from '../../Button/Button';
 import CongressRepealLegislationFastTrackModal from '../../Modals/CongressRepealLegislationFastTrackModal';
 import {
   congressSelectors,
@@ -17,9 +16,10 @@ export default function ProposeRepealLegislationButton({ tier, id, section }) {
 
   return (
     <>
-      <Button small primary onClick={handleModalOpen}>
+      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+      <a href="#" onClick={handleModalOpen}>
         PROPOSE REFERENDUM TO REPEAL
-      </Button>
+      </a>
       {isModalOpen && (
         <CongressRepealLegislationFastTrackModal
           closeModal={handleModalOpen}

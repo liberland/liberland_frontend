@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
-
+import ButtonInternal from 'antd/es/button';
 import styles from './styles.module.scss';
 
 function Button({
@@ -9,7 +9,6 @@ function Button({
   type = 'button',
   primary,
   onClick = () => { },
-  medium,
   large,
   little,
   small,
@@ -21,30 +20,53 @@ function Button({
   red,
   whiteRed,
   disabled,
+  multiline,
+  href,
+  link,
 }) {
+  const getSize = () => {
+    if (large) {
+      return 'large';
+    }
+    if (small) {
+      return 'small';
+    }
+    return undefined;
+  };
+
+  const getType = () => {
+    if (primary) {
+      return 'primary';
+    }
+    if (href || link) {
+      return 'link';
+    }
+    return undefined;
+  };
+
   return (
-    <button
+    <ButtonInternal
       disabled={disabled}
       onClick={onClick}
-      type={type}
+      htmlType={type}
+      type={getType()}
+      href={href}
+      danger={red}
+      size={getSize()}
       className={
-      cx(styles.button, className, {
-        [styles.primary]: primary,
-        [styles.secondary]: secondary,
-        [styles.medium]: medium,
-        [styles.large]: large,
-        [styles.little]: little,
-        [styles.small]: small,
-        [styles.nano]: nano,
-        [styles.green]: green,
-        [styles.grey]: grey,
-        [styles.red]: red,
-        [styles.whiteRed]: whiteRed,
-      })
-    }
+        cx(styles.button, className, {
+          [styles.secondary]: secondary,
+          [styles.little]: little,
+          [styles.nano]: nano,
+          [styles.green]: green,
+          [styles.grey]: grey,
+          [styles.whiteRed]: whiteRed,
+          [styles.multiline]: multiline,
+        })
+      }
     >
       {children}
-    </button>
+    </ButtonInternal>
   );
 }
 
@@ -52,7 +74,6 @@ Button.defaultProps = {
   type: 'button',
   primary: false,
   onClick: () => {},
-  medium: false,
   large: false,
   little: false,
   small: false,
@@ -64,6 +85,8 @@ Button.defaultProps = {
   red: false,
   whiteRed: false,
   disabled: false,
+  multiline: false,
+  link: false,
 };
 
 Button.propTypes = {
@@ -71,7 +94,6 @@ Button.propTypes = {
   type: PropTypes.string,
   primary: PropTypes.bool,
   onClick: PropTypes.func,
-  medium: PropTypes.bool,
   large: PropTypes.bool,
   little: PropTypes.bool,
   small: PropTypes.bool,
@@ -83,6 +105,9 @@ Button.propTypes = {
   red: PropTypes.bool,
   whiteRed: PropTypes.bool,
   disabled: PropTypes.bool,
+  href: PropTypes.string,
+  multiline: PropTypes.bool,
+  link: PropTypes.bool,
 };
 
 export default Button;

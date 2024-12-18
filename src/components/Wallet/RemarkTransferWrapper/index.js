@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -7,6 +7,10 @@ import { calculateProperBalance, parseDollars } from '../../../utils/walletHelpe
 import { walletActions } from '../../../redux/actions';
 import { encodeRemarkUser } from '../../../api/nodeRpcCall';
 import { walletSelectors } from '../../../redux/selectors';
+import ButtonArrowIcon from '../../../assets/icons/button-arrow.svg';
+import Button from '../../Button/Button';
+import ModalRoot from '../../Modals/ModalRoot';
+import styles from '../../Modals/styles.module.scss';
 
 function RemarkTransferWrapper({ closeModal }) {
   const dispatch = useDispatch();
@@ -58,4 +62,26 @@ RemarkTransferWrapper.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
-export default RemarkTransferWrapper;
+function RemarkTransferModalWrapper() {
+  const [show, setShow] = useState(false);
+  return (
+    <>
+      <Button
+        onClick={() => setShow(true)}
+        className={styles.button}
+      >
+        Transfer remark
+        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
+      </Button>
+      {show && (
+        <ModalRoot>
+          <RemarkTransferWrapper
+            closeModal={() => setShow(false)}
+          />
+        </ModalRoot>
+      )}
+    </>
+  );
+}
+
+export default RemarkTransferModalWrapper;

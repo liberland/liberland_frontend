@@ -1,5 +1,5 @@
 // LIBS
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
@@ -16,6 +16,7 @@ import styles from './styles.module.scss';
 import { walletActions } from '../../redux/actions';
 import { parseMerits, valueToBN, isValidSubstrateAddress } from '../../utils/walletHelpers';
 import { walletSelectors } from '../../redux/selectors';
+import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 
 function SendLLMModal({
   closeModal,
@@ -108,11 +109,20 @@ SendLLMModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
-function SendLLMModalWrapper(props) {
+function SendLLMModalWrapper() {
+  const [open, setOpen] = useState(false);
   return (
-    <ModalRoot>
-      <SendLLMModal {...props} />
-    </ModalRoot>
+    <>
+      <Button className={styles.button} onClick={() => setOpen(true)}>
+        Send LLM
+        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
+      </Button>
+      {open && (
+        <ModalRoot>
+          <SendLLMModal closeModal={() => setOpen(false)} />
+        </ModalRoot>
+      )}
+    </>
   );
 }
 

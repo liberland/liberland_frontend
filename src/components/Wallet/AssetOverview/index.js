@@ -1,79 +1,65 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import Card from '../../Card';
+import Row from 'antd/es/row';
+import Col from 'antd/es/col';
+import Card from 'antd/es/card';
+import { useMediaQuery } from 'usehooks-ts';
 
-import styles from './styles.module.scss';
 import { formatAssets } from '../../../utils/walletHelpers';
-import SendAssetModal from '../../Modals/SendAssetModal';
-import Button from '../../Button/Button';
+import SendAssetModalWrapper from '../../Modals/SendAssetModal';
 
 function AssetOverview({
   additionalAssets,
   isRemarkNeeded,
   officeType,
   userIsMember,
+  isCongress,
 }) {
-  const [whichModalOpen, setWhichModalOpen] = useState(null);
-  const handleModalOpenAssets = (symbol) => setWhichModalOpen(symbol);
-  const handleModalCloseAssets = () => setWhichModalOpen(null);
+  const filteredAssets = useMemo(
+    () => additionalAssets?.filter((asset) => asset?.balance?.balance > 0) || [],
+    [additionalAssets],
+  );
 
-  if (additionalAssets.length === 0) { return <div />; }
-  // Show only assets that the user owns
-  const filteredAssets = additionalAssets.filter((asset) => asset?.balance?.balance > 0);
-  return (
-    <Card className={styles.assetOverviewWrapper} title="Additional assets">
-      <div className={styles.assetOverViewCard}>
-        {
-          filteredAssets.map((assetInfo) => (
-            <div
-              className={styles.assetCardInfo}
-              key={assetInfo.metadata.symbol}
-            >
-              <p className={styles.assetCardInfoAmount}>
-                {assetInfo?.balance ? formatAssets(assetInfo.balance.balance, assetInfo.metadata.decimals) : 0}
-              </p>
-              <p className={styles.assetCardInfoTitle}>
-                {assetInfo.metadata.name}
-                {' '}
-                <span>
-                  (
-                  {assetInfo.metadata.symbol}
-                  )
-                </span>
-
-              </p>
-              {userIsMember && (
-              <Button
-                className={styles.button}
-                small
-                primary
-                onClick={() => handleModalOpenAssets(assetInfo.metadata.symbol)}
-              >
-                <>
-                  SEND
-                  <span>
-                    {assetInfo.metadata.symbol}
-                  </span>
-                </>
-              </Button>
-              )}
-              {whichModalOpen === assetInfo.metadata.symbol
-              && (
-              <SendAssetModal
-                assetData={assetInfo}
-                closeModal={handleModalCloseAssets}
-                isRemarkNeeded={isRemarkNeeded}
-                officeType={officeType}
-              />
-              )}
-            </div>
-          ))
+  const renderItem = (assetData) => (
+    <Card
+      actions={!isCongress || userIsMember ? [
+        <SendAssetModalWrapper
+          isRemarkNeeded={isRemarkNeeded}
+          assetData={assetData}
+          officeType={officeType}
+        />,
+        <div />,
+      ] : undefined}
+    >
+      <Card.Meta
+        title={assetData.metadata.name}
+        description={
+          `${formatAssets(
+            assetData.balance?.balance || '0',
+            assetData.metadata.decimals,
+            true,
+          )} ${assetData.metadata.symbol}`
         }
-      </div>
-
+      />
     </Card>
   );
+
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
+
+  return (
+    <Row gutter={[16, 16]}>
+      {filteredAssets.map((assetData) => (
+        <Col
+          span={isBiggerThanDesktop ? Math.floor(Math.max(1, 24 / filteredAssets.length)) : 24}
+          key={assetData.metadata.name}
+        >
+          {renderItem(assetData)}
+        </Col>
+      ))}
+    </Row>
+  );
 }
+
 AssetOverview.defaultProps = {
   additionalAssets: [],
   isRemarkNeeded: false,
@@ -82,7 +68,8 @@ AssetOverview.defaultProps = {
 
 AssetOverview.propTypes = {
   userIsMember: PropTypes.bool,
-  officeType: PropTypes.string.isRequired,
+  isCongress: PropTypes.bool,
+  officeType: PropTypes.string,
   isRemarkNeeded: PropTypes.bool,
   additionalAssets: PropTypes.arrayOf(PropTypes.shape({
     metadata: {

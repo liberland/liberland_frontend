@@ -10,6 +10,7 @@ import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
 import { blockchainSelectors, walletSelectors } from '../../redux/selectors';
+import PlusIcon from '../../assets/icons/plus-dark.svg';
 import {
   convertLiquidityData, convertToEnumDex, getDecimalsForAsset,
 } from '../../utils/dexFormatter';
@@ -18,7 +19,7 @@ import { formatAssets, parseAssets, sanitizeValue } from '../../utils/walletHelp
 import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } from '../../api/nodeRpcCall';
 
 function AddLiquidityModal({
-  handleModal, assets, isReservedDataEmpty,
+  closeModal, assets, isReservedDataEmpty,
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -73,7 +74,7 @@ function AddLiquidityModal({
       walletAddress,
       mintTo,
     }));
-    handleModal();
+    closeModal();
   };
 
   const validate = (v, assetBalance, decimals, asset) => {
@@ -224,7 +225,7 @@ function AddLiquidityModal({
       </div>
 
       <div className={styles.buttonWrapper}>
-        <Button medium onClick={handleModal}>
+        <Button medium onClick={closeModal}>
           Cancel
         </Button>
         <Button primary medium type="submit">
@@ -236,17 +237,38 @@ function AddLiquidityModal({
 }
 
 AddLiquidityModal.propTypes = {
-  handleModal: PropsTypes.func.isRequired,
+  closeModal: PropsTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
   isReservedDataEmpty: PropsTypes.bool.isRequired,
 };
 
-function AddLiquidityModalWrapper(props) {
+function AddLiquidityModalWrapper({
+  assets,
+  isReservedDataEmpty,
+}) {
+  const [show, setShow] = useState(false);
   return (
-    <ModalRoot>
-      <AddLiquidityModal {...props} />
-    </ModalRoot>
+    <>
+      <Button onClick={() => setShow(true)}>
+        Add liquidity
+        <img src={PlusIcon} className={cx(styles.backIcon, styles.darken)} alt="button icon" />
+      </Button>
+      {show && (
+        <ModalRoot>
+          <AddLiquidityModal
+            assets={assets}
+            closeModal={() => setShow(false)}
+            isReservedDataEmpty={isReservedDataEmpty}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+AddLiquidityModalWrapper.propTypes = {
+  assets: AssetsPropTypes.isRequired,
+  isReservedDataEmpty: PropsTypes.bool.isRequired,
+};
 
 export default AddLiquidityModalWrapper;

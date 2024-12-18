@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useHistory } from 'react-router-dom';
 import { identityActions, walletActions } from '../../../redux/actions';
@@ -18,11 +18,11 @@ function PayMe() {
   const identity = useSelector(identitySelectors.selectorIdentity);
   const identityIsLoading = useSelector(identitySelectors.selectorIsLoading);
   const transferState = useSelector(walletSelectors.selectorTransferState);
-  const [linkData, setLinkData] = React.useState();
+  const [linkData, setLinkData] = useState();
   const { search } = useLocation();
   const history = useHistory();
 
-  React.useEffect(() => {
+  useEffect(() => {
     try {
       setLinkData(JSON.parse(window.atob(new URLSearchParams(search).get('data'))));
     } catch (e) {
@@ -31,7 +31,7 @@ function PayMe() {
     }
   }, [search]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (linkData?.recipient) {
       dispatch(identityActions.getIdentity.call(linkData.recipient));
     }

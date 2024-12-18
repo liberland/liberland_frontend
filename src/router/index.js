@@ -49,11 +49,17 @@ export default {
   },
   legislation: {
     view: '/home/legislation/:tier',
+    constitution: '/home/legislation/Constitution',
+    internationalTreaty: '/home/legislation/InternationalTreaty',
+    law: '/home/legislation/Law',
+    tier3: '/home/legislation/Tier3',
+    tier4: '/home/legislation/Tier4',
+    tier5: '/home/legislation/Tier5',
+    decisions: '/home/legislation/Decision',
   },
   wallet: {
     exchange: '/home/wallet/exchange',
     assets: '/home/wallet/assets',
-    allTransactions: '/home/wallet/all-transactions',
     overView: '/home/wallet/overview',
     bridge: '/home/wallet/bridge',
     nfts: '/home/wallet/nfts',

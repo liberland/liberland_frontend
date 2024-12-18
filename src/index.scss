@@ -9,6 +9,7 @@ body {
   font-family: $openSans;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: #243F5F;
 }
 
 p {
@@ -62,4 +63,75 @@ p {
     top: 5%;
     transform: translate(-50%, 0%);
   }
+}
+
+// ANTD overrides
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #e4d6a0, #EDC007,#e4d6a0);
+  transition: all 0.3s;
+
+  &:focus,&:active,&:hover {
+    background: linear-gradient(135deg, #e4d6a0, #EDC007,#e4d6a0)!important;
+    filter: brightness(120%);
+  }
+}
+
+.ant-btn-dangerous {
+  background: #ff4d4f!important;
+  color: white!important;
+
+  &:focus,&:active,&:hover {
+    background: white!important;
+    color: black!important;
+    filter: brightness(120%);
+  }
+}
+
+.ant-collapse-header-text {
+  font-family: Open Sans;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+}
+.ant-tabs-tab-btn[aria-selected="true"] {
+  color: #243F5F !important;
+}
+
+.description {
+  font-family: Open Sans;
+  font-weight: 600;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+  color: #ACBDC5;
+}
+
+.values {
+  font-family: Open Sans;
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+}
+
+.ant-card {
+  border-color: #ECEBF0!important;
+}
+
+.ant-card-actions {
+  border-top: none!important;
+}
+
+.ant-col {
+  .ant-card {
+    height: 100%;
+  }
+}
+
+.ant-table-wrapper {
+  overflow-x: auto;
+}
+
+th.ant-table-cell {
+  word-break: keep-all;
 }

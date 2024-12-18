@@ -1,4 +1,3 @@
-import GetCitizenshipModal from './GetCitizenshipModal';
 import SendLLDModal from './SendLLDModal';
 import SendLLMModal from './SendLLMModal';
 import OnchainIdentityModal from './OnchainIdentityModal';
@@ -13,7 +12,6 @@ import PayoutStakingModal from './PayoutStakingModal';
 import UnpoolModal from './UnpoolModal';
 
 export {
-  GetCitizenshipModal,
   SendLLDModal,
   SendLLMModal,
   OnchainIdentityModal,

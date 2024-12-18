@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
@@ -165,7 +165,7 @@ function MintAssetFormModalWrapper({
   assetId,
   minimumBalance,
 }) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
   return (
     <div>
       <Button

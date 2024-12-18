@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
@@ -105,7 +105,7 @@ function StakeEthForm({
   const exchangeRateError = useSelector(ethSelectors.selectorWethLpExchangeRateError);
   const lldBalances = useSelector(ethSelectors.selectorERC20Balance)?.[process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS];
 
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(ethActions.getWethLpExchangeRate.call());
     dispatch(ethActions.getBalance.call({ provider: connected.provider, address: account }));
     dispatch(ethActions.getErc20Balance.call(
@@ -114,14 +114,14 @@ function StakeEthForm({
     ));
   }, [account, dispatch, connected]);
 
-  const lldBalance = React.useMemo(
+  const lldBalance = useMemo(
     () => formatCustom(lldBalances?.[account]?.balance?.toString() || '0'),
     [account, lldBalances],
   );
 
   const formattedBalance = formatCustom(balance || '0');
 
-  const liquidityPoolReward = React.useMemo(() => {
+  const liquidityPoolReward = useMemo(() => {
     if (stake && tokens && exchangeRate && !errors.stake && !errors.token) {
       try {
         const lpTokens = exchangeRate.rewardRate({
@@ -137,13 +137,13 @@ function StakeEthForm({
     return 'No reward calculated';
   }, [exchangeRate, stake, tokens, errors]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (exchangeRateError) {
       setError('stake', { message: 'LP stake did not load correctly' });
     }
   }, [setError, exchangeRateError]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (stake && exchangeRate && stakeFocused && !tokensFocused) {
       setValue(
         'tokens',
@@ -154,7 +154,7 @@ function StakeEthForm({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stake, exchangeRate]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (tokens && exchangeRate && tokensFocused && !stakeFocused) {
       setValue(
         'stake',
@@ -288,7 +288,7 @@ StakeEthForm.propTypes = {
 };
 
 function StakeEthFormModalWrapper(props) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
   return (
     <div className={styles.modal}>
       <Button primary medium onClick={() => setShow(true)}>

@@ -163,7 +163,9 @@ export const getExchangeRate = (reserved1, reserved2, decimals1, decimals2) => {
     resultString = integerNumber.toString();
   }
 
-  return removeTrailingZerosFromString(resultString);
+  const finalValue = removeTrailingZerosFromString(resultString);
+
+  return finalValue;
 };
 
 export const calculatePooled = (

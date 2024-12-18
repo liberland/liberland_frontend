@@ -1,5 +1,5 @@
 // LIBS
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
@@ -21,6 +21,7 @@ import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { encodeRemark } from '../../api/nodeRpcCall';
+import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 import { OfficeType } from '../../utils/officeTypeEnum';
 
 // TODO add validation
@@ -206,19 +207,49 @@ SendAssetModal.defaultProps = {
 };
 
 SendAssetModal.propTypes = {
-  officeType: PropTypes.string.isRequired,
+  officeType: PropTypes.string,
   isRemarkNeeded: PropTypes.bool,
-  closeModal: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
   assetData: PropTypes.any,
+  closeModal: PropTypes.func.isRequired,
 };
 
-function SendAssetModalWrapper(props) {
+function SendAssetModalWrapper({
+  isRemarkNeeded,
+  assetData,
+  officeType,
+}) {
+  const [show, setShow] = useState(false);
   return (
-    <ModalRoot>
-      <SendAssetModal {...props} />
-    </ModalRoot>
+    <>
+      <Button
+        className={styles.button}
+        onClick={() => setShow(true)}
+      >
+        Send
+        {' '}
+        {assetData.metadata.symbol}
+        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
+      </Button>
+      {show && (
+        <ModalRoot>
+          <SendAssetModal
+            closeModal={() => setShow(false)}
+            assetData={assetData}
+            isRemarkNeeded={isRemarkNeeded}
+            officeType={officeType}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+SendAssetModalWrapper.propTypes = {
+  isRemarkNeeded: PropTypes.bool,
+  // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
+  assetData: PropTypes.any,
+  officeType: PropTypes.string,
+};
 
 export default SendAssetModalWrapper;

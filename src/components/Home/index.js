@@ -1,10 +1,7 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import router from '../../router';
-import HomeHeader from './HomeHeader';
-import HomeNavigation from './HomeNavigation';
 import Wallet from '../Wallet';
-import RoleHOC from '../../hocs/RoleHOC';
 import Profile from '../Profile';
 import Documents from '../Documents';
 import Voting from '../Voting';
@@ -14,12 +11,11 @@ import Offices from '../Offices';
 import Staking from '../Staking';
 import Registries from '../Registries';
 import Companies from '../Companies';
-import AllTransactions from '../Wallet/AllTransactions';
-import styles from './styles.module.scss';
 import Congress from '../Congress';
 
 import Contracts from '../Contracts';
 import Senate from '../Senate';
+import Layout from '../Layout';
 import NFTS from '../Nfts';
 
 function Home() {
@@ -96,11 +92,6 @@ function Home() {
       component={Legislation}
     />,
     <Route
-      key={router.wallet.allTransactions}
-      path={router.wallet.allTransactions}
-      component={AllTransactions}
-    />,
-    <Route
       key={router.home.congress}
       path={router.home.congress}
       component={Congress}
@@ -116,23 +107,15 @@ function Home() {
       key={router.home.index}
       path={router.home.index}
       render={() => (
-        <RoleHOC>
-          <Redirect to={router.home.feed} />
-        </RoleHOC>
+        <Redirect to={router.home.feed} />
       )}
     />,
   ];
 
   return (
-    <div>
-      <div className={styles.homeContentWrapper}>
-        <HomeNavigation />
-        <div className={styles.homeMain}>
-          <HomeHeader />
-          <Switch>{renderRoutes}</Switch>
-        </div>
-      </div>
-    </div>
+    <Layout>
+      <Switch>{renderRoutes}</Switch>
+    </Layout>
   );
 }
 

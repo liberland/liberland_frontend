@@ -4,6 +4,7 @@
   "private": true,
   "packageManager": "yarn@1.22.19",
   "dependencies": {
+    "@ant-design/icons": "^5.5.1",
     "@braintree/sanitize-url": "^7.0.0",
     "@emotion/core": "^10.0.27",
     "@fortawesome/fontawesome-svg-core": "^1.2.28",
@@ -17,6 +18,7 @@
     "@polkadot/util": "^12.4.2",
     "@polkadot/util-crypto": "12.4.2",
     "@svgr/webpack": "^6.2.1",
+    "antd": "^5.22.0",
     "axios": "^0.19.0",
     "babel-plugin-named-asset-import": "^0.3.8",
     "bigint-isqrt": "^0.3.2",
