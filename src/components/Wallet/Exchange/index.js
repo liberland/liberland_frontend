@@ -10,7 +10,8 @@ function Exchange() {
           <>
             Liberland DEX uses alghoritmic market making which may not always be up to date with other exchanges.
             Arbitrage is possible.
-            <a href="https://docs.liberland.org/public-documents/blockchain/ecosystem/liberland-decentralized-exchange">
+            {' '}
+            <a href="https://docs.liberland.org/blockchain/ecosystem/liberland-decentralized-exchange">
               Learn more
             </a>
           </>

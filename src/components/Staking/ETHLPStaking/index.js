@@ -10,7 +10,7 @@ export default function ETHLPStaking() {
   const [selectedWallet, setSelectedWallet] = useState();
   const [selectedAccount, setSelectedAccount] = useState();
   // eslint-disable-next-line max-len
-  const instructions = 'https://docs.liberland.org/public-documents/blockchain/for-validators-nominators-and-stakers/liquidity-staking';
+  const instructions = 'https://docs.liberland.org/blockchain/for-validators-nominators-and-stakers/liquidity-staking';
   return (
     <div className={stylesPage.contentWrapper}>
       <div className={stylesPage.sectionWrapper}>
@@ -33,7 +33,7 @@ export default function ETHLPStaking() {
             <br />
             or
             <br />
-            <a href="https://docs.liberland.org/public-documents/blockchain/ecosystem/cross-chain-bridge">
+            <a href="https://docs.liberland.org/blockchain/ecosystem/cross-chain-bridge">
               Bridge LLD.
             </a>
             <br />
