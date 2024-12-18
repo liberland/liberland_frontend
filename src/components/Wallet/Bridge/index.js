@@ -18,7 +18,7 @@ function Bridge() {
             Liberland chain is connected to other chains via SORA HASHI bridge.
             <br />
             <a
-              href="https://docs.liberland.org/public-documents/blockchain/ecosystem/cross-chain-bridge"
+              href="https://docs.liberland.org/blockchain/ecosystem/cross-chain-bridge"
             >
               Learn more
             </a>

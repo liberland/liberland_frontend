@@ -75,7 +75,7 @@ function Assets() {
           <p>
             Assets and stocks on the Liberland blockchain.
             {' '}
-            <a href="https://docs.liberland.org/public-documents/blockchain/for-citizens/assets-and-stocks">
+            <a href="https://docs.liberland.org/blockchain/for-citizens/assets-and-stocks">
               Learn more
             </a>
           </p>
