@@ -20,6 +20,7 @@ function Button({
   red,
   whiteRed,
   disabled,
+  href,
 }) {
   const getSize = () => {
     if (large) {
@@ -31,12 +32,23 @@ function Button({
     return undefined;
   };
 
+  const getType = () => {
+    if (primary) {
+      return 'primary';
+    }
+    if (href) {
+      return 'link';
+    }
+    return undefined;
+  };
+
   return (
     <ButtonInternal
       disabled={disabled}
       onClick={onClick}
       htmlType={type}
-      type={primary ? 'primary' : undefined}
+      type={getType()}
+      href={href}
       danger={red}
       size={getSize()}
       className={
@@ -88,6 +100,7 @@ Button.propTypes = {
   red: PropTypes.bool,
   whiteRed: PropTypes.bool,
   disabled: PropTypes.bool,
+  href: PropTypes.string,
 };
 
 export default Button;

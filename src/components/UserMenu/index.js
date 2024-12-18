@@ -9,6 +9,7 @@ import { AuthContext } from 'react-oauth2-code-pkce';
 import UserIcon from '../../assets/icons/user.svg';
 import { blockchainSelectors, userSelectors } from '../../redux/selectors';
 import { authActions, blockchainActions, validatorActions } from '../../redux/actions';
+import Button from '../Button/Button';
 import ChangeWallet from '../Home/ChangeWallet';
 import styles from './styles.module.scss';
 
@@ -68,11 +69,10 @@ function UserMenu() {
       }}
       trigger={['click']}
     >
-      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-      <a href="#" onClick={(e) => e.preventDefault()} className={styles.dropdownLink}>
+      <Button href="#" className={styles.dropdownLink}>
         <Avatar src={UserIcon} size={30} className={styles.avatar} />
         <DownOutlined />
-      </a>
+      </Button>
     </Dropdown>
   );
 }
