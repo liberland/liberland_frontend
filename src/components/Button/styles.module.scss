@@ -35,4 +35,10 @@
     border: 2px solid $red;
     color: $red;
   }
+  &.multiline {
+    white-space: wrap;
+    height: auto;
+    padding: 0;
+    text-align: initial;
+  }
 }

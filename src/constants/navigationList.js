@@ -33,7 +33,7 @@ export const navigationList = [
   },
   {
     route: router.home.nfts,
-    title: 'NFTS',
+    title: 'NFTs',
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED === 'true',
     subLinks: {

@@ -20,6 +20,7 @@ function Button({
   red,
   whiteRed,
   disabled,
+  multiline,
   href,
 }) {
   const getSize = () => {
@@ -59,6 +60,7 @@ function Button({
           [styles.green]: green,
           [styles.grey]: grey,
           [styles.whiteRed]: whiteRed,
+          [styles.multiline]: multiline,
         })
       }
     >
@@ -82,6 +84,7 @@ Button.defaultProps = {
   red: false,
   whiteRed: false,
   disabled: false,
+  multiline: false,
 };
 
 Button.propTypes = {
@@ -101,6 +104,7 @@ Button.propTypes = {
   whiteRed: PropTypes.bool,
   disabled: PropTypes.bool,
   href: PropTypes.string,
+  multiline: PropTypes.bool,
 };
 
 export default Button;
