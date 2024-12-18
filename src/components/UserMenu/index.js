@@ -69,7 +69,7 @@ function UserMenu() {
       }}
       trigger={['click']}
     >
-      <Button href="#" className={styles.dropdownLink}>
+      <Button link className={styles.dropdownLink}>
         <Avatar src={UserIcon} size={30} className={styles.avatar} />
         <DownOutlined />
       </Button>

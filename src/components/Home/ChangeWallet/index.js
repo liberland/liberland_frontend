@@ -81,7 +81,7 @@ function ChangeWallet() {
       }}
       className={styles.dropdown}
     >
-      <Button href="#">
+      <Button link>
         {isBiggerThanSmallScreen && (
           <img src={Polkadot} className={styles.polkadot} alt="Polkadot icon" />
         )}

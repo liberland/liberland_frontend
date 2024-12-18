@@ -22,6 +22,7 @@ function Button({
   disabled,
   multiline,
   href,
+  link,
 }) {
   const getSize = () => {
     if (large) {
@@ -37,7 +38,7 @@ function Button({
     if (primary) {
       return 'primary';
     }
-    if (href) {
+    if (href || link) {
       return 'link';
     }
     return undefined;
@@ -85,6 +86,7 @@ Button.defaultProps = {
   whiteRed: false,
   disabled: false,
   multiline: false,
+  link: false,
 };
 
 Button.propTypes = {
@@ -105,6 +107,7 @@ Button.propTypes = {
   disabled: PropTypes.bool,
   href: PropTypes.string,
   multiline: PropTypes.bool,
+  link: PropTypes.bool,
 };
 
 export default Button;

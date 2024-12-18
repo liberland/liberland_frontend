@@ -9,7 +9,7 @@ export default function CitizenProposeRepealLegislationButton({ tier, id, sectio
 
   return (
     <>
-      <Button href="#" multiline onClick={handleModalOpen}>
+      <Button link multiline onClick={handleModalOpen}>
         PROPOSE CITIZEN REFERENDUM TO REPEAL
       </Button>
       {isModalOpen && (
