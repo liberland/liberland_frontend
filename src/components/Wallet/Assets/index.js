@@ -1,14 +1,18 @@
 import React, { useEffect, useMemo } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 import Paragraph from 'antd/es/typography/Paragraph';
+import Popover from 'antd/es/popover';
+import Descriptions from 'antd/es/descriptions';
 import { useSelector, useDispatch } from 'react-redux';
 import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
 import { walletActions } from '../../../redux/actions';
+import Button from '../../Button/Button';
 import Table from '../../Table';
 import { formatCustom } from '../../../utils/walletHelpers';
 import UpdateOrCreateAssetFormModalWrapper from './UpdateOrCreateAssetForm';
 import ActionsMenuModalWrapper from './ActionsMenu';
 import { useStockContext } from '../StockContext';
+import styles from './styles.module.scss';
 
 function Assets() {
   const userWalletAddress = useSelector(
@@ -32,7 +36,7 @@ function Assets() {
     }
   }, [dispatch, ids]);
 
-  const isBiggerThanDesktop = useMediaQuery('(min-width: 1025px)');
+  const isBiggerThanLargeScreen = useMediaQuery('(min-width: 1025px)');
   const { isStock } = useStockContext();
   const formatted = useMemo(
     () => additionalAssets?.map((asset, index) => (
@@ -40,11 +44,40 @@ function Assets() {
         ...asset,
         ...asset.metadata,
         ...assetDetails[index]?.identity,
-        supply: `${
-          formatCustom(
-            assetDetails?.[index]?.supply ?? '0',
-            parseInt(asset.metadata.decimals),
-          )} ${asset.metadata.symbol}`,
+        details: (
+          <Popover
+            content={(
+              <Descriptions className={styles.details} layout="vertical" size="small">
+                <Descriptions.Item label="Admin">
+                  {assetDetails?.[index]?.admin}
+                </Descriptions.Item>
+                <Descriptions.Item label="Owner">
+                  {assetDetails?.[index]?.owner}
+                </Descriptions.Item>
+                <Descriptions.Item label="Issuer">
+                  {assetDetails?.[index]?.issuer}
+                </Descriptions.Item>
+                <Descriptions.Item label="Freezer">
+                  {assetDetails?.[index]?.freezer}
+                </Descriptions.Item>
+                <Descriptions.Item label="Supply">
+                  {formatCustom(
+                    assetDetails?.[index]?.supply ?? '0',
+                    parseInt(asset.metadata.decimals),
+                  )}
+                  {' '}
+                  {asset.metadata.symbol}
+                </Descriptions.Item>
+              </Descriptions>
+            )}
+            title="Details"
+            trigger="click"
+          >
+            <Button>
+              Details
+            </Button>
+          </Popover>
+        ),
         actions: (
           <ActionsMenuModalWrapper
             isAdmin={assetDetails?.[index]?.admin === userWalletAddress}
@@ -87,7 +120,7 @@ function Assets() {
       </Paragraph>
       <Table
         data={formatted}
-        columns={isBiggerThanDesktop ? [
+        columns={isBiggerThanLargeScreen ? [
           {
             Header: 'Name',
             accessor: 'name',
@@ -97,24 +130,8 @@ function Assets() {
             accessor: 'symbol',
           },
           {
-            Header: 'Owner',
-            accessor: 'owner',
-          },
-          {
-            Header: 'Admin',
-            accessor: 'admin',
-          },
-          {
-            Header: 'Issuer',
-            accessor: 'issuer',
-          },
-          {
-            Header: 'Freezer',
-            accessor: 'freezer',
-          },
-          {
-            Header: 'Supply',
-            accessor: 'supply',
+            Header: 'Details',
+            accessor: 'details',
           },
           {
             Header: 'Actions',
