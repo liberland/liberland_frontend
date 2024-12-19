@@ -264,23 +264,23 @@ function TradeTokensModal({
       <Form.Item
         name="amount1In"
         label={(
-          <Flex gap="15px">
-            <span>
-              Amount In (
-              {isBuy ? asset2ToShow : asset1ToShow}
-              )
-            </span>
-            <span>
-              Balance
-              {' '}
-              {(assetsBalance && assetsBalance.length > 0)
-                ? formatAssets(
-                  isBuy ? assetsBalance[1] : assetsBalance[0],
-                  isBuy ? decimals2 : decimals1,
-                  { symbol: isBuy ? asset2ToShow : asset1ToShow, withAll: true },
-                ) : 0}
-            </span>
-          </Flex>
+          <>
+            Amount In
+            {' '}
+            {isBuy ? asset2ToShow : asset1ToShow}
+          </>
+        )}
+        extra={(
+          <>
+            Balance
+            {' '}
+            {(assetsBalance && assetsBalance.length > 0)
+              ? formatAssets(
+                isBuy ? assetsBalance[1] : assetsBalance[0],
+                isBuy ? decimals2 : decimals1,
+                { symbol: isBuy ? asset2ToShow : asset1ToShow, withAll: true },
+              ) : 0}
+          </>
         )}
         rules={[
           { required: true },
@@ -309,22 +309,22 @@ function TradeTokensModal({
       <Form.Item
         name="amountIn2"
         label={(
-          <Flex gap="15px">
-            <span>
-              Amount Out (
-              {!isBuy ? asset2ToShow : asset1ToShow}
-              )
-            </span>
-            <span>
-              Balance
-              {' '}
-              {assetsBalance && assetsBalance.length > 0 ? formatAssets(
-                isBuy ? assetsBalance[0] : assetsBalance[1],
-                isBuy ? decimals1 : decimals2,
-                { symbol: isBuy ? asset1ToShow : asset2ToShow, withAll: true },
-              ) : 0}
-            </span>
-          </Flex>
+          <>
+            Amount Out
+            {' '}
+            {!isBuy ? asset2ToShow : asset1ToShow}
+          </>
+        )}
+        extra={(
+          <>
+            Balance
+            {' '}
+            {assetsBalance && assetsBalance.length > 0 ? formatAssets(
+              isBuy ? assetsBalance[0] : assetsBalance[1],
+              isBuy ? decimals1 : decimals2,
+              { symbol: isBuy ? asset1ToShow : asset2ToShow, withAll: true },
+            ) : 0}
+          </>
         )}
         rules={[
           { required: true },

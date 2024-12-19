@@ -9,7 +9,7 @@ import { BN_ZERO } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
-import InputSearch from '../InputComponents/InputSearchAddressName';
+import InputSearch from '../InputComponents/OldInputSearchAddressName';
 
 // STYLES
 import styles from './styles.module.scss';

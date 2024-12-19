@@ -16,7 +16,7 @@ import { parseAssets, isValidSubstrateAddress } from '../../utils/walletHelpers'
 import {
   congressActions, ministryFinanceActions, senateActions, walletActions,
 } from '../../redux/actions';
-import InputSearch from '../InputComponents/InputSearchAddressName';
+import InputSearch from '../InputComponents/OldInputSearchAddressName';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
