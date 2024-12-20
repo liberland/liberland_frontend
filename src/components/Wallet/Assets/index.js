@@ -9,7 +9,7 @@ import { walletActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import Table from '../../Table';
 import { formatCustom } from '../../../utils/walletHelpers';
-import UpdateOrCreateAssetFormModalWrapper from './UpdateOrCreateAssetForm';
+import CreateOrUpdateAssetFormModalWrapper from './CreateOrUpdateAssetForm';
 import ActionsMenuModalWrapper from './ActionsMenu';
 import { useStockContext } from '../StockContext';
 import styles from './styles.module.scss';
@@ -152,7 +152,7 @@ function Assets() {
           },
         ]}
       />
-      <UpdateOrCreateAssetFormModalWrapper isCreate />
+      <CreateOrUpdateAssetFormModalWrapper isCreate />
     </>
   );
 }

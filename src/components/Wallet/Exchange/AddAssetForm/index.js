@@ -111,7 +111,6 @@ function AddAssetFormDisplay({
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-    } finally {
       setLoading(false);
     }
   };

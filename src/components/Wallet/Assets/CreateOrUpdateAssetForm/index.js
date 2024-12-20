@@ -8,14 +8,13 @@ import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
 import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
 import { walletActions } from '../../../../redux/actions';
-import { createOrUpdateAsset } from '../../../../api/nodeRpcCall';
 import ModalRoot from '../../../Modals/ModalRoot';
 import Button from '../../../Button/Button';
 import InputSearch from '../../../InputComponents/InputSearchAddressName';
 import styles from './styles.module.scss';
 import { useStockContext } from '../../StockContext';
 
-function UpdateOrCreateAssetForm({
+function CreateOrUpdateAssetForm({
   onClose,
   isCreate,
   isStock,
@@ -48,7 +47,7 @@ function UpdateOrCreateAssetForm({
           .sort((a, b) => b - a)[0] + 1
       ) : defaultValues.id;
 
-      await createOrUpdateAsset({
+      dispatch(walletActions.createOrUpdateAsset.call({
         id: nextId,
         name,
         symbol,
@@ -61,13 +60,12 @@ function UpdateOrCreateAssetForm({
         isCreate,
         defaultValues,
         isStock,
-      });
+      }));
       dispatch(walletActions.getAdditionalAssets.call());
       onClose();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-    } finally {
       setLoading(false);
     }
   };
@@ -180,14 +178,14 @@ const defaultValues = PropTypes.shape({
   freezer: PropTypes.string,
 });
 
-UpdateOrCreateAssetForm.propTypes = {
+CreateOrUpdateAssetForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   isCreate: PropTypes.bool,
   isStock: PropTypes.bool,
   defaultValues,
 };
 
-function UpdateOrCreateAssetFormModalWrapper({
+function CreateOrUpdateAssetFormModalWrapper({
   isCreate, defaultValues: dV,
 }) {
   const [show, setShow] = useState();
@@ -203,7 +201,7 @@ function UpdateOrCreateAssetFormModalWrapper({
       </Button>
       {show && (
         <ModalRoot>
-          <UpdateOrCreateAssetForm
+          <CreateOrUpdateAssetForm
             defaultValues={dV}
             isCreate={isCreate}
             onClose={() => setShow(false)}
@@ -219,9 +217,9 @@ function UpdateOrCreateAssetFormModalWrapper({
   return modal;
 }
 
-UpdateOrCreateAssetFormModalWrapper.propTypes = {
+CreateOrUpdateAssetFormModalWrapper.propTypes = {
   isCreate: PropTypes.bool,
   defaultValues,
 };
 
-export default UpdateOrCreateAssetFormModalWrapper;
+export default CreateOrUpdateAssetFormModalWrapper;

@@ -6,7 +6,6 @@ import Flex from 'antd/es/flex';
 import PropTypes from 'prop-types';
 import { blockchainSelectors } from '../../../../redux/selectors';
 import { walletActions } from '../../../../redux/actions';
-import { mintAsset } from '../../../../api/nodeRpcCall';
 import ModalRoot from '../../../Modals/ModalRoot';
 import Button from '../../../Button/Button';
 import InputSearch from '../../../InputComponents/InputSearchAddressName';
@@ -33,18 +32,17 @@ function MintAssetForm({
   }) => {
     setLoading(true);
     try {
-      await mintAsset({
+      dispatch(walletActions.mintAsset.call({
         amount,
         beneficiary,
         id: assetId,
         owner: userWalletAddress,
-      });
+      }));
       dispatch(walletActions.getAdditionalAssets.call());
       onClose();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-    } finally {
       setLoading(false);
     }
   };

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
 import ModalRoot from '../../../Modals/ModalRoot';
 import Button from '../../../Button/Button';
-import UpdateOrCreateAssetFormModalWrapper from '../UpdateOrCreateAssetForm';
+import CreateOrUpdateAssetFormModalWrapper from '../CreateOrUpdateAssetForm';
 import MintAssetFormModalWrapper from '../MintAssetForm';
 
 function ActionsMenu({
@@ -17,7 +17,7 @@ function ActionsMenu({
   return (
     <Flex gap="15px" justify="center" align="center" vertical>
       {(isOwner || isAdmin) && (
-        <UpdateOrCreateAssetFormModalWrapper defaultValues={defaultValues} />
+        <CreateOrUpdateAssetFormModalWrapper defaultValues={defaultValues} />
       )}
       {isIssuer && (
         <MintAssetFormModalWrapper
