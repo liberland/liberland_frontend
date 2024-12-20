@@ -19,7 +19,7 @@ function AssetOverview({
     () => additionalAssets?.filter((asset) => asset?.balance?.balance > 0) || [],
     [additionalAssets],
   );
-
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
   const renderItem = (assetData) => (
     <Card
       actions={!isCongress || userIsMember ? [
@@ -44,13 +44,11 @@ function AssetOverview({
     </Card>
   );
 
-  const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
-
   return (
-    <Row gutter={[16, 16]}>
+    <Row gutter={[16, 16]} wrap>
       {filteredAssets.map((assetData) => (
         <Col
-          span={isBiggerThanDesktop ? Math.floor(Math.max(1, 24 / filteredAssets.length)) : 24}
+          span={isBiggerThanDesktop ? 6 : 24}
           key={assetData.metadata.name}
         >
           {renderItem(assetData)}

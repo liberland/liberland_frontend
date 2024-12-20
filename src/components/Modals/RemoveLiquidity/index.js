@@ -5,7 +5,6 @@ import { BN, BN_HUNDRED, BN_MILLION } from '@polkadot/util';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
-import useNotification from 'antd/es/notification/useNotification';
 import ModalRoot from '../ModalRoot';
 import stylesModal from '../styles.module.scss';
 import Button from '../../Button/Button';
@@ -54,7 +53,6 @@ function RemoveLiquidityModal({
     const asset2Data = calculatedAmount2.sub(calculatedAmount2.mul(fee).div(BN_MILLION));
     return { asset1Data, asset2Data };
   }, [liquidity, lpTokensBalance, reserved.asset1, reserved.asset2, withdrawalFee]);
-  const [api, handle] = useNotification();
 
   const onSubmit = async () => {
     setLoading(true);
@@ -73,18 +71,10 @@ function RemoveLiquidityModal({
           withdrawTo,
         },
       ));
-      api.success({
-        message: 'Liquidity removed!',
-      });
+      closeModal();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-      form.setFields([
-        {
-          name: 'lpTokenBurn',
-          errors: ['Something went wrong'],
-        },
-      ]);
     } finally {
       setLoading(false);
     }
@@ -114,7 +104,6 @@ function RemoveLiquidityModal({
       form={form}
       layout="vertical"
     >
-      {handle}
       <Form.Item
         name="lpTokenBurn"
         label="Remove liquidity for pair"

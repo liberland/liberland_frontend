@@ -4,7 +4,6 @@ import Form from 'antd/es/form';
 import Input from 'antd/es/input';
 import Flex from 'antd/es/flex';
 import Paragraph from 'antd/es/typography/Paragraph';
-import useNotification from 'antd/es/notification/useNotification';
 import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
 import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
@@ -31,7 +30,6 @@ function UpdateOrCreateAssetForm({
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const type = isStock ? 'stock' : 'asset';
   const typeCapitalized = isStock ? 'Stock' : 'Asset';
-  const [api, handle] = useNotification();
 
   const onSubmit = async ({
     name,
@@ -65,16 +63,10 @@ function UpdateOrCreateAssetForm({
         isStock,
       });
       dispatch(walletActions.getAdditionalAssets.call());
-      api.success({
-        message: `${typeCapitalized} ${isCreate ? 'created' : 'updated'} successfully`,
-      });
-    } catch {
-      form.setFields([
-        {
-          name: 'name',
-          errors: ['Something went wrong'],
-        },
-      ]);
+      onClose();
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -94,7 +86,6 @@ function UpdateOrCreateAssetForm({
       className={styles.form}
       layout="vertical"
     >
-      {handle}
       <Form.Item
         name="name"
         rules={[

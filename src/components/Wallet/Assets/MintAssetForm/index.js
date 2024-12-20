@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import InputNumber from 'antd/es/input-number';
 import Flex from 'antd/es/flex';
-import useNotification from 'antd/es/notification/useNotification';
 import PropTypes from 'prop-types';
 import { blockchainSelectors } from '../../../../redux/selectors';
 import { walletActions } from '../../../../redux/actions';
@@ -22,7 +21,6 @@ function MintAssetForm({
 }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState();
-  const [api, handle] = useNotification();
 
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
@@ -42,18 +40,10 @@ function MintAssetForm({
         owner: userWalletAddress,
       });
       dispatch(walletActions.getAdditionalAssets.call());
-      api.success({
-        message: `${isStock ? 'Shares' : 'Assets'} minted successfully`,
-      });
+      onClose();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-      form.setFields([
-        {
-          name: 'amount',
-          errors: ['Something went wrong'],
-        },
-      ]);
     } finally {
       setLoading(false);
     }
@@ -72,7 +62,6 @@ function MintAssetForm({
       className={styles.form}
       layout="vertical"
     >
-      {handle}
       <Form.Item
         name="amount"
         label={`${isStock ? 'Issue' : 'Mint'} amount`}

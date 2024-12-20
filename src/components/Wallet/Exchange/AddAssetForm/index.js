@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Select from 'antd/es/select';
-import useNotification from 'antd/es/notification/useNotification';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useStockContext } from '../../StockContext';
@@ -24,7 +23,6 @@ function AddAssetFormDisplay({
   const dispatch = useDispatch();
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const [api, handle] = useNotification();
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
@@ -109,16 +107,10 @@ function AddAssetFormDisplay({
       );
       await createNewPool(getAssetId(aAsset), getAssetId(bAsset), walletAddress);
       dispatch(dexActions.getPools.call());
-      api.success({ message: 'Pool successfully created' });
+      onClose();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-      form.setFields([
-        {
-          name: 'firstAsset',
-          errors: ['Something went wrong'],
-        },
-      ]);
     } finally {
       setLoading(false);
     }
@@ -132,7 +124,6 @@ function AddAssetFormDisplay({
 
   return (
     <Form layout="vertical" form={form} className={styles.form} onFinish={onSubmit}>
-      {handle}
       <Flex gap="15px" wrap>
         <Form.Item
           label="Select first pool asset"

@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import cx from 'classnames';
-import useNotification from 'antd/es/notification/useNotification';
 import Title from 'antd/es/typography/Title';
 import InputNumber from 'antd/es/input-number';
 import Checkbox from 'antd/es/checkbox';
@@ -44,7 +43,6 @@ function AddLiquidityModal({
 
   const decimals1 = getDecimalsForAsset(asset1, assetData1?.decimals);
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
-  const [api, handle] = useNotification();
 
   const onSubmit = async ({
     amount1Desired, amount2Desired, minAmountPercent,
@@ -71,16 +69,10 @@ function AddLiquidityModal({
         walletAddress,
         mintTo,
       }));
-      api.success({
-        message: 'Liquidity added successfully',
-      });
+      closeModal();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-      form.setFields([{
-        name: 'amount1Desired',
-        errors: ['Something went wrong'],
-      }]);
     } finally {
       setLoading(false);
     }
@@ -161,7 +153,6 @@ function AddLiquidityModal({
       layout="vertical"
       form={form}
     >
-      {handle}
       <Title level={3}>
         Add liquidity for pair
         {' '}
