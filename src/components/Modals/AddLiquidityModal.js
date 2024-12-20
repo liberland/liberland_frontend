@@ -104,7 +104,7 @@ function AddLiquidityModal({
   };
   const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
 
-  const handleChangeInput = async (value, isAsset1) => {
+  const handleChangeInput = React.useCallback(async (value, isAsset1) => {
     if (!value || value === 0
       || (value.split('.')[1]?.length || 0) > (isAsset1 ? decimals1 : decimals2)) {
       return;
@@ -132,7 +132,7 @@ function AddLiquidityModal({
       form.setFieldValue('amount1Desired', sanitizedValue);
     }
     form.validateFields();
-  };
+  }, [decimals1, decimals2, enum1, enum2, form, isReservedDataEmpty]);
 
   const amount1Desired = Form.useWatch('amount1Desired', form);
   const amount2Desired = Form.useWatch('amount2Desired', form);
@@ -142,15 +142,13 @@ function AddLiquidityModal({
     if (asset1Focused && amount1Desired) {
       handleChangeInput(amount1Desired, true);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount1Desired]);
+  }, [handleChangeInput, amount1Desired, asset1Focused]);
 
   useEffect(() => {
     if (asset2Focused && amount2Desired) {
       handleChangeInput(amount2Desired, false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount2Desired]);
+  }, [handleChangeInput, amount2Desired, asset2Focused]);
 
   useEffect(() => {
     dispatch(walletActions.getAssetsBalance.call([asset1, asset2]));
@@ -173,24 +171,14 @@ function AddLiquidityModal({
       </Title>
       <Form.Item
         name="amount1Desired"
-        label={(
-          <Flex gap="15px">
-            <span>
-              Amount
-              {' '}
-              {asset1ToShow}
-              {' '}
-              Desired
-            </span>
-            {assetsBalance && assetsBalance.length > 0 && (
-            <span>
-              Balance
-              {' '}
-              {assetsBalance[0]
-                ? formatAssets(assetsBalance[0], decimals1, { symbol: asset1ToShow, withAll: true }) : 0}
-            </span>
-            )}
-          </Flex>
+        label={`Amount ${asset1ToShow} desired`}
+        extra={assetsBalance && assetsBalance.length > 0 && (
+          <span>
+            Balance
+            {' '}
+            {assetsBalance[0]
+              ? formatAssets(assetsBalance[0], decimals1, { symbol: asset1ToShow, withAll: true }) : 0}
+          </span>
         )}
         rules={[
           { required: true },
@@ -216,25 +204,14 @@ function AddLiquidityModal({
       </Form.Item>
       <Form.Item
         name="amount2Desired"
-        label={(
-          <Flex gap="15px">
-            <span>
-              Amount
-              {' '}
-              {asset2ToShow}
-              {' '}
-              Desired
-            </span>
-            {assetsBalance && assetsBalance.length > 0
-            && (
-            <span>
-              Balance
-              {' '}
-              {assetsBalance[1]
-                ? formatAssets(assetsBalance[1], decimals2, { symbol: asset2ToShow, withAll: true }) : 0}
-            </span>
-            )}
-          </Flex>
+        label={`Amount ${asset2ToShow} desired`}
+        extra={assetsBalance && assetsBalance.length > 0 && (
+          <span>
+            Balance
+            {' '}
+            {assetsBalance[1]
+              ? formatAssets(assetsBalance[1], decimals2, { symbol: asset2ToShow, withAll: true }) : 0}
+          </span>
         )}
         rules={[
           { required: true },
