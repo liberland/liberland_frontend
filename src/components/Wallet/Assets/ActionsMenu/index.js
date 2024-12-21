@@ -36,7 +36,7 @@ const defaultValues = PropTypes.shape({
   id: PropTypes.number,
   name: PropTypes.string,
   symbol: PropTypes.string,
-  decimals: PropTypes.string,
+  decimals: PropTypes.number,
   balance: PropTypes.number,
   admin: PropTypes.string,
   issuer: PropTypes.string,

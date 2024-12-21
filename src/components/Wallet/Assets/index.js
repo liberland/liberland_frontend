@@ -87,7 +87,7 @@ function Assets() {
             defaultValues={{
               admin: assetDetails?.[index]?.admin,
               balance: assetDetails?.[index]?.minBalance,
-              decimals: asset.metadata.decimals,
+              decimals: parseInt(asset.metadata.decimals) || 0,
               freezer: assetDetails?.[index]?.freezer,
               id: asset.index,
               issuer: assetDetails?.[index]?.issuer,
