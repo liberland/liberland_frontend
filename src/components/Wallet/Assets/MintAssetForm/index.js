@@ -38,7 +38,6 @@ function MintAssetForm({
         id: assetId,
         owner: userWalletAddress,
       }));
-      dispatch(walletActions.getAdditionalAssets.call());
       onClose();
     } catch (e) {
       // eslint-disable-next-line no-console

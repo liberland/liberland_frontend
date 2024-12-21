@@ -61,7 +61,6 @@ function CreateOrUpdateAssetForm({
         defaultValues,
         isStock,
       }));
-      dispatch(walletActions.getAdditionalAssets.call());
       onClose();
     } catch (e) {
       // eslint-disable-next-line no-console

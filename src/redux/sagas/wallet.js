@@ -152,11 +152,13 @@ function* sendTransferRemarkWorker(action) {
 function* mintAssetWorker(action) {
   yield call(mintAsset, action.payload);
   yield put(walletActions.mintAsset.success());
+  yield put(walletActions.getAdditionalAssets.call());
 }
 
 function* createOrUpdateAssetWorker(action) {
   yield call(createOrUpdateAsset, action.payload);
   yield put(walletActions.createOrUpdateAsset.success());
+  yield put(walletActions.getAdditionalAssets.call());
 }
 
 // WATCHERS
