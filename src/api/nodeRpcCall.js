@@ -284,6 +284,7 @@ const createOrUpdateAsset = async ({
   freezer,
   owner,
   isCreate,
+  isStock,
   defaultValues,
 }) => {
   try {
@@ -299,6 +300,10 @@ const createOrUpdateAsset = async ({
     if (defaultValues?.issuer !== issuer || defaultValues?.admin !== admin || defaultValues?.freezer !== freezer) {
       const setTeam = await api.tx.assets.setTeam(id, issuer, admin, freezer);
       await submitExtrinsic(setTeam, owner, api);
+    }
+    if (isStock && isCreate) {
+      const params = await api.tx.assets.setParameters(id, { eresidencyRequired: true });
+      await submitExtrinsic(params, owner, api);
     }
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -378,7 +383,7 @@ const getAssetDetails = async (ids) => {
       queries.push([api.query.identity.identityOf, detail.owner]);
       return queries;
     }, []);
-    const assetResults = await api.queryMulti([...assetQueries]);
+    const assetResults = await api.queryMulti(assetQueries);
     const resolvedIdentity = assetResults.map((result) => {
       const json = result.toJSON();
       const raw = json?.info?.display?.raw?.slice(2);
@@ -428,33 +433,42 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
       index: parseInt(rawEntry[0].toHuman()[0].replace(/,/g, '')),
       metadata: rawEntry[1].toHuman(),
     }));
-    const indexedFilteredAssets = [];
+    const assets = [];
     const assetQueries = [];
+    const parametersQueries = [];
     processedMetadatas.forEach((asset) => {
       // Disregard LLM, asset of ID 1 because it has special treatment already
       const isLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
       if (isLLM) {
         assetQueries.push([api.query.assets.account, [asset.index, address]]);
-        if (isIndexNeed) {
-          indexedFilteredAssets[asset.index] = asset;
-        } else {
-          indexedFilteredAssets.push(asset);
-        }
+        parametersQueries.push([api.query.assets.parameters, [asset.index]]);
+        assets.push(asset);
       }
     });
-    if (isIndexNeed) {
-      return indexedFilteredAssets;
-    }
 
     if (assetQueries.length !== 0) {
-      const assetResults = await api.queryMulti([...assetQueries]);
+      const assetResults = await api.queryMulti(assetQueries);
 
       assetResults.forEach((assetResult, index) => {
-        indexedFilteredAssets[index].balance = assetResult.toJSON() || '0';
+        assets[index].balance = assetResult.toJSON() || '0';
       });
-      return indexedFilteredAssets;
     }
-    return [];
+
+    if (parametersQueries.length !== 0) {
+      const parametersResults = await api.queryMulti(parametersQueries);
+      parametersResults.forEach(({ eresidencyRequired }, index) => {
+        assets[index].isStock = eresidencyRequired?.valueOf() || false;
+      });
+    }
+
+    if (isIndexNeed) {
+      return assets.reduce((acc, asset) => {
+        acc[asset.index] = asset;
+        return acc;
+      }, {});
+    }
+
+    return assets;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -2509,6 +2523,7 @@ const getDexPools = async (walletAddress) => {
         lpToken: lpTokenTransform,
         lpTokensBalance: lpTokensValue?.balance || BN_ZERO,
         reserved,
+        isStock: assetData1?.isStock || assetData2?.isStock || false,
       };
     }));
     return { poolsData, assetsPoolData };

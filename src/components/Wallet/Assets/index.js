@@ -1,16 +1,18 @@
 import React, { useEffect, useMemo } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Popover from 'antd/es/popover';
+import Descriptions from 'antd/es/descriptions';
 import { useSelector, useDispatch } from 'react-redux';
-import cx from 'classnames';
 import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
 import { walletActions } from '../../../redux/actions';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import Card from '../../Card';
+import Button from '../../Button/Button';
 import Table from '../../Table';
-import styles from './styles.module.scss';
 import { formatCustom } from '../../../utils/walletHelpers';
-import UpdateOrCreateAssetFormModalWrapper from './UpdateOrCreateAssetForm';
+import CreateOrUpdateAssetFormModalWrapper from './CreateOrUpdateAssetForm';
 import ActionsMenuModalWrapper from './ActionsMenu';
+import { useStockContext } from '../StockContext';
+import styles from './styles.module.scss';
 
 function Assets() {
   const userWalletAddress = useSelector(
@@ -34,108 +36,124 @@ function Assets() {
     }
   }, [dispatch, ids]);
 
-  const isBiggerThanDesktop = useMediaQuery('(min-width: 1025px)');
+  const isBiggerThanLargeScreen = useMediaQuery('(min-width: 1025px)');
+  const { isStock } = useStockContext();
+  const formatted = useMemo(
+    () => additionalAssets?.map((asset, index) => (
+      {
+        ...asset,
+        ...asset.metadata,
+        ...assetDetails[index]?.identity,
+        details: (
+          <Popover
+            content={(
+              <Descriptions className={styles.details} layout="vertical" size="small">
+                <Descriptions.Item label="Admin">
+                  {assetDetails?.[index]?.admin}
+                </Descriptions.Item>
+                <Descriptions.Item label="Owner">
+                  {assetDetails?.[index]?.owner}
+                </Descriptions.Item>
+                <Descriptions.Item label="Issuer">
+                  {assetDetails?.[index]?.issuer}
+                </Descriptions.Item>
+                <Descriptions.Item label="Freezer">
+                  {assetDetails?.[index]?.freezer}
+                </Descriptions.Item>
+                <Descriptions.Item label="Supply">
+                  {formatCustom(
+                    assetDetails?.[index]?.supply ?? '0',
+                    parseInt(asset.metadata.decimals),
+                  )}
+                  {' '}
+                  {asset.metadata.symbol}
+                </Descriptions.Item>
+              </Descriptions>
+            )}
+            title="Details"
+            trigger="click"
+          >
+            <Button>
+              Details
+            </Button>
+          </Popover>
+        ),
+        actions: (
+          <ActionsMenuModalWrapper
+            isAdmin={assetDetails?.[index]?.admin === userWalletAddress}
+            isOwner={assetDetails?.[index]?.owner === userWalletAddress}
+            isIssuer={assetDetails?.[index]?.issuer === userWalletAddress}
+            assetId={asset.index}
+            defaultValues={{
+              admin: assetDetails?.[index]?.admin,
+              balance: assetDetails?.[index]?.minBalance,
+              decimals: parseInt(asset.metadata.decimals) || 0,
+              freezer: assetDetails?.[index]?.freezer,
+              id: asset.index,
+              issuer: assetDetails?.[index]?.issuer,
+              name: asset.metadata.name,
+              symbol: asset.metadata.symbol,
+            }}
+          />
+        ),
+      }
+    )).filter(({ isStock: assetIsStock }) => assetIsStock === isStock) || [],
+    [additionalAssets, assetDetails, userWalletAddress, isStock],
+  );
 
   if (!assetDetails || !additionalAssets || !userWalletAddress) {
     return <div>Loading...</div>;
   }
 
-  const formatted = additionalAssets.map((asset, index) => (
-    {
-      ...asset,
-      ...asset.metadata,
-      ...assetDetails[index]?.identity,
-      supply: `${
-        formatCustom(assetDetails[index]?.supply ?? '0', parseInt(asset.metadata.decimals))} ${asset.metadata.symbol}`,
-      actions: (
-        <ActionsMenuModalWrapper
-          isAdmin={assetDetails[index]?.admin === userWalletAddress}
-          isOwner={assetDetails[index]?.owner === userWalletAddress}
-          isIssuer={assetDetails[index]?.issuer === userWalletAddress}
-          assetId={asset.index}
-          defaultValues={{
-            admin: assetDetails[index]?.admin,
-            balance: assetDetails[index]?.minBalance,
-            decimals: asset.metadata.decimals,
-            freezer: assetDetails[index]?.freezer,
-            id: asset.index,
-            issuer: assetDetails[index]?.issuer,
-            name: asset.metadata.name,
-            symbol: asset.metadata.symbol,
-          }}
-        />
-      ),
-    }
-  ));
-
   return (
-    <div className={stylesPage.contentWrapper}>
-      <div className={stylesPage.sectionWrapper}>
-        <Card className={cx(stylesPage.overviewWrapper, styles.cardWrapper)} title="Info">
-          <p>
-            Assets and stocks on the Liberland blockchain.
-            {' '}
-            <a href="https://docs.liberland.org/blockchain/for-citizens/assets-and-stocks">
-              Learn more
-            </a>
-          </p>
-        </Card>
-        <br />
-        <Card className={cx(stylesPage.overviewWrapper, styles.cardWrapper)} title="Assets overview">
-          <Table
-            data={formatted}
-            columns={isBiggerThanDesktop ? [
-              {
-                Header: 'Name',
-                accessor: 'name',
-              },
-              {
-                Header: 'Symbol',
-                accessor: 'symbol',
-              },
-              {
-                Header: 'Owner',
-                accessor: 'owner',
-              },
-              {
-                Header: 'Admin',
-                accessor: 'admin',
-              },
-              {
-                Header: 'Issuer',
-                accessor: 'issuer',
-              },
-              {
-                Header: 'Freezer',
-                accessor: 'freezer',
-              },
-              {
-                Header: 'Supply',
-                accessor: 'supply',
-              },
-              {
-                Header: 'Actions',
-                accessor: 'actions',
-              },
-            ] : [
-              {
-                Header: 'Symbol',
-                accessor: 'symbol',
-              },
-              {
-                Header: 'Owner',
-                accessor: 'owner',
-              },
-              {
-                Header: 'Actions',
-                accessor: 'actions',
-              },
-            ]}
-          />
-          <UpdateOrCreateAssetFormModalWrapper isCreate />
-        </Card>
-      </div>
-    </div>
+    <>
+      <Paragraph>
+        <p>
+          {isStock ? 'Stocks' : 'Assets'}
+          {' '}
+          on the Liberland blockchain.
+          {' '}
+          <a href="https://docs.liberland.org/blockchain/for-citizens/assets-and-stocks">
+            Learn more
+          </a>
+        </p>
+      </Paragraph>
+      <Table
+        data={formatted}
+        columns={isBiggerThanLargeScreen ? [
+          {
+            Header: 'Name',
+            accessor: 'name',
+          },
+          {
+            Header: 'Symbol',
+            accessor: 'symbol',
+          },
+          {
+            Header: 'Details',
+            accessor: 'details',
+          },
+          {
+            Header: 'Actions',
+            accessor: 'actions',
+          },
+        ] : [
+          {
+            Header: 'Symbol',
+            accessor: 'symbol',
+          },
+          {
+            Header: 'Owner',
+            accessor: 'owner',
+          },
+          {
+            Header: 'Actions',
+            accessor: 'actions',
+          },
+        ]}
+      />
+      <CreateOrUpdateAssetFormModalWrapper isCreate />
+    </>
   );
 }
 

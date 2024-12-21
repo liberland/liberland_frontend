@@ -11,7 +11,7 @@ import { SelectInput, TextInput } from '../InputComponents';
 import {
   isValidSubstrateAddress, parseAssets,
 } from '../../utils/walletHelpers';
-import InputSearch from '../InputComponents/InputSearchAddressName';
+import InputSearch from '../InputComponents/OldInputSearchAddressName';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { IndexHelper } from '../../utils/council/councilEnum';
 import RemarkFormUser from '../Wallet/RemarkFormUser';

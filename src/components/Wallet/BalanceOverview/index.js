@@ -11,7 +11,6 @@ import SendLLMModalWrapper from '../../Modals/SendLLMModal';
 import RequestLLDModalWrapper from '../../Modals/RequestLLDModal';
 import UnpoolLLMModalWrapper from '../../Modals/UnpoolModal';
 import PolitipoolLLMModalWrapper from '../../Modals/PolitipoolModal';
-import RemarkTransferModalWrapper from '../RemarkTransferWrapper';
 
 function BalanceOverview({
   balances, liquidMerits, showStaked,
@@ -24,7 +23,7 @@ function BalanceOverview({
         currency: 'LLM',
         actions: [
           <UnpoolLLMModalWrapper />,
-          <RemarkTransferModalWrapper />,
+          <div />,
         ],
       },
       {

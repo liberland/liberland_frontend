@@ -6,6 +6,7 @@ import Row from 'antd/es/row';
 import Col from 'antd/es/col';
 import { blockchainSelectors, dexSelectors } from '../../../../redux/selectors';
 import { dexActions } from '../../../../redux/actions';
+import { useStockContext } from '../../StockContext';
 import ExchangeItem from '../ExchangeItem';
 import AddAssetForm from '../AddAssetForm';
 import { sortByMap } from '../ExchangeSort/utils';
@@ -19,6 +20,7 @@ function ExchangeList() {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const [highLiquiditySort, setHighLiquiditySort] = useState(Object.keys(sortByMap)[0]);
   const [lowLiquiditySort, setLowLiquiditySort] = useState(Object.keys(sortByMap)[0]);
+  const { isStock } = useStockContext();
 
   useEffect(() => {
     dispatch(dexActions.getPools.call());
@@ -26,16 +28,18 @@ function ExchangeList() {
 
   const { poolsData, assetsPoolData } = dexs || {};
 
-  const [highLiquidity, lowLiquidity] = useMemo(() => poolsData?.reduce(([highLiq, lowLiq], pool) => {
-    const asset1Liquidity = valueToBN(pool.reserved?.asset1 || 0);
-    const asset2Liquidity = valueToBN(pool.reserved?.asset2 || 0);
-    if (asset1Liquidity > 1 && asset2Liquidity > 1) {
-      highLiq.push(pool);
-    } else {
-      lowLiq.push(pool);
-    }
-    return [highLiq, lowLiq];
-  }, [[], []]) || [[], []], [poolsData]);
+  const [highLiquidity, lowLiquidity] = useMemo(() => poolsData
+    ?.filter(({ isStock: isStockPool }) => isStockPool === isStock)
+    .reduce(([highLiq, lowLiq], pool) => {
+      const asset1Liquidity = valueToBN(pool.reserved?.asset1 || 0);
+      const asset2Liquidity = valueToBN(pool.reserved?.asset2 || 0);
+      if (asset1Liquidity > 1 && asset2Liquidity > 1) {
+        highLiq.push(pool);
+      } else {
+        lowLiq.push(pool);
+      }
+      return [highLiq, lowLiq];
+    }, [[], []]) || [[], []], [poolsData, isStock]);
 
   const sortPool = (pool, type) => pool.sort(
     (aPool, bPool) => sortByMap[type](aPool, assetsPoolData, bPool, assetsPoolData),
@@ -47,14 +51,11 @@ function ExchangeList() {
     );
   }
 
-  if (!highLiquidity.length && !lowLiquidity.length) {
-    return (
-      <Alert type="error" message="No pools were found" />
-    );
-  }
-
   return (
     <>
+      {!highLiquidity.length && !lowLiquidity.length && (
+        <Alert type="error" className={styles.noneFound} message="No pools were found" />
+      )}
       {highLiquidity.length > 0 && (
         <Collapse
           defaultActiveKey={['highliq']}

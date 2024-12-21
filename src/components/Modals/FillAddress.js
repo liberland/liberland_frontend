@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 // COMPONENTS
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
-import InputSearch from '../InputComponents/InputSearchAddressName';
+import InputSearch from '../InputComponents/OldInputSearchAddressName';
 
 // STYLES
 import styles from './styles.module.scss';

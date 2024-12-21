@@ -19,6 +19,7 @@ function Button({
   grey,
   red,
   whiteRed,
+  flex,
   disabled,
   multiline,
   href,
@@ -61,6 +62,7 @@ function Button({
           [styles.green]: green,
           [styles.grey]: grey,
           [styles.whiteRed]: whiteRed,
+          [styles.flex]: flex,
           [styles.multiline]: multiline,
         })
       }
@@ -85,6 +87,7 @@ Button.defaultProps = {
   red: false,
   whiteRed: false,
   disabled: false,
+  flex: false,
   multiline: false,
   link: false,
 };
@@ -105,6 +108,7 @@ Button.propTypes = {
   red: PropTypes.bool,
   whiteRed: PropTypes.bool,
   disabled: PropTypes.bool,
+  flex: PropTypes.bool,
   href: PropTypes.string,
   multiline: PropTypes.bool,
   link: PropTypes.bool,

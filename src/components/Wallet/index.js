@@ -12,6 +12,7 @@ import Exchange from './Exchange';
 import Bridge from './Bridge';
 import PayMe from './PayMe';
 import WalletOverview from './WalletOverview';
+import { stockWrapper } from './StockContext';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -24,11 +25,19 @@ function Wallet() {
         />
         <Route
           path={router.wallet.exchange}
-          component={Exchange}
+          component={stockWrapper(Exchange, false)}
+        />
+        <Route
+          path={router.wallet.stockExchange}
+          component={stockWrapper(Exchange, true)}
         />
         <Route
           path={router.wallet.assets}
-          component={Assets}
+          component={stockWrapper(Assets, false)}
+        />
+        <Route
+          path={router.wallet.stocks}
+          component={stockWrapper(Assets, true)}
         />
         <Route
           path={router.wallet.bridge}

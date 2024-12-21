@@ -137,6 +137,11 @@ function Layout({ children }) {
 
   return (
     <ConfigProvider
+      form={{
+        validateMessages: {
+          required: 'Enter a value',
+        },
+      }}
       theme={{
         token: {
           colorText: '#243F5F',
@@ -199,6 +204,20 @@ function Layout({ children }) {
           Card: {
             extraColor: '#243F5F',
             actionsLiMargin: '12px 5px',
+          },
+          InputNumber: {
+            controlWidth: '100%',
+            activeBorderColor: '#243F5F',
+            hoverBorderColor: '#243F5F',
+            colorText: '#243F5F',
+          },
+          Input: {
+            activeBorderColor: '#243F5F',
+            hoverBorderColor: '#243F5F',
+            colorText: '#243F5F',
+          },
+          Message: {
+            margin: 'auto 0',
           },
         },
       }}
