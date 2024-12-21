@@ -1,6 +1,8 @@
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { identitySelectors } from '../../../redux/selectors';
 import { formatMerits } from '../../../utils/walletHelpers';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
 import { useAddIdToContext } from './useAddIdToContext';
 
 function useTransferLLM(proposal) {
@@ -18,8 +20,14 @@ function useTransferLLM(proposal) {
     identity,
     accountId,
     formattedRow: [
-      `${formattedValue} (${symbol}) `,
-      `${identity ? `${identity} (${accountId})` : accountId}`,
+      `${formattedValue} (${symbol})`,
+      <CopyIconWithAddress
+        isTruncate
+        name={identity?.name}
+        legal={identity?.legal}
+        address={accountId}
+        showAddress
+      />,
     ],
   };
 }

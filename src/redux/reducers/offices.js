@@ -1,4 +1,5 @@
 import { handleActions, combineActions } from 'redux-actions';
+import { BN_ZERO } from '@polkadot/util';
 import { officesActions } from '../actions';
 
 const initialState = {
@@ -19,6 +20,29 @@ const initialState = {
   },
   backendAddressLLMBalance: null,
   pendingAdditionalMerits: [],
+  senateWalletInfo: {
+    balances: {
+      liberstake: {
+        amount: BN_ZERO,
+      },
+      polkastake: {
+        amount: 0,
+      },
+      liquidMerits: {
+        amount: 0,
+      },
+      totalAmount: {
+        amount: BN_ZERO,
+      },
+      liquidAmount: {
+        amount: BN_ZERO,
+      },
+      meritsTotalAmount: {
+        amount: 0,
+      },
+      electionLock: 0,
+    },
+  },
 };
 
 const officesReducer = handleActions({

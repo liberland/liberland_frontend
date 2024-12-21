@@ -1,15 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import CouncilMotionCountdown from '../../Congress/MotionCountDown';
 
 function Schedule({ proposal, children }) {
   const { args } = proposal;
-
+  const when = args[0];
   return (
     <div>
-      Schedule call to be made on
+      Schedule call to be made on:
       {' '}
-      {args[0].toString()}
+      {when.toString()}
       :
+      <CouncilMotionCountdown motionEndBlockNumber={when} />
+      <br />
       {children(args[3])}
     </div>
   );

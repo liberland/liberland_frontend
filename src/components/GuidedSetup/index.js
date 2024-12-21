@@ -16,6 +16,7 @@ import InstructionOnBoard from './OnBording/InstructionOnBoard';
 import { parseIdentityData, parseLegal } from '../../utils/identityParser';
 import { GuidedSetupWrapper } from './Wrapper';
 import NoConnectedWalletComponent from './NoConnectedWalletComponent';
+import NoWalletsDetectedInBrowser from './NoWalletsDetectedInBrowser';
 
 function GuidedSetup({ children }) {
   const dispatch = useDispatch();
@@ -76,6 +77,14 @@ function GuidedSetup({ children }) {
     return (
       <GuidedSetupWrapper>
         <LoadingComponent />
+      </GuidedSetupWrapper>
+    );
+  }
+
+  if (extensions.length === 0 || wallets.length === 0) {
+    return (
+      <GuidedSetupWrapper>
+        <NoWalletsDetectedInBrowser />
       </GuidedSetupWrapper>
     );
   }

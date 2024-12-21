@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Tooltip from 'rc-tooltip';
@@ -8,6 +8,7 @@ import { formatCustom } from '../../../../utils/walletHelpers';
 import Table from '../../../Table';
 import Button from '../../../Button/Button';
 import StakeForm from '../StakeForm';
+import StakeEthForm from '../StakeEthForm';
 import ClaimReward from '../ClaimReward';
 import WithdrawForm from '../WithdrawForm';
 import styles from './styles.module.scss';
@@ -61,17 +62,17 @@ function TokenStakeInfo({ selectedAccount }) {
     return mapped;
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     getTokenStake();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     getAddressRelated();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAccount, tokenStakeInfo]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (tokenStakeInfo && !tokenStakeInfo.error) {
       getERC20Info(tokenStakeInfo.rewardToken);
       getERC20Info(tokenStakeInfo.stakingToken);
@@ -115,28 +116,35 @@ function TokenStakeInfo({ selectedAccount }) {
 
   return (
     <div>
-      {selectedAccount && stakingTokenInfo && stakingTokenBalance && (
-        <StakeForm
-          account={selectedAccount}
-          stakingToken={{
-            ...stakingTokenInfo,
-            address: tokenStakeInfo.stakingToken,
-            balance: stakingTokenBalance.balance.toString(),
-            decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
-          }}
-        />
-      )}
-      {selectedAccount && stakingTokenInfo && addressInfo && (
-        <WithdrawForm
-          account={selectedAccount}
-          stakingToken={{
-            ...stakingTokenInfo,
-            address: tokenStakeInfo.stakingToken,
-            balance: addressInfo.stake[0].toString(),
-            decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
-          }}
-        />
-      )}
+      <div className={styles.stakingContainer}>
+        {selectedAccount && stakingTokenInfo && stakingTokenBalance && (
+          <>
+            <StakeForm
+              account={selectedAccount}
+              stakingToken={{
+                ...stakingTokenInfo,
+                address: tokenStakeInfo.stakingToken,
+                balance: stakingTokenBalance.balance.toString(),
+                decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
+              }}
+            />
+            <StakeEthForm
+              account={selectedAccount}
+            />
+          </>
+        )}
+        {selectedAccount && stakingTokenInfo && addressInfo && (
+          <WithdrawForm
+            account={selectedAccount}
+            stakingToken={{
+              ...stakingTokenInfo,
+              address: tokenStakeInfo.stakingToken,
+              balance: addressInfo.stake[0].toString(),
+              decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
+            }}
+          />
+        )}
+      </div>
       <div className={styles.detailContainer}>
         <div className={styles.tableContainer}>
           <Table

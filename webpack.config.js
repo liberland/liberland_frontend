@@ -1,3 +1,4 @@
+/* eslint-disable */
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const Dotenv = require('dotenv-webpack');
@@ -142,7 +143,12 @@ module.exports = (env, argv) => {
         },
       ],
     },
-    devtool: argv.mode === 'development' ? 'eval-source-map' : undefined,
+    devtool: argv.mode === 'development' ? 'eval-cheap-module-source-map' : undefined,
+    cache: argv.mode === 'development' ? {
+      type: 'filesystem',
+      compression: 'gzip',
+      allowCollectingMemory: true,
+    } : undefined,
     plugins: [
       new HtmlWebPackPlugin({
         template: path.resolve(__dirname, 'public/index.html'),

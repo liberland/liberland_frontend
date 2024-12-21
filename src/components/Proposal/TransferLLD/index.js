@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import useTransferLLD from '../hooks/useTransferLLD';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
 
 function TransferLLD({ proposal }) {
   const {
@@ -14,7 +15,14 @@ function TransferLLD({ proposal }) {
       <b>Transfer</b>
       {` ${formattedValue} (LLD) `}
       <b>to</b>
-      {` ${identity ? `${identity} (${accountId})` : accountId}`}
+      {' '}
+      <CopyIconWithAddress
+        isTruncate
+        name={identity?.name}
+        legal={identity?.legal}
+        address={accountId}
+        showAddress
+      />
     </div>
   );
 }

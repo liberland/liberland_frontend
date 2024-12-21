@@ -18,7 +18,7 @@ function CurrentAssemble({
             currentCongressMembers?.map((currentCongressMember) => (
               <div
                 className={cx(stylesPage.transactionHistoryCardMain, styles.gridList)}
-                key={`current-congress-member${currentCongressMember.name}`}
+                key={`current-congress-member${currentCongressMember.rawIdentity}`}
               >
                 <PoliticanCard
                   politician={currentCongressMember}

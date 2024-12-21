@@ -3,47 +3,18 @@
 @import '../../assets/main.scss';
 
 .button {
-  background: $grey;
-  border-radius: 6px;
-  min-height: 58px;
-  border: none;
-  
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  min-width: max-content;
-
   & > svg {
     margin-right: 10px;
-  }
-  &.large{
-    min-width: 540px;
-  }
-  &.medium{
-    min-width: 222px;
   }
   &.little{
     min-width: 190px;
     min-height: 43px;
     font-size: 14px;
   }
-  &.small{
-    min-width: 139px;
-    min-height: 48px;
-    font-size: 14px;
-  }
   &.nano{
     min-width: 60px;
     min-height: 25px;
     font-size: 12px;
-  }
-  color: $black;
-  cursor: pointer;
-  &.primary {
-    background: $primary;
-    color: $clearBlack;
   }
   &.secondary {
     background: $secondary3;
@@ -52,10 +23,9 @@
   &.green{
     background: $succes;
     color: $bg4;
-  }
-  &.red{
-    background: $red;
-    color: $bg4;
+    &:focus,&:active,&:hover {
+      color: $clearBlack;
+    }
   }
   &.grey{
     background: $grey;
@@ -65,9 +35,14 @@
     border: 2px solid $red;
     color: $red;
   }
-
-  &:disabled{
-    opacity: 20%;
-    border: 1px solid $grey;
+  &.flex {
+    flex-grow: 1;
+    width: 100%;
+  }
+  &.multiline {
+    white-space: wrap;
+    height: auto;
+    padding: 0;
+    text-align: initial;
   }
 }

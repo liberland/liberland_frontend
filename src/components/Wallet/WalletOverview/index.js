@@ -1,94 +1,121 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-
-import Card from '../../Card';
-
+import React, { useEffect, useMemo, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import Collapse from 'antd/es/collapse';
+import Dropdown from 'antd/es/dropdown';
+import Flex from 'antd/es/flex';
+import Space from 'antd/es/space';
+import uniqBy from 'lodash/uniqBy';
+import DownOutlined from '@ant-design/icons/DownOutlined';
+import BalanceOverview from '../BalanceOverview';
+import WalletTransactionHistory from '../WalletTransactionHistory';
+import AssetOverview from '../AssetOverview';
+import { walletActions } from '../../../redux/actions';
+import { walletSelectors, blockchainSelectors, congressSelectors } from '../../../redux/selectors';
+import Button from '../../Button/Button';
+import { transactionHistoryProcessorFactory } from '../WalletTransactionHistory/utils';
+import RemarkTransferModalWrapper from '../RemarkTransferWrapper';
 import styles from './styles.module.scss';
-import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 
-function WalletOverview({
-  balances, liquidMerits, showStaked,
-}) {
-  const overviewInfo = [];
-  if (showStaked) {
-    overviewInfo.push(...[
-      {
-        amount: formatMerits(balances.liberstake.amount),
-        title: 'PolitiPooled',
-        currency: 'LLM',
-      },
-      {
-        amount: formatDollars(balances.polkastake.amount),
-        title: 'Validator Staked',
-        currency: 'LLD',
-      },
-    ]);
-  }
-  overviewInfo.push(...[
-    {
-      amount: formatMerits(liquidMerits),
-      title: 'Liquid',
-      currency: 'LLM',
-    },
-    {
-      amount: formatDollars(balances.liquidAmount.amount),
-      title: 'Liquid',
-      currency: 'LLD',
-    },
-  ]);
+function WalletOverview() {
+  const [filterTransactionsBy, setFilterTransactionsBy] = useState();
+
+  const balances = useSelector(walletSelectors.selectorBalances);
+  const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
+  const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
+  const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
+  const historyFetchFailed = useSelector(walletSelectors.selectorTxHistoryFailed);
+  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
+  const userIsMember = useSelector(congressSelectors.userIsMember);
+
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+
+  const dispatch = useDispatch();
+
+  const transactionHistoryTranslated = useMemo(
+    () => transactionHistory?.map(transactionHistoryProcessorFactory(userWalletAddress)) || [],
+    [transactionHistory, userWalletAddress],
+  );
+
+  useEffect(() => {
+    dispatch(walletActions.getWallet.call());
+    dispatch(walletActions.getAdditionalAssets.call());
+    dispatch(walletActions.getTxTransfers.call());
+  }, [dispatch, userWalletAddress]);
 
   return (
-    <Card className={styles.overviewWrapper} title="Overview">
-      <div className={styles.overViewCard}>
+    <Collapse
+      defaultActiveKey={['Remarks', 'BalanceOverview', 'AssetOverview', 'WalletTransactionHistory']}
+      items={[
         {
-          overviewInfo.map((cardInfo, index) => (
-            <div
-              className={styles.cardInfo}
-              // eslint-disable-next-line react/no-array-index-key
-              key={cardInfo + index}
-            >
-              <p className={styles.cardInfoAmount}>
-                {cardInfo.amount}
-              </p>
-              <p className={styles.cardInfoTitle}>
-                {cardInfo.title}
-                {' '}
-                {cardInfo.currency}
-              </p>
-            </div>
-          ))
-        }
-      </div>
-    </Card>
+          key: 'BalanceOverview',
+          label: 'Balance overview',
+          children: (
+            <BalanceOverview
+              totalBalance={totalBalance}
+              balances={balances}
+              liquidMerits={liquidMerits}
+            />
+          ),
+        },
+        {
+          key: 'AssetOverview',
+          label: 'Additional assets',
+          children: (
+            <AssetOverview
+              additionalAssets={additionalAssets}
+              userIsMember={userIsMember}
+            />
+          ),
+        },
+        {
+          label: 'Remarks',
+          key: 'Remarks',
+          children: (
+            <RemarkTransferModalWrapper />
+          ),
+        },
+        {
+          key: 'WalletTransactionHistory',
+          label: 'Transaction history',
+          extra: (
+            <Flex align="center" justify="center" gap="15px" onClick={(e) => e.stopPropagation()}>
+              <span className={styles.description}>
+                Show
+              </span>
+              <Dropdown
+                trigger={['click']}
+                arrow={false}
+                menu={{
+                  items: [{ key: '', label: 'All transaction types' }]
+                    .concat(uniqBy(transactionHistoryTranslated, ({ typeText }) => typeText).map(({ typeText }) => ({
+                      key: typeText,
+                      label: typeText,
+                    }))),
+                  onClick: ({ key }) => {
+                    setFilterTransactionsBy(key);
+                  },
+                }}
+              >
+                <Button>
+                  <Space>
+                    {filterTransactionsBy || 'All transaction types'}
+                    <DownOutlined />
+                  </Space>
+                </Button>
+              </Dropdown>
+            </Flex>
+          ),
+          children: (
+            <WalletTransactionHistory
+              failure={historyFetchFailed}
+              transactionHistory={transactionHistoryTranslated}
+              filterTransactionsBy={filterTransactionsBy}
+            />
+          ),
+        },
+      ]}
+    />
   );
 }
-WalletOverview.defaultProps = {
-  totalBalance: '0x0',
-  balances: {},
-  liquidMerits: 0,
-  showStaked: true,
-};
-
-WalletOverview.propTypes = {
-  // eslint-disable-next-line
-  totalBalance: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  showStaked: PropTypes.bool,
-  balances: PropTypes.shape({
-    liquidAmount: PropTypes.shape({
-      // eslint-disable-next-line react/forbid-prop-types
-      amount: PropTypes.object,
-    }),
-    liberstake: PropTypes.shape({
-      amount: PropTypes.number,
-    }),
-    polkastake: PropTypes.shape({
-      amount: PropTypes.number,
-    }),
-    liquidMerits: PropTypes.shape({
-      amount: PropTypes.string,
-    }),
-  }),
-  liquidMerits: PropTypes.string,
-};
 
 export default WalletOverview;

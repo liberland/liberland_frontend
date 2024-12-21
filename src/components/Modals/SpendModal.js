@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
-import InputSearch from '../InputComponents/InputSearchAddressName';
+import InputSearch from '../InputComponents/OldInputSearchAddressName';
 
 // STYLES
 import styles from './styles.module.scss';
@@ -17,9 +17,10 @@ import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { encodeRemark } from '../../api/nodeRpcCall';
+import { OfficeType } from '../../utils/officeTypeEnum';
 
 function SpendModal({
-  closeModal, onSend, spendData, isCongress, balance,
+  closeModal, onSend, spendData, officeType, balance,
 }) {
   const dispatch = useDispatch();
   const {
@@ -115,17 +116,17 @@ function SpendModal({
 
       <RemarkForm errors={errors} register={register} watch={watch} setValue={setValue} />
 
-      {isCongress && (
+      {officeType === OfficeType.CONGRESS && (
       <>
         <div className={styles.title}>
-          {isCongress ? 'Congress' : 'Senate'}
+          Congress
           {' '}
           voting time in days
         </div>
         <div className={styles.description}>
           How long will it take
           {' '}
-          {isCongress ? 'Congress' : 'Senate'}
+          Congress
           {' '}
           to close the motion?
         </div>
@@ -172,7 +173,6 @@ function SpendModal({
 }
 
 SpendModal.defaultProps = {
-  isCongress: true,
   spendData: {
     title: '',
     description: '',
@@ -191,7 +191,7 @@ SpendModal.propTypes = {
     subtitle: PropTypes.string,
     submitButtonText: PropTypes.string,
   }),
-  isCongress: PropTypes.bool,
+  officeType: PropTypes.string.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   balance: PropTypes.object.isRequired,
 };

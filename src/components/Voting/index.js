@@ -7,8 +7,6 @@ import { NavLink, useLocation } from 'react-router-dom/cjs/react-router-dom.min'
 
 import { useSelector } from 'react-redux';
 import { AuthContext } from 'react-oauth2-code-pkce';
-import VotingHeader from './VotingHeader';
-import RoleHOC from '../../hocs/RoleHOC';
 import router from '../../router';
 
 import CongressionalAssemble from './CongressionalAssemble';
@@ -18,6 +16,15 @@ import Referendum from './Referendum';
 import { AddLegislation } from './Referendum/ProposalForms/AddLegislation/AddLegislation';
 import Button from '../Button/Button';
 import { userSelectors } from '../../redux/selectors';
+import { MotionProvider } from '../WalletCongresSenate/ContextMotions';
+
+function ReferendumWrapper() {
+  return (
+    <MotionProvider>
+      <Referendum />
+    </MotionProvider>
+  );
+}
 
 function Voting() {
   const location = useLocation();
@@ -27,7 +34,6 @@ function Voting() {
     <div className={stylesPage.sectionWrapper}>
       <div className={stylesPage.menuAddressWrapper}>
         <div className={styles.votingHeaderWrapper}>
-          <VotingHeader />
           {location.pathname === router.voting.referendum && (
           <NavLink
             className={styles.linkButton}
@@ -35,7 +41,6 @@ function Voting() {
           >
             <Button
               onClick={() => !user && login()}
-              small
               primary
             >
               {user ? 'Propose' : 'Log in to propose referenda'}
@@ -55,7 +60,7 @@ function Voting() {
           />
           <Route
             path={router.voting.referendum}
-            component={Referendum}
+            component={ReferendumWrapper}
           />
           <Route
             path={router.voting.addLegislation}
@@ -65,9 +70,7 @@ function Voting() {
             exact
             path={router.home.voting}
             render={() => (
-              <RoleHOC>
-                <Redirect to={router.voting.congressionalAssemble} />
-              </RoleHOC>
+              <Redirect to={router.voting.congressionalAssemble} />
             )}
           />
         </Switch>

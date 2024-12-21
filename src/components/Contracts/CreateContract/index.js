@@ -8,7 +8,7 @@ import Button from '../../Button/Button';
 import stylesOwn from './styles.module.scss';
 import ModalRoot from '../../Modals/ModalRoot';
 import styles from '../../Modals/styles.module.scss';
-import InputSearch from '../../InputComponents/InputSearchAddressName';
+import InputSearch from '../../InputComponents/OldInputSearchAddressName';
 
 function CreateContract({ handleModal, isMyContracts }) {
   const dispatch = useDispatch();

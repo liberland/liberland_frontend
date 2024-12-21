@@ -18,11 +18,10 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
 import {
-  parseIdentityData,
   parseDOB,
   parseAdditionalFlag,
   parseCitizenshipJudgement,
-  parseLegal,
+  decodeAndFilter,
 } from '../../utils/identityParser';
 
 function OnchainIdentityModal({
@@ -37,27 +36,32 @@ function OnchainIdentityModal({
   let identityCitizen = false;
   let eResident = false;
   let identityDOB = false;
+  let company = false;
 
   if (identity.isSome) {
     const { judgements, info } = identity.unwrap();
     identityCitizen = parseAdditionalFlag(info.additional, 'citizen');
     eResident = parseAdditionalFlag(info.additional, 'eresident');
+    company = parseAdditionalFlag(info.additional, 'company');
     let onChainIdentity;
     if (identityCitizen && eResident) {
       onChainIdentity = 'citizen';
     } else if (!identityCitizen && eResident) {
       onChainIdentity = 'eresident';
+    } else if (company) {
+      onChainIdentity = 'company';
     } else {
       onChainIdentity = 'neither';
     }
 
     identityDOB = parseDOB(info.additional, blockNumber);
 
+    const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email']);
     defaultValues = {
-      display: parseIdentityData(info.display) ?? name,
-      legal: parseLegal(info) ?? name,
-      web: parseIdentityData(info.web),
-      email: parseIdentityData(info.email),
+      display: decodedData?.display ?? name,
+      legal: decodedData?.legal ?? name,
+      web: decodedData?.web,
+      email: decodedData?.email,
       date_of_birth: identityDOB ?? undefined,
       older_than_15: !identityDOB,
       onChainIdentity,
@@ -126,6 +130,7 @@ function OnchainIdentityModal({
         options={[
           { value: 'eresident', display: 'E-resident' },
           { value: 'citizen', display: 'Citizen' },
+          { value: 'company', display: 'Company' },
           { value: 'neither', display: 'Neither' },
         ]}
       />

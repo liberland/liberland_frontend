@@ -15,7 +15,7 @@ function WalletListComponent() {
 
   return (
     <div style={{ width: '100%' }}>
-      {walletList.map((walletObject, index) => (
+      {walletList.length > 0 && walletList.map((walletObject, index) => (
         // eslint-disable-next-line react/no-array-index-key
         <div className={styles.connectWalletContainer} key={`availableWallet${index}`}>
           <div
@@ -41,6 +41,7 @@ function WalletListComponent() {
           <br />
         </div>
       ))}
+      {walletList.length === 0 && <div>No wallet connected. Connect your wallet to get started!</div>}
     </div>
   );
 }
