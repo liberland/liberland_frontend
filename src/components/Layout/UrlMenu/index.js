@@ -41,6 +41,7 @@ function UrlMenu() {
       label: <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>{navigation.title}</span>,
       key: navigation.route,
       onClick: subs.length ? undefined : () => history.push(navigation.route),
+      onTitleClick: !subs.length ? undefined : () => history.push(navigation.route),
       children: subs.length ? subs : undefined,
     };
   };
