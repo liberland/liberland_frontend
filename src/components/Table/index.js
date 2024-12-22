@@ -5,12 +5,13 @@ import TableInternal from 'antd/es/table';
 function Table({ columns, data }) {
   const identityData = useMemo(() => data?.map((d) => ({
     ...d,
-    hash: Object.values(d).map((val) => val.toString()).join('|'),
+    hash: d.hash || Object.values(d).map((val) => val.toString()).join('|'),
   })) || [], [data]);
   return (
     <TableInternal
       dataSource={identityData}
       rowKey="hash"
+      onRow={() => ({ tabIndex: '0' })}
       columns={columns.map(({ Header, accessor }) => ({
         dataIndex: accessor,
         key: accessor,

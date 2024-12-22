@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
+import objectHash from 'object-hash';
+import Title from 'antd/es/typography/Title';
 import PropTypes from 'prop-types';
 import { useProposalContext } from '../ProposalContext';
 import { proposalHeading, proposalTableHeadings } from '../utils';
-import stylesPage from '../../../utils/pagesBase.module.scss';
 import Table from '../../Table';
-import Card from '../../Card';
 
 function ProposalTable({ type }) {
   const headings = useMemo(
@@ -21,18 +21,21 @@ function ProposalTable({ type }) {
   }
 
   return (
-    <Card title={proposalHeading(type)} className={stylesPage.overviewWrapper}>
+    <>
+      <Title level={3}>
+        {proposalHeading(type)}
+      </Title>
       <Table
         columns={headings.map((heading, index) => ({
           Header: heading,
           accessor: index.toString(),
         }))}
-        data={rows.map(([_, values]) => values.reduce((map, value, index) => {
+        data={rows.map(([key, values]) => values.reduce((map, value, index) => {
           map[index.toString()] = value;
           return map;
-        }, {}))}
+        }, { hash: objectHash(key) }))}
       />
-    </Card>
+    </>
   );
 }
 
