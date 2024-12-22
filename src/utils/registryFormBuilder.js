@@ -216,7 +216,7 @@ export function BuildRegistryForm({
             {' '}
             <a
               // eslint-disable-next-line max-len
-              href="https://docs.liberland.org/public-documents/blockchain/for-citizens/how-to-run-liberland-company"
+              href="https://docs.liberland.org/blockchain/for-citizens/how-to-run-liberland-company"
               target="_blank"
               rel="noreferrer"
             >

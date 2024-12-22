@@ -93,6 +93,10 @@
   }
 }
 
+.transferWithRemarkWidth {
+  width: 88%;
+}
+
 @media (min-width: 640px) {
   .getCitizenshipModal {
     max-width: 765px;
@@ -334,6 +338,13 @@
   width: 10px;
   height: 10px;
   margin-left: 5px;
+}
+
+.primaryIcon {
+  width: 15px;
+  height: 15px;
+  margin-left: 5px;
+  margin-bottom: 4.9px;
 }
 
 .arrowIcon {

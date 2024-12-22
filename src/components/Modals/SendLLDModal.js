@@ -1,5 +1,5 @@
 // LIBS
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
@@ -9,7 +9,7 @@ import { BN_ZERO, BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
-import InputSearch from '../InputComponents/InputSearchAddressName';
+import InputSearch from '../InputComponents/OldInputSearchAddressName';
 
 // STYLES
 import styles from './styles.module.scss';
@@ -21,10 +21,10 @@ import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 function SendLLDModal({ closeModal }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
-  const maxUnbond = BN.max(
+  const maxUnbond = balances?.liquidAmount?.amount !== '0x0' ? BN.max(
     BN_ZERO,
     new BN(balances?.liquidAmount?.amount ?? 0).sub(parseDollars('2')), // leave at least 2 liquid LLD...
-  );
+  ) : 0;
 
   const {
     handleSubmit,
@@ -119,7 +119,7 @@ SendLLDModal.propTypes = {
 };
 
 function SendLLDModalWrapper() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   return (
     <>
       <Button className={styles.button} onClick={() => setOpen(true)}>

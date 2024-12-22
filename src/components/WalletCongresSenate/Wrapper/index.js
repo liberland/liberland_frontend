@@ -21,7 +21,7 @@ export default function WalletCongresSenateWrapper({
   additionalAssets,
   onSendFunctions,
   balances,
-  isCongress,
+  officeType,
   userIsMember,
 }) {
   const { LLD, LLM, LLMPolitipool } = onSendFunctions;
@@ -90,24 +90,22 @@ export default function WalletCongresSenateWrapper({
         </div>
       </div>
 
-      <div className={styles.balanceWrapper}>
-        <BalanceOverview
-          totalBalance={totalBalance}
-          balances={balances}
-          liquidMerits={liquidMerits}
-          showStaked={false}
-        />
-      </div>
-      <div className={styles.assetsWrapper}>
-        <AssetOverview
-          additionalAssets={additionalAssets}
-          isRemarkNeeded
-          isCongress={isCongress}
-        />
-      </div>
+      <BalanceOverview
+        totalBalance={totalBalance}
+        balances={balances}
+        liquidMerits={liquidMerits}
+        showStaked={false}
+      />
+      <AssetOverview
+        additionalAssets={additionalAssets}
+        isRemarkNeeded
+        officeType={officeType}
+        userIsMember={userIsMember}
+        isCongress
+      />
       {isModalOpenLLDSpend && (
       <SpendModalWrapper
-        isCongress={isCongress}
+        officeType={officeType}
         closeModal={toggleModalLLDSpendOpen}
         onSend={LLD}
         spendData={{
@@ -119,7 +117,7 @@ export default function WalletCongresSenateWrapper({
       {isModalOpenLLMSpend
       && (
       <SpendModalWrapper
-        isCongress={isCongress}
+        officeType={officeType}
         closeModal={toggleModalLLMSpendOpen}
         onSend={LLM}
         spendData={{
@@ -130,7 +128,7 @@ export default function WalletCongresSenateWrapper({
       )}
       {isModalOpenPolitipoolLLMSpend && (
       <SpendModalWrapper
-        isCongress={isCongress}
+        officeType={officeType}
         closeModal={toggleModalPolitipoolLLMSpendOpen}
         spendData={{
           name: 'LLM to politipool',
@@ -146,12 +144,8 @@ export default function WalletCongresSenateWrapper({
   );
 }
 
-WalletCongresSenateWrapper.defaultProps = {
-  isCongress: true,
-};
-
 WalletCongresSenateWrapper.propTypes = {
-  isCongress: PropTypes.bool,
+  officeType: PropTypes.string.isRequired,
   totalBalance: PropTypes.oneOfType([PropTypes.number.isRequired, PropTypes.string.isRequired]).isRequired,
   congresAccountAddress: PropTypes.string.isRequired,
   liquidMerits: PropTypes.string.isRequired,

@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import Flex from 'antd/es/flex';
 import ModalRoot from '../../../Modals/ModalRoot';
 import Button from '../../../Button/Button';
-import UpdateOrCreateAssetFormModalWrapper from '../UpdateOrCreateAssetForm';
-import styles from './styles.module.scss';
+import CreateOrUpdateAssetFormModalWrapper from '../CreateOrUpdateAssetForm';
 import MintAssetFormModalWrapper from '../MintAssetForm';
 
 function ActionsMenu({
@@ -16,9 +15,9 @@ function ActionsMenu({
   onClose,
 }) {
   return (
-    <div className={classNames(styles.form, styles.assetButtonsContainer)}>
+    <Flex gap="15px" justify="center" align="center" vertical>
       {(isOwner || isAdmin) && (
-        <UpdateOrCreateAssetFormModalWrapper defaultValues={defaultValues} />
+        <CreateOrUpdateAssetFormModalWrapper defaultValues={defaultValues} />
       )}
       {isIssuer && (
         <MintAssetFormModalWrapper
@@ -29,7 +28,7 @@ function ActionsMenu({
       <Button medium onClick={onClose}>
         Close
       </Button>
-    </div>
+    </Flex>
   );
 }
 
@@ -37,7 +36,7 @@ const defaultValues = PropTypes.shape({
   id: PropTypes.number,
   name: PropTypes.string,
   symbol: PropTypes.string,
-  decimals: PropTypes.string,
+  decimals: PropTypes.number,
   balance: PropTypes.number,
   admin: PropTypes.string,
   issuer: PropTypes.string,
@@ -60,7 +59,7 @@ function ActionsMenuModalWrapper({
   assetId,
   defaultValues: dV,
 }) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
   if (!isOwner && !isIssuer && !isAdmin) {
     return null;
   }

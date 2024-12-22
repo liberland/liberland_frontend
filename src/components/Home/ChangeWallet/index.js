@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
 import Dropdown from 'antd/es/dropdown/dropdown';
@@ -11,6 +11,7 @@ import { blockchainSelectors } from '../../../redux/selectors';
 import truncate from '../../../utils/truncate';
 import Polkadot from '../../../assets/icons/polkadot.svg';
 import styles from './styles.module.scss';
+import Button from '../../Button/Button';
 
 function ChangeWallet() {
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 576px)');
@@ -20,7 +21,7 @@ function ChangeWallet() {
   );
 
   const dispatch = useDispatch();
-  const onWalletAdresssChange = (address) => {
+  const onWalletAdresssChange = useCallback((address) => {
     if (address) {
       dispatch(blockchainActions.setUserWallet.success(address));
       dispatch(validatorActions.getInfo.call());
@@ -28,16 +29,15 @@ function ChangeWallet() {
       dispatch(democracyActions.getDemocracy.call());
       localStorage.setItem('BlockchainAdress', address);
     }
-  };
+  }, [dispatch]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (wallets?.length === 1 && !walletAdressSelector) {
       onWalletAdresssChange(wallets[0].address);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [walletAdressSelector, wallets]);
+  }, [walletAdressSelector, wallets, onWalletAdresssChange]);
 
-  const displaySelected = React.useMemo(() => {
+  const displaySelected = useMemo(() => {
     const found = wallets.find(({ address }) => walletAdressSelector === address);
     if (found) {
       const { meta, address } = found;
@@ -81,14 +81,13 @@ function ChangeWallet() {
       }}
       className={styles.dropdown}
     >
-      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-      <a href="#" onClick={(e) => e.preventDefault()} className={styles.dropdownLink}>
+      <Button link>
         {isBiggerThanSmallScreen && (
           <img src={Polkadot} className={styles.polkadot} alt="Polkadot icon" />
         )}
         {displaySelected}
         <DownOutlined />
-      </a>
+      </Button>
     </Dropdown>
   );
 }

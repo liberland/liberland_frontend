@@ -96,19 +96,23 @@ export const convertTransferData = async (
 };
 
 export const convertAssetData = (assetsData, asset1, asset2) => {
-  const asset1Metadata = assetsData[Number(asset1)]?.metadata;
+  const asset1Values = assetsData[Number(asset1)];
+  const asset1Metadata = asset1Values?.metadata;
   const assetData1 = {
     decimals: asset1Metadata?.decimals ? Number(asset1Metadata?.decimals) : undefined,
     deposit: asset1Metadata?.deposit,
     name: asset1Metadata?.name,
     symbol: asset1Metadata?.symbol,
+    isStock: asset1Values?.isStock,
   };
-  const asset2Metadata = assetsData[Number(asset2)]?.metadata;
+  const asset2Values = assetsData[Number(asset2)];
+  const asset2Metadata = asset2Values?.metadata;
   const assetData2 = {
     decimals: asset2Metadata?.decimals ? Number(asset2Metadata?.decimals) : undefined,
     deposit: asset2Metadata?.deposit,
     name: asset2Metadata?.name,
     symbol: asset2Metadata?.symbol,
+    isStock: asset2Values?.isStock,
   };
   return { assetData1, assetData2 };
 };

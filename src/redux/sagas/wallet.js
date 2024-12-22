@@ -13,6 +13,9 @@ import {
   unpool, getAdditionalAssets, sendAssetTransfer,
   getAssetData,
   getAssetDetails,
+  transferWithRemark,
+  mintAsset,
+  createOrUpdateAsset,
 } from '../../api/nodeRpcCall';
 import { getHistoryTransfers } from '../../api/explorer';
 
@@ -137,7 +140,40 @@ function* getTransfersTxWorker() {
   }
 }
 
+function* sendTransferRemarkWorker(action) {
+  const { transferData, remarkInfo } = action.payload;
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+  yield call(transferWithRemark, remarkInfo, transferData, walletAddress);
+  yield put(walletActions.sendTransferRemark.success());
+}
+
+function* mintAssetWorker(action) {
+  yield call(mintAsset, action.payload);
+  yield put(walletActions.mintAsset.success());
+  yield put(walletActions.getAdditionalAssets.call());
+}
+
+function* createOrUpdateAssetWorker(action) {
+  yield call(createOrUpdateAsset, action.payload);
+  yield put(walletActions.createOrUpdateAsset.success());
+  yield put(walletActions.getAdditionalAssets.call());
+}
+
 // WATCHERS
+
+function* sendTransferWithRemarkWatcher() {
+  yield* blockchainWatcher(walletActions.sendTransferRemark, sendTransferRemarkWorker);
+}
+
+function* mintAssetWatcher() {
+  yield* blockchainWatcher(walletActions.mintAsset, mintAssetWorker);
+}
+
+function* createOrUpdateAssetWatcher() {
+  yield* blockchainWatcher(walletActions.createOrUpdateAsset, createOrUpdateAssetWorker);
+}
 
 function* getWalletWatcher() {
   yield* blockchainWatcher(walletActions.getWallet, getWalletWorker);
@@ -209,4 +245,7 @@ export {
   unpoolWatcher,
   getAssetsBalanceWatcher,
   getAssetDetailsWatcher,
+  sendTransferWithRemarkWatcher,
+  mintAssetWatcher,
+  createOrUpdateAssetWatcher,
 };

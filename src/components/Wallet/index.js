@@ -7,8 +7,8 @@ import router from '../../router';
 import { blockchainSelectors } from '../../redux/selectors';
 import styles from './styles.module.scss';
 import Card from '../Card';
-import RoleHOC from '../../hocs/RoleHOC';
 import { loader } from '../../utils/loader';
+import { stockWrapper } from './StockContext';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -21,19 +21,23 @@ function Wallet() {
         />
         <Route
           path={router.wallet.exchange}
-          component={loader(() => import('./Exchange'))}
+          component={stockWrapper(loader(() => import('./Exchange')), false)}
+        />
+        <Route
+          path={router.wallet.stockExchange}
+          component={stockWrapper(loader(() => import('./Exchange')), true)}
         />
         <Route
           path={router.wallet.assets}
-          component={loader(() => import('./Assets'))}
+          component={stockWrapper(loader(() => import('./Assets')), false)}
+        />
+        <Route
+          path={router.wallet.stocks}
+          component={stockWrapper(loader(() => import('./Assets')), true)}
         />
         <Route
           path={router.wallet.bridge}
           component={loader(() => import('./Bridge'))}
-        />
-        <Route
-          path={router.wallet.nfts}
-          component={loader(() => import('./Nfts'))}
         />
         <Route
           path={router.wallet.payMe}
@@ -43,9 +47,7 @@ function Wallet() {
           exact
           path={router.home.wallet}
           render={() => (
-            <RoleHOC>
-              <Redirect to={router.wallet.overView} />
-            </RoleHOC>
+            <Redirect to={router.wallet.overView} />
           )}
         />
       </Switch>

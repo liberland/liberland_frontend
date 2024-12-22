@@ -46,6 +46,11 @@ function Offices() {
         path={router.offices.scheduledCongressSpending}
         component={loader(() => import('./ScheduledCongressSpendingWrapper'))}
       />
+      <Route
+        exact
+        path={router.offices.ministryOfFinance}
+        component={loader(() => import('./MinistryOfFinance'))}
+      />
     </Switch>
   );
 }

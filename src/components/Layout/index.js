@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import LayoutInternal, {
   Content,
@@ -18,15 +18,21 @@ import Tabs from './Tabs';
 
 function Layout({ children }) {
   const dispatch = useDispatch();
-  React.useEffect(() => {
+  useEffect(() => {
     dispatch(walletActions.getWallet.call());
   }, [dispatch]);
 
   return (
     <ConfigProvider
+      form={{
+        validateMessages: {
+          required: 'Enter a value',
+        },
+      }}
       theme={{
         token: {
           colorText: '#243F5F',
+          fontSize: 15,
         },
         components: {
           Layout: {
@@ -57,15 +63,14 @@ function Layout({ children }) {
           Button: {
             defaultActiveBorderColor: '#243F5F',
             defaultBg: 'white',
-            defaultBorderColor: '#ECEBF0',
+            defaultBorderColor: '#ACBDC5',
             defaultHoverBorderColor: '#243F5F',
-            defaultHoverColor: '243F5F',
+            defaultHoverColor: '#243F5F',
             defaultShadow: '0',
-            primaryColor: 'white',
+            primaryColor: '#243F5F',
             primaryShadow: '0',
-            contentFontSize: '12px',
-            paddingBlock: '10px',
-            paddingInline: '5px',
+            paddingBlock: '18px',
+            paddingInline: '12px',
           },
           Typography: {
             colorText: '#243F5F',
@@ -85,6 +90,21 @@ function Layout({ children }) {
           },
           Card: {
             extraColor: '#243F5F',
+            actionsLiMargin: '12px 5px',
+          },
+          InputNumber: {
+            controlWidth: '100%',
+            activeBorderColor: '#243F5F',
+            hoverBorderColor: '#243F5F',
+            colorText: '#243F5F',
+          },
+          Input: {
+            activeBorderColor: '#243F5F',
+            hoverBorderColor: '#243F5F',
+            colorText: '#243F5F',
+          },
+          Message: {
+            margin: 'auto 0',
           },
         },
       }}

@@ -40,13 +40,13 @@ function CopyIconWithAddress({
         </span>
       ) : (
         <span>
-          {isTruncate ? truncate(address, isBigScreen ? 18 : 12) : address}
+          {isTruncate ? truncate(address || '', isBigScreen ? 18 : 12) : address}
         </span>
       )}
       {showAddress && (name || legal) && (
         <span>
           (
-            {isTruncate ? truncate(address, isBigScreen ? 18 : 12) : address}
+            {isTruncate ? truncate(address || '', isBigScreen ? 18 : 12) : address}
           )
         </span>
       )}

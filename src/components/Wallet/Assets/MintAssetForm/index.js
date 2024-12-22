@@ -1,33 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
+import InputNumber from 'antd/es/input-number';
+import Flex from 'antd/es/flex';
 import PropTypes from 'prop-types';
 import { blockchainSelectors } from '../../../../redux/selectors';
 import { walletActions } from '../../../../redux/actions';
-import { mintAsset } from '../../../../api/nodeRpcCall';
 import ModalRoot from '../../../Modals/ModalRoot';
-import { TextInput } from '../../../InputComponents';
 import Button from '../../../Button/Button';
-import { isValidSubstrateAddress } from '../../../../utils/walletHelpers';
 import InputSearch from '../../../InputComponents/InputSearchAddressName';
 import styles from './styles.module.scss';
+import { useStockContext } from '../../StockContext';
 
-function MintAssetForm({ assetId, onClose, minimumBalance }) {
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    watch,
-    setError,
-    trigger,
-    formState: {
-      errors,
-      isSubmitting,
-      isSubmitSuccessful,
-    },
-  } = useForm({
-    mode: 'onChange',
-  });
+function MintAssetForm({
+  assetId,
+  onClose,
+  minimumBalance,
+  isStock,
+}) {
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState();
 
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
@@ -38,120 +30,82 @@ function MintAssetForm({ assetId, onClose, minimumBalance }) {
     amount,
     beneficiary,
   }) => {
+    setLoading(true);
     try {
-      await mintAsset({
+      dispatch(walletActions.mintAsset.call({
         amount,
         beneficiary,
         id: assetId,
         owner: userWalletAddress,
-      });
-      dispatch(walletActions.getAdditionalAssets.call());
+      }));
+      onClose();
     } catch (e) {
-      setError('amount', { message: 'Something went wrong' });
+      // eslint-disable-next-line no-console
+      console.error(e);
+      setLoading(false);
     }
   };
-
-  const amount = watch('amount', '');
-
-  const validateAddress = (v) => (
-    !isValidSubstrateAddress(v)
-      ? 'Invalid Address'
-      : undefined
-  );
 
   if (!userWalletAddress) {
     return <div>Loading...</div>;
   }
 
+  const submitText = isStock ? 'Issue stock' : 'Mint assets';
+
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
+    <Form
+      form={form}
+      onFinish={onSubmit}
       className={styles.form}
+      layout="vertical"
     >
-      <div className={styles.asset}>
-        <label className={styles.wrapper}>
-          Mint amount
-          <div className={styles.inputWrapper}>
-            <TextInput
-              register={register}
-              name="amount"
-              errorTitle="Amount"
-              value={amount}
-              className={styles.input}
-              onChange={(event) => setValue('amount', event.target.value)}
-              validate={(input) => {
-                if (!input) {
-                  return undefined;
-                }
-                if (!/^\d*\.?\d+$/.test(input)) {
-                  return 'Invalid amount';
-                }
+      <Form.Item
+        name="amount"
+        label={`${isStock ? 'Issue' : 'Mint'} amount`}
+        rules={[
+          { required: true },
+          {
+            validator: (_, input) => {
+              if (input) {
                 try {
                   const isEnough = window.BigInt(input) > window.BigInt(minimumBalance);
-                  return isEnough ? undefined : `Amount is smaller than minimum balance: ${minimumBalance}`;
+                  if (!isEnough) {
+                    return Promise.reject(`Amount is smaller than minimum balance: ${minimumBalance}`);
+                  }
                 } catch (e) {
                   // eslint-disable-next-line no-console
                   console.error(e);
-                  return 'Invalid amount';
+                  return Promise.reject('Amount is invalid');
                 }
-              }}
-              disabled={isSubmitting}
-              required
-            />
-          </div>
-          {errors.amount && (
-            <div className={styles.error}>
-              {errors.amount.message}
-            </div>
-          )}
-          {isSubmitSuccessful && (
-            <div className={styles.success}>
-              Assets minted successfully
-            </div>
-          )}
-        </label>
-      </div>
-      <div className={styles.asset}>
-        <label className={styles.wrapper} htmlFor="beneficiary">
-          Beneficiary account
-          <div className={styles.inputWrapper}>
-            <InputSearch
-              id="beneficiary"
-              errorTitle="Beneficiary account"
-              register={register}
-              name="beneficiary"
-              placeholder="Beneficiary"
-              isRequired
-              trigger={trigger}
-              setValue={setValue}
-              validate={validateAddress}
-            />
-          </div>
-          {errors.beneficiary && (
-            <div className={styles.error}>
-              {errors.beneficiary.message}
-            </div>
-          )}
-        </label>
-      </div>
-      <div className={styles.buttonRow}>
-        <div className={styles.closeForm}>
-          <Button disabled={isSubmitting} medium onClick={onClose}>
-            Close
-          </Button>
-        </div>
-        <div>
-          <Button
-            primary
-            medium
-            type="submit"
-            disabled={isSubmitting}
-          >
-            Mint assets
-          </Button>
-        </div>
-      </div>
-    </form>
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <InputNumber stringMode controls={false} />
+      </Form.Item>
+      <Form.Item
+        name="beneficiary"
+        label="Beneficiary amount"
+        rules={[{ required: true }]}
+      >
+        <InputSearch />
+      </Form.Item>
+      <Flex wrap gap="15px">
+        <Button disabled={loading} medium onClick={onClose}>
+          Close
+        </Button>
+        <Button
+          primary
+          medium
+          type="submit"
+          disabled={loading}
+        >
+          {loading ? 'Minting...' : submitText}
+        </Button>
+      </Flex>
+    </Form>
   );
 }
 
@@ -159,32 +113,35 @@ MintAssetForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   assetId: PropTypes.number.isRequired,
   minimumBalance: PropTypes.number.isRequired,
+  isStock: PropTypes.bool,
 };
 
 function MintAssetFormModalWrapper({
   assetId,
   minimumBalance,
 }) {
-  const [show, setShow] = React.useState();
+  const [show, setShow] = useState();
+  const { isStock } = useStockContext();
   return (
-    <div>
+    <>
       <Button
         primary
         medium
         onClick={() => setShow(true)}
       >
-        Mint asset
+        {isStock ? 'Issue stock' : 'Mint asset'}
       </Button>
       {show && (
-        <ModalRoot id="mint">
+        <ModalRoot>
           <MintAssetForm
             assetId={assetId}
             minimumBalance={minimumBalance}
             onClose={() => setShow(false)}
+            isStock={isStock}
           />
         </ModalRoot>
       )}
-    </div>
+    </>
   );
 }
 

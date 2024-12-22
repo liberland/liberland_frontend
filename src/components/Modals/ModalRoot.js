@@ -1,59 +1,33 @@
-import React, { useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
+import Modal from 'antd/es/modal';
 import PropTypes from 'prop-types';
+import CloseableModal from './CloseableModal';
 
-const modalContainer = (id) => {
-  const existing = document.getElementById(id);
-  if (!existing) {
-    const newElement = document.createElement('div');
-    newElement.id = id;
-    newElement.className = 'modal-root';
-    document.body.appendChild(newElement);
-    return newElement;
+function ModalRoot({ children, onClose }) {
+  if (onClose) {
+    return (
+      <CloseableModal onClose={onClose}>
+        {children}
+      </CloseableModal>
+    );
   }
-  return existing;
-};
 
-function ModalRoot({ children, id }) {
-  const root = useRef(modalContainer(id));
-
-  useEffect(() => {
-    root.current.classList.add('active');
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      root.current.classList.remove('active');
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
-
-  const customChildren = React.Children.map(children, (child) => {
-    const props = { root };
-    return React.cloneElement(child, props);
-  });
-
-  const content = (
-    <div className={children.props.proposal?.proposalModalShown ? 'modal-wrapper modal-text-wrapper' : 'modal-wrapper'}>
-      <div>
-        { customChildren }
-      </div>
-    </div>
-  );
-
-  return ReactDOM.createPortal(
-    content,
-    root.current,
+  return (
+    <Modal
+      open
+      footer={null}
+      closable={Boolean(onClose)}
+      maskClosable={Boolean(onClose)}
+      onClose={onClose}
+    >
+      {children}
+    </Modal>
   );
 }
 
 ModalRoot.propTypes = {
-  id: PropTypes.string,
   children: PropTypes.node,
-};
-
-ModalRoot.defaultProps = {
-  id: 'modal-root',
+  onClose: PropTypes.func,
 };
 
 export default ModalRoot;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN } from '@polkadot/util';
@@ -77,7 +77,7 @@ UnpoolModal.propTypes = {
 };
 
 function UnpoolModalWrapper() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   return (
     <>
       <Button className={styles.button} onClick={() => setOpen(true)}>

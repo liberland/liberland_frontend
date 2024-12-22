@@ -13,7 +13,7 @@ import { congressSelectors } from '../../redux/selectors';
 import { isValidSubstrateAddress } from '../../utils/walletHelpers';
 import { closestNumberToZeroNotInArray, extractItemsFromObject } from '../../utils/council/councilHelper';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
-import InputSearch from '../InputComponents/InputSearchAddressName';
+import InputSearch from '../InputComponents/OldInputSearchAddressName';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { IndexHelper } from '../../utils/council/councilEnum';
 

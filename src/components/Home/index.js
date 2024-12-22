@@ -1,7 +1,6 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import router from '../../router';
-import RoleHOC from '../../hocs/RoleHOC';
 
 import Layout from '../Layout';
 import { loader } from '../../utils/loader';
@@ -29,20 +28,14 @@ function Home() {
     />,
     <Route key={router.home.companies} path={router.home.companies} component={loader(() => import('../Companies'))} />,
     <Route key={router.home.documents} path={router.home.documents} component={loader(() => import('../Documents'))} />,
-    <Route
-      key={router.wallet.allTransactions}
-      path={router.wallet.allTransactions}
-      component={loader(() => import('../Wallet/AllTransactions'))}
-    />,
     <Route key={router.home.senate} path={router.home.senate} component={loader(() => import('../Senate'))} />,
+    <Route key={router.home.nfts} path={router.home.nfts} component={loader(() => import('../Nfts'))} />,
     <Route
       exact
       key={router.home.index}
       path={router.home.index}
       render={() => (
-        <RoleHOC>
-          <Redirect to={router.home.feed} />
-        </RoleHOC>
+        <Redirect to={router.home.feed} />
       )}
     />,
   ];

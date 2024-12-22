@@ -1,5 +1,5 @@
 // LIBS
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useForm } from 'react-hook-form';
 
@@ -9,7 +9,7 @@ import { BN_ZERO } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
-import InputSearch from '../InputComponents/InputSearchAddressName';
+import InputSearch from '../InputComponents/OldInputSearchAddressName';
 
 // STYLES
 import styles from './styles.module.scss';
@@ -110,7 +110,7 @@ SendLLMModal.propTypes = {
 };
 
 function SendLLMModalWrapper() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   return (
     <>
       <Button className={styles.button} onClick={() => setOpen(true)}>

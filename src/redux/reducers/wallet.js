@@ -62,6 +62,9 @@ const walletReducer = handleActions(
       walletActions.unpool.call,
       walletActions.getTxTransfers.call,
       walletActions.getAssetsBalance.call,
+      walletActions.sendTransferRemark.call,
+      walletActions.createOrUpdateAsset.call,
+      walletActions.mintAsset.call,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
@@ -143,6 +146,12 @@ const walletReducer = handleActions(
       walletActions.getTxTransfers.failure,
       walletActions.getAssetsBalance.success,
       walletActions.getAssetsBalance.failure,
+      walletActions.sendTransferRemark.success,
+      walletActions.sendTransferRemark.failure,
+      walletActions.createOrUpdateAsset.success,
+      walletActions.mintAsset.success,
+      walletActions.createOrUpdateAsset.failure,
+      walletActions.mintAsset.failure,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,
