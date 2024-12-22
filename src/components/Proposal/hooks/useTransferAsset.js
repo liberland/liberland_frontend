@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { identitySelectors, walletSelectors } from '../../../redux/selectors';
 import { walletActions } from '../../../redux/actions';
 import { formatAssets } from '../../../utils/walletHelpers';
 import { useAddIdToContext } from './useAddIdToContext';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
 
 function useTransferAsset(proposal) {
   const dispatch = useDispatch();
@@ -18,6 +19,16 @@ function useTransferAsset(proposal) {
   const formattedValue = asset ? formatAssets(value, asset?.metadata?.decimals) : value;
   const identity = names?.[target]?.identity;
 
+  const memoized = useMemo(() => (
+    <CopyIconWithAddress
+      isTruncate
+      name={identity?.name}
+      legal={identity?.legal}
+      address={target}
+      showAddress
+    />
+  ), [target, identity?.legal, identity?.name]);
+
   useEffect(() => {
     dispatch(walletActions.getAdditionalAssets.call(true));
   }, [dispatch]);
@@ -30,7 +41,7 @@ function useTransferAsset(proposal) {
     target,
     formattedRow: [
       `${formattedValue} (${asset?.metadata?.symbol || assetId})`,
-      `${identity ? `${identity} (${target})` : target}`,
+      memoized,
     ],
   };
 }

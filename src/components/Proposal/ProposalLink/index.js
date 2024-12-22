@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import objectHash from 'object-hash';
 import { proposalHeading } from '../utils';
 import Button from '../../Button/Button';
 
@@ -32,7 +31,7 @@ function ProposalLink({
       primary
       onClick={
         () => {
-          const row = document.querySelector(`#hash${objectHash(identifier)}`);
+          const row = document.querySelector(`#hash${identifier}`);
           if (row) {
             row.scrollIntoView();
             setTimeout(() => row.focus(), 50);
@@ -52,7 +51,12 @@ ProposalLink.propTypes = {
   type: PropTypes.string.isRequired,
   identifier: PropTypes.string.isRequired,
   setTabledProposals: PropTypes.func.isRequired,
-  values: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+  values: PropTypes.arrayOf(
+    PropTypes.oneOfType(
+      PropTypes.string.isRequired,
+      PropTypes.node.isRequired,
+    ),
+  ).isRequired,
 };
 
 export default ProposalLink;

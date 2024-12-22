@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { identitySelectors } from '../../../redux/selectors';
 import { formatMerits } from '../../../utils/walletHelpers';
@@ -14,6 +14,16 @@ function useTransferLLM(proposal) {
   const identity = names?.[accountId]?.identity;
   useAddIdToContext(accountId);
 
+  const memoized = useMemo(() => (
+    <CopyIconWithAddress
+      isTruncate
+      name={identity?.name}
+      legal={identity?.legal}
+      address={accountId}
+      showAddress
+    />
+  ), [accountId, identity?.legal, identity?.name]);
+
   return {
     symbol,
     formattedValue,
@@ -21,13 +31,7 @@ function useTransferLLM(proposal) {
     accountId,
     formattedRow: [
       `${formattedValue} (${symbol})`,
-      <CopyIconWithAddress
-        isTruncate
-        name={identity?.name}
-        legal={identity?.legal}
-        address={accountId}
-        showAddress
-      />,
+      memoized,
     ],
   };
 }
