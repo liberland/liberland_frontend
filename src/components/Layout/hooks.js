@@ -18,7 +18,6 @@ export function useNavigationList() {
   );
 
   return {
-    navigationList,
     matchedRoute,
     matchedSubLink,
     pathname,

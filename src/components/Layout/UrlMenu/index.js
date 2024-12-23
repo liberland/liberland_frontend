@@ -6,6 +6,7 @@ import { useLocation, useHistory } from 'react-router-dom';
 import { useMediaQuery } from 'usehooks-ts';
 import styles from '../styles.module.scss';
 import { useNavigationList } from '../hooks';
+import { navigationList } from '../../../constants/navigationList';
 
 function UrlMenu() {
   const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
@@ -21,7 +22,7 @@ function UrlMenu() {
     }
     return 'small';
   };
-  const { navigationList, matchedSubLink } = useNavigationList();
+  const { matchedSubLink } = useNavigationList();
   const openKeys = React.useMemo(() => {
     const matchOpen = matchedSubLink;
     return {

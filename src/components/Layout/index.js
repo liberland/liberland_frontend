@@ -116,9 +116,8 @@ function Layout({ children }) {
           <LayoutInternal>
             <Content className={styles.content}>
               <PageTitle />
-              <Tabs>
-                {children}
-              </Tabs>
+              <Tabs />
+              {children}
             </Content>
             <Footer className={styles.footer}>
               <div className={styles.footerItem}>

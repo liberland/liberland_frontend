@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import PropTypes from 'prop-types';
 import { useHistory } from 'react-router-dom';
+import TabsInternal from 'antd/es/tabs';
 import Spin from 'antd/es/spin';
 import { useNavigationList } from '../hooks';
 
-function Tabs({ children }) {
+function Tabs() {
   const history = useHistory();
   const {
     matchedRoute,
@@ -25,7 +25,7 @@ function Tabs({ children }) {
   const hasTab = tabs.find(([_, url]) => url === pathname);
 
   return tabs?.length && hasTab ? (
-    <Tabs
+    <TabsInternal
       activeKey={pathname}
       onChange={(activeKey) => {
         history.push(activeKey);
@@ -33,14 +33,10 @@ function Tabs({ children }) {
       items={tabs.map(([title, url]) => ({
         key: url,
         label: title,
-        children: pathname === url ? children : <Spin size="large" />,
+        children: pathname === url ? null : <Spin size="large" />,
       }))}
     />
-  ) : children;
+  ) : null;
 }
-
-Tabs.propTypes = {
-  children: PropTypes.node,
-};
 
 export default Tabs;
