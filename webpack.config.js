@@ -1,6 +1,5 @@
 /* eslint-disable */
 const HtmlWebPackPlugin = require('html-webpack-plugin');
-const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const Dotenv = require('dotenv-webpack');
 
 const webpack = require('webpack');
@@ -11,8 +10,6 @@ const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
 const postcssNormalize = require('postcss-normalize');
-// const postcssNormalize = require('postcss-flexbugs-fixes');
-// const postcssNormalize = require('postcss-preset-env');
 
 const getStyleLoaders = (cssOptions) => {
   const loaders = [
@@ -57,15 +54,9 @@ module.exports = (env, argv) => {
     },
     optimization: {
       moduleIds: 'deterministic',
-      runtimeChunk: 'single',
       splitChunks: {
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-        },
+        maxSize: 51200,
+        maxAsyncSize: 51200,
       },
     },
     module: {

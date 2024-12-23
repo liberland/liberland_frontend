@@ -3,15 +3,8 @@ import {
   Switch, Route, Redirect,
 } from 'react-router-dom';
 
-import Identity from './Identity';
-import CompanyRegistry from './CompanyRegistry';
-import CompanyRegistryEdit from './CompanyRegistry/EditCompany';
-import LandRegistry from './LandRegistry';
-import Finances from './Finances';
 import router from '../../router';
-
-import ScheduledCongressSpendingWrapper from './ScheduledCongressSpendingWrapper';
-import Wallet from './MinistryOfFinance';
+import { loader } from '../../utils/loader';
 
 function Offices() {
   return (
@@ -19,17 +12,17 @@ function Offices() {
       <Route
         exact
         path={router.offices.identity}
-        component={Identity}
+        component={loader(() => import('./Identity'))}
       />
       <Route
         exact
         path={router.offices.companyRegistry.home}
-        component={CompanyRegistry}
+        component={loader(() => import('./CompanyRegistry'))}
       />
       <Route
         exact
         path={router.offices.companyRegistry.edit}
-        component={CompanyRegistryEdit}
+        component={loader(() => import('./CompanyRegistry/EditCompany'))}
       />
       <Route
         exact
@@ -41,22 +34,22 @@ function Offices() {
       <Route
         exact
         path={router.offices.landRegistry}
-        component={LandRegistry}
+        component={loader(() => import('./LandRegistry'))}
       />
       <Route
         exact
         path={router.offices.finances}
-        component={Finances}
+        component={loader(() => import('./Finances'))}
       />
       <Route
         exact
         path={router.offices.scheduledCongressSpending}
-        component={ScheduledCongressSpendingWrapper}
+        component={loader(() => import('./ScheduledCongressSpendingWrapper'))}
       />
       <Route
         exact
         path={router.offices.ministryOfFinance}
-        component={Wallet}
+        component={loader(() => import('./MinistryOfFinance'))}
       />
     </Switch>
   );

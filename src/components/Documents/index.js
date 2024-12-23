@@ -1,17 +1,14 @@
 import React from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import router from '../../router';
-import Profile from '../Profile';
-
-import styles from './styles.module.scss';
+import { loader } from '../../utils/loader';
 
 function Documents() {
   return (
     <Switch>
       <Route
         path={router.documents.myAccount}
-        // eslint-disable-next-line react/no-unstable-nested-components
-        component={() => <Profile className={styles.withoutMargin} />}
+        component={loader(() => import('../Profile'))}
       />
       <Route
         path={router.documents.citizenshipHistory}

@@ -6,12 +6,8 @@ import {
 import router from '../../router';
 import { blockchainSelectors } from '../../redux/selectors';
 import styles from './styles.module.scss';
-import Assets from './Assets';
 import Card from '../Card';
-import Exchange from './Exchange';
-import Bridge from './Bridge';
-import PayMe from './PayMe';
-import WalletOverview from './WalletOverview';
+import { loader } from '../../utils/loader';
 import { stockWrapper } from './StockContext';
 
 function Wallet() {
@@ -21,31 +17,31 @@ function Wallet() {
       <Switch>
         <Route
           path={router.wallet.overView}
-          component={WalletOverview}
+          component={loader(() => import('./WalletOverview'))}
         />
         <Route
           path={router.wallet.exchange}
-          component={stockWrapper(Exchange, false)}
+          component={stockWrapper(loader(() => import('./Exchange')), false)}
         />
         <Route
           path={router.wallet.stockExchange}
-          component={stockWrapper(Exchange, true)}
+          component={stockWrapper(loader(() => import('./Exchange')), true)}
         />
         <Route
           path={router.wallet.assets}
-          component={stockWrapper(Assets, false)}
+          component={stockWrapper(loader(() => import('./Assets')), false)}
         />
         <Route
           path={router.wallet.stocks}
-          component={stockWrapper(Assets, true)}
+          component={stockWrapper(loader(() => import('./Assets')), true)}
         />
         <Route
           path={router.wallet.bridge}
-          component={Bridge}
+          component={loader(() => import('./Bridge'))}
         />
         <Route
           path={router.wallet.payMe}
-          component={PayMe}
+          component={loader(() => import('./PayMe'))}
         />
         <Route
           exact
