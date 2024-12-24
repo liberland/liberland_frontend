@@ -35,7 +35,7 @@ function ScheduledCongressSpending({ isVetoButton }) {
   }
 
   return (
-    <ProposalContainer>
+    <>
       {scheduledCalls.map(({
         preimage, proposal, blockNumber, idx, sectionType,
       }, index) => {
@@ -56,16 +56,17 @@ function ScheduledCongressSpending({ isVetoButton }) {
                   <Button onClick={onVetoClick} primary small>Veto</Button>
                 </div>
               )}
-
-              <Proposal
-                proposal={proposalData}
-                isTableRow
-              />
+              <ProposalContainer>
+                <Proposal
+                  proposal={proposalData}
+                  isTableRow
+                />
+              </ProposalContainer>
             </Card>
           </div>
         );
       })}
-    </ProposalContainer>
+    </>
   );
 }
 

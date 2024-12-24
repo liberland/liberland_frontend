@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { useProposalContext } from '../ProposalContext';
 import { proposalHeading, proposalTableHeadings } from '../utils';
 import Table from '../../Table';
+import styles from './styles.module.scss';
 
 function ProposalTable({ type }) {
   const headings = useMemo(
@@ -21,8 +22,8 @@ function ProposalTable({ type }) {
   }
 
   return (
-    <>
-      <Title level={3}>
+    <div className={styles.tableWrapper}>
+      <Title level={5}>
         {proposalHeading(type)}
       </Title>
       <Table
@@ -35,7 +36,7 @@ function ProposalTable({ type }) {
           return map;
         }, { hash: objectHash(key) }))}
       />
-    </>
+    </div>
   );
 }
 

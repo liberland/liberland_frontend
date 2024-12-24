@@ -32,12 +32,12 @@ export default function Motions() {
   }
 
   return (
-    <ProposalContainer>
-      <div className={styles.wrapper}>
-        {motions.map(({
-          proposal, proposalOf, voting, membersCount,
-        }, index) => (
-          <div ref={motions.length - 1 === index ? divRef : null} key={proposal}>
+    <div className={styles.wrapper}>
+      {motions.map(({
+        proposal, proposalOf, voting, membersCount,
+      }, index) => (
+        <div ref={motions.length - 1 === index ? divRef : null} key={proposal}>
+          <ProposalContainer>
             <Motion
               userIsMember={userIsMember}
               membersCount={membersCount}
@@ -49,9 +49,9 @@ export default function Motions() {
               closeMotion={(data) => congressActions.closeMotion.call(data)}
               isTableRow
             />
-          </div>
-        ))}
-      </div>
-    </ProposalContainer>
+          </ProposalContainer>
+        </div>
+      ))}
+    </div>
   );
 }
