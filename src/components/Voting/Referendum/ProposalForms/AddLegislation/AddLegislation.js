@@ -17,7 +17,7 @@ import ModalRoot from '../../../../Modals/ModalRoot';
 import stylesModal from '../../../../Modals/styles.module.scss';
 import stylesPage from '../../../../../utils/pagesBase.module.scss';
 
-export function AddLegislation() {
+function AddLegislation() {
   const dispatch = useDispatch();
   const isLoading = useSelector(
     democracySelectors.selectorGettingDemocracyInfo,
@@ -143,3 +143,5 @@ export function AddLegislation() {
     </form>
   );
 }
+
+export default AddLegislation;

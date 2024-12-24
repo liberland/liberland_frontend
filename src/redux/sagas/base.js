@@ -14,7 +14,7 @@ function errorHandler(onFailure, worker) {
       yield put(blockchainActions.setError.success(
         !walletAddress
           ? { details: 'No wallet detected, you need to login.', type: 'LOGIN_ERROR' }
-          : e?.errorData || { details: e.message, type: 'LOGIN_ERROR' },
+          : e?.errorData || { details: e.message },
       ));
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
     }

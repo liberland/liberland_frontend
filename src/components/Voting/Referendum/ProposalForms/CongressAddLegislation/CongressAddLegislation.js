@@ -12,7 +12,7 @@ import { congressSelectors } from '../../../../../redux/selectors';
 import { AddLegislationFields } from '../AddLegislationFields/AddLegislationFields';
 import { congressActions } from '../../../../../redux/actions';
 
-export function CongressAddLegislation() {
+function CongressAddLegislation() {
   const dispatch = useDispatch();
   const isLoading = useSelector(congressSelectors.isLoading);
   const [shouldRedirect, setShouldRedirect] = useState(false);
@@ -97,3 +97,5 @@ export function CongressAddLegislation() {
     </form>
   );
 }
+
+export default CongressAddLegislation;

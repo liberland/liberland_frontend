@@ -3,8 +3,8 @@ import {
   Switch, Route, Redirect,
 } from 'react-router-dom';
 
-import LegislationView from './LegislationView';
 import router from '../../router';
+import { loader } from '../../utils/loader';
 
 function Legislation() {
   return (
@@ -12,7 +12,7 @@ function Legislation() {
       <Route
         exact
         path={router.legislation.view}
-        component={LegislationView}
+        component={loader(() => import('./LegislationView'))}
       />
       <Route
         exact

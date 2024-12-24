@@ -1,19 +1,15 @@
 import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import router from '../../router';
-
-import NftsComponent from './Overview';
-import OwnedNfts from './OwnedNfts';
-import Collections from './Collections';
-import OnSale from './OnSale';
+import { loader } from '../../utils/loader';
 
 function NFTS() {
   return (
     <Switch>
-      <Route path={router.nfts.overview} component={NftsComponent} />
-      <Route path={router.nfts.ownedNfts} component={OwnedNfts} />
-      <Route path={router.nfts.collections} component={Collections} />
-      <Route path={router.nfts.shop} component={OnSale} />
+      <Route path={router.nfts.overview} component={loader(() => import('./Overview'))} />
+      <Route path={router.nfts.ownedNfts} component={loader(() => import('./OwnedNfts'))} />
+      <Route path={router.nfts.collections} component={loader(() => import('./Collections'))} />
+      <Route path={router.nfts.shop} component={loader(() => import('./OnSale'))} />
       <Route
         exact
         path={router.home.nfts}

@@ -9,16 +9,15 @@ import { useSelector } from 'react-redux';
 import { AuthContext } from 'react-oauth2-code-pkce';
 import router from '../../router';
 
-import CongressionalAssemble from './CongressionalAssemble';
 import styles from './styles.module.scss';
 import stylesPage from '../../utils/pagesBase.module.scss';
-import Referendum from './Referendum';
-import { AddLegislation } from './Referendum/ProposalForms/AddLegislation/AddLegislation';
 import Button from '../Button/Button';
 import { userSelectors } from '../../redux/selectors';
 import { MotionProvider } from '../WalletCongresSenate/ContextMotions';
+import { loader } from '../../utils/loader';
 
 function ReferendumWrapper() {
+  const Referendum = loader(() => import('./Referendum'));
   return (
     <MotionProvider>
       <Referendum />
@@ -56,7 +55,7 @@ function Voting() {
           <Route
             exact
             path={router.voting.congressionalAssemble}
-            component={CongressionalAssemble}
+            component={loader(() => import('./CongressionalAssemble'))}
           />
           <Route
             path={router.voting.referendum}
@@ -64,7 +63,7 @@ function Voting() {
           />
           <Route
             path={router.voting.addLegislation}
-            component={AddLegislation}
+            component={loader(() => import('./Referendum/ProposalForms/AddLegislation/AddLegislation'))}
           />
           <Route
             exact
