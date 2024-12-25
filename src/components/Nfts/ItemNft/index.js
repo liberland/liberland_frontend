@@ -9,7 +9,7 @@ import FillNumberWrapper from '../../Modals/FillNumber';
 import Button from '../../Button/Button';
 import styles from '../Overview/styles.module.scss';
 import CreateEditNFTModalWrapper from '../../Modals/Nfts/CreateEditNft';
-import SetAttributeModalWrapper from '../../Modals/Nfts/SetAttribiute';
+import SetAttributeModalWrapper from '../../Modals/Nfts/SetAttribute';
 import { ReactComponent as FullScreenIcon } from '../../../assets/icons/fullScreen.svg';
 import { ReactComponent as OpenNewTabIcon } from '../../../assets/icons/openNewTab.svg';
 import { ReactComponent as MenuIcon } from '../../../assets/icons/menu.svg';
@@ -37,7 +37,6 @@ function ItemNft({
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isSetPriceModalOpen, setIsSetPriceModalOpen] = useState(false);
   const [isSetMedatadaOpen, setIsSetMedatadaOpen] = useState(false);
-  const [isSetAttribiutesOpen, setIsSetAttribiutesOpen] = useState(false);
   const [isImageOpen, setIsImageOpen] = useState(false);
 
   const handleMenuOpen = () => {
@@ -56,10 +55,6 @@ function ItemNft({
 
   const onSetPrice = () => {
     setIsSetPriceModalOpen(true);
-  };
-
-  const onSetAttribiutes = () => {
-    setIsSetAttribiutesOpen(true);
   };
 
   const onBuyNft = () => {
@@ -85,13 +80,6 @@ function ItemNft({
 
   return (
     <>
-      {isSetAttribiutesOpen && (
-        <SetAttributeModalWrapper
-          closeModal={() => setIsSetAttribiutesOpen(false)}
-          collectionId={collectionId}
-          itemId={nftId}
-        />
-      )}
       {isSetMedatadaOpen && (
         <CreateEditNFTModalWrapper
           collectionId={collectionId}
@@ -225,14 +213,10 @@ function ItemNft({
               >
                 Set Metadata
               </Button>
-              <Button
-                small
-                onClick={onSetAttribiutes}
-                primary
-                className={styles.button}
-              >
-                Set Attribute
-              </Button>
+              <SetAttributeModalWrapper
+                collectionId={collectionId}
+                itemId={nftId}
+              />
               <Button small onClick={onBurn} red className={styles.button}>
                 Burn
               </Button>
