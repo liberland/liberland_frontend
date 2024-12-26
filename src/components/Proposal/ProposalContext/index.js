@@ -6,7 +6,7 @@ import React, {
   useContext,
 } from 'react';
 import PropTypes from 'prop-types';
-import ProposalLink from '../ProposalLink';
+import ProposalController from '../ProposalController';
 
 const ProposalContext = createContext({ data: {} });
 
@@ -15,12 +15,11 @@ export function ProposalProvider({
 }) {
   const [tabledProposals, setTabledProposals] = useState({});
   const addTabledProposal = useCallback(
-    (type, identifier, values) => (
-      <ProposalLink
+    (identifier, values) => (
+      <ProposalController
         identifier={identifier}
         setTabledProposals={setTabledProposals}
         tabledProposals={tabledProposals}
-        type={type}
         values={values}
       />
     ),

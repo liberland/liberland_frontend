@@ -39,10 +39,10 @@ function useTransferAsset(proposal) {
     asset,
     assetId,
     target,
-    formattedRow: [
-      `${formattedValue} (${asset?.metadata?.symbol || assetId})`,
-      memoized,
-    ],
+    formattedRow: {
+      transfer: `${formattedValue} (${asset?.metadata?.symbol || assetId})`,
+      to: memoized,
+    },
   };
 }
 

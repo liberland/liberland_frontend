@@ -27,10 +27,10 @@ function useTransferLLD(proposal) {
     formattedValue,
     identity,
     accountId,
-    formattedRow: [
-      `${formattedValue} (LLD)`,
-      memoized,
-    ],
+    formattedRow: {
+      transfer: `${formattedValue} (LLD)`,
+      to: memoized,
+    },
   };
 }
 

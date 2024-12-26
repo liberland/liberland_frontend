@@ -1,21 +1,13 @@
-import React, { useMemo } from 'react';
-import objectHash from 'object-hash';
+import React from 'react';
 import Title from 'antd/es/typography/Title';
-import PropTypes from 'prop-types';
 import { useProposalContext } from '../ProposalContext';
-import { proposalHeading, proposalTableHeadings } from '../utils';
 import Table from '../../Table';
 import styles from './styles.module.scss';
 
-function ProposalTable({ type }) {
-  const headings = useMemo(
-    () => proposalTableHeadings(type),
-    [type],
-  );
-
+function ProposalTable() {
   const { data } = useProposalContext();
 
-  const rows = Object.entries(data[type] || {});
+  const rows = Object.entries(data || {});
 
   if (!rows.length) {
     return null;
@@ -24,24 +16,55 @@ function ProposalTable({ type }) {
   return (
     <div className={styles.tableWrapper}>
       <Title level={5}>
-        {proposalHeading(type)}
+        Transfers
       </Title>
       <Table
-        columns={headings.map((heading, index) => ({
-          Header: heading,
-          accessor: index.toString(),
-        }))}
-        data={rows.map(([key, values]) => values.reduce((map, value, index) => {
-          map[index.toString()] = value;
-          return map;
-        }, { hash: objectHash(key) }))}
+        columns={[
+          {
+            Heading: 'Transfer',
+            accessor: 'transfer',
+          },
+          {
+            Heading: 'Amount in USD',
+            accessor: 'amountInUsd',
+          },
+          {
+            Heading: 'Category',
+            accessor: 'category',
+          },
+          {
+            Heading: 'Project',
+            accessor: 'project',
+          },
+          {
+            Heading: 'Supplier',
+            accessor: 'supplier',
+          },
+          {
+            Heading: 'Description',
+            accessor: 'description',
+          },
+          {
+            Heading: 'Currency',
+            accessor: 'currency',
+          },
+          {
+            Heading: 'Final destination',
+            accessor: 'finalDestination',
+          },
+          {
+            Heading: 'Date',
+            accessor: 'formatedDate',
+          },
+          {
+            Heading: 'To',
+            accessor: 'to',
+          },
+        ]}
+        data={rows}
       />
     </div>
   );
 }
-
-ProposalTable.propTypes = {
-  type: PropTypes.string.isRequired,
-};
 
 export default ProposalTable;

@@ -9,7 +9,7 @@ function TransferLLD({ proposal, id }) {
 
   const { addTabledProposal } = useProposalContext();
 
-  return addTabledProposal('transferLLD', id, formattedRow);
+  return addTabledProposal(id, formattedRow);
 }
 
 TransferLLD.propTypes = {

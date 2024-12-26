@@ -17,7 +17,7 @@ function RemarkRow({ proposal, id }) {
     supplier,
   } = remark;
 
-  return addTabledProposal('remarks', id, [
+  return addTabledProposal(id, {
     category,
     project,
     supplier,
@@ -26,7 +26,7 @@ function RemarkRow({ proposal, id }) {
     amountInUsd,
     finalDestination,
     formatedDate,
-  ]);
+  });
 }
 
 RemarkRow.propTypes = {

@@ -29,10 +29,10 @@ function useTransferLLM(proposal) {
     formattedValue,
     identity,
     accountId,
-    formattedRow: [
-      `${formattedValue} (${symbol})`,
-      memoized,
-    ],
+    formattedRow: {
+      transfer: `${formattedValue} (${symbol})`,
+      to: memoized,
+    },
   };
 }
 

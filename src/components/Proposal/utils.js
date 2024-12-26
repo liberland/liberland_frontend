@@ -92,67 +92,8 @@ function getTransferHook(proposal) {
   return useTransferAsset;
 }
 
-function proposalHeading(type) {
-  if (type === 'transferLLD') {
-    return 'Transfer LLD';
-  }
-  if (type === 'transferLLM') {
-    return 'Transfer LLM';
-  }
-  if (type === 'transferAsset') {
-    return 'Transfer assets';
-  }
-  if (type === 'remarks') {
-    return 'Remarks';
-  }
-  if (type === 'remarkedTransfer') {
-    return 'Transfer with remark';
-  }
-  return '';
-}
-
-function proposalTableHeadings(type) {
-  if (type === 'transferLLD' || type === 'transferLLM' || type === 'transferAsset') {
-    return [
-      'Transfer',
-      'To',
-    ];
-  }
-  if (type === 'remarks') {
-    return [
-      'Category',
-      'Project',
-      'Supplier',
-      'Description',
-      'Currency',
-      'Amount in USD',
-      'Final Destination',
-      'Date',
-    ];
-  }
-  if (type === 'remarkedTransfer') {
-    return [
-      'Transfer',
-      'Amount in USD',
-      'Category',
-      'Project',
-      'Supplier',
-      'Description',
-      'Currency',
-      'Final Destination',
-      'Date',
-      'To',
-    ];
-  }
-  // eslint-disable-next-line no-console
-  console.warn(`Trying to display proposal ${type} as table. Unsupported`);
-  return [];
-}
-
 export {
-  proposalHeading,
   isRepealLegislation,
-  proposalTableHeadings,
   isFastTrackProposal,
   isTransferWithRemark,
   isAddLegislation,
