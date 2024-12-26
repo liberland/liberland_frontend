@@ -36,7 +36,6 @@ function ItemNft({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isSetPriceModalOpen, setIsSetPriceModalOpen] = useState(false);
-  const [isSetMedatadaOpen, setIsSetMedatadaOpen] = useState(false);
   const [isImageOpen, setIsImageOpen] = useState(false);
 
   const handleMenuOpen = () => {
@@ -80,13 +79,6 @@ function ItemNft({
 
   return (
     <>
-      {isSetMedatadaOpen && (
-        <CreateEditNFTModalWrapper
-          collectionId={collectionId}
-          nftId={nftId}
-          closeModal={() => setIsSetMedatadaOpen(false)}
-        />
-      )}
       {isTransferModalOpen && (
         <FillAddressWrapper
           textData={textData}
@@ -205,14 +197,10 @@ function ItemNft({
               >
                 Set Price
               </Button>
-              <Button
-                small
-                onClick={() => setIsSetMedatadaOpen(true)}
-                primary
-                className={styles.button}
-              >
-                Set Metadata
-              </Button>
+              <CreateEditNFTModalWrapper
+                collectionId={collectionId}
+                nftId={nftId}
+              />
               <SetAttributeModalWrapper
                 collectionId={collectionId}
                 itemId={nftId}

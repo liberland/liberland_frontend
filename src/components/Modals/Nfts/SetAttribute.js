@@ -57,7 +57,7 @@ function SetAttributeModal({ closeModal, collectionId, itemId }) {
       <Form.Item label="Value" name="value" rules={{ required: true }}>
         <Input placeholder="Enter value for attribute" />
       </Form.Item>
-      <Flex wrap>
+      <Flex wrap gap="15px">
         <Button onClick={closeModal}>
           Cancel
         </Button>

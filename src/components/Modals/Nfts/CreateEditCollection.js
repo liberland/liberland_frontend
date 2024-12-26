@@ -27,7 +27,7 @@ function CreatEditCollectionModal({
       <Title level={3}>
         Create Collection
       </Title>
-      <Flex wrap>
+      <Flex wrap gap="15px">
         <Button onClick={closeModal}>
           Cancel
         </Button>

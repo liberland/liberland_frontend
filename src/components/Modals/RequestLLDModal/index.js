@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
-import QRCode from 'react-qr-code';
-import { useForm } from 'react-hook-form';
+import QRCode from 'antd/es/qr-code';
+import Form from 'antd/es/form';
+import Flex from 'antd/es/flex';
+import List from 'antd/es/list';
+import InputNumber from 'antd/es/input-number';
+import TextArea from 'antd/es/input/TextArea';
 import PropTypes from 'prop-types';
 import ModalRoot from '../ModalRoot';
-import { TextInput, TextArea } from '../../InputComponents';
 import Button from '../../Button/Button';
 import { identitySelectors } from '../../../redux/selectors';
 import { identityActions } from '../../../redux/actions';
@@ -20,19 +23,7 @@ function RequestLLDModal({
   onClose,
   walletAddress,
 }) {
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    watch,
-    setError,
-    formState: {
-      errors,
-      isSubmitting,
-    },
-  } = useForm({
-    mode: 'onChange',
-  });
+  const [form] = Form.useForm();
 
   const dispatch = useDispatch();
   const identity = useSelector(identitySelectors.selectorIdentity);
@@ -66,12 +57,9 @@ function RequestLLDModal({
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-      setError('amount', 'Something went wrong');
     }
   };
 
-  const amount = watch('amount', '');
-  const note = watch('note', '');
   const isLargerThanTable = useMediaQuery('(min-width: 768px)');
 
   if (identityIsLoading) {
@@ -83,8 +71,9 @@ function RequestLLDModal({
   const submitText = linkData ? 'Update payment link' : 'Create payment link';
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
+    <Form
+      form={form}
+      onSubmit={onSubmit}
       className={styles.form}
     >
       {linkData && (
@@ -127,42 +116,59 @@ function RequestLLDModal({
             </div>
           ) : (
             <div className={styles.listContainer}>
-              <h2>Payment links</h2>
-              <ul>
-                <li>
-                  Direct:
-                  {' '}
-                  <CopyLink link={linkData.link} />
-                </li>
-                <li>
-                  Subwallet:
-                  {' '}
-                  <CopyLink link={linkData.subwalletLink} />
-                </li>
-                <li>
-                  Edge:
-                  {' '}
-                  <CopyLink link={linkData.edgeLink} />
-                </li>
-              </ul>
-              <h2>Payment QR codes</h2>
-              <ul>
-                <li>
-                  Direct:
-                  {' '}
-                  <QRCode value={linkData.link} />
-                </li>
-                <li>
-                  Subwallet:
-                  {' '}
-                  <QRCode value={linkData.subwalletLink} />
-                </li>
-                <li>
-                  Edge:
-                  {' '}
-                  <QRCode value={linkData.edgeLink} />
-                </li>
-              </ul>
+              <List
+                itemLayout="vertical"
+                size="large"
+                header="Payment links"
+                dataSource={[
+                  {
+                    title: 'Direct',
+                    content: (
+                      <CopyLink link={linkData.link} />
+                    ),
+                  },
+                  {
+                    title: 'Subwallet',
+                    content: (
+                      <CopyLink link={linkData.subwalletLink} />
+                    ),
+                  },
+                  {
+                    title: 'Edge',
+                    content: (
+                      <CopyLink link={linkData.edgeLink} />
+                    ),
+                  },
+                ]}
+                renderItem={({ title, content }) => (
+                  <List.Item>
+                    <List.Item.Meta title={title} />
+                    {content}
+                  </List.Item>
+                )}
+              />
+              <List
+                header="Payment QR codes"
+                dataSource={[
+                  {
+                    title: 'Direct',
+                    extra: <QRCode value={linkData.link} />,
+                  },
+                  {
+                    title: 'Subwallet',
+                    extra: <QRCode value={linkData.subwalletLink} />,
+                  },
+                  {
+                    title: 'Edge',
+                    extra: <QRCode value={linkData.edgeLink} />,
+                  },
+                ]}
+                renderItem={({ title, extra }) => (
+                  <List.Item extra={extra}>
+                    <List.Item.Meta title={title} />
+                  </List.Item>
+                )}
+              />
             </div>
           )}
           <div className={styles.tableContainer}>
@@ -194,61 +200,36 @@ function RequestLLDModal({
           </div>
         </div>
       )}
-      <label className={styles.wrapper} htmlFor="amount">
-        Requested payment amount in LLD
-        <div className={styles.inputWrapper}>
-          <TextInput
-            id="amount"
-            register={register}
-            name="amount"
-            errorTitle="Amount"
-            value={amount}
-            className={styles.input}
-            onChange={(event) => setValue('amount', event.target.value)}
-            validate={(input) => (!input || /^\d*\.?\d+$/.test(input) ? undefined : 'Invalid amount')}
-            disabled={isSubmitting}
-            placeholder="LLD"
-            required
-          />
-        </div>
-        {errors.amount && (
-          <div className={styles.error}>
-            {errors.amount.message}
-          </div>
-        )}
-      </label>
-      <label className={styles.wrapper} htmlFor="note">
-        Note (optional)
-        <div className={styles.inputWrapper}>
-          <TextArea
-            register={register}
-            id="note"
-            name="note"
-            value={note}
-            className={styles.textarea}
-            onChange={(event) => setValue('note', event.target.value)}
-            disabled={isSubmitting}
-          />
-        </div>
-      </label>
-      <div className={styles.buttonRow}>
-        <div className={styles.closeForm}>
-          <Button disabled={isSubmitting} medium onClick={onClose}>
-            Close
-          </Button>
-        </div>
-        <div>
-          <Button
-            primary
-            medium
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Loading...' : submitText}
-          </Button>
-        </div>
-      </div>
-    </form>
+      <Form.Item
+        label="Requested payment amount in LLD"
+        name="amount"
+        rules={[
+          { required: true },
+          { pattern: /^\d*\.?\d+$/, message: 'Must be a number' },
+        ]}
+      >
+        <InputNumber placeholder="LLD" stringMode controls={false} />
+      </Form.Item>
+      <Form.Item
+        label="Note"
+        name="note"
+        extra="Optional"
+      >
+        <TextArea className={styles.textarea} />
+      </Form.Item>
+      <Flex wrap gap="15px">
+        <Button medium onClick={onClose}>
+          Close
+        </Button>
+        <Button
+          primary
+          medium
+          type="submit"
+        >
+          {submitText}
+        </Button>
+      </Flex>
+    </Form>
   );
 }
 

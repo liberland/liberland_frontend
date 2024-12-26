@@ -1,36 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import DatePicker from 'antd/es/date-picker';
+import InputNumber from 'antd/es/input-number';
+import Select from 'antd/es/select';
+import Popconfirm from 'antd/es/popconfirm';
 import { useDispatch } from 'react-redux';
 import ModalRoot from './ModalRoot';
-import { TextInput, SelectInput } from '../InputComponents';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { democracyActions } from '../../redux/actions';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import AgreeDisagreeModal from './AgreeDisagreeModal';
-import useAgreeDisagreeModal from '../../hooks/useAgreeDisagreeModal';
 
 function CitizenRepealLegislationModal({
   closeModal, tier, id, section,
 }) {
   const dispatch = useDispatch();
-  const {
-    handleSubmit,
-    register,
-    trigger,
-    formState: { errors, isValid },
-  } = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      tier,
-      year: id.year,
-      index: id.index,
-      section,
-    },
-  });
+  const [form] = Form.useForm();
 
   const onSubmitRepeal = ({
     discussionName,
@@ -50,89 +37,62 @@ function CitizenRepealLegislationModal({
     closeModal();
   };
 
-  const { dialogStep, handleClick } = useAgreeDisagreeModal(isValid, trigger);
-
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmitRepeal)}
+    <Form
+      onFinish={onSubmitRepeal}
+      form={form}
+      initialValues={{
+        tier,
+        year: id.year,
+        index: id.index,
+        section,
+      }}
     >
-      {dialogStep === 'form' ? (
-        <>
-          <div className={styles.h3}>
-            Propose referendum for legislation repeal
-          </div>
+      <Title level={3}>
+        Propose referendum for legislation repeal
+      </Title>
 
-          <div className={styles.title}>Legislation Tier</div>
-          <SelectInput
-            register={register}
-            name="tier"
-            disabled
-            options={[
-              { value: 'Constitution', display: 'Constitution' },
-              { value: 'InternationalTreaty', display: 'International Treaty' },
-              { value: 'Law', display: 'Law' },
-              { value: 'Tier3', display: 'Tier 3' },
-              { value: 'Tier4', display: 'Tier 4' },
-              { value: 'Tier5', display: 'Tier 5' },
-              { value: 'Decision', display: 'Decision' },
-            ]}
-          />
-
-          <div className={styles.title}>Legislation Year</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Year"
-            register={register}
-            name="year"
-            disabled
-          />
-
-          <div className={styles.title}>Legislation Index</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Index"
-            register={register}
-            name="index"
-            disabled
-          />
-
-          {section !== null && (
-            <>
-              <div className={styles.title}>Legislation Section</div>
-              <TextInput
-                required
-                validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-                errorTitle="Section"
-                register={register}
-                name="section"
-                disabled
-              />
-            </>
-          )}
-
-          <ProposalDiscussionFields
-            {...{
-              register,
-              errors,
-            }}
-          />
-
-          <div className={styles.buttonWrapper}>
-            <Button medium onClick={closeModal}>
-              Cancel
-            </Button>
-            <Button primary medium onClick={handleClick}>
-              Submit
-            </Button>
-          </div>
-        </>
-      ) : (
-        <AgreeDisagreeModal onDisagree={closeModal} agreeButtonType="submit" />
-      ) }
-    </form>
+      <Form.Item name="tier" label="Legislation tier" rules={{ required: true }}>
+        <Select
+          options={[
+            { value: 'Constitution', label: 'Constitution' },
+            { value: 'InternationalTreaty', label: 'International Treaty' },
+            { value: 'Law', label: 'Law' },
+            { value: 'Tier3', label: 'Tier 3' },
+            { value: 'Tier4', label: 'Tier 4' },
+            { value: 'Tier5', label: 'Tier 5' },
+            { value: 'Decision', label: 'Decision' },
+          ]}
+          disabled
+        />
+      </Form.Item>
+      <Form.Item name="year" label="Legislation year" rules={{ required: true }}>
+        <DatePicker picker="year" disabled />
+      </Form.Item>
+      <Form.Item name="index" label="Legislation Index" rules={{ required: true }}>
+        <InputNumber controls={false} disabled />
+      </Form.Item>
+      {section !== null && (
+        <Form.Item name="section" label="Legislation section" rules={{ required: true }}>
+          <InputNumber controls={false} disabled />
+        </Form.Item>
+      )}
+      <ProposalDiscussionFields />
+      <div className={styles.buttonWrapper}>
+        <Button medium onClick={closeModal}>
+          Cancel
+        </Button>
+        <Popconfirm
+          title="Confirm form submission"
+          description="This operation costs 100 LLD."
+          onConfirm={() => form.submit()}
+        >
+          <Button primary>
+            Submit
+          </Button>
+        </Popconfirm>
+      </div>
+    </Form>
   );
 }
 

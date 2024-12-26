@@ -130,7 +130,6 @@ function CreatEditNFTModal({
             if (file) {
               setPreviewImage(URL.createObjectURL(file));
             }
-            return undefined;
           }}
         >
           <Paragraph className="ant-upload-drag-icon">
@@ -147,7 +146,7 @@ function CreatEditNFTModal({
         )}
       </Form.Item>
 
-      <Flex wrap>
+      <Flex wrap gap="15px">
         <Button onClick={closeModal}>
           Cancel
         </Button>
@@ -165,12 +164,36 @@ CreatEditNFTModal.propTypes = {
   collectionId: PropTypes.string.isRequired,
 };
 
-function CreateEditNFTModalWrapper(props) {
+function CreateEditNFTModalWrapper({
+  collectionId,
+  nftId,
+}) {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <CreatEditNFTModal {...props} />
-    </ModalRoot>
+    <>
+      <Button
+        small
+        onClick={() => setShow(true)}
+        primary
+      >
+        Set Metadata
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <CreatEditNFTModal
+            closeModal={() => setShow(false)}
+            collectionId={collectionId}
+            nftId={nftId}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+CreateEditNFTModalWrapper.propTypes = {
+  nftId: PropTypes.string.isRequired,
+  collectionId: PropTypes.string.isRequired,
+};
 
 export default CreateEditNFTModalWrapper;

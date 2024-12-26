@@ -1,16 +1,16 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import NotificationPortal from '../../../NotificationPortal';
+import notification from 'antd/es/notification';
 import Button from '../../../Button/Button';
 
 function CopyLink({
   link,
 }) {
-  const notificationRef = useRef();
+  const [api, handle] = notification.useNotification();
 
   const handleCopyClick = () => {
     navigator.clipboard.writeText(link);
-    notificationRef.current.addSuccess({ text: 'Link was copied' });
+    api.success('Link was copied');
   };
 
   return (
@@ -18,7 +18,7 @@ function CopyLink({
       <Button small primary type="button" onClick={handleCopyClick}>
         Copy link
       </Button>
-      <NotificationPortal ref={notificationRef} />
+      {handle}
     </>
   );
 }
