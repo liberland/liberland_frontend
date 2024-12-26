@@ -11,7 +11,7 @@ function RemarkInfo({ proposal }) {
     currency,
     description,
     finalDestination,
-    formatedDate,
+    formattedDate,
     project,
     supplier,
   } = remark;
@@ -56,7 +56,7 @@ function RemarkInfo({ proposal }) {
       <div>
         <b>Date:</b>
         {' '}
-        {formatedDate}
+        {formattedDate}
       </div>
     </>
   );

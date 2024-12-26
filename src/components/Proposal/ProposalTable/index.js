@@ -7,7 +7,7 @@ import styles from './styles.module.scss';
 function ProposalTable() {
   const { data } = useProposalContext();
 
-  const rows = Object.entries(data || {});
+  const rows = Object.values(data || {});
 
   if (!rows.length) {
     return null;
@@ -21,43 +21,43 @@ function ProposalTable() {
       <Table
         columns={[
           {
-            Heading: 'Transfer',
+            Header: 'Transfer',
             accessor: 'transfer',
           },
           {
-            Heading: 'Amount in USD',
+            Header: 'Amount in USD',
             accessor: 'amountInUsd',
           },
           {
-            Heading: 'Category',
+            Header: 'Category',
             accessor: 'category',
           },
           {
-            Heading: 'Project',
+            Header: 'Project',
             accessor: 'project',
           },
           {
-            Heading: 'Supplier',
+            Header: 'Supplier',
             accessor: 'supplier',
           },
           {
-            Heading: 'Description',
+            Header: 'Description',
             accessor: 'description',
           },
           {
-            Heading: 'Currency',
+            Header: 'Currency',
             accessor: 'currency',
           },
           {
-            Heading: 'Final destination',
+            Header: 'Final destination',
             accessor: 'finalDestination',
           },
           {
-            Heading: 'Date',
-            accessor: 'formatedDate',
+            Header: 'Date',
+            accessor: 'formattedDate',
           },
           {
-            Heading: 'To',
+            Header: 'To',
             accessor: 'to',
           },
         ]}

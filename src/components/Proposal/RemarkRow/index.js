@@ -12,7 +12,7 @@ function RemarkRow({ proposal, id }) {
     currency,
     description,
     finalDestination,
-    formatedDate,
+    formattedDate,
     project,
     supplier,
   } = remark;
@@ -25,7 +25,7 @@ function RemarkRow({ proposal, id }) {
     currency,
     amountInUsd,
     finalDestination,
-    formatedDate,
+    formattedDate,
   });
 }
 

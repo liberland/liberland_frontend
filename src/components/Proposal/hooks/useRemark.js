@@ -40,7 +40,7 @@ function useRemark(proposal) {
       date: '',
       finalDestination: '',
       amountInUsd: '',
-      formatedDate: '',
+      formattedDate: '',
     };
   }
 
@@ -55,7 +55,7 @@ function useRemark(proposal) {
     amountInUsd,
   } = data;
   const dateTime = new Date(date.toNumber());
-  const formatedDate = formatDate(dateTime, false, false);
+  const formattedDate = formatDate(dateTime, false, false);
 
   return {
     category: category.toString(),
@@ -65,7 +65,7 @@ function useRemark(proposal) {
     currency: currency.toString(),
     amountInUsd: amountInUsd.toString(),
     finalDestination: finalDestination.toString(),
-    formatedDate,
+    formattedDate,
   };
 }
 

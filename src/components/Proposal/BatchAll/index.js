@@ -42,6 +42,8 @@ function BatchAll({
         transferRowParts.map((transfer, i) => (
           <TransferWithRemark
             id={id + i}
+            // eslint-disable-next-line react/no-array-index-key
+            key={id + i}
             remark={remarkRowParts[i]}
             transfer={transfer}
             useTransfer={getTransferHook(transfer)}

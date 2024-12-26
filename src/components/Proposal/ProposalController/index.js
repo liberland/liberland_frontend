@@ -1,7 +1,7 @@
-import useEffect from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-function ProposalLink({
+function ProposalController({
   tabledProposals,
   identifier,
   values,
@@ -9,8 +9,11 @@ function ProposalLink({
 }) {
   useEffect(() => {
     const fromType = tabledProposals || {};
-    const fromKey = fromType[identifier] || [];
-    const hasStateChanged = values.length !== fromKey.length || values.some((v, i) => v !== fromKey[i]);
+    const fromKey = fromType[identifier] || {};
+    const fromEntries = Object.values(fromKey);
+    const valuesEntries = Object.values(values);
+    const hasStateChanged = valuesEntries.length !== fromEntries.length
+      || valuesEntries.some((v, i) => v !== fromEntries[i]);
     if (hasStateChanged) {
       setTabledProposals((proposals) => ({
         ...proposals,
@@ -22,16 +25,11 @@ function ProposalLink({
   return null;
 }
 
-ProposalLink.propTypes = {
+ProposalController.propTypes = {
   tabledProposals: PropTypes.shape({}).isRequired,
   identifier: PropTypes.string.isRequired,
   setTabledProposals: PropTypes.func.isRequired,
-  values: PropTypes.arrayOf(
-    PropTypes.oneOfType([
-      PropTypes.string.isRequired,
-      PropTypes.node.isRequired,
-    ]),
-  ).isRequired,
+  values: PropTypes.shape({}).isRequired,
 };
 
-export default ProposalLink;
+export default ProposalController;

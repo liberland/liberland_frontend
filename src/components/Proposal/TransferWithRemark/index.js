@@ -15,14 +15,13 @@ function TransferWithRemark({
     currency,
     description,
     finalDestination,
-    formatedDate,
+    formattedDate,
     project,
     supplier,
   } = useRemark(remark);
   const { addTabledProposal } = useProposalContext();
 
   return addTabledProposal(id, {
-    transfer: formattedRow[0],
     amountInUsd,
     category,
     project,
@@ -30,8 +29,8 @@ function TransferWithRemark({
     description,
     currency,
     finalDestination,
-    formatedDate,
-    to: formattedRow[1],
+    formattedDate,
+    ...formattedRow,
   });
 }
 
