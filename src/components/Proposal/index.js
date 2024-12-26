@@ -53,7 +53,12 @@ export function Proposal({
   }
   if (isBatchAll(proposal)) {
     return (
-      <BatchAll {...{ proposal }} batchId={proposal.toJSON().callIndex} id={proposal.toString()}>
+      <BatchAll
+        {...{ proposal }}
+        isTableRow={isTableRow}
+        batchId={proposal.toJSON().callIndex}
+        id={proposal.toString()}
+      >
         {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
       </BatchAll>
     );

@@ -77,11 +77,6 @@ function isTransfer(proposal) {
   return isTransferAssets(proposal) || isTransferLLD(proposal) || isTransferLLM(proposal);
 }
 
-function isTransferWithRemark(proposal) {
-  const { args: [calls] } = proposal;
-  return calls.length === 2 && isTransfer(calls[0]) && isRemark(calls[1]);
-}
-
 function getTransferHook(proposal) {
   if (isTransferLLD(proposal)) {
     return useTransferLLD;
@@ -95,7 +90,6 @@ function getTransferHook(proposal) {
 export {
   isRepealLegislation,
   isFastTrackProposal,
-  isTransferWithRemark,
   isAddLegislation,
   isAmendLegislation,
   isBatchAll,
