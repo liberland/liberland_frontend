@@ -1,27 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
-import { useDispatch } from 'react-redux';
+import Form from 'antd/es/form';
+import Flex from 'antd/es/flex';
+import Title from 'antd/es/typography/Title';
+import { useDispatch, useSelector } from 'react-redux';
 import ModalRoot from './ModalRoot';
-import { TextInput, SelectInput } from '../InputComponents';
 import Button from '../Button/Button';
-import styles from './styles.module.scss';
 import { congressActions } from '../../redux/actions';
+import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
+import { congressSelectors } from '../../redux/selectors';
 
 function CongressRepealLegislationModal({
   closeModal, tier, id, section,
 }) {
   const dispatch = useDispatch();
-  const { handleSubmit, register } = useForm({
-    defaultValues: {
-      tier,
-      year: id.year,
-      index: id.index,
-      section,
-    },
-  });
+  const [form] = Form.useForm();
 
   const onSubmitRepeal = () => {
     dispatch(congressActions.congressRepealLegislation.call({ tier, id, section }));
@@ -29,57 +22,17 @@ function CongressRepealLegislationModal({
   };
 
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmitRepeal)}
+    <Form
+      form={form}
+      onFinish={onSubmitRepeal}
     >
-      <div className={styles.h3}>Propose a Congress Motion - repeal legislation</div>
+      <Title level={3}>
+        Propose a Congress Motion - repeal legislation
+      </Title>
 
-      <div className={styles.title}>Legislation Tier</div>
-      <SelectInput
-        register={register}
-        name="tier"
-        disabled
-        options={[
-          { value: 'InternationalTreaty', display: 'International Treaty' },
-        ]}
-      />
+      <DisplayOnlyLegislation section={section} />
 
-      <div className={styles.title}>Legislation Year</div>
-      <TextInput
-        required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-        errorTitle="Year"
-        register={register}
-        name="year"
-        disabled
-      />
-
-      <div className={styles.title}>Legislation Index</div>
-      <TextInput
-        required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-        errorTitle="Index"
-        register={register}
-        name="index"
-        disabled
-      />
-
-      { section !== null && (
-      <>
-        <div className={styles.title}>Legislation Section</div>
-        <TextInput
-          required
-          validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-          errorTitle="Section"
-          register={register}
-          name="section"
-          disabled
-        />
-      </>
-      )}
-
-      <div className={styles.buttonWrapper}>
+      <Flex wrap gap="15px">
         <Button
           medium
           onClick={closeModal}
@@ -93,8 +46,8 @@ function CongressRepealLegislationModal({
         >
           Submit
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
@@ -108,12 +61,43 @@ CongressRepealLegislationModal.propTypes = {
   section: PropTypes.string.isRequired,
 };
 
-function CongressRepealLegislationModalWrapper(props) {
+function CongressRepealLegislationModalWrapper({
+  tier,
+  id,
+  section,
+}) {
+  const [show, setShow] = useState();
+  const userIsMember = useSelector(congressSelectors.userIsMember);
+  if (!userIsMember) {
+    return null;
+  }
+
   return (
-    <ModalRoot>
-      <CongressRepealLegislationModal {...props} />
-    </ModalRoot>
+    <>
+      <Button link onClick={() => setShow(true)}>
+        Propose congress motion to repeal
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <CongressRepealLegislationModal
+            closeModal={() => setShow(false)}
+            id={id}
+            section={section}
+            tier={tier}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+CongressRepealLegislationModalWrapper.propTypes = {
+  tier: PropTypes.string.isRequired,
+  id: PropTypes.shape({
+    year: PropTypes.number.isRequired,
+    index: PropTypes.number.isRequired,
+  }).isRequired,
+  section: PropTypes.string.isRequired,
+};
 
 export default CongressRepealLegislationModalWrapper;

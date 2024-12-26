@@ -18,14 +18,14 @@ import Card from '../../Card';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
-import RepealLegislationButton from '../../Congress/RepealLegislationButton';
 import ProposeRepealLegislationButton from '../../Congress/ProposeRepealLegislationButton';
-import CitizenProposeRepealLegislationButton from '../../Congress/CitizenProposeRepealLegislationButton';
 import AmendLegislationButton from './AmendLegislationButton';
-import CongressAmendLegislationButton from './CongressAmendLegislationButton';
-import CongressAmendLegislationViaReferendumButton from './CongressAmendLegislationViaReferendumButton';
 import Header from './Header';
 import useCalculateDropdownPosition from '../../../hooks/useCalculateDropdownPosition';
+import CitizenRepealLegislationModalWrapper from '../../Modals/CitizenRepealLegislationModal';
+import CongressAmendLegislationModalWrapper from '../../Modals/CongressAmendLegislationModal';
+import CongressAmendLegislationViaReferendumModalWrapper from '../../Modals/CongressAmendLegislationViaReferendumModal';
+import CongressRepealLegislationModalWrapper from '../../Modals/CongressRepealLegislationModal';
 
 function VetoStats({
   tier, id, section, isH2,
@@ -161,13 +161,19 @@ function ActionButtons({
         {isProposeOpen && (
         <div className={styles.dropdown} ref={dropdownRefPropose}>
           {isRepealOption && (
-          <RepealLegislationButton {...{ tier, id, section }} />
+            <CongressRepealLegislationModalWrapper
+              tier={tier}
+              id={id}
+              section={section}
+            />
           )}
           {tier !== 'Constitution' && (
           <ProposeRepealLegislationButton {...{ tier, id, section }} />
           )}
-          <CitizenProposeRepealLegislationButton
-            {...{ tier, id, section }}
+          <CitizenRepealLegislationModalWrapper
+            tier={tier}
+            id={id}
+            section={section}
           />
         </div>
         )}
@@ -188,8 +194,18 @@ function ActionButtons({
         {isAmendOpen && (
           <div className={styles.dropdown} ref={dropdownRefAmend}>
             <AmendLegislationButton {...{ tier, id, section }} />
-              { tier === 'InternationalTreaty' && <CongressAmendLegislationButton {...{ tier, id, section }} /> }
-            <CongressAmendLegislationViaReferendumButton {...{ tier, id, section }} />
+            {tier === 'InternationalTreaty' && (
+              <CongressAmendLegislationModalWrapper
+                tier={tier}
+                id={id}
+                section={section}
+              />
+            )}
+            <CongressAmendLegislationViaReferendumModalWrapper
+              tier={tier}
+              id={id}
+              section={section}
+            />
           </div>
         )}
         {isAmendOpen && <div className={styles.overlay} onClick={() => setAmendOpen((prevValue) => !prevValue)} />}
@@ -379,9 +395,20 @@ function LegislationItem({
                     && (
                     <div className={styles.dropdown} ref={dropdownRef}>
                       <AmendLegislationButton add {...{ tier, id, section: sections.length }} />
-                      { tier === 'InternationalTreaty'
-                        && <CongressAmendLegislationButton add {...{ tier, id, section: sections.length }} /> }
-                      <CongressAmendLegislationViaReferendumButton add {...{ tier, id, section: sections.length }} />
+                      {tier === 'InternationalTreaty' && (
+                        <CongressAmendLegislationModalWrapper
+                          add
+                          tier={tier}
+                          id={id}
+                          section={sections.length}
+                        />
+                      )}
+                      <CongressAmendLegislationViaReferendumModalWrapper
+                        add
+                        tier={tier}
+                        id={id}
+                        section={sections.length}
+                      />
                     </div>
                     )}
                   {isAddOpen && (

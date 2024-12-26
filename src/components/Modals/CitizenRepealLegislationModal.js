@@ -1,10 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
-import DatePicker from 'antd/es/date-picker';
-import InputNumber from 'antd/es/input-number';
-import Select from 'antd/es/select';
 import Popconfirm from 'antd/es/popconfirm';
 import { useDispatch } from 'react-redux';
 import ModalRoot from './ModalRoot';
@@ -12,6 +9,7 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { democracyActions } from '../../redux/actions';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
+import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
 
 function CitizenRepealLegislationModal({
   closeModal, tier, id, section,
@@ -51,32 +49,7 @@ function CitizenRepealLegislationModal({
       <Title level={3}>
         Propose referendum for legislation repeal
       </Title>
-
-      <Form.Item name="tier" label="Legislation tier" rules={{ required: true }}>
-        <Select
-          options={[
-            { value: 'Constitution', label: 'Constitution' },
-            { value: 'InternationalTreaty', label: 'International Treaty' },
-            { value: 'Law', label: 'Law' },
-            { value: 'Tier3', label: 'Tier 3' },
-            { value: 'Tier4', label: 'Tier 4' },
-            { value: 'Tier5', label: 'Tier 5' },
-            { value: 'Decision', label: 'Decision' },
-          ]}
-          disabled
-        />
-      </Form.Item>
-      <Form.Item name="year" label="Legislation year" rules={{ required: true }}>
-        <DatePicker picker="year" disabled />
-      </Form.Item>
-      <Form.Item name="index" label="Legislation Index" rules={{ required: true }}>
-        <InputNumber controls={false} disabled />
-      </Form.Item>
-      {section !== null && (
-        <Form.Item name="section" label="Legislation section" rules={{ required: true }}>
-          <InputNumber controls={false} disabled />
-        </Form.Item>
-      )}
+      <DisplayOnlyLegislation section={section} />
       <ProposalDiscussionFields />
       <div className={styles.buttonWrapper}>
         <Button medium onClick={closeModal}>
@@ -106,12 +79,38 @@ CitizenRepealLegislationModal.propTypes = {
   section: PropTypes.string.isRequired,
 };
 
-function CitizenRepealLegislationModalWrapper(props) {
+function CitizenRepealLegislationModalWrapper({
+  tier,
+  id,
+  section,
+}) {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <CitizenRepealLegislationModal {...props} />
-    </ModalRoot>
+    <>
+      <Button link multiline onClick={() => setShow(true)}>
+        Propose citizen referendum to repeal
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <CitizenRepealLegislationModal
+            closeModal={() => setShow(false)}
+            id={id}
+            section={section}
+            tier={tier}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+CitizenRepealLegislationModalWrapper.propTypes = {
+  tier: PropTypes.string.isRequired,
+  id: PropTypes.shape({
+    year: PropTypes.number.isRequired,
+    index: PropTypes.number.isRequired,
+  }).isRequired,
+  section: PropTypes.string.isRequired,
+};
 
 export default CitizenRepealLegislationModalWrapper;

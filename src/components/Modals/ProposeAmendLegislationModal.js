@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 // COMPONENTS
 import { useDispatch, useSelector } from 'react-redux';
 import ModalRoot from './ModalRoot';
-import { TextInput, SelectInput } from '../InputComponents';
+import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import { democracyActions } from '../../redux/actions';
@@ -13,6 +13,7 @@ import { legislationSelectors } from '../../redux/selectors';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
 import AgreeDisagreeModal from './AgreeDisagreeModal';
 import useAgreeDisagreeModal from '../../hooks/useAgreeDisagreeModal';
+import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
 
 function ProposeAmendLegislationModal({
   closeModal, tier, id, section,
@@ -73,51 +74,7 @@ function ProposeAmendLegislationModal({
               : 'add legislation section'}
           </div>
 
-          <div className={styles.title}>Legislation Tier</div>
-          <SelectInput
-            register={register}
-            name="tier"
-            disabled
-            options={[
-              { value: 'Constitution', display: 'Constitution' },
-              { value: 'InternationalTreaty', display: 'International Treaty' },
-              { value: 'Law', display: 'Law' },
-              { value: 'Tier3', display: 'Tier3' }, // FIXME proper names
-              { value: 'Tier4', display: 'Tier4' },
-              { value: 'Tier5', display: 'Tier5' },
-              { value: 'Decision', display: 'Decision' },
-            ]}
-          />
-
-          <div className={styles.title}>Legislation Year</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Year"
-            register={register}
-            name="year"
-            disabled
-          />
-
-          <div className={styles.title}>Legislation Index</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Index"
-            register={register}
-            name="index"
-            disabled
-          />
-
-          <div className={styles.title}>Legislation Section</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Section"
-            register={register}
-            name="section"
-            disabled
-          />
+          <DisplayOnlyLegislation section={section} />
 
           <div className={styles.title}>Legislation Content</div>
           <TextInput

@@ -1,7 +1,11 @@
 import React from 'react';
+import Form from 'antd/es/form';
 import PropTypes from 'prop-types';
-import { CheckboxInput, TextInput } from '../../InputComponents';
-import styles from '../../Modals/styles.module.scss';
+import Checkbox from 'antd/es/checkbox';
+import Collapse from 'antd/es/collapse';
+import InputNumber from 'antd/es/input-number';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
 
 export const FastTrackDefaults = {
   fastTrack: false,
@@ -9,66 +13,62 @@ export const FastTrackDefaults = {
   fastTrackEnactmentPeriod: 1,
 };
 
-export default function FastTrackForm({
-  register, errors, watch,
-}) {
-  const fastTrack = watch('fastTrack');
-  const validateVotingPeriod = (v) => (
-    (!Number.isNaN(parseInt(v))
-    && parseInt(v) >= 3)
-    || 'Invalid value, must be a number, minimum 3.'
-  );
-  const validateEnactmentPeriod = (v) => (
-    (!Number.isNaN(parseInt(v))
-    && parseInt(v) >= 0)
-    || 'Invalid value, must be a non-negative number.'
-  );
+export default function FastTrackForm({ form }) {
+  const fastTrack = Form.useWatch('fastTrack', form);
   return (
     <>
-      <CheckboxInput
-        register={register}
-        name="fastTrack"
-        label="Fast track proposal"
+      <Form.Item name="fastTrack" valuePropName="checked" label="Fast track proposal">
+        <Checkbox />
+      </Form.Item>
+      <Collapse
+        activeKey={fastTrack ? ['fastTrack'] : []}
+        onChange={() => form.setFieldValue('fastTrack', !fastTrack)}
+        items={[
+          {
+            key: 'fastTrack',
+            label: 'Fast track proposal',
+            children: (
+              <>
+                <Title level={4}>
+                  Referendum period
+                </Title>
+                <Paragraph>
+                  How long should voting take, specified in days, minimum 3 days.
+                </Paragraph>
+                <Form.Item
+                  name="fastTrackVotingPeriod"
+                  label="Referendum period"
+                  rules={[
+                    { required: true },
+                    { type: 'number' },
+                    { min: 3 },
+                  ]}
+                >
+                  <InputNumber controls={false} />
+                </Form.Item>
+                <Form.Item
+                  name="fastTrackEnactmentPeriod"
+                  label="Enactment period"
+                  rules={[
+                    { required: true },
+                    { type: 'number' },
+                    { min: 0 },
+                  ]}
+                  extra="Delay between referendum end and its execution, specified in days."
+                >
+                  <InputNumber controls={false} />
+                </Form.Item>
+              </>
+            ),
+          },
+        ]}
       />
-
-      {fastTrack && (
-      <>
-        <div className={styles.title}>Referendum period</div>
-        <div className={styles.description}>
-          How long should voting take, specified in days, minimum 3 days.
-        </div>
-        <TextInput
-          register={register}
-          name="fastTrackVotingPeriod"
-          required
-          validate={validateVotingPeriod}
-          errorTitle="Referendum period"
-        />
-        {errors?.fastTrackVotingPeriod?.message
-        && <div className={styles.error}>{errors.fastTrackVotingPeriod.message}</div>}
-
-        <div className={styles.title}>Enactment period</div>
-        <div className={styles.description}>
-          Delay between referendum end and its execution, specified in days.
-        </div>
-        <TextInput
-          register={register}
-          name="fastTrackEnactmentPeriod"
-          required
-          validate={validateEnactmentPeriod}
-          errorTitle="Enactment period"
-        />
-        {errors?.fastTrackEnactmentPeriod?.message
-        && <div className={styles.error}>{errors.fastTrackEnactmentPeriod.message}</div>}
-      </>
-      )}
     </>
   );
 }
 
 FastTrackForm.propTypes = {
-  register: PropTypes.func.isRequired,
-  watch: PropTypes.func.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  errors: PropTypes.object.isRequired,
+  form: PropTypes.shape({
+    setFieldValue: PropTypes.func.isRequired,
+  }).isRequired,
 };

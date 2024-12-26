@@ -1,18 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Flex from 'antd/es/flex';
+import Popconfirm from 'antd/es/popconfirm';
 import { useDispatch } from 'react-redux';
 import ModalRoot from './ModalRoot';
-import { TextInput, SelectInput } from '../InputComponents';
 import Button from '../Button/Button';
-import styles from './styles.module.scss';
 import { congressActions } from '../../redux/actions';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import AgreeDisagreeModal from './AgreeDisagreeModal';
-import useAgreeDisagreeModal from '../../hooks/useAgreeDisagreeModal';
+import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
 
 function CongressRepealLegislationFastTrackModal({
   closeModal,
@@ -21,22 +19,7 @@ function CongressRepealLegislationFastTrackModal({
   section,
 }) {
   const dispatch = useDispatch();
-  const {
-    handleSubmit,
-    formState: { errors, isValid },
-    register,
-    watch,
-    trigger,
-  } = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      tier,
-      year: id.year,
-      index: id.index,
-      section,
-      ...FastTrackDefaults,
-    },
-  });
+  const [form] = Form.useForm();
 
   const onSubmitRepeal = ({
     discussionName,
@@ -62,85 +45,42 @@ function CongressRepealLegislationFastTrackModal({
     closeModal();
   };
 
-  const { dialogStep, handleClick } = useAgreeDisagreeModal(isValid, trigger);
-
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmitRepeal)}
+    <Form
+      form={form}
+      initialValues={{
+        tier,
+        year: id.year,
+        index: id.index,
+        section,
+        ...FastTrackDefaults,
+      }}
+      onFinish={onSubmitRepeal}
     >
-      {dialogStep === 'form' ? (
-        <>
-          <div className={styles.h3}>
-            Propose a Congress Motion - propose referendum for legislation
-            repeal
-          </div>
+      <Title level={3}>
+        Propose a Congress Motion - propose referendum for legislation
+        repeal
+      </Title>
 
-          <div className={styles.title}>Legislation Tier</div>
-          <SelectInput
-            register={register}
-            name="tier"
-            disabled
-            options={[
-              { value: 'InternationalTreaty', display: 'International Treaty' },
-              { value: 'Law', display: 'Law' },
-              { value: 'Tier3', display: 'Tier 3' },
-              { value: 'Tier4', display: 'Tier 4' },
-              { value: 'Tier5', display: 'Tier 5' },
-              { value: 'Decision', display: 'Decision' },
-            ]}
-          />
+      <DisplayOnlyLegislation section={section} />
+      <ProposalDiscussionFields />
+      <FastTrackForm form={form} />
 
-          <div className={styles.title}>Legislation Year</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Year"
-            register={register}
-            name="year"
-            disabled
-          />
-
-          <div className={styles.title}>Legislation Index</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Index"
-            register={register}
-            name="index"
-            disabled
-          />
-
-          {section !== null && (
-            <>
-              <div className={styles.title}>Legislation Section</div>
-              <TextInput
-                required
-                validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-                errorTitle="Section"
-                register={register}
-                name="section"
-                disabled
-              />
-            </>
-          )}
-
-          <ProposalDiscussionFields {...{ register, errors }} />
-          <FastTrackForm {...{ register, errors, watch }} />
-
-          <div className={styles.buttonWrapper}>
-            <Button medium onClick={closeModal}>
-              Cancel
-            </Button>
-            <Button primary medium onClick={handleClick}>
-              Submit
-            </Button>
-          </div>
-        </>
-      ) : (
-        <AgreeDisagreeModal onDisagree={closeModal} agreeButtonType="submit" />
-      )}
-    </form>
+      <Flex wrap gap="15px">
+        <Button medium onClick={closeModal}>
+          Cancel
+        </Button>
+        <Popconfirm
+          title="Confirm form submission"
+          description="This operation costs 100 LLD."
+          onConfirm={() => form.submit()}
+        >
+          <Button primary>
+            Submit
+          </Button>
+        </Popconfirm>
+      </Flex>
+    </Form>
   );
 }
 
