@@ -62,6 +62,7 @@ function ProposalTable() {
           },
         ]}
         data={rows}
+        noPagination
       />
     </div>
   );
