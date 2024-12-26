@@ -34,7 +34,6 @@ InvalidCompany.propTypes = {
 
 function CompaniesOverview() {
   const [expandedDetailsForCompany, setExpandedDetailsForCompany] = useState(null);
-  const [isDeleteCompanyModalOpen, setIsDeleteCompanyModalOpen] = useState(false);
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
@@ -124,14 +123,9 @@ function CompaniesOverview() {
                     Request change
                   </Button>
                 </NavLink>
-                <Button
-                  red
-                  small
-                  onClick={() => setIsDeleteCompanyModalOpen(true)}
-                  className={styles.buttonSeparation}
-                >
-                  Request Deletion
-                </Button>
+                <DeleteCompanyModal
+                  companyId={registeredCompany?.id}
+                />
                 <Button
                   secondary
                   small
@@ -141,14 +135,6 @@ function CompaniesOverview() {
                   Generate Certificate
                 </Button>
               </div>
-              {isDeleteCompanyModalOpen && (
-              <DeleteCompanyModal
-                closeModal={() => {
-                  setIsDeleteCompanyModalOpen(false);
-                }}
-                companyId={registeredCompany?.id}
-              />
-              )}
             </Card>
           )),
         )}

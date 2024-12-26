@@ -1,12 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import cx from 'classnames';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
 import libertarianTorch from '../../../../assets/images/libertariantorch.png';
 
-import { democracyActions } from '../../../../redux/actions';
 import { blockchainSelectors, democracySelectors } from '../../../../redux/selectors';
 import { DelegateModal } from '../../../Modals';
 import Button from '../../../Button/Button';
@@ -18,20 +17,11 @@ import stylesVoting from '../SelectedCandidateCard/styles.module.scss';
 function PoliticanCard({
   politician,
 }) {
-  const dispatch = useDispatch();
   const notificationRef = useRef();
-  const [isModalOpenDelegate, setIsModalOpenDelegate] = useState(false);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const { website } = politician;
   const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
-  const handleModalOpenDelegate = () => {
-    setIsModalOpenDelegate(!isModalOpenDelegate);
-  };
-  const handleSubmitDelegate = (delegateAddress) => {
-    dispatch(democracyActions.delegate.call({ values: { delegateAddress }, userWalletAddress }));
-    handleModalOpenDelegate();
-  };
 
   return (
     <>
@@ -75,32 +65,21 @@ function PoliticanCard({
                 ? (
                   <Button
                     className={cx(stylesVoting.unselectContainer, stylesVoting.buttonFont)}
-                    grey
+                    disabled
                   >
                     DELEGATE
                   </Button>
                 )
                 : (
-                  <Button
-                    className={cx(stylesVoting.unselectContainer, stylesVoting.buttonFont)}
-                    primary
-                    onClick={handleModalOpenDelegate}
-                  >
-                    DELEGATE
-                  </Button>
+                  <DelegateModal
+                    delegateAddress={politician.rawIdentity}
+                    currentlyDelegatingTo={delegatingTo}
+                  />
                 )}
             </div>
           )}
       </div>
       <span className={styles.votesCounterDesktop}>1 x Votes</span>
-      {isModalOpenDelegate && (
-      <DelegateModal
-        closeModal={handleModalOpenDelegate}
-        onSubmitDelegate={handleSubmitDelegate}
-        delegateAddress={politician.rawIdentity}
-        currentlyDelegatingTo={delegatingTo}
-      />
-      )}
     </>
   );
 }

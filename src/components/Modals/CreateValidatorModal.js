@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
@@ -161,10 +161,20 @@ CreateValidatorModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
-export default function CreateValidatorModalWrapper(props) {
+export default function CreateValidatorModalWrapper() {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <CreateValidatorModal {...props} />
-    </ModalRoot>
+    <>
+      <Button small primary onClick={() => setShow(true)}>
+        Start Validating
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <CreateValidatorModal
+            closeModal={() => setShow(false)}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }

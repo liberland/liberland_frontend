@@ -54,9 +54,7 @@ function Switcher() {
 }
 
 function Starter() {
-  const [isValidatorModalOpen, setIsValidatorModalOpen] = useState(false);
   const [isStakeModalOpen, setIsStakeModalOpen] = useState(false);
-  const handleValidatorModalOpen = () => setIsValidatorModalOpen(!isValidatorModalOpen);
   const handleStakeModalOpen = () => setIsStakeModalOpen(!isStakeModalOpen);
 
   return (
@@ -64,10 +62,8 @@ function Starter() {
       <Button small primary onClick={handleStakeModalOpen}>
         Start Nominating
       </Button>
-      <Button small primary onClick={handleValidatorModalOpen}>
-        Start Validating
-      </Button>
-      {isValidatorModalOpen && <CreateValidatorModal closeModal={handleValidatorModalOpen} />}
+
+      <CreateValidatorModal />
       {isStakeModalOpen && <StakeLLDModal closeModal={handleStakeModalOpen} />}
     </div>
   );
