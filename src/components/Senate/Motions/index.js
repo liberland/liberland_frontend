@@ -4,6 +4,7 @@ import { identityActions, senateActions } from '../../../redux/actions';
 import { senateSelectors } from '../../../redux/selectors';
 import Motion from '../../WalletCongresSenate/Motion';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
+import ProposalContainer from '../../Proposal/ProposalContainer';
 
 function Motions() {
   const dispatch = useDispatch();
@@ -35,19 +36,21 @@ function Motions() {
         const isLastItem = motions.length - 1 === index;
         return (
           <div ref={isLastItem ? divRef : null} key={proposal}>
-            <Motion
-              userIsMember={userIsMember}
-              membersCount={membersCount}
-              proposal={proposal.toString()}
-              proposalOf={proposalOf}
-              voting={voting.unwrap()}
-              voteMotion={(data) => senateActions.senateVoteAtMotions.call(data)}
-              closeMotion={(data) => senateActions.senateCloseMotion.call(data)}
-            />
+            <ProposalContainer>
+              <Motion
+                userIsMember={userIsMember}
+                membersCount={membersCount}
+                proposal={proposal.toString()}
+                proposalOf={proposalOf}
+                voting={voting.unwrap()}
+                voteMotion={(data) => senateActions.senateVoteAtMotions.call(data)}
+                closeMotion={(data) => senateActions.senateCloseMotion.call(data)}
+                isTableRow
+              />
+            </ProposalContainer>
           </div>
         );
       })}
-
     </>
   );
 }

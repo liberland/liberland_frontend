@@ -15,12 +15,17 @@
     th {
       font-weight: 600;
       line-height: 29px;
-      padding: 14px 0;
+      padding: 14px 3px;
       text-align: left;
+      text-wrap: nowrap;
     }
   }
 
   .tbody {
+    tr:focus {
+      outline: none;
+      background-color: $grey;
+    }
     td{
       height: 90px;
       font-size: 14px;
@@ -48,4 +53,19 @@
   td:last-child {
     border-radius: 0 15px 15px 0;
   }
+}
+
+.tableInnerScrollContainer {
+  min-width: 100%;
+}
+
+.tableScrollContainer {
+  overflow-x: auto;
+}
+
+.bigTextContainer {
+  max-width: 250px;
+  min-width: 100px;
+  padding-left: 3px;
+  padding-right: 3px;
 }

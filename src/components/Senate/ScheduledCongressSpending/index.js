@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, Fragment } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { identityActions, senateActions } from '../../../redux/actions';
@@ -8,6 +8,7 @@ import Card from '../../Card';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
+import ProposalContainer from '../../Proposal/ProposalContainer';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 
 function ScheduledCongressSpending({ isVetoButton }) {
@@ -55,10 +56,12 @@ function ScheduledCongressSpending({ isVetoButton }) {
                   <Button onClick={onVetoClick} primary small>Veto</Button>
                 </div>
               )}
-
-              <Proposal
-                proposal={proposalData}
-              />
+              <ProposalContainer>
+                <Proposal
+                  proposal={proposalData}
+                  isTableRow
+                />
+              </ProposalContainer>
             </Card>
           </div>
         );

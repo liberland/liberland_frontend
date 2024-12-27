@@ -1,527 +1,115 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import cx from 'classnames';
-import router from '../../router';
-import { blockchainActions, walletActions } from '../../redux/actions';
-import { blockchainSelectors, identitySelectors, walletSelectors } from '../../redux/selectors';
-import { decodeCall, decodeRemark } from '../../api/nodeRpcCall';
-import styles from './styles.module.scss';
-import stylesAnim from '../Voting/Referendum/Items/item.module.scss';
-import { formatAssets, formatDollars, formatMerits } from '../../utils/walletHelpers';
-import formatDate from '../../utils/formatDate';
-import { useAddIdToContext } from './useAddIdToContect.js';
-import CopyIconWithAddress from '../CopyIconWithAddress';
-import CouncilMotionCountdown from '../Congress/MotionCountDown';
-/* eslint-disable react/forbid-prop-types */
-const ProposalProp = PropTypes.object;
+import RepealLegislation from './RepealLegislation';
+import RepealLegislationSection from './RepealLegislationSection';
+import AmendLegislation from './AmendLegislation';
+import AddLegislation from './AddLegislation';
+import BatchAll from './BatchAll';
+import Referendum from './Referendum';
+import Blacklist from './Blacklist';
+import CouncilSenateExecute from './CouncilSenateExecute';
+import Schedule from './Schedule';
+import TransferLLD from './TransferLLD';
+import TransferLLM from './TransferLLM';
+import TransferAsset from './TransferAsset';
+import RemarkInfo from './RemarkInfo';
+import Raw from './Raw';
+import RemarkRow from './RemarkRow';
+import TransferLLMRow from './TransferLLMRow';
+import TransferAssetRow from './TransferAssetRow';
+import TransferLLDRow from './TransferLLDRow';
+import {
+  isAddLegislation,
+  isAmendLegislation,
+  isBatchAll,
+  isBlacklist,
+  isCouncilSenateExecute,
+  isExternalProposeMajority,
+  isRemark,
+  isRepealLegislation,
+  isRepealLegislationSection,
+  isScheduler,
+  isTransferAssets,
+  isTransferLLD,
+  isTransferLLM,
+} from './utils';
 
-function Raw({ proposal }) {
-  return <pre className={styles.legislationContent}>{JSON.stringify(proposal.toHuman(), null, 2)}</pre>;
-}
-
-Raw.propTypes = { proposal: ProposalProp.isRequired };
-
-function RepealLegislationSection({ proposal }) {
-  const { args: [tier, { year, index }, section] } = proposal;
-  return (
-    <div>
-      Repeal legislation
-      {' '}
-      <Link to={`${router.home.legislation}/${tier.toString()}`}>
-        {tier.toString()}
-        {' '}
-        -
-        {' '}
-        {year.toNumber()}
-        /
-        {index.toNumber()}
-        {' '}
-        - Section #
-        {section.toNumber()}
-      </Link>
-    </div>
-  );
-}
-RepealLegislationSection.propTypes = { proposal: ProposalProp.isRequired };
-
-function AddLegislation({ proposal, isDetailsHidden }) {
-  const { args: [tier, { year, index }, sections] } = proposal;
-  return (
-    <div className={styles.text}>
-      <p>
-        Add new legislation
-        {' '}
-        <Link to={`${router.home.legislation}/${tier.toString()}`} className={styles.blue}>
-          {tier.toString()}
-        </Link>
-        {' '}
-        -
-        {' '}
-        {year.toNumber()}
-        /
-        {index.toNumber()}
-        {!isDetailsHidden ? '.' : '...'}
-      </p>
-      <div className={cx(stylesAnim.anim, !isDetailsHidden ? stylesAnim.shown : stylesAnim.hidden)}>
-        {sections.map((section, idx) => (
-        // eslint-disable-next-line react/no-array-index-key
-          <Fragment key={idx}>
-            <p>
-              Section #
-              {idx}
-            </p>
-            <p className={styles.legislationContent}>{new TextDecoder('utf-8').decode(section)}</p>
-          </Fragment>
-        ))}
-      </div>
-
-    </div>
-  );
-}
-
-AddLegislation.defaultProps = {
-  isDetailsHidden: false,
-};
-
-AddLegislation.propTypes = {
-  proposal: ProposalProp.isRequired,
-  isDetailsHidden: PropTypes.bool,
-};
-
-function AmendLegislation({ proposal }) {
-  const { args: [tier, { year, index }, section, newContent] } = proposal;
-  return (
-    <div>
-      <p>
-        Amend or add legislation section
-        {' '}
-        <Link to={`${router.home.legislation}/${tier.toString()}`}>
-          {tier.toString()}
-          {' '}
-          -
-          {' '}
-          {year.toNumber()}
-          /
-          {index.toNumber()}
-          {' '}
-          - Section #
-          {section.toNumber()}
-        </Link>
-        .
-      </p>
-      <p>New content:</p>
-      <p className={styles.legislationContent}>{newContent.toHuman()}</p>
-    </div>
-  );
-}
-AmendLegislation.propTypes = { proposal: ProposalProp.isRequired };
-
-function RepealLegislation({ proposal }) {
-  const { args: [tier, { year, index }] } = proposal;
-  return (
-    <div>
-      Repeal legislation
-      {' '}
-      <Link to={`${router.home.legislation}/${tier.toString()}`}>
-        {tier.toString()}
-        {' '}
-        -
-        {' '}
-        {year.toNumber()}
-        /
-        {index.toNumber()}
-      </Link>
-    </div>
-  );
-}
-RepealLegislation.propTypes = { proposal: ProposalProp.isRequired };
-
-export function Preimage({ hash, len, isDetailsHidden }) {
-  const dispatch = useDispatch();
-  const [call, setCall] = useState(null);
-  const preimages = useSelector(blockchainSelectors.preimages);
-  const preimage = preimages[hash.toString()];
-
-  useEffect(() => {
-    if (!preimage) {
-      dispatch(blockchainActions.fetchPreimage.call({
-        hash,
-        len,
-      }));
-    }
-  }, [dispatch, preimage, hash, len]);
-
-  useEffect(() => {
-    (async () => {
-      if (preimage && preimage.isSome && !call) {
-        setCall(await decodeCall(preimage.unwrap()));
-      }
-    })();
-  }, [preimage, call, setCall]);
-
-  if (preimage === undefined) return <div>Loading details...</div>;
-  if (preimage.isNone) {
-    return (
-      <div>
-        Details not provided on-chain. Hash:
-        {hash.toString()}
-      </div>
-    );
-  }
-  if (call === null) return <div>Loading details...</div>;
-
-  return <Proposal proposal={call} isDetailsHidden={isDetailsHidden} />;
-}
-
-Preimage.propTypes = {
-  hash: PropTypes.object.isRequired,
-  len: PropTypes.object.isRequired,
-  isDetailsHidden: PropTypes.bool.isRequired,
-};
-
-function FastTrackedReferendum({ proposal, fastTrack }) {
-  const { hash_: hash, len } = proposal.args[0].asLookup;
-  const [, votingPeriodInBlocks, enactmentPeriodInBlocks] = fastTrack.args;
-  const votingPeriodInDays = (votingPeriodInBlocks.toNumber() * 6) / 3600 / 24;
-  const enactmentPeriodInDays = (enactmentPeriodInBlocks.toNumber() * 6) / 3600 / 24;
-  return (
-    <div>
-      Immediately start new referendum with shortened Referendum and/or Enactment Period.
-      <ul>
-        <li>
-          Referendum Period:
-          {votingPeriodInDays}
-          {' '}
-          day(s)
-        </li>
-        <li>
-          Enactment Period:
-          {enactmentPeriodInDays}
-          {' '}
-          day(s)
-        </li>
-        <li>
-          <Preimage {...{ hash, len }} />
-        </li>
-      </ul>
-    </div>
-  );
-}
-FastTrackedReferendum.propTypes = { proposal: ProposalProp.isRequired, fastTrack: ProposalProp.isRequired };
-
-function Referendum({ proposal }) {
-  const { hash_: hash, len } = proposal.args[0].asLookup;
-  return (
-    <div>
-      Propose a new referendum with simplified tally rules (simple majority of votes).
-      <Preimage {...{ hash, len }} />
-    </div>
-  );
-}
-Referendum.propTypes = { proposal: ProposalProp.isRequired };
-
-function BatchAll({ proposal }) {
-  function fastTrackMatches(prop, fastTrack) {
-    const fastTrackHash = fastTrack.args[0];
-    const p = prop.args[0];
-    if (p.isLookup) return p.asLookup.hash_.eq(fastTrackHash);
-
-    // our FE only uses Lookup
-    return false;
-  }
-
-  const { args: [calls] } = proposal;
-  if (calls.length === 2
-    && calls[0].section === 'democracy'
-    && calls[0].method === 'externalPropose'
-    && calls[1].section === 'democracy'
-    && calls[1].method === 'fastTrack'
-    && fastTrackMatches(calls[0], calls[1])) {
-    return <FastTrackedReferendum proposal={calls[0]} fastTrack={calls[1]} />;
-  }
-  return calls.map((call, idx) => (
-    // eslint-disable-next-line react/no-array-index-key
-    <div key={`proposal ${idx}`}>
-      <Proposal proposal={call} />
-      <br />
-    </div>
-  ));
-}
-BatchAll.propTypes = { proposal: ProposalProp.isRequired };
-
-function Blacklist({ proposal }) {
-  const hash = proposal.args[0];
-  return (
-    <div>
-      Blacklist and cancel referendum proposal.
-      {' '}
-      { proposal.args[1].isSome && `Cancel ongoing referendum #${proposal.args[1].unwrap().toString()}.`}
-      <Preimage hash={hash} len={null} />
-    </div>
-  );
-}
-Blacklist.propTypes = { proposal: ProposalProp.isRequired };
-
-function CouncilSenateExecute({ proposal }) {
-  const { args: [calls] } = proposal;
-  return (
-    <div>
-      Execute using
-      {' '}
-      {proposal.section === 'councilAccount' ? 'Congress' : 'Senate'}
-      {' '}
-      Wallet:
-      <Proposal proposal={calls} />
-    </div>
-  );
-}
-CouncilSenateExecute.propTypes = { proposal: ProposalProp.isRequired };
-
-function Schedule({ proposal }) {
-  const { args } = proposal;
-  const when = args[0];
-  return (
-    <div>
-      Schedule call to be made on:
-      {' '}
-      {when.toString()}
-      :
-      <CouncilMotionCountdown motionEndBlockNumber={when} />
-      <br />
-      <Proposal proposal={args[3]} />
-    </div>
-  );
-}
-Schedule.propTypes = { proposal: ProposalProp.isRequired };
-
-function TransferLLD({ proposal }) {
-  const names = useSelector(identitySelectors.selectorIdentityMotions);
-  const accountId = proposal.args[0].value.toString();
-  const value = proposal.args[1];
-  const formattedValue = formatDollars(value);
-  const identity = names?.[accountId]?.identity;
-  useAddIdToContext(accountId);
-  return (
-    <div>
-      <b>Transfer</b>
-      {` ${formattedValue} (LLD) `}
-      <b>to</b>
-      {' '}
-      <CopyIconWithAddress
-        isTruncate
-        name={identity?.name}
-        legal={identity?.legal}
-        address={accountId}
-        showAddress
-      />
-    </div>
-  );
-}
-TransferLLD.propTypes = { proposal: ProposalProp.isRequired };
-
-function TransferLLM({ proposal }) {
-  const names = useSelector(identitySelectors.selectorIdentityMotions);
-  const accountId = proposal.args[0].toString();
-  const value = proposal.args[1];
-  const formattedValue = formatMerits(value);
-  const symbol = proposal.method === 'sendLlm' ? 'LLM' : 'PolitiPooled LLM';
-  const identity = names?.[accountId]?.identity;
-  useAddIdToContext(accountId);
-
-  return (
-    <div>
-      <b>Transfer</b>
-      {` ${formattedValue} (${symbol}) `}
-      <b>to</b>
-      {' '}
-      <CopyIconWithAddress
-        isTruncate
-        name={identity?.name}
-        legal={identity?.legal}
-        address={accountId}
-        showAddress
-      />
-    </div>
-  );
-}
-TransferLLM.propTypes = { proposal: ProposalProp.isRequired };
-
-function TransferAsset({ proposal }) {
-  const dispatch = useDispatch();
-  const assetId = proposal.args[0];
-  const target = proposal.args[1].toString();
-  const value = proposal.args[2].toString();
-  useAddIdToContext(target);
-
-  const names = useSelector(identitySelectors.selectorIdentityMotions);
-  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
-  const [asset] = additionalAssets.filter((item) => item.index === Number(assetId));
-  const formattedValue = asset ? formatAssets(value, asset?.metadata?.decimals) : value;
-  const identity = names?.[target]?.identity;
-
-  useEffect(() => {
-    dispatch(walletActions.getAdditionalAssets.call(true));
-  }, [dispatch]);
-
-  return (
-    <div>
-      <b>Transfer</b>
-      {` ${formattedValue} (${asset?.metadata?.symbol || assetId}) `}
-      <b>to</b>
-      {' '}
-      <CopyIconWithAddress
-        isTruncate
-        name={identity?.name}
-        legal={identity?.legal}
-        address={target}
-        showAddress
-      />
-    </div>
-  );
-}
-TransferAsset.propTypes = { proposal: ProposalProp.isRequired };
-
-function RemarkInfo({ proposal }) {
-  const [data, setData] = useState(null);
-  const bytes = proposal.get('args').data;
-
-  useEffect(() => {
-    decodeRemark(bytes).then((item) => {
-      setData({
-        currency: item.currency,
-        date: item.date,
-        amountInUsd: item.amountInUSDAtDateOfPayment,
-        category: item.category,
-        project: item.project,
-        supplier: item.supplier,
-        description: item.description,
-        finalDestination: item.finalDestination,
-      });
-    });
-  }, [bytes, proposal]);
-
-  if (!data) {
-    return (
-      <div>
-        {new TextDecoder('utf-8').decode(bytes)}
-      </div>
-    );
-  }
-
-  const {
-    project,
-    description,
-    category,
-    supplier,
-    currency,
-    date,
-    finalDestination,
-    amountInUsd,
-  } = data;
-  const dateTime = new Date(date.toNumber());
-  const formatedDate = formatDate(dateTime, false, false);
-  return (
-    <>
-      <div>
-        <b>Category:</b>
-        {' '}
-        {category}
-      </div>
-      <div>
-        <b>Project:</b>
-        {' '}
-        {project}
-      </div>
-      <div>
-        <b>Supplier:</b>
-        {' '}
-        {supplier}
-      </div>
-      <div>
-        <b>Description:</b>
-        {' '}
-        {description}
-      </div>
-      <div>
-        <b>Currency:</b>
-        {' '}
-        {currency}
-      </div>
-      <div>
-        <b>Amount in USD:</b>
-        {' '}
-        {amountInUsd.toString()}
-      </div>
-      <div>
-        <b>Final Destination:</b>
-        {' '}
-        {finalDestination}
-      </div>
-      <div>
-        <b>Date:</b>
-        {' '}
-        {formatedDate}
-      </div>
-    </>
-  );
-}
-RemarkInfo.propTypes = { proposal: ProposalProp.isRequired };
-
-function CancelScheduler({ proposal }) {
-  const isArray = Array.isArray(proposal.args);
-  const [when, index] = proposal.args;
-  return (
-    <div>
-      <b>Senate veto cancel congress spending:</b>
-      {isArray ? (
-        <div>
-          when:
-          {' '}
-          {when.toString()}
-          {' '}
-          index:
-          {' '}
-          {index.toString()}
-        </div>
-      ) : <Proposal proposal={proposal.args} />}
-    </div>
-  );
-}
-CancelScheduler.propTypes = { proposal: ProposalProp.isRequired };
-export function Proposal({ proposal, isDetailsHidden }) {
-  const proposalMethod = proposal.method;
-  const proposalSection = proposal.section;
-
-  if (proposalMethod === 'repealLegislation') {
+export function Proposal({
+  proposal,
+  isDetailsHidden,
+  isTableRow,
+}) {
+  if (isRepealLegislation(proposal)) {
     return <RepealLegislation {...{ proposal }} />;
-  } if (proposalMethod === 'repealLegislationSection') {
+  }
+  if (isRepealLegislationSection(proposal)) {
     return <RepealLegislationSection {...{ proposal }} />;
-  } if (proposalMethod === 'amendLegislation') {
+  }
+  if (isAmendLegislation(proposal)) {
     return <AmendLegislation {...{ proposal }} />;
-  } if (proposalMethod === 'addLegislation') {
+  }
+  if (isAddLegislation(proposal)) {
     return <AddLegislation {...{ proposal }} isDetailsHidden={isDetailsHidden} />;
-  } if (proposalMethod === 'batchAll') {
-    return <BatchAll {...{ proposal }} />;
-  } if (proposalMethod === 'externalProposeMajority') {
-    return <Referendum {...{ proposal }} />;
-  } if (proposalMethod === 'blacklist' && proposalSection === 'democracy') {
-    return <Blacklist {...{ proposal }} />;
-  } if (proposalMethod === 'execute' && (proposalSection === 'councilAccount' || proposalSection === 'senateAccount')) {
-    return <CouncilSenateExecute {...{ proposal }} />;
-  } if (proposalMethod === 'schedule' && proposalSection === 'scheduler') {
-    return <Schedule {...{ proposal }} />;
-  } if (proposalMethod === 'transfer' && proposalSection === 'balances') {
-    return <TransferLLD {...{ proposal }} />;
-  } if ((proposalMethod === 'sendLlmToPolitipool' || proposalMethod === 'sendLlm') && proposalSection === 'llm') {
-    return <TransferLLM {...{ proposal }} />;
-  } if (proposalMethod === 'transfer' && proposalSection === 'assets') {
-    return <TransferAsset {...{ proposal }} />;
-  } if (proposalMethod === 'remark' && proposalSection === 'llm') {
-    return <RemarkInfo {...{ proposal }} />;
-  } if (proposalMethod === 'cancel' && proposalSection === 'scheduler') {
-    return <CancelScheduler {...{ proposal }} />;
+  }
+  if (isBatchAll(proposal)) {
+    return (
+      <BatchAll
+        {...{ proposal }}
+        isTableRow={isTableRow}
+        batchId={proposal.toJSON().callIndex}
+        id={proposal.toString()}
+      >
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
+      </BatchAll>
+    );
+  }
+  if (isExternalProposeMajority(proposal)) {
+    return (
+      <Referendum {...{ proposal }}>
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
+      </Referendum>
+    );
+  }
+  if (isBlacklist(proposal)) {
+    return (
+      <Blacklist {...{ proposal }}>
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
+      </Blacklist>
+    );
+  }
+  if (isCouncilSenateExecute(proposal)) {
+    return (
+      <CouncilSenateExecute {...{ proposal }}>
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
+      </CouncilSenateExecute>
+    );
+  }
+  if (isScheduler(proposal)) {
+    return (
+      <Schedule {...{ proposal }}>
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
+      </Schedule>
+    );
+  }
+  if (isTransferLLD(proposal)) {
+    return isTableRow
+      ? <TransferLLDRow id={proposal.toString()} {...{ proposal }} />
+      : <TransferLLD {...{ proposal }} />;
+  }
+  if (isTransferLLM(proposal)) {
+    return isTableRow
+      ? <TransferLLMRow id={proposal.toString()} {...{ proposal }} />
+      : <TransferLLM {...{ proposal }} />;
+  }
+  if (isTransferAssets(proposal)) {
+    return isTableRow
+      ? <TransferAssetRow id={proposal.toString()} {...{ proposal }} />
+      : <TransferAsset {...{ proposal }} />;
+  }
+  if (isRemark(proposal)) {
+    return isTableRow
+      ? <RemarkRow id={proposal.toString()} {...{ proposal }} />
+      : <RemarkInfo {...{ proposal }} />;
   }
 
   return <Raw {...{ proposal }} />;
@@ -529,11 +117,15 @@ export function Proposal({ proposal, isDetailsHidden }) {
 
 Proposal.defaultProps = {
   isDetailsHidden: false,
+  isTableRow: false,
   names: {},
 };
 
 Proposal.propTypes = {
-  proposal: ProposalProp.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  proposal: PropTypes.object.isRequired,
   isDetailsHidden: PropTypes.bool,
+  isTableRow: PropTypes.bool,
+  // eslint-disable-next-line react/forbid-prop-types
   names: PropTypes.object,
 };
