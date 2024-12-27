@@ -1,22 +1,17 @@
-// LIBS
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
-import cx from 'classnames';
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Input from 'antd/es/input';
+import Alert from 'antd/es/alert';
+import Checkbox from 'antd/es/checkbox';
+import DatePicker from 'antd/es/date-picker';
+import Flex from 'antd/es/flex';
+import Select from 'antd/es/select';
 import ModalRoot from './ModalRoot';
-import {
-  TextInput,
-  DateInput,
-  CheckboxInput,
-  SelectInput,
-} from '../InputComponents';
 import Button from '../Button/Button';
-
-// STYLES
 import styles from './styles.module.scss';
-
 import {
   parseDOB,
   parseAdditionalFlag,
@@ -31,155 +26,131 @@ function OnchainIdentityModal({
   blockNumber,
   name,
 }) {
-  let defaultValues = {};
-  let isKnownGood = false;
-  let identityCitizen = false;
-  let eResident = false;
-  let identityDOB = false;
-  let company = false;
+  const defaultValues = useMemo(() => {
+    if (identity.isSome) {
+      const { judgements, info } = identity.unwrap();
+      const identityCitizen = parseAdditionalFlag(info.additional, 'citizen');
+      const eResident = parseAdditionalFlag(info.additional, 'eresident');
+      const company = parseAdditionalFlag(info.additional, 'company');
+      const onChainIdentity = [
+        identityCitizen && eResident && 'citizen',
+        !identityCitizen && eResident && 'eresident',
+        company && 'company',
+        'neither',
+      ].find(Boolean);
 
-  if (identity.isSome) {
-    const { judgements, info } = identity.unwrap();
-    identityCitizen = parseAdditionalFlag(info.additional, 'citizen');
-    eResident = parseAdditionalFlag(info.additional, 'eresident');
-    company = parseAdditionalFlag(info.additional, 'company');
-    let onChainIdentity;
-    if (identityCitizen && eResident) {
-      onChainIdentity = 'citizen';
-    } else if (!identityCitizen && eResident) {
-      onChainIdentity = 'eresident';
-    } else if (company) {
-      onChainIdentity = 'company';
-    } else {
-      onChainIdentity = 'neither';
+      const identityDOB = parseDOB(info.additional, blockNumber);
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email']);
+
+      return {
+        display: decodedData?.display ?? name,
+        legal: decodedData?.legal ?? name,
+        web: decodedData?.web,
+        email: decodedData?.email,
+        date_of_birth: identityDOB ?? undefined,
+        older_than_15: !identityDOB,
+        onChainIdentity,
+        isUserWarnAccepted: !parseCitizenshipJudgement(judgements),
+      };
     }
+    return {};
+  }, [identity, blockNumber, name]);
 
-    identityDOB = parseDOB(info.additional, blockNumber);
+  const [form] = Form.useForm();
 
-    const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email']);
-    defaultValues = {
-      display: decodedData?.display ?? name,
-      legal: decodedData?.legal ?? name,
-      web: decodedData?.web,
-      email: decodedData?.email,
-      date_of_birth: identityDOB ?? undefined,
-      older_than_15: !identityDOB,
-      onChainIdentity,
-    };
-
-    isKnownGood = parseCitizenshipJudgement(judgements);
-  }
-  const isWarning = identity.isSome && isKnownGood;
-
-  const [isUserWarnAccepted, setIsUserWarnAccepted] = useState(!isWarning);
-
-  const {
-    handleSubmit,
-    register,
-    watch,
-    formState: { errors },
-  } = useForm({ mode: 'all', defaultValues });
-
-  const isOlderThan15 = watch('older_than_15');
-  const onChainIdentity = watch('onChainIdentity');
+  const isOlderThan15 = Form.useWatch('older_than_15', form);
+  const onChainIdentity = Form.useWatch('onChainIdentity', form);
+  const isUserWarnAccepted = Form.useWatch('isUserWarnAccepted', form);
 
   return (
-    <form
-      className={cx(styles.getCitizenshipModal, styles.onChainIdentity)}
-      onSubmit={handleSubmit(onSubmit)}
+    <Form
+      form={form}
+      initialValues={defaultValues}
+      onFinish={onSubmit}
     >
-      <div className={styles.h3}>Update on-chain identity</div>
-      <div className={styles.description}>
+      <Title level={3}>Update on-chain identity</Title>
+      <Paragraph>
         You are going to update your identity stored on blockchain. This needs
         to be up-to-date for your citizenship or e-residency.
-      </div>
-      <br />
-      {!isWarning ? null : (
-        <div className={styles.description}>
+      </Paragraph>
+      {!isUserWarnAccepted && (
+        <Paragraph>
           Warning! Your identity is currently confirmed by citizenship office
           as valid. Changing it will require reapproval - you&apos;ll
           temporarily lose citizenship or e-resident rights onchain.
-        </div>
+        </Paragraph>
       )}
 
-      <div className={cx(styles.title, styles.margin)}>
-        Display name (mandatory)
-      </div>
-      <TextInput
-        register={register}
-        name="display"
-        placeholder="Display name"
-      />
-
-      <div className={styles.title}>Legal name (optional)</div>
-      <TextInput register={register} name="legal" placeholder="Legal name" />
-      <div className={styles.title}>Web address (optional)</div>
-      <TextInput register={register} name="web" placeholder="Web address" />
-      <div className={styles.error}>
-        {errors?.web?.message || errors?.web?.message}
-      </div>
-      <div className={styles.title}>Email (recommended, optional)</div>
-      <TextInput register={register} name="email" placeholder="Email" />
-      <div className={styles.error}>
-        {errors?.email?.message || errors?.email?.message}
-      </div>
-      <div className={styles.title}>I am a</div>
-      <SelectInput
-        register={register}
+      <Form.Item name="display" label="Display name" rules={[{ required: true }]}>
+        <Input placeholder="Display name" />
+      </Form.Item>
+      <Form.Item name="legal" label="Legal name" extra="Optional">
+        <Input placeholder="Legal name" />
+      </Form.Item>
+      <Form.Item name="web" label="Web address" extra="Optional">
+        <Input placeholder="Web address" />
+      </Form.Item>
+      <Form.Item name="email" label="E-mail" extra="Recommended, Optional">
+        <Input inputMode="email" placeholder="Web address" />
+      </Form.Item>
+      <Form.Item
         name="onChainIdentity"
-        options={[
-          { value: 'eresident', display: 'E-resident' },
-          { value: 'citizen', display: 'Citizen' },
-          { value: 'company', display: 'Company' },
-          { value: 'neither', display: 'Neither' },
-        ]}
-      />
+        label="I am a"
+        rules={[{ required: true }]}
+      >
+        <Select
+          options={[
+            { value: 'eresident', label: 'E-resident' },
+            { value: 'citizen', label: 'Citizen' },
+            { value: 'company', label: 'Company' },
+            { value: 'neither', label: 'Neither' },
+          ]}
+        />
+      </Form.Item>
 
-      {!(onChainIdentity === 'citizen') ? null : (
+      {onChainIdentity === 'citizen' && (
         <>
-          <div className={styles.title}>Date of birth</div>
-          <CheckboxInput
-            register={register}
+          <Form.Item
             name="older_than_15"
             label="I'm 15 or older"
-          />
-          {isOlderThan15 ? null : (
-            <DateInput
-              register={register}
+          >
+            <Checkbox />
+          </Form.Item>
+          {!isOlderThan15 && (
+            <Form.Item
               name="date_of_birth"
-              placeholder="Date of birth"
-            />
+              label="Date of birth"
+            >
+              <DatePicker />
+            </Form.Item>
           )}
         </>
       )}
 
-      <div className={styles.error}>
-        {errors?.e_resident?.message || errors?.citizen?.message}
-      </div>
-
-      {isUserWarnAccepted ? null : (
-        <>
-          <div className={cx(styles.description, styles.warning)}>
+      <Form.Item
+        name="isUserWarnAccepted"
+        label="I want to change my identity"
+        extra={(
+          <Alert type="warning">
             Warning! Your identity is currently confirmed by citizenship office
             as valid. Changing it will require reapproval - you&apos;ll
             temporarily lose citizenship or e-resident rights onchain.
             Until its manually handled by ministry of interior which takes about two days.
-          </div>
-          <Button medium red onClick={() => setIsUserWarnAccepted(true)}>
-            I want to change my identity
-          </Button>
-        </>
-      )}
+          </Alert>
+        )}
+      >
+        <Checkbox />
+      </Form.Item>
 
-      <div className={styles.buttonWrapper}>
-        <Button className={styles.button} medium grey onClick={closeModal}>
+      <Flex wrap gap="15px">
+        <Button className={styles.button} onClick={closeModal}>
           Cancel
         </Button>
-        <Button className={styles.button} primary medium type="submit" disabled={!isUserWarnAccepted}>
+        <Button className={styles.button} primary type="submit">
           Set identity
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 

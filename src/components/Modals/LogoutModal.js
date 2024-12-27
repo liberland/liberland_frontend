@@ -1,31 +1,26 @@
 import React from 'react';
-
+import Form from 'antd/es/form';
+import Flex from 'antd/es/flex';
 import PropTypes from 'prop-types';
 import Button from '../Button/Button';
 import ModalRoot from './ModalRoot';
 
-import styles from './styles.module.scss';
-
 function LogoutModal({ closeModal, handleLogout }) {
+  const [form] = Form.useForm();
   return (
-    <div
-      className={styles.getCitizenshipModal}
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        maxWidth: '300px',
-        margin: 'auto',
-        flexWrap: 'wrap',
-        gap: '8px',
-      }}
+    <Form
+      form={form}
+      onFinish={handleLogout}
     >
-      <Button small red onClick={handleLogout}>
-        Logout
-      </Button>
-      <Button small primary onClick={closeModal}>
-        Cancel
-      </Button>
-    </div>
+      <Flex wrap gap="15px">
+        <Button red onClick={handleLogout}>
+          Logout
+        </Button>
+        <Button primary onClick={closeModal}>
+          Cancel
+        </Button>
+      </Flex>
+    </Form>
   );
 }
 

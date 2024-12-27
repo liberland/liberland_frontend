@@ -1,16 +1,12 @@
-// LIBS
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Flex from 'antd/es/flex';
+import Paragraph from 'antd/es/typography/Paragraph';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
-import InputSearch from '../InputComponents/OldInputSearchAddressName';
-
-// STYLES
-import styles from './styles.module.scss';
-import { isValidSubstrateAddress } from '../../utils/walletHelpers';
+import InputSearch from '../InputComponents/InputSearchAddressName';
 
 function FillAddress({
   closeModal, textData, onAccept,
@@ -24,63 +20,46 @@ function FillAddress({
     submitButtonText = 'Make transfer',
   } = textData;
 
-  const {
-    handleSubmit,
-    formState: { errors, isValid },
-    register,
-    setValue,
-    trigger,
-  } = useForm({
-    mode: 'all',
-  });
+  const [form] = Form.useForm();
 
   const formSubmit = async (data) => {
-    if (!isValid || !data?.recipient) return null;
     await onAccept(data.recipient);
-    return true;
+    closeModal();
   };
 
   return (
-    <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(formSubmit)}>
-      <div className={styles.h3}>
+    <Form
+      form={form}
+      onFinish={formSubmit}
+    >
+      <Title level={3}>
         {title}
-      </div>
-      <div className={styles.description}>
+      </Title>
+      <Paragraph>
         {description}
-      </div>
-
-      <InputSearch
-        trigger={trigger}
-        errorTitle="Recipient"
-        register={register}
+      </Paragraph>
+      <Form.Item
         name="recipient"
-        placeholder="Recipient address"
-        isRequired
-        setValue={setValue}
-        validate={(v) => {
-          if (!isValidSubstrateAddress(v)) return 'Invalid Address';
-          return true;
-        }}
-      />
-      {errors?.recipient?.message
-        && <div className={styles.error}>{errors.recipient.message}</div>}
+        label="Recipient"
+        rules={[{ required: true }]}
+      >
+        <InputSearch placeholder="Recipient address" />
+      </Form.Item>
 
-      <div className={styles.buttonWrapper}>
+      <Flex wrap gap="15px">
         <Button
-          medium
           onClick={closeModal}
         >
           Cancel
         </Button>
         <Button
           primary
-          medium
           type="submit"
         >
           {submitButtonText}
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
@@ -113,10 +92,22 @@ FillAddress.propTypes = {
 };
 
 function FillAddressWrapper(props) {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <FillAddress {...props} />
-    </ModalRoot>
+    <>
+      <Button
+        small
+        onClick={() => setShow(true)}
+        primary
+      >
+        Transfer
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <FillAddress {...props} closeModal={() => setShow(false)} />
+        </ModalRoot>
+      )}
+    </>
   );
 }
 

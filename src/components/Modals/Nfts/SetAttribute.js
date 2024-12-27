@@ -32,7 +32,7 @@ function SetAttributeModal({ closeModal, collectionId, itemId }) {
       <Paragraph>
         Fill in the details below to set a new attribute for your NFT.
       </Paragraph>
-      <Form.Item label="Namespace" name="namespace" rules={{ required: true }}>
+      <Form.Item label="Namespace" name="namespace" rules={[{ required: true }]}>
         <Select
           options={[
             {
@@ -51,10 +51,10 @@ function SetAttributeModal({ closeModal, collectionId, itemId }) {
           placeholder="Select namespace"
         />
       </Form.Item>
-      <Form.Item label="Key" name="key" rules={{ required: true }}>
+      <Form.Item label="Key" name="key" rules={[{ required: true }]}>
         <Input placeholder="Enter key for attribute" />
       </Form.Item>
-      <Form.Item label="Value" name="value" rules={{ required: true }}>
+      <Form.Item label="Value" name="value" rules={[{ required: true }]}>
         <Input placeholder="Enter value for attribute" />
       </Form.Item>
       <Flex wrap gap="15px">

@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 function DisplayOnlyLegislation({ section }) {
   return (
     <>
-      <Form.Item name="tier" label="Legislation tier" rules={{ required: true }}>
+      <Form.Item name="tier" label="Legislation tier" rules={[{ required: true }]}>
         <Select
           options={[
             { value: 'Constitution', label: 'Constitution' },
@@ -22,14 +22,14 @@ function DisplayOnlyLegislation({ section }) {
           disabled
         />
       </Form.Item>
-      <Form.Item name="year" label="Legislation year" rules={{ required: true }}>
+      <Form.Item name="year" label="Legislation year" rules={[{ required: true }]}>
         <DatePicker picker="year" disabled />
       </Form.Item>
-      <Form.Item name="index" label="Legislation Index" rules={{ required: true }}>
+      <Form.Item name="index" label="Legislation Index" rules={[{ required: true }]}>
         <InputNumber controls={false} disabled />
       </Form.Item>
       {section !== null && (
-        <Form.Item name="section" label="Legislation section" rules={{ required: true }}>
+        <Form.Item name="section" label="Legislation section" rules={[{ required: true }]}>
           <InputNumber controls={false} disabled />
         </Form.Item>
       )}

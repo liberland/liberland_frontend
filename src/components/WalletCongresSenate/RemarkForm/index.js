@@ -44,50 +44,7 @@ const remarkOptions = {
   ],
 };
 
-export default function RemarkForm({
-  register,
-  indexItem,
-  errors,
-  watch,
-  setValue,
-}) {
-  const categoryName = indexItem !== null ? `category${indexItem}` : 'category';
-  const projectName = indexItem !== null ? `project${indexItem}` : 'project';
-  const supplierName = indexItem !== null ? `supplier${indexItem}` : 'supplier';
-  const descriptionName = indexItem !== null ? `description${indexItem}` : 'description';
-  const amountInUsdName = indexItem !== null ? `amountInUsd${indexItem}` : 'amountInUsd';
-  const finalDestinationName = indexItem !== null ? `finalDestination${indexItem}` : 'finalDestination';
-  const combined = indexItem !== null ? `combined${indexItem}` : 'combined';
-
-  const category = watch(categoryName);
-  const project = watch(projectName);
-  const supplier = watch(supplierName);
-  const description = watch(descriptionName);
-  const amountInUsd = watch(amountInUsdName);
-  const finalDestination = watch(finalDestinationName);
-
-  useEffect(() => {
-    const remark = {
-      category,
-      project,
-      supplier,
-      description,
-      finalDestination,
-      amountInUSDAtDateOfPayment: Number(amountInUsd),
-    };
-
-    encodeRemark(remark).then((encoded) => setValue(combined, encoded, { shouldValidate: true }));
-  }, [
-    category,
-    project,
-    supplier,
-    description,
-    amountInUsd,
-    finalDestination,
-    setValue,
-    combined,
-  ]);
-
+export default function RemarkForm() {
   return (
     <>
       <div className={styles.title}>Category</div>

@@ -19,13 +19,13 @@ import stylesPage from '../../../utils/pagesBase.module.scss';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
 import ProposeRepealLegislationButton from '../../Congress/ProposeRepealLegislationButton';
-import AmendLegislationButton from './AmendLegislationButton';
 import Header from './Header';
 import useCalculateDropdownPosition from '../../../hooks/useCalculateDropdownPosition';
 import CitizenRepealLegislationModalWrapper from '../../Modals/CitizenRepealLegislationModal';
 import CongressAmendLegislationModalWrapper from '../../Modals/CongressAmendLegislationModal';
 import CongressAmendLegislationViaReferendumModalWrapper from '../../Modals/CongressAmendLegislationViaReferendumModal';
 import CongressRepealLegislationModalWrapper from '../../Modals/CongressRepealLegislationModal';
+import ProposeAmendLegislationModalWrapper from '../../Modals/ProposeAmendLegislationModal';
 
 function VetoStats({
   tier, id, section, isH2,
@@ -193,7 +193,11 @@ function ActionButtons({
         </Button>
         {isAmendOpen && (
           <div className={styles.dropdown} ref={dropdownRefAmend}>
-            <AmendLegislationButton {...{ tier, id, section }} />
+            <ProposeAmendLegislationModalWrapper
+              tier={tier}
+              id={id}
+              section={section}
+            />
             {tier === 'InternationalTreaty' && (
               <CongressAmendLegislationModalWrapper
                 tier={tier}
@@ -394,7 +398,12 @@ function LegislationItem({
                   {isAddOpen
                     && (
                     <div className={styles.dropdown} ref={dropdownRef}>
-                      <AmendLegislationButton add {...{ tier, id, section: sections.length }} />
+                      <ProposeAmendLegislationModalWrapper
+                        add
+                        tier={tier}
+                        id={id}
+                        section={sections.length}
+                      />
                       {tier === 'InternationalTreaty' && (
                         <CongressAmendLegislationModalWrapper
                           add

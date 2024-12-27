@@ -113,13 +113,13 @@ function CreatEditNFTModal({
       <Paragraph>
         Fill out the details to create your NFT.
       </Paragraph>
-      <Form.Item name="name" label="NFT name" rules={{ required: true }}>
+      <Form.Item name="name" label="NFT name" rules={[{ required: true }]}>
         <Input placeholder="Enter NFT name" />
       </Form.Item>
-      <Form.Item name="name" label="Description" rules={{ required: true }}>
+      <Form.Item name="name" label="Description" rules={[{ required: true }]}>
         <Input placeholder="Enter description" />
       </Form.Item>
-      <Form.Item name="imageFile" label="Upload image" rules={{ required: true }}>
+      <Form.Item name="imageFile" label="Upload image" rules={[{ required: true }]}>
         <Upload.Dragger
           action={uploadImageToIPFS}
           disabled={uploading}

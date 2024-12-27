@@ -65,7 +65,7 @@ function CongressAmendLegislationViaReferendumModal({
       </Title>
 
       <DisplayOnlyLegislation section={section} />
-      <Form.Item name="content" label="Legislation content" rules={{ required: true }}>
+      <Form.Item name="content" label="Legislation content" rules={[{ required: true }]}>
         <TextArea />
       </Form.Item>
 

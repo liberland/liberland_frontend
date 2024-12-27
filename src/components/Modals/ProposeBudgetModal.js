@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
 import PropTypes from 'prop-types';
 
 // COMPONENTS
@@ -16,6 +16,8 @@ import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import InputSearch from '../InputComponents/OldInputSearchAddressName';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { IndexHelper } from '../../utils/council/councilEnum';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
 
 const defaultValueSpending = {
   currency: null,
@@ -48,26 +50,11 @@ function ProposeBudgetModal({
   const allBalance = useSelector(congressSelectors.allBalance);
   const [itemsInList, setItemsInList] = useState([0]);
   const [spendings, setSpendings] = useState([defaultValueSpending]);
-
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    formState: { errors, isValid },
-    watch,
-    unregister,
-    trigger,
-  } = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      votingDays: '7',
-    },
-  });
+  const [form] = Form.useForm();
 
   const executionBlock = useCongressExecutionBlock(7);
 
   const onSubmit = async (data) => {
-    if (!isValid) return;
     const bugetProposalItems = await extractItemsFromObject(data, spendings[0].optionsInput);
     dispatch(congressActions.congressBudgetPropose.call({ bugetProposalItems, executionBlock }));
     closeModal();
@@ -115,15 +102,17 @@ function ProposeBudgetModal({
   if (!optionsInputDefault) return null;
 
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      style={{ width: '90%' }}
-      onSubmit={handleSubmit(onSubmit)}
+    <Form
+      form={form}
+      onFinish={onSubmit}
+      initialValues={{
+        votingDays: '7',
+      }}
     >
-      <div className={styles.h3}>Congress Budget Proposal</div>
-      <div className={styles.description}>
+      <Title level={3}>Congress Budget Proposal</Title>
+      <Paragraph>
         You are going to propose new budget proposal as a Congress member
-      </div>
+      </Paragraph>
       {spendings.map(({ optionsInput, indexItem }, index) => ( // eslint-disable-next-line react/no-array-index-key
         <div key={`${index}-${indexItem}`}>
           <div className={styles.title}>

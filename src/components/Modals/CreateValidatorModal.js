@@ -91,7 +91,7 @@ function CreateValidatorModal({
       <Form.Item
         name="comission"
         label="Reward commission percentage"
-        rules={{ required: true }}
+        rules={[{ required: true }]}
         extra="The commission is deducted from all rewards before the remainder is split with nominators."
       >
         <Slider
@@ -105,7 +105,7 @@ function CreateValidatorModal({
       </Form.Item>
       <Form.Item
         name="payee"
-        rules={{ required: true }}
+        rules={[{ required: true }]}
         label="Staking rewards destination"
       >
         <Select

@@ -34,8 +34,6 @@ function ItemNft({
   } = itemMetadata;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
-  const [isSetPriceModalOpen, setIsSetPriceModalOpen] = useState(false);
   const [isImageOpen, setIsImageOpen] = useState(false);
 
   const handleMenuOpen = () => {
@@ -46,14 +44,6 @@ function ItemNft({
     dispatch(
       nftsActions.destroyNft.call({ collectionId, itemId: Number(nftId) }),
     );
-  };
-
-  const onTransfer = () => {
-    setIsTransferModalOpen(true);
-  };
-
-  const onSetPrice = () => {
-    setIsSetPriceModalOpen(true);
   };
 
   const onBuyNft = () => {
@@ -79,38 +69,6 @@ function ItemNft({
 
   return (
     <>
-      {isTransferModalOpen && (
-        <FillAddressWrapper
-          textData={textData}
-          closeModal={() => setIsTransferModalOpen(false)}
-          onAccept={(address) => {
-            dispatch(
-              nftsActions.transferNft.call({
-                collectionId,
-                itemId: Number(nftId),
-                newOwner: address,
-              }),
-            );
-            setIsTransferModalOpen(false);
-          }}
-        />
-      )}
-      {isSetPriceModalOpen && (
-        <FillNumberWrapper
-          closeModal={() => setIsSetPriceModalOpen(false)}
-          textData={{ ...textData, submitButtonText: 'Set Price' }}
-          onAccept={(amount) => {
-            dispatch(
-              nftsActions.sellNft.call({
-                collectionId,
-                itemId: Number(nftId),
-                price: parseDollars(amount),
-              }),
-            );
-            setIsSetPriceModalOpen(false);
-          }}
-        />
-      )}
       {isImageOpen && (
         <FullImageWrapper closeModal={() => setIsImageOpen(false)} image={image} />
       )}
@@ -181,22 +139,30 @@ function ItemNft({
           )}
           {isMenuOpen && isOwnItem && (
             <div className={styles.buttonContainer}>
-              <Button
-                small
-                onClick={onTransfer}
-                primary
-                className={styles.button}
-              >
-                Transfer
-              </Button>
-              <Button
-                small
-                onClick={onSetPrice}
-                primary
-                className={styles.button}
-              >
-                Set Price
-              </Button>
+              <FillAddressWrapper
+                textData={textData}
+                onAccept={(address) => {
+                  dispatch(
+                    nftsActions.transferNft.call({
+                      collectionId,
+                      itemId: Number(nftId),
+                      newOwner: address,
+                    }),
+                  );
+                }}
+              />
+              <FillNumberWrapper
+                textData={{ ...textData, submitButtonText: 'Set Price' }}
+                onAccept={(amount) => {
+                  dispatch(
+                    nftsActions.sellNft.call({
+                      collectionId,
+                      itemId: Number(nftId),
+                      price: parseDollars(amount),
+                    }),
+                  );
+                }}
+              />
               <CreateEditNFTModalWrapper
                 collectionId={collectionId}
                 nftId={nftId}

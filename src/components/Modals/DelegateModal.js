@@ -80,7 +80,7 @@ function DelegateModalWrapper({
         primary
         onClick={() => setShow(true)}
       >
-        DELEGATE
+        Delegate
       </Button>
       {show && (
         <ModalRoot onClose={() => setShow(true)}>

@@ -1,18 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import TextArea from 'antd/es/input/TextArea';
+import Flex from 'antd/es/flex';
+import Popconfirm from 'antd/es/popconfirm';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalRoot from './ModalRoot';
-import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
-import styles from './styles.module.scss';
 import { democracyActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import AgreeDisagreeModal from './AgreeDisagreeModal';
-import useAgreeDisagreeModal from '../../hooks/useAgreeDisagreeModal';
 import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
 
 function ProposeAmendLegislationModal({
@@ -22,21 +20,7 @@ function ProposeAmendLegislationModal({
   const allLegislation = useSelector(legislationSelectors.legislation);
   const legislation = allLegislation[tier][id.year][id.index];
   const sectionContent = legislation.sections[section]?.content.toHuman() ?? '';
-  const {
-    handleSubmit,
-    register,
-    trigger,
-    formState: { errors, isValid },
-  } = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      tier,
-      year: id.year,
-      index: id.index,
-      section,
-      content: sectionContent,
-    },
-  });
+  const [form] = Form.useForm();
 
   const onSubmit = ({
     discussionName,
@@ -58,50 +42,48 @@ function ProposeAmendLegislationModal({
     closeModal();
   };
 
-  const { dialogStep, handleClick } = useAgreeDisagreeModal(isValid, trigger);
-
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmit)}
+    <Form
+      form={form}
+      initialValues={{
+        tier,
+        year: id.year,
+        index: id.index,
+        section,
+        content: sectionContent,
+      }}
+      onFinish={onSubmit}
     >
-      {dialogStep === 'form' ? (
-        <>
-          <div className={styles.h3}>
-            Propose a Referendum -
-            {legislation.sections[section]
-              ? 'amend legislation'
-              : 'add legislation section'}
-          </div>
+      <Title level={3}>
+        Propose a Referendum -
+        {legislation.sections[section]
+          ? 'amend legislation'
+          : 'add legislation section'}
+      </Title>
 
-          <DisplayOnlyLegislation section={section} />
-
-          <div className={styles.title}>Legislation Content</div>
-          <TextInput
-            required
-            errorTitle="Content"
-            register={register}
-            name="content"
-          />
-          {errors?.content?.message && (
-            <div className={styles.error}>{errors.content.message}</div>
-          )}
-
-          <ProposalDiscussionFields {...{ register, errors }} />
-
-          <div className={styles.buttonWrapper}>
-            <Button medium onClick={closeModal}>
-              Cancel
-            </Button>
-            <Button primary medium onClick={handleClick}>
-              Submit
-            </Button>
-          </div>
-        </>
-      ) : (
-        <AgreeDisagreeModal onDisagree={closeModal} agreeButtonType="submit" />
-      )}
-    </form>
+      <DisplayOnlyLegislation section={section} />
+      <Form.Item
+        name="content"
+        label="Legislation Content"
+      >
+        <TextArea />
+      </Form.Item>
+      <ProposalDiscussionFields />
+      <Flex wrap gap="15px">
+        <Button onClick={closeModal}>
+          Cancel
+        </Button>
+        <Popconfirm
+          title="Confirm form submission"
+          description="This operation costs 100 LLD."
+          onConfirm={() => form.submit()}
+        >
+          <Button primary>
+            Submit
+          </Button>
+        </Popconfirm>
+      </Flex>
+    </Form>
   );
 }
 
@@ -115,12 +97,40 @@ ProposeAmendLegislationModal.propTypes = {
   section: PropTypes.string.isRequired,
 };
 
-function ProposeAmendLegislationModalWrapper(props) {
+function ProposeAmendLegislationModalWrapper({
+  add,
+  tier,
+  id,
+  section,
+}) {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <ProposeAmendLegislationModal {...props} />
-    </ModalRoot>
+    <>
+      <Button link onClick={() => setShow(true)}>
+        {add ? 'Add section' : 'Amend'}
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <ProposeAmendLegislationModal
+            closeModal={() => setShow(false)}
+            id={id}
+            section={section}
+            tier={tier}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+ProposeAmendLegislationModalWrapper.propTypes = {
+  add: PropTypes.bool,
+  tier: PropTypes.string.isRequired,
+  id: PropTypes.shape({
+    year: PropTypes.number.isRequired,
+    index: PropTypes.number.isRequired,
+  }).isRequired,
+  section: PropTypes.string.isRequired,
+};
 
 export default ProposeAmendLegislationModalWrapper;
