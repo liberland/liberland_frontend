@@ -44,7 +44,14 @@ Voters.propTypes = {
 };
 
 export default function Motion({
-  proposal, proposalOf, voting, voteMotion, closeMotion, membersCount, userIsMember,
+  proposal,
+  proposalOf,
+  voting,
+  voteMotion,
+  closeMotion,
+  membersCount,
+  userIsMember,
+  isTableRow,
 }) {
   const dispatch = useDispatch();
   const userAddress = useSelector(
@@ -146,7 +153,7 @@ export default function Motion({
           </div>
         )
           : (<div className={styles.buttonsContainer} />)}
-        <Proposal proposal={proposalOf} />
+        <Proposal proposal={proposalOf} isTableRow={isTableRow} />
       </Card>
     </div>
   );
@@ -171,5 +178,6 @@ Motion.propTypes = {
   closeMotion: PropTypes.func.isRequired,
   voteMotion: PropTypes.func.isRequired,
   membersCount: PropTypes.number.isRequired,
+  isTableRow: PropTypes.bool,
   userIsMember: PropTypes.bool.isRequired,
 };

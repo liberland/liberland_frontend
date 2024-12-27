@@ -7,6 +7,7 @@ import { congressActions, identityActions } from '../../../redux/actions';
 import { congressSelectors } from '../../../redux/selectors';
 import Motion from '../../WalletCongresSenate/Motion';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
+import ProposalContainer from '../../Proposal/ProposalContainer';
 
 export default function Motions() {
   const dispatch = useDispatch();
@@ -36,16 +37,19 @@ export default function Motions() {
         proposal, proposalOf, voting, membersCount,
       }, index) => (
         <div ref={motions.length - 1 === index ? divRef : null} key={proposal}>
-          <Motion
-            userIsMember={userIsMember}
-            membersCount={membersCount}
-            key={proposal}
-            proposal={proposal.toString()}
-            proposalOf={proposalOf.unwrap()}
-            voting={voting.unwrap()}
-            voteMotion={(data) => congressActions.voteAtMotions.call(data)}
-            closeMotion={(data) => congressActions.closeMotion.call(data)}
-          />
+          <ProposalContainer>
+            <Motion
+              userIsMember={userIsMember}
+              membersCount={membersCount}
+              key={proposal}
+              proposal={proposal.toString()}
+              proposalOf={proposalOf.unwrap()}
+              voting={voting.unwrap()}
+              voteMotion={(data) => congressActions.voteAtMotions.call(data)}
+              closeMotion={(data) => congressActions.closeMotion.call(data)}
+              isTableRow
+            />
+          </ProposalContainer>
         </div>
       ))}
     </div>
