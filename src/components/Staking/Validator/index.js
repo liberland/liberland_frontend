@@ -1,12 +1,12 @@
 import React from 'react';
 import Slashes from './Slashes';
 import Status from './Status';
-import SetSessionKeysButton from './SetSessionKeysButton';
 import NominatorsList from './NominatorsList';
 import Stats from './Stats';
 import StartStopButton from './StartStopButton';
 import CreateValidatorButton from './CreateValidatorButton';
 import styles from './styles.module.scss';
+import SetSessionKeysModalWrapper from '../../Modals/SetSessionKeysModal';
 
 export default function Overview() {
   return (
@@ -26,7 +26,7 @@ export default function Overview() {
       </div>
       <div className={styles.rowEnd}>
         <CreateValidatorButton />
-        <SetSessionKeysButton />
+        <SetSessionKeysModalWrapper />
         <StartStopButton />
       </div>
       <Slashes />

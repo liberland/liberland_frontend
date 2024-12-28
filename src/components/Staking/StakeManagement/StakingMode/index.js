@@ -54,17 +54,10 @@ function Switcher() {
 }
 
 function Starter() {
-  const [isStakeModalOpen, setIsStakeModalOpen] = useState(false);
-  const handleStakeModalOpen = () => setIsStakeModalOpen(!isStakeModalOpen);
-
   return (
     <div className={styles.rowEnd}>
-      <Button small primary onClick={handleStakeModalOpen}>
-        Start Nominating
-      </Button>
-
+      <StakeLLDModal label="Start nominating" />
       <CreateValidatorModal />
-      {isStakeModalOpen && <StakeLLDModal closeModal={handleStakeModalOpen} />}
     </div>
   );
 }

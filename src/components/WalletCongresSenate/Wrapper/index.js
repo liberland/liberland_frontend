@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import cx from 'classnames';
 import { BN } from '@polkadot/util';
 import PropTypes from 'prop-types';
 import walletStyles from '../../Wallet/styles.module.scss';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
-import Button from '../../Button/Button';
-import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
+import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import styles from './styles.module.scss';
 import AssetOverview from '../../Wallet/AssetOverview';
@@ -28,15 +27,9 @@ export default function WalletCongresSenateWrapper({
   const balanceLLD = new BN(balances?.liquidAmount?.amount ?? 0);
   const balanceLLM = valueToBN(balances?.liquidMerits?.amount ?? 0);
 
-  const [isModalOpenLLDSpend, setIsModalOpenLLDSpend] = useState(false);
-  const [isModalOpenLLMSpend, setIsModalOpenLLMSpend] = useState(false);
-  const [isModalOpenPolitipoolLLMSpend, setIsModalOpenPolitipoolLLMSpend] = useState(false);
-
-  if (!congresAccountAddress) return null;
-
-  const toggleModalLLDSpendOpen = () => setIsModalOpenLLDSpend(!isModalOpenLLDSpend);
-  const toggleModalLLMSpendOpen = () => setIsModalOpenLLMSpend(!isModalOpenLLMSpend);
-  const toggleModalPolitipoolLLMSpendOpen = () => setIsModalOpenPolitipoolLLMSpend(!isModalOpenPolitipoolLLMSpend);
+  if (!congresAccountAddress) {
+    return null;
+  }
 
   return (
     <>
@@ -66,26 +59,42 @@ export default function WalletCongresSenateWrapper({
           )}
         >
           {userIsMember && (
-          <>
-            <Button small primary className={walletStyles.button} onClick={toggleModalPolitipoolLLMSpendOpen}>
-              <div className={walletStyles.icon}>
-                <GraphIcon />
-              </div>
-              SPEND LLM (POLITIPOOL)
-            </Button>
-            <Button small primary className={walletStyles.button} onClick={toggleModalLLMSpendOpen}>
-              <div className={walletStyles.icon}>
-                <UploadIcon />
-              </div>
-              SPEND LLM
-            </Button>
-            <Button small primary className={walletStyles.button} onClick={toggleModalLLDSpendOpen}>
-              <div className={walletStyles.icon}>
-                <UploadIcon />
-              </div>
-              SPEND LLD
-            </Button>
-          </>
+            <>
+              <SpendModalWrapper
+                officeType={officeType}
+                spendData={{
+                  name: 'LLM to politipool',
+                  title: 'Spend LLM to politipool',
+                  description:
+                    'You are going to create LLM spend proposal that will transfer LLM to recipients politipool',
+                  subtitle: "Spend LLM to address's politipool",
+                }}
+                onSend={LLMPolitipool}
+                balance={balanceLLM}
+                label="Spend LLM (Politipool)"
+                icon={<GraphIcon />}
+              />
+              <SpendModalWrapper
+                officeType={officeType}
+                onSend={LLM}
+                spendData={{
+                  name: 'LLM',
+                }}
+                balance={balanceLLM}
+                label="Spend LLM"
+                icon={<GraphIcon />}
+              />
+              <SpendModalWrapper
+                officeType={officeType}
+                onSend={LLD}
+                spendData={{
+                  name: 'LLD',
+                }}
+                balance={balanceLLD}
+                label="Spend LLD"
+                icon={<UploadIcon />}
+              />
+            </>
           )}
         </div>
       </div>
@@ -103,43 +112,6 @@ export default function WalletCongresSenateWrapper({
         userIsMember={userIsMember}
         isCongress
       />
-      {isModalOpenLLDSpend && (
-      <SpendModalWrapper
-        officeType={officeType}
-        closeModal={toggleModalLLDSpendOpen}
-        onSend={LLD}
-        spendData={{
-          name: 'LLD',
-        }}
-        balance={balanceLLD}
-      />
-      )}
-      {isModalOpenLLMSpend
-      && (
-      <SpendModalWrapper
-        officeType={officeType}
-        closeModal={toggleModalLLMSpendOpen}
-        onSend={LLM}
-        spendData={{
-          name: 'LLM',
-        }}
-        balance={balanceLLM}
-      />
-      )}
-      {isModalOpenPolitipoolLLMSpend && (
-      <SpendModalWrapper
-        officeType={officeType}
-        closeModal={toggleModalPolitipoolLLMSpendOpen}
-        spendData={{
-          name: 'LLM to politipool',
-          title: 'Spend LLM to politipool',
-          description: 'You are going to create LLM spend proposal that will transfer LLM to recipients politipool',
-          subtitle: "Spend LLM to address's politipool",
-        }}
-        onSend={LLMPolitipool}
-        balance={balanceLLM}
-      />
-      )}
     </>
   );
 }

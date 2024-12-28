@@ -34,12 +34,10 @@ function CurrentlyStaked() {
 export default function StakeManagement() {
   const balances = useSelector(walletSelectors.selectorBalances);
   const info = useSelector(validatorSelectors.info);
-  const [isStakeModalOpen, setIsStakeModalOpen] = useState(false);
   const [isUnbondModalOpen, setIsUnbondModalOpen] = useState(false);
 
   if (!balances) return null;
 
-  const handleStakeModalOpen = () => setIsStakeModalOpen(!isStakeModalOpen);
   const handleUnbondModalOpen = () => setIsUnbondModalOpen(!isUnbondModalOpen);
 
   return (
@@ -53,9 +51,7 @@ export default function StakeManagement() {
             <RewardsConfig />
             <Unbonding {...{ info }} />
             <div className={styles.stakingActionButtonsWrapper}>
-              <Button small primary onClick={handleStakeModalOpen}>
-                ADD STAKE
-              </Button>
+              <StakeLLDModal label="Add stake" />
               <WithdrawUnbondedButton />
               <Button small secondary onClick={handleUnbondModalOpen}>
                 UNSTAKE
@@ -72,7 +68,6 @@ export default function StakeManagement() {
           <StakingMode />
         </div>
       </Card>
-      {isStakeModalOpen && <StakeLLDModal closeModal={handleStakeModalOpen} />}
       {isUnbondModalOpen && <UnbondModal closeModal={handleUnbondModalOpen} />}
     </div>
   );

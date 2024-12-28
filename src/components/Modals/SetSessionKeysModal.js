@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Flex from 'antd/es/flex';
+import Input from 'antd/es/input';
 import PropTypes from 'prop-types';
 import { isHex } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
-import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
-
-import styles from './styles.module.scss';
 
 function SetSessionKeysModal({
   onSubmit, closeModal,
@@ -15,37 +15,37 @@ function SetSessionKeysModal({
 
   return (
     <Form form={form} onFinish={onSubmit}>
-      <div className={styles.h3}>Change session keys</div>
-
-      <div className={styles.title}>Session keys</div>
-      <TextInput
-        register={register}
+      <Title level={3}>Change session keys</Title>
+      <Form.Item
+        label="Session keys"
         name="keys"
-        errorTitle="keys"
-        validate={(v) => {
-          if (!isHex(v)) return 'Must be a hex string starting with 0x';
-          return v.length === 258 || 'Invalid length';
-        }}
-        required
-      />
-      { errors?.keys?.message
-        && <div className={styles.error}>{errors.keys.message}</div>}
-
-      <div className={styles.buttonWrapper}>
+        rules={[
+          { required: true },
+          {
+            validator: (v) => {
+              if (!isHex(v)) {
+                return Promise.reject('Must be a hex string starting with 0x');
+              }
+              return v.length === 258 ? Promise.resolve() : Promise.reject('Invalid length');
+            },
+          },
+        ]}
+      >
+        <Input />
+      </Form.Item>
+      <Flex wrap gap="15px">
         <Button
-          medium
           onClick={closeModal}
         >
           Cancel
         </Button>
         <Button
           primary
-          medium
           type="submit"
         >
           Change session keys
         </Button>
-      </div>
+      </Flex>
     </Form>
   );
 }
@@ -55,10 +55,31 @@ SetSessionKeysModal.propTypes = {
   onSubmit: PropTypes.func.isRequired,
 };
 
-export default function SetSessionKeysModalWrapper(props) {
+export default function SetSessionKeysModalWrapper({
+  onSubmit,
+}) {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <SetSessionKeysModal {...props} />
-    </ModalRoot>
+    <>
+      <Button
+        small
+        primary
+        onClick={() => setShow(true)}
+      >
+        Change session keys
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <SetSessionKeysModal
+            closeModal={() => setShow(false)}
+            onSubmit={onSubmit}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+SetSessionKeysModalWrapper.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
