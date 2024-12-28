@@ -10,8 +10,8 @@ import {
 import styles from '../styles.module.scss';
 import ProposeLegislationButton from '../ProposeLegislationButton';
 import ProposeLegislationViaReferendumButton from '../ProposeLegislationViaReferendumButton';
-import ProposeBudgetButton from '../ProposeBudgetButton';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
+import ProposeBudgetModalWrapper from '../../Modals/ProposeBudgetModal';
 
 export default function Overview() {
   const dispatch = useDispatch();
@@ -62,7 +62,7 @@ export default function Overview() {
             <>
               <ProposeLegislationButton />
               <ProposeLegislationViaReferendumButton />
-              <ProposeBudgetButton />
+              <ProposeBudgetModalWrapper />
             </>
           )}
           {(userIsMember || userIsCandidate || userIsRunnersUp) && (

@@ -1,5 +1,6 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
+import PropTypes from 'prop-types';
 import { isHex } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import { TextInput } from '../InputComponents';
@@ -8,17 +9,12 @@ import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
 function SetSessionKeysModal({
-  // eslint-disable-next-line react/prop-types
   onSubmit, closeModal,
 }) {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm({ mode: 'all' });
+  const [form] = Form.useForm();
 
   return (
-    <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
+    <Form form={form} onFinish={onSubmit}>
       <div className={styles.h3}>Change session keys</div>
 
       <div className={styles.title}>Session keys</div>
@@ -50,9 +46,14 @@ function SetSessionKeysModal({
           Change session keys
         </Button>
       </div>
-    </form>
+    </Form>
   );
 }
+
+SetSessionKeysModal.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+};
 
 export default function SetSessionKeysModalWrapper(props) {
   return (
