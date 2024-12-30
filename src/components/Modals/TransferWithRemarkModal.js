@@ -1,17 +1,19 @@
 import React, { useMemo } from 'react';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Flex from 'antd/es/flex';
+import InputNumber from 'antd/es/input-number';
+import Select from 'antd/es/select';
 import PropTypes from 'prop-types';
-
 import { BN } from '@polkadot/util';
-import cx from 'classnames';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
-import { SelectInput, TextInput } from '../InputComponents';
 import {
-  isValidSubstrateAddress, parseAssets,
+  parseAssets,
 } from '../../utils/walletHelpers';
-import InputSearch from '../InputComponents/OldInputSearchAddressName';
+import InputSearch from '../InputComponents/InputSearchAddressName';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { IndexHelper } from '../../utils/council/councilEnum';
 import RemarkFormUser from '../Wallet/RemarkFormUser';
@@ -19,12 +21,12 @@ import Validator from '../../utils/validator';
 
 const optionsInput = [{
   value: 'LLD',
-  display: 'Liberland Dolar (LLD)',
+  label: 'Liberland Dolar (LLD)',
   index: IndexHelper.LLD,
 },
 {
   value: 'POLITIPOOL_LLM',
-  display: 'Politipool LLM',
+  label: 'Politipool LLM',
   index: IndexHelper.POLITIPOOL_LLM,
 }];
 
@@ -51,132 +53,95 @@ function TransferWithRemarkModal({
     return [...optionsInput, ...itemsArray];
   }, [additionalAssets]);
 
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    formState: { errors, isValid },
-    trigger,
-    watch,
-  } = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      id: 0,
-    },
-  });
+  const [form] = Form.useForm();
 
-  const getFieldStateSelect = watch('select') || 'LLD';
+  const getFieldStateSelect = Form.useWatch('select', form) || 'LLD';
 
   const validate = (value) => {
-    if (Number.isNaN(Number(value))) return 'Not a number';
-
+    if (Number.isNaN(Number(value))) {
+      return Promise.reject('Not a number');
+    }
+    const validateWrapper = (validated) => (
+      validated === true ? Promise.resolve() : Promise.reject(validated)
+    );
     const itemData = options.find((item) => item.value === getFieldStateSelect);
     const { index, decimals, balance } = itemData;
     if (Number(index) < 0) {
       if (index === IndexHelper.POLITIPOOL_LLM) {
-        return Validator.validateMeritsValue(politipoolLlm, value);
+        return validateWrapper(Validator.validateMeritsValue(politipoolLlm, value));
       }
-      return Validator.validateDollarsValue(maxUnbond, value);
+      return validateWrapper(Validator.validateDollarsValue(maxUnbond, value));
     }
-    return Validator.validateValue(
+    return validateWrapper(Validator.validateValue(
       typeof balance === 'string' ? new BN(balance.slice(2), 16) : new BN(balance),
       parseAssets(value, decimals),
-    );
+    ));
   };
 
   return (
-    <form
-      className={cx(styles.getCitizenshipModal, styles.transferWithRemarkWidth)}
-      onSubmit={handleSubmit(((value) => {
-        if (!isValid) return;
-        submit(value, options);
-      }))}
+    <Form
+      form={form}
+      initialValues={{
+        id: 0,
+      }}
+      onFinish={(values) => submit(values, options)}
     >
-      <div className={styles.h3}>
+      <Title level={3}>
         Spend
         {' '}
         {getFieldStateSelect}
         {' '}
         with remark
-      </div>
-      <div className={styles.description}>
+      </Title>
+      <Paragraph className={styles.description}>
         You are going to spend
         {' '}
         {getFieldStateSelect}
         {' '}
         with remark
-      </div>
-
+      </Paragraph>
+      <Form.Item
+        name="select"
+        label="Transfer"
+        rules={[{ required: true }]}
+        initialValue="LLD"
+      >
+        <Select
+          defaultActiveFirstOption
+          options={options}
+        />
+      </Form.Item>
+      <Form.Item
+        label="Amount"
+        name="transfer"
+        rules={[{ required: true }, { validator: validate }]}
+      >
+        <InputNumber stringMode controls={false} />
+      </Form.Item>
+      <Form.Item
+        label="Recipient"
+        name="recipient"
+        rules={[{ required: true }]}
+      >
+        <InputSearch />
+      </Form.Item>
       <div>
-        <div className={styles.title}>
-          Transfer
-          <SelectInput
-            register={register}
-            options={options}
-            name="select"
-            selected="LLD"
-            onChange={(value) => {
-              setValue('select', value);
-              trigger('transfer');
-            }}
-          />
-        </div>
-
-        <div className={styles.title}>Amount</div>
-        <TextInput
-          register={register}
-          name="transfer"
-          errorTitle="Amount"
-          placeholder="Amount"
-          require
-          validate={validate}
-        />
-        {errors?.transfer
-            && <div className={styles.error}>{errors.transfer.message}</div>}
-
-        <div className={styles.title}>Recipient</div>
-        <InputSearch
-          errorTitle="Recipient"
-          register={register}
-          name="recipient"
-          placeholder="Recipient"
-          isRequired
-          trigger={trigger}
-          setValue={setValue}
-          validate={(v) => {
-            if (!isValidSubstrateAddress(v)) return 'Invalid Address';
-            return true;
-          }}
-        />
-        {errors.recipient?.message
-          && <div className={styles.error}>{errors.recipient.message}</div>}
-
         {userRemark ? (
-          <RemarkFormUser
-            errors={errors}
-            register={register}
-            watch={watch}
-            setValue={setValue}
-          />
+          <RemarkFormUser />
         ) : (
-          <RemarkForm
-            errors={errors}
-            register={register}
-            watch={watch}
-            setValue={setValue}
-          />
+          <RemarkForm form={form} />
         )}
       </div>
 
-      <div className={styles.buttonWrapper}>
-        <Button className={styles.button} medium onClick={closeModal}>
+      <Flex wrap gap="15px">
+        <Button onClick={closeModal}>
           Cancel
         </Button>
-        <Button className={styles.button} medium primary type="submit">
+        <Button primary type="submit">
           Submit
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 

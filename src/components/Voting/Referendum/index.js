@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
 import cx from 'classnames';
 import { blockchainSelectors, democracySelectors, congressSelectors } from '../../../redux/selectors';
 import ProposalItem from './Items/ProposalItem';
@@ -10,13 +9,10 @@ import ReferendumItem from './Items/ReferendumItem';
 import DispatchItem from './Items/DispatchItem';
 import { UndelegateModal } from '../../Modals';
 import { democracyActions, congressActions, identityActions } from '../../../redux/actions';
-import Button from '../../Button/Button';
 import stylesPage from '../../../utils/pagesBase.module.scss';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 
 function Referendum() {
-  const [isModalOpenUndelegate, setIsModalOpenUndelegate] = useState(false);
-  const { handleSubmit } = useForm();
   const dispatch = useDispatch();
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -33,12 +29,8 @@ function Referendum() {
   const handleSubmitVoteForm = (voteType, referendumInfo) => {
     dispatch(democracyActions.voteOnReferendum.call({ ...referendumInfo, voteType }));
   };
-  const handleModalOpenUndelegate = () => {
-    setIsModalOpenUndelegate(!isModalOpenUndelegate);
-  };
   const handleSubmitUndelegate = () => {
     dispatch(democracyActions.undelegate.call({ userWalletAddress }));
-    handleModalOpenUndelegate();
   };
   const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
   const alreadyVoted = (referendum) => {
@@ -64,12 +56,14 @@ function Referendum() {
             delegatingTo
               ? (
                 <div className={styles.proposeReferendumLine}>
-                  (
                   Delegating to:
                   {' '}
                   {delegatingTo}
-                  <Button small primary onClick={handleModalOpenUndelegate}>Undelegate</Button>
-                  )
+                  {' '}
+                  <UndelegateModal
+                    delegatee={delegatingTo}
+                    onSubmitUndelegate={handleSubmitUndelegate}
+                  />
                 </div>
               )
               : null
@@ -146,14 +140,6 @@ function Referendum() {
             )) : 'There are no active Dispatches'}
         </div>
       </div>
-      {isModalOpenUndelegate && (
-        <UndelegateModal
-          closeModal={handleModalOpenUndelegate}
-          handleSubmit={handleSubmit}
-          delegatee={delegatingTo}
-          onSubmitUndelegate={handleSubmitUndelegate}
-        />
-      )}
     </div>
   );
 }

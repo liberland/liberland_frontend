@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -95,8 +95,6 @@ export default function Treasury() {
   const treasuryInfo = useSelector(congressSelectors.treasury);
   const userIsMember = useSelector(congressSelectors.userIsMember);
   const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
-  const [isSpendingModalOpen, setIsSpendingModalOpen] = useState(false);
-  const handleSpendingModalOpen = () => setIsSpendingModalOpen(!isSpendingModalOpen);
 
   useEffect(() => {
     dispatch(congressActions.getMembers.call());
@@ -154,20 +152,13 @@ export default function Treasury() {
         </div>
         <div className={congressStyles.rowEnd}>
           {userIsMember && (
-            <Button primary medium onClick={handleSpendingModalOpen}>
-              Propose spend
-            </Button>
+            <TreasurySpendingMotionModalWrapper
+              budget={remainingBudget}
+            />
           )}
         </div>
       </div>
       <div>
-        {isSpendingModalOpen && (
-          <TreasurySpendingMotionModalWrapper
-            closeModal={handleSpendingModalOpen}
-            budget={remainingBudget}
-          />
-        )}
-
         <table>
           <thead>
             {(treasuryInfo.proposals.approvals.length > 0

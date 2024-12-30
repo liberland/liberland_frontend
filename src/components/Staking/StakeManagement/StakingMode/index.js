@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import cx from 'classnames';
 import { validatorSelectors } from '../../../../redux/selectors';
@@ -8,8 +8,6 @@ import { CreateValidatorModal, StartValidatorModal, StakeLLDModal } from '../../
 import styles from '../styles.module.scss';
 
 function SwitchToValidator() {
-  const [isValidatorModalOpen, setIsValidatorModalOpen] = useState(false);
-  const handleValidatorModalOpen = () => setIsValidatorModalOpen(!isValidatorModalOpen);
   return (
     <div>
       <div className={cx(styles.rowWrapper, styles.currentlyStaked)}>
@@ -18,11 +16,8 @@ function SwitchToValidator() {
       </div>
       <div>
         <div className={styles.rowEnd}>
-          <Button small whiteRed onClick={handleValidatorModalOpen}>
-            SWITCH TO VALIDATOR
-          </Button>
+          <StartValidatorModal />
         </div>
-        {isValidatorModalOpen && <StartValidatorModal closeModal={handleValidatorModalOpen} />}
       </div>
     </div>
   );

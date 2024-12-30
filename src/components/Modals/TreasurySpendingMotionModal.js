@@ -1,28 +1,21 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Flex from 'antd/es/flex';
+import InputNumber from 'antd/es/input-number';
 import { useDispatch } from 'react-redux';
 import { BN_ZERO, BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
-import { TextInput } from '../InputComponents';
 import { congressActions } from '../../redux/actions';
-
-import { parseDollars, isValidSubstrateAddress } from '../../utils/walletHelpers';
-
-import styles from './styles.module.scss';
+import { parseDollars } from '../../utils/walletHelpers';
+import InputSearch from '../InputComponents/InputSearchAddressName';
 
 function TreasurySpendingMotionModal({ closeModal, budget }) {
   const dispatch = useDispatch();
-
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm({
-    mode: 'all',
-  });
+  const [form] = Form.useForm();
 
   const onSubmit = ({ transferToAddress, transferAmount }) => {
     dispatch(
@@ -45,47 +38,40 @@ function TreasurySpendingMotionModal({ closeModal, budget }) {
   };
 
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmit)}
+    <Form
+      form={form}
+      onFinish={onSubmit}
     >
-      <h3 className={styles.h3}>Create new spending</h3>
-      <span className={styles.description}>
+      <Title level={3}>Create new spending</Title>
+      <Paragraph>
         Here you can create a new motion for LLD spending.
-      </span>
-
-      <div className={styles.title}>Recipient Address</div>
-      <TextInput
-        register={register}
+      </Paragraph>
+      <Form.Item
         name="transferToAddress"
-        required
-        errorTitle="Address not valid"
-        validate={(v) => isValidSubstrateAddress(v) || 'Invalid length'}
-      />
-      {errors?.transferToAddress?.message && (
-        <div className={styles.error}>{errors.transferToAddress.message}</div>
-      )}
-      <span className={styles.title}>Amount</span>
-      <TextInput
-        register={register}
+        label="Recipient address"
+        rules={[{ required: true }]}
+      >
+        <InputSearch />
+      </Form.Item>
+      <Form.Item
+        label="Amount"
         name="transferAmount"
-        required
-        errorTitle="Amount not valid"
-        validate={validateUnbondValue}
-      />
-      {errors?.transferAmount?.message && (
-        <div className={styles.error}>{errors.transferAmount.message}</div>
-      )}
-
-      <div className={styles.buttonWrapper}>
+        rules={[
+          { required: true },
+          { validator: validateUnbondValue },
+        ]}
+      >
+        <InputNumber stringMode controls={false} />
+      </Form.Item>
+      <Flex wrap gap="15px">
         <Button medium onClick={closeModal}>
           Cancel
         </Button>
         <Button primary medium type="submit">
           Create
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
@@ -94,10 +80,24 @@ TreasurySpendingMotionModal.propTypes = {
   budget: PropTypes.instanceOf(BN).isRequired,
 };
 
-export default function TreasurySpendingMotionModalWrapper(props) {
+export default function TreasurySpendingMotionModalWrapper({
+  budget,
+}) {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <TreasurySpendingMotionModal {...props} />
-    </ModalRoot>
+    <>
+      <Button primary onClick={() => setShow(true)}>
+        Propose spend
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <TreasurySpendingMotionModal budget={budget} closeModal={() => setShow(false)} />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+TreasurySpendingMotionModalWrapper.propTypes = {
+  budget: PropTypes.instanceOf(BN).isRequired,
+};

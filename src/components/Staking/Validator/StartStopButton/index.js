@@ -1,24 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { validatorSelectors } from '../../../../redux/selectors';
 import { validatorActions } from '../../../../redux/actions';
 import Button from '../../../Button/Button';
 import StartValidatorModal from '../../../Modals/StartValidatorModal';
-
-function StartButton() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleModalOpen = () => setIsModalOpen(!isModalOpen);
-
-  return (
-    <>
-      <Button small primary onClick={handleModalOpen}>
-        Start Validating
-      </Button>
-      {isModalOpen && <StartValidatorModal closeModal={handleModalOpen} />}
-    </>
-  );
-}
 
 function StopButton({ typeText }) {
   const dispatch = useDispatch();
@@ -49,5 +35,5 @@ export default function StartStopButton() {
 
   if (info.isNominator) return <StopButton typeText="Nominating" />;
 
-  return <StartButton />;
+  return <StartValidatorModal />;
 }

@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import cx from 'classnames';
 import { validatorSelectors, walletSelectors } from '../../../redux/selectors';
 import { formatDollars } from '../../../utils/walletHelpers';
-import Button from '../../Button/Button';
-import { StakeLLDModal, UnbondModal } from '../../Modals';
+import { StakeLLDModal, StakingRewardsDestinationModal, UnbondModal } from '../../Modals';
 import StakingMode from './StakingMode';
 import RewardsConfig from './RewardsConfig';
 import styles from './styles.module.scss';
 import PendingRewardsData from './PendingRewardsData';
-import RewardsConfigButton from './RewardsConfig/RewardsConfigButton';
 import WithdrawUnbondedButton from './WithdrawUnbondedButton';
 import PayoutRewards from './PayoutRewards';
 import Unbonding from './Unbonding';
@@ -34,11 +32,10 @@ function CurrentlyStaked() {
 export default function StakeManagement() {
   const balances = useSelector(walletSelectors.selectorBalances);
   const info = useSelector(validatorSelectors.info);
-  const [isUnbondModalOpen, setIsUnbondModalOpen] = useState(false);
 
-  if (!balances) return null;
-
-  const handleUnbondModalOpen = () => setIsUnbondModalOpen(!isUnbondModalOpen);
+  if (!balances) {
+    return null;
+  }
 
   return (
     <div className={styles.stakingWrapper}>
@@ -46,20 +43,18 @@ export default function StakeManagement() {
         <div>
           <CurrentlyStaked />
           {info?.stash && (
-          <>
-            <PendingRewardsData />
-            <RewardsConfig />
-            <Unbonding {...{ info }} />
-            <div className={styles.stakingActionButtonsWrapper}>
-              <StakeLLDModal label="Add stake" />
-              <WithdrawUnbondedButton />
-              <Button small secondary onClick={handleUnbondModalOpen}>
-                UNSTAKE
-              </Button>
-              <RewardsConfigButton />
-              <PayoutRewards />
-            </div>
-          </>
+            <>
+              <PendingRewardsData />
+              <RewardsConfig />
+              <Unbonding {...{ info }} />
+              <div className={styles.stakingActionButtonsWrapper}>
+                <StakeLLDModal label="Add stake" />
+                <WithdrawUnbondedButton />
+                <UnbondModal />
+                <StakingRewardsDestinationModal />
+                <PayoutRewards />
+              </div>
+            </>
           )}
         </div>
       </Card>
@@ -68,7 +63,6 @@ export default function StakeManagement() {
           <StakingMode />
         </div>
       </Card>
-      {isUnbondModalOpen && <UnbondModal closeModal={handleUnbondModalOpen} />}
     </div>
   );
 }
