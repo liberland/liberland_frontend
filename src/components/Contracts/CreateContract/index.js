@@ -1,125 +1,91 @@
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
+import TextArea from 'antd/es/input/TextArea';
+import Title from 'antd/es/typography/Title';
+import Divider from 'antd/es/divider';
+import Space from 'antd/es/space';
+import Flex from 'antd/es/flex';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { contractsActions } from '../../../redux/actions';
-import { TextArea } from '../../InputComponents';
 import Button from '../../Button/Button';
+import { ReactComponent as PlusIcon } from '../../../assets/icons/plus.svg';
+import { ReactComponent as MinusIcon } from '../../../assets/icons/minus.svg';
 import stylesOwn from './styles.module.scss';
 import ModalRoot from '../../Modals/ModalRoot';
-import styles from '../../Modals/styles.module.scss';
-import InputSearch from '../../InputComponents/OldInputSearchAddressName';
+import InputSearch from '../../InputComponents/InputSearchAddressName';
 
 function CreateContract({ handleModal, isMyContracts }) {
   const dispatch = useDispatch();
-  const [inputs, setInputs] = useState([]);
-
-  const {
-    handleSubmit, formState: { errors }, register, setValue, trigger,
-  } = useForm({
-    mode: 'all',
-  });
-
-  const handleAddInput = () => {
-    setInputs((prevValue) => [...prevValue, '']);
-  };
-
-  const handleDeleteInput = (index) => {
-    const newInputs = [...inputs.slice(0, index), ...inputs.slice(index + 1)];
-    setInputs(newInputs);
-  };
+  const [form] = Form.useForm();
 
   const submit = (data) => {
-    const inputsData = [];
-    Object.entries(data).forEach(([name, value]) => {
-      if (name.includes('input')) {
-        inputsData.push(value);
-      }
-    });
     dispatch(contractsActions.createContract.call({
       data: data.contractData,
-      parties: inputsData.length > 0 ? inputsData : null,
+      parties: data.parties,
       isMyContracts,
     }));
     handleModal();
   };
 
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(submit)}
+    <Form
+      form={form}
+      onFinish={submit}
     >
-      <div className={styles.h3}>Create a new Contract</div>
+      <Title level={3}>Create a new Contract</Title>
 
-      <div className={styles.title}>Contract data</div>
-      <TextArea
-        required
-        errorTitle="Contract Data"
-        register={register}
+      <Form.Item
         name="contractData"
-      />
-      { errors?.contractData?.message && <div className={styles.error}>{errors.contractData.message}</div> }
-
-      {inputs.map((_, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <div key={`${index}input`}>
-          <div className={styles.title}>
-            Party user
-            {' '}
-            {index + 1}
-          </div>
-          <div className={stylesOwn.inputWithDelete}>
-            <InputSearch
-              trigger={trigger}
-              errorTitle={`Input ${index + 1}`}
-              isRequired
-              placeholder="Write Address"
-              name={`input${index}`}
-              register={register}
-              setValue={setValue}
-              validate={(v) => {
-                if (Number.isNaN(parseInt(v))) {
-                  return 'Not a valid number';
-                }
-                if (v.length < 48) {
-                  return 'Invalid decoded number length';
-                }
-                return true;
-              }}
-            />
-            <Button
-              className={stylesOwn.button}
-              onClick={() => handleDeleteInput(index)}
-              red
-            >
-              -
+        label="Contract data"
+        rules={[{ required: true }]}
+      >
+        <TextArea />
+      </Form.Item>
+      <Form.List name="parties">
+        {(fields, { add, remove }) => (
+          <>
+            {fields.map((field, index) => (
+              <div key={field.key}>
+                <Form.Item
+                  name={[index, 'input']}
+                  label={`Party user ${index + 1}`}
+                >
+                  <InputSearch />
+                </Form.Item>
+                <Button
+                  className={stylesOwn.button}
+                  onClick={() => remove(field.name)}
+                  red
+                >
+                  <MinusIcon className={stylesOwn.icon} />
+                  Remove member
+                </Button>
+                <Divider />
+              </div>
+            ))}
+            <Button className={stylesOwn.button} onClick={add} green medium>
+              <PlusIcon className={stylesOwn.icon} />
+              <Space />
+              Add party member
             </Button>
-          </div>
-          { errors[`input${index}`]?.message && <div className={styles.error}>{errors[`input${index}`].message}</div> }
-        </div>
-      ))}
-      <div className={stylesOwn.addButtonWrapper} />
-
-      <div className={styles.buttonWrapper}>
-        <Button onClick={handleAddInput} green medium>
-          + Party member
-        </Button>
+          </>
+        )}
+      </Form.List>
+      <Flex wrap gap="15px">
         <Button
-          primary
-          medium
           onClick={handleModal}
         >
           Cancel
         </Button>
         <Button
           primary
-          medium
           type="submit"
         >
           Submit
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
@@ -128,12 +94,32 @@ CreateContract.propTypes = {
   isMyContracts: PropTypes.bool.isRequired,
 };
 
-function CreateContractModalWrapper(props) {
+function CreateContractModalWrapper({
+  isMyContracts,
+}) {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <CreateContract {...props} />
-    </ModalRoot>
+    <>
+      <Button
+        onClick={() => setShow(true)}
+        primary
+      >
+        Create Contract
+      </Button>
+      {show && (
+        <ModalRoot>
+          <CreateContract
+            handleModal={() => setShow(false)}
+            isMyContracts={isMyContracts}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+CreateContractModalWrapper.propTypes = {
+  isMyContracts: PropTypes.bool.isRequired,
+};
 
 export default CreateContractModalWrapper;
