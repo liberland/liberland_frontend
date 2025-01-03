@@ -38,7 +38,7 @@ function DisplayOnlyLegislation({ section }) {
 }
 
 DisplayOnlyLegislation.propTypes = {
-  section: PropTypes.number.isRequired,
+  section: PropTypes.number,
 };
 
 export default DisplayOnlyLegislation;

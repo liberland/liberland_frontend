@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
 import { useDispatch, useSelector } from 'react-redux';
 import { TextInput, SelectInput } from '../../../../InputComponents';
 import Button from '../../../../Button/Button';
@@ -13,26 +10,18 @@ import { AddLegislationFields } from '../AddLegislationFields/AddLegislationFiel
 import { congressActions } from '../../../../../redux/actions';
 import FastTrackForm, { FastTrackDefaults } from '../../../../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../ProposalDiscussionFields';
+import { Form } from 'antd';
 
 function CongressAddLegislationViaReferendum() {
   const dispatch = useDispatch();
   const isLoading = useSelector(congressSelectors.isLoading);
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
-  const {
-    handleSubmit, formState: { errors }, register, control, watch,
-  } = useForm({
-    mode: 'all',
-    defaultValues: {
-      year: new Date().getFullYear(),
-      FastTrackDefaults,
-      sections: [
-        { value: 'Paste markdown to autosplit sections' },
-      ],
-    },
-  });
+  const [form] = Form.useForm();
 
-  if (!isLoading && shouldRedirect) return <Redirect to={router.congress.motions} />;
+  if (!isLoading && shouldRedirect) {
+    return <Redirect to={router.congress.motions} />;
+  }
 
   const propose = ({
     discussionName,
@@ -62,8 +51,16 @@ function CongressAddLegislationViaReferendum() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(propose)}
+    <Form
+      onFinish={propose}
+      initialValues={{
+        year: new Date().getFullYear(),
+        FastTrackDefaults,
+        sections: [
+          { value: 'Paste markdown to autosplit sections' },
+        ],
+      }}
+      form={form}
     >
       <div className={styles.h3}>Propose a new Congress Motion</div>
       <div className={styles.description}>Propose a new Congress Motion to propose a Referendum</div>

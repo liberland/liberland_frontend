@@ -1,25 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
+import Input from 'antd/es/input';
+import Flex from 'antd/es/flex';
 import styles from './styles.module.scss';
 import { ReactComponent as SearchIcon } from '../../assets/icons/search.svg';
-import { TextInput } from '../InputComponents';
+import Button from '../Button/Button';
 
-function SearchBar() {
-  const {
-    register,
-  } = useForm();
+function SearchBar({
+  setSearchTerm,
+}) {
+  const [form] = Form.useForm();
   return (
     <div className={styles.searchBarWrapper}>
-      <form className={styles.signInForm}>
-        <TextInput
-          register={register}
+      <Form form={form} onFinish={({ searchTerm }) => setSearchTerm(searchTerm)} className={styles.signInForm}>
+        <Form.Item
           name="searchTerm"
-          placeholder="Search validators"
-          withIcon
-          Icon={SearchIcon}
-        />
-      </form>
+          label="Search validators"
+        >
+          <Input />
+        </Form.Item>
+        <Flex wrap gap="15px">
+          <Button className={styles.button}>
+            Search
+            <SearchIcon className={styles.icon} />
+          </Button>
+        </Flex>
+      </Form>
     </div>
   );
 }

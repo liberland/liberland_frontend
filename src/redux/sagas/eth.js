@@ -10,10 +10,32 @@ import {
   getAvailableWallets,
   getSwapExchangeRate,
   getBalance,
+  stakeLPWithEth,
+  stakeTokens,
+  withdrawTokens,
 } from '../../api/ethereum';
 import { ethActions } from '../actions';
+import { blockchainWatcher } from './base';
 
 // WORKERS
+
+function* stakeLpWithEthWorker(action) {
+  yield call(stakeLPWithEth, action.payload);
+  yield put(ethActions.getWethLpExchangeRate.call());
+  yield put(ethActions.getBalance.call({ provider: action.payload.provider, address: action.payload.account }));
+  yield put(ethActions.getErc20Balance.call(
+    process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+    action.payload.account,
+  ));
+}
+
+function* stakeTokensWorker(action) {
+  yield call(stakeTokens, action.payload);
+}
+
+function* withdrawTokensWorker(action) {
+  yield call(withdrawTokens, action.payload);
+}
 
 function* getWethExchangeRateWorker(action) {
   try {
@@ -107,6 +129,27 @@ function* erc20BalanceWorker(action) {
 
 // WATCHERS
 
+function* stakeLpWithEthWatcher() {
+  yield* blockchainWatcher(
+    ethActions.stakeLpWithEth,
+    stakeLpWithEthWorker,
+  );
+}
+
+function* stakeTokensWatcher() {
+  yield* blockchainWatcher(
+    ethActions.stakeTokens,
+    stakeTokensWorker,
+  );
+}
+
+function* withdrawTokensWatcher() {
+  yield* blockchainWatcher(
+    ethActions.withdrawTokens,
+    withdrawTokensWorker,
+  );
+}
+
 function* getBalanceWatcher() {
   try {
     yield takeLatest(ethActions.getBalance.call, getBalanceWorker);
@@ -172,6 +215,9 @@ function* getWalletConnectingWatcher() {
 }
 
 export {
+  stakeTokensWatcher,
+  stakeLpWithEthWatcher,
+  withdrawTokensWatcher,
   getWethExchangeRateWatcher,
   getWalletOptionsWatcher,
   getWalletConnectingWatcher,

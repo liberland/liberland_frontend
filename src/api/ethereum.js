@@ -155,7 +155,7 @@ const erc20Approve = async (erc20Address, account, spender, value) => {
   );
 };
 
-const stakeTokens = async (account, erc20Address, tokens) => {
+const stakeTokens = async ({ account, erc20Address, tokens }) => {
   const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
   await erc20Approve(erc20Address, account, process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, tokens);
   await resolveOperation('function stake(uint256 _amount) payable', [tokens]);
@@ -184,14 +184,14 @@ const tryGetPairAndBalance = async (account) => {
   }
 };
 
-const stakeLPWithEth = async (
+const stakeLPWithEth = async ({
   account,
   ethAmount,
   ethAmountMin,
   tokenAmount,
   tokenAmountMin,
   provider,
-) => {
+}) => {
   await erc20Approve(
     process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
     account,
@@ -229,7 +229,7 @@ const claimRewards = async (account) => {
   await resolveOperation('function claimRewards()');
 };
 
-const withdrawTokens = async (account, amount) => {
+const withdrawTokens = async ({ account, amount }) => {
   const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
   await resolveOperation('function withdraw(uint256 _amount)', [amount]);
 };
