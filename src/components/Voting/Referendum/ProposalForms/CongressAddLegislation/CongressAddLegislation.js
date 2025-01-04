@@ -62,8 +62,8 @@ function CongressAddLegislation() {
         />
       </Form.Item>
       <Form.Item
-        name="year"
-        label="Legislation year"
+        name="index"
+        label="Legislation index"
         rules={[{ required: true }]}
       >
         <InputNumber disabled controls={false} />
