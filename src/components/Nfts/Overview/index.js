@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Alert from 'antd/es/alert';
+import Collapse from 'antd/es/collapse';
+import List from 'antd/es/list';
+import Spin from 'antd/es/spin';
 import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
-import styles from './styles.module.scss';
-import Card from '../../Card';
-import stylesPage from '../../../utils/pagesBase.module.scss';
 import CreateEditNFTModalWrapper from '../../Modals/Nfts/CreateEditNft';
 import ItemNft from '../ItemNft';
 
@@ -12,59 +13,43 @@ function NftsComponent() {
   const dispatch = useDispatch();
   const nftsAll = useSelector(nftsSelectors.nfts);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     dispatch(nftsActions.getAllNfts.call(walletAddress));
   }, [dispatch, walletAddress]);
   const { nfts, hasUserNft } = nftsAll;
-  return (
-    <>
-      <div className={stylesPage.contentWrapper}>
-        <div className={stylesPage.sectionWrapper}>
-          <Card className={stylesPage.overviewWrapper}>
-            <>
-              <div className={styles.topInfo}>
-                <span className={stylesPage.cardTitle}>Nfts</span>
 
-              </div>
-              {!hasUserNft && <div>You dont have any NFTs, buy some here or browse NFTs</div>}
-            </>
-            {!nfts || nfts.length < 1 ? (
-              <div>No any NFTs minted</div>
-            ) : (
-              <div className={stylesPage.overViewCard}>
-                <div className={styles.nfts}>
-                  {nfts.map((nft) => {
-                    const {
-                      collectionId,
-                      nftId,
-                      collectionMetadata,
-                      itemMetadata,
-                    } = nft;
-                    if (!nftId) {
-                      return null;
-                    }
-                    return (
-                      <ItemNft
-                        key={collectionId + nftId}
-                        itemMetadata={itemMetadata}
-                        collectionId={collectionId}
-                        nftId={nftId}
-                        collectionMetadata={collectionMetadata}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
+  if (!nfts) {
+    return <Spin />;
+  }
+
+  return (
+    <Collapse
+      defaultActiveKey={['nfts']}
+      items={[{
+        extra: <CreateEditNFTModalWrapper />,
+        label: 'Nfts',
+        children: !hasUserNft || !nfts.length ? (
+          <List
+            dataSource={nfts}
+            renderItem={({
+              collectionId,
+              nftId,
+              collectionMetadata,
+              itemMetadata,
+            }) => (
+              <ItemNft
+                key={collectionId + nftId}
+                itemMetadata={itemMetadata}
+                collectionId={collectionId}
+                nftId={nftId}
+                collectionMetadata={collectionMetadata}
+              />
             )}
-          </Card>
-        </div>
-      </div>
-      {isModalOpen && (
-        <CreateEditNFTModalWrapper closeModal={() => setIsModalOpen(false)} />
-      )}
-    </>
+          />
+        ) : <Alert type="info">No NFTs found</Alert>,
+      }]}
+    />
   );
 }
 

@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import Card from '../../Card';
-import styles from '../Overview/styles.module.scss';
+import Alert from 'antd/es/alert';
+import Collapse from 'antd/es/collapse';
+import List from 'antd/es/list';
+import Spin from 'antd/es/spin';
 import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import ItemNft from '../ItemNft';
@@ -18,42 +19,39 @@ function OnSale() {
     dispatch(nftsActions.getNftsOnSale.call(userWalletAddress));
   }, [dispatch, userWalletAddress]);
 
+  if (!nftsOnSale) {
+    return <Spin />;
+  }
+
   return (
-    <div className={stylesPage.contentWrapper}>
-      <div className={stylesPage.sectionWrapper}>
-        <Card className={stylesPage.overviewWrapper}>
-          <div className={styles.topInfo}>
-            <span className={stylesPage.cardTitle}>Nfts On Sale</span>
-          </div>
-          {!nftsOnSale || nftsOnSale.length < 1 ? (
-            <div>There is no any nft on sale</div>
-          ) : (
-            <div className={stylesPage.overViewCard}>
-              <div className={styles.nfts}>
-                {nftsOnSale.map((nft) => {
-                  const {
-                    collectionId,
-                    nftId,
-                    collectionMetadata,
-                    itemMetadata,
-                  } = nft;
-                  return (
-                    <ItemNft
-                      key={collectionId + nftId}
-                      itemMetadata={itemMetadata}
-                      collectionId={collectionId}
-                      nftId={nftId}
-                      collectionMetadata={collectionMetadata}
-                      isOnSaleItem
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </Card>
-      </div>
-    </div>
+    <Collapse
+      defaultActiveKey={['onsale']}
+      items={[{
+        key: 'onsale',
+        label: 'NFTs on sale',
+        children: nftsOnSale.length ? (
+          <List
+            dataSource={nftsOnSale}
+            itemLayout="vertical"
+            renderItem={({
+              collectionId,
+              nftId,
+              collectionMetadata,
+              itemMetadata,
+            }) => (
+              <ItemNft
+                key={collectionId + nftId}
+                itemMetadata={itemMetadata}
+                collectionId={collectionId}
+                nftId={nftId}
+                collectionMetadata={collectionMetadata}
+                isOnSaleItem
+              />
+            )}
+          />
+        ) : <Alert type="info">There are no NFTs on sale</Alert>,
+      }]}
+    />
   );
 }
 

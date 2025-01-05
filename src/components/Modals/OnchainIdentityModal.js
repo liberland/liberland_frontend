@@ -165,12 +165,35 @@ OnchainIdentityModal.propTypes = {
   name: PropTypes.string.isRequired,
 };
 
-function OnchainIdentityModalWrapper(props) {
+function OnchainIdentityModalWrapper({
+  onSubmit,
+  closeModal,
+  identity,
+  blockNumber,
+  name,
+}) {
   return (
-    <ModalRoot>
-      <OnchainIdentityModal {...props} />
+    <ModalRoot onClose={closeModal}>
+      <OnchainIdentityModal
+        blockNumber={blockNumber}
+        closeModal={closeModal}
+        identity={identity}
+        name={name}
+        onSubmit={onSubmit}
+      />
     </ModalRoot>
   );
 }
+
+OnchainIdentityModalWrapper.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  closeModal: PropTypes.func.isRequired,
+  identity: PropTypes.shape({
+    isSome: PropTypes.bool.isRequired,
+    unwrap: PropTypes.func.isRequired,
+  }).isRequired,
+  blockNumber: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
+};
 
 export default OnchainIdentityModalWrapper;

@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Spin from 'antd/es/spin';
+import Alert from 'antd/es/alert';
+import Collapse from 'antd/es/collapse';
+import List from 'antd/es/list';
 import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
-import styles from '../Overview/styles.module.scss';
-import Card from '../../Card';
-import stylesPage from '../../../utils/pagesBase.module.scss';
 import CreateEditCollectionModalWrapper from '../../Modals/Nfts/CreateEditCollection';
 
 function Collections() {
@@ -19,32 +19,31 @@ function Collections() {
     dispatch(nftsActions.getUserCollections.call(userWalletAddress));
   }, [dispatch, userWalletAddress]);
 
+  if (!userCollections) {
+    return <Spin />;
+  }
+
   return (
-    <div className={stylesPage.contentWrapper}>
-      <div className={stylesPage.sectionWrapper}>
-        <Card className={stylesPage.overviewWrapper}>
-          <div className={styles.topInfo}>
-            <span className={stylesPage.cardTitle}>Collections</span>
-            <CreateEditCollectionModalWrapper />
-          </div>
-          <div>
-            {!userCollections && (
-              <Spin />
+    <Collapse
+      defaultActiveKey={['collections']}
+      items={[{
+        key: 'collections',
+        extra: (
+          <CreateEditCollectionModalWrapper />
+        ),
+        label: 'Collections',
+        children: userCollections?.length ? (
+          <List
+            dataSource={userCollections}
+            renderItem={({ collectionId }) => (
+              <List.Item>
+                <List.Item.Meta title={`Collection ID: ${collectionId}`} />
+              </List.Item>
             )}
-            {userCollections && (userCollections.length > 0 ? (
-              userCollections.map((item) => (
-                <div key={item.collectionId}>
-                  Collection ID:
-                  {item.collectionId}
-                </div>
-              ))
-            ) : (
-              <div>You don&apos;t have any collection</div>
-            ))}
-          </div>
-        </Card>
-      </div>
-    </div>
+          />
+        ) : <Alert type="info">You don&apos;t have any collection</Alert>,
+      }]}
+    />
   );
 }
 
