@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'antd/es/alert';
-import Collapse from 'antd/es/collapse';
 import List from 'antd/es/list';
 import Spin from 'antd/es/spin';
 import { nftsActions } from '../../../redux/actions';
@@ -23,36 +22,28 @@ function OnSale() {
     return <Spin />;
   }
 
-  return (
-    <Collapse
-      defaultActiveKey={['onsale']}
-      items={[{
-        key: 'onsale',
-        label: 'NFTs on sale',
-        children: nftsOnSale.length ? (
-          <List
-            dataSource={nftsOnSale}
-            itemLayout="vertical"
-            renderItem={({
-              collectionId,
-              nftId,
-              collectionMetadata,
-              itemMetadata,
-            }) => (
-              <ItemNft
-                key={collectionId + nftId}
-                itemMetadata={itemMetadata}
-                collectionId={collectionId}
-                nftId={nftId}
-                collectionMetadata={collectionMetadata}
-                isOnSaleItem
-              />
-            )}
-          />
-        ) : <Alert type="info">There are no NFTs on sale</Alert>,
-      }]}
+  return nftsOnSale.length ? (
+    <List
+      dataSource={nftsOnSale}
+      itemLayout="vertical"
+      header="NFTs on sale"
+      renderItem={({
+        collectionId,
+        nftId,
+        collectionMetadata,
+        itemMetadata,
+      }) => (
+        <ItemNft
+          key={collectionId + nftId}
+          itemMetadata={itemMetadata}
+          collectionId={collectionId}
+          nftId={nftId}
+          collectionMetadata={collectionMetadata}
+          isOnSaleItem
+        />
+      )}
     />
-  );
+  ) : <Alert type="info">There are no NFTs on sale</Alert>;
 }
 
 export default OnSale;

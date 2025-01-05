@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import Card from '../../Card';
+import List from 'antd/es/list';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import { blockchainActions, senateActions, validatorActions } from '../../../redux/actions';
 import { senateSelectors } from '../../../redux/selectors';
@@ -24,40 +23,35 @@ function Overview() {
   };
 
   return (
-    <Card className={stylesPage.overviewWrapper}>
-      <b>
-        <span>Senate Members:</span>
-        <br />
-        {userHasWalletSenateMember && !userIsMember && (
-          <Button
-            small
-            primary
-            onClick={
-            () => switchWallet(userHasWalletSenateMember)
-          }
-          >
-            Switch wallet to Senate Member
-          </Button>
-        )}
-      </b>
-      <br />
-      <ul>
-        {members
-          && members.map((item, index) => {
-            const { member, identity } = item;
-            return (
-              // eslint-disable-next-line react/no-array-index-key
-              <li key={member + index}>
-                <CopyIconWithAddress
-                  address={member}
-                  name={identity.identity?.name}
-                  legal={identity.identity?.legal}
-                />
-              </li>
-            );
-          })}
-      </ul>
-    </Card>
+    <List
+      header="Senate members"
+      extra={userHasWalletSenateMember && !userIsMember ? (
+        <Button
+          small
+          primary
+          onClick={
+          () => switchWallet(userHasWalletSenateMember)
+        }
+        >
+          Switch wallet to Senate Member
+        </Button>
+      ) : undefined}
+      dataSource={members || []}
+      renderItem={({ member, identity }) => (
+        <List.Item>
+          <List.Item
+            title={(
+              <CopyIconWithAddress
+                address={member}
+                name={identity.identity?.name}
+                legal={identity.identity?.legal}
+              />
+            )}
+          />
+        </List.Item>
+      )}
+    />
   );
 }
+
 export default Overview;

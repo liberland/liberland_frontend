@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import cx from 'classnames';
-import { useHistory } from 'react-router-dom/cjs/react-router-dom';
-import styles from './styles.module.scss';
+import Collapse from 'antd/es/collapse';
+import Flex from 'antd/es/flex';
+import Popconfirm from 'antd/es/popconfirm';
+import { useHistory } from 'react-router-dom';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList/ValidatorList';
 import Button from '../../Button/Button';
 import { walletActions } from '../../../redux/actions';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import Card from '../../Card';
-import AgreeDisagreeModal from '../../Modals/AgreeDisagreeModal';
-import ModalRoot from '../../Modals/ModalRoot';
-import stylesModal from '../../Modals/styles.module.scss';
 import { areArraysSame } from '../../../utils/staking';
 
 function Nominator() {
@@ -119,58 +115,47 @@ function Nominator() {
 
   return (
     <>
-      {isModalOpen
-      && (
-      <ModalRoot>
-        <AgreeDisagreeModal
-          text="You have unsaved changes. What would you like to do with them?"
-          buttonLeft="Discard"
-          buttonRight="Update"
-          style={stylesModal.getCitizenshipModal}
-          onDisagree={handleDiscardChanges}
-          onAgree={() => updateNominations(selectedValidatorsAsTargets)}
-        >
-          <span />
-        </AgreeDisagreeModal>
-      </ModalRoot>
-      )}
-
-      <Card title="Validators" className={cx(stylesPage.overviewWrapper, styles.nominatorWrapper)}>
-        <div className={styles.nominatorsList}>
-          {/* <SearchBar
-          setSearchTerm={setSearchTerm}
-        /> */}
-          <div className={styles.updateNominationsContainer}>
-            <Button
-              className={styles.button}
-              small
-              primary
-              onClick={() => updateNominations(selectedValidatorsAsTargets)}
-            >
-              UPDATE NOMINATIONS
-            </Button>
-          </div>
-          <ValidatorList
-            validators={validators}
-            selectedValidatorsAsTargets={selectedValidatorsAsTargets}
-            selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
-            toggleSelectedValidator={toggleSelectedValidator}
-          />
-        </div>
-        <div className={styles.updateNominationsContainer}>
-          <Button small primary onClick={() => goToAdvancedPage()}>
-            ADVANCED
-          </Button>
-          <Button
-            className={styles.button}
-            small
-            primary
-            onClick={() => updateNominations(selectedValidatorsAsTargets)}
-          >
-            UPDATE NOMINATIONS
-          </Button>
-        </div>
-      </Card>
+      <Popconfirm
+        open={isModalOpen}
+        title="You have unsaved changes. What would you like to do with them?"
+        onConfirm={() => updateNominations(selectedValidatorsAsTargets)}
+        onCancel={handleDiscardChanges}
+      />
+      {/* <SearchBar setSearchTerm={setSearchTerm} /> */}
+      <Collapse
+        defaultActiveKey={['validators', 'actions']}
+        items={[
+          {
+            key: 'validators',
+            label: 'Validators',
+            children: (
+              <ValidatorList
+                validators={validators}
+                selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+                selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+                toggleSelectedValidator={toggleSelectedValidator}
+              />
+            ),
+          },
+          {
+            key: 'actions',
+            label: 'Actions',
+            children: (
+              <Flex wrap gap="15px">
+                <Button link onClick={() => goToAdvancedPage()}>
+                  Advanced
+                </Button>
+                <Button
+                  primary
+                  onClick={() => updateNominations(selectedValidatorsAsTargets)}
+                >
+                  Update nominations
+                </Button>
+              </Flex>
+            ),
+          },
+        ]}
+      />
     </>
   );
 }

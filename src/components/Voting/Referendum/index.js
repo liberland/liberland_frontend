@@ -1,15 +1,15 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import cx from 'classnames';
+import Alert from 'antd/es/alert';
+import Collapse from 'antd/es/collapse';
+import Flex from 'antd/es/flex';
+import List from 'antd/es/list';
 import { blockchainSelectors, democracySelectors, congressSelectors } from '../../../redux/selectors';
 import ProposalItem from './Items/ProposalItem';
-import Card from '../../Card';
-import styles from './styles.module.scss';
 import ReferendumItem from './Items/ReferendumItem';
 import DispatchItem from './Items/DispatchItem';
 import { UndelegateModal } from '../../Modals';
 import { democracyActions, congressActions, identityActions } from '../../../redux/actions';
-import stylesPage from '../../../utils/pagesBase.module.scss';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 
 function Referendum() {
@@ -42,36 +42,34 @@ function Referendum() {
   const proposalRef = useRef(null);
   const { motionIds } = useMotionContext();
 
-  useEffect(() => {
-    if (proposalRef.current || dispatchRef.current) {
-      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds))));
-    }
+  useLayoutEffect(() => {
+    dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds))));
   }, [motionIds, dispatch, proposalRef, dispatchRef]);
 
   return (
-    <div className={cx(stylesPage.contentWrapper, styles.wrapper)}>
-      <div>
-        <h3 className={styles.title}>Referendums</h3>
+    <Collapse
+      defaultActiveKey={['referendums', 'proposals', 'dispatches']}
+      items={[
         {
-            delegatingTo
-              ? (
-                <div className={styles.proposeReferendumLine}>
-                  Delegating to:
-                  {' '}
-                  {delegatingTo}
-                  {' '}
-                  <UndelegateModal
-                    delegatee={delegatingTo}
-                    onSubmitUndelegate={handleSubmitUndelegate}
-                  />
-                </div>
-              )
-              : null
-        }
-        <div className={styles.overViewCard}>
-          {democracy.democracy?.crossReferencedReferendumsData?.length > 0
-            ? democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
-              <Card className={stylesPage.overviewWrapper} key={referendum.index}>
+          key: 'referendums',
+          label: 'Referendums',
+          extra: (
+            <Flex wrap gap="15px">
+              <div>
+                Delegating to:
+                {' '}
+                {delegatingTo}
+              </div>
+              <UndelegateModal
+                delegatee={delegatingTo}
+                onSubmitUndelegate={handleSubmitUndelegate}
+              />
+            </Flex>
+          ),
+          children: democracy.democracy?.crossReferencedReferendumsData?.length ? (
+            <List
+              dataSource={democracy.democracy.crossReferencedReferendumsData}
+              renderItem={(referendum) => (
                 <ReferendumItem
                   centralizedDatas={referendum.centralizedDatas}
                   voted={{
@@ -88,59 +86,44 @@ function Referendum() {
                   blacklistMotion={referendum.blacklistMotion}
                   userIsMember={userIsMember}
                 />
-              </Card>
-            ))
-            : 'There are no active Referendums'}
-        </div>
-      </div>
-      <div>
-        <h3 className={styles.title}>Proposals</h3>
-        <div className={styles.overViewCard}>
-          { democracy.democracy?.crossReferencedProposalsData?.length > 0
-            ? democracy.democracy?.crossReferencedProposalsData.map((proposal, index) => (
-              <div
-                key={proposal.index}
-                // eslint-disable-next-line no-unsafe-optional-chaining
-                ref={democracy.democracy?.crossReferencedProposalsData?.length - 1 === index ? proposalRef : null}
-              >
-                <Card className={stylesPage.overviewWrapper}>
-                  <ProposalItem
-                    centralizedDatas={proposal.centralizedDatas}
-                    boundedCall={proposal.boundedCall}
-                    blacklistMotion={proposal.blacklistMotion}
-                    userIsMember={userIsMember}
-                  />
-                </Card>
-
-              </div>
-
-            ))
-            : 'There are no active Proposals'}
-        </div>
-      </div>
-      <div>
-        <h3 className={styles.title}>Dispatches</h3>
-        <div className={styles.overViewCard}>
-          {democracy.democracy?.scheduledCalls?.length > 0
-            ? democracy.democracy?.scheduledCalls.map((item, index) => (
-              <div
-                // eslint-disable-next-line no-unsafe-optional-chaining
-                ref={democracy.democracy?.scheduledCalls?.length - 1 === index ? dispatchRef : null}
-                key={`${item.blockNumber.toString()}-${item.idx}`}
-              >
-                <Card
-                  className={cx(stylesPage.overviewWrapper, styles.itemWrapper)}
-                >
-                  <DispatchItem
-                    item={item}
-                  />
-                </Card>
-              </div>
-
-            )) : 'There are no active Dispatches'}
-        </div>
-      </div>
-    </div>
+              )}
+            />
+          ) : <Alert type="info">There are no active Referendums</Alert>,
+        },
+        {
+          key: 'proposals',
+          label: 'Proposals',
+          children: democracy.democracy?.crossReferencedProposalsData?.length ? (
+            <List
+              dataSource={democracy.democracy.crossReferencedProposalsData}
+              renderItem={(proposal) => (
+                <ProposalItem
+                  centralizedDatas={proposal.centralizedDatas}
+                  boundedCall={proposal.boundedCall}
+                  blacklistMotion={proposal.blacklistMotion}
+                  userIsMember={userIsMember}
+                />
+              )}
+            />
+          ) : <Alert type="info">There are no active Proposals</Alert>,
+        },
+        {
+          key: 'dispatches',
+          label: 'Dispatches',
+          children: democracy.democracy?.scheduledCalls?.length ? (
+            <List
+              dataSource={democracy.democracy.scheduledCalls}
+              renderItem={(item) => (
+                <DispatchItem
+                  item={item}
+                />
+              )}
+            />
+          ) : <Alert type="info">There are no active Dispatches</Alert>,
+        },
+      ]}
+    />
   );
 }
+
 export default Referendum;

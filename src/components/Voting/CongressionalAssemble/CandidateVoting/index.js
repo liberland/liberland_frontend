@@ -1,60 +1,66 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from './styles.module.scss';
-import Card from '../../../Card';
+import Collapse from 'antd/es/collapse';
+import List from 'antd/es/list';
 import CandidateCard from '../CandidateCard';
 import SelectedCandidateCard from '../SelectedCandidateCard';
 import Button from '../../../Button/Button';
-import stylesPage from '../../../../utils/pagesBase.module.scss';
 
 function CandidateVoting({
-  eligibleUnselectedCandidates, selectedCandidates, selectCandidate, unselectCandidate,
-  moveSelectedCandidate, didChangeSelectedCandidates, handleUpdate,
+  eligibleUnselectedCandidates,
+  selectedCandidates,
+  selectCandidate,
+  unselectCandidate,
+  moveSelectedCandidate,
+  didChangeSelectedCandidates,
+  handleUpdate,
 }) {
   return (
-    <Card className={stylesPage.overviewWrapper} title="Voting">
-      <div className={styles.candidateVotingContainer}>
-        <div className={styles.eligibleCandidatesContainer}>
-          <div className={styles.headerWithButton}>
-            <span className={styles.candidatesHeader}>Eligible Candidates (including current congressmen)</span>
-          </div>
-          <div className={styles.candidatesList}>
-            {
-                eligibleUnselectedCandidates?.map((eligibleUnselectedCandidate) => (
-                  <CandidateCard
-                    politician={eligibleUnselectedCandidate}
-                    selectCandidate={selectCandidate}
-                    key={`candidate-${eligibleUnselectedCandidate.rawIdentity}`}
-                  />
-                ))
-              }
-          </div>
-        </div>
-        <div className={styles.selectedCandidatesContainer}>
-          <div className={styles.headerWithButton}>
-            <span className={styles.candidatesHeader}>My preference ordered Votes</span>
+    <Collapse
+      defaultActiveKey={['voting', 'preference']}
+      items={[
+        {
+          key: 'voting',
+          label: 'Voting',
+          children: (
+            <List
+              dataSource={eligibleUnselectedCandidates}
+              renderItem={(eligibleUnselectedCandidate) => (
+                <CandidateCard
+                  politician={eligibleUnselectedCandidate}
+                  selectCandidate={selectCandidate}
+                />
+              )}
+            />
+          ),
+        },
+        {
+          key: 'preference',
+          label: 'My preference ordered Votes',
+          extra: (
             <Button
-              primary={didChangeSelectedCandidates}
+              primary
+              disabled={!didChangeSelectedCandidates}
               onClick={() => handleUpdate()}
             >
-              UPDATE VOTE
+              Update vote
             </Button>
-          </div>
-          <div className={styles.currentlySelectedCandidatesList}>
-            {
-                selectedCandidates?.map((currentCandidateVoteByUser) => (
-                  <SelectedCandidateCard
-                    key={currentCandidateVoteByUser.name}
-                    politician={currentCandidateVoteByUser}
-                    unselectCandidate={unselectCandidate}
-                    moveSelectedCandidate={moveSelectedCandidate}
-                  />
-                ))
-              }
-          </div>
-        </div>
-      </div>
-    </Card>
+          ),
+          children: (
+            <List
+              dataSource={selectedCandidates}
+              renderItem={(currentCandidateVoteByUser) => (
+                <SelectedCandidateCard
+                  politician={currentCandidateVoteByUser}
+                  unselectCandidate={unselectCandidate}
+                  moveSelectedCandidate={moveSelectedCandidate}
+                />
+              )}
+            />
+          ),
+        },
+      ]}
+    />
   );
 }
 

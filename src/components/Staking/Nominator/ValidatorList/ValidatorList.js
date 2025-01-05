@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import cx from 'classnames';
 import { useMediaQuery } from 'usehooks-ts';
-import styles from './styles.module.scss';
-import ValidatorCard from '../ValidatorCard/ValidatorCard';
-import stylesPage from '../../../../utils/pagesBase.module.scss';
+import Checkbox from 'antd/es/checkbox';
+import Table from '../../../Table';
+import truncate from '../../../../utils/truncate';
+import { formatDollars, sanitizeValue } from '../../../../utils/walletHelpers';
 
 function ValidatorList({
   validators,
@@ -14,45 +14,76 @@ function ValidatorList({
 }) {
   const isDesktopHigher = useMediaQuery('(min-width: 1400px)');
   return (
-    <div className={stylesPage.transactionHistoryCard}>
-      {isDesktopHigher
-        && (
-          <div className={cx(styles.validatorsListHeader, stylesPage.transactionHistoryCardHeader, styles.gridList)}>
-            <span>NAME</span>
-            <span>TOTAL STAKE</span>
-            <span>OWN STAKE</span>
-            <span>OTHER STAKE</span>
-            <span>COMMISSION</span>
-            <span>ALLOWED</span>
-            <span>RETURN</span>
-            <span>NOMINATED</span>
-          </div>
-        )}
-      <div className={styles.validatorsList}>
-        {validators.map((validator, index) => {
-          const {
-            bondTotal, bondOwn, bondOther, displayName, commission, blocked, stakedReturnCmp, accountId,
-          } = validator;
-          const address = accountId?.toString();
-          return (
-            <ValidatorCard
-              key={address || index}
-              stakedReturnCmp={stakedReturnCmp}
-              total={bondTotal}
-              own={bondOwn}
-              others={bondOther}
-              name={displayName || address}
-              validatorAddress={address}
-              commission={commission}
-              blocked={blocked}
-              nominatedByMe={selectedValidatorsAsTargets.includes(address)}
-              toggleSelectedValidator={toggleSelectedValidator}
-              selectingValidatorsDisabled={selectingValidatorsDisabled}
+    <Table
+      data={validators.map(({
+        bondTotal,
+        bondOwn,
+        bondOther,
+        displayName,
+        commission,
+        blocked,
+        stakedReturnCmp,
+        accountId,
+      }) => {
+        const address = accountId?.toString();
+        const totalSanitized = bondTotal ? sanitizeValue(bondTotal.toString()) : null;
+        const totalValue = totalSanitized ? formatDollars(totalSanitized) : null;
+        const ownSanitized = bondOwn ? sanitizeValue(bondOwn.toString()) : null;
+        const ownValue = ownSanitized ? formatDollars(ownSanitized) : null;
+        const otherValue = formatDollars(sanitizeValue(bondOther.toString()));
+        const nominatedByMe = selectedValidatorsAsTargets.includes(address);
+        return {
+          name: truncate(displayName || address, isDesktopHigher ? 13 : 20),
+          total: `${totalValue || 0} LLD`,
+          own: `${ownValue || 0} LLD`,
+          other: `${otherValue || 0} LLD`,
+          commission,
+          allowed: blocked ? 'Blocked' : 'Available',
+          return: `${stakedReturnCmp || 0}%`,
+          nominated: (
+            <Checkbox
+              disabled={selectingValidatorsDisabled}
+              checked={nominatedByMe}
+              onChange={() => toggleSelectedValidator(address)}
             />
-          );
-        })}
-      </div>
-    </div>
+          ),
+        };
+      })}
+      columns={[
+        {
+          Header: 'Name',
+          accessor: 'name',
+        },
+        {
+          Header: 'Total stake',
+          accessor: 'total',
+        },
+        {
+          Header: 'Own stake',
+          accessor: 'own',
+        },
+        {
+          Header: 'Other stake',
+          accessor: 'other',
+        },
+        {
+          Header: 'Commission',
+          accessor: 'commission',
+        },
+        {
+          Header: 'Allowed',
+          accessor: 'allowed',
+        },
+        {
+          Header: 'Return',
+          accessor: 'return',
+        },
+        {
+          Header: 'Nominated',
+          accessor: 'nominated',
+        },
+      ]}
+    />
   );
 }
 
@@ -67,4 +98,5 @@ ValidatorList.propTypes = {
   selectingValidatorsDisabled: PropTypes.bool.isRequired,
   toggleSelectedValidator: PropTypes.func.isRequired,
 };
+
 export default ValidatorList;
