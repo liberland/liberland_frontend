@@ -2,7 +2,12 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import TableInternal from 'antd/es/table';
 
-function Table({ columns, data, noPagination }) {
+function Table({
+  columns,
+  data,
+  noPagination,
+  showHeader,
+}) {
   const identityData = useMemo(() => data?.map((d) => ({
     ...d,
     hash: d.hash || Object.values(d).map((val) => val.toString()).join('|'),
@@ -12,8 +17,9 @@ function Table({ columns, data, noPagination }) {
       dataSource={identityData}
       rowKey="hash"
       onRow={() => ({ tabIndex: '0' })}
+      showHeader={showHeader}
       pagination={noPagination ? false : undefined}
-      columns={columns.map(({ Header, accessor }) => ({
+      columns={columns.filter(Boolean).map(({ Header, accessor }) => ({
         dataIndex: accessor,
         key: accessor,
         title: Header,
@@ -31,6 +37,7 @@ Table.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({})),
   data: PropTypes.arrayOf(PropTypes.shape({})),
   noPagination: PropTypes.bool,
+  showHeader: PropTypes.bool,
 };
 
 export default Table;

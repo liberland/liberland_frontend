@@ -1,11 +1,12 @@
 /* eslint-disable max-len */
 import React from 'react';
 import cx from 'classnames';
-
-import Card from '../Card';
+import Flex from 'antd/es/flex';
+import Card from 'antd/es/card';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Markdown from 'markdown-to-jsx';
 import Status from '../Status';
 import styles from './styles.module.scss';
-import stylesPage from '../../utils/pagesBase.module.scss';
 
 function Feed() {
   const news = [
@@ -70,60 +71,40 @@ function Feed() {
   ];
 
   return (
-    <div className={stylesPage.contentWrapper}>
-      <div className={styles.cardWrapper}>
-        {
-          news.map((newsItem) => (
-            <Card
-              key={newsItem.title + newsItem.date}
-              className={cx(stylesPage.overviewWrapper, styles.card)}
-            >
-              <div className={styles.mainContent}>
-                <h2 className={stylesPage.cardTitle}>{newsItem.title}</h2>
-                <p className={styles.cardInfo}>
-                  {newsItem.date}
-                  {' '}
-                  •
-                  {' '}
-                  <span
-                    className={
-                      cx(
-                        styles.author,
-                        {
-                          [styles.green]: newsItem.type === 'president',
-                          [styles.yellow]: newsItem.type === 'liberland',
-                        },
-                      )
-                    }
-                  >
-                    {newsItem.author}
-                  </span>
-                </p>
-                {/* eslint-disable-next-line react/no-danger */}
-                <p className={cx(styles.cardInfo, styles.withMargin)} dangerouslySetInnerHTML={{ __html: newsItem.text }} />
-              </div>
-
-              <div className={styles.cardFooter}>
-                <div>
-                  {newsItem.hashtags.map((hashtag, index) => (
-                    <Status
-                      key={hashtag}
-                      className={cx({
-                        [styles.greenStatus]: !index && newsItem.type === 'president',
-                        [styles.yellowStatus]: !index && newsItem.type === 'liberland',
-                      })}
-                      completed={newsItem.type === 'president'}
-                      status={hashtag}
-                      pending={newsItem.type === 'liberland'}
-                    />
-                  ))}
-                </div>
-              </div>
-            </Card>
-          ))
-        }
-      </div>
-    </div>
+    <Flex wrap gap="20px">
+      {news.map((newsItem) => (
+        <Card
+          key={newsItem.title + newsItem.date}
+          extra={(
+            <Flex wrap gap="4px">
+              {newsItem.hashtags.map((hashtag, index) => (
+                <Status
+                  key={hashtag}
+                  className={cx({
+                    [styles.greenStatus]: !index && newsItem.type === 'president',
+                    [styles.yellowStatus]: !index && newsItem.type === 'liberland',
+                  })}
+                  completed={newsItem.type === 'president'}
+                  status={hashtag}
+                  pending={newsItem.type === 'liberland'}
+                />
+              ))}
+            </Flex>
+          )}
+        >
+          <Card.Meta
+            title={`${newsItem.title} • ${newsItem.date}`}
+            description={(
+              <Paragraph>
+                <Markdown>
+                  {newsItem.text}
+                </Markdown>
+              </Paragraph>
+            )}
+          />
+        </Card>
+      ))}
+    </Flex>
   );
 }
 

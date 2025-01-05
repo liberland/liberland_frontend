@@ -1,22 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import cx from 'classnames';
-
-import styles from './styles.module.scss';
+import Tag from 'antd/es/tag';
 
 function Status({
-  status, completed, declined, pending, className,
+  status,
+  completed,
+  declined,
+  pending,
+  className,
 }) {
+  const colors = {
+    success: completed,
+    error: declined,
+    processing: pending,
+  };
   return (
-    <span
-      className={cx(
-        styles.status,
-        className,
-        { [styles.completed]: completed, [styles.declined]: declined, [styles.pending]: pending },
-      )}
-    >
+    <Tag color={Object.values(colors).find(Boolean)} className={className}>
       {status}
-    </span>
+    </Tag>
   );
 }
 

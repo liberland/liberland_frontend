@@ -17,7 +17,7 @@ function AllCompanies() {
     <div>Not Registries..</div>;
   }
   return (
-    <CompaniesCard registries={allRegistries} />
+    <CompaniesCard registries={allRegistries.officialRegistryEntries} />
   );
 }
 
