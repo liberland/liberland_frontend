@@ -1,47 +1,16 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import Card from '../../Card';
-import styles from './styles.module.scss';
+import Card from 'antd/es/card';
+import Flex from 'antd/es/flex';
 import Button from '../../Button/Button';
 import truncate from '../../../utils/truncate';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-
-// REDUX
 import {
   blockchainSelectors,
-  identitySelectors,
 } from '../../../redux/selectors';
 import { Proposal } from '../../Proposal';
 import { walletAddress } from '../../../redux/selectors/congress';
-import CopyIconWithAddress from '../../CopyIconWithAddress';
-
-function Voters({ voting }) {
-  const names = useSelector(identitySelectors.selectorIdentityMotions);
-  return (
-    <ul className={styles.list}>
-      {voting.map((item) => {
-        const id = item.toString();
-        const identity = names?.[id]?.identity;
-        return (
-          <li key={id}>
-            <CopyIconWithAddress
-              isTruncate
-              name={identity?.name}
-              legal={identity?.legal}
-              address={id}
-              showAddress
-            />
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-Voters.propTypes = {
-  voting: PropTypes.arrayOf(PropTypes.string).isRequired,
-};
+import Voters from '../Voters';
 
 export default function Motion({
   proposal,
@@ -72,15 +41,53 @@ export default function Motion({
     };
     dispatch(voteMotion(voteMotionData));
   };
+
   return (
-    <div className={stylesPage.stakingWrapper}>
-      <Card className={stylesPage.overviewWrapper}>
-        <div className={styles.metaInfoLine}>
-          <p>
+    <Card
+      actions={userIsMember ? [
+        isClosable && (
+          <Button
+            medium
+            primary
+            onClick={() => dispatch(
+              closeMotion({ proposal, index: voting.index }),
+            )}
+          >
+            Close & Execute
+          </Button>
+        ),
+        !voting.nays.map((v) => v.toString()).includes(userAddress)
+          && !isClosable && (
+            <Button
+              small
+              secondary
+              onClick={() => voteMotionCall(false)}
+            >
+              Vote nay
+            </Button>
+        ),
+        isClosableNaye && (
+          <Button
+            small
+            secondary
+            onClick={() => dispatch(
+              closeMotion({ proposal, index: voting.index, walletAddress }),
+            )}
+          >
+            Close Motion
+          </Button>
+        ),
+      ].filter(Boolean) : []}
+    >
+      <Card.Meta
+        title={(
+          <>
             Proposal id:
             <b>{truncate(proposal, 13)}</b>
-          </p>
-          <span>
+          </>
+        )}
+        description={(
+          <Flex wrap gap="15px">
             <p>
               Aye
               {' '}
@@ -101,61 +108,11 @@ export default function Motion({
               </b>
             </p>
             <Voters voting={voting.nays} />
-          </span>
-        </div>
-
-        {userIsMember ? (
-          <div className={styles.buttonsContainer}>
-            {isClosable && (
-            <Button
-              medium
-              primary
-              onClick={() => dispatch(
-                closeMotion({ proposal, index: voting.index }),
-              )}
-            >
-              Close & Execute
-            </Button>
-            )}
-            {!voting.ayes.map((v) => v.toString()).includes(userAddress)
-              && !isClosable && (
-                <Button
-                  small
-                  primary
-                  onClick={() => voteMotionCall(true)}
-                >
-                  Vote aye
-                </Button>
-            )}
-            {!voting.nays.map((v) => v.toString()).includes(userAddress)
-              && !isClosable && (
-                <Button
-                  small
-                  secondary
-                  onClick={() => voteMotionCall(false)}
-                >
-                  Vote nay
-                </Button>
-            )}
-            {
-              isClosableNaye && (
-              <Button
-                small
-                secondary
-                onClick={() => dispatch(
-                  closeMotion({ proposal, index: voting.index, walletAddress }),
-                )}
-              >
-                Close Motion
-              </Button>
-              )
-            }
-          </div>
-        )
-          : (<div className={styles.buttonsContainer} />)}
-        <Proposal proposal={proposalOf} isTableRow={isTableRow} />
-      </Card>
-    </div>
+          </Flex>
+        )}
+      />
+      <Proposal proposal={proposalOf} isTableRow={isTableRow} />
+    </Card>
   );
 }
 

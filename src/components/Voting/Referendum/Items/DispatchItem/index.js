@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import styles from './styles.module.scss';
-import Card from '../../../../Card';
+import Card from 'antd/es/card';
+import Flex from 'antd/es/flex';
 import { Proposal } from '../../../../Proposal';
 import { blockchainSelectors } from '../../../../../redux/selectors';
 import Button from '../../../../Button/Button';
@@ -40,37 +40,32 @@ function DispatchItem({
 
   return (
     <Card
-      title={`#${item.blockNumber.toNumber()}/${item.idx}`}
-      isNotBackground
+      extra={hash.toHex()}
+      actions={[
+        <Button primary onClick={onClick} disabled={isLoading}>
+          {isLoading && 'Loading...'}
+          {isError && 'Error, try again'}
+          {(!isLoading && !isError) && 'Get Details'}
+        </Button>,
+      ]}
     >
-      <div className={styles.metaInfoLine}>
-        <div>
-          <div className={styles.hashText}>
-            {hash.toHex()}
-          </div>
-        </div>
-      </div>
-      <div className={styles.discussionMetaLine}>
-        <div>
-          <span className={styles.votingTimeText}>Implements in:</span>
-          {' '}
-          <b>{timeLeftUntilImplemented}</b>
-        </div>
-      </div>
-      <div>
-        Details:
-        {needCallPreImage && !preimage
-          && (
-          <Button primary medium onClick={onClick} disabled={isLoading}>
-            {isLoading && 'Loading...'}
-            {isError && 'Error, try again'}
-            {(!isLoading && !isError) && 'Get Details'}
-          </Button>
-          )}
-        {needCallPreImage && preimage
-          && <Proposal proposal={preimage} />}
-        {!needCallPreImage && <Proposal proposal={proposal} />}
-      </div>
+      <Card.Meta
+        title={`#${item.blockNumber.toNumber()}/${item.idx}`}
+        description={(
+          <Flex wrap gap="15px">
+            <div>
+              Implements in:
+              {' '}
+              {timeLeftUntilImplemented}
+            </div>
+            <div>
+              Details:
+              {needCallPreImage && preimage && <Proposal proposal={preimage} />}
+              {!needCallPreImage && <Proposal proposal={proposal} />}
+            </div>
+          </Flex>
+        )}
+      />
     </Card>
   );
 }
