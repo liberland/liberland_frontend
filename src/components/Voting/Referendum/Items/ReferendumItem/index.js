@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { BN, BN_ZERO } from '@polkadot/util';
@@ -7,7 +7,6 @@ import styles from './styles.module.scss';
 import Button from '../../../../Button/Button';
 import { formatMerits } from '../../../../../utils/walletHelpers';
 import truncate from '../../../../../utils/truncate';
-import NotificationPortal from '../../../../NotificationPortal';
 // REDUX
 import { congressActions } from '../../../../../redux/actions';
 import Header from '../Header';
@@ -183,70 +182,65 @@ function ReferendumItem({
     ? `${yayVotes.mul(new BN('100'))
       .div(yayVotes.add(nayVotes)).toString()}%`
     : '0%';
-  const notificationRef = useRef();
 
   return (
-    <>
-      <NotificationPortal ref={notificationRef} />
-      <div className={styles.itemWrapper}>
-        <Header
-          hash={hash}
-          setIsHidden={setIsReferendumHidden}
-          isHidden={isReferendumHidden}
-        >
-          <VoteButtonsContainer
-            alreadyVoted={alreadyVoted}
-            buttonVoteCallback={buttonVoteCallback}
-            delegating={delegating}
-            referendumData={{ id: hash, referendumIndex }}
-          />
-          {blacklistMotion && (
-            <div className={styles.rowEnd}>
-              <small>
-                Blacklist motion:
-                <a href={`/home/congress/motions#${blacklistMotion}`}>
-                  {truncate(blacklistMotion, 13)}
-                </a>
-              </small>
-            </div>
+    <div className={styles.itemWrapper}>
+      <Header
+        hash={hash}
+        setIsHidden={setIsReferendumHidden}
+        isHidden={isReferendumHidden}
+      >
+        <VoteButtonsContainer
+          alreadyVoted={alreadyVoted}
+          buttonVoteCallback={buttonVoteCallback}
+          delegating={delegating}
+          referendumData={{ id: hash, referendumIndex }}
+        />
+        {blacklistMotion && (
+          <div className={styles.rowEnd}>
+            <small>
+              Blacklist motion:
+              <a href={`/home/congress/motions#${blacklistMotion}`}>
+                {truncate(blacklistMotion, 13)}
+              </a>
+            </small>
+          </div>
+        )}
+        {!blacklistMotion && userIsMember
+          && (
+          <div className={styles.rowEnd}>
+            <BlacklistButton
+              hash={hash}
+              referendumIndex={referendumIndex}
+            />
+          </div>
           )}
-          {!blacklistMotion && userIsMember
-            && (
-            <div className={styles.rowEnd}>
-              <BlacklistButton
-                hash={hash}
-                referendumIndex={referendumIndex}
-              />
-            </div>
-            )}
-        </Header>
-        <div className={styles.metaInfoLine}>
-          <div className={styles.votesInfo}>
-            <div className={styles.progressBar}>
-              <div className={styles.yayProgressBar} style={{ width: progressBarRatio }} />
-            </div>
-            <div className={styles.votesCount}>
-              <CounterItem votedTotal={votedTotal} votes={yayVotes} />
-              <CounterItem votedTotal={votedTotal} votes={nayVotes} isNay />
-            </div>
+      </Header>
+      <div className={styles.metaInfoLine}>
+        <div className={styles.votesInfo}>
+          <div className={styles.progressBar}>
+            <div className={styles.yayProgressBar} style={{ width: progressBarRatio }} />
+          </div>
+          <div className={styles.votesCount}>
+            <CounterItem votedTotal={votedTotal} votes={yayVotes} />
+            <CounterItem votedTotal={votedTotal} votes={nayVotes} isNay />
           </div>
         </div>
-        { !isReferendumHidden
-        && (
-          <>
-            <Details proposal={proposal} isReferendumHidden={isReferendumHidden} />
-            <div className={styles.discussionMetaLine}>
-              {centralizedDatas?.length > 0
-              && (
-                <Discussions centralizedDatas={centralizedDatas} />
-              )}
-            </div>
-
-          </>
-        )}
-
       </div>
-    </>
+      { !isReferendumHidden
+      && (
+        <>
+          <Details proposal={proposal} isReferendumHidden={isReferendumHidden} />
+          <div className={styles.discussionMetaLine}>
+            {centralizedDatas?.length > 0
+            && (
+              <Discussions centralizedDatas={centralizedDatas} />
+            )}
+          </div>
+
+        </>
+      )}
+    </div>
   );
 }
 

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import cx from 'classnames';
@@ -9,7 +9,6 @@ import libertarianTorch from '../../../../assets/images/libertariantorch.png';
 import { blockchainSelectors, democracySelectors } from '../../../../redux/selectors';
 import { DelegateModal } from '../../../Modals';
 import Button from '../../../Button/Button';
-import NotificationPortal from '../../../NotificationPortal';
 import CopyIconWithAddress from '../../../CopyIconWithAddress';
 import sanitizeUrlHelper from '../../../../utils/sanitizeUrlHelper';
 import stylesVoting from '../SelectedCandidateCard/styles.module.scss';
@@ -17,7 +16,6 @@ import stylesVoting from '../SelectedCandidateCard/styles.module.scss';
 function PoliticanCard({
   politician,
 }) {
-  const notificationRef = useRef();
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const { website } = politician;
@@ -25,7 +23,6 @@ function PoliticanCard({
 
   return (
     <>
-      <NotificationPortal ref={notificationRef} />
       <div className={styles.nameAndIcons}>
         <div className={styles.politicianImageContainer}>
           <img src={liberlandEmblemImage} style={{ height: '100%' }} alt="liberlandEmblemImage" />
@@ -53,7 +50,7 @@ function PoliticanCard({
               className={cx(stylesVoting.unselectContainer, stylesVoting.buttonFont)}
               primary
             >
-              WEBSITE
+              Website
             </Button>
           </a>
         </div>
@@ -67,7 +64,7 @@ function PoliticanCard({
                     className={cx(stylesVoting.unselectContainer, stylesVoting.buttonFont)}
                     disabled
                   >
-                    DELEGATE
+                    Delegate
                   </Button>
                 )
                 : (

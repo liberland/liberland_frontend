@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { blake2AsHex } from '@polkadot/util-crypto';
@@ -6,7 +6,6 @@ import { hexToU8a } from '@polkadot/util';
 import styles from './styles.module.scss';
 import Button from '../../../../Button/Button';
 import truncate from '../../../../../utils/truncate';
-import NotificationPortal from '../../../../NotificationPortal';
 import Header from '../Header';
 import Discussions from '../Discussions';
 import stylesItem from '../item.module.scss';
@@ -60,47 +59,43 @@ function ProposalItem({
   }
 
   const [isProposalHidden, setIsProposalHidden] = useState(false);
-  const notificationRef = useRef();
 
   return (
-    <>
-      <NotificationPortal ref={notificationRef} />
-      <div className={stylesItem.itemWrapper}>
-        <Header
-          hash={hash}
-          setIsHidden={setIsProposalHidden}
-          isHidden={isProposalHidden}
-          textButton="PROPOSAL"
-        >
-          {blacklistMotion && (
+    <div className={stylesItem.itemWrapper}>
+      <Header
+        hash={hash}
+        setIsHidden={setIsProposalHidden}
+        isHidden={isProposalHidden}
+        textButton="PROPOSAL"
+      >
+        {blacklistMotion && (
+          <div className={styles.rowEnd}>
+            <small>
+              Blacklist motion:
+              <a href={`/home/congress/motions#${blacklistMotion}`}>
+                {truncate(blacklistMotion, 13)}
+              </a>
+            </small>
+          </div>
+        )}
+        {!blacklistMotion && userIsMember
+          && (
             <div className={styles.rowEnd}>
-              <small>
-                Blacklist motion:
-                <a href={`/home/congress/motions#${blacklistMotion}`}>
-                  {truncate(blacklistMotion, 13)}
-                </a>
-              </small>
+              <BlacklistButton hash={
+              boundedCall?.lookup?.hash
+              ?? boundedCall?.legacy?.hash
+            }
+              />
             </div>
           )}
-          {!blacklistMotion && userIsMember
-            && (
-              <div className={styles.rowEnd}>
-                <BlacklistButton hash={
-                boundedCall?.lookup?.hash
-                ?? boundedCall?.legacy?.hash
-              }
-                />
-              </div>
-            )}
-        </Header>
-        {!isProposalHidden && hash && len
-            && (
-            <Details proposal={{ hash, len }} isProposal />
-            )}
-        {!isProposalHidden && centralizedDatas?.length > 0
-          && <Discussions centralizedDatas={centralizedDatas} />}
-      </div>
-    </>
+      </Header>
+      {!isProposalHidden && hash && len
+          && (
+          <Details proposal={{ hash, len }} isProposal />
+          )}
+      {!isProposalHidden && centralizedDatas?.length > 0
+        && <Discussions centralizedDatas={centralizedDatas} />}
+    </div>
   );
 }
 

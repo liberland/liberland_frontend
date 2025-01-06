@@ -1,25 +1,25 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 import PropTypes from 'prop-types';
+import notification from 'antd/es/notification';
 import { ReactComponent as CopyIcon } from '../../assets/icons/copy.svg';
-import NotificationPortal from '../NotificationPortal';
 import truncate from '../../utils/truncate';
 import styles from './styles.module.scss';
 
 function CopyIconWithAddress({
   address, name, isTruncate, legal, showAddress, noDetails,
 }) {
-  const notificationRef = useRef();
+  const [api, contextHolder] = notification.useNotification();
   const isBigScreen = useMediaQuery('(min-width: 1200px)');
   const handleCopyClick = (dataToCoppy) => {
     navigator.clipboard.writeText(dataToCoppy);
-    notificationRef.current.addSuccess({ text: 'Address was copied' });
+    api.success('Address was copied');
   };
 
   if (noDetails) {
     return (
       <>
-        <NotificationPortal ref={notificationRef} />
+        {contextHolder}
         <CopyIcon
           className={styles.copyIcon}
           name="walletAddress"
@@ -31,7 +31,7 @@ function CopyIconWithAddress({
 
   return (
     <div className={styles.copyIconWithAdress}>
-      <NotificationPortal ref={notificationRef} />
+      {contextHolder}
       {name || legal ? (
         <span>
           {name && truncate(name, 20)}
