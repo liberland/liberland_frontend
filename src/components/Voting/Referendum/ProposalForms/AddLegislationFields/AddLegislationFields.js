@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Divider from 'antd/es/divider';
+import TextArea from 'antd/es/input/TextArea';
 import Title from 'antd/es/typography/Title';
-import { TextArea } from '../../../../InputComponents';
 import Button from '../../../../Button/Button';
 import { markdown2sections } from '../../../../../utils/legislation';
 

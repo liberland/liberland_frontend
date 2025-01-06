@@ -144,3 +144,11 @@ th.ant-table-cell {
 .ant-typography.ant-typography-ellipsis {
   max-width: 500px;
 }
+
+.ant-card-head-title {
+  white-space: unset!important;
+}
+
+.ant-card.ant-card-bordered {
+  max-width: 600px;
+}

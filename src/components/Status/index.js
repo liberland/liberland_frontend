@@ -15,7 +15,7 @@ function Status({
     processing: pending,
   };
   return (
-    <Tag color={Object.values(colors).find(Boolean)} className={className}>
+    <Tag color={Object.entries(colors).find(([_, value]) => value)?.[0] || 'default'} className={className}>
       {status}
     </Tag>
   );

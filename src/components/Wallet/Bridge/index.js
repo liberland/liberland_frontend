@@ -10,9 +10,10 @@ function Bridge() {
 
   return (
     <Card
+      title="Bridge"
       actions={[
-        <Button link onClick={() => goToHashiBridge()}>
-          Bridge
+        <Button primary onClick={() => goToHashiBridge()}>
+          Go to bridge
         </Button>,
       ]}
       extra={(
@@ -24,7 +25,6 @@ function Bridge() {
       )}
     >
       <Card.Meta
-        title="Bridge"
         description="Liberland chain is connected to other chains via SORA HASHI bridge."
       />
     </Card>

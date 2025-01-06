@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Autocomplete from 'antd/es/auto-complete';
 import Spin from 'antd/es/spin';
-import cx from 'classnames';
+import CheckCircleFilled from '@ant-design/icons/CheckCircleFilled';
+import CloseCircleFilled from '@ant-design/icons/CloseCircleFilled';
 import { getUsersIdentityData } from '../../api/explorer';
-import styles from './styles.module.scss';
 
 function InputSearch(props) {
   const [loading, setLoading] = useState();
@@ -24,8 +24,8 @@ function InputSearch(props) {
             {id}
             &nbsp;
             {isConfirmed
-              ? <span className={styles.icon}>&#10003;</span>
-              : <span className={cx(styles.icon, styles.iconRed)}>&#10005;</span>}
+              ? <CheckCircleFilled color="green" />
+              : <CloseCircleFilled color="red" />}
           </span>
         ),
       })));

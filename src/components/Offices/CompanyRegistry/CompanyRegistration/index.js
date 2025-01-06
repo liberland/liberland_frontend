@@ -79,3 +79,5 @@ CompanyRegistration.propTypes = {
     }),
   }).isRequired,
 };
+
+export default CompanyRegistration;

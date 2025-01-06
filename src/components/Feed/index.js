@@ -43,14 +43,12 @@ function Feed() {
       title: 'What can you do on Liberland blockchain?',
       date: 'Jan 27, 2024',
       author: 'Liberland',
-      text: `
-     Trading LLD and LLM are available, or soon will be available at coinstore, emirex, uniswap and polkaswap.
+      text: `Trading LLD and LLM are available, or soon will be available at coinstore, emirex, uniswap and polkaswap.
      LLD and LLM can be bridged to ethereum via the Liberland ETH bridge or polkaswap via the SORA bridge.
      LLD can be staked for inflation and block rewards.
      Any citizen can engage in the political process by voting for congressmen and referendums in the Voting tab.
      Politics for now is just advisory, but the expected date of binding politics is the birthday of Liberland on 13.4.
-     Upcoming features include company registrations, Liberland stock market, the judiciary system and contracts enforcement.
-     `,
+     Upcoming features include company registrations, Liberland stock market, the judiciary system and contracts enforcement.`,
       hashtags: ['#Blockchain'],
       type: 'liberland',
     },
@@ -71,11 +69,12 @@ function Feed() {
   ];
 
   return (
-    <Flex wrap gap="20px">
+    <Flex wrap gap="10px">
       {news.map((newsItem) => (
         <Card
           key={newsItem.title + newsItem.date}
-          extra={(
+          title={newsItem.title}
+          actions={[newsItem.date, (
             <Flex wrap gap="4px">
               {newsItem.hashtags.map((hashtag, index) => (
                 <Status
@@ -90,10 +89,9 @@ function Feed() {
                 />
               ))}
             </Flex>
-          )}
+          )]}
         >
           <Card.Meta
-            title={`${newsItem.title} • ${newsItem.date}`}
             description={(
               <Paragraph>
                 <Markdown>

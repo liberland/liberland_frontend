@@ -15,6 +15,9 @@ function FetchedItem({ address }) {
     </div>
   );
 }
+
 FetchedItem.propTypes = {
   address: PropTypes.string.isRequired,
 };
+
+export default FetchedItem;
