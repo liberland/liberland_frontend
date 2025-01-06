@@ -1,13 +1,13 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Space from 'antd/es/space';
 import Splitter from 'antd/es/splitter';
 import DownOutlined from '@ant-design/icons/DownOutlined';
-import useCalculateDropdownPosition from '../../../../hooks/useCalculateDropdownPosition';
+import Dropdown from 'antd/es/dropdown';
+import Flex from 'antd/es/flex';
 import Header from '../Header';
 import VetoStats from '../VetoStats';
 import SectionItem from '../SectionItem';
-import styles from '../styles.module.scss';
 import ExistingMotionsAndReferendums from '../ExistingMotionsAndReferendums';
 import ActionButtons from '../ActionButtons';
 import Button from '../../../Button/Button';
@@ -19,15 +19,11 @@ function LegislationItem({
   year, index, tier, id, sections, mainRepealProposalReferendum,
 }) {
   const [isHidden, setIsHidden] = useState(true);
-  const [isAddOpen, setAddOpen] = useState(false);
-  const dropdownRef = useRef(null);
   const {
     mainRepealMotion,
     mainRepealReferendum,
     mainRepealProposal,
   } = mainRepealProposalReferendum;
-
-  useCalculateDropdownPosition(isAddOpen, dropdownRef);
 
   return (
     <Splitter.Panel>
@@ -36,7 +32,7 @@ function LegislationItem({
         isHidden={isHidden}
         isH2
         setIsHidden={() => setIsHidden((prevValue) => !prevValue)}
-        textButton="LEGISLATION"
+        textButton="Legislation"
       >
         <VetoStats
           tier={tier}
@@ -45,81 +41,67 @@ function LegislationItem({
         />
       </Header>
 
-      {!isHidden
-            && (
-            <>
-              <>
-                {sections.map(({
-                  content, repealMotion, repealReferendum, repealProposal,
-                }, section) => (
-                  <SectionItem
-                    tier={tier}
-                    content={content.unwrap()}
-                    id={id}
-                    section={section}
-                    repealProposalReferendum={{
-                      repealMotion,
-                      repealReferendum,
-                      repealProposal,
-                    }}
-                  />
-                ))}
-              </>
-              <div className={styles.buttonsWrapper}>
-                <ExistingMotionsAndReferendums
-                  motion={mainRepealMotion}
-                  referendum={mainRepealReferendum}
-                  proposal={mainRepealProposal}
-                />
-                <ActionButtons
+      {!isHidden && (
+        <>
+          {sections.map(({
+            content, repealMotion, repealReferendum, repealProposal,
+          }, section) => (
+            <SectionItem
+              tier={tier}
+              content={content.unwrap()}
+              id={id}
+              section={section}
+              repealProposalReferendum={{
+                repealMotion,
+                repealReferendum,
+                repealProposal,
+              }}
+            />
+          ))}
+          <Flex wrap gap="15px">
+            <ExistingMotionsAndReferendums
+              motion={mainRepealMotion}
+              referendum={mainRepealReferendum}
+              proposal={mainRepealProposal}
+            />
+            <ActionButtons
+              tier={tier}
+              id={id}
+              repealMotion={mainRepealMotion}
+            />
+            <Dropdown
+              menu={[
+                <ProposeAmendLegislationModalWrapper
+                  add
                   tier={tier}
                   id={id}
-                  repealMotion={mainRepealMotion}
-                />
-                <div className={styles.dropdownWrapper}>
-                  <Button
-                    primary
-                    onClick={() => setAddOpen((prevValue) => !prevValue)}
-                  >
-                    ADD
-                    <Space />
-                    <DownOutlined />
-                  </Button>
-                  {isAddOpen
-                    && (
-                    <div className={styles.dropdown} ref={dropdownRef}>
-                      <ProposeAmendLegislationModalWrapper
-                        add
-                        tier={tier}
-                        id={id}
-                        section={sections.length}
-                      />
-                      {tier === 'InternationalTreaty' && (
-                        <CongressAmendLegislationModalWrapper
-                          add
-                          tier={tier}
-                          id={id}
-                          section={sections.length}
-                        />
-                      )}
-                      <CongressAmendLegislationViaReferendumModal
-                        add
-                        tier={tier}
-                        id={id}
-                        section={sections.length}
-                      />
-                    </div>
-                    )}
-                  {isAddOpen && (
-                  <div
-                    className={styles.overlay}
-                    onClick={() => setAddOpen((prevValue) => !prevValue)}
+                  section={sections.length}
+                />,
+                tier === 'InternationalTreaty' && (
+                  <CongressAmendLegislationModalWrapper
+                    add
+                    tier={tier}
+                    id={id}
+                    section={sections.length}
                   />
-                  )}
-                </div>
-              </div>
-            </>
-            )}
+                ),
+                <CongressAmendLegislationViaReferendumModal
+                  add
+                  tier={tier}
+                  id={id}
+                  section={sections.length}
+                />,
+              ].filter(Boolean)}
+            >
+              <Button primary>
+                Add
+                <Space />
+                <DownOutlined />
+              </Button>
+            </Dropdown>
+          </Flex>
+        </>
+      )}
     </Splitter.Panel>
   );
 }

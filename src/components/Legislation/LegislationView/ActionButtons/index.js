@@ -1,13 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Space from 'antd/es/space';
+import Dropdown from 'antd/es/dropdown';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import { blockchainSelectors, legislationSelectors } from '../../../../redux/selectors';
-import useCalculateDropdownPosition from '../../../../hooks/useCalculateDropdownPosition';
 import Button from '../../../Button/Button';
 import { legislationActions } from '../../../../redux/actions';
-import styles from '../styles.module.scss';
 import CongressRepealLegislationModalWrapper from '../../../Modals/CongressRepealLegislationModal';
 import ProposeRepealLegislationButton from '../../../Congress/ProposeRepealLegislationButton';
 import CitizenRepealLegislationModalWrapper from '../../../Modals/CitizenRepealLegislationModal';
@@ -25,14 +24,6 @@ function ActionButtons({
   const allLegislation = useSelector(legislationSelectors.legislation);
   const legislation = allLegislation[tier][id.year][id.index];
   const vetos = section !== null ? legislation.sections[section].vetos : legislation.vetos;
-
-  const [isProposeOpen, setProposeOpen] = useState(false);
-  const [isAmendOpen, setAmendOpen] = useState(false);
-
-  const dropdownRefAmend = useRef(null);
-  const dropdownRefPropose = useRef(null);
-  useCalculateDropdownPosition(isAmendOpen, dropdownRefAmend);
-  useCalculateDropdownPosition(isProposeOpen, dropdownRefPropose);
 
   const isRepealOption = (tier === 'InternationalTreaty' && !repealMotion);
   const isProposeButtonHasOpption = isRepealOption || tier !== 'Constitution';
@@ -62,78 +53,64 @@ function ActionButtons({
       </div>
 
       {isProposeButtonHasOpption && (
-      <div className={styles.dropdownWrapper}>
-        <Button
-          primary
-          onClick={() => {
-            setAmendOpen(false);
-            setProposeOpen(!isProposeOpen);
-          }}
+        <Dropdown
+          menu={[
+            isRepealOption && (
+              <CongressRepealLegislationModalWrapper
+                tier={tier}
+                id={id}
+                section={section}
+              />
+            ),
+            tier !== 'Constitution' && (
+              <ProposeRepealLegislationButton
+                tier={tier}
+                id={id}
+                section={section}
+              />
+            ),
+            <CitizenRepealLegislationModalWrapper
+              tier={tier}
+              id={id}
+              section={section}
+            />,
+          ].filter(Boolean)}
         >
-          PROPOSE
-          <Space />
-          <DownOutlined />
-        </Button>
-        {isProposeOpen && (
-        <div className={styles.dropdown} ref={dropdownRefPropose}>
-          {isRepealOption && (
-            <CongressRepealLegislationModalWrapper
-              tier={tier}
-              id={id}
-              section={section}
-            />
-          )}
-          {tier !== 'Constitution' && (
-            <ProposeRepealLegislationButton
-              tier={tier}
-              id={id}
-              section={section}
-            />
-          )}
-          <CitizenRepealLegislationModalWrapper
-            tier={tier}
-            id={id}
-            section={section}
-          />
-        </div>
-        )}
-        {isProposeOpen && <div className={styles.overlay} onClick={() => setProposeOpen((prevValue) => !prevValue)} />}
-      </div>
+          <Button primary>
+            PROPOSE
+            <Space />
+            <DownOutlined />
+          </Button>
+        </Dropdown>
       )}
-      {section !== null
-      && (
-      <div className={styles.dropdownWrapper}>
-        <Button
-          primary
-          onClick={() => setAmendOpen((prevValue) => !prevValue)}
-        >
-          AMEND
-          {' '}
-          <span>&#x2304;</span>
-        </Button>
-        {isAmendOpen && (
-          <div className={styles.dropdown} ref={dropdownRefAmend}>
+      {section !== null && (
+        <Dropdown
+          menu={[
             <ProposeAmendLegislationModalWrapper
               tier={tier}
               id={id}
               section={section}
-            />
-            {tier === 'InternationalTreaty' && (
+            />,
+            tier === 'InternationalTreaty' && (
               <CongressAmendLegislationModalWrapper
                 tier={tier}
                 id={id}
                 section={section}
               />
-            )}
+            ),
             <CongressAmendLegislationViaReferendumModal
               tier={tier}
               id={id}
               section={section}
-            />
-          </div>
-        )}
-        {isAmendOpen && <div className={styles.overlay} onClick={() => setAmendOpen((prevValue) => !prevValue)} />}
-      </div>
+            />,
+          ].filter(Boolean)}
+        >
+          <Button primary>
+            Amend
+            {' '}
+            <span>&#x2304;</span>
+          </Button>
+        </Dropdown>
       )}
     </>
   );
