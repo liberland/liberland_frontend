@@ -25,7 +25,9 @@ function Collections() {
 
   return (
     <Flex vertical gap="20px">
-      <CreateEditCollectionModalWrapper />
+      <Flex gap="15px" wrap justify="end">
+        <CreateEditCollectionModalWrapper />
+      </Flex>
       {userCollections?.length ? (
         <List
           grid={{

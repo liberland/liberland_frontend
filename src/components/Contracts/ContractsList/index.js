@@ -1,21 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from '../styles.module.scss';
+import List from 'antd/es/list';
 import ContractItem from '../ContractItem';
 
 function ContractsList({ contracts, isOneItem, isMyContracts }) {
   return (
-    <div className={styles.itemsWrapper}>
-      {contracts.map((contract, index) => (
+    <List
+      dataSource={contracts}
+      renderItem={(contract) => (
         <ContractItem
-          // eslint-disable-next-line react/no-array-index-key
-          key={contract.contractId + index}
           {...contract}
           isOneItem={isOneItem}
           isMyContracts={isMyContracts}
         />
-      ))}
-    </div>
+      )}
+    />
   );
 }
 

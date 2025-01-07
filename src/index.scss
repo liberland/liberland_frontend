@@ -149,7 +149,7 @@ th.ant-table-cell {
   white-space: unset!important;
 }
 
-.ant-card.ant-card-bordered {
+.ant-list-grid .ant-card.ant-card-bordered {
   max-width: 600px;
 }
 
@@ -160,4 +160,12 @@ th.ant-table-cell {
 
 .ant-list .ant-row {
   gap: 15px;
+}
+
+.hidden {
+  display: none;
+}
+
+.ant-list-item-meta-title {
+  text-align: left;
 }

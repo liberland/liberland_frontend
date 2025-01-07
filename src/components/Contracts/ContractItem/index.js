@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
+import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Markdown from 'markdown-to-jsx';
 import router from '../../../router';
@@ -11,6 +12,7 @@ import { blockchainSelectors, contractsSelectors } from '../../../redux/selector
 import Button from '../../Button/Button';
 import ButtonsWrapper from '../ButtonsWrapper';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
+import { deriveAndHideContractTitle } from './utils';
 
 function ContractItem({
   contractId,
@@ -39,7 +41,7 @@ function ContractItem({
   ];
 
   const history = useHistory();
-  const title = useState(`Contract id: ${contractId}`);
+  const [title, setTitle] = useState(`Contract id: ${contractId}`);
 
   const handleClick = (id) => {
     const routerLink = router.contracts.item.split(':')[0];
@@ -47,6 +49,7 @@ function ContractItem({
   };
   return (
     <Card
+      title={<Title level={1}>{title}</Title>}
       extra={!isOneItem ? (
         <Button link onClick={() => handleClick(contractId)}>More</Button>
       ) : null}
@@ -61,9 +64,8 @@ function ContractItem({
       )}
     >
       <Card.Meta
-        title={title}
         description={(
-          <Paragraph ellipsis={{ rows: 300 }}>
+          <Paragraph ref={(p) => deriveAndHideContractTitle(p, title, setTitle)}>
             <Markdown>{data}</Markdown>
           </Paragraph>
         )}

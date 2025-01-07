@@ -47,7 +47,7 @@ function CreateEditCollectionModalWrapper() {
   const [show, setShow] = useState();
   return (
     <>
-      <Button primary small onClick={() => setShow(true)}>
+      <Button primary onClick={() => setShow(true)}>
         Create collection
       </Button>
       {show && (
