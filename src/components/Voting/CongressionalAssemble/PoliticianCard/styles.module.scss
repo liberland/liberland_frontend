@@ -1,97 +1,11 @@
 @import "../../../../assets/base/variables";
 @import '../../../../assets/main.scss';
 
-.nameAndIcons{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-
-
-  .copyName{
-    display: flex;
-    flex-direction: column;
-
-    .copyWithName{
-      display: flex;
-      align-items: center;
-      font-weight: 700;
-      @media screen and (min-width: map-get($breakpoints, 'tablet')){
-        font-size: 17px;
-      }
-    }
-    .votesCounterMobile{
-      font-size: 13px;
-      display: block;
-      margin-top: 6px;
-      margin-left: 6px;
-      @media screen and (min-width: map-get($breakpoints, 'desktop')){
-        display: none;
-      }
-    }
-  }
+.icon {
+  max-height: 20px;
+  margin-right: 10px;
 }
-
-.copyIcon{
-  margin-right: 2px;
-}
-
-.buttonsWrapper{
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  width: 100%;
-  @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    width: unset;
-  }
-
-  @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
-    gap: 75px
-  }
-}
-
-.buttonWrapper{
-  width: 100%;
-  @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    width: unset;
-  }
-   & button {
-    width: 100%;
-    padding: 0 10px;
-    min-height: 40px;
-    @media screen and (min-width: map-get($breakpoints, 'desktop')){
-      width: unset;
-      min-width: 150px;
-      max-height: unset;
-      min-height: 50px;
-    }
-   }
-}
-
-.votesCounterDesktop{
-  display: none;
-  @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    display: block;
-  }
-}
-
-.politicianImageContainer,
-.politicianPartyImageContainer,
-.politicianVotingPowerImageContainer{
-  height: 40px;
-  @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    height: 50px;
-  }
-}
-
-.politicianPartyImageContainer{
-  @media screen and (min-width: map-get($breakpoints, 'desktop')){
-    margin-right: 3px;
-  }
-}
-
-.text{
-  color: black;
-  font-weight: bold;
-  text-decoration: none;
+.torch {
+  width: 50px!important;
+  margin: 20px auto;
 }

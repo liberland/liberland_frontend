@@ -4,6 +4,7 @@ import LayoutInternal, {
   Content,
   Footer,
 } from 'antd/es/layout/layout';
+import Alert from 'antd/es/alert';
 import ConfigProvider from 'antd/es/config-provider';
 import PropTypes from 'prop-types';
 import { walletActions } from '../../redux/actions';
@@ -121,7 +122,9 @@ function Layout({ children }) {
             <Content className={styles.content}>
               <PageTitle />
               <Tabs />
-              {children}
+              <Alert.ErrorBoundary>
+                {children}
+              </Alert.ErrorBoundary>
             </Content>
             <Footer className={styles.footer}>
               <div className={styles.footerItem}>

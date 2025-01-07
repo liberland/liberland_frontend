@@ -4,6 +4,7 @@ import Form from 'antd/es/form';
 import Divider from 'antd/es/divider';
 import TextArea from 'antd/es/input/TextArea';
 import Title from 'antd/es/typography/Title';
+import Flex from 'antd/es/flex';
 import Button from '../../../../Button/Button';
 import { markdown2sections } from '../../../../../utils/legislation';
 
@@ -24,32 +25,34 @@ export function AddLegislationFields({
   };
 
   return (
-    <>
-      <Title level={4}>Legislation Content</Title>
-      <Form.List
-        name="sections"
-        rules={[{ min: 1 }]}
-      >
-        {(fields, { add, remove }) => (
-          <>
-            {fields.map((field, index) => (
-              <div key={field.key}>
-                <Form.Item
-                  name={[index, 'value']}
-                  label={`Section #${index + 1}`}
-                  rules={[{ required: true }]}
-                >
-                  <TextArea onPaste={handlePaste} />
-                </Form.Item>
-                <Button nano secondary onClick={() => remove(field.name)}>Delete</Button>
-                <Divider />
-              </div>
-            ))}
-            <Button nano secondary onClick={add}>Add</Button>
-          </>
-        )}
-      </Form.List>
-    </>
+    <Form.List
+      name="sections"
+      rules={[{ min: 1 }]}
+    >
+      {(fields, { add, remove }) => (
+        <>
+          <Flex wrap gap="15px" align="center" justify="space-between">
+            <Title level={4}>Legislation Content</Title>
+            <Flex justify="end">
+              <Button green onClick={add}>Add</Button>
+            </Flex>
+          </Flex>
+          {fields.map((field, index) => (
+            <div key={field.key}>
+              <Form.Item
+                name={[index, 'value']}
+                label={`Section #${index + 1}`}
+                rules={[{ required: true }]}
+              >
+                <TextArea onPaste={handlePaste} />
+              </Form.Item>
+              <Button red onClick={() => remove(field.name)}>Delete</Button>
+              <Divider />
+            </div>
+          ))}
+        </>
+      )}
+    </Form.List>
   );
 }
 

@@ -1,22 +1,39 @@
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'antd/es/alert';
 import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
-import { blockchainSelectors, democracySelectors, congressSelectors } from '../../../redux/selectors';
+import { useHistory } from 'react-router-dom';
+import { AuthContext } from 'react-oauth2-code-pkce';
+import {
+  blockchainSelectors,
+  democracySelectors,
+  congressSelectors,
+  userSelectors,
+} from '../../../redux/selectors';
 import ProposalItem from './Items/ProposalItem';
 import ReferendumItem from './Items/ReferendumItem';
 import DispatchItem from './Items/DispatchItem';
 import { UndelegateModal } from '../../Modals';
 import { democracyActions, congressActions, identityActions } from '../../../redux/actions';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
+import Button from '../../Button/Button';
+import router from '../../../router';
 
 function Referendum() {
   const dispatch = useDispatch();
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const userIsMember = useSelector(congressSelectors.userIsMember);
+  const history = useHistory();
+  const { login } = useContext(AuthContext);
+  const user = useSelector(userSelectors.selectUser);
 
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call(userWalletAddress));
@@ -55,15 +72,34 @@ function Referendum() {
           label: 'Referendums',
           extra: (
             <Flex wrap gap="15px">
-              <div>
-                Delegating to:
-                {' '}
-                {delegatingTo}
-              </div>
-              <UndelegateModal
-                delegatee={delegatingTo}
-                onSubmitUndelegate={handleSubmitUndelegate}
-              />
+              {delegatingTo && (
+                <>
+                  <UndelegateModal
+                    delegatee={delegatingTo}
+                    onSubmitUndelegate={handleSubmitUndelegate}
+                  />
+                  <div>
+                    Delegating to:
+                    {' '}
+                    {delegatingTo}
+                  </div>
+                </>
+              )}
+              {user ? (
+                <Button
+                  onClick={() => history.pushState(router.voting.addLegislation)}
+                  primary
+                >
+                  Propose
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => login()}
+                  primary
+                >
+                  Log in to propose referenda
+                </Button>
+              )}
             </Flex>
           ),
           children: democracy.democracy?.crossReferencedReferendumsData?.length ? (

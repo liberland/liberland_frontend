@@ -1,57 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Flex from 'antd/es/flex';
-import styles from './styles.module.scss';
-import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
-import libertarianTorch from '../../../../assets/images/libertariantorch.png';
-import stylesVotes from '../SelectedCandidateCard/styles.module.scss';
-import CopyIconWithAddress from '../../../CopyIconWithAddress';
-import sanitizeUrlHelper from '../../../../utils/sanitizeUrlHelper';
 import Button from '../../../Button/Button';
+import PoliticanCard from '../PoliticianCard';
 
 function CandidateCard({ politician, selectCandidate }) {
-  const { website } = politician;
-
   return (
-    <div className={stylesVotes.politicianCardContainer}>
-      <div className={stylesVotes.leftColumn}>
-        <div className={stylesVotes.politicianImageContainer}>
-          <img
-            src={liberlandEmblemImage}
-            style={{ height: '100%' }}
-            alt="liberlandEmblemImage"
-          />
-          <img
-            src={libertarianTorch}
-            style={{ height: '100%' }}
-            alt="libertarianTorch"
-          />
-        </div>
-        <div
-          className={`${stylesVotes.politicianDisplayName} ${styles.maxContent}`}
-        >
-          <CopyIconWithAddress
-            isTruncate={!politician.name}
-            name={politician.name}
-            legal={politician.legal}
-            address={politician.rawIdentity}
-          />
-        </div>
-      </div>
-      <Flex wrap gap="15px">
-        {website && (
-          <Button link href={sanitizeUrlHelper(website)}>
-            Website
-          </Button>
-        )}
+    <PoliticanCard
+      politician={politician}
+      actions={[
         <Button
           primary
           onClick={() => selectCandidate(politician)}
         >
           Add vote
-        </Button>
-      </Flex>
-    </div>
+        </Button>,
+      ]}
+    />
   );
 }
 

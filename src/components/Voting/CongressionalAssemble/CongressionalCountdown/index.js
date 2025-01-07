@@ -5,7 +5,6 @@ import { intervalToDuration, format } from 'date-fns';
 import Card from 'antd/es/card';
 import Progress from 'antd/es/progress';
 import Paragraph from 'antd/es/typography/Paragraph';
-import congressionalCountdown from './styles.module.scss';
 import {
   blockchainSelectors,
 } from '../../../../redux/selectors';
@@ -28,12 +27,9 @@ function CongressionalCountdown({ termDuration }) {
 
   return (
     <Card
-      cover={(
-        <Progress type="circle" percent={ratio} />
-      )}
+      title="Countdown until end of election"
     >
       <Card.Meta
-        title="Countdown until end of election"
         description={(
           <>
             <Paragraph>
@@ -45,14 +41,17 @@ function CongressionalCountdown({ termDuration }) {
               {hours > 1 && ` ${hours} hours`}
               {!days && !hours && 'less than 1 hour'}
             </Paragraph>
-            <time dateTime={untilEnd.toString()} className={congressionalCountdown.countdown}>
-              Election end date:
-              {' '}
-              {format(untilEnd, 'd. M. yyyy')}
-            </time>
+            <Paragraph>
+              <time dateTime={untilEnd.toString()}>
+                Election end date:
+                {' '}
+                {format(untilEnd, 'd. M. yyyy')}
+              </time>
+            </Paragraph>
           </>
         )}
       />
+      <Progress type="circle" percent={ratio} />
     </Card>
   );
 }

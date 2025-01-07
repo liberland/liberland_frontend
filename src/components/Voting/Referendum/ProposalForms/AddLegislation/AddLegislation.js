@@ -13,7 +13,6 @@ import router from '../../../../../router';
 import { democracySelectors } from '../../../../../redux/selectors';
 import { AddLegislationFields } from '../AddLegislationFields/AddLegislationFields';
 import { ProposalDiscussionFields } from '../ProposalDiscussionFields';
-import stylesPage from '../../../../../utils/pagesBase.module.scss';
 
 function AddLegislation() {
   const dispatch = useDispatch();
@@ -56,7 +55,6 @@ function AddLegislation() {
         sections: [{ value: 'Paste markdown to autosplit sections' }],
       }}
       onFinish={propose}
-      className={stylesPage.contentWrapper}
     >
       <Title level={3}>Propose a new Referendum</Title>
       <Form.Item
@@ -85,7 +83,6 @@ function AddLegislation() {
       </Form.Item>
       <ProposalDiscussionFields />
       <AddLegislationFields form={form} />
-
       <Flex wrap gap="15px">
         <Popconfirm
           title="Confirm form submission"
