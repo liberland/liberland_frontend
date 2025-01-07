@@ -28,7 +28,7 @@ function ScheduledCongressSpending({ isVetoButton }) {
   }, [motionIds, dispatch, scheduledCalls]);
 
   if (!scheduledCalls || scheduledCalls.length < 1) {
-    return <Alert type="info">There are no open items</Alert>;
+    return <Alert type="info" message="There are no open items" />;
   }
 
   return (

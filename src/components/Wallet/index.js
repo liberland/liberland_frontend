@@ -51,13 +51,18 @@ function Wallet() {
         />
       </Switch>
     ) : (
-      <Alert type="error">
-        No extension installed, or you did not accept the authorization, please visit
-        {' '}
-        <a target="_blank" href="https://polkadot.js.org/extension/" rel="noopener noreferrer">polkadot.js.org</a>
-        {' '}
-        for more details.
-      </Alert>
+      <Alert
+        type="error"
+        message={(
+          <>
+            No extension installed, or you did not accept the authorization, please visit
+            {' '}
+            <a target="_blank" href="https://polkadot.js.org/extension/" rel="noopener noreferrer">polkadot.js.org</a>
+            {' '}
+            for more details.
+          </>
+        )}
+      />
     )
   );
 }

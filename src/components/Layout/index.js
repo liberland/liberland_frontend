@@ -33,6 +33,7 @@ function Layout({ children }) {
         token: {
           colorText: '#243F5F',
           fontSize: 15,
+          fontFamily: 'Open Sans',
         },
         components: {
           Layout: {
@@ -105,6 +106,9 @@ function Layout({ children }) {
           },
           Message: {
             margin: 'auto 0',
+          },
+          Progress: {
+            defaultColor: '#243F5F',
           },
         },
       }}

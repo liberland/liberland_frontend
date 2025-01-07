@@ -172,11 +172,10 @@ function CreateEditNFTModalWrapper({
   return (
     <>
       <Button
-        small
         onClick={() => setShow(true)}
         primary
       >
-        Set Metadata
+        Create NFT
       </Button>
       {show && (
         <ModalRoot onClose={() => setShow(false)}>

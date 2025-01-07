@@ -201,7 +201,16 @@ export function BuildRegistryForm({
   const defaultValues = getDefaultValuesFromDataObject(formObject, !!companyId);
 
   if (formObject.invalid) {
-    return <Alert type="error">This company&apos;s registry data is corrupted. Please contact administration.</Alert>;
+    return (
+      <Alert
+        type="error"
+        message={(
+          <>
+            This company&apos;s registry data is corrupted. Please contact administration.
+          </>
+        )}
+      />
+    );
   }
 
   return (

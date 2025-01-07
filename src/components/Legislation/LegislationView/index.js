@@ -48,7 +48,7 @@ function LegislationView() {
     ))));
 
   if (!items.length) {
-    return <Alert type="info">No legislation found</Alert>;
+    return <Alert type="info" message="No legislation found" />;
   }
 
   return (

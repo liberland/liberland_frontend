@@ -131,12 +131,17 @@ function OnchainIdentityModal({
         name="isUserWarnAccepted"
         label="I want to change my identity"
         extra={(
-          <Alert type="warning">
-            Warning! Your identity is currently confirmed by citizenship office
-            as valid. Changing it will require reapproval - you&apos;ll
-            temporarily lose citizenship or e-resident rights onchain.
-            Until its manually handled by ministry of interior which takes about two days.
-          </Alert>
+          <Alert
+            type="warning"
+            message={(
+              <>
+                Warning! Your identity is currently confirmed by citizenship office
+                as valid. Changing it will require reapproval - you&apos;ll
+                temporarily lose citizenship or e-resident rights onchain.
+                Until its manually handled by ministry of interior which takes about two days.
+              </>
+            )}
+          />
         )}
       >
         <Checkbox />

@@ -88,7 +88,7 @@ function Referendum() {
                 />
               )}
             />
-          ) : <Alert type="info">There are no active Referendums</Alert>,
+          ) : <Alert type="info" message="There are no active Referendums" />,
         },
         {
           key: 'proposals',
@@ -105,7 +105,7 @@ function Referendum() {
                 />
               )}
             />
-          ) : <Alert type="info">There are no active Proposals</Alert>,
+          ) : <Alert type="info" message="There are no active Proposals" />,
         },
         {
           key: 'dispatches',
@@ -119,7 +119,7 @@ function Referendum() {
                 />
               )}
             />
-          ) : <Alert type="info">There are no active Dispatches</Alert>,
+          ) : <Alert type="info" message="There are no active Dispatches" />,
         },
       ]}
     />

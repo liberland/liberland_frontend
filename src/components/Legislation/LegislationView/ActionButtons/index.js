@@ -54,27 +54,34 @@ function ActionButtons({
 
       {isProposeButtonHasOpption && (
         <Dropdown
-          menu={[
-            isRepealOption && (
-              <CongressRepealLegislationModalWrapper
-                tier={tier}
-                id={id}
-                section={section}
-              />
-            ),
-            tier !== 'Constitution' && (
-              <ProposeRepealLegislationButton
-                tier={tier}
-                id={id}
-                section={section}
-              />
-            ),
-            <CitizenRepealLegislationModalWrapper
-              tier={tier}
-              id={id}
-              section={section}
-            />,
-          ].filter(Boolean)}
+          menu={{
+            items: [
+              [
+                isRepealOption && (
+                  <CongressRepealLegislationModalWrapper
+                    tier={tier}
+                    id={id}
+                    section={section}
+                  />
+                ),
+                tier !== 'Constitution' && (
+                  <ProposeRepealLegislationButton
+                    tier={tier}
+                    id={id}
+                    section={section}
+                  />
+                ),
+                <CitizenRepealLegislationModalWrapper
+                  tier={tier}
+                  id={id}
+                  section={section}
+                />,
+              ].filter(Boolean).map((children, key) => ({
+                children,
+                key,
+              })),
+            ],
+          }}
         >
           <Button primary>
             PROPOSE

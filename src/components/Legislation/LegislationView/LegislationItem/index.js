@@ -70,28 +70,35 @@ function LegislationItem({
               repealMotion={mainRepealMotion}
             />
             <Dropdown
-              menu={[
-                <ProposeAmendLegislationModalWrapper
-                  add
-                  tier={tier}
-                  id={id}
-                  section={sections.length}
-                />,
-                tier === 'InternationalTreaty' && (
-                  <CongressAmendLegislationModalWrapper
-                    add
-                    tier={tier}
-                    id={id}
-                    section={sections.length}
-                  />
-                ),
-                <CongressAmendLegislationViaReferendumModal
-                  add
-                  tier={tier}
-                  id={id}
-                  section={sections.length}
-                />,
-              ].filter(Boolean)}
+              menu={{
+                items: [
+                  [
+                    <ProposeAmendLegislationModalWrapper
+                      add
+                      tier={tier}
+                      id={id}
+                      section={sections.length}
+                    />,
+                    tier === 'InternationalTreaty' && (
+                      <CongressAmendLegislationModalWrapper
+                        add
+                        tier={tier}
+                        id={id}
+                        section={sections.length}
+                      />
+                    ),
+                    <CongressAmendLegislationViaReferendumModal
+                      add
+                      tier={tier}
+                      id={id}
+                      section={sections.length}
+                    />,
+                  ].filter(Boolean).map((children, key) => ({
+                    children,
+                    key,
+                  })),
+                ],
+              }}
             >
               <Button primary>
                 Add

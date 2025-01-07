@@ -154,7 +154,6 @@ function FillNumberWrapper({
   return (
     <>
       <Button
-        small
         onClick={() => setShow(true)}
         primary
       >

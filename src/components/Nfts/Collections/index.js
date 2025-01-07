@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Spin from 'antd/es/spin';
 import Alert from 'antd/es/alert';
 import List from 'antd/es/list';
+import Flex from 'antd/es/flex';
 import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import CreateEditCollectionModalWrapper from '../../Modals/Nfts/CreateEditCollection';
@@ -22,18 +23,24 @@ function Collections() {
     return <Spin />;
   }
 
-  return userCollections?.length ? (
-    <List
-      header="Collections"
-      extra={<CreateEditCollectionModalWrapper />}
-      dataSource={userCollections}
-      renderItem={({ collectionId }) => (
-        <List.Item>
-          <List.Item.Meta title={`Collection ID: ${collectionId}`} />
-        </List.Item>
-      )}
-    />
-  ) : <Alert type="info">You don&apos;t have any collection</Alert>;
+  return (
+    <Flex vertical gap="20px">
+      <CreateEditCollectionModalWrapper />
+      {userCollections?.length ? (
+        <List
+          grid={{
+            gutter: 16,
+          }}
+          dataSource={userCollections}
+          renderItem={({ collectionId }) => (
+            <List.Item>
+              <List.Item.Meta title={`Collection ID: ${collectionId}`} />
+            </List.Item>
+          )}
+        />
+      ) : <Alert type="info" message={<>You don&apos;t have any collection</>} />}
+    </Flex>
+  );
 }
 
 export default Collections;

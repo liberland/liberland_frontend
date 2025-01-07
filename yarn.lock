@@ -1557,7 +1557,7 @@
     "@emotion/weak-memoize" "^0.4.0"
     stylis "4.2.0"
 
-"@emotion/core@^10.0.15", "@emotion/core@^10.0.27":
+"@emotion/core@^10.0.27":
   version "10.3.1"
   resolved "https://registry.npmjs.org/@emotion/core/-/core-10.3.1.tgz"
   integrity sha512-447aUEjPIm0MnE6QYIaFz9VQOHSXf4Iu6EWOIqq11EAPqinkSZmfymPTmlOE3QjLv846lH4JVZBUOtwGbuQoww==
@@ -15912,13 +15912,6 @@ react-smooth@^2.0.2:
   dependencies:
     fast-equals "^5.0.0"
     react-transition-group "2.9.0"
-
-react-spinners@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.npmjs.org/react-spinners/-/react-spinners-0.9.0.tgz"
-  integrity sha512-+x6eD8tn/aYLdxZjNW7fSR1uoAXLb9qq6TFYZR1dFweJvckcf/HfP8Pa/cy5HOvB/cvI4JgrYXTjh2Me3S6Now==
-  dependencies:
-    "@emotion/core" "^10.0.15"
 
 react-style-singleton@^2.2.1:
   version "2.2.1"

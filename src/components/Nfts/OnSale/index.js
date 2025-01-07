@@ -25,8 +25,9 @@ function OnSale() {
   return nftsOnSale.length ? (
     <List
       dataSource={nftsOnSale}
-      itemLayout="vertical"
-      header="NFTs on sale"
+      grid={{
+        gutter: 16,
+      }}
       renderItem={({
         collectionId,
         nftId,
@@ -43,7 +44,7 @@ function OnSale() {
         />
       )}
     />
-  ) : <Alert type="info">There are no NFTs on sale</Alert>;
+  ) : <Alert type="info" message="There are no NFTs on sale" />;
 }
 
 export default OnSale;
