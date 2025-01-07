@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Space from 'antd/es/space';
-import Splitter from 'antd/es/splitter';
+import Collapse from 'antd/es/collapse';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import Dropdown from 'antd/es/dropdown';
 import Flex from 'antd/es/flex';
-import Header from '../Header';
 import VetoStats from '../VetoStats';
 import SectionItem from '../SectionItem';
 import ExistingMotionsAndReferendums from '../ExistingMotionsAndReferendums';
@@ -18,7 +17,6 @@ import CongressAmendLegislationViaReferendumModal from '../../../Modals/Congress
 function LegislationItem({
   year, index, tier, id, sections, mainRepealProposalReferendum,
 }) {
-  const [isHidden, setIsHidden] = useState(true);
   const {
     mainRepealMotion,
     mainRepealReferendum,
@@ -26,90 +24,87 @@ function LegislationItem({
   } = mainRepealProposalReferendum;
 
   return (
-    <Splitter.Panel>
-      <Header
-        title={`Legislation ${year}/${index}`}
-        isHidden={isHidden}
-        isH2
-        setIsHidden={() => setIsHidden((prevValue) => !prevValue)}
-        textButton="Legislation"
-      >
-        <VetoStats
-          tier={tier}
-          id={id}
-          isH2
-        />
-      </Header>
-
-      {!isHidden && (
-        <>
-          {sections.map(({
-            content, repealMotion, repealReferendum, repealProposal,
-          }, section) => (
-            <SectionItem
-              tier={tier}
-              content={content.unwrap()}
-              id={id}
-              section={section}
-              repealProposalReferendum={{
-                repealMotion,
-                repealReferendum,
-                repealProposal,
-              }}
-            />
-          ))}
-          <Flex wrap gap="15px">
-            <ExistingMotionsAndReferendums
-              motion={mainRepealMotion}
-              referendum={mainRepealReferendum}
-              proposal={mainRepealProposal}
-            />
-            <ActionButtons
-              tier={tier}
-              id={id}
-              repealMotion={mainRepealMotion}
-            />
-            <Dropdown
-              menu={{
-                items: [
-                  [
-                    <ProposeAmendLegislationModalWrapper
-                      add
-                      tier={tier}
-                      id={id}
-                      section={sections.length}
-                    />,
-                    tier === 'InternationalTreaty' && (
-                      <CongressAmendLegislationModalWrapper
+    <Collapse
+      items={[{
+        label: `Legislation ${year}/${index}`,
+        key: 'legislation',
+        extra: (
+          <VetoStats
+            tier={tier}
+            id={id}
+            isH2
+          />
+        ),
+        children: (
+          <>
+            {sections.map(({
+              content, repealMotion, repealReferendum, repealProposal,
+            }, section) => (
+              <SectionItem
+                tier={tier}
+                content={content.unwrap()}
+                id={id}
+                section={section}
+                repealProposalReferendum={{
+                  repealMotion,
+                  repealReferendum,
+                  repealProposal,
+                }}
+              />
+            ))}
+            <Flex wrap gap="15px">
+              <ExistingMotionsAndReferendums
+                motion={mainRepealMotion}
+                referendum={mainRepealReferendum}
+                proposal={mainRepealProposal}
+              />
+              <ActionButtons
+                tier={tier}
+                id={id}
+                repealMotion={mainRepealMotion}
+              />
+              <Dropdown
+                menu={{
+                  items: [
+                    [
+                      <ProposeAmendLegislationModalWrapper
                         add
                         tier={tier}
                         id={id}
                         section={sections.length}
-                      />
-                    ),
-                    <CongressAmendLegislationViaReferendumModal
-                      add
-                      tier={tier}
-                      id={id}
-                      section={sections.length}
-                    />,
-                  ].filter(Boolean).map((children, key) => ({
-                    children,
-                    key,
-                  })),
-                ],
-              }}
-            >
-              <Button primary>
-                Add
-                <Space />
-                <DownOutlined />
-              </Button>
-            </Dropdown>
-          </Flex>
-        </>
-      )}
-    </Splitter.Panel>
+                      />,
+                      tier === 'InternationalTreaty' && (
+                        <CongressAmendLegislationModalWrapper
+                          add
+                          tier={tier}
+                          id={id}
+                          section={sections.length}
+                        />
+                      ),
+                      <CongressAmendLegislationViaReferendumModal
+                        add
+                        tier={tier}
+                        id={id}
+                        section={sections.length}
+                      />,
+                    ].filter(Boolean).map((children, key) => ({
+                      children,
+                      key,
+                    })),
+                  ],
+                }}
+              >
+                <Button primary>
+                  Add
+                  <Space />
+                  <DownOutlined />
+                </Button>
+              </Dropdown>
+            </Flex>
+          </>
+        ),
+      }]}
+    />
   );
 }
 

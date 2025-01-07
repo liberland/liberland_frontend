@@ -19,7 +19,7 @@ function ProposeAmendLegislationModal({
   const dispatch = useDispatch();
   const allLegislation = useSelector(legislationSelectors.legislation);
   const legislation = allLegislation[tier][id.year][id.index];
-  const sectionContent = legislation.sections[section]?.content.toHuman() ?? '';
+  const sectionContent = legislation?.sections?.[section]?.content.toHuman() ?? '';
   const [form] = Form.useForm();
 
   const onSubmit = ({
@@ -56,7 +56,7 @@ function ProposeAmendLegislationModal({
     >
       <Title level={3}>
         Propose a Referendum -
-        {legislation.sections[section]
+        {legislation?.sections?.[section]
           ? 'amend legislation'
           : 'add legislation section'}
       </Title>

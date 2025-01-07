@@ -19,6 +19,7 @@ function SectionItem({
 
   return (
     <Card
+      title={`Section #${section}`}
       extra={(
         <VetoStats
           tier={tier}
@@ -41,7 +42,6 @@ function SectionItem({
       ]}
     >
       <Card.Meta
-        title={`Section #${section}`}
         description={(
           <Paragraph ellipsis={{ rows: isBigScreen ? 60 : 40, expandable: true }}>
             {content}

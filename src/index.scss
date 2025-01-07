@@ -153,6 +153,13 @@ th.ant-table-cell {
   max-width: 600px;
 }
 
+.ant-list-grid {
+  .ant-row > * {
+    display: flex;
+    height: auto;
+  }
+}
+
 .ant-form {
   max-width: 900px;
   margin: 0 auto;

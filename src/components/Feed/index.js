@@ -3,6 +3,7 @@ import React from 'react';
 import cx from 'classnames';
 import Flex from 'antd/es/flex';
 import Card from 'antd/es/card';
+import List from 'antd/es/list';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Markdown from 'markdown-to-jsx';
 import Status from '../Status';
@@ -69,13 +70,16 @@ function Feed() {
   ];
 
   return (
-    <Flex wrap gap="10px">
-      {news.map((newsItem) => (
+    <List
+      grid={{ gutter: 16 }}
+      dataSource={news}
+      renderItem={(newsItem) => (
         <Card
           key={newsItem.title + newsItem.date}
           title={newsItem.title}
-          actions={[newsItem.date, (
-            <Flex wrap gap="4px">
+          extra={newsItem.date}
+          cover={(
+            <Flex wrap gap="4px" className={styles.cover}>
               {newsItem.hashtags.map((hashtag, index) => (
                 <Status
                   key={hashtag}
@@ -89,20 +93,16 @@ function Feed() {
                 />
               ))}
             </Flex>
-          )]}
+          )}
         >
-          <Card.Meta
-            description={(
-              <Paragraph>
-                <Markdown>
-                  {newsItem.text}
-                </Markdown>
-              </Paragraph>
-            )}
-          />
+          <Paragraph>
+            <Markdown>
+              {newsItem.text}
+            </Markdown>
+          </Paragraph>
         </Card>
-      ))}
-    </Flex>
+      )}
+    />
   );
 }
 

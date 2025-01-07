@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Alert from 'antd/es/alert';
-import Splitter from 'antd/es/splitter';
+import Spin from 'antd/es/spin';
 import { congressActions, legislationActions } from '../../../redux/actions';
 import {
   legislationSelectors,
@@ -22,9 +22,7 @@ function LegislationView() {
 
   const legislation = useSelector(legislationSelectors.legislation);
 
-  if (!legislation[tier]) return 'Loading...';
-
-  const items = Object.entries(legislation[tier]).flatMap(([year, legislations]) => (
+  const items = useMemo(() => Object.entries(legislation[tier] || {}).flatMap(([year, legislations]) => (
     Object.entries(legislations).map(([index, {
       id,
       sections,
@@ -45,16 +43,20 @@ function LegislationView() {
         }}
         key={`${year}-${index}`}
       />
-    ))));
+    )))), [legislation, tier]);
+
+  if (!legislation[tier]) {
+    return <Spin />;
+  }
 
   if (!items.length) {
     return <Alert type="info" message="No legislation found" />;
   }
 
   return (
-    <Splitter layout="vertical">
+    <div>
       {items}
-    </Splitter>
+    </div>
   );
 }
 

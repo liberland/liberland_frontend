@@ -19,7 +19,7 @@ function CongressAmendLegislationViaReferendumModal({
   const dispatch = useDispatch();
   const allLegislation = useSelector(legislationSelectors.legislation);
   const legislation = allLegislation[tier][id.year][id.index];
-  const sectionContent = legislation.sections[section]?.content.toHuman() ?? '';
+  const sectionContent = legislation?.sections?.[section]?.content.toHuman() ?? '';
   const [form] = Form.useForm();
 
   const onSubmit = ({
@@ -61,7 +61,7 @@ function CongressAmendLegislationViaReferendumModal({
     >
       <Title level={3}>
         Propose a Motion for Referendum -
-        {legislation.sections[section] ? 'amend legislation' : 'add legislation section'}
+        {legislation.sections?.[section] ? 'amend legislation' : 'add legislation section'}
       </Title>
 
       <DisplayOnlyLegislation section={section} />

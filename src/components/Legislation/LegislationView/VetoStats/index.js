@@ -10,7 +10,7 @@ function VetoStats({
 }) {
   const allLegislation = useSelector(legislationSelectors.legislation);
   const legislation = allLegislation[tier][id.year][id.index];
-  const vetos = section !== null ? legislation.sections[section].vetos : legislation.vetos;
+  const vetos = section !== null ? (legislation?.sections?.[section]?.vetos || []) : legislation.vetos;
   const citizens = useSelector(legislationSelectors.citizenCount);
 
   return (

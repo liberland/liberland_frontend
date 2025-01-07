@@ -17,7 +17,7 @@ function CongressAmendLegislationModal({
   const dispatch = useDispatch();
   const allLegislation = useSelector(legislationSelectors.legislation);
   const legislation = allLegislation[tier][id.year][id.index];
-  const sectionContent = legislation.sections[section]?.content.toHuman() ?? '';
+  const sectionContent = legislation.sections?.[section]?.content.toHuman() ?? '';
   const [form] = Form.useForm();
 
   const onSubmit = ({ content }) => {
@@ -41,7 +41,7 @@ function CongressAmendLegislationModal({
     >
       <Title level={3}>
         Propose a Motion -
-        {legislation.sections[section] ? 'amend legislation' : 'add legislation section'}
+        {legislation?.sections?.[section] ? 'amend legislation' : 'add legislation section'}
       </Title>
       <DisplayOnlyLegislation section={section} />
       <Form.Item name="content" label="Legislation content" rules={[{ required: true }]}>

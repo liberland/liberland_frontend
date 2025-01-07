@@ -1,44 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { hexToU8a } from '@polkadot/util';
-import styles from './styles.module.scss';
+import Collapse from 'antd/es/collapse';
+import Flex from 'antd/es/flex';
+import { useHistory } from 'react-router-dom';
 import Button from '../../../../Button/Button';
 import truncate from '../../../../../utils/truncate';
-import Header from '../Header';
 import Discussions from '../Discussions';
-import stylesItem from '../item.module.scss';
-
-// REDUX
-import { congressActions } from '../../../../../redux/actions';
-import {
-  congressSelectors,
-} from '../../../../../redux/selectors';
 import Details from '../Details';
-
-function BlacklistButton({ hash }) {
-  const dispatch = useDispatch();
-  const userIsMember = useSelector(congressSelectors.userIsMember);
-
-  useEffect(() => {
-    dispatch(congressActions.getMembers.call());
-  }, [dispatch]);
-
-  if (!userIsMember) return null;
-
-  const blacklistMotion = () => {
-    dispatch(congressActions.congressDemocracyBlacklist.call({ hash }));
-  };
-
-  return (
-    <Button small secondary onClick={blacklistMotion}>
-      Cancel
-    </Button>
-  );
-}
-
-BlacklistButton.propTypes = { hash: PropTypes.string.isRequired };
+import CopyIconWithAddress from '../../../../CopyIconWithAddress';
+import router from '../../../../../router';
+import BlacklistButton from '../BlacklistButton';
 
 function ProposalItem({
   centralizedDatas,
@@ -58,44 +31,43 @@ function ProposalItem({
     hash = blake2AsHex(hexToU8a(boundedCall.inline));
   }
 
-  const [isProposalHidden, setIsProposalHidden] = useState(false);
+  const history = useHistory();
 
   return (
-    <div className={stylesItem.itemWrapper}>
-      <Header
-        hash={hash}
-        setIsHidden={setIsProposalHidden}
-        isHidden={isProposalHidden}
-        textButton="PROPOSAL"
-      >
-        {blacklistMotion && (
-          <div className={styles.rowEnd}>
-            <small>
-              Blacklist motion:
-              <a href={`/home/congress/motions#${blacklistMotion}`}>
+    <Collapse
+      defaultActiveKey={['proposal']}
+      items={[{
+        key: 'proposal',
+        label: (
+          <Flex wrap gap="15px">
+            Proposal
+            <CopyIconWithAddress address={hash} />
+          </Flex>
+        ),
+        extra: (
+          <Flex wrap gap="15px">
+            {blacklistMotion && (
+              <Button link onClick={() => history.push(`${router.congress.motions}#${blacklistMotion}`)}>
+                Blacklist motion:
+                {' '}
                 {truncate(blacklistMotion, 13)}
-              </a>
-            </small>
-          </div>
-        )}
-        {!blacklistMotion && userIsMember
-          && (
-            <div className={styles.rowEnd}>
-              <BlacklistButton hash={
-              boundedCall?.lookup?.hash
-              ?? boundedCall?.legacy?.hash
-            }
-              />
-            </div>
-          )}
-      </Header>
-      {!isProposalHidden && hash && len
-          && (
-          <Details proposal={{ hash, len }} isProposal />
-          )}
-      {!isProposalHidden && centralizedDatas?.length > 0
-        && <Discussions centralizedDatas={centralizedDatas} />}
-    </div>
+              </Button>
+            )}
+            {!blacklistMotion && userIsMember && (
+              <BlacklistButton hash={boundedCall?.lookup?.hash ?? boundedCall?.legacy?.hash} />
+            )}
+          </Flex>
+        ),
+        children: (
+          <>
+            {hash && len && (
+              <Details proposal={{ hash, len }} isProposal />
+            )}
+            {centralizedDatas?.length > 0 && <Discussions centralizedDatas={centralizedDatas} />}
+          </>
+        ),
+      }]}
+    />
   );
 }
 
