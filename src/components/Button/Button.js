@@ -8,7 +8,7 @@ function Button({
   children,
   type = 'button',
   primary,
-  onClick = () => { },
+  onClick,
   large,
   little,
   small,
@@ -71,26 +71,6 @@ function Button({
     </ButtonInternal>
   );
 }
-
-Button.defaultProps = {
-  type: 'button',
-  primary: false,
-  onClick: () => {},
-  large: false,
-  little: false,
-  small: false,
-  nano: false,
-  className: '',
-  secondary: false,
-  green: false,
-  grey: false,
-  red: false,
-  whiteRed: false,
-  disabled: false,
-  flex: false,
-  multiline: false,
-  link: false,
-};
 
 Button.propTypes = {
   children: PropTypes.node.isRequired,

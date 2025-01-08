@@ -37,7 +37,7 @@ VetoStats.propTypes = {
     // eslint-disable-next-line react/forbid-prop-types
     index: PropTypes.object.isRequired,
   }).isRequired,
-  section: PropTypes.number.isRequired,
+  section: PropTypes.number,
   isH2: PropTypes.bool,
 };
 

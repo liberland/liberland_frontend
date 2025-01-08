@@ -100,6 +100,7 @@ function ItemNft({
           </div>
           {isOwnItem && (
             <Dropdown
+              trigger={['click']}
               menu={{
                 items: [
                   {
@@ -162,7 +163,10 @@ function ItemNft({
                       </Button>
                     ),
                   },
-                ],
+                ].map((label, index) => ({
+                  label,
+                  index,
+                })),
               }}
             >
               <div className={cx(styles.showImage, styles.menu)}>

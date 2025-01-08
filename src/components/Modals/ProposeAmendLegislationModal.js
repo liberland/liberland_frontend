@@ -91,10 +91,12 @@ ProposeAmendLegislationModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
-    year: PropTypes.number.isRequired,
-    index: PropTypes.number.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    year: PropTypes.object.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    index: PropTypes.object.isRequired,
   }).isRequired,
-  section: PropTypes.string.isRequired,
+  section: PropTypes.number,
 };
 
 function ProposeAmendLegislationModalWrapper({
@@ -127,10 +129,12 @@ ProposeAmendLegislationModalWrapper.propTypes = {
   add: PropTypes.bool,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
-    year: PropTypes.number.isRequired,
-    index: PropTypes.number.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    year: PropTypes.object.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    index: PropTypes.object.isRequired,
   }).isRequired,
-  section: PropTypes.string.isRequired,
+  section: PropTypes.number,
 };
 
 export default ProposeAmendLegislationModalWrapper;

@@ -21,7 +21,6 @@ function LegislationView() {
   }, [dispatch, tier]);
 
   const legislation = useSelector(legislationSelectors.legislation);
-
   const items = useMemo(() => Object.entries(legislation[tier] || {}).flatMap(([year, legislations]) => (
     Object.entries(legislations).map(([index, {
       id,

@@ -7,6 +7,7 @@ import Dropdown from 'antd/es/dropdown';
 import { useDispatch, useSelector } from 'react-redux';
 import { AuthContext } from 'react-oauth2-code-pkce';
 import UserIcon from '../../assets/icons/user.svg';
+import router from '../../router';
 import { blockchainSelectors, userSelectors } from '../../redux/selectors';
 import { authActions, blockchainActions, validatorActions } from '../../redux/actions';
 import Button from '../Button/Button';
@@ -30,17 +31,26 @@ function UserMenu() {
     localStorage.removeItem('BlockchainAdress');
   };
 
-  const logAction = user ? {
+  const logoutAction = {
     key: 'logout',
     label: 'Logout',
-  } : {
+  };
+
+  const loginAction = {
     key: 'login',
     label: 'Login',
   };
 
+  const logAction = user ? logoutAction : loginAction;
+
   const switchToRegisteredAction = {
     key: 'registered',
     label: 'Switch to registered wallet',
+  };
+
+  const profile = {
+    key: 'profile',
+    label: 'Profile',
   };
 
   return (
@@ -53,17 +63,26 @@ function UserMenu() {
           label: <ChangeWallet />,
         }]).concat(
           user && !isWalletAdressSame ? [switchToRegisteredAction] : [],
-        ),
+        ).concat(user ? [profile] : []),
         onClick: ({ key }) => {
-          if (key === 'login') {
-            login();
-          } else if (key === 'logout') {
-            logOut();
-            dispatch(authActions.signOut.call(history));
-            window.location.href = `${
-              process.env.REACT_APP_SSO_API}/logout?redirect=${process.env.REACT_APP_FRONTEND_REDIRECT}`;
-          } else if (key === 'registered') {
-            switchToRegisteredWallet();
+          switch (key) {
+            case loginAction.key:
+              login();
+              break;
+            case logoutAction.key:
+              logOut();
+              dispatch(authActions.signOut.call(history));
+              window.location.href = `${
+                process.env.REACT_APP_SSO_API}/logout?redirect=${process.env.REACT_APP_FRONTEND_REDIRECT}`;
+              break;
+            case switchToRegisteredAction.key:
+              switchToRegisteredWallet();
+              break;
+            case profile.key:
+              history.push(router.home.profile);
+              break;
+            default:
+              break;
           }
         },
       }}

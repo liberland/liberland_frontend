@@ -4,15 +4,20 @@ import Space from 'antd/es/space';
 import Collapse from 'antd/es/collapse';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import Dropdown from 'antd/es/dropdown';
+import Card from 'antd/es/card';
+import List from 'antd/es/list';
 import Flex from 'antd/es/flex';
 import VetoStats from '../VetoStats';
 import SectionItem from '../SectionItem';
-import ExistingMotionsAndReferendums from '../ExistingMotionsAndReferendums';
-import ActionButtons from '../ActionButtons';
 import Button from '../../../Button/Button';
 import ProposeAmendLegislationModalWrapper from '../../../Modals/ProposeAmendLegislationModal';
 import CongressAmendLegislationModalWrapper from '../../../Modals/CongressAmendLegislationModal';
 import CongressAmendLegislationViaReferendumModal from '../../../Modals/CongressAmendLegislationViaReferendumModal';
+import CastVeto from '../CastVeto';
+import ProposeButton from '../ProposeButton';
+import AmendButton from '../AmendButton';
+import ExistingMotionsAndReferendums from '../ExistingMotionsAndReferendums';
+import styles from '../styles.module.scss';
 
 function LegislationItem({
   year, index, tier, id, sections, mainRepealProposalReferendum,
@@ -36,37 +41,32 @@ function LegislationItem({
           />
         ),
         children: (
-          <>
-            {sections.map(({
-              content, repealMotion, repealReferendum, repealProposal,
-            }, section) => (
-              <SectionItem
-                tier={tier}
-                content={content.unwrap()}
-                id={id}
-                section={section}
-                repealProposalReferendum={{
-                  repealMotion,
-                  repealReferendum,
-                  repealProposal,
-                }}
-              />
-            ))}
-            <Flex wrap gap="15px">
-              <ExistingMotionsAndReferendums
-                motion={mainRepealMotion}
-                referendum={mainRepealReferendum}
-                proposal={mainRepealProposal}
-              />
-              <ActionButtons
-                tier={tier}
-                id={id}
-                repealMotion={mainRepealMotion}
-              />
-              <Dropdown
-                menu={{
-                  items: [
-                    [
+          <Card
+            title="Sections"
+            actions={[
+              <Flex className={styles.actions} justify="end" wrap gap="15px">
+                <ExistingMotionsAndReferendums
+                  motion={mainRepealMotion}
+                  proposal={mainRepealProposal}
+                  referendum={mainRepealReferendum}
+                />
+                <CastVeto
+                  id={id}
+                  tier={tier}
+                />
+                <ProposeButton
+                  id={id}
+                  tier={tier}
+                  repealMotion={mainRepealMotion}
+                />
+                <AmendButton
+                  id={id}
+                  tier={tier}
+                />
+                <Dropdown
+                  trigger={['click']}
+                  menu={{
+                    items: [
                       <ProposeAmendLegislationModalWrapper
                         add
                         tier={tier}
@@ -87,21 +87,40 @@ function LegislationItem({
                         id={id}
                         section={sections.length}
                       />,
-                    ].filter(Boolean).map((children, key) => ({
-                      children,
+                    ].filter(Boolean).map((label, key) => ({
+                      label,
                       key,
                     })),
-                  ],
-                }}
-              >
-                <Button primary>
-                  Add
-                  <Space />
-                  <DownOutlined />
-                </Button>
-              </Dropdown>
-            </Flex>
-          </>
+                  }}
+                >
+                  <Button primary>
+                    Add
+                    <Space />
+                    <DownOutlined />
+                  </Button>
+                </Dropdown>
+              </Flex>,
+            ]}
+          >
+            <List
+              dataSource={sections}
+              renderItem={({
+                content, repealMotion, repealReferendum, repealProposal,
+              }, section) => (
+                <SectionItem
+                  tier={tier}
+                  content={content.unwrap()}
+                  id={id}
+                  section={section}
+                  repealProposalReferendum={{
+                    repealMotion,
+                    repealReferendum,
+                    repealProposal,
+                  }}
+                />
+              )}
+            />
+          </Card>
         ),
       }]}
     />

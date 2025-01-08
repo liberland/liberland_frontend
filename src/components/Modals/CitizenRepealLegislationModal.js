@@ -73,10 +73,12 @@ CitizenRepealLegislationModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
-    year: PropTypes.number.isRequired,
-    index: PropTypes.number.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    year: PropTypes.object.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    index: PropTypes.object.isRequired,
   }).isRequired,
-  section: PropTypes.string.isRequired,
+  section: PropTypes.number,
 };
 
 function CitizenRepealLegislationModalWrapper({
@@ -87,7 +89,7 @@ function CitizenRepealLegislationModalWrapper({
   const [show, setShow] = useState();
   return (
     <>
-      <Button link multiline onClick={() => setShow(true)}>
+      <Button link onClick={() => setShow(true)}>
         Propose citizen referendum to repeal
       </Button>
       {show && (
@@ -107,10 +109,12 @@ function CitizenRepealLegislationModalWrapper({
 CitizenRepealLegislationModalWrapper.propTypes = {
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
-    year: PropTypes.number.isRequired,
-    index: PropTypes.number.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    year: PropTypes.object.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    index: PropTypes.object.isRequired,
   }).isRequired,
-  section: PropTypes.string.isRequired,
+  section: PropTypes.number,
 };
 
 export default CitizenRepealLegislationModalWrapper;

@@ -5,6 +5,7 @@ import CongressRepealLegislationFastTrackModal from '../../Modals/CongressRepeal
 import {
   congressSelectors,
 } from '../../../redux/selectors';
+import Button from '../../Button/Button';
 
 export default function ProposeRepealLegislationButton({ tier, id, section }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -12,14 +13,15 @@ export default function ProposeRepealLegislationButton({ tier, id, section }) {
 
   // requires parent to dispatch getMembers action
   const userIsMember = useSelector(congressSelectors.userIsMember);
-  if (!userIsMember) return null;
+  if (!userIsMember) {
+    return null;
+  }
 
   return (
     <>
-      {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-      <a href="#" onClick={handleModalOpen}>
-        PROPOSE REFERENDUM TO REPEAL
-      </a>
+      <Button link onClick={handleModalOpen}>
+        Propose referendum to repeal
+      </Button>
       {isModalOpen && (
         <CongressRepealLegislationFastTrackModal
           closeModal={handleModalOpen}
@@ -35,8 +37,10 @@ export default function ProposeRepealLegislationButton({ tier, id, section }) {
 ProposeRepealLegislationButton.propTypes = {
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
-    year: PropTypes.number.isRequired,
-    index: PropTypes.number.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    year: PropTypes.object.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    index: PropTypes.object.isRequired,
   }).isRequired,
-  section: PropTypes.string.isRequired,
+  section: PropTypes.number,
 };
