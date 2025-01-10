@@ -18,7 +18,6 @@ function ClaimReward({
     <div className={styles.rewards}>
       <Button
         primary
-        small
         disabled={loading}
         onClick={async () => {
           setLoading(true);
