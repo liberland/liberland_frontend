@@ -38,6 +38,7 @@ function FillNumber({
     <Form
       onFinish={formSubmit}
       form={form}
+      layout="vertical"
       initialValues={{
         amount,
       }}

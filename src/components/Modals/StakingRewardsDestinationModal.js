@@ -27,6 +27,7 @@ function StakingRewardsDestinationModal({
     <Form
       onFinish={onSubmit}
       form={form}
+      layout="vertical"
       initialValues={{
         payee: payee.toString(),
       }}

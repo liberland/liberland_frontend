@@ -51,6 +51,7 @@ function UnbondModal({
     <Form
       onFinish={onSubmit}
       form={form}
+      layout="vertical"
       initialValues={{
         unbondValue: formatDollars(maxUnbond),
       }}

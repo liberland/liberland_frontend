@@ -45,6 +45,7 @@ function ProposeAmendLegislationModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       initialValues={{
         tier,
         year: id.year,

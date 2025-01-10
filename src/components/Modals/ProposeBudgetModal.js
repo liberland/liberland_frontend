@@ -65,6 +65,7 @@ function ProposeBudgetModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={onSubmit}
       initialValues={{
         votingDays: '7',

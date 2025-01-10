@@ -44,6 +44,7 @@ function PolitipoolModal({ closeModal }) {
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={handleSubmitStakeLiberland}
     >
       <Title level={3}>PolitiPool</Title>

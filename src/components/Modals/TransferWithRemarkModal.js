@@ -81,6 +81,7 @@ function TransferWithRemarkModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       initialValues={{
         id: 0,
       }}

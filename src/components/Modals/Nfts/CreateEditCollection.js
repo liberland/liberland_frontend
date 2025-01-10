@@ -23,7 +23,7 @@ function CreatEditCollectionModal({
   };
 
   return (
-    <Form form={form} onFinish={createCollection}>
+    <Form form={form} layout="vertical" onFinish={createCollection}>
       <Title level={3}>
         Create Collection
       </Title>

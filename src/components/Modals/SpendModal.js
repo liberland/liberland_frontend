@@ -63,6 +63,7 @@ function SpendModal({
         votingDays: '7',
       }}
       form={form}
+      layout="vertical"
       onFinish={transfer}
     >
       <Title level={3}>

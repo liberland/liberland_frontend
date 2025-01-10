@@ -49,6 +49,7 @@ function SendLLMModal({
     <Form
       onFinish={transfer}
       form={form}
+      layout="vertical"
     >
       <Title level={3}>Send LLM</Title>
       <Paragraph>

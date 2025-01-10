@@ -39,6 +39,7 @@ function CitizenRepealLegislationModal({
     <Form
       onFinish={onSubmitRepeal}
       form={form}
+      layout="vertical"
       initialValues={{
         tier,
         year: id.year,

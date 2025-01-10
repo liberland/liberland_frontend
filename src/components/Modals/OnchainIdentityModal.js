@@ -65,6 +65,7 @@ function OnchainIdentityModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       initialValues={defaultValues}
       onFinish={onSubmit}
     >

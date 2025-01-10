@@ -14,7 +14,7 @@ function SetSessionKeysModal({
   const [form] = Form.useForm();
 
   return (
-    <Form form={form} onFinish={onSubmit}>
+    <Form form={form} layout="vertical" onFinish={onSubmit}>
       <Title level={3}>Change session keys</Title>
       <Form.Item
         label="Session keys"

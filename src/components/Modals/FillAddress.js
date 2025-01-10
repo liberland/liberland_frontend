@@ -30,6 +30,7 @@ function FillAddress({
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={formSubmit}
     >
       <Title level={3}>

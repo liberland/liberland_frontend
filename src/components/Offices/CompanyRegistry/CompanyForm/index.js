@@ -55,7 +55,7 @@ function CompanyForm() {
           </List.Item>
         )}
       />
-      <Form form={form} onSubmit={onSubmit}>
+      <Form form={form} layout="vertical" onSubmit={onSubmit}>
         <Title level={3}>Verify company registration request</Title>
         <Form.Item
           name="entity_id"

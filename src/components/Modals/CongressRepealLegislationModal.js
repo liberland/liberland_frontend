@@ -24,6 +24,7 @@ function CongressRepealLegislationModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={onSubmitRepeal}
     >
       <Title level={3}>

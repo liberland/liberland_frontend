@@ -53,6 +53,7 @@ function SendLLDModal({ closeModal }) {
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={transfer}
     >
       <Title level={3}>Send LLD</Title>

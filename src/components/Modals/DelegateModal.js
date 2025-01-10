@@ -26,6 +26,7 @@ function DelegateModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={handleSubmitDelegate}
     >
       <Title level={3}>Delegate your votes</Title>

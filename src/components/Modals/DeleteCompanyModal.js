@@ -17,6 +17,7 @@ function DeleteCompanyModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={() => {
         dispatch(
           registriesActions.requestUnregisterCompanyRegistrationAction.call({

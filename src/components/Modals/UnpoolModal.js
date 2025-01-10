@@ -32,6 +32,7 @@ function UnpoolModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       onSubmit={handleSubmitUnpool}
     >
       <Title level={3}>Unpool</Title>

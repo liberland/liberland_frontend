@@ -32,6 +32,7 @@ function StakeForm({
     <Form
       form={form}
       onFinish={onSubmit}
+      layout="vertical"
       className={styles.form}
     >
       <Form.Item

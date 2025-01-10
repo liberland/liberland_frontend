@@ -65,6 +65,7 @@ function CongressAddLegislationViaReferendum() {
         ],
       }}
       form={form}
+      layout="vertical"
     >
       <Title level={3}>Propose a new Congress Motion</Title>
       <Paragraph>Propose a new Congress Motion to propose a Referendum</Paragraph>

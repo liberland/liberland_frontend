@@ -27,6 +27,7 @@ function CompaniesOverview() {
       items={[
         {
           label: 'My registered companies',
+          key: 'registered',
           children: (
             <CompaniesCard
               type="mine"
@@ -37,6 +38,7 @@ function CompaniesOverview() {
         },
         {
           label: 'My requested companies',
+          key: 'requested',
           children: (
             <CompaniesCard
               type="requested"

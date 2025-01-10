@@ -21,7 +21,7 @@ function LandRegistry() {
   };
 
   return (
-    <Form form={form} onFinish={onSubmit}>
+    <Form form={form} layout="vertical" onFinish={onSubmit}>
       <Title level={3}>Set metadata for NFT</Title>
       <Form.Item
         name="sign_with_address"

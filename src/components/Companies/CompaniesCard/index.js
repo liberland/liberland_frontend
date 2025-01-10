@@ -5,7 +5,6 @@ import Avatar from 'antd/es/avatar';
 import Flex from 'antd/es/flex';
 import Table from '../../Table';
 
-import { getCompanyDetail } from '../utils';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import CompanyActions from '../CompanyActions';
 
@@ -16,7 +15,6 @@ function CompaniesCard({
 }) {
   return (
     <Table
-      showHeader={false}
       columns={[
         {
           Header: 'ID',
@@ -38,19 +36,20 @@ function CompaniesCard({
           Header: 'Actions',
           accessor: 'actions',
         },
-      ]}
+      ].filter(Boolean)}
       data={registries
         ?.filter((registered) => registered && !registered.invalid)
         .map((registeredCompany) => {
-          const owner = getCompanyDetail('Owner (Principal)', registeredCompany, [0, 1]);
-          const avatar = getCompanyDetail('Logo URL (optional)', registeredCompany);
+          const owner = registeredCompany.principals?.[0]?.name?.value;
+          const address = registeredCompany.principals?.[0]?.walletAddress?.value;
+          const avatar = registeredCompany.logoURL;
 
           return {
             id: registeredCompany.id,
-            name: getCompanyDetail('Company name', registeredCompany),
+            name: registeredCompany.name,
             mission: (
               <Paragraph ellipsis={{ expandable: true, rows: 2 }}>
-                {getCompanyDetail('Purpose', registeredCompany)}
+                {registeredCompany.purpose}
               </Paragraph>
             ),
             owner: (
@@ -59,7 +58,7 @@ function CompaniesCard({
                   <Avatar src={avatar} />
                 )}
                 {owner && (
-                  <CopyIconWithAddress address={owner} isTruncate />
+                  <CopyIconWithAddress name={owner} address={address} isTruncate />
                 )}
               </Flex>
             ),

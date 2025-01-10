@@ -14,6 +14,7 @@ function UndelegateModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={(values) => {
         onSubmitUndelegate(values);
         closeModal();

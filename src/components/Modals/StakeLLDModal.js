@@ -53,6 +53,7 @@ function StakeLLDModal({
         bondValue: formatDollars(maxBond).replaceAll(',', ''),
       }}
       form={form}
+      layout="vertical"
       onFinish={onSubmit}
     >
       <Title level={3}>Stake LLD</Title>

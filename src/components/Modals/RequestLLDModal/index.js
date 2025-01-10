@@ -74,7 +74,7 @@ function RequestLLDModal({
     <Form
       form={form}
       onSubmit={onSubmit}
-      className={styles.form}
+      layout="vertical"
     >
       {linkData && (
         <div>

@@ -10,6 +10,7 @@ function LogoutModal({ closeModal, handleLogout }) {
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={handleLogout}
     >
       <Flex wrap gap="15px">

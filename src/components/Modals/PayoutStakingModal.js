@@ -22,6 +22,7 @@ function PayoutStakingModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={payout}
     >
       <Title level={3}>Payout staking rewards</Title>

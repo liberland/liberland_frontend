@@ -28,6 +28,7 @@ function StartValidatorModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       initialValues={{
         commission: '10',
         allow_nominations: true,

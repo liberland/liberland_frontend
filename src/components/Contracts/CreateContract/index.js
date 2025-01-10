@@ -31,6 +31,7 @@ function CreateContract({ handleModal, isMyContracts }) {
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={submit}
     >
       <Title level={3}>Create a new Contract</Title>

@@ -141,6 +141,7 @@ function StakeEthForm({
       form={form}
       onFinish={onSubmit}
       className={styles.form}
+      layout="vertical"
       initialValues={{
         tolerance: 90,
       }}

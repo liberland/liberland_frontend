@@ -13,7 +13,12 @@ function SearchBar({
   const [form] = Form.useForm();
   return (
     <div className={styles.searchBarWrapper}>
-      <Form form={form} onFinish={({ searchTerm }) => setSearchTerm(searchTerm)} className={styles.signInForm}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={({ searchTerm }) => setSearchTerm(searchTerm)}
+        className={styles.signInForm}
+      >
         <Form.Item
           name="searchTerm"
           label="Search validators"

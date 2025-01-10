@@ -50,6 +50,7 @@ function CongressAmendLegislationViaReferendumModal({
     <Form
       onFinish={onSubmit}
       form={form}
+      layout="vertical"
       initialValues={{
         tier,
         year: id.year,

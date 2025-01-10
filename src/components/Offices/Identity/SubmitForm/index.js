@@ -49,7 +49,7 @@ function SubmitForm({
   };
 
   return (
-    <Form form={form} initialValues={defaultValues} onFinish={provideJudgementAndSendTokens}>
+    <Form form={form} layout="vertical" initialValues={defaultValues} onFinish={provideJudgementAndSendTokens}>
       <Form.Item
         label="Amount LLM"
         name="amountLLM"

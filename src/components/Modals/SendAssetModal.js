@@ -73,6 +73,7 @@ function SendAssetModal({
   return (
     <Form
       form={form}
+      layout="vertical"
       initialValues={{
         votingDays: '7',
       }}

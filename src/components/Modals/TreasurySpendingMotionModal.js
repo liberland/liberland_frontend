@@ -41,6 +41,7 @@ function TreasurySpendingMotionModal({ closeModal, budget }) {
     <Form
       form={form}
       onFinish={onSubmit}
+      layout="vertical"
     >
       <Title level={3}>Create new spending</Title>
       <Paragraph>

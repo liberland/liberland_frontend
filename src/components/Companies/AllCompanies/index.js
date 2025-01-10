@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Alert from 'antd/es/alert';
 import { registriesSelectors } from '../../../redux/selectors';
 import { registriesActions } from '../../../redux/actions';
 import CompaniesCard from '../CompaniesCard';
@@ -13,11 +14,13 @@ function AllCompanies() {
 
   const allRegistries = useSelector(registriesSelectors.allRegistries);
 
-  if (allRegistries?.officialRegistryEntries && allRegistries.officialRegistryEntries.length < 1) {
-    <div>Not Registries..</div>;
+  if (!allRegistries.officialRegistryEntries?.length) {
+    return (
+      <Alert type="info" message="No registries found" />
+    );
   }
   return (
-    <CompaniesCard registries={allRegistries.officialRegistryEntries} />
+    <CompaniesCard registries={allRegistries.officialRegistryEntries} type="all" />
   );
 }
 

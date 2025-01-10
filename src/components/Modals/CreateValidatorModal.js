@@ -62,6 +62,7 @@ function CreateValidatorModal({
     <Form
       onFinish={onSubmit}
       form={form}
+      layout="vertical"
       initialValues={{
         bondValue: formatDollars(maxBond).replaceAll(',', ''),
         commission: '10',

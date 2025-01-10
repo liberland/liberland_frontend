@@ -106,7 +106,7 @@ function CreatEditNFTModal({
   };
 
   return (
-    <Form form={form} onFinish={createNFT}>
+    <Form form={form} layout="vertical" onFinish={createNFT}>
       <Title level={3}>
         Create NFT
       </Title>

@@ -38,6 +38,7 @@ function CongressAddLegislation() {
   return (
     <Form
       form={form}
+      layout="vertical"
       onFinish={propose}
       initialValues={{
         tier: 'InternationalTreaty',

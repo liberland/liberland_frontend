@@ -50,7 +50,7 @@ export default function IdentityForm() {
         </Button>
       </div>
 
-      <Form form={form} onFinish={onSubmit}>
+      <Form form={form} layout="vertical" onFinish={onSubmit}>
         <Form.Item
           name="account"
           label="Verify citizenship request"

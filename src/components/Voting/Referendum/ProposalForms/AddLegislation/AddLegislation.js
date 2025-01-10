@@ -50,6 +50,7 @@ function AddLegislation() {
   return (
     <Form
       form={form}
+      layout="vertical"
       initialValues={{
         tier: 'Law',
         sections: [{ value: 'Paste markdown to autosplit sections' }],

@@ -28,7 +28,7 @@ function WithdrawForm({
     <Form
       form={form}
       onFinish={onSubmit}
-      className={styles.form}
+      layout="vertical"
     >
       <Form.Item
         name="withdraw"

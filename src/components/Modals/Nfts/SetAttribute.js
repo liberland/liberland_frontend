@@ -27,7 +27,7 @@ function SetAttributeModal({ closeModal, collectionId, itemId }) {
   };
 
   return (
-    <Form form={form} onFinish={submitAttribute}>
+    <Form form={form} layout="vertical" onFinish={submitAttribute}>
       <Title level={3}>Set NFT Attribute</Title>
       <Paragraph>
         Fill in the details below to set a new attribute for your NFT.
