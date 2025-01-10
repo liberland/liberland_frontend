@@ -66,7 +66,7 @@ function FillNumber({
         rules={[
           { required: true },
           {
-            validator: (val) => {
+            validator: (_, val) => {
               if (val) {
                 try {
                   const value = valueToBN(val);

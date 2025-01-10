@@ -22,7 +22,7 @@ function SetSessionKeysModal({
         rules={[
           { required: true },
           {
-            validator: (v) => {
+            validator: (_, v) => {
               if (!isHex(v)) {
                 return Promise.reject('Must be a hex string starting with 0x');
               }
@@ -62,7 +62,6 @@ export default function SetSessionKeysModalWrapper({
   return (
     <>
       <Button
-        small
         primary
         onClick={() => setShow(true)}
       >

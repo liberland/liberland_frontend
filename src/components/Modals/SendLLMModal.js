@@ -33,7 +33,7 @@ function SendLLMModal({
     closeModal();
   };
 
-  const validateUnbondValue = (textUnbondValue) => {
+  const validateUnbondValue = (_, textUnbondValue) => {
     try {
       const unbondValue = parseMerits(textUnbondValue);
       if (unbondValue.gt(maxUnbond) || unbondValue.lte(BN_ZERO)) {

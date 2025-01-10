@@ -27,7 +27,7 @@ function TreasurySpendingMotionModal({ closeModal, budget }) {
     closeModal();
   };
 
-  const validateUnbondValue = (textUnbondValue) => {
+  const validateUnbondValue = (_, textUnbondValue) => {
     try {
       const unbondValue = parseDollars(textUnbondValue);
       if (unbondValue.gt(budget) || unbondValue.lte(BN_ZERO)) return 'Invalid amount';

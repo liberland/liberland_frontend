@@ -57,7 +57,7 @@ function TransferWithRemarkModal({
 
   const getFieldStateSelect = Form.useWatch('select', form) || 'LLD';
 
-  const validate = (value) => {
+  const validate = (_, value) => {
     if (Number.isNaN(Number(value))) {
       return Promise.reject('Not a number');
     }

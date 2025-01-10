@@ -103,7 +103,7 @@ function SendAssetModal({
         rules={[
           { required: true },
           {
-            validator: (textValue) => {
+            validator: (_, textValue) => {
               try {
                 return Validator.validateValue(
                   typeof balance === 'string' ? new BN(balance.slice(2), 16) : new BN(balance),

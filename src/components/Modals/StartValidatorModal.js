@@ -8,6 +8,7 @@ import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { BN, isHex } from '@polkadot/util';
+import Divider from 'antd/es/divider';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { validatorActions } from '../../redux/actions';
@@ -47,6 +48,8 @@ function StartValidatorModal({
       <Form.Item
         name="allow_nominations"
         label="Allow new nominations"
+        valuePropName="checked"
+        layout="vertical"
       >
         <Checkbox />
       </Form.Item>
@@ -56,7 +59,7 @@ function StartValidatorModal({
         rules={[
           { required: true },
           {
-            validator: (v) => {
+            validator: (_, v) => {
               if (!isHex(v)) {
                 return Promise.reject('Must be a hex string starting with 0x');
               }
@@ -69,6 +72,7 @@ function StartValidatorModal({
       >
         <Input />
       </Form.Item>
+      <Divider />
       <Flex wrap gap="15px">
         <Button
           medium
@@ -98,7 +102,7 @@ export default function StartValidatorModalWrapper({
   const [show, setShow] = useState();
   return (
     <>
-      <Button small primary onClick={() => setShow(true)}>
+      <Button primary onClick={() => setShow(true)}>
         {label}
       </Button>
       {show && (

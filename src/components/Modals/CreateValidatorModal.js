@@ -123,7 +123,7 @@ function CreateValidatorModal({
         rules={[
           { required: true },
           {
-            validator: (v) => {
+            validator: (_, v) => {
               if (v) {
                 if (!isHex(v)) {
                   return Promise.reject('Must be a hex string starting with 0x');

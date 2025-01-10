@@ -85,7 +85,7 @@ function SpendModal({
         rules={[
           { required: true },
           {
-            validator: (textValue) => (
+            validator: (_, textValue) => (
               Validator.validateMeritsValue(balance, textValue) === true
                 ? Promise.resolve()
                 : Promise.reject('Invalid amount')

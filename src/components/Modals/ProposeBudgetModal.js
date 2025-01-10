@@ -107,7 +107,7 @@ function ProposeBudgetModal({
                   rules={[
                     { required: true },
                     {
-                      validator: (val) => {
+                      validator: (_, val) => {
                         try {
                           const bn = valueToBN(val);
                           if (!bn.lt(valueToBN(0))) {

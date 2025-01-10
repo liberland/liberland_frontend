@@ -57,7 +57,7 @@ export default function IdentityForm() {
           rules={[
             { required: true },
             {
-              validator: (v) => (
+              validator: (_, v) => (
                 isValidSubstrateAddress(v) ? Promise.resolve : Promise.reject('Invalid Address')
               ),
             },

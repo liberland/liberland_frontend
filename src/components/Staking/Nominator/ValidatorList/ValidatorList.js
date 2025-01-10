@@ -2,19 +2,36 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useMediaQuery } from 'usehooks-ts';
 import Checkbox from 'antd/es/checkbox';
+import Flex from 'antd/es/flex';
 import Table from '../../../Table';
 import truncate from '../../../../utils/truncate';
 import { formatDollars, sanitizeValue } from '../../../../utils/walletHelpers';
+import Button from '../../../Button/Button';
 
 function ValidatorList({
   validators,
   selectedValidatorsAsTargets,
   selectingValidatorsDisabled,
   toggleSelectedValidator,
+  updateNominations,
+  goToAdvancedPage,
 }) {
   const isDesktopHigher = useMediaQuery('(min-width: 1400px)');
   return (
     <Table
+      footer={(
+        <Flex wrap gap="15px" justify="end">
+          <Button link onClick={() => goToAdvancedPage()}>
+            Advanced
+          </Button>
+          <Button
+            primary
+            onClick={() => updateNominations(selectedValidatorsAsTargets)}
+          >
+            Update nominations
+          </Button>
+        </Flex>
+      )}
       data={validators.map(({
         bondTotal,
         bondOwn,
@@ -97,6 +114,8 @@ ValidatorList.propTypes = {
   selectedValidatorsAsTargets: PropTypes.arrayOf(PropTypes.string).isRequired,
   selectingValidatorsDisabled: PropTypes.bool.isRequired,
   toggleSelectedValidator: PropTypes.func.isRequired,
+  updateNominations: PropTypes.func.isRequired,
+  goToAdvancedPage: PropTypes.func.isRequired,
 };
 
 export default ValidatorList;

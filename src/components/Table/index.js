@@ -17,7 +17,7 @@ function Table({
     <TableInternal
       dataSource={identityData}
       rowKey="hash"
-      footer={footer}
+      footer={() => footer}
       onRow={() => ({ tabIndex: '0' })}
       showHeader={showHeader}
       pagination={noPagination ? false : undefined}

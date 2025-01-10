@@ -35,7 +35,7 @@ function UnbondModal({
     closeModal();
   };
 
-  const validateUnbondValue = (textUnbondValue) => {
+  const validateUnbondValue = (_, textUnbondValue) => {
     try {
       const unbondValue = parseDollars(textUnbondValue);
       if (unbondValue.gt(maxUnbond) || unbondValue.lte(BN_ZERO)) {
@@ -105,7 +105,7 @@ export default function UnbondModalWrapper() {
   const [show, setShow] = useState();
   return (
     <>
-      <Button small secondary onClick={() => setShow(true)}>
+      <Button onClick={() => setShow(true)}>
         Unstake
       </Button>
       {show && (

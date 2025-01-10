@@ -11,15 +11,25 @@ export default function WithdrawUnbondedButton() {
   const activeEra = useSelector(blockchainSelectors.activeEra);
   const { stakingInfo } = useSelector(validatorSelectors.stakingData);
 
-  if (!stakingInfo?.redeemable || stakingInfo?.redeemable.lte(BN_ZERO)) return null;
-  if (!info || info.unlocking.length <= 0) return null;
+  if (!stakingInfo?.redeemable || stakingInfo?.redeemable.lte(BN_ZERO)) {
+    return null;
+  }
+  if (!info || info.unlocking.length <= 0) {
+    return null;
+  }
 
   const anyReady = info.unlocking.some(({ era }) => activeEra.index.gte(era.unwrap()));
-  if (!anyReady) return null;
+  if (!anyReady) {
+    return null;
+  }
 
   const withdrawUnbonded = () => {
     dispatch(validatorActions.withdrawUnbonded.call());
   };
 
-  return <Button primary small onClick={withdrawUnbonded}>Withdraw unlocked</Button>;
+  return (
+    <Button primary onClick={withdrawUnbonded}>
+      Withdraw unlocked
+    </Button>
+  );
 }

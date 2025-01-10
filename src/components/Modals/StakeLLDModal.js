@@ -33,7 +33,7 @@ function StakeLLDModal({
     closeModal();
   };
 
-  const validateBondValue = (textBondValue) => {
+  const validateBondValue = (_, textBondValue) => {
     try {
       const bondValue = parseDollars(textBondValue);
       if (bondValue.gt(maxBond)) {
@@ -111,7 +111,7 @@ export default function StakeLLDModalWrapper({
 
   return (
     <>
-      <Button small primary onClick={() => setShow(true)}>
+      <Button primary onClick={() => setShow(true)}>
         {label}
       </Button>
       {show && (

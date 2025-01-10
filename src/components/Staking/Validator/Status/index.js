@@ -1,22 +1,32 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { validatorSelectors } from '../../../../redux/selectors';
 
 export default function Status() {
   const info = useSelector(validatorSelectors.info);
-
-  let status;
-  if (info.isSessionValidator) status = 'Active';
-  else if (info.isStakingValidator) status = 'Waiting';
-  else if (info.isNominator) status = 'Nominating';
-  else if (!info.stash) status = 'Not created';
-  else status = 'Stopped';
+  const status = useMemo(() => {
+    if (info.isSessionValidator) {
+      return 'Active';
+    }
+    if (info.isStakingValidator) {
+      return 'Waiting';
+    }
+    if (info.isNominator) {
+      return 'Nominating';
+    }
+    if (!info.stash) {
+      return 'Not created';
+    }
+    return 'Stopped';
+  }, [info]);
 
   return (
-    <>
+    <strong>
+      Status:
+      {' '}
       {status}
       {' '}
       {info.isNextSessionValidator && ' - scheduled for next session'}
-    </>
+    </strong>
   );
 }

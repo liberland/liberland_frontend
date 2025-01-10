@@ -57,7 +57,7 @@ function PayoutStakingModalWrapper() {
   const [show, setShow] = useState();
   return (
     <>
-      <Button small secondary onClick={() => setShow(true)}>
+      <Button onClick={() => setShow(true)}>
         Payout rewards
       </Button>
       {show && (

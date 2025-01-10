@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import cx from 'classnames';
+import Spin from 'antd/es/spin';
+import Collapse from 'antd/es/collapse';
 import { blockchainSelectors, validatorSelectors } from '../../../redux/selectors';
 import { validatorActions } from '../../../redux/actions';
 import StakeManagement from '../StakeManagement';
 import Validator from '../Validator';
 import Nominator from '../Nominator';
-import styles from '../../../utils/pagesBase.module.scss';
-import stylesStacking from './styles.module.scss';
-
 
 export default function StakingOverview() {
   const dispatch = useDispatch();
@@ -19,21 +17,28 @@ export default function StakingOverview() {
     dispatch(validatorActions.getInfo.call());
   }, [dispatch, walletAddress]);
 
-  if (!info) return null; // loading
-
-  let render = null;
-  if (info.isStakingValidator) {
-    render = <Validator />;
-  } else if (info.stash) {
-    render = <Nominator />;
+  if (!info) {
+    return <Spin />;
   }
 
   return (
-    <div className={styles.sectionWrapper}>
-      <div className={cx(styles.contentWrapper, stylesStacking.contentWrapper)}>
-        <StakeManagement />
-        {render}
-      </div>
-    </div>
+    <>
+      <StakeManagement />
+      <Collapse
+        defaultActiveKey={['validator', 'nominator']}
+        items={[
+          info.isStakingValidator && {
+            key: 'validator',
+            label: 'Validator',
+            children: <Validator />,
+          },
+          info.stash && {
+            key: 'nominator',
+            label: 'Nominators',
+            children: <Nominator />,
+          },
+        ].filter(Boolean)}
+      />
+    </>
   );
 }

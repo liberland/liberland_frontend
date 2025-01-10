@@ -13,7 +13,9 @@ export default function PayoutRewards() {
     dispatch(validatorActions.getPendingRewards.call());
   }, [dispatch]);
 
-  if (!pendingRewards?.gt(BN_ZERO)) return null;
+  if (!pendingRewards?.gt(BN_ZERO)) {
+    return null;
+  }
 
   return (
     <PayoutStakingModal />
