@@ -22,8 +22,8 @@ function MyContracts() {
   }
   return (
     <Flex vertical gap="20px">
-      <Flex wrap gap="15px" align="end">
-        <CreateContractModalWrapper />
+      <Flex wrap gap="15px" justify="end">
+        <CreateContractModalWrapper isMyContracts />
       </Flex>
       {myContracts.length < 1 ? (
         <Alert type="info" message="No contracts found" />

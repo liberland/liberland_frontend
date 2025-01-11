@@ -34,7 +34,6 @@ function CreateContract({ handleModal, isMyContracts }) {
       onFinish={submit}
     >
       <Title level={3}>Create a new Contract</Title>
-
       <Form.Item
         name="contractData"
         label="Contract data"
@@ -48,7 +47,7 @@ function CreateContract({ handleModal, isMyContracts }) {
             {fields.map((field, index) => (
               <div key={field.key}>
                 <Form.Item
-                  name={[index, 'input']}
+                  name={field.name}
                   label={`Party user ${index + 1}`}
                 >
                   <InputSearch />
@@ -72,6 +71,7 @@ function CreateContract({ handleModal, isMyContracts }) {
           </>
         )}
       </Form.List>
+      <Divider />
       <Flex wrap gap="15px">
         <Button
           onClick={handleModal}

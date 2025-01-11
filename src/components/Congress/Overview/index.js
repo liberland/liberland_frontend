@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
@@ -27,10 +27,18 @@ export default function Overview() {
     dispatch(congressActions.getRunnersUp.call());
   }, [dispatch]);
 
-  let userStatus = 'None';
-  if (userIsMember) userStatus = 'Member';
-  else if (userIsCandidate) userStatus = 'Candidate';
-  else if (userIsRunnersUp) userStatus = 'RunnerUp';
+  const userStatus = useMemo(() => {
+    if (userIsMember) {
+      return 'Member';
+    }
+    if (userIsCandidate) {
+      return 'Candidate';
+    }
+    if (userIsRunnersUp) {
+      return 'RunnerUp';
+    }
+    return 'None';
+  }, [userIsMember, userIsCandidate, userIsRunnersUp]);
 
   const switchWallet = (walletAddress) => {
     dispatch(blockchainActions.setUserWallet.success(walletAddress));
