@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import Spin from 'antd/es/spin';
+import Alert from 'antd/es/alert';
 import ContractsList from '../ContractsList';
 import { blockchainSelectors, contractsSelectors } from '../../../redux/selectors';
 import { contractsActions } from '../../../redux/actions';
@@ -13,11 +15,14 @@ function HomeContract() {
     dispatch(contractsActions.getContracts.call());
   }, [dispatch, walletAddress]);
 
-  if (!contracts) return <div>Loading...</div>;
-
-  if (contracts.length < 1) {
-    return <div>No data...</div>;
+  if (!contracts) {
+    return <Spin />;
   }
+
+  if (!contracts.length) {
+    return <Alert type="info" message="No contracts found" />;
+  }
+
   return (
     <ContractsList contracts={contracts} />
   );

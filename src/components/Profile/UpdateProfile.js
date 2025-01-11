@@ -29,9 +29,9 @@ function UpdateProfile({
     } else if (values.date_of_birth) {
       const dob = new Date(values.date_of_birth);
       eligible_on = new Date(
-        dob.getFullYear() + 15,
-        dob.getMonth(),
-        dob.getDate(),
+        dob.year() + 15,
+        dob.month(),
+        dob.date(),
       );
     }
 

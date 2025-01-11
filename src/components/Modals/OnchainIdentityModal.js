@@ -9,6 +9,7 @@ import Checkbox from 'antd/es/checkbox';
 import DatePicker from 'antd/es/date-picker';
 import Flex from 'antd/es/flex';
 import Select from 'antd/es/select';
+import dayjs from 'dayjs';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
@@ -47,7 +48,7 @@ function OnchainIdentityModal({
         legal: decodedData?.legal ?? name,
         web: decodedData?.web,
         email: decodedData?.email,
-        date_of_birth: identityDOB ?? undefined,
+        date_of_birth: dayjs(identityDOB) ?? undefined,
         older_than_15: !identityDOB,
         onChainIdentity,
         isUserWarnAccepted: !parseCitizenshipJudgement(judgements),
@@ -121,6 +122,7 @@ function OnchainIdentityModal({
             <Form.Item
               name="date_of_birth"
               label="Date of birth"
+              getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
             >
               <DatePicker />
             </Form.Item>

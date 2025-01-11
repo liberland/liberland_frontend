@@ -15,6 +15,7 @@ import Title from 'antd/es/typography/Title';
 import Input from 'antd/es/input';
 import List from 'antd/es/list';
 import Card from 'antd/es/card';
+import dayjs from 'dayjs';
 import Button from '../components/Button/Button';
 import './utils.scss';
 import { newCompanyDataObject } from './defaultData';
@@ -23,40 +24,72 @@ const buildFieldName = (formKey, index, dynamicField, suffix) => (dynamicField.e
   ? `${formKey}.${index}.${dynamicField.key}.${suffix}`
   : `${formKey}.${index}.${dynamicField.key}`);
 
+const fieldDateTypes = {
+  date: true,
+  month: true,
+  week: true,
+  time: true,
+};
+
 function getFieldComponent(staticField) {
   if (staticField.key === 'companyType') {
-    return null;
+    return {
+      fieldComponent: null,
+    };
   }
   if (staticField.type === 'checkbox') {
-    return <Checkbox />;
+    return {
+      fieldComponent: <Checkbox />,
+      layout: 'horizontal',
+    };
   }
   if (staticField.type === 'date') {
-    return <DatePicker />;
+    return {
+      fieldComponent: <DatePicker />,
+      getValueProps: (value) => ({ value: value ? dayjs(value) : '' }),
+    };
   }
   if (staticField.type === 'color') {
-    return <ColorPicker />;
+    return {
+      fieldComponent: <ColorPicker />,
+    };
   }
   if (staticField.type === 'month') {
-    return <DatePicker picker="month" />;
+    return {
+      fieldComponent: <DatePicker picker="month" />,
+      getValueProps: (value) => ({ value: value ? dayjs(value) : '' }),
+    };
   }
   if (staticField.type === 'week') {
-    return <DatePicker picker="week" />;
+    return {
+      fieldComponent: <DatePicker picker="week" />,
+      getValueProps: (value) => ({ value: value ? dayjs(value) : '' }),
+    };
   }
   if (staticField.type === 'time') {
-    return <DatePicker picker="time" />;
+    return {
+      fieldComponent: <DatePicker picker="time" />,
+      getValueProps: (value) => ({ value: value ? dayjs(value) : '' }),
+    };
   }
   if (staticField.type === 'number') {
-    return <InputNumber controls={false} placeholder={staticField.display} />;
+    return {
+      fieldComponent: <InputNumber controls={false} placeholder={staticField.display} />,
+    };
   }
   if (staticField.type === 'password') {
-    return <Password />;
+    return {
+      fieldComponent: <Password />,
+    };
   }
-  return (
-    <Input
-      type={staticField.type}
-      placeholder={staticField.display}
-    />
-  );
+  return {
+    fieldComponent: (
+      <Input
+        type={staticField.type}
+        placeholder={staticField.display}
+      />
+    ),
+  };
 }
 
 export function blockchainDataToFormObject(blockchainDataRaw) {
@@ -140,12 +173,17 @@ export function GetFieldsForm({
                 <Flex vertical gap="15px">
                   {dynamicFieldData.fields.map((dynamicField) => {
                     const fieldName = buildFieldName(formKey, index, dynamicField, 'value');
-                    const fieldComponent = getFieldComponent(dynamicField);
+                    const { fieldComponent, layout, getValueProps } = getFieldComponent(dynamicField);
                     if (!fieldComponent) {
                       return null;
                     }
                     return (
-                      <Form.Item name={fieldName} label={dynamicField.display}>
+                      <Form.Item
+                        name={fieldName}
+                        label={dynamicField.display}
+                        layout={layout}
+                        getValueProps={getValueProps}
+                      >
                         {fieldComponent}
                       </Form.Item>
                     );
@@ -171,7 +209,9 @@ export const getDefaultValuesFromDataObject = (formObject, editMode = false) => 
   const defaultValues = {};
   if (editMode) {
     formObject?.staticFields?.forEach((staticField) => {
-      defaultValues[staticField.key] = staticField.display;
+      defaultValues[staticField.key] = fieldDateTypes[staticField.type]
+        ? dayjs(staticField.display)
+        : staticField.display;
     });
   }
   formObject?.dynamicFields?.forEach((dynamicField) => {
@@ -182,7 +222,7 @@ export const getDefaultValuesFromDataObject = (formObject, editMode = false) => 
         const encryptable = dynamicField.fields.find((v) => v.key === field.key)?.encryptable;
         if (editMode) {
           defaultValuesForField[index][field.key] = {
-            value: field.display,
+            value: fieldDateTypes[field.type] ? dayjs(field.display) : field.display,
             isEncrypted: field.isEncrypted,
           };
         } else {
@@ -245,12 +285,17 @@ export function BuildRegistryForm({
         dataSource={formObject.staticFields}
         renderItem={(staticField) => {
           const staticFieldName = staticField.encryptable ? `${staticField.key}.value` : staticField.key;
-          const fieldComponent = getFieldComponent(staticField);
+          const { fieldComponent, layout, getValueProps } = getFieldComponent(staticField);
           if (!fieldComponent) {
             return null;
           }
           return (
-            <Form.Item name={staticFieldName} label={staticField.name}>
+            <Form.Item
+              name={staticFieldName}
+              label={staticField.name}
+              layout={layout}
+              getValueProps={getValueProps}
+            >
               {fieldComponent}
             </Form.Item>
           );

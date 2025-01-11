@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
+import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
@@ -26,6 +27,12 @@ function CongressRepealLegislationModal({
       form={form}
       layout="vertical"
       onFinish={onSubmitRepeal}
+      initialValues={{
+        tier,
+        year: dayjs(new Date(id.year, 0, 1)),
+        index: id.index,
+        section,
+      }}
     >
       <Title level={3}>
         Propose a Congress Motion - repeal legislation

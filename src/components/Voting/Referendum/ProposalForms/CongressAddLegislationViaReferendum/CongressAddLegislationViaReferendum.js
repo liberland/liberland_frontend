@@ -8,6 +8,7 @@ import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
+import dayjs from 'dayjs';
 import Button from '../../../../Button/Button';
 import router from '../../../../../router';
 import { congressSelectors } from '../../../../../redux/selectors';
@@ -89,6 +90,7 @@ function CongressAddLegislationViaReferendum() {
         name="tier"
         label="Legislation year"
         rules={[{ required: true }]}
+        getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
       >
         <DatePicker picker="year" />
       </Form.Item>

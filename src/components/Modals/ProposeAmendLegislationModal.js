@@ -5,6 +5,7 @@ import Title from 'antd/es/typography/Title';
 import TextArea from 'antd/es/input/TextArea';
 import Flex from 'antd/es/flex';
 import Popconfirm from 'antd/es/popconfirm';
+import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
@@ -48,7 +49,7 @@ function ProposeAmendLegislationModal({
       layout="vertical"
       initialValues={{
         tier,
-        year: id.year,
+        year: dayjs(new Date(id.year, 0, 1)),
         index: id.index,
         section,
         content: sectionContent,

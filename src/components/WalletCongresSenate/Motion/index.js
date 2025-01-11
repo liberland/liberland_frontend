@@ -11,6 +11,8 @@ import {
 import { Proposal } from '../../Proposal';
 import { walletAddress } from '../../../redux/selectors/congress';
 import Voters from '../Voters';
+import ProposalTable from '../../Proposal/ProposalTable';
+import styles from './styles.module.scss';
 
 export default function Motion({
   proposal,
@@ -44,10 +46,16 @@ export default function Motion({
 
   return (
     <Card
+      title={(
+        <>
+          Proposal id:
+          <b>{truncate(proposal, 13)}</b>
+        </>
+      )}
+      className={styles.fullWidth}
       actions={userIsMember ? [
         isClosable && (
           <Button
-            medium
             primary
             onClick={() => dispatch(
               closeMotion({ proposal, index: voting.index }),
@@ -59,8 +67,6 @@ export default function Motion({
         !voting.nays.map((v) => v.toString()).includes(userAddress)
           && !isClosable && (
             <Button
-              small
-              secondary
               onClick={() => voteMotionCall(false)}
             >
               Vote nay
@@ -68,8 +74,6 @@ export default function Motion({
         ),
         isClosableNaye && (
           <Button
-            small
-            secondary
             onClick={() => dispatch(
               closeMotion({ proposal, index: voting.index, walletAddress }),
             )}
@@ -80,12 +84,6 @@ export default function Motion({
       ].filter(Boolean) : []}
     >
       <Card.Meta
-        title={(
-          <>
-            Proposal id:
-            <b>{truncate(proposal, 13)}</b>
-          </>
-        )}
         description={(
           <Flex wrap gap="15px">
             <p>
@@ -107,11 +105,14 @@ export default function Motion({
                 {threshold}
               </b>
             </p>
-            <Voters voting={voting.nays} />
           </Flex>
         )}
       />
-      <Proposal proposal={proposalOf} isTableRow={isTableRow} />
+      <Flex vertical gap="15px">
+        <Proposal proposal={proposalOf} isTableRow={isTableRow} />
+        <ProposalTable />
+        <Voters voting={voting.nays} />
+      </Flex>
     </Card>
   );
 }

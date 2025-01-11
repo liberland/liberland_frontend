@@ -3,17 +3,20 @@ import PropTypes from 'prop-types';
 import { ProposalProvider } from '../ProposalContext';
 import ProposalTable from '../ProposalTable';
 
-function ProposalContainer({ children }) {
+function ProposalContainer({ children, noTable }) {
   return (
     <ProposalProvider>
       {children}
-      <ProposalTable />
+      {!noTable && (
+        <ProposalTable />
+      )}
     </ProposalProvider>
   );
 }
 
 ProposalContainer.propTypes = {
   children: PropTypes.node.isRequired,
+  noTable: PropTypes.bool,
 };
 
 export default ProposalContainer;

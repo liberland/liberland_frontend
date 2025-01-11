@@ -1,14 +1,12 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import Flex from 'antd/es/flex';
-import Table from 'antd/es/table';
+import Descriptions from 'antd/es/descriptions';
 import { BN_ZERO } from '@polkadot/util';
 import { formatDollars } from '../../../utils/walletHelpers';
 import Button from '../../Button/Button';
 import TreasurySpendingMotionModalWrapper from '../../Modals/TreasurySpendingMotionModal';
-
-// REDUX
+import Table from '../../Table';
 import { congressActions } from '../../../redux/actions';
 import {
   congressSelectors,
@@ -64,11 +62,11 @@ export default function Treasury() {
         </>
       ),
       actions: userIsMember && (approved ? (
-        <Button primary small onClick={unapprove}>
+        <Button primary onClick={unapprove}>
           Unapprove
         </Button>
       ) : (
-        <Button primary small onClick={approve}>
+        <Button primary onClick={approve}>
           Approve
         </Button>
       )),
@@ -104,53 +102,41 @@ export default function Treasury() {
         ...(treasuryInfo.proposals.proposals || []).map(mapper(false)),
       ]}
       footer={(
-        <Flex wrap gap="15px">
-          <div>
-            <span className="description">
-              Spend period
-            </span>
-            <span className="value">
-              {periodDays}
-              {' '}
-              days
-            </span>
-          </div>
-          <div>
-            <span className="description">
-              Current period ends in
-            </span>
-            <span className="value">
-              {periodRemainingDays}
-              {' '}
-              days
-            </span>
-          </div>
-          <div>
-            <span className="description">
-              Total budget
-            </span>
-            <span className="value">
-              {formatDollars(treasuryInfo.budget)}
-              {' '}
-              LLD
-            </span>
-          </div>
-          <div>
-            <span className="description">
-              Remaining budget
-            </span>
-            <span className="value">
-              {formatDollars(remainingBudget)}
-              {' '}
-              LLD
-            </span>
-          </div>
-          {userIsMember && (
-            <TreasurySpendingMotionModalWrapper
-              budget={remainingBudget}
-            />
-          )}
-        </Flex>
+        <Descriptions
+          title="Financials"
+          layout="vertical"
+          items={[
+            {
+              key: 'spend',
+              label: 'Spend period',
+              children: `${periodDays} days`,
+            },
+            {
+              key: 'current',
+              label: 'Current period ends in',
+              children: `${periodRemainingDays} days`,
+            },
+            {
+              key: 'total',
+              label: 'Total budget',
+              children: `${formatDollars(treasuryInfo.budget)} LLD`,
+            },
+            {
+              key: 'remaining',
+              label: 'Remaining budget',
+              children: `${formatDollars(remainingBudget)} LLD`,
+            },
+            userIsMember && {
+              key: 'motion',
+              label: 'Spending motion',
+              children: (
+                <TreasurySpendingMotionModalWrapper
+                  budget={remainingBudget}
+                />
+              ),
+            },
+          ].filter(Boolean)}
+        />
       )}
     />
   );

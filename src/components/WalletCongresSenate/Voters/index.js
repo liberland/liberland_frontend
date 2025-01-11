@@ -10,6 +10,7 @@ function Voters({ voting }) {
   return (
     <List
       dataSource={voting}
+      locale={{ emptyText: 'No voting record found' }}
       renderItem={(item) => {
         const id = item.toString();
         const identity = names?.[id]?.identity;

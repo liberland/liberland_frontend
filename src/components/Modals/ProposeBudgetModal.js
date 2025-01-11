@@ -184,7 +184,7 @@ function ProposeBudgetModalWrapper() {
   const [show, setShow] = useState();
   return (
     <>
-      <Button small primary onClick={() => setShow(true)}>
+      <Button primary onClick={() => setShow(true)}>
         Propose budget
       </Button>
       {show && (

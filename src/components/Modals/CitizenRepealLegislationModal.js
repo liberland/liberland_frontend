@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Popconfirm from 'antd/es/popconfirm';
+import Flex from 'antd/es/flex';
 import { useDispatch } from 'react-redux';
+import dayjs from 'dayjs';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
-import styles from './styles.module.scss';
 import { democracyActions } from '../../redux/actions';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
 import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
@@ -42,7 +43,7 @@ function CitizenRepealLegislationModal({
       layout="vertical"
       initialValues={{
         tier,
-        year: id.year,
+        year: dayjs(new Date(id.year.toString(), 0, 1)),
         index: id.index,
         section,
       }}
@@ -52,7 +53,7 @@ function CitizenRepealLegislationModal({
       </Title>
       <DisplayOnlyLegislation section={section} />
       <ProposalDiscussionFields />
-      <div className={styles.buttonWrapper}>
+      <Flex wrap gap="15px">
         <Button medium onClick={closeModal}>
           Cancel
         </Button>
@@ -65,7 +66,7 @@ function CitizenRepealLegislationModal({
             Submit
           </Button>
         </Popconfirm>
-      </div>
+      </Flex>
     </Form>
   );
 }

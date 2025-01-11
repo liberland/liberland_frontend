@@ -4,6 +4,7 @@ import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import DatePicker from 'antd/es/date-picker';
 import Flex from 'antd/es/flex';
+import dayjs from 'dayjs';
 import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,7 +30,7 @@ function CongressAddLegislation() {
     const sections = sectionsRaw.map((v) => v.value);
     dispatch(congressActions.congressProposeLegislation.call({
       tier,
-      id: { year, index },
+      id: { year: year.year(), index },
       sections,
     }));
     setShouldRedirect(true);
@@ -42,7 +43,7 @@ function CongressAddLegislation() {
       onFinish={propose}
       initialValues={{
         tier: 'InternationalTreaty',
-        year: new Date().getFullYear(),
+        year: dayjs(new Date()),
         sections: [
           { value: 'Paste markdown to autosplit sections' },
         ],
@@ -73,6 +74,7 @@ function CongressAddLegislation() {
         name="year"
         label="Legislation year"
         rules={[{ required: true }]}
+        getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
       >
         <DatePicker picker="year" disabled />
       </Form.Item>

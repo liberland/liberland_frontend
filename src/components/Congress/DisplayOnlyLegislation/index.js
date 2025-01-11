@@ -4,6 +4,7 @@ import Select from 'antd/es/select';
 import DatePicker from 'antd/es/date-picker';
 import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
+import dayjs from 'dayjs';
 
 function DisplayOnlyLegislation({ section }) {
   return (
@@ -22,7 +23,11 @@ function DisplayOnlyLegislation({ section }) {
           disabled
         />
       </Form.Item>
-      <Form.Item name="year" label="Legislation year">
+      <Form.Item
+        name="year"
+        label="Legislation year"
+        getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
+      >
         <DatePicker picker="year" disabled />
       </Form.Item>
       <Form.Item name="index" label="Legislation Index">

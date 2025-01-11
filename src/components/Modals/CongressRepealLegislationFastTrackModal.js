@@ -5,6 +5,7 @@ import Title from 'antd/es/typography/Title';
 import Flex from 'antd/es/flex';
 import Popconfirm from 'antd/es/popconfirm';
 import { useDispatch } from 'react-redux';
+import dayjs from 'dayjs';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
@@ -51,7 +52,7 @@ function CongressRepealLegislationFastTrackModal({
       layout="vertical"
       initialValues={{
         tier,
-        year: id.year,
+        year: dayjs(new Date(id.year, 0, 1)),
         index: id.index,
         section,
         ...FastTrackDefaults,
