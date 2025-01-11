@@ -118,6 +118,7 @@ export default function Finances() {
           llm: `${formatMerits(balances.LLM[a.address] ?? 0)} LLM`,
           lld: `${formatDollars(balances.LLD[a.address] ?? 0)} LLD`,
         }))}
+        noPagination
       />
       <h3>Financial metrics</h3>
       {financesLoading && (
@@ -153,6 +154,7 @@ export default function Finances() {
             value: formatPercent(finances.stakerApyWeeklyPayouts),
           },
         ]}
+        noPagination
       />
       )}
     </>

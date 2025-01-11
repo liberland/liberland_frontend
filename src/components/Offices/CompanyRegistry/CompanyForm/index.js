@@ -27,34 +27,6 @@ function CompanyForm() {
 
   return (
     <div>
-      <List
-        dataSource={requestedCompanies}
-        extra={(
-          <Button primary onClick={() => doFetchRequestedCompanies()}>
-            Fetch requested companies
-          </Button>
-        )}
-        pagination={{ position: 'bottom', align: 'end' }}
-        renderItem={(requestedCompany) => (
-          <List.Item actions={[
-            {
-              children: (
-                <Button
-                  small
-                  onClick={() => dispatch(officesActions.getCompanyRequest.call(requestedCompany.indexes[1]))}
-                >
-                  fetch
-                </Button>
-              ),
-            },
-          ]}
-          >
-            <List.Item.Meta
-              title={`Registrar id ${requestedCompany.indexes[0]} request index ${requestedCompany.indexes[1]}`}
-            />
-          </List.Item>
-        )}
-      />
       <Form form={form} layout="vertical" onSubmit={onSubmit}>
         <Title level={3}>Verify company registration request</Title>
         <Form.Item
@@ -65,15 +37,36 @@ function CompanyForm() {
           <Input />
         </Form.Item>
         <Flex wrap gap="15px">
+          <Button onClick={() => doFetchRequestedCompanies()}>
+            Fetch requested companies
+          </Button>
           <Button
             primary
-            medium
             type="submit"
           >
             Fetch data
           </Button>
         </Flex>
       </Form>
+      <List
+        dataSource={requestedCompanies}
+        pagination={{ position: 'bottom', align: 'end' }}
+        renderItem={(requestedCompany) => (
+          <List.Item
+            actions={[
+              <Button
+                onClick={() => dispatch(officesActions.getCompanyRequest.call(requestedCompany.indexes[1]))}
+              >
+                fetch
+              </Button>,
+            ]}
+          >
+            <List.Item.Meta
+              title={`Registrar id ${requestedCompany.indexes[0]} request index ${requestedCompany.indexes[1]}`}
+            />
+          </List.Item>
+        )}
+      />
     </div>
   );
 }

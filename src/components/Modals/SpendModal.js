@@ -172,7 +172,6 @@ function SpendModalWrapper({
   return (
     <>
       <Button
-        small
         primary
         className={styles.button}
         onClick={() => setShow(true)}

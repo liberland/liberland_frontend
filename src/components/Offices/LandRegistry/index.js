@@ -51,17 +51,20 @@ function LandRegistry() {
           <>
             Example:
             {' '}
-            <pre>
-              {`{
-                "demarcation": [
-                  {"lat":45.7723532,"long":18.8870918},{"lat":45.7721717,"long":18.8871917},
-                  {"lat":45.772333,"long":18.8877504},{"lat":45.7724976,"long":18.8876859},
-                  {"lat":45.7725234,"long":18.8876738},{"lat":45.7723532,"long":18.8870918}
-                ],
-                "type":"residential",
-                "status":"undeveloped"
-              }`}
-            </pre>
+            <code>
+              <pre>
+                {`
+                {
+                  "demarcation": [
+                    {"lat":45.7723532,"long":18.8870918},{"lat":45.7721717,"long":18.8871917},
+                    {"lat":45.772333,"long":18.8877504},{"lat":45.7724976,"long":18.8876859},
+                    {"lat":45.7725234,"long":18.8876738},{"lat":45.7723532,"long":18.8870918}
+                  ],
+                  "type":"residential",
+                  "status":"undeveloped"
+                }`}
+              </pre>
+            </code>
           </>
         )}
       >

@@ -36,10 +36,12 @@ function* stakeTokensWorker(action) {
 
 function* withdrawTokensWorker(action) {
   yield call(withdrawTokens, action.payload);
+  yield put(ethActions.withdrawTokens.success());
 }
 
 function* claimRewardsWorker(action) {
   yield call(claimRewards, action.payload);
+  yield put(ethActions.claimReward.success());
 }
 
 function* getWethExchangeRateWorker(action) {

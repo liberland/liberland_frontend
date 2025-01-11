@@ -190,6 +190,7 @@ export default function* rootSaga() {
     ethSagas.withdrawTokensWatcher(),
     ethSagas.stakeLpWithEthWatcher(),
     ethSagas.stakeTokensWatcher(),
+    ethSagas.claimRewardsWatcher(),
 
     // FINANCES
     financesSagas.getFinancesWatcher(),

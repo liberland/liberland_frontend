@@ -2,12 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Card from 'antd/es/card';
+import Flex from 'antd/es/flex';
+import CheckCircleFilled from '@ant-design/icons/CheckCircleFilled';
+import CloseCircleOutlined from '@ant-design/icons/CloseCircleOutlined';
 import { blockchainSelectors } from '../../../../redux/selectors';
-import { ReactComponent as CancelIcon } from '../../../../assets/icons/cancel.svg';
-import { ReactComponent as OkIcon } from '../../../../assets/icons/green-check.svg';
 import UnregisterCompany from '../UnregisterCompany';
 import { officesActions } from '../../../../redux/actions';
 import Button from '../../../Button/Button';
+import styles from './styles.module.scss';
 
 function CompanyRequest({ companyRequest }) {
   const dispatch = useDispatch();
@@ -47,15 +49,17 @@ function CompanyRequest({ companyRequest }) {
     <Card
       title="Company data"
       cover={(
-        <code>
-          <pre>
-            {JSON.stringify(
-              data.toJSON(),
-              null,
-              2,
-            )}
-          </pre>
-        </code>
+        <Flex justify="center" align="center" className={styles.enforceFlex}>
+          <code className={styles.code}>
+            <pre className={styles.code}>
+              {JSON.stringify(
+                data.toJSON(),
+                null,
+                2,
+              )}
+            </pre>
+          </code>
+        </Flex>
       )}
       actions={[
         <Button
@@ -65,11 +69,15 @@ function CompanyRequest({ companyRequest }) {
           Register company
         </Button>,
       ]}
+      extra={editableByRegistrar.isTrue ? (
+        <CheckCircleFilled className={styles.green} />
+      ) : (
+        <CloseCircleOutlined className={styles.red} />
+      )}
     >
       Data editable by registrar:
       {' '}
       {editableByRegistrar.toString()}
-      {editableByRegistrar.isTrue ? <OkIcon /> : <CancelIcon />}
     </Card>
   );
 }

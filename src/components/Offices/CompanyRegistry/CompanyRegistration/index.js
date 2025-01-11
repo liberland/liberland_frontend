@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import Card from 'antd/es/card';
 import Alert from 'antd/es/alert';
+import Flex from 'antd/es/flex';
 import { useHistory } from 'react-router-dom';
 import Button from '../../../Button/Button';
 import { officesActions } from '../../../../redux/actions';
@@ -35,15 +36,17 @@ function CompanyRegistration({ registration }) {
     <Card
       title="Company data"
       cover={(
-        <code>
-          <pre>
-            {JSON.stringify(
-              registration.registration.data.toJSON(),
-              null,
-              2,
-            )}
-          </pre>
-        </code>
+        <Flex justify="center" align="center">
+          <code>
+            <pre>
+              {JSON.stringify(
+                registration.registration.data.toJSON(),
+                null,
+                2,
+              )}
+            </pre>
+          </code>
+        </Flex>
       )}
       actions={[
         <Button
