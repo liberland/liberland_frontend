@@ -13,6 +13,7 @@ import {
   stakeLPWithEth,
   stakeTokens,
   withdrawTokens,
+  claimRewards,
 } from '../../api/ethereum';
 import { ethActions } from '../actions';
 import { blockchainWatcher } from './base';
@@ -35,6 +36,10 @@ function* stakeTokensWorker(action) {
 
 function* withdrawTokensWorker(action) {
   yield call(withdrawTokens, action.payload);
+}
+
+function* claimRewardsWorker(action) {
+  yield call(claimRewards, action.payload);
 }
 
 function* getWethExchangeRateWorker(action) {
@@ -150,6 +155,13 @@ function* withdrawTokensWatcher() {
   );
 }
 
+function* claimRewardsWatcher() {
+  yield* blockchainWatcher(
+    ethActions.claimReward,
+    claimRewardsWorker,
+  );
+}
+
 function* getBalanceWatcher() {
   try {
     yield takeLatest(ethActions.getBalance.call, getBalanceWorker);
@@ -226,4 +238,5 @@ export {
   erc20InfoWatcher,
   erc20BalanceWatcher,
   getBalanceWatcher,
+  claimRewardsWatcher,
 };

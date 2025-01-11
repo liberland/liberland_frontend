@@ -12,6 +12,7 @@ export const {
   stakeLpWithEth,
   stakeTokens,
   withdrawTokens,
+  claimReward,
 } = createActions({
   GET_ETH_WALLET_OPTIONS: {
     call: undefined,
@@ -64,6 +65,11 @@ export const {
     failure: undefined,
   },
   WITHDRAW_TOKENS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CLAIM_REWARD: {
     call: undefined,
     success: undefined,
     failure: undefined,

@@ -83,7 +83,6 @@ function SetAttributeModalWrapper({
   return (
     <>
       <Button
-        small
         onClick={() => setShow(true)}
         primary
       >

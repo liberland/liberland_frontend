@@ -30,9 +30,6 @@ function Collections() {
       </Flex>
       {userCollections?.length ? (
         <List
-          grid={{
-            gutter: 16,
-          }}
           dataSource={userCollections}
           renderItem={({ collectionId }) => (
             <List.Item>

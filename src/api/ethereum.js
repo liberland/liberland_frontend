@@ -224,7 +224,7 @@ const stakeLPWithEth = async ({
   return liquidity;
 };
 
-const claimRewards = async (account) => {
+const claimRewards = async ({ account }) => {
   const resolveOperation = resolveOperationFactory(process.env.REACT_APP_THIRD_WEB_CONTRACT_ADDRESS, account);
   await resolveOperation('function claimRewards()');
 };

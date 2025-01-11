@@ -17,6 +17,7 @@ const initialState = {
   wethLpExchangeRateError: null,
   balance: null,
   balanceLoading: false,
+  claimsProcessing: false,
 };
 
 const ethReducer = handleActions(
@@ -212,6 +213,17 @@ const ethReducer = handleActions(
     [ethActions.getConnectedEthWallet.failure]: (state, action) => ({
       ...state,
       walletError: action.payload,
+    }),
+    [ethActions.claimReward.call]: (state) => ({
+      ...state,
+      claimsProcessing: true,
+    }),
+    [combineActions(
+      ethActions.claimReward.success,
+      ethActions.claimReward.failure,
+    )]: (state) => ({
+      ...state,
+      claimsProcessing: initialState.claimsProcessing,
     }),
   },
   initialState,

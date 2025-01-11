@@ -101,66 +101,51 @@ function ItemNft({
               trigger={['click']}
               menu={{
                 items: [
-                  {
-                    key: 'address',
-                    children: (
-                      <FillAddressWrapper
-                        textData={textData}
-                        onAccept={(address) => {
-                          dispatch(
-                            nftsActions.transferNft.call({
-                              collectionId,
-                              itemId: Number(nftId),
-                              newOwner: address,
-                            }),
-                          );
-                        }}
-                      />
-                    ),
-                  },
-                  {
-                    key: 'price',
-                    children: (
-                      <FillNumberWrapper
-                        textData={{ ...textData, submitButtonText: 'Set Price' }}
-                        onAccept={(amount) => {
-                          dispatch(
-                            nftsActions.sellNft.call({
-                              collectionId,
-                              itemId: Number(nftId),
-                              price: parseDollars(amount),
-                            }),
-                          );
-                        }}
-                      />
-                    ),
-                  },
-                  {
-                    key: 'create',
-                    children: (
-                      <CreateEditNFTModalWrapper
-                        collectionId={collectionId}
-                        nftId={nftId}
-                      />
-                    ),
-                  },
-                  {
-                    key: 'attribute',
-                    children: (
-                      <SetAttributeModalWrapper
-                        collectionId={collectionId}
-                        itemId={nftId}
-                      />
-                    ),
-                  },
-                  {
-                    key: 'burn',
-                    children: (
-                      <Button onClick={onBurn} red className={styles.button}>
-                        Burn
-                      </Button>
-                    ),
-                  },
+                  (
+                    <FillAddressWrapper
+                      textData={textData}
+                      onAccept={(address) => {
+                        dispatch(
+                          nftsActions.transferNft.call({
+                            collectionId,
+                            itemId: Number(nftId),
+                            newOwner: address,
+                          }),
+                        );
+                      }}
+                    />
+                  ),
+                  (
+                    <FillNumberWrapper
+                      textData={{ ...textData, submitButtonText: 'Set Price' }}
+                      onAccept={(amount) => {
+                        dispatch(
+                          nftsActions.sellNft.call({
+                            collectionId,
+                            itemId: Number(nftId),
+                            price: parseDollars(amount),
+                          }),
+                        );
+                      }}
+                    />
+                  ),
+                  (
+                    <CreateEditNFTModalWrapper
+                      collectionId={collectionId}
+                      nftId={nftId}
+                    />
+                  ),
+                  (
+                    <SetAttributeModalWrapper
+                      collectionId={collectionId}
+                      itemId={nftId}
+                    />
+                  ),
+                  (
+                    <Button onClick={onBurn} red className={styles.button}>
+                      Burn
+                    </Button>
+                  ),
                 ].map((label, index) => ({
                   label,
                   index,

@@ -97,7 +97,6 @@ function FillAddressWrapper(props) {
   return (
     <>
       <Button
-        small
         onClick={() => setShow(true)}
         primary
       >
