@@ -1,15 +1,20 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import cx from 'classnames';
+import Collapse from 'antd/es/collapse';
 import PropTypes from 'prop-types';
 import router from '../../../router';
-import stylesAnim from '../../Voting/Referendum/Items/item.module.scss';
 import styles from '../styles.module.scss';
 
 function AddLegislation({ proposal, isDetailsHidden }) {
   const { args: [tier, { year, index }, sections] } = proposal;
+  const [show, setShow] = useState(isDetailsHidden);
+
+  useEffect(() => {
+    setShow(!isDetailsHidden);
+  }, [isDetailsHidden]);
+
   return (
-    <div className={styles.text}>
+    <div>
       <p>
         Add new legislation
         {' '}
@@ -22,21 +27,32 @@ function AddLegislation({ proposal, isDetailsHidden }) {
         {year.toNumber()}
         /
         {index.toNumber()}
-        {!isDetailsHidden ? '.' : '...'}
+        {show ? '.' : '...'}
       </p>
-      <div className={cx(stylesAnim.anim, !isDetailsHidden ? stylesAnim.shown : stylesAnim.hidden)}>
-        {sections.map((section, idx) => (
-        // eslint-disable-next-line react/no-array-index-key
-          <Fragment key={idx}>
-            <p>
-              Section #
-              {idx}
-            </p>
-            <p className={styles.legislationContent}>{new TextDecoder('utf-8').decode(section)}</p>
-          </Fragment>
-        ))}
-      </div>
-
+      <Collapse
+        onChange={() => setShow(!show)}
+        activeKey={show ? ['details'] : []}
+        items={[
+          {
+            label: 'Details',
+            key: 'details',
+            children: (
+              <>
+                {sections.map((section, idx) => (
+                // eslint-disable-next-line react/no-array-index-key
+                  <Fragment key={idx}>
+                    <p>
+                      Section #
+                      {idx}
+                    </p>
+                    <p className={styles.legislationContent}>{new TextDecoder('utf-8').decode(section)}</p>
+                  </Fragment>
+                ))}
+              </>
+            ),
+          },
+        ]}
+      />
     </div>
   );
 }

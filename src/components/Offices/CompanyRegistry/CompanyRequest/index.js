@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
+import Card from 'antd/es/card';
 import { blockchainSelectors } from '../../../../redux/selectors';
 import { ReactComponent as CancelIcon } from '../../../../assets/icons/cancel.svg';
 import { ReactComponent as OkIcon } from '../../../../assets/icons/green-check.svg';
 import UnregisterCompany from '../UnregisterCompany';
 import { officesActions } from '../../../../redux/actions';
 import Button from '../../../Button/Button';
-import styles from '../styles.module.scss';
 
 function CompanyRequest({ companyRequest }) {
   const dispatch = useDispatch();
@@ -44,31 +44,33 @@ function CompanyRequest({ companyRequest }) {
   };
 
   return (
-    <>
-      Company data:
-      <code>
-        <pre>
-          {JSON.stringify(
-            data.toJSON(),
-            null,
-            2,
-          )}
-        </pre>
-      </code>
+    <Card
+      title="Company data"
+      cover={(
+        <code>
+          <pre>
+            {JSON.stringify(
+              data.toJSON(),
+              null,
+              2,
+            )}
+          </pre>
+        </code>
+      )}
+      actions={[
+        <Button
+          primary
+          onClick={onClick}
+        >
+          Register company
+        </Button>,
+      ]}
+    >
       Data editable by registrar:
       {' '}
       {editableByRegistrar.toString()}
       {editableByRegistrar.isTrue ? <OkIcon /> : <CancelIcon />}
-      <div className={styles.buttonWrapper}>
-        <Button
-          primary
-          medium
-          onClick={onClick}
-        >
-          Register company
-        </Button>
-      </div>
-    </>
+    </Card>
   );
 }
 

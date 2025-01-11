@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
+import Card from 'antd/es/card';
 import { officesActions } from '../../../../redux/actions';
-import styles from '../styles.module.scss';
 import Button from '../../../Button/Button';
 
 function UnregisterCompany({ entityId }) {
@@ -14,19 +14,17 @@ function UnregisterCompany({ entityId }) {
     }));
   };
   return (
-    <div>
-      <p>User requested company unregistration.</p>
-      <div className={styles.buttonWrapper}>
+    <Card
+      title="User requested company unregistration"
+      actions={[
         <Button
-          primary
-          medium
           red
           onClick={() => unregisterCompany()}
         >
           Approve request & Unregister company
-        </Button>
-      </div>
-    </div>
+        </Button>,
+      ]}
+    />
   );
 }
 

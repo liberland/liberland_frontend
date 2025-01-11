@@ -1,13 +1,11 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import cx from 'classnames';
 import Button from '../../Button/Button';
 // REDUX
 import { blockchainActions, congressActions, validatorActions } from '../../../redux/actions';
 import {
   congressSelectors,
 } from '../../../redux/selectors';
-import styles from '../styles.module.scss';
 import ProposeLegislationButton from '../ProposeLegislationButton';
 import ProposeLegislationViaReferendumButton from '../ProposeLegislationViaReferendumButton';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
@@ -39,16 +37,16 @@ export default function Overview() {
   };
 
   return (
-    <div className={styles.congressWrapper}>
-      <div className={styles.rowWrapper}>
-        <div className={styles.navCol}>
+    <div>
+      <div>
+        <div>
           <h4>User congress status</h4>
           <p>
             {' '}
             {userStatus}
           </p>
         </div>
-        <div className={cx(styles.rowEnd, styles.gap)}>
+        <div>
           {!userIsCandidate && !userIsMember && !userIsRunnersUp && (
             <Button
               small
@@ -79,7 +77,7 @@ export default function Overview() {
         </div>
       </div>
       <br />
-      <div className={styles.list}>
+      <div>
         <b><span>Congress Members:</span></b>
         <br />
         {userHasWalletCongressMember && !userIsMember && (

@@ -5,13 +5,12 @@ import Title from 'antd/es/typography/Title';
 import Divider from 'antd/es/divider';
 import Space from 'antd/es/space';
 import Flex from 'antd/es/flex';
+import MinusCircleOutlined from '@ant-design/icons/MinusCircleOutlined';
+import PlusCircleOutlined from '@ant-design/icons/PlusCircleOutlined';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { contractsActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
-import { ReactComponent as PlusIcon } from '../../../assets/icons/plus.svg';
-import { ReactComponent as MinusIcon } from '../../../assets/icons/minus.svg';
-import stylesOwn from './styles.module.scss';
 import ModalRoot from '../../Modals/ModalRoot';
 import InputSearch from '../../InputComponents/InputSearchAddressName';
 
@@ -55,18 +54,18 @@ function CreateContract({ handleModal, isMyContracts }) {
                   <InputSearch />
                 </Form.Item>
                 <Button
-                  className={stylesOwn.button}
                   onClick={() => remove(field.name)}
                   red
                 >
-                  <MinusIcon className={stylesOwn.icon} />
+                  <MinusCircleOutlined />
+                  <Space />
                   Remove member
                 </Button>
                 <Divider />
               </div>
             ))}
-            <Button className={stylesOwn.button} onClick={add} green medium>
-              <PlusIcon className={stylesOwn.icon} />
+            <Button onClick={add} green medium>
+              <PlusCircleOutlined />
               <Space />
               Add party member
             </Button>

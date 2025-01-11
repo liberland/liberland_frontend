@@ -11,7 +11,7 @@ import ExchangeItem from '../ExchangeItem';
 import AddAssetForm from '../AddAssetForm';
 import { sortByMap } from '../ExchangeSort/utils';
 import ExchangeSort from '../ExchangeSort';
-import styles from '../styles.module.scss';
+import styles from './styles.module.scss';
 import { valueToBN } from '../../../../utils/walletHelpers';
 
 function ExchangeList() {

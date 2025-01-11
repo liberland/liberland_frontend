@@ -9,7 +9,7 @@ import { nftsActions } from '../../../redux/actions';
 import FillAddressWrapper from '../../Modals/FillAddress';
 import FillNumberWrapper from '../../Modals/FillNumber';
 import Button from '../../Button/Button';
-import styles from '../Overview/styles.module.scss';
+import styles from './styles.module.scss';
 import CreateEditNFTModalWrapper from '../../Modals/Nfts/CreateEditNft';
 import SetAttributeModalWrapper from '../../Modals/Nfts/SetAttribute';
 import { ReactComponent as FullScreenIcon } from '../../../assets/icons/fullScreen.svg';
@@ -69,19 +69,17 @@ function ItemNft({
       title={collectionMetadata?.data || name || nftId}
       actions={[
         isOnSaleItem && itemPrice && (
-          <div className={styles.buttonContainer}>
-            <Button
-              onClick={onBuyNft}
-              primary
-              className={styles.button}
-            >
-              Buy for
-              {' '}
-              {formatDollars(itemPrice)}
-              {' '}
-              LLD
-            </Button>
-          </div>
+          <Button
+            onClick={onBuyNft}
+            primary
+            className={styles.button}
+          >
+            Buy for
+            {' '}
+            {formatDollars(itemPrice)}
+            {' '}
+            LLD
+          </Button>
         ),
       ].filter(Boolean)}
       cover={(

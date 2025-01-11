@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ModalRoot from '../ModalRoot';
 import Button from '../../Button/Button';
 import { blockchainSelectors } from '../../../redux/selectors';
-import stylesNfts from '../../Nfts/Overview/styles.module.scss';
+import styles from './styles.module.scss';
 import { nftsActions } from '../../../redux/actions';
 
 function CreatEditNFTModal({
@@ -140,8 +140,8 @@ function CreatEditNFTModal({
           </Paragraph>
         </Upload.Dragger>
         {previewImage && (
-          <div className={stylesNfts.imageWrapper}>
-            <img className={stylesNfts.image} src={previewImage} alt="Preview" />
+          <div className={styles.createImageWrapper}>
+            <img className={styles.image} src={previewImage} alt="Preview" />
           </div>
         )}
       </Form.Item>

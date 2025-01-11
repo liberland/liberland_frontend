@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Table from '../../../Table';
-import styles from '../styles.module.scss';
 import IdentityFlagAnalysis from '../IdentityFlagAnalysis';
 import EligibleOnAnalysis from '../EligibleOnAnalysis';
 
@@ -31,7 +30,7 @@ function IdentityAnalysis({ identity }) {
           desc: (
             <>
               Age check
-              <span className={styles.monospace}>eligible_on</span>
+              <span>eligible_on</span>
             </>
           ),
           res: <EligibleOnAnalysis identity={identity} />,

@@ -7,7 +7,6 @@ import { officesSelectors } from '../../../../redux/selectors';
 import { fetchPendingIdentities } from '../../../../api/nodeRpcCall';
 import { officesActions } from '../../../../redux/actions';
 import FetchedItem from '../FetchedItem';
-import styles from '../styles.module.scss';
 import Button from '../../../Button/Button';
 import { isValidSubstrateAddress } from '../../../../utils/walletHelpers';
 
@@ -35,14 +34,13 @@ export default function IdentityForm() {
         {pendingIdentities.map((pendingIdentity) => (
           <FetchedItem key={pendingIdentity.address} address={pendingIdentity.address} />
         ))}
-        <Button className={styles.button} primary onClick={() => doFetchPendingIdentities()}>
+        <Button primary onClick={() => doFetchPendingIdentities()}>
           Fetch pending identities
         </Button>
         {pendingAdditionalMerits.map((pendingAdditionalMerit) => (
           <FetchedItem key={pendingAdditionalMerit.address} address={pendingAdditionalMerit.blockchainAddress} />
         ))}
         <Button
-          className={styles.button}
           primary
           onClick={() => fetchPendingAdditionalMerits()}
         >

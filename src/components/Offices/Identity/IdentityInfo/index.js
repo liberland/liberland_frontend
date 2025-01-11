@@ -6,7 +6,6 @@ import IdentityTable from '../IdentityTable';
 import IdentityAnalysis from '../IdentityAnalysis';
 import TokenTable from '../TokenTable';
 import SubmitForm from '../SubmitForm';
-import styles from '../styles.module.scss';
 
 function IdentityInfo() {
   const identity = useSelector(officesSelectors.selectorIdentity);
@@ -32,19 +31,17 @@ function IdentityInfo() {
 
   return (
     <>
-      <div className={styles.identityInfo}>
-        <Title level={4}>Candidate&apos;s identity:</Title>
-        <IdentityTable info={onchain.info} />
-        <IdentityAnalysis identity={onchain} />
-        <TokenTable
-          backendMerits={backendMerits}
-          backendDollars={backendDollars}
-        />
-        <Title level={4}>Current status:</Title>
-        <div>
-          Current judgement:
-          {judgement}
-        </div>
+      <Title level={4}>Candidate&apos;s identity:</Title>
+      <IdentityTable info={onchain.info} />
+      <IdentityAnalysis identity={onchain} />
+      <TokenTable
+        backendMerits={backendMerits}
+        backendDollars={backendDollars}
+      />
+      <Title level={4}>Current status:</Title>
+      <div>
+        Current judgement:
+        {judgement}
       </div>
       <SubmitForm
         backendMerits={backendMerits}

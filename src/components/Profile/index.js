@@ -177,12 +177,9 @@ function Profile() {
                 userName={userName}
               />
               <Button
-                className={styles.textColor}
-                medium
                 primary={isUserEligibleForComplimentaryLLD && !isLoading}
-                grey={!isUserEligibleForComplimentaryLLD || isLoading}
                 onClick={handleGetFreeLLD}
-                disabled={isLoading}
+                disabled={!isUserEligibleForComplimentaryLLD || isLoading}
               >
                 {isUserEligibleForComplimentaryLLD || !user
                   ? 'Claim complimentary LLD'
@@ -204,7 +201,7 @@ function Profile() {
                     <List.Item.Meta
                       title={title}
                       description={htmlElement ? (
-                        <span className={styles.bold}>{htmlElement}</span>
+                        <strong>{htmlElement}</strong>
                       ) : (
                         emptyElement
                       )}

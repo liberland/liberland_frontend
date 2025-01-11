@@ -4,6 +4,7 @@ import { useMediaQuery } from 'usehooks-ts';
 import QRCode from 'antd/es/qr-code';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
+import Spin from 'antd/es/spin';
 import List from 'antd/es/list';
 import InputNumber from 'antd/es/input-number';
 import TextArea from 'antd/es/input/TextArea';
@@ -16,7 +17,7 @@ import { formatDollars, parseDollars } from '../../../utils/walletHelpers';
 import Table from '../../Table';
 import ButtonArrowIcon from '../../../assets/icons/button-arrow.svg';
 import router from '../../../router';
-import styles from './styles.module.scss';
+import styles from '../styles.module.scss';
 import CopyLink from './CopyLink';
 
 function RequestLLDModal({
@@ -63,7 +64,7 @@ function RequestLLDModal({
   const isLargerThanTable = useMediaQuery('(min-width: 768px)');
 
   if (identityIsLoading) {
-    return <div className={styles.form}>Loading...</div>;
+    return <Spin />;
   }
 
   const { info } = identity?.unwrap() || {};
@@ -79,43 +80,41 @@ function RequestLLDModal({
       {linkData && (
         <div>
           {isLargerThanTable ? (
-            <div className={styles.tableContainer}>
-              <Table
-                columns={[
-                  {
-                    Header: 'Link',
-                    accessor: 'name',
-                  },
-                  {
-                    Header: '',
-                    accessor: 'value',
-                  },
-                  {
-                    Header: 'QR code',
-                    accessor: 'qr',
-                  },
-                ]}
-                data={[
-                  {
-                    name: 'Direct link',
-                    value: <CopyLink link={linkData.link} />,
-                    qr: <QRCode value={linkData.link} />,
-                  },
-                  {
-                    name: 'Subwallet link',
-                    value: <CopyLink link={linkData.subwalletLink} />,
-                    qr: <QRCode value={linkData.subwalletLink} />,
-                  },
-                  {
-                    name: 'Edge link',
-                    value: <CopyLink link={linkData.edgeLink} />,
-                    qr: <QRCode value={linkData.edgeLink} />,
-                  },
-                ]}
-              />
-            </div>
+            <Table
+              columns={[
+                {
+                  Header: 'Link',
+                  accessor: 'name',
+                },
+                {
+                  Header: '',
+                  accessor: 'value',
+                },
+                {
+                  Header: 'QR code',
+                  accessor: 'qr',
+                },
+              ]}
+              data={[
+                {
+                  name: 'Direct link',
+                  value: <CopyLink link={linkData.link} />,
+                  qr: <QRCode value={linkData.link} />,
+                },
+                {
+                  name: 'Subwallet link',
+                  value: <CopyLink link={linkData.subwalletLink} />,
+                  qr: <QRCode value={linkData.subwalletLink} />,
+                },
+                {
+                  name: 'Edge link',
+                  value: <CopyLink link={linkData.edgeLink} />,
+                  qr: <QRCode value={linkData.edgeLink} />,
+                },
+              ]}
+            />
           ) : (
-            <div className={styles.listContainer}>
+            <>
               <List
                 itemLayout="vertical"
                 size="large"
@@ -169,35 +168,33 @@ function RequestLLDModal({
                   </List.Item>
                 )}
               />
-            </div>
+            </>
           )}
-          <div className={styles.tableContainer}>
-            <Table
-              columns={[
-                {
-                  Header: 'Payment information',
-                  accessor: 'name',
-                },
-                {
-                  Header: '',
-                  accessor: 'value',
-                },
-              ]}
-              data={[
-                {
-                  name: 'Recipient',
-                  value: displayName,
-                },
-                {
-                  name: 'Amount',
-                  value: `${formatDollars(linkData.amount, true)} LLD`,
-                },
-              ].concat(linkData.note ? [{
-                name: 'Note',
-                value: linkData.note,
-              }] : [])}
-            />
-          </div>
+          <Table
+            columns={[
+              {
+                Header: 'Payment information',
+                accessor: 'name',
+              },
+              {
+                Header: '',
+                accessor: 'value',
+              },
+            ]}
+            data={[
+              {
+                name: 'Recipient',
+                value: displayName,
+              },
+              {
+                name: 'Amount',
+                value: `${formatDollars(linkData.amount, true)} LLD`,
+              },
+            ].concat(linkData.note ? [{
+              name: 'Note',
+              value: linkData.note,
+            }] : [])}
+          />
         </div>
       )}
       <Form.Item

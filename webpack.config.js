@@ -1,9 +1,9 @@
 /* eslint-disable */
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
-const { PurgeCSSPlugin } = require('purgecss-webpack-plugin');
+
 const webpack = require('webpack');
-const glob = require('glob');
+
 const path = require('path');
 
 const sassRegex = /\.(scss|sass)$/;
@@ -152,9 +152,7 @@ module.exports = (env, argv) => {
         process: 'process/browser',
       }),
       new Dotenv(),
-      new PurgeCSSPlugin({
-        paths: glob.sync(`./src/**/*`, { nodir: true }),
-      }),
+      // new InterpolateHtmlPlugin({PUBLIC_URL: 'static' }),
     ],
     resolve: {
       extensions: ['.ts', '.js'],

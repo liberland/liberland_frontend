@@ -11,7 +11,6 @@ import ModalRoot from '../../../Modals/ModalRoot';
 import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
 import { walletActions, dexActions } from '../../../../redux/actions';
 import { ExchangeItemPropTypes } from '../proptypes';
-import styles from '../styles.module.scss';
 
 function AddAssetFormDisplay({
   poolsData,
@@ -122,7 +121,7 @@ function AddAssetFormDisplay({
   }
 
   return (
-    <Form layout="vertical" form={form} className={styles.form} onFinish={onSubmit}>
+    <Form layout="vertical" form={form} onFinish={onSubmit}>
       <Flex gap="15px" wrap>
         <Form.Item
           label="Select first pool asset"
@@ -198,7 +197,7 @@ AddAssetFormDisplay.propTypes = {
 function AddAssetForm(props) {
   const [show, setShow] = useState();
   return (
-    <div className={styles.add}>
+    <>
       <Button primary medium onClick={() => setShow(true)}>
         Create pool
       </Button>
@@ -207,7 +206,7 @@ function AddAssetForm(props) {
           <AddAssetFormDisplay {...props} onClose={() => setShow(false)} />
         </ModalRoot>
       )}
-    </div>
+    </>
   );
 }
 

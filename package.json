@@ -72,8 +72,7 @@
     "eslint": "node_modules/.bin/eslint src/",
     "webpack-dev-server": "webpack-dev-server",
     "dev": "webpack-dev-server --mode=development",
-    "prod": "rm -rf dist/* && webpack --mode=production",
-    "knip": "knip"
+    "prod": "rm -rf dist/* && webpack --mode=production"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -111,11 +110,9 @@
     "eslint-plugin-react": "^7.31.11",
     "html-webpack-plugin": "^5.5.0",
     "husky": "^4.2.1",
-    "knip": "^5.42.0",
     "lint-staged": "^10.0.7",
     "path": "^0.12.7",
     "prop-types": "^15.7.2",
-    "purgecss-webpack-plugin": "^7.0.2",
     "typescript": "^5.7.3",
     "webpack": "^5.70.0",
     "webpack-cli": "^4.9.2",

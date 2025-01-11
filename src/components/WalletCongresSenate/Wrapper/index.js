@@ -1,13 +1,11 @@
 import React from 'react';
-import cx from 'classnames';
+import Flex from 'antd/es/flex';
+import Collapse from 'antd/es/collapse';
 import { BN } from '@polkadot/util';
 import PropTypes from 'prop-types';
-import walletStyles from '../../Wallet/styles.module.scss';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
 import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import styles from './styles.module.scss';
 import AssetOverview from '../../Wallet/AssetOverview';
 import SpendModalWrapper from '../../Modals/SpendModal';
 import { valueToBN } from '../../../utils/walletHelpers';
@@ -32,34 +30,14 @@ export default function WalletCongresSenateWrapper({
   }
 
   return (
-    <>
-      <div
-        className={cx(stylesPage.menuAddressWrapper, styles.walletMenuWrapper)}
-      >
-        <div className={cx(walletStyles.walletAddressLineWrapper, styles.walletAddressWrapper)}>
-          <div className={walletStyles.navWallet}>
-            <div className={walletStyles.addressesWrapper}>
-              <div className={walletStyles.singleAddressWrapper}>
-                <span className={walletStyles.addressTitle}>
-                  Wallet address
-                  {' '}
-                </span>
-                <span className={walletStyles.address}>
-                  <CopyIconWithAddress address={congresAccountAddress} />
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={cx(
-            walletStyles.buttonsWrapper,
-            styles.walletButtonsWrapper,
-          )}
-        >
-          {userIsMember && (
-            <>
+    <Collapse
+      defaultActiveKey={['actions', 'balance', 'assets']}
+      items={[
+        userIsMember && {
+          label: 'Actions',
+          key: 'actions',
+          children: (
+            <Flex wrap gap="15px">
               <SpendModalWrapper
                 officeType={officeType}
                 spendData={{
@@ -94,25 +72,44 @@ export default function WalletCongresSenateWrapper({
                 label="Spend LLD"
                 icon={<UploadIcon />}
               />
-            </>
-          )}
-        </div>
-      </div>
-
-      <BalanceOverview
-        totalBalance={totalBalance}
-        balances={balances}
-        liquidMerits={liquidMerits}
-        showStaked={false}
-      />
-      <AssetOverview
-        additionalAssets={additionalAssets}
-        isRemarkNeeded
-        officeType={officeType}
-        userIsMember={userIsMember}
-        isCongress
-      />
-    </>
+            </Flex>
+          ),
+          extra: (
+            <Flex wrap gap="15px">
+              <span>
+                Wallet address
+              </span>
+              <CopyIconWithAddress address={congresAccountAddress} />
+            </Flex>
+          ),
+        },
+        {
+          label: 'Balance overview',
+          key: 'balance',
+          children: (
+            <BalanceOverview
+              totalBalance={totalBalance}
+              balances={balances}
+              liquidMerits={liquidMerits}
+              showStaked={false}
+            />
+          ),
+        },
+        {
+          label: 'Assets overview',
+          key: 'assets',
+          children: (
+            <AssetOverview
+              additionalAssets={additionalAssets}
+              isRemarkNeeded
+              officeType={officeType}
+              userIsMember={userIsMember}
+              isCongress
+            />
+          ),
+        },
+      ].filter(Boolean)}
+    />
   );
 }
 

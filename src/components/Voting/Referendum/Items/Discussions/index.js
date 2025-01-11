@@ -1,88 +1,41 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import cx from 'classnames';
+import List from 'antd/es/list';
+import Card from 'antd/es/card';
 import sanitizeUrlHelper from '../../../../../utils/sanitizeUrlHelper';
-import styles from '../item.module.scss';
 import { centralizedDatasType } from '../types';
 import Button from '../../../../Button/Button';
 import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 
-function DiscussionList({ centralizedDatas }) {
-  return (
-    <ol>
-      {centralizedDatas.map((centralizedData) => {
-        const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
-        return (
-          <li
-            className={styles.listItem}
-            key={centralizedData.id}
-          >
-            <a
-              href={sanitizeUrl}
-              target="_blank"
-              rel="noreferrer"
-              className={styles.blueText}
-            >
-              {centralizedData.name}
-            </a>
-            {' - '}
-            {centralizedData.description}
-            {' '}
-            (Discussion added by
-            {' '}
-            <span className={styles.centerItem}>
-              <CopyIconWithAddress
-                address={centralizedData.proposerAddress}
-              />
-            </span>
-            )
-          </li>
-        );
-      })}
-    </ol>
-  );
-}
-
-DiscussionList.propTypes = {
-  centralizedDatas: PropTypes.arrayOf(centralizedDatasType).isRequired,
-};
-
 function Discussions({ centralizedDatas }) {
-  const [isDiscussionsHidden, setIsDiscussionsHidden] = useState(true);
   return (
-    <div className={styles.greyWrapper}>
-      <div className={cx(styles.smallHeader, styles.discussionWrapper)}>
-        <h4 className={styles.title}>Discussions</h4>
-        <div className={cx(!isDiscussionsHidden && styles.none)}>
-          <DiscussionList
-            centralizedDatas={[centralizedDatas[0]]}
-            isDiscussionsHidden={isDiscussionsHidden}
-          />
-        </div>
-        <div className={cx(isDiscussionsHidden && styles.hidden)}>
-          <DiscussionList
-            centralizedDatas={centralizedDatas}
-            isDiscussionsHidden={isDiscussionsHidden}
-          />
-        </div>
-      </div>
-      {
-        centralizedDatas.length > 1
-        && (
-        <Button
-          className={styles.button}
-          small
-          secondary={isDiscussionsHidden}
-          grey={!isDiscussionsHidden}
-          onClick={() => setIsDiscussionsHidden((prevState) => !prevState)}
-        >
-          {!isDiscussionsHidden ? 'HIDE' : 'SHOW'}
-          {' '}
-          DISCUSSIONS
-        </Button>
-        )
-      }
-    </div>
+    <Card title="Discussions">
+      <List
+        dataSource={centralizedDatas}
+        pagination={{ pageSize: 5 }}
+        renderItem={(centralizedData) => {
+          const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
+          return (
+            <List.Item
+              actions={[
+                <Button
+                  href={sanitizeUrl}
+                  link
+                >
+                  {centralizedData.name}
+                </Button>,
+                <CopyIconWithAddress
+                  address={centralizedData.proposerAddress}
+                  name="Author address"
+                />,
+              ]}
+            >
+              {centralizedData.description}
+            </List.Item>
+          );
+        }}
+      />
+    </Card>
   );
 }
 

@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import SearchOutlined from '@ant-design/icons/SearchOutlined';
 import Form from 'antd/es/form';
 import Input from 'antd/es/input';
 import Flex from 'antd/es/flex';
-import styles from './styles.module.scss';
-import { ReactComponent as SearchIcon } from '../../assets/icons/search.svg';
+import Space from 'antd/es/space';
 import Button from '../Button/Button';
 
 function SearchBar({
@@ -12,27 +12,25 @@ function SearchBar({
 }) {
   const [form] = Form.useForm();
   return (
-    <div className={styles.searchBarWrapper}>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={({ searchTerm }) => setSearchTerm(searchTerm)}
-        className={styles.signInForm}
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={({ searchTerm }) => setSearchTerm(searchTerm)}
+    >
+      <Form.Item
+        name="searchTerm"
+        label="Search validators"
       >
-        <Form.Item
-          name="searchTerm"
-          label="Search validators"
-        >
-          <Input />
-        </Form.Item>
-        <Flex wrap gap="15px">
-          <Button className={styles.button}>
-            Search
-            <SearchIcon className={styles.icon} />
-          </Button>
-        </Flex>
-      </Form>
-    </div>
+        <Input />
+      </Form.Item>
+      <Flex wrap gap="15px">
+        <Button primary>
+          Search
+          <Space />
+          <SearchOutlined />
+        </Button>
+      </Flex>
+    </Form>
   );
 }
 

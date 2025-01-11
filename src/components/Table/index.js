@@ -8,6 +8,7 @@ function Table({
   noPagination,
   showHeader,
   footer,
+  title,
 }) {
   const identityData = useMemo(() => data?.map((d) => ({
     ...d,
@@ -17,6 +18,7 @@ function Table({
     <TableInternal
       dataSource={identityData}
       rowKey="hash"
+      title={() => title}
       footer={() => footer}
       onRow={() => ({ tabIndex: '0' })}
       showHeader={showHeader}
@@ -41,6 +43,7 @@ Table.propTypes = {
   noPagination: PropTypes.bool,
   showHeader: PropTypes.bool,
   footer: PropTypes.node,
+  title: PropTypes.node,
 };
 
 export default Table;
