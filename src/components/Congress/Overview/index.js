@@ -77,7 +77,6 @@ export default function Overview() {
           )}
           {userHasWalletCongressMember && !userIsMember && (
             <Button
-              small
               primary
               onClick={
               () => switchWallet(userHasWalletCongressMember)

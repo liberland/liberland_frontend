@@ -95,7 +95,6 @@ export default function Motion({
                 {threshold}
               </b>
             </p>
-            <Voters voting={voting.ayes} />
             <p>
               Nay
               {' '}
@@ -110,8 +109,15 @@ export default function Motion({
       />
       <Flex vertical gap="15px">
         <Proposal proposal={proposalOf} isTableRow={isTableRow} />
+        <Flex wrap gap="15px">
+          <Card size="small" title="Voted aye">
+            <Voters voting={voting.ayes} />
+          </Card>
+          <Card size="small" title="Voted nay">
+            <Voters voting={voting.nays} />
+          </Card>
+        </Flex>
         <ProposalTable />
-        <Voters voting={voting.nays} />
       </Flex>
     </Card>
   );

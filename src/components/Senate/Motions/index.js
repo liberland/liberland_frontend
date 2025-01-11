@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import List from 'antd/es/list';
+import Divider from 'antd/es/divider';
 import { identityActions, senateActions } from '../../../redux/actions';
 import { senateSelectors } from '../../../redux/selectors';
 import Motion from '../../WalletCongresSenate/Motion';
@@ -29,29 +31,26 @@ function Motions() {
   }
 
   return (
-    <>
-      {motions.map(({
+    <List
+      dataSource={motions}
+      renderItem={({
         proposal, proposalOf, voting, membersCount,
-      }, index) => {
-        const isLastItem = motions.length - 1 === index;
-        return (
-          <div ref={isLastItem ? divRef : null} key={proposal}>
-            <ProposalContainer>
-              <Motion
-                userIsMember={userIsMember}
-                membersCount={membersCount}
-                proposal={proposal.toString()}
-                proposalOf={proposalOf}
-                voting={voting.unwrap()}
-                voteMotion={(data) => senateActions.senateVoteAtMotions.call(data)}
-                closeMotion={(data) => senateActions.senateCloseMotion.call(data)}
-                isTableRow
-              />
-            </ProposalContainer>
-          </div>
-        );
-      })}
-    </>
+      }) => (
+        <ProposalContainer noTable>
+          <Motion
+            userIsMember={userIsMember}
+            membersCount={membersCount}
+            proposal={proposal.toString()}
+            proposalOf={proposalOf}
+            voting={voting.unwrap()}
+            voteMotion={(data) => senateActions.senateVoteAtMotions.call(data)}
+            closeMotion={(data) => senateActions.senateCloseMotion.call(data)}
+            isTableRow
+          />
+          <Divider />
+        </ProposalContainer>
+      )}
+    />
   );
 }
 

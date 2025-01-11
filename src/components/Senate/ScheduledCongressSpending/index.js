@@ -35,31 +35,32 @@ function ScheduledCongressSpending({ isVetoButton }) {
     <List
       dataSource={scheduledCalls.filter(({ sectionType }) => sectionType === 'congress')}
       renderItem={({
-        preimage, proposal, blockNumber, idx, sectionType,
+        preimage, proposal, blockNumber, idx,
       }) => {
         const proposalData = preimage || proposal;
-        if (sectionType !== 'congress') return null;
-
         const onVetoClick = () => {
           dispatch(senateActions.senateProposeCloseMotion.call(
             { executionBlock: blockNumber, idx },
           ));
         };
         return (
-          <Card
-            actions={
-              isVetoButton && userIsMember ? [
-                <Button onClick={onVetoClick} primary>Veto</Button>,
-              ] : []
-            }
-          >
-            <ProposalContainer>
-              <Proposal
-                proposal={proposalData}
-                isTableRow
-              />
-            </ProposalContainer>
-          </Card>
+          <List.Item>
+            <Card
+              actions={
+                isVetoButton && userIsMember ? [
+                  <Button onClick={onVetoClick} primary>Veto</Button>,
+                ] : []
+              }
+              title={`Scheduled item: ${idx}`}
+            >
+              <ProposalContainer>
+                <Proposal
+                  proposal={proposalData}
+                  isTableRow
+                />
+              </ProposalContainer>
+            </Card>
+          </List.Item>
         );
       }}
     />
