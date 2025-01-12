@@ -17,18 +17,9 @@ import { extractItemsFromObject } from '../../utils/council/councilHelper';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
-import { IndexHelper } from '../../utils/council/councilEnum';
 
 const defaultValueSpending = {
-  currency: null,
-  amount: null,
-  remark: null,
-  optionsInput: [{
-    value: 'LLD',
-    display: 'Liberland Dolar (LLD)',
-    index: IndexHelper.LLD,
-  }],
-  indexItem: 0,
+  select: 'LLD',
 };
 
 function ProposeBudgetModal({
@@ -37,6 +28,7 @@ function ProposeBudgetModal({
   const dispatch = useDispatch();
   const allBalance = useSelector(congressSelectors.allBalance);
   const [form] = Form.useForm();
+  const [isLoading, setIsLoading] = useState(false);
 
   const executionBlock = useCongressExecutionBlock(7);
 
@@ -45,7 +37,7 @@ function ProposeBudgetModal({
     const { symbol, name, decimals } = metadata;
     return {
       value: symbol,
-      display: `${name}  (${symbol})`,
+      display: `${name} (${symbol})`,
       index,
       decimals,
       balance: balance?.balance || balance,
@@ -53,7 +45,7 @@ function ProposeBudgetModal({
   }), [allBalance]);
 
   const onSubmit = async (data) => {
-    const budgetProposalItems = await extractItemsFromObject(data.spendings, optionsInputDefault);
+    const budgetProposalItems = extractItemsFromObject(data.spendings, optionsInputDefault);
     dispatch(congressActions.congressBudgetPropose.call({ budgetProposalItems, executionBlock }));
     closeModal();
   };
@@ -76,7 +68,7 @@ function ProposeBudgetModal({
       <Paragraph>
         You are going to propose new budget proposal as a Congress member
       </Paragraph>
-      <Form.List name="spendings" rules={[{ required: true }]}>
+      <Form.List name="spendings">
         {(fields, { add, remove }) => (
           <>
             {fields.map((field, index) => (
@@ -85,7 +77,6 @@ function ProposeBudgetModal({
                   name={[index, 'select']}
                   label={`Transfer ${index + 1}`}
                   rules={[{ required: true }]}
-                  initialValue="LLD"
                 >
                   <Select
                     defaultActiveFirstOption
@@ -110,7 +101,7 @@ function ProposeBudgetModal({
                       validator: (_, val) => {
                         try {
                           const bn = valueToBN(val);
-                          if (!bn.lt(valueToBN(0))) {
+                          if (bn.lt(valueToBN(0))) {
                             return Promise.reject('Value must be greater than 0');
                           }
                         } catch {
@@ -130,10 +121,17 @@ function ProposeBudgetModal({
                 >
                   <InputSearch />
                 </Form.Item>
-                <RemarkForm form={form} index={index} />
-                <Button red onClick={() => remove(field.name)}>
-                  Remove item
-                </Button>
+                <RemarkForm
+                  prefix="spendings"
+                  form={form}
+                  index={index}
+                  setIsLoading={setIsLoading}
+                />
+                {index !== 0 && (
+                  <Button red onClick={() => remove(field.name)}>
+                    Remove item
+                  </Button>
+                )}
                 <Divider />
               </div>
             ))}
@@ -143,6 +141,7 @@ function ProposeBudgetModal({
           </>
         )}
       </Form.List>
+      <Divider />
       <Form.Item
         label="Congress voting time in days"
         extra="How long will it take for congress to close this motion?"
@@ -168,8 +167,8 @@ function ProposeBudgetModal({
         <Button onClick={closeModal}>
           Cancel
         </Button>
-        <Button primary type="submit">
-          Submit
+        <Button primary type="submit" disabled={isLoading}>
+          {isLoading ? 'Loading...' : 'Submit'}
         </Button>
       </Flex>
     </Form>

@@ -7,18 +7,28 @@ import { encodeRemark } from '../../../api/nodeRpcCall';
 
 export default function RemarkFormUser({
   form,
+  setIsLoading,
 }) {
   const id = Form.useWatch('id', form);
   const description = Form.useWatch('description', form);
 
   useEffect(() => {
     (async () => {
-      const remark = await encodeRemark({
-        id, description,
-      });
-      form.setFieldValue('combined', remark);
+      setIsLoading(true);
+      try {
+        const remark = await encodeRemark({
+          id, description,
+        });
+        form.setFieldValue('combined', remark);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+        form.setFields([{ name: 'id', errors: ['Something went wrong'] }]);
+      } finally {
+        setIsLoading(false);
+      }
     })();
-  }, [id, description, form]);
+  }, [id, description, form, setIsLoading]);
 
   return (
     <>
@@ -50,5 +60,7 @@ export default function RemarkFormUser({
 RemarkFormUser.propTypes = {
   form: PropTypes.shape({
     setFieldValue: PropTypes.func.isRequired,
+    setFields: PropTypes.func.isRequired,
   }).isRequired,
+  setIsLoading: PropTypes.func.isRequired,
 };

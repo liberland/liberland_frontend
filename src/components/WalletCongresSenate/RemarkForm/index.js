@@ -6,80 +6,86 @@ import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
 import { encodeRemark } from '../../../api/nodeRpcCall';
 
-const remarkOptions = {
-  category: [
-    {
-      value: 'marketingAndPr',
-      label: 'Marketing and PR',
-      index: 0,
-    },
-    {
-      value: 'diplomacy',
-      label: 'Diplomacy',
-      index: 1,
-    },
-    {
-      value: 'it',
-      label: 'It',
-      index: 2,
-    },
-    {
-      value: 'legal',
-      label: 'Legal',
-      index: 3,
-    },
-    {
-      value: 'administration',
-      label: 'Administration',
-      index: 4,
-    },
-    {
-      value: 'settlement',
-      label: 'Settlement',
-      index: 5,
-    },
-    {
-      value: 'other',
-      label: 'Other',
-      index: 6,
-    },
-  ],
-};
+const remarkOptions = [
+  {
+    value: 'marketingAndPr',
+    label: 'Marketing and PR',
+    index: 0,
+  },
+  {
+    value: 'diplomacy',
+    label: 'Diplomacy',
+    index: 1,
+  },
+  {
+    value: 'it',
+    label: 'It',
+    index: 2,
+  },
+  {
+    value: 'legal',
+    label: 'Legal',
+    index: 3,
+  },
+  {
+    value: 'administration',
+    label: 'Administration',
+    index: 4,
+  },
+  {
+    value: 'settlement',
+    label: 'Settlement',
+    index: 5,
+  },
+  {
+    value: 'other',
+    label: 'Other',
+    index: 6,
+  },
+];
 
 export default function RemarkForm({
+  prefix,
   index,
   form,
+  setIsLoading,
 }) {
-  const getName = useCallback((name) => (
-    typeof index === 'number' ? [index, name] : name
-  ), [index]);
-  const [
-    category,
-    project,
-    supplier,
-    description,
-    amountInUsd,
-    finalDestination,
-  ] = Form.useWatch([
-    getName('category'),
-    getName('project'),
-    getName('supplier'),
-    getName('description'),
-    getName('amountInUsd'),
-    getName('finalDestination'),
-  ], form);
+  const getName = useCallback((name, withPrefix) => {
+    const baseName = typeof index === 'number' ? [index, name] : [name];
+    if (prefix && withPrefix) {
+      baseName.unshift(prefix);
+    }
+    return baseName.length === 1 ? baseName[0] : baseName;
+  }, [prefix, index]);
+  const category = Form.useWatch(getName('category', true), form);
+  const project = Form.useWatch(getName('project', true), form);
+  const supplier = Form.useWatch(getName('supplier', true), form);
+  const description = Form.useWatch(getName('description', true), form);
+  const amountInUsd = Form.useWatch(getName('amountInUsd', true), form);
+  const finalDestination = Form.useWatch(getName('finalDestination', true), form);
   useEffect(() => {
     (async () => {
-      const remark = {
-        category,
-        project,
-        supplier,
-        description,
-        finalDestination,
-        amountInUSDAtDateOfPayment: Number(amountInUsd),
-      };
-      const encoded = await encodeRemark(remark);
-      form.setFieldValue(getName('combined'), encoded);
+      if (amountInUsd) {
+        try {
+          setIsLoading(true);
+          const remark = {
+            category,
+            project,
+            supplier,
+            description,
+            finalDestination,
+            amountInUSDAtDateOfPayment: Number(amountInUsd),
+          };
+          const encoded = await encodeRemark(remark);
+          form.setFieldValue(getName('combined', true), encoded);
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error(e);
+          form.setFields([{ name: getName('category', true), errors: ['Something went wrong'] }]);
+        } finally {
+          setIsLoading(false);
+        }
+      }
     })();
   }, [
     category,
@@ -90,6 +96,7 @@ export default function RemarkForm({
     finalDestination,
     form,
     getName,
+    setIsLoading,
   ]);
   return (
     <>
@@ -151,7 +158,10 @@ export default function RemarkForm({
 
 RemarkForm.propTypes = {
   index: PropTypes.number,
+  prefix: PropTypes.string,
   form: PropTypes.shape({
     setFieldValue: PropTypes.func.isRequired,
+    setFields: PropTypes.func.isRequired,
   }).isRequired,
+  setIsLoading: PropTypes.func.isRequired,
 };

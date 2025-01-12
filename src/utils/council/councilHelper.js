@@ -10,14 +10,14 @@ export const objectToHex = (object) => {
   return hexString;
 };
 
-export const extractItemFromObject = async (part, assetsData) => {
+export const extractItemFromObject = (part, assetsData) => {
   const assetInfo = assetsData.find((item) => item.value === part.select);
   const encodedRemark = part.combined;
   return {
     transfer: {
       asset: part.select,
       balance: parseAssets(
-        part.transfer,
+        part.amount,
         assetInfo.decimals,
       ),
       recipient: part.recipient,
@@ -27,7 +27,7 @@ export const extractItemFromObject = async (part, assetsData) => {
   };
 };
 
-export const extractItemsFromObject = async (obj, assetsData) => {
+export const extractItemsFromObject = (obj, assetsData) => {
   const resultArray = obj.map((part) => extractItemFromObject(part, assetsData));
   return resultArray;
 };

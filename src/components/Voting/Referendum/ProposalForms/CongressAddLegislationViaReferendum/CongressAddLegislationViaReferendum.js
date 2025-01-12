@@ -46,7 +46,7 @@ function CongressAddLegislationViaReferendum() {
       discussionDescription,
       discussionLink,
       tier,
-      id: { year, index },
+      id: { year: year.year(), index },
       sections,
       fastTrack,
       fastTrackVotingPeriod,
@@ -59,7 +59,7 @@ function CongressAddLegislationViaReferendum() {
     <Form
       onFinish={propose}
       initialValues={{
-        year: new Date().getFullYear(),
+        year: dayjs(new Date()),
         FastTrackDefaults,
         sections: [
           { value: 'Paste markdown to autosplit sections' },
@@ -87,7 +87,7 @@ function CongressAddLegislationViaReferendum() {
         />
       </Form.Item>
       <Form.Item
-        name="tier"
+        name="year"
         label="Legislation year"
         rules={[{ required: true }]}
         getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}

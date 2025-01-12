@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
@@ -54,7 +54,7 @@ function TransferWithRemarkModal({
   }, [additionalAssets]);
 
   const [form] = Form.useForm();
-
+  const [isLoading, setIsLoading] = useState(false);
   const getFieldStateSelect = Form.useWatch('select', form) || 'LLD';
 
   const validate = (_, value) => {
@@ -128,9 +128,15 @@ function TransferWithRemarkModal({
       </Form.Item>
       <div>
         {userRemark ? (
-          <RemarkFormUser form={form} />
+          <RemarkFormUser
+            form={form}
+            setIsLoading={setIsLoading}
+          />
         ) : (
-          <RemarkForm form={form} />
+          <RemarkForm
+            form={form}
+            setIsLoading={setIsLoading}
+          />
         )}
       </div>
 
@@ -138,8 +144,8 @@ function TransferWithRemarkModal({
         <Button onClick={closeModal}>
           Cancel
         </Button>
-        <Button primary type="submit">
-          Submit
+        <Button disabled={isLoading} primary type="submit">
+          {isLoading ? 'Loading...' : 'Submit'}
         </Button>
       </Flex>
     </Form>

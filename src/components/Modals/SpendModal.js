@@ -31,6 +31,7 @@ function SpendModal({
   const [form] = Form.useForm();
   const votingDays = Form.useWatch('votingDays', form);
   const executionBlock = useCongressExecutionBlock(votingDays);
+  const [isLoading, setIsLoading] = useState();
 
   const transfer = async (values) => {
     const {
@@ -96,7 +97,7 @@ function SpendModal({
         <InputNumber placeholder={`Amount ${name}`} controls={false} stringMode />
       </Form.Item>
 
-      <RemarkForm form={form} />
+      <RemarkForm form={form} setIsLoading={setIsLoading} />
 
       {officeType === OfficeType.CONGRESS && (
         <>
@@ -119,17 +120,16 @@ function SpendModal({
 
       <Flex wrap gap="15px">
         <Button
-          medium
           onClick={closeModal}
         >
           Cancel
         </Button>
         <Button
           primary
-          medium
+          disabled={isLoading}
           type="submit"
         >
-          {submitButtonText}
+          {isLoading ? 'Loading...' : submitButtonText}
         </Button>
       </Flex>
     </Form>

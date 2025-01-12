@@ -29,6 +29,7 @@ function SendAssetModal({
   const [form] = Form.useForm();
   const votingDays = Form.useWatch('votingDays', form);
   const executionBlock = useCongressExecutionBlock(votingDays);
+  const [isLoading, setIsLoading] = useState(false);
 
   const transfer = async (values) => {
     const {
@@ -120,8 +121,7 @@ function SendAssetModal({
       </Form.Item>
       {isRemarkNeeded && (
         <>
-          <RemarkForm form={form} />
-
+          <RemarkForm form={form} setIsLoading={setIsLoading} />
           {officeType === 'congress' && (
             <>
               <Form.Item
@@ -152,8 +152,9 @@ function SendAssetModal({
         <Button
           primary
           type="submit"
+          disabled={isLoading}
         >
-          Make transfer
+          {isLoading ? 'Loading...' : 'Make transfer'}
         </Button>
       </Flex>
     </Form>
