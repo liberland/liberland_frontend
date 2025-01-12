@@ -1,23 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
 import Flex from 'antd/es/flex';
-import Popover from 'antd/es/popover';
-import router from '../../../router';
 import Button from '../../Button/Button';
-import CompanyDetail from '../CompanyDetail';
 import { registriesActions } from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
 import { generatePdf } from '../../../api/middleware';
+import ManageInfo from '../ManageInfo';
+import ShowInfo from '../ShowInfo';
 import styles from './styles.module.scss';
 
 export default function CompanyActions({
   registeredCompany,
   type,
 }) {
-  const history = useHistory();
   const dispatch = useDispatch();
   const website = registeredCompany?.onlineAddresses?.[0]?.url?.value;
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
@@ -35,45 +32,25 @@ export default function CompanyActions({
     URL.revokeObjectURL(href);
   };
 
-  const showInfo = (
-    <Popover
-      trigger={['click']}
-      title="Details"
-      content={<CompanyDetail mainDataObject={registeredCompany} showAll />}
-    >
-      <Button link>
-        Show info
-      </Button>
-    </Popover>
-  );
-  const manageInfo = (
-    <Button
-      primary
-      onClick={() => history.push(`${router.companies.edit.replace(':companyId', registeredCompany.id)}#requested`)}
-    >
-      Manage Info
-    </Button>
-  );
-
   switch (type) {
     case 'mine':
       return (
         <Flex className={styles.fit} vertical gap="15px">
-          {manageInfo}
-          {showInfo}
+          <ManageInfo registeredCompany={registeredCompany} />
+          <ShowInfo registeredCompany={registeredCompany} />
         </Flex>
       );
     case 'requested':
       return (
         <Flex className={styles.fit} vertical gap="15px">
-          {manageInfo}
-          {showInfo}
+          <ManageInfo registeredCompany={registeredCompany} />
+          <ShowInfo registeredCompany={registeredCompany} />
         </Flex>
       );
     case 'all':
       return (
         <Flex className={styles.fit} vertical gap="15px">
-          {showInfo}
+          <ShowInfo registeredCompany={registeredCompany} />
           {website && (
             <Button
               link

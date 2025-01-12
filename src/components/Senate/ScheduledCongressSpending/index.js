@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import Alert from 'antd/es/alert';
@@ -22,7 +22,7 @@ function ScheduledCongressSpending({ isVetoButton }) {
 
   const { motionIds } = useMotionContext();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const votes = scheduledCalls.map((item) => item.votes);
     dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds.concat(votes.flat())))));
   }, [motionIds, dispatch, scheduledCalls]);

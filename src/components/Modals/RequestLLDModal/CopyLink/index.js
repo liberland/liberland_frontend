@@ -10,7 +10,7 @@ function CopyLink({
 
   const handleCopyClick = () => {
     navigator.clipboard.writeText(link);
-    api.success('Link was copied');
+    api.success({ message: 'Link was copied' });
   };
 
   return (

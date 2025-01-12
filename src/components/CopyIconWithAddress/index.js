@@ -13,7 +13,7 @@ function CopyIconWithAddress({
   const isBigScreen = useMediaQuery('(min-width: 1200px)');
   const handleCopyClick = (dataToCoppy) => {
     navigator.clipboard.writeText(dataToCoppy);
-    api.success('Address was copied');
+    api.success({ message: 'Address was copied' });
   };
 
   if (noDetails) {
