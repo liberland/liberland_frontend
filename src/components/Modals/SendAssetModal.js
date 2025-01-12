@@ -108,7 +108,7 @@ function SendAssetModal({
                 return Validator.validateValue(
                   typeof balance === 'string' ? new BN(balance.slice(2), 16) : new BN(balance),
                   parseAssets(textValue, assetData.metadata.decimals),
-                ) ? Promise.resolve : Promise.reject('Invalid number');
+                ) ? Promise.resolve() : Promise.reject('Invalid number');
               } catch {
                 return Promise.reject('Invalid value');
               }
@@ -118,29 +118,12 @@ function SendAssetModal({
       >
         <InputNumber stringMode controls={false} />
       </Form.Item>
-      <div className={styles.title}>
-        Amount
-        {' '}
-        {assetData.metadata.symbol}
-      </div>
       {isRemarkNeeded && (
         <>
           <RemarkForm form={form} />
 
           {officeType === 'congress' && (
             <>
-              <div className={styles.title}>
-                Congress
-                {' '}
-                voting time in days
-              </div>
-              <div className={styles.description}>
-                How long will it take
-                {' '}
-                Congress
-                {' '}
-                to close the motion?
-              </div>
               <Form.Item
                 name="votingDays"
                 label="Congress voting time in days"

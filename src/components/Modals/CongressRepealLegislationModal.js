@@ -84,7 +84,7 @@ function CongressRepealLegislationModalWrapper({
 
   return (
     <>
-      <Button link onClick={() => setShow(true)}>
+      <Button onClick={() => setShow(true)}>
         Propose congress motion to repeal
       </Button>
       {show && (

@@ -7,6 +7,7 @@ import Flex from 'antd/es/flex';
 import Spin from 'antd/es/spin';
 import List from 'antd/es/list';
 import InputNumber from 'antd/es/input-number';
+import Divider from 'antd/es/divider';
 import TextArea from 'antd/es/input/TextArea';
 import PropTypes from 'prop-types';
 import ModalRoot from '../ModalRoot';
@@ -74,7 +75,7 @@ function RequestLLDModal({
   return (
     <Form
       form={form}
-      onSubmit={onSubmit}
+      onFinish={onSubmit}
       layout="vertical"
     >
       {linkData && (
@@ -95,6 +96,7 @@ function RequestLLDModal({
                   accessor: 'qr',
                 },
               ]}
+              noPagination
               data={[
                 {
                   name: 'Direct link',
@@ -181,6 +183,7 @@ function RequestLLDModal({
                 accessor: 'value',
               },
             ]}
+            noPagination
             data={[
               {
                 name: 'Recipient',
@@ -195,6 +198,7 @@ function RequestLLDModal({
               value: linkData.note,
             }] : [])}
           />
+          <Divider />
         </div>
       )}
       <Form.Item

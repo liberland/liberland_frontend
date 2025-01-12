@@ -27,7 +27,6 @@ export function AddLegislationFields({
   return (
     <Form.List
       name="sections"
-      rules={[{ min: 1 }]}
     >
       {(fields, { add, remove }) => (
         <>
@@ -44,9 +43,11 @@ export function AddLegislationFields({
                 label={`Section #${index + 1}`}
                 rules={[{ required: true }]}
               >
-                <TextArea onPaste={handlePaste} />
+                <TextArea onPaste={handlePaste} placeholder="Paste markdown to autosplit sections" />
               </Form.Item>
-              <Button red onClick={() => remove(field.name)}>Delete</Button>
+              {index !== 0 && (
+                <Button red onClick={() => remove(field.name)}>Delete</Button>
+              )}
               <Divider />
             </div>
           ))}

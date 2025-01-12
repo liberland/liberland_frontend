@@ -128,7 +128,7 @@ function TransferWithRemarkModal({
       </Form.Item>
       <div>
         {userRemark ? (
-          <RemarkFormUser />
+          <RemarkFormUser form={form} />
         ) : (
           <RemarkForm form={form} />
         )}

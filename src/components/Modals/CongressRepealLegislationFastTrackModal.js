@@ -37,7 +37,7 @@ function CongressRepealLegislationFastTrackModal({
         discussionLink,
         tier,
         id,
-        section,
+        section: section || null,
         fastTrack,
         fastTrackVotingPeriod,
         fastTrackEnactmentPeriod,

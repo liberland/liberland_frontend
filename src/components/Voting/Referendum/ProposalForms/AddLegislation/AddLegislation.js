@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Redirect } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
@@ -15,15 +15,13 @@ import { AddLegislationFields } from '../AddLegislationFields/AddLegislationFiel
 import { ProposalDiscussionFields } from '../ProposalDiscussionFields';
 
 function AddLegislation() {
+  const history = useHistory();
   const dispatch = useDispatch();
   const isLoading = useSelector(
     democracySelectors.selectorGettingDemocracyInfo,
   );
   const [shouldRedirect, setShouldRedirect] = useState(false);
-
   const [form] = Form.useForm();
-
-  if (!isLoading && shouldRedirect) { return <Redirect to={router.voting.referendum} />; }
 
   const propose = ({
     tier,
@@ -47,13 +45,19 @@ function AddLegislation() {
     setShouldRedirect(true);
   };
 
+  useEffect(() => {
+    if (!isLoading && shouldRedirect) {
+      history.push(router.voting.referendum);
+    }
+  }, [shouldRedirect, isLoading, history]);
+
   return (
     <Form
       form={form}
       layout="vertical"
       initialValues={{
         tier: 'Law',
-        sections: [{ value: 'Paste markdown to autosplit sections' }],
+        sections: [{ value: '' }],
       }}
       onFinish={propose}
     >

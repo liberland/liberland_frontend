@@ -110,7 +110,7 @@ function ProposeAmendLegislationModalWrapper({
   const [show, setShow] = useState();
   return (
     <>
-      <Button link onClick={() => setShow(true)}>
+      <Button onClick={() => setShow(true)}>
         {add ? 'Add section' : 'Amend'}
       </Button>
       {show && (

@@ -38,7 +38,7 @@ function CongressAmendLegislationViaReferendumModal({
       discussionLink,
       tier,
       id,
-      section,
+      section: section || null,
       content,
       fastTrack,
       fastTrackVotingPeriod,
@@ -114,7 +114,7 @@ export default function CongressAmendLegislationViaReferendumModalWrapper({
   const [show, setShow] = useState();
   return (
     <>
-      <Button link onClick={() => setShow(true)}>
+      <Button onClick={() => setShow(true)}>
         {add
           ? 'Propose add section referendum as congress'
           : 'Propose amend referendum as congress'}

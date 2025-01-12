@@ -54,7 +54,7 @@ function AddLiquidityModal({
         amount2Desired,
         decimals1,
         decimals2,
-        minAmountPercent,
+        minAmountPercent || '',
       );
       const mintTo = walletAddress;
       dispatch(dexActions.addLiquidity.call({

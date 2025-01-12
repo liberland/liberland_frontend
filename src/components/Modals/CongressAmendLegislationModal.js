@@ -90,7 +90,7 @@ function CongressAmendLegislationModalWrapper({
   const [show, setShow] = useState();
   return (
     <>
-      <Button link multiline onClick={() => setShow(true)}>
+      <Button onClick={() => setShow(true)}>
         {add ? 'Add section as congress' : 'Amend as congress'}
       </Button>
       {show && (

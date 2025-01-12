@@ -30,7 +30,7 @@ function CitizenRepealLegislationModal({
         discussionLink,
         tier,
         id,
-        section,
+        section: section || null,
       }),
     );
     closeModal();
@@ -91,7 +91,7 @@ function CitizenRepealLegislationModalWrapper({
   const [show, setShow] = useState();
   return (
     <>
-      <Button link onClick={() => setShow(true)}>
+      <Button onClick={() => setShow(true)}>
         Propose citizen referendum to repeal
       </Button>
       {show && (

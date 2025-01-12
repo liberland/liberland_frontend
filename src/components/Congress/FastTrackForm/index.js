@@ -40,23 +40,19 @@ export default function FastTrackForm({ form }) {
                   label="Referendum period"
                   rules={[
                     { required: true },
-                    { type: 'number' },
-                    { min: 3 },
                   ]}
                 >
-                  <InputNumber controls={false} />
+                  <InputNumber controls={false} min={3} />
                 </Form.Item>
                 <Form.Item
                   name="fastTrackEnactmentPeriod"
                   label="Enactment period"
                   rules={[
                     { required: true },
-                    { type: 'number' },
-                    { min: 0 },
                   ]}
                   extra="Delay between referendum end and its execution, specified in days."
                 >
-                  <InputNumber controls={false} />
+                  <InputNumber controls={false} min={0} />
                 </Form.Item>
               </>
             ),

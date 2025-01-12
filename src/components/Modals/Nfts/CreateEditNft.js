@@ -6,6 +6,7 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import Flex from 'antd/es/flex';
 import Input from 'antd/es/input';
 import Upload from 'antd/es/upload';
+import Spin from 'antd/es/spin';
 import InboxOutlined from '@ant-design/icons/InboxOutlined';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalRoot from '../ModalRoot';
@@ -25,6 +26,7 @@ function CreatEditNFTModal({
   const [form] = Form.useForm();
 
   const uploadImageToIPFS = async (file) => {
+    setUploading(true);
     const formData = new FormData();
     formData.append('file', file);
 
@@ -39,14 +41,17 @@ function CreatEditNFTModal({
 
     if (!response.ok) {
       const error = await response.json();
+      setUploading(false);
       throw new Error(error.message || 'Failed to upload image');
     }
 
     const data = await response.json();
+    setUploading(false);
     return data.IpfsHash;
   };
 
   const uploadJsonToIPFS = async (json) => {
+    setUploading(true);
     const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
       method: 'POST',
       headers: {
@@ -59,10 +64,12 @@ function CreatEditNFTModal({
 
     if (!response.ok) {
       const error = await response.json();
+      setUploading(false);
       throw new Error(error.message || 'Failed to upload JSON');
     }
 
     const data = await response.json();
+    setUploading(false);
     return data.IpfsHash;
   };
 
@@ -116,10 +123,10 @@ function CreatEditNFTModal({
       <Form.Item name="name" label="NFT name" rules={[{ required: true }]}>
         <Input placeholder="Enter NFT name" />
       </Form.Item>
-      <Form.Item name="name" label="Description" rules={[{ required: true }]}>
+      <Form.Item name="description" label="Description" rules={[{ required: true }]}>
         <Input placeholder="Enter description" />
       </Form.Item>
-      <Form.Item name="imageFile" label="Upload image" rules={[{ required: true }]}>
+      <Form.Item name="imageFile" valuePropName="fileList" label="Upload image" rules={[{ required: true }]}>
         <Upload.Dragger
           action={uploadImageToIPFS}
           disabled={uploading}
@@ -133,7 +140,7 @@ function CreatEditNFTModal({
           }}
         >
           <Paragraph className="ant-upload-drag-icon">
-            <InboxOutlined />
+            {uploading ? <Spin /> : <InboxOutlined />}
           </Paragraph>
           <Paragraph className="ant-upload-text">
             Click or drag file to this area to upload
@@ -160,8 +167,8 @@ function CreatEditNFTModal({
 
 CreatEditNFTModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
-  nftId: PropTypes.string.isRequired,
-  collectionId: PropTypes.string.isRequired,
+  nftId: PropTypes.string,
+  collectionId: PropTypes.string,
 };
 
 function CreateEditNFTModalWrapper({
@@ -191,8 +198,8 @@ function CreateEditNFTModalWrapper({
 }
 
 CreateEditNFTModalWrapper.propTypes = {
-  nftId: PropTypes.string.isRequired,
-  collectionId: PropTypes.string.isRequired,
+  nftId: PropTypes.string,
+  collectionId: PropTypes.string,
 };
 
 export default CreateEditNFTModalWrapper;

@@ -12,17 +12,17 @@ function ExistingMotionsAndReferendums({ motion, referendum, proposal }) {
 
   const items = [
     motion && (
-      <Button link onClick={() => history.push(`${router.congress.motions}#${motion}`)}>
+      <Button onClick={() => history.push(`${router.congress.motions}#${motion}`)}>
         Repeal motion
       </Button>
     ),
     referendum && (
-      <Button link onClick={() => history.push(`${router.voting.referendum}#${referendum}`)}>
+      <Button onClick={() => history.push(`${router.voting.referendum}#${referendum}`)}>
         Repeal referendum
       </Button>
     ),
     proposal && (
-      <Button link onClick={() => history.push(`${router.voting.referendum}#${proposal}`)}>
+      <Button onClick={() => history.push(`${router.voting.referendum}#${proposal}`)}>
         Repeal proposal
       </Button>
     ),

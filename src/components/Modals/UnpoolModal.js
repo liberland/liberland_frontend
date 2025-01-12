@@ -33,7 +33,7 @@ function UnpoolModal({
     <Form
       form={form}
       layout="vertical"
-      onSubmit={handleSubmitUnpool}
+      onFinish={handleSubmitUnpool}
     >
       <Title level={3}>Unpool</Title>
       <Paragraph>
@@ -86,7 +86,7 @@ function UnpoolModalWrapper() {
         <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {open && (
-        <ModalRoot>
+        <ModalRoot closeModal={() => setOpen(false)}>
           <UnpoolModal closeModal={() => setOpen(false)} />
         </ModalRoot>
       )}
