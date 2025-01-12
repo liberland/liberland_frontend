@@ -112,6 +112,13 @@ function CreatEditNFTModal({
     closeModal();
   };
 
+  const getFileFromEvent = (eventOrFile) => {
+    if (Array.isArray(eventOrFile)) {
+      return eventOrFile;
+    }
+    return eventOrFile?.fileList;
+  };
+
   return (
     <Form form={form} layout="vertical" onFinish={createNFT}>
       <Title level={3}>
@@ -126,7 +133,13 @@ function CreatEditNFTModal({
       <Form.Item name="description" label="Description" rules={[{ required: true }]}>
         <Input placeholder="Enter description" />
       </Form.Item>
-      <Form.Item name="imageFile" valuePropName="fileList" label="Upload image" rules={[{ required: true }]}>
+      <Form.Item
+        name="imageFile"
+        valuePropName="fileList"
+        label="Upload image"
+        rules={[{ required: true }]}
+        getValueFromEvent={getFileFromEvent}
+      >
         <Upload.Dragger
           action={uploadImageToIPFS}
           disabled={uploading}

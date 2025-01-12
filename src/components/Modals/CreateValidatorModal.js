@@ -98,7 +98,6 @@ function CreateValidatorModal({
         <Slider
           min={0}
           max={100}
-          defaultValue={0}
         />
       </Form.Item>
       <Form.Item name="allow_nominations" label="Allow new nominations">

@@ -177,7 +177,7 @@ function StakeEthForm({
         label={`Contract will fail if cannot stake ${tolerance}% of ETH/LLD into LP`}
         rules={[{ required: true }]}
       >
-        <Slider min={0} max={100} defaultValue={90} />
+        <Slider min={0} max={100} />
       </Form.Item>
       <Paragraph>
         {liquidityPoolReward}

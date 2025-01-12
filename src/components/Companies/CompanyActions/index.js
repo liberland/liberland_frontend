@@ -19,7 +19,7 @@ export default function CompanyActions({
 }) {
   const history = useHistory();
   const dispatch = useDispatch();
-  const website = registeredCompany?.onlineAddresses?.[0]?.url;
+  const website = registeredCompany?.onlineAddresses?.[0]?.url?.value;
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const handleGenerateButton = async (companyId) => {
     const pathName = 'certificate';
@@ -37,6 +37,8 @@ export default function CompanyActions({
 
   const showInfo = (
     <Popover
+      trigger={['click']}
+      title="Details"
       content={<CompanyDetail mainDataObject={registeredCompany} showAll />}
     >
       <Button link>

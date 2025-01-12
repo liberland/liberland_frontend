@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { List } from 'antd';
+import { Descriptions, List } from 'antd';
+import styles from './styles.module.scss';
 
 function simplifyList(maybeList) {
   if (Array.isArray(maybeList)) {
@@ -10,61 +11,59 @@ function simplifyList(maybeList) {
 }
 
 function CompanyDetail({ mainDataObject, showAll = false }) {
+  const details = useMemo(() => (
+    mainDataObject?.staticFields || []
+  ).map((staticField) => ({
+    name: staticField?.name || '',
+    display: staticField?.display || '',
+  })).concat(showAll
+    ? (
+      mainDataObject?.dynamicFields || []
+    ).map((dynamicField) => {
+      switch (dynamicField?.data?.length || 0) {
+        case 0:
+          return null;
+        case 1:
+          return {
+            name: dynamicField?.name || '',
+            display: dynamicField.data[0]?.display
+              ? `${
+                simplifyList(dynamicField.data[0].display)
+              }${dynamicField.data[0]?.isEncrypted ? ' (Encrypted)' : ''}`
+              : '',
+          };
+        default:
+          return {
+            name: dynamicField?.name || '',
+            children: (dynamicField.data || []).map((formObject, index) => ({
+              name: dynamicField?.name ? `${dynamicField.name} ${index + 1}` : index + 1,
+              display: formObject?.display
+                ? `${simplifyList(formObject.display)}${formObject.isEncrypted ? ' (Encrypted)' : ''}`
+                : '',
+            })),
+          };
+      }
+    }).filter(Boolean)
+    : []), [mainDataObject, showAll]);
+
   return (
-    <List
-      itemLayout="vertical"
-      dataSource={(
-        mainDataObject?.staticFields || []
-      ).map((staticField) => ({
-        name: staticField?.name || '',
-        display: staticField?.display || '',
-      })).concat(showAll
-        ? (
-          mainDataObject?.dynamicFields || []
-        ).map((dynamicField) => {
-          switch (dynamicField?.data?.length || 0) {
-            case 0:
-              return null;
-            case 1:
-              return {
-                name: dynamicField?.name || '',
-                display: dynamicField.data[0]?.display
-                  ? `${
-                    simplifyList(dynamicField.data[0].display)
-                  }${dynamicField.data[0]?.isEncrypted ? ' (Encrypted)' : ''}`
-                  : '',
-              };
-            default:
-              return {
-                name: dynamicField?.name || '',
-                children: (dynamicField.data || []).map((formObject, index) => ({
-                  name: dynamicField?.name ? `${dynamicField.name} ${index + 1}` : index + 1,
-                  display: formObject?.display
-                    ? `${simplifyList(formObject.display)}${formObject.isEncrypted ? ' (Encrypted)' : ''}`
-                    : '',
-                })),
-              };
-          }
-        }).filter(Boolean)
-        : [])}
-      renderItem={({ name, display, children }) => (
-        <List.Item key={name}>
-          <List.Item.Meta title={name} description={display}>
-            {children ? (
-              <List
-                itemLayout="vertical"
-                dataSource={children}
-                renderItem={({ name: subName, display: subDisplay }) => (
-                  <List.Item key={subName}>
-                    <List.Item.Meta title={subName} description={subDisplay} />
-                  </List.Item>
-                )}
-              />
-            ) : null}
-          </List.Item.Meta>
-        </List.Item>
-      )}
-    />
+    <Descriptions layout="vertical" size="small" className={styles.details}>
+      {details.map(({ name, display, children }) => (
+        <Descriptions.Item label={name}>
+          {children?.length ? (
+            <List
+              itemLayout="vertical"
+              dataSource={children}
+              renderItem={({ name: subName, display: subDisplay }) => (
+                <List.Item>
+                  <List.Item.Meta title={subName} description={subDisplay} />
+                </List.Item>
+              )}
+            />
+          ) : (display || 'None')}
+        </Descriptions.Item>
+      ))}
+    </Descriptions>
   );
 }
 

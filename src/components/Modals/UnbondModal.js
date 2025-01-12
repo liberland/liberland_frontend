@@ -69,7 +69,7 @@ function UnbondModal({
         days.
       </Paragraph>
       <Form.Item
-        name="unboundValue"
+        name="unbondValue"
         label="Amount to unstake"
         rules={[
           { required: true },

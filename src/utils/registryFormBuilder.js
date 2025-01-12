@@ -20,9 +20,9 @@ import Button from '../components/Button/Button';
 import './utils.scss';
 import { newCompanyDataObject } from './defaultData';
 
-const buildFieldName = (formKey, index, dynamicField, suffix) => (dynamicField.encryptable
-  ? `${formKey}.${index}.${dynamicField.key}.${suffix}`
-  : `${formKey}.${index}.${dynamicField.key}`);
+const buildFieldName = (index, dynamicField, suffix) => (dynamicField.encryptable
+  ? [index, dynamicField.key, suffix]
+  : [index, dynamicField.key]);
 
 const fieldDateTypes = {
   date: true,
@@ -41,6 +41,7 @@ function getFieldComponent(staticField) {
     return {
       fieldComponent: <Checkbox />,
       layout: 'horizontal',
+      valuePropName: 'checked',
     };
   }
   if (staticField.type === 'date') {
@@ -172,8 +173,13 @@ export function GetFieldsForm({
               >
                 <Flex vertical gap="15px">
                   {dynamicFieldData.fields.map((dynamicField) => {
-                    const fieldName = buildFieldName(formKey, index, dynamicField, 'value');
-                    const { fieldComponent, layout, getValueProps } = getFieldComponent(dynamicField);
+                    const fieldName = buildFieldName(index, dynamicField, 'value');
+                    const {
+                      fieldComponent,
+                      layout,
+                      getValueProps,
+                      valuePropName,
+                    } = getFieldComponent(dynamicField);
                     if (!fieldComponent) {
                       return null;
                     }
@@ -183,6 +189,7 @@ export function GetFieldsForm({
                         label={dynamicField.display}
                         layout={layout}
                         getValueProps={getValueProps}
+                        valuePropName={valuePropName}
                       >
                         {fieldComponent}
                       </Form.Item>
@@ -285,7 +292,12 @@ export function BuildRegistryForm({
         dataSource={formObject.staticFields}
         renderItem={(staticField) => {
           const staticFieldName = staticField.encryptable ? `${staticField.key}.value` : staticField.key;
-          const { fieldComponent, layout, getValueProps } = getFieldComponent(staticField);
+          const {
+            fieldComponent,
+            layout,
+            getValueProps,
+            valuePropName,
+          } = getFieldComponent(staticField);
           if (!fieldComponent) {
             return null;
           }
@@ -295,6 +307,7 @@ export function BuildRegistryForm({
               label={staticField.name}
               layout={layout}
               getValueProps={getValueProps}
+              valuePropName={valuePropName}
             >
               {fieldComponent}
             </Form.Item>
@@ -389,6 +402,7 @@ export function BuildRegistryForm({
         name="signedContract"
         rules={[{ required: true }]}
         layout="horizontal"
+        valuePropName="checked"
       >
         <Checkbox disabled={!companyType} />
       </Form.Item>
