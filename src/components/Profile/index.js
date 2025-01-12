@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Avatar from 'react-avatar';
 import Collapse from 'antd/es/collapse';
 import Descriptions from 'antd/es/descriptions';
 import Flex from 'antd/es/flex';
@@ -120,26 +119,19 @@ function Profile() {
       defaultActiveKey={['profile', 'account', 'onchain']}
       items={[
         {
-          key: 'profile',
-          label: 'Profile',
-          extra: (
-            <Button disabled>
-              Edit
-            </Button>
-          ),
-          children: (
-            <Avatar name={displayName} size="100%" round color="#F6F6F6" />
-          ),
-        },
-        {
           key: 'account',
           label: displayName || 'Account',
           extra: (
-            <img
-              className={styles.liberlandLogo}
-              src={liberlandEmblemImage}
-              alt="liberlandEmblem"
-            />
+            <Flex wrap gap="15px">
+              <Button disabled>
+                Edit
+              </Button>
+              <img
+                className={styles.liberlandLogo}
+                src={liberlandEmblemImage}
+                alt="liberlandEmblem"
+              />
+            </Flex>
           ),
           children: (
             <Descriptions title="Information">

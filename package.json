@@ -46,7 +46,6 @@
     "postcss-preset-env": "^7.4.3",
     "process": "^0.11.10",
     "react": "^18.3.1",
-    "react-avatar": "^3.10.0",
     "react-dom": "^18.3.1",
     "react-dropzone": "^11.3.4",
     "react-oauth2-code-pkce": "^1.16.0",
