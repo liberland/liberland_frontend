@@ -1,7 +1,6 @@
 import React, {
   useContext,
   useEffect,
-  useLayoutEffect,
   useRef,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -59,7 +58,7 @@ function Referendum() {
   const proposalRef = useRef(null);
   const { motionIds } = useMotionContext();
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds))));
   }, [motionIds, dispatch, proposalRef, dispatchRef]);
 
