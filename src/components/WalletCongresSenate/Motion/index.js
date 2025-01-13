@@ -69,6 +69,7 @@ export default function Motion({
             && !isClosable && (
               <Button
                 onClick={() => voteMotionCall(false)}
+                red
               >
                 Vote nay
               </Button>
@@ -77,6 +78,7 @@ export default function Motion({
             && !isClosable && (
               <Button
                 onClick={() => voteMotionCall(true)}
+                green
               >
                 Vote aye
               </Button>
@@ -86,6 +88,7 @@ export default function Motion({
               onClick={() => dispatch(
                 closeMotion({ proposal, index: voting.index, walletAddress }),
               )}
+              primary
             >
               Close Motion
             </Button>
