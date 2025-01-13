@@ -24,6 +24,7 @@ function Button({
   multiline,
   href,
   link,
+  newTab,
 }) {
   const getSize = () => {
     if (large) {
@@ -51,6 +52,7 @@ function Button({
       onClick={onClick}
       htmlType={type}
       type={getType()}
+      target={newTab ? '_blank' : undefined}
       href={href}
       danger={red}
       size={getSize()}
@@ -92,6 +94,7 @@ Button.propTypes = {
   href: PropTypes.string,
   multiline: PropTypes.bool,
   link: PropTypes.bool,
+  newTab: PropTypes.bool,
 };
 
 export default Button;

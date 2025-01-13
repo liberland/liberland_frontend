@@ -128,6 +128,7 @@ export const navigationList = [
     subLinks: {
       Overview: router.staking.overview,
       'ETH LP Staking': router.staking.ethlpstaking,
+      'SOL LP Staking': router.staking.sollpstaking,
     },
   },
   {

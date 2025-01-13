@@ -15,6 +15,10 @@ export default function Staking() {
         component={loader(() => import('./ETHLPStaking'))}
       />
       <Route
+        path={router.staking.sollpstaking}
+        component={loader(() => import('./SOLLPStaking'))}
+      />
+      <Route
         exact
         path={router.home.staking}
         render={() => (
