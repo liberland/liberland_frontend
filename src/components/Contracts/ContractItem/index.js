@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
 import Title from 'antd/es/typography/Title';
@@ -9,7 +9,6 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import Markdown from 'markdown-to-jsx';
 import router from '../../../router';
 import { blockchainSelectors, contractsSelectors } from '../../../redux/selectors';
-import Button from '../../Button/Button';
 import ButtonsWrapper from '../ButtonsWrapper';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import { deriveAndHideContractTitle } from './utils';
@@ -40,18 +39,17 @@ function ContractItem({
     { itemsOrItem: judgesSignaturesList || [], name: 'Judges Signatures' },
   ];
 
-  const history = useHistory();
   const [title, setTitle] = useState(`Contract id: ${contractId}`);
+  const routerLinkBase = router.contracts.item.split(':')[0];
+  const routerLink = `${routerLinkBase}${contractId}`;
 
-  const handleClick = (id) => {
-    const routerLink = router.contracts.item.split(':')[0];
-    history.push(`${routerLink}${id}`);
-  };
   return (
     <Card
       title={<Title level={1}>{title}</Title>}
       extra={!isOneItem ? (
-        <Button link onClick={() => handleClick(contractId)}>More</Button>
+        <NavLink to={routerLink}>
+          More
+        </NavLink>
       ) : null}
       actions={(
         <ButtonsWrapper
@@ -65,7 +63,12 @@ function ContractItem({
     >
       <Card.Meta
         description={(
-          <Paragraph ref={(p) => deriveAndHideContractTitle(p, title, setTitle)}>
+          <Paragraph
+            ref={(p) => deriveAndHideContractTitle(p, title, setTitle)}
+            ellipsis={isOneItem ? undefined : {
+              rows: 5,
+            }}
+          >
             <Markdown>{data}</Markdown>
           </Paragraph>
         )}

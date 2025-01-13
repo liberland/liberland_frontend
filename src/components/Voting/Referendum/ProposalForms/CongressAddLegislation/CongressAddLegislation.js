@@ -78,13 +78,6 @@ function CongressAddLegislation() {
       >
         <DatePicker picker="year" disabled />
       </Form.Item>
-      <Form.Item
-        name="index"
-        label="Legislation index"
-        rules={[{ required: true }]}
-      >
-        <InputNumber controls={false} />
-      </Form.Item>
       <AddLegislationFields form={form} />
       <Flex wrap gap="15px">
         <Button

@@ -6,7 +6,7 @@ import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 
-function DisplayOnlyLegislation({ section }) {
+function ReadOnlyLegislation({ section }) {
   return (
     <>
       <Form.Item name="tier" label="Legislation tier">
@@ -42,8 +42,8 @@ function DisplayOnlyLegislation({ section }) {
   );
 }
 
-DisplayOnlyLegislation.propTypes = {
+ReadOnlyLegislation.propTypes = {
   section: PropTypes.number,
 };
 
-export default DisplayOnlyLegislation;
+export default ReadOnlyLegislation;

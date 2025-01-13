@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { Descriptions, List } from 'antd';
+import Descriptions from 'antd/es/descriptions';
+import List from 'antd/es/list';
 import styles from './styles.module.scss';
 
 function simplifyList(maybeList) {

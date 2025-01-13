@@ -115,6 +115,8 @@ function OnchainIdentityModal({
           <Form.Item
             name="older_than_15"
             label="I'm 15 or older"
+            layout="horizontal"
+            valuePropName="checked"
           >
             <Checkbox />
           </Form.Item>
@@ -131,25 +133,31 @@ function OnchainIdentityModal({
       )}
 
       <Form.Item
+        layout="horizontal"
         name="isUserWarnAccepted"
         label="I want to change my identity"
-        extra={(
-          <Alert
-            type="warning"
-            message={(
-              <>
-                Warning! Your identity is currently confirmed by citizenship office
-                as valid. Changing it will require reapproval - you&apos;ll
-                temporarily lose citizenship or e-resident rights onchain.
-                Until its manually handled by ministry of interior which takes about two days.
-              </>
-            )}
-          />
-        )}
+        valuePropName="checked"
+        rules={[{
+          validator: (_, val) => (
+            val ? Promise.resolve() : Promise.reject('Check if identity changes are intentional')
+          ),
+        }]}
       >
         <Checkbox />
       </Form.Item>
-
+      <Paragraph>
+        <Alert
+          type="warning"
+          message={(
+            <>
+              Warning! Your identity is currently confirmed by citizenship office
+              as valid. Changing it will require reapproval - you&apos;ll
+              temporarily lose citizenship or e-resident rights onchain.
+              Until its manually handled by ministry of interior which takes about two days.
+            </>
+          )}
+        />
+      </Paragraph>
       <Flex wrap gap="15px">
         <Button className={styles.button} onClick={closeModal}>
           Cancel

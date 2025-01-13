@@ -12,7 +12,7 @@ import { congressActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
+import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
 
 function CongressAmendLegislationViaReferendumModal({
   closeModal, tier, id, section,
@@ -66,7 +66,7 @@ function CongressAmendLegislationViaReferendumModal({
         {legislation.sections?.[section] ? 'amend legislation' : 'add legislation section'}
       </Title>
 
-      <DisplayOnlyLegislation section={section} />
+      <ReadOnlyLegislation section={section} />
       <Form.Item name="content" label="Legislation content" rules={[{ required: true }]}>
         <TextArea />
       </Form.Item>

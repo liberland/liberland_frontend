@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Progress } from 'antd';
+import Progress from 'antd/es/progress';
 import { formatMerits } from '../../../../../utils/walletHelpers';
 
 function CounterItem({ votedTotal, votes, isNay }) {

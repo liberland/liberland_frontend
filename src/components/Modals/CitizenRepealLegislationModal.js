@@ -10,7 +10,7 @@ import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { democracyActions } from '../../redux/actions';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
+import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
 
 function CitizenRepealLegislationModal({
   closeModal, tier, id, section,
@@ -51,7 +51,7 @@ function CitizenRepealLegislationModal({
       <Title level={3}>
         Propose referendum for legislation repeal
       </Title>
-      <DisplayOnlyLegislation section={section} />
+      <ReadOnlyLegislation section={section} />
       <ProposalDiscussionFields />
       <Flex wrap gap="15px">
         <Button medium onClick={closeModal}>

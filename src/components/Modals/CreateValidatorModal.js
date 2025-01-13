@@ -100,7 +100,11 @@ function CreateValidatorModal({
           max={100}
         />
       </Form.Item>
-      <Form.Item name="allow_nominations" label="Allow new nominations">
+      <Form.Item
+        name="allow_nominations"
+        valuePropName="checked"
+        label="Allow new nominations"
+      >
         <Checkbox />
       </Form.Item>
       <Form.Item

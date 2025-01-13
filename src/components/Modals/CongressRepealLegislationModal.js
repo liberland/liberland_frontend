@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
-import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
+import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
 import { congressSelectors } from '../../redux/selectors';
 
 function CongressRepealLegislationModal({
@@ -38,7 +38,7 @@ function CongressRepealLegislationModal({
         Propose a Congress Motion - repeal legislation
       </Title>
 
-      <DisplayOnlyLegislation section={section} />
+      <ReadOnlyLegislation section={section} />
 
       <Flex wrap gap="15px">
         <Button

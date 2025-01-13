@@ -1,8 +1,8 @@
 import React from 'react';
-import { Typography, Row, Col } from 'antd';
+import Title from 'antd/es/typography/Title';
+import Col from 'antd/es/col';
+import Row from 'antd/es/row';
 import Button from '../../Button/Button';
-
-const { Title } = Typography;
 
 const linkRaydium = 'https://raydium.io/clmm/create-position/?pool_id=2AXXcN6oN9bBT5owwmTH53C7QHUXvhLeu718Kqt8rvY2';
 

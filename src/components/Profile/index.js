@@ -171,7 +171,8 @@ function Profile() {
               <Button
                 primary={isUserEligibleForComplimentaryLLD && !isLoading}
                 onClick={handleGetFreeLLD}
-                disabled={!isUserEligibleForComplimentaryLLD || isLoading}
+                grey={!isUserEligibleForComplimentaryLLD}
+                disabled={isLoading}
               >
                 {isUserEligibleForComplimentaryLLD || !user
                   ? 'Claim complimentary LLD'

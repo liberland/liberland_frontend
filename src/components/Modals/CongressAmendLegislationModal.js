@@ -10,7 +10,7 @@ import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
-import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
+import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
 
 function CongressAmendLegislationModal({
   closeModal, tier, id, section,
@@ -45,7 +45,7 @@ function CongressAmendLegislationModal({
         Propose a Motion -
         {legislation?.sections?.[section] ? 'amend legislation' : 'add legislation section'}
       </Title>
-      <DisplayOnlyLegislation section={section} />
+      <ReadOnlyLegislation section={section} />
       <Form.Item name="content" label="Legislation content" rules={[{ required: true }]}>
         <TextArea />
       </Form.Item>

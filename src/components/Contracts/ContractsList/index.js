@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import List from 'antd/es/list';
+import Divider from 'antd/es/divider';
 import ContractItem from '../ContractItem';
 
 function ContractsList({ contracts, isOneItem, isMyContracts }) {
@@ -8,11 +9,14 @@ function ContractsList({ contracts, isOneItem, isMyContracts }) {
     <List
       dataSource={contracts}
       renderItem={(contract) => (
-        <ContractItem
-          {...contract}
-          isOneItem={isOneItem}
-          isMyContracts={isMyContracts}
-        />
+        <>
+          <ContractItem
+            {...contract}
+            isOneItem={isOneItem}
+            isMyContracts={isMyContracts}
+          />
+          <Divider />
+        </>
       )}
     />
   );

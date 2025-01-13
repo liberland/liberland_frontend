@@ -17,7 +17,7 @@ function NftsComponent() {
   useEffect(() => {
     dispatch(nftsActions.getAllNfts.call(walletAddress));
   }, [dispatch, walletAddress]);
-  const { nfts, hasUserNft } = nftsAll;
+  const { nfts } = nftsAll;
 
   if (!nfts) {
     return <Spin />;
@@ -28,7 +28,7 @@ function NftsComponent() {
       <Flex justify="end">
         <CreateEditNFTModalWrapper />
       </Flex>
-      {!hasUserNft || !nfts.length ? (
+      {nfts.length ? (
         <List
           dataSource={nfts}
           grid={{

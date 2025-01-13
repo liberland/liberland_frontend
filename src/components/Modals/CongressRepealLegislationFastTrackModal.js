@@ -11,7 +11,7 @@ import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
+import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
 
 function CongressRepealLegislationFastTrackModal({
   closeModal,
@@ -64,7 +64,7 @@ function CongressRepealLegislationFastTrackModal({
         repeal
       </Title>
 
-      <DisplayOnlyLegislation section={section} />
+      <ReadOnlyLegislation section={section} />
       <ProposalDiscussionFields />
       <FastTrackForm form={form} />
 

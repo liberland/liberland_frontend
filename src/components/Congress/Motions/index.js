@@ -1,22 +1,33 @@
 import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import List from 'antd/es/list';
 import Alert from 'antd/es/alert';
-import { congressActions, identityActions } from '../../../redux/actions';
-import { congressSelectors } from '../../../redux/selectors';
+import { congressActions, identityActions, senateActions } from '../../../redux/actions';
+import { congressSelectors, senateSelectors } from '../../../redux/selectors';
 import Motion from '../../WalletCongresSenate/Motion';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 import ProposalContainer from '../../Proposal/ProposalContainer';
 
-export default function Motions() {
+function Motions({
+  isSenate,
+}) {
   const dispatch = useDispatch();
   const motions = useSelector(congressSelectors.motions);
-  const userIsMember = useSelector(congressSelectors.userIsMember);
+  const userIsMember = useSelector(isSenate ? congressSelectors.userIsMember : senateSelectors.userIsMember);
   const { motionIds } = useMotionContext();
 
   useEffect(() => {
     dispatch(congressActions.getMotions.call());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (isSenate) {
+      dispatch(congressActions.getMembers.call());
+    } else {
+      dispatch(senateActions.senateGetMembers.call());
+    }
+  }, [dispatch, isSenate]);
 
   useEffect(() => {
     if (motionIds.length > 0) {
@@ -54,3 +65,9 @@ export default function Motions() {
     />
   );
 }
+
+Motions.propTypes = {
+  isSenate: PropTypes.bool,
+};
+
+export default Motions;

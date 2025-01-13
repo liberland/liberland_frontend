@@ -12,7 +12,7 @@ import Button from '../Button/Button';
 import { democracyActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import DisplayOnlyLegislation from '../Congress/DisplayOnlyLegislation';
+import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
 
 function ProposeAmendLegislationModal({
   closeModal, tier, id, section,
@@ -63,7 +63,7 @@ function ProposeAmendLegislationModal({
           : 'add legislation section'}
       </Title>
 
-      <DisplayOnlyLegislation section={section} />
+      <ReadOnlyLegislation section={section} />
       <Form.Item
         name="content"
         label="Legislation Content"
