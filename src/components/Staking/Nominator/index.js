@@ -108,7 +108,6 @@ function Nominator() {
         onConfirm={() => updateNominations(selectedValidatorsAsTargets)}
         onCancel={handleDiscardChanges}
       />
-      {/* <SearchBar setSearchTerm={setSearchTerm} /> */}
       <ValidatorList
         validators={validators}
         selectedValidatorsAsTargets={selectedValidatorsAsTargets}

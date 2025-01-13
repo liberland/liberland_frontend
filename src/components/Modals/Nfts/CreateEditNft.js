@@ -16,7 +16,7 @@ import styles from './styles.module.scss';
 import { nftsActions } from '../../../redux/actions';
 
 function CreatEditNFTModal({
-  closeModal, collectionId, nftId,
+  closeModal,
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -107,7 +107,7 @@ function CreatEditNFTModal({
     } = values;
     const metadataCID = await uploadMetadataToIPFS(imageFile[0], name, description);
     dispatch(nftsActions.setMetadataNft.call({
-      collectionId, itemId: nftId, metadataCID, walletAddress,
+      metadataCID, walletAddress,
     }));
     closeModal();
   };
@@ -180,8 +180,6 @@ function CreatEditNFTModal({
 
 CreatEditNFTModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
-  nftId: PropTypes.string,
-  collectionId: PropTypes.string,
 };
 
 function CreateEditNFTModalWrapper({

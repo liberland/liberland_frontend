@@ -54,34 +54,44 @@ export default function Motion({
       )}
       className={styles.fullWidth}
       actions={userIsMember ? [
-        isClosable && (
-          <Button
-            primary
-            onClick={() => dispatch(
-              closeMotion({ proposal, index: voting.index }),
-            )}
-          >
-            Close & Execute
-          </Button>
-        ),
-        !voting.nays.map((v) => v.toString()).includes(userAddress)
-          && !isClosable && (
+        <Flex wrap gap="15px" justify="start" className={styles.actions}>
+          {isClosable && (
             <Button
-              onClick={() => voteMotionCall(false)}
+              primary
+              onClick={() => dispatch(
+                closeMotion({ proposal, index: voting.index }),
+              )}
             >
-              Vote nay
+              Close & Execute
             </Button>
-        ),
-        isClosableNaye && (
-          <Button
-            onClick={() => dispatch(
-              closeMotion({ proposal, index: voting.index, walletAddress }),
-            )}
-          >
-            Close Motion
-          </Button>
-        ),
-      ].filter(Boolean) : []}
+          )}
+          {!voting.nays.map((v) => v.toString()).includes(userAddress)
+            && !isClosable && (
+              <Button
+                onClick={() => voteMotionCall(false)}
+              >
+                Vote nay
+              </Button>
+          )}
+          {!voting.ayes.map((v) => v.toString()).includes(userAddress)
+            && !isClosable && (
+              <Button
+                onClick={() => voteMotionCall(true)}
+              >
+                Vote aye
+              </Button>
+          )}
+          {isClosableNaye && (
+            <Button
+              onClick={() => dispatch(
+                closeMotion({ proposal, index: voting.index, walletAddress }),
+              )}
+            >
+              Close Motion
+            </Button>
+          )}
+        </Flex>,
+      ] : []}
     >
       <Card.Meta
         description={(

@@ -187,10 +187,10 @@ function CongressionalAssemble() {
             children: (
               <List
                 grid={{ gutter: 16 }}
-                dataSource={eligibleUnselectedCandidates}
-                renderItem={(eligibleUnselectedCandidate) => (
+                dataSource={selectedCandidates}
+                renderItem={(selectedCandidate) => (
                   <CandidateCard
-                    politician={eligibleUnselectedCandidate}
+                    politician={selectedCandidate}
                     selectCandidate={selectCandidate}
                   />
                 )}

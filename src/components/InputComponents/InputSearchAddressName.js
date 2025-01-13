@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import Autocomplete from 'antd/es/auto-complete';
 import Spin from 'antd/es/spin';
+import Flex from 'antd/es/flex';
 import CheckCircleFilled from '@ant-design/icons/CheckCircleFilled';
 import CloseCircleFilled from '@ant-design/icons/CloseCircleFilled';
 import { getUsersIdentityData } from '../../api/explorer';
+import styles from './styles.module.scss';
 
 function InputSearch(props) {
   const [loading, setLoading] = useState();
@@ -15,18 +17,17 @@ function InputSearch(props) {
     try {
       const apiData = await getUsersIdentityData(searchTerm);
       setSuggestions(apiData.map(({ name, id, isConfirmed }) => ({
-        label: name,
         value: id,
-        children: (
-          <span>
-            <strong>{name}</strong>
-            &nbsp;
-            {id}
-            &nbsp;
+        label: (
+          <Flex gap="15px">
             {isConfirmed
-              ? <CheckCircleFilled color="green" />
-              : <CloseCircleFilled color="red" />}
-          </span>
+              ? <CheckCircleFilled className={styles.green} />
+              : <CloseCircleFilled className={styles.red} />}
+            <strong>{name}</strong>
+            <span>
+              {id}
+            </span>
+          </Flex>
         ),
       })));
     } catch (e) {

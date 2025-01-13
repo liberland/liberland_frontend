@@ -10,7 +10,6 @@ import FillAddressWrapper from '../../Modals/FillAddress';
 import FillNumberWrapper from '../../Modals/FillNumber';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
-import CreateEditNFTModalWrapper from '../../Modals/Nfts/CreateEditNft';
 import SetAttributeModalWrapper from '../../Modals/Nfts/SetAttribute';
 import { ReactComponent as FullScreenIcon } from '../../../assets/icons/fullScreen.svg';
 import { ReactComponent as OpenNewTabIcon } from '../../../assets/icons/openNewTab.svg';
@@ -127,12 +126,6 @@ function ItemNft({
                           }),
                         );
                       }}
-                    />
-                  ),
-                  (
-                    <CreateEditNFTModalWrapper
-                      collectionId={collectionId}
-                      nftId={nftId}
                     />
                   ),
                   (
