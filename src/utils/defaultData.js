@@ -50,13 +50,6 @@ export const newCompanyDataObject = {
       encryptable: false,
     },
     {
-      key: 'registryAllowedToEdit',
-      name: 'Registry allowed to edit',
-      display: 'Allow registry to edit details on-chain. Required for registration',
-      type: 'checkbox',
-      encryptable: false,
-    },
-    {
       key: 'companyType',
       name: 'Company Type',
       display: 'Company Type',
