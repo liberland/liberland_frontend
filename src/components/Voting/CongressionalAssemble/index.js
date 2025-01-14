@@ -181,16 +181,16 @@ function CongressionalAssemble() {
               <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />
             ),
           },
-          selectedCandidates?.length && {
+          eligibleUnselectedCandidates?.length && {
             key: 'voting',
-            label: 'Voting',
+            label: 'Eligible Candidates (including current congressmen)',
             children: (
               <List
                 grid={{ gutter: 16 }}
-                dataSource={selectedCandidates}
-                renderItem={(selectedCandidate) => (
+                dataSource={eligibleUnselectedCandidates}
+                renderItem={(unSelectedCandidate) => (
                   <CandidateCard
-                    politician={selectedCandidate}
+                    politician={unSelectedCandidate}
                     selectCandidate={selectCandidate}
                   />
                 )}
