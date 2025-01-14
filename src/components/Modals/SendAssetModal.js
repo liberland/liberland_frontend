@@ -1,22 +1,20 @@
-// LIBS
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Flex from 'antd/es/flex';
+import InputNumber from 'antd/es/input-number';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
 import { useDispatch } from 'react-redux';
 import { BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
-import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
-
-// STYLES
 import styles from './styles.module.scss';
-import { parseAssets, isValidSubstrateAddress } from '../../utils/walletHelpers';
+import { parseAssets } from '../../utils/walletHelpers';
 import {
   congressActions, ministryFinanceActions, senateActions, walletActions,
 } from '../../redux/actions';
-import InputSearch from '../InputComponents/OldInputSearchAddressName';
+import InputSearch from '../InputComponents/InputSearchAddressName';
 import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
@@ -24,29 +22,16 @@ import { encodeRemark } from '../../api/nodeRpcCall';
 import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 import { OfficeType } from '../../utils/officeTypeEnum';
 
-// TODO add validation
 function SendAssetModal({
   closeModal, assetData, isRemarkNeeded, officeType,
 }) {
   const dispatch = useDispatch();
-  const {
-    handleSubmit,
-    formState: { errors, isValid },
-    register,
-    setValue,
-    watch,
-    trigger,
-  } = useForm({
-    mode: 'all',
-    defaultValues: {
-      votingDays: '7',
-    },
-  });
-  const votingDays = watch('votingDays');
+  const [form] = Form.useForm();
+  const votingDays = Form.useWatch('votingDays', form);
   const executionBlock = useCongressExecutionBlock(votingDays);
+  const [isLoading, setIsLoading] = useState(false);
 
   const transfer = async (values) => {
-    if (!isValid) return;
     const {
       recipient, project, description, category, supplier, amountInUsd, finalDestination,
     } = values;
@@ -87,118 +72,92 @@ function SendAssetModal({
   };
   const { balance } = assetData.balance;
   return (
-    <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(transfer)}>
-      <div className={styles.h3}>
+    <Form
+      form={form}
+      layout="vertical"
+      initialValues={{
+        votingDays: '7',
+      }}
+      onFinish={transfer}
+    >
+      <Title level={3}>
         Send
         {' '}
         {assetData.metadata.symbol}
-      </div>
-      <div className={styles.description}>
+      </Title>
+      <Paragraph>
         {!isRemarkNeeded
           ? 'You are going to send tokens from your wallet'
           : 'You are going to create spend token proposal'}
-      </div>
+      </Paragraph>
 
-      <div className={styles.title}>Send to address</div>
-      <InputSearch
-        trigger={trigger}
-        errorTitle="Recipient"
-        isRequired
-        placeholder="Send to address"
+      <Form.Item
+        label="Send to address"
         name="recipient"
-        register={register}
-        setValue={setValue}
-        validate={((v) => {
-          if (!isValidSubstrateAddress(v)) return 'Invalid Address';
-          return true;
-        })}
-      />
-      {errors?.recipient?.message
-        && <div className={styles.error}>{errors.recipient.message}</div>}
-
-      <div className={styles.title}>
-        Amount
-        {' '}
-        {assetData.metadata.symbol}
-      </div>
-      <TextInput
-        register={register}
-        errorTitle={`Amount ${assetData.metadata.symbol}`}
+        rules={[{ required: true }]}
+      >
+        <InputSearch />
+      </Form.Item>
+      <Form.Item
         name="amount"
-        validate={
-          (textValue) => Validator.validateValue(
-            typeof balance === 'string' ? new BN(balance.slice(2), 16) : new BN(balance),
-            parseAssets(textValue, assetData.metadata.decimals),
-          )
-        }
-        placeholder={`Amount ${assetData.metadata.symbol}`}
-        required
-      />
-      { errors?.amount?.message
-        && <div className={styles.error}>{errors.amount.message}</div> }
-
-      {isRemarkNeeded
-        && (
+        label={`Amount ${assetData.metadata.symbol}`}
+        rules={[
+          { required: true },
+          {
+            validator: (_, textValue) => {
+              try {
+                return Validator.validateValue(
+                  typeof balance === 'string' ? new BN(balance.slice(2), 16) : new BN(balance),
+                  parseAssets(textValue, assetData.metadata.decimals),
+                ) ? Promise.resolve() : Promise.reject('Invalid number');
+              } catch {
+                return Promise.reject('Invalid value');
+              }
+            },
+          },
+        ]}
+      >
+        <InputNumber stringMode controls={false} />
+      </Form.Item>
+      {isRemarkNeeded && (
         <>
-          <RemarkForm errors={errors} register={register} watch={watch} setValue={setValue} />
-
+          <RemarkForm form={form} setIsLoading={setIsLoading} />
           {officeType === 'congress' && (
-          <>
-            <div className={styles.title}>
-              Congress
-              {' '}
-              voting time in days
-            </div>
-            <div className={styles.description}>
-              How long will it take
-              {' '}
-              Congress
-              {' '}
-              to close the motion?
-            </div>
-
-            <TextInput
-              errorTitle="Voting days"
-              register={register}
-              name="votingDays"
-              placeholder="Voting days"
-              validate={((v) => {
-                if (parseInt(v) < 1) {
-                  return 'Must be at least 1 day';
-                }
-                return true;
-              })}
-              required
-            />
-            <div>
-              If motion passes in time, actual transfer will execute on block
-              {' '}
-              {executionBlock}
-              .
-            </div>
-            { errors?.votingDays?.message
-        && <div className={styles.error}>{errors.votingDays.message}</div> }
-          </>
+            <>
+              <Form.Item
+                name="votingDays"
+                label="Congress voting time in days"
+                extra="How long will it take for congress to close the motion?"
+                rules={[{ required: true }, { min: 1 }]}
+              >
+                <InputNumber controls={false} placeholder="Voting days" />
+              </Form.Item>
+              <Paragraph>
+                If motion passes in time, actual transfer will execute on block
+                {' '}
+                {executionBlock}
+                .
+              </Paragraph>
+            </>
           )}
         </>
-        )}
+      )}
 
-      <div className={styles.buttonWrapper}>
+      <Flex wrap gap="15px">
         <Button
-          medium
           onClick={closeModal}
         >
           Cancel
         </Button>
         <Button
           primary
-          medium
           type="submit"
+          disabled={isLoading}
         >
-          Make transfer
+          {isLoading ? 'Loading...' : 'Make transfer'}
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 

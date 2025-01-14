@@ -1,4 +1,9 @@
-@import '../styles.module.scss';
+@import '../../../../assets/base/variables';
+@import '../../../../assets/main';
+
+.exchangePairs {
+  margin-top: 30px;
+}
 
 .liquidityWrapper {
     margin-left: auto;

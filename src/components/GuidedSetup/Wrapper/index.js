@@ -1,12 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from '../styles.module.scss';
+import Flex from 'antd/es/flex';
+import ModalRoot from '../../Modals/ModalRoot';
 
 export function GuidedSetupWrapper({ children }) {
   return (
-    <div className={styles.guidedSetupWrapper}>
-      <div className={styles.componentWrapper}>{children}</div>
-    </div>
+    <ModalRoot>
+      <Flex justify="center" align="center">
+        {children}
+      </Flex>
+    </ModalRoot>
   );
 }
 

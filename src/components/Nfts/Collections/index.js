@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Spin from 'antd/es/spin';
+import Alert from 'antd/es/alert';
+import List from 'antd/es/list';
+import Flex from 'antd/es/flex';
 import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
-import styles from '../Overview/styles.module.scss';
-import Card from '../../Card';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import Button from '../../Button/Button';
 import CreateEditCollectionModalWrapper from '../../Modals/Nfts/CreateEditCollection';
 
 function Collections() {
   const dispatch = useDispatch();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const userCollections = useSelector(nftsSelectors.userCollections);
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
@@ -20,37 +19,26 @@ function Collections() {
     dispatch(nftsActions.getUserCollections.call(userWalletAddress));
   }, [dispatch, userWalletAddress]);
 
-  return (
-    <div className={stylesPage.contentWrapper}>
-      <div className={stylesPage.sectionWrapper}>
-        <Card className={stylesPage.overviewWrapper}>
-          <div className={styles.topInfo}>
-            <span className={stylesPage.cardTitle}>Collections</span>
-            <Button primary small onClick={() => setIsModalOpen(true)}>
-              CREATE COLLECTION
-            </Button>
-          </div>
-          <div>
-            {userCollections && userCollections.length > 0 ? (
-              userCollections.map((item) => (
-                <div key={item.collectionId}>
-                  Collection ID:
-                  {item.collectionId}
-                </div>
-              ))
-            ) : (
-              <div>You don&apos;t have any collection</div>
-            )}
-          </div>
-        </Card>
-      </div>
+  if (!userCollections) {
+    return <Spin />;
+  }
 
-      {isModalOpen && (
-        <CreateEditCollectionModalWrapper
-          closeModal={() => setIsModalOpen(false)}
+  return (
+    <Flex vertical gap="20px">
+      <Flex gap="15px" wrap justify="end">
+        <CreateEditCollectionModalWrapper />
+      </Flex>
+      {userCollections?.length ? (
+        <List
+          dataSource={userCollections}
+          renderItem={({ collectionId }) => (
+            <List.Item>
+              <List.Item.Meta title={`Collection ID: ${collectionId}`} />
+            </List.Item>
+          )}
         />
-      )}
-    </div>
+      ) : <Alert type="info" message={<>You don&apos;t have any collection</>} />}
+    </Flex>
   );
 }
 

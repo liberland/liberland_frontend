@@ -3,10 +3,9 @@ import { useSelector } from 'react-redux';
 import {
   Redirect, Route, Switch,
 } from 'react-router-dom';
+import Alert from 'antd/es/alert';
 import router from '../../router';
 import { blockchainSelectors } from '../../redux/selectors';
-import styles from './styles.module.scss';
-import Card from '../Card';
 import { loader } from '../../utils/loader';
 import { stockWrapper } from './StockContext';
 
@@ -52,17 +51,18 @@ function Wallet() {
         />
       </Switch>
     ) : (
-      <Card>
-        <div className={styles.haveNotExtension}>
-          <span>
+      <Alert
+        type="error"
+        message={(
+          <>
             No extension installed, or you did not accept the authorization, please visit
             {' '}
             <a target="_blank" href="https://polkadot.js.org/extension/" rel="noopener noreferrer">polkadot.js.org</a>
             {' '}
             for more details.
-          </span>
-        </div>
-      </Card>
+          </>
+        )}
+      />
     )
   );
 }

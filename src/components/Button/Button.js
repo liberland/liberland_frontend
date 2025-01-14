@@ -8,7 +8,7 @@ function Button({
   children,
   type = 'button',
   primary,
-  onClick = () => { },
+  onClick,
   large,
   little,
   small,
@@ -24,6 +24,7 @@ function Button({
   multiline,
   href,
   link,
+  newTab,
 }) {
   const getSize = () => {
     if (large) {
@@ -51,6 +52,7 @@ function Button({
       onClick={onClick}
       htmlType={type}
       type={getType()}
+      target={newTab ? '_blank' : undefined}
       href={href}
       danger={red}
       size={getSize()}
@@ -72,26 +74,6 @@ function Button({
   );
 }
 
-Button.defaultProps = {
-  type: 'button',
-  primary: false,
-  onClick: () => {},
-  large: false,
-  little: false,
-  small: false,
-  nano: false,
-  className: '',
-  secondary: false,
-  green: false,
-  grey: false,
-  red: false,
-  whiteRed: false,
-  disabled: false,
-  flex: false,
-  multiline: false,
-  link: false,
-};
-
 Button.propTypes = {
   children: PropTypes.node.isRequired,
   type: PropTypes.string,
@@ -112,6 +94,7 @@ Button.propTypes = {
   href: PropTypes.string,
   multiline: PropTypes.bool,
   link: PropTypes.bool,
+  newTab: PropTypes.bool,
 };
 
 export default Button;

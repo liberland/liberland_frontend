@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
 import { useDispatch, useSelector } from 'react-redux';
-import { TextInput, SelectInput } from '../../../../InputComponents';
+import DatePicker from 'antd/es/date-picker';
+import Flex from 'antd/es/flex';
+import Form from 'antd/es/form';
+import InputNumber from 'antd/es/input-number';
+import Select from 'antd/es/select';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import dayjs from 'dayjs';
 import Button from '../../../../Button/Button';
-import styles from './styles.module.scss';
 import router from '../../../../../router';
 import { congressSelectors } from '../../../../../redux/selectors';
 import { AddLegislationFields } from '../AddLegislationFields/AddLegislationFields';
@@ -19,20 +22,11 @@ function CongressAddLegislationViaReferendum() {
   const isLoading = useSelector(congressSelectors.isLoading);
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
-  const {
-    handleSubmit, formState: { errors }, register, control, watch,
-  } = useForm({
-    mode: 'all',
-    defaultValues: {
-      year: new Date().getFullYear(),
-      FastTrackDefaults,
-      sections: [
-        { value: 'Paste markdown to autosplit sections' },
-      ],
-    },
-  });
+  const [form] = Form.useForm();
 
-  if (!isLoading && shouldRedirect) return <Redirect to={router.congress.motions} />;
+  if (!isLoading && shouldRedirect) {
+    return <Redirect to={router.congress.motions} />;
+  }
 
   const propose = ({
     discussionName,
@@ -52,7 +46,7 @@ function CongressAddLegislationViaReferendum() {
       discussionDescription,
       discussionLink,
       tier,
-      id: { year, index },
+      id: { year: year.year(), index },
       sections,
       fastTrack,
       fastTrackVotingPeriod,
@@ -62,65 +56,65 @@ function CongressAddLegislationViaReferendum() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(propose)}
-    >
-      <div className={styles.h3}>Propose a new Congress Motion</div>
-      <div className={styles.description}>Propose a new Congress Motion to propose a Referendum</div>
-
-      <div className={styles.title}>Legislation Tier</div>
-      <SelectInput
-        register={register}
-        name="tier"
-        options={[
-          // no constitution, as it requires propose_rich
-          { value: 'InternationalTreaty', display: 'International Treaty' },
-          { value: 'Law', display: 'Law' },
-          { value: 'Tier3', display: 'Tier3' }, // FIXME proper names
-          { value: 'Tier4', display: 'Tier4' },
-          { value: 'Tier5', display: 'Tier5' },
-          { value: 'Decision', display: 'Decision' },
-        ]}
-      />
-
-      <div className={styles.title}>Legislation Year</div>
-      <TextInput
-        required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-        errorTitle="Year"
-        register={register}
-        name="year"
-      />
-      { errors?.year?.message && <div className={styles.error}>{errors.year.message}</div> }
-
-      <div className={styles.title}>Legislation Index</div>
-      <TextInput
-        required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-        errorTitle="Index"
-        register={register}
-        name="index"
-      />
-      { errors?.index?.message && <div className={styles.error}>{errors.index.message}</div> }
-
-      <ProposalDiscussionFields {...{ register, errors }} />
-      <AddLegislationFields {...{
-        register, control, errors, watch,
+    <Form
+      onFinish={propose}
+      initialValues={{
+        year: dayjs(new Date()),
+        FastTrackDefaults,
+        sections: [
+          { value: 'Paste markdown to autosplit sections' },
+        ],
       }}
-      />
+      form={form}
+      layout="vertical"
+    >
+      <Title level={3}>Propose a new Congress Motion</Title>
+      <Paragraph>Propose a new Congress Motion to propose a Referendum</Paragraph>
+      <Form.Item
+        name="tier"
+        label="Legislation tier"
+        rules={[{ required: true }]}
+      >
+        <Select
+          options={[
+            { value: 'InternationalTreaty', display: 'International Treaty' },
+            { value: 'Law', display: 'Law' },
+            { value: 'Tier3', display: 'Tier 3' },
+            { value: 'Tier4', display: 'Tier 4' },
+            { value: 'Tier5', display: 'Tier 5' },
+            { value: 'Decision', display: 'Decision' },
+          ]}
+        />
+      </Form.Item>
+      <Form.Item
+        name="year"
+        label="Legislation year"
+        rules={[{ required: true }]}
+        getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
+      >
+        <DatePicker picker="year" />
+      </Form.Item>
+      <Form.Item
+        name="index"
+        label="Legislation index"
+        rules={[{ required: true }]}
+      >
+        <InputNumber controls={false} />
+      </Form.Item>
 
-      <FastTrackForm {...{ register, errors, watch }} />
+      <ProposalDiscussionFields />
+      <AddLegislationFields form={form} />
+      <FastTrackForm form={form} />
 
-      <div className={styles.buttonWrapper}>
+      <Flex wrap gap="15px">
         <Button
           primary
-          medium
           type="submit"
         >
           Submit
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 

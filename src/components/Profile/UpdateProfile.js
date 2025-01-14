@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { blockchainSelectors } from '../../redux/selectors';
 import { identityActions } from '../../redux/actions';
 import { OnchainIdentityModal } from '../Modals';
+import Button from '../Button/Button';
 
 function UpdateProfile({
-  toggleModalOnchainIdentity,
+  closeModal,
   userName,
   lastName,
   identity,
@@ -28,9 +29,9 @@ function UpdateProfile({
     } else if (values.date_of_birth) {
       const dob = new Date(values.date_of_birth);
       eligible_on = new Date(
-        dob.getFullYear() + 15,
-        dob.getMonth(),
-        dob.getDate(),
+        dob.year() + 15,
+        dob.month(),
+        dob.date(),
       );
     }
 
@@ -46,13 +47,16 @@ function UpdateProfile({
     dispatch(
       identityActions.setIdentity.call({ userWalletAddress, values: params, isGuidedUpdate }),
     );
-    toggleModalOnchainIdentity();
+    closeModal();
   };
 
-  if (!identity || !blockNumber) return null;
+  if (!identity || !blockNumber) {
+    return null;
+  }
+
   return (
     <OnchainIdentityModal
-      closeModal={toggleModalOnchainIdentity}
+      closeModal={closeModal}
       onSubmit={handleSubmitOnchainIdentity}
       identity={identity}
       blockNumber={blockNumber}
@@ -69,7 +73,7 @@ UpdateProfile.defaultProps = {
 
 UpdateProfile.propTypes = {
   isGuidedUpdate: PropTypes.bool,
-  toggleModalOnchainIdentity: PropTypes.func.isRequired,
+  closeModal: PropTypes.func.isRequired,
   userName: PropTypes.string,
   lastName: PropTypes.string,
   identity: PropTypes.shape({
@@ -79,4 +83,46 @@ UpdateProfile.propTypes = {
   blockNumber: PropTypes.number.isRequired,
 };
 
-export default UpdateProfile;
+function UpdateProfileWrapper({
+  userName,
+  lastName,
+  identity,
+  blockNumber,
+  isGuidedUpdate,
+}) {
+  const [show, setShow] = useState();
+
+  return (
+    <>
+      <Button
+        primary
+        onClick={() => setShow(true)}
+      >
+        Update identity
+      </Button>
+      {show && (
+        <UpdateProfile
+          blockNumber={blockNumber}
+          closeModal={() => setShow(false)}
+          identity={identity}
+          isGuidedUpdate={isGuidedUpdate}
+          lastName={lastName}
+          userName={userName}
+        />
+      )}
+    </>
+  );
+}
+
+UpdateProfileWrapper.propTypes = {
+  isGuidedUpdate: PropTypes.bool,
+  userName: PropTypes.string,
+  lastName: PropTypes.string,
+  identity: PropTypes.shape({
+    isSome: PropTypes.bool.isRequired,
+    unwrap: PropTypes.func.isRequired,
+  }).isRequired,
+  blockNumber: PropTypes.number.isRequired,
+};
+
+export default UpdateProfileWrapper;

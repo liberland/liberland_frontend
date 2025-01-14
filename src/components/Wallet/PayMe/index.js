@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useHistory } from 'react-router-dom';
+import Spin from 'antd/es/spin';
 import { identityActions, walletActions } from '../../../redux/actions';
 import { identitySelectors, walletSelectors } from '../../../redux/selectors';
 import { formatDollars } from '../../../utils/walletHelpers';
 import ModalRoot from '../../Modals/ModalRoot';
-import Card from '../../Card';
 import Table from '../../Table';
-import stylesPage from '../../../utils/pagesBase.module.scss';
 import routes from '../../../router';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
 import styles from './styles.module.scss';
@@ -49,51 +48,46 @@ function PayMe() {
     );
   };
 
+  if (identityIsLoading) {
+    return <Spin />;
+  }
+
   return (
-    <div className={stylesPage.contentWrapper}>
-      <div className={stylesPage.sectionWrapper}>
-        <Card className={stylesPage.overviewWrapper} title="Send payment">
-          <div className={stylesPage.overViewCard}>
-            <div className={styles.payMeContainer}>
-              {identityIsLoading && <div>Loading...</div>}
-              {linkData && (
-                <Table
-                  columns={[
-                    {
-                      Header: 'Payment information',
-                      accessor: 'name',
-                    },
-                    {
-                      Header: '',
-                      accessor: 'value',
-                    },
-                  ]}
-                  data={[
-                    {
-                      name: 'Recipient',
-                      value: displayName,
-                    },
-                    {
-                      name: 'Amount',
-                      value: `${formatDollars(linkData.amount)} LLD`,
-                    },
-                  ].concat(linkData.note ? [{
-                    name: 'Note',
-                    value: linkData.note,
-                  }] : [])}
-                />
-              )}
-              <Button primary medium type="button" onClick={payRecipient}>
-                <div className={styles.icon}>
-                  <UploadIcon />
-                </div>
-                Pay recipient
-              </Button>
+    <>
+      <Table
+        columns={[
+          {
+            Header: 'Payment information',
+            accessor: 'name',
+          },
+          {
+            Header: '',
+            accessor: 'value',
+          },
+        ]}
+        data={[
+          {
+            name: 'Recipient',
+            value: displayName,
+          },
+          {
+            name: 'Amount',
+            value: `${formatDollars(linkData.amount)} LLD`,
+          },
+        ].concat(linkData.note ? [{
+          name: 'Note',
+          value: linkData.note,
+        }] : [])}
+        footer={(
+          <Button primary type="button" onClick={payRecipient}>
+            <div className={styles.icon}>
+              <UploadIcon />
             </div>
-          </div>
-        </Card>
-      </div>
-      {transferState === 'success' && (
+            Pay recipient
+          </Button>
+        )}
+      />
+      {transferState === 'success' ? (
         <ModalRoot>
           <div className={styles.successModal}>
             <h2>Transfer successful!</h2>
@@ -109,8 +103,8 @@ function PayMe() {
             </Button>
           </div>
         </ModalRoot>
-      )}
-    </div>
+      ) : null}
+    </>
   );
 }
 

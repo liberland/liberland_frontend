@@ -135,3 +135,51 @@ p {
 th.ant-table-cell {
   word-break: keep-all;
 }
+
+.ant-splitter {
+  min-height: 300;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.ant-typography.ant-typography-ellipsis {
+  max-width: 500px;
+}
+
+.ant-card-head-title {
+  white-space: unset!important;
+}
+
+.ant-list-grid .ant-card.ant-card-bordered {
+  max-width: 600px;
+}
+
+.ant-list-grid {
+  .ant-row > * {
+    display: flex;
+    height: auto;
+  }
+}
+
+.ant-form {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.ant-list .ant-row {
+  gap: 15px;
+}
+
+.hidden {
+  display: none;
+}
+
+.ant-list-item-meta-title {
+  text-align: left;
+}
+
+.ant-dropdown-menu-title-content {
+  .ant-btn {
+    width: 100%;
+    border: none;
+  }
+}

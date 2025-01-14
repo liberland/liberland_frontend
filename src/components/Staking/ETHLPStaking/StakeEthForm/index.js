@@ -1,18 +1,19 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Flex from 'antd/es/flex';
+import InputNumber from 'antd/es/input-number';
+import Slider from 'antd/es/slider';
 import PropTypes from 'prop-types';
 import ModalRoot from '../../../Modals/ModalRoot';
 import { ethSelectors } from '../../../../redux/selectors';
 import { ethActions } from '../../../../redux/actions';
-import { TextInput } from '../../../InputComponents';
 import Button from '../../../Button/Button';
-import ProgressBar from '../../../InputComponents/ProgressBar';
 import {
   formatCustom as formatCustomUnsafe,
   parseAssets as parseAssetsUnsafe,
 } from '../../../../utils/walletHelpers';
-import { stakeLPWithEth } from '../../../../api/ethereum';
 import styles from './styles.module.scss';
 
 const formatCustom = (value) => {
@@ -41,65 +42,35 @@ function StakeEthForm({
   account,
   onClose,
 }) {
-  const {
-    handleSubmit,
-    register,
-    setValue,
-    watch,
-    setError,
-    formState: {
-      errors,
-      isSubmitting,
-      isSubmitSuccessful,
-    },
-  } = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      tolerance: '90',
-    },
-  });
+  const [form] = Form.useForm();
 
   const dispatch = useDispatch();
-  const [results, setResults] = useState(0);
   const connected = useSelector(ethSelectors.selectorConnected);
   const balance = useSelector(ethSelectors.selectorBalance);
 
   const onSubmit = async ({ stake, tokens, tolerance }) => {
-    try {
-      const realStake = parseAssets(stake);
-      const realTokens = parseAssets(tokens);
-      const signer = await connected.provider.getSigner(account);
-      const getAmountWithTolerance = (amount) => (
-        ((window.BigInt(amount) * window.BigInt(tolerance)) / window.BigInt(100)).toString()
-      );
-      setResults(await stakeLPWithEth(
-        signer,
-        realStake,
-        getAmountWithTolerance(realStake),
-        realTokens,
-        getAmountWithTolerance(realTokens),
-        connected.provider,
-      ));
-      dispatch(ethActions.getWethLpExchangeRate.call());
-      dispatch(ethActions.getBalance.call({ provider: connected.provider, address: account }));
-      dispatch(ethActions.getErc20Balance.call(
-        process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
-        account,
-      ));
-    } catch (e) {
-      setError('stake', {
-        message: 'Something went wrong',
-      });
-      // eslint-disable-next-line no-console
-      console.error(e);
-    }
+    const realStake = parseAssets(stake);
+    const realTokens = parseAssets(tokens);
+    const signer = await connected.provider.getSigner(account);
+    const getAmountWithTolerance = (amount) => (
+      ((window.BigInt(amount) * window.BigInt(tolerance)) / window.BigInt(100)).toString()
+    );
+    dispatch(ethActions.stakeLpWithEth.call({
+      address: account,
+      account: signer,
+      ethAmount: realStake,
+      ethAmountMin: getAmountWithTolerance(realStake),
+      tokenAmount: realTokens,
+      tokenAmountMin: getAmountWithTolerance(realTokens),
+      provider: connected.provider,
+    }));
   };
 
-  const stake = watch('stake', '');
-  const tokens = watch('tokens', '');
+  const stake = Form.useWatch('stake', form) || '';
+  const tokens = Form.useWatch('tokens', form) || '';
   const [stakeFocused, setStakeFocused] = useState(false);
   const [tokensFocused, setTokensFocused] = useState(false);
-  const tolerance = watch('tolerance', '90');
+  const tolerance = Form.useWatch('tolerance', form) || '90';
   const exchangeRate = useSelector(ethSelectors.selectorWethLpExchangeRate);
   const exchangeRateLoading = useSelector(ethSelectors.selectorWethLpExchangeRateLoading);
   const exchangeRateError = useSelector(ethSelectors.selectorWethLpExchangeRateError);
@@ -122,7 +93,7 @@ function StakeEthForm({
   const formattedBalance = formatCustom(balance || '0');
 
   const liquidityPoolReward = useMemo(() => {
-    if (stake && tokens && exchangeRate && !errors.stake && !errors.token) {
+    if (stake && tokens && exchangeRate && !form.getFieldError('stake') && !form.getFieldError('token')) {
       try {
         const lpTokens = exchangeRate.rewardRate({
           eth: window.BigInt(parseAssets(stake)),
@@ -135,150 +106,98 @@ function StakeEthForm({
       }
     }
     return 'No reward calculated';
-  }, [exchangeRate, stake, tokens, errors]);
+  }, [exchangeRate, stake, tokens, form]);
 
   useEffect(() => {
     if (exchangeRateError) {
-      setError('stake', { message: 'LP stake did not load correctly' });
+      form.setFields([{ name: 'stake', errors: ['LP stake did not load correctly'] }]);
     }
-  }, [setError, exchangeRateError]);
+  }, [form, exchangeRateError]);
 
   useEffect(() => {
     if (stake && exchangeRate && stakeFocused && !tokensFocused) {
-      setValue(
+      form.setFieldValue(
         'tokens',
         formatCustom(exchangeRate.tokenRate(window.BigInt(parseAssets(stake)))),
-        { shouldValidate: true },
       );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stake, exchangeRate]);
+  }, [stake, exchangeRate, stakeFocused, tokensFocused, form]);
 
   useEffect(() => {
     if (tokens && exchangeRate && tokensFocused && !stakeFocused) {
-      setValue(
+      form.setFieldValue(
         'stake',
         formatCustom(exchangeRate.ethRate(window.BigInt(parseAssets(tokens)))),
-        { shouldValidate: true },
       );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tokens, exchangeRate]);
+  }, [tokens, exchangeRate, tokensFocused, stakeFocused, form]);
 
   if (exchangeRateLoading) {
     return <div className={styles.form}>Loading...</div>;
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
+    <Form
+      form={form}
+      onFinish={onSubmit}
       className={styles.form}
+      layout="vertical"
+      initialValues={{
+        tolerance: 90,
+      }}
     >
-      <label className={styles.wrapper} htmlFor="stake">
-        Stake your ETH through Uniswap (balance:
-        {' '}
-        {formattedBalance}
-        )
-        <div className={styles.inputWrapper}>
-          <TextInput
-            register={register}
-            id="stake"
-            name="stake"
-            errorTitle="Stake"
-            onFocus={() => setStakeFocused(true)}
-            onBlur={() => setStakeFocused(false)}
-            value={stake}
-            className={styles.input}
-            onChange={(event) => setValue('stake', event.target.value)}
-            validate={(input) => (!input || /^\d*\.?\d+$/.test(input) ? undefined : 'Invalid stake')}
-            disabled={isSubmitting}
-            placeholder="ETH"
-            required
-          />
-        </div>
-        {errors.stake && (
-        <div className={styles.error}>
-          {errors.stake.message}
-        </div>
-        )}
-        {isSubmitSuccessful && (
-          <div className={styles.success}>
-            LP staked:
-            {' '}
-            {formatCustom(results)}
-          </div>
-        )}
-      </label>
-      <label className={styles.wrapper} htmlFor="tokens">
-        Stake your LLD through Uniswap (balance:
-        {' '}
-        {lldBalance}
-        )
-        <div className={styles.inputWrapper}>
-          <TextInput
-            register={register}
-            id="tokens"
-            name="tokens"
-            errorTitle="Tokens"
-            onFocus={() => setTokensFocused(true)}
-            onBlur={() => setTokensFocused(false)}
-            value={tokens}
-            className={styles.input}
-            onChange={(event) => setValue('tokens', event.target.value)}
-            validate={(input) => (!input || /^\d*\.?\d+$/.test(input) ? undefined : 'Invalid tokens')}
-            disabled={isSubmitting}
-            placeholder="LLD"
-            required
-          />
-        </div>
-        {errors.tokens && (
-          <div className={styles.error}>
-            {errors.tokens.message}
-          </div>
-        )}
-      </label>
-      <label className={styles.wrapper} htmlFor="tolerance">
-        Contract will fail if cannot stake
-        {' '}
-        {tolerance}
-        % of ETH/LLD into LP
-        <ProgressBar
-          value={parseInt(tolerance)}
-          handleChange={(event) => setValue('tolerance', event.target.value.toString())}
-          register={register}
-          name="tolerance"
+      <Form.Item
+        name="stake"
+        label="Stake your ETH through Uniswap"
+        extra={`balance: ${formattedBalance}`}
+        rules={[{ required: true }]}
+      >
+        <InputNumber
+          stringMode
+          controls={false}
+          onFocus={() => setStakeFocused(true)}
+          onBlur={() => setStakeFocused(false)}
         />
-        {errors.tolerance && (
-          <div className={styles.error}>
-            {errors.tolerance.message}
-          </div>
-        )}
-      </label>
-      <div className={styles.reward}>
+      </Form.Item>
+      <Form.Item
+        name="tokens"
+        label="Stake your LLD through Uniswap"
+        extra={`balance: ${lldBalance}`}
+        rules={[{ required: true }]}
+      >
+        <InputNumber
+          stringMode
+          controls={false}
+          onFocus={() => setTokensFocused(true)}
+          onBlur={() => setTokensFocused(false)}
+        />
+      </Form.Item>
+      <Form.Item
+        name="tolerance"
+        label={`Contract will fail if cannot stake ${tolerance}% of ETH/LLD into LP`}
+        rules={[{ required: true }]}
+      >
+        <Slider min={0} max={100} />
+      </Form.Item>
+      <Paragraph>
         {liquidityPoolReward}
-      </div>
-      <div className={styles.reward}>
+      </Paragraph>
+      <Paragraph>
         Will ask you to sign 4 transactions.
         Close the form after and click on refresh after to see all current information.
-      </div>
-      <div className={styles.buttonRow}>
-        <div className={styles.closeForm}>
-          <Button disabled={isSubmitting} medium onClick={onClose}>
-            Close
-          </Button>
-        </div>
-        <div>
-          <Button
-            primary
-            medium
-            type="submit"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Loading...' : 'Stake ETH & LLD'}
-          </Button>
-        </div>
-      </div>
-    </form>
+      </Paragraph>
+      <Flex wrap gap="15px">
+        <Button onClick={onClose}>
+          Close
+        </Button>
+        <Button
+          primary
+          type="submit"
+        >
+          Stake ETH & LLD
+        </Button>
+      </Flex>
+    </Form>
   );
 }
 

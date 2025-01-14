@@ -1,87 +1,66 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { TextInput } from '../../InputComponents';
-import styles from '../../Modals/styles.module.scss';
+import Form from 'antd/es/form';
+import InputNumber from 'antd/es/input-number';
+import Input from 'antd/es/input';
 import { encodeRemark } from '../../../api/nodeRpcCall';
 
 export default function RemarkFormUser({
-  register,
-  indexItem,
-  errors,
-  watch,
-  setValue,
+  form,
+  setIsLoading,
 }) {
-  const idName = indexItem !== null ? `id${indexItem}` : 'id';
-  const descriptionName = indexItem !== null ? `description${indexItem}` : 'description';
-  const combined = indexItem !== null ? `combined${indexItem}` : 'combined';
-
-  const id = watch(idName);
-  const description = watch(descriptionName);
+  const id = Form.useWatch('id', form);
+  const description = Form.useWatch('description', form);
 
   useEffect(() => {
-    const remark = {
-      id,
-      description,
-    };
-
-    encodeRemark(remark).then((encoded) => setValue(combined, encoded, { shouldValidate: true }));
-  }, [id, description, setValue, combined]);
+    (async () => {
+      setIsLoading(true);
+      try {
+        const remark = await encodeRemark({
+          id, description,
+        });
+        form.setFieldValue('combined', remark);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+        form.setFields([{ name: 'id', errors: ['Something went wrong'] }]);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, [id, description, form, setIsLoading]);
 
   return (
     <>
-      <div className={styles.title}>ID</div>
-      <TextInput
-        register={register}
-        name={idName}
-        errorTitle="ID"
-        placeholder="Enter ID"
-        required
-      />
-      {errors?.[`${idName}`] && (
-        <div className={styles.error}>{errors?.[`${idName}`].message}</div>
-      )}
-
-      <div className={styles.title}>Description</div>
-      <TextInput
-        register={register}
-        name={descriptionName}
-        errorTitle="Description"
-        placeholder="Enter Description"
-        required
-      />
-      {errors?.[`${descriptionName}`] && (
-        <div className={styles.error}>
-          {errors[`${descriptionName}`].message}
-        </div>
-      )}
-
-      <TextInput
-        className={styles.displayNone}
-        register={register}
-        name={combined}
-        validate={(value) => {
-          if (Object.keys(value).length > 256) {
-            return 'Remark should have less than 256 bytes';
-          }
-          return true;
-        }}
-      />
-      {errors?.[`${combined}`] && (
-        <div className={styles.error}>{errors[`${combined}`].message}</div>
-      )}
+      <Form.Item
+        name="id"
+        label="ID"
+        rules={[{ required: true }]}
+      >
+        <InputNumber controls={false} />
+      </Form.Item>
+      <Form.Item
+        name="description"
+        label="Description"
+        rules={[{ required: true }]}
+      >
+        <Input placeholder="Enter description" />
+      </Form.Item>
+      <Form.Item
+        hidden
+        name="combined"
+        rules={[{ required: true }]}
+      >
+        <Input />
+      </Form.Item>
     </>
   );
 }
 
-RemarkFormUser.defaultProps = {
-  indexItem: null,
-};
-
 RemarkFormUser.propTypes = {
-  register: PropTypes.func.isRequired,
-  indexItem: PropTypes.number,
-  watch: PropTypes.func.isRequired,
-  setValue: PropTypes.func.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  errors: PropTypes.any.isRequired,
+  form: PropTypes.shape({
+    setFieldValue: PropTypes.func.isRequired,
+    setFields: PropTypes.func.isRequired,
+  }).isRequired,
+  setIsLoading: PropTypes.func.isRequired,
 };

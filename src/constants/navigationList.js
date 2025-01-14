@@ -128,6 +128,7 @@ export const navigationList = [
     subLinks: {
       Overview: router.staking.overview,
       'ETH LP Staking': router.staking.ethlpstaking,
+      'SOL LP Staking': router.staking.sollpstaking,
     },
   },
   {
@@ -140,7 +141,7 @@ export const navigationList = [
       Overview: router.congress.overview,
       Motions: router.congress.motions,
       Treasury: router.congress.treasury,
-      'Propose linternational treaty': router.congress.addLegislation,
+      'Propose International treaty': router.congress.addLegislation,
       'Propose legislaton': router.congress.addLegislationViaReferendum,
       Wallet: router.congress.wallet,
     },
@@ -152,6 +153,7 @@ export const navigationList = [
     isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
+      Overview: router.senate.overview,
       Motions: router.senate.motions,
       'Scheduled Congress Spending': router.senate.scheduledCongressSpending,
       Wallet: router.senate.wallet,

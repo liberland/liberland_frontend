@@ -77,6 +77,7 @@ export default {
   staking: {
     overview: '/home/staking/overview',
     ethlpstaking: '/home/staking/ethlpstaking',
+    sollpstaking: '/home/staking/sollpstaking',
   },
   congress: {
     overview: '/home/congress/overview',

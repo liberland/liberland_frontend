@@ -1,51 +1,10 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { formatDollars } from '../../../../utils/walletHelpers';
+import Card from 'antd/es/card';
 import { validatorSelectors } from '../../../../redux/selectors';
 import { validatorActions } from '../../../../redux/actions';
-import Table from '../../../Table';
 import slashesIcon from '../../../../assets/icons/slashes.svg';
-import styles from './styles.module.scss';
-
-function SlashTable({ slashes }) {
-  return (
-    <Table
-      columns={[
-        {
-          Header: 'Slash apply era',
-          accessor: 'era',
-        },
-        {
-          Header: 'Your slash amount (as validator)',
-          accessor: 'validatorSlash',
-        },
-        {
-          Header: 'Your slash amount (as nominator)',
-          accessor: 'nominatorSlash',
-        },
-      ]}
-      data={slashes.map(({ era, validatorSlash, nominatorSlash }) => ({
-        era,
-        validatorSlash: `${formatDollars(validatorSlash ?? 0)} LLD`,
-        nominatorSlash: `${formatDollars(nominatorSlash ?? 0)} LLD`,
-      }))}
-    />
-  );
-}
-
-SlashTable.propTypes = {
-  slashes: PropTypes.arrayOf(
-    PropTypes.shape({
-      // eslint-disable-next-line react/forbid-prop-types
-      era: PropTypes.any.isRequired,
-      // eslint-disable-next-line react/forbid-prop-types
-      validatorSlash: PropTypes.any.isRequired,
-      // eslint-disable-next-line react/forbid-prop-types
-      nominatorSlash: PropTypes.any.isRequired,
-    }),
-  ).isRequired,
-};
+import SlashTable from '../SlashTable';
 
 export default function Slashes() {
   const dispatch = useDispatch();
@@ -56,34 +15,27 @@ export default function Slashes() {
     dispatch(validatorActions.getSlashes.call());
   }, [dispatch]);
 
+  if (!appliedSlashes?.length && !unappliedSlashes?.length) {
+    return null;
+  }
+
   return (
-    <>
-      {(appliedSlashes?.length > 0 || unappliedSlashes?.length > 0) && (
-        <div className={styles.headerWithIcon}>
-          <img
-            className={styles.slashesIcon}
-            src={slashesIcon}
-            width="16"
-            alt=""
-          />
-          {' '}
-          <h3>Slashes</h3>
-        </div>
+    <Card
+      title="Slashes"
+      cover={(
+        <img
+          src={slashesIcon}
+          width="16"
+          alt="slash icon"
+        />
       )}
-      <div className={styles.internalWrapper}>
-        {appliedSlashes?.length > 0 && (
-          <div>
-            <h4>Applied slashes:</h4>
-            <SlashTable slashes={appliedSlashes} />
-          </div>
-        )}
-        {unappliedSlashes?.length > 0 && (
-          <div>
-            <h4>Unapplied slashes:</h4>
-            <SlashTable slashes={unappliedSlashes} />
-          </div>
-        )}
-      </div>
-    </>
+    >
+      {appliedSlashes?.length > 0 && (
+        <SlashTable title="Applied slashes" slashes={appliedSlashes} />
+      )}
+      {unappliedSlashes?.length > 0 && (
+        <SlashTable title="Unapplied slashes" slashes={unappliedSlashes} />
+      )}
+    </Card>
   );
 }

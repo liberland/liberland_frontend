@@ -1,17 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import cx from 'classnames';
+import Flex from 'antd/es/flex';
+import Title from 'antd/es/typography/Title';
 import Button from '../../Button/Button';
-// REDUX
 import { blockchainActions, congressActions, validatorActions } from '../../../redux/actions';
 import {
   congressSelectors,
 } from '../../../redux/selectors';
-import styles from '../styles.module.scss';
 import ProposeLegislationButton from '../ProposeLegislationButton';
 import ProposeLegislationViaReferendumButton from '../ProposeLegislationViaReferendumButton';
-import ProposeBudgetButton from '../ProposeBudgetButton';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
+import ProposeBudgetModalWrapper from '../../Modals/ProposeBudgetModal';
+import Table from '../../Table';
 
 export default function Overview() {
   const dispatch = useDispatch();
@@ -27,10 +27,18 @@ export default function Overview() {
     dispatch(congressActions.getRunnersUp.call());
   }, [dispatch]);
 
-  let userStatus = 'None';
-  if (userIsMember) userStatus = 'Member';
-  else if (userIsCandidate) userStatus = 'Candidate';
-  else if (userIsRunnersUp) userStatus = 'RunnerUp';
+  const userStatus = useMemo(() => {
+    if (userIsMember) {
+      return 'Member';
+    }
+    if (userIsCandidate) {
+      return 'Candidate';
+    }
+    if (userIsRunnersUp) {
+      return 'RunnerUp';
+    }
+    return 'None';
+  }, [userIsMember, userIsCandidate, userIsRunnersUp]);
 
   const switchWallet = (walletAddress) => {
     dispatch(blockchainActions.setUserWallet.success(walletAddress));
@@ -39,77 +47,80 @@ export default function Overview() {
   };
 
   return (
-    <div className={styles.congressWrapper}>
-      <div className={styles.rowWrapper}>
-        <div className={styles.navCol}>
-          <h4>User congress status</h4>
-          <p>
-            {' '}
-            {userStatus}
-          </p>
-        </div>
-        <div className={cx(styles.rowEnd, styles.gap)}>
-          {!userIsCandidate && !userIsMember && !userIsRunnersUp && (
-            <Button
-              small
-              primary
-              onClick={() => dispatch(congressActions.applyForCongress.call())}
-            >
-              Apply for Congress
-            </Button>
-          )}
+    <Table
+      title={(
+        <Flex wrap gap="15px" justify="space-between">
+          <Title level={2}>
+            Congress members
+          </Title>
+          <Flex wrap gap="15px" align="center">
+            {!userIsCandidate && !userIsMember && !userIsRunnersUp && (
+              <Button
+                primary
+                onClick={() => dispatch(congressActions.applyForCongress.call())}
+              >
+                Apply for Congress
+              </Button>
+            )}
+            {(userIsMember || userIsCandidate || userIsRunnersUp) && (
+              <Button
+                onClick={() => dispatch(congressActions.renounceCandidacy.call(userStatus))}
+              >
+                Renounce
+                {userIsMember ? ' Congress Membership' : null}
+                {userIsCandidate || userIsRunnersUp ? ' Candidacy' : null}
+              </Button>
+            )}
+          </Flex>
+        </Flex>
+      )}
+      footer={(
+        <Flex wrap gap="15px" justify="end">
           {userIsMember && (
             <>
               <ProposeLegislationButton />
               <ProposeLegislationViaReferendumButton />
-              <ProposeBudgetButton />
+              <ProposeBudgetModalWrapper />
             </>
           )}
-          {(userIsMember || userIsCandidate || userIsRunnersUp) && (
+          {userHasWalletCongressMember && !userIsMember && (
             <Button
-              small
-              secondary
-              onClick={() => dispatch(congressActions.renounceCandidacy.call(userStatus))}
+              primary
+              onClick={
+              () => switchWallet(userHasWalletCongressMember)
+            }
             >
-              Renounce
-              {userIsMember ? ' Congress Membership' : null}
-              {userIsCandidate || userIsRunnersUp ? ' Candidacy' : null}
+              Switch wallet to Congress Member
             </Button>
           )}
-        </div>
-      </div>
-      <br />
-      <div className={styles.list}>
-        <b><span>Congress Members:</span></b>
-        <br />
-        {userHasWalletCongressMember && !userIsMember && (
-          <Button
-            small
-            primary
-            onClick={
-            () => switchWallet(userHasWalletCongressMember)
-          }
-          >
-            Switch wallet to Congress Member
-          </Button>
-        )}
-        <br />
-        <ul>
-          {members && members.map((item, index) => {
-            const { member, identity } = item;
-            return (
-              // eslint-disable-next-line react/no-array-index-key
-              <li key={member + index}>
-                <CopyIconWithAddress
-                  address={member}
-                  name={identity.identity?.name}
-                  legal={identity.identity?.legal}
-                />
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </div>
+        </Flex>
+      )}
+      columns={[
+        {
+          Header: 'User name',
+          accessor: 'name',
+        },
+        {
+          Header: 'Full legal name',
+          accessor: 'legal',
+        },
+        {
+          Header: 'Address',
+          accessor: 'address',
+        },
+      ]}
+      data={members?.map((item) => {
+        const { member, identity } = item;
+        return {
+          name: identity.identity?.name || 'Unknown',
+          legal: identity.identity?.legal || 'Unknown',
+          address: (
+            <CopyIconWithAddress
+              address={member}
+            />
+          ),
+        };
+      }) || []}
+    />
   );
 }

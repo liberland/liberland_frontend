@@ -1,22 +1,20 @@
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import cx from 'classnames';
-import { useHistory } from 'react-router-dom/cjs/react-router-dom';
-import { useMediaQuery } from 'usehooks-ts';
+import Collapse from 'antd/es/collapse';
+import List from 'antd/es/list';
+import Modal from 'antd/es/modal';
+import Alert from 'antd/es/alert';
+import { useHistory } from 'react-router-dom';
 import { blockchainSelectors, democracySelectors } from '../../../redux/selectors';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import styles from './styles.module.scss';
 import CurrentAssemble from './CurrentAssemble';
-import CandidateVoting from './CandidateVoting';
 import { democracyActions } from '../../../redux/actions';
-import AgreeDisagreeModal from '../../Modals/AgreeDisagreeModal';
 import CongressionalCountdown from './CongressionalCountdown';
-import ModalRoot from '../../Modals/ModalRoot';
-import stylesModal from '../../Modals/styles.module.scss';
+import CandidateCard from './CandidateCard';
+import Button from '../../Button/Button';
+import SelectedCandidateCard from './SelectedCandidateCard';
 
 function CongressionalAssemble() {
-  const isNotTablet = useMediaQuery('(min-width: 768px)');
   const history = useHistory();
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
@@ -163,62 +161,78 @@ function CongressionalAssemble() {
 
   return (
     <>
-      {isModalOpen
-      && (
-      <ModalRoot>
-        <AgreeDisagreeModal
-          text=""
-          buttonLeft="CANCEL AND LEAVE PAGE"
-          buttonRight="UPDATE VOTE"
-          style={cx(stylesModal.getCitizenshipModal, styles.modal)}
-          onDisagree={handleDiscardChanges}
-          onAgree={() => handleUpdate()}
-        >
-          <h3>
-            {isNotTablet
-
-              ? (
-                <>
-                  Your voting preferences haven&#96;t been
-                  <br />
-                  {' '}
-                  saved, would you like to save them?
-                </>
-              )
-              : (
-                <>
-                  Your voting preferences
-                  <br />
-                  haven&#96;t been saved,
-                  <br />
-                  would you like to save them?
-                </>
-              )}
-
-          </h3>
-        </AgreeDisagreeModal>
-      </ModalRoot>
-      )}
-      <div className={cx(stylesPage.contentWrapper, styles.contentWrapper)}>
-        {democracy?.democracy?.currentCongressMembers
-      && <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />}
-        {selectedCandidates && (
-        <CandidateVoting
-          handleUpdate={handleUpdate}
-          eligibleUnselectedCandidates={eligibleUnselectedCandidates}
-          selectedCandidates={selectedCandidates}
-          selectCandidate={selectCandidate}
-          unselectCandidate={unselectCandidate}
-          moveSelectedCandidate={moveSelectedCandidate}
-          didChangeSelectedCandidates={didChangeSelectedCandidates}
-        />
-        )}
-        {termDuration && (
-          <CongressionalCountdown termDuration={termDuration.toNumber()} />
-        )}
-      </div>
+      <Modal
+        open={isModalOpen}
+        title="Are you certain you want to leave the page?"
+        onOk={() => handleUpdate()}
+        onCancel={handleDiscardChanges}
+        okText="Update vote"
+        cancelText="Cancel and leave the page"
+      >
+        Your voting preferences haven&#96;t been saved, would you like to save them?
+      </Modal>
+      <Collapse
+        defaultActiveKey={['current', 'voting', 'preference', 'term']}
+        items={[
+          democracy?.democracy?.currentCongressMembers && {
+            key: 'current',
+            label: 'Acting Congressional Assembly',
+            children: (
+              <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />
+            ),
+          },
+          eligibleUnselectedCandidates?.length && {
+            key: 'voting',
+            label: 'Eligible Candidates (including current congressmen)',
+            children: (
+              <List
+                grid={{ gutter: 16 }}
+                dataSource={eligibleUnselectedCandidates}
+                renderItem={(unSelectedCandidate) => (
+                  <CandidateCard
+                    politician={unSelectedCandidate}
+                    selectCandidate={selectCandidate}
+                  />
+                )}
+              />
+            ),
+          },
+          {
+            key: 'preference',
+            label: 'My preference ordered Votes',
+            extra: (
+              <Button
+                primary
+                disabled={!didChangeSelectedCandidates}
+                onClick={() => handleUpdate()}
+              >
+                Update vote
+              </Button>
+            ),
+            children: selectedCandidates?.length ? (
+              <List
+                dataSource={selectedCandidates}
+                grid={{ gutter: 16 }}
+                renderItem={(currentCandidateVoteByUser) => (
+                  <SelectedCandidateCard
+                    politician={currentCandidateVoteByUser}
+                    unselectCandidate={unselectCandidate}
+                    moveSelectedCandidate={moveSelectedCandidate}
+                  />
+                )}
+              />
+            ) : <Alert type="info" message="No selected candidates" />,
+          },
+          termDuration && {
+            label: 'Term duration',
+            key: 'term',
+            children: (
+              <CongressionalCountdown termDuration={termDuration.toNumber()} />
+            ),
+          },
+        ].filter(Boolean)}
+      />
     </>
-
   );
 }
 

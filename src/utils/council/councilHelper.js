@@ -1,4 +1,3 @@
-import { encodeRemark } from '../../api/nodeRpcCall';
 import { parseAssets } from '../walletHelpers';
 
 export const objectToHex = (object) => {
@@ -11,38 +10,25 @@ export const objectToHex = (object) => {
   return hexString;
 };
 
-export const extractItemFromObject = async (obj, assetsData, key) => {
-  const assetInfo = assetsData.find((item) => item.value === obj[key]);
-  const remark = {
-    currency: obj[key],
-    project: obj[`project${key.slice(-1)}`],
-    description: obj[`description${key.slice(-1)}`],
-    category: obj[`category${key.slice(-1)}`],
-    supplier: obj[`supplier${key.slice(-1)}`],
-    date: Date.now(),
-    finalDestination: obj[`finalDestination${key.slice(-1)}`],
-    amountInUSDAtDateOfPayment: obj[`amountInUsd${key.slice(-1)}`],
-  };
-  const encodedRemark = await encodeRemark(remark);
+export const extractItemFromObject = (part, assetsData) => {
+  const assetInfo = assetsData.find((item) => item.value === part.select);
+  const encodedRemark = part.combined;
   return {
     transfer: {
-      asset: obj[key],
+      asset: part.select,
       balance: parseAssets(
-        obj[`transfer${key.slice(-1)}`],
+        part.amount,
         assetInfo.decimals,
       ),
-      recipient: obj[`recipient${key.slice(-1)}`],
+      recipient: part.recipient,
       index: assetInfo.index,
     },
     remark: encodedRemark,
   };
 };
 
-export const extractItemsFromObject = async (obj, assetsData) => {
-  const selectKeys = Object.keys(obj).filter((key) => key.startsWith('select'));
-  const resultArray = await Promise.all(
-    selectKeys.map(async (key) => extractItemFromObject(obj, assetsData, key)),
-  );
+export const extractItemsFromObject = (obj, assetsData) => {
+  const resultArray = obj.map((part) => extractItemFromObject(part, assetsData));
   return resultArray;
 };
 

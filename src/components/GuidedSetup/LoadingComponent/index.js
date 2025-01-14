@@ -1,8 +1,9 @@
 import React from 'react';
+import Spin from 'antd/es/spin';
 
 function LoadingComponent() {
   return (
-    <div>Loading...</div>
+    <Spin size="large" />
   );
 }
 

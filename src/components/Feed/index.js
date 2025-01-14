@@ -1,11 +1,13 @@
 /* eslint-disable max-len */
 import React from 'react';
 import cx from 'classnames';
-
-import Card from '../Card';
+import Flex from 'antd/es/flex';
+import Card from 'antd/es/card';
+import List from 'antd/es/list';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Markdown from 'markdown-to-jsx';
 import Status from '../Status';
 import styles from './styles.module.scss';
-import stylesPage from '../../utils/pagesBase.module.scss';
 
 function Feed() {
   const news = [
@@ -42,14 +44,12 @@ function Feed() {
       title: 'What can you do on Liberland blockchain?',
       date: 'Jan 27, 2024',
       author: 'Liberland',
-      text: `
-     Trading LLD and LLM are available, or soon will be available at coinstore, emirex, uniswap and polkaswap.
+      text: `Trading LLD and LLM are available, or soon will be available at coinstore, emirex, uniswap and polkaswap.
      LLD and LLM can be bridged to ethereum via the Liberland ETH bridge or polkaswap via the SORA bridge.
      LLD can be staked for inflation and block rewards.
      Any citizen can engage in the political process by voting for congressmen and referendums in the Voting tab.
      Politics for now is just advisory, but the expected date of binding politics is the birthday of Liberland on 13.4.
-     Upcoming features include company registrations, Liberland stock market, the judiciary system and contracts enforcement.
-     `,
+     Upcoming features include company registrations, Liberland stock market, the judiciary system and contracts enforcement.`,
       hashtags: ['#Blockchain'],
       type: 'liberland',
     },
@@ -70,60 +70,39 @@ function Feed() {
   ];
 
   return (
-    <div className={stylesPage.contentWrapper}>
-      <div className={styles.cardWrapper}>
-        {
-          news.map((newsItem) => (
-            <Card
-              key={newsItem.title + newsItem.date}
-              className={cx(stylesPage.overviewWrapper, styles.card)}
-            >
-              <div className={styles.mainContent}>
-                <h2 className={stylesPage.cardTitle}>{newsItem.title}</h2>
-                <p className={styles.cardInfo}>
-                  {newsItem.date}
-                  {' '}
-                  •
-                  {' '}
-                  <span
-                    className={
-                      cx(
-                        styles.author,
-                        {
-                          [styles.green]: newsItem.type === 'president',
-                          [styles.yellow]: newsItem.type === 'liberland',
-                        },
-                      )
-                    }
-                  >
-                    {newsItem.author}
-                  </span>
-                </p>
-                {/* eslint-disable-next-line react/no-danger */}
-                <p className={cx(styles.cardInfo, styles.withMargin)} dangerouslySetInnerHTML={{ __html: newsItem.text }} />
-              </div>
-
-              <div className={styles.cardFooter}>
-                <div>
-                  {newsItem.hashtags.map((hashtag, index) => (
-                    <Status
-                      key={hashtag}
-                      className={cx({
-                        [styles.greenStatus]: !index && newsItem.type === 'president',
-                        [styles.yellowStatus]: !index && newsItem.type === 'liberland',
-                      })}
-                      completed={newsItem.type === 'president'}
-                      status={hashtag}
-                      pending={newsItem.type === 'liberland'}
-                    />
-                  ))}
-                </div>
-              </div>
-            </Card>
-          ))
-        }
-      </div>
-    </div>
+    <List
+      grid={{ gutter: 16 }}
+      dataSource={news}
+      renderItem={(newsItem) => (
+        <Card
+          key={newsItem.title + newsItem.date}
+          title={newsItem.title}
+          extra={newsItem.date}
+          cover={(
+            <Flex wrap gap="4px" className={styles.cover}>
+              {newsItem.hashtags.map((hashtag, index) => (
+                <Status
+                  key={hashtag}
+                  className={cx({
+                    [styles.greenStatus]: !index && newsItem.type === 'president',
+                    [styles.yellowStatus]: !index && newsItem.type === 'liberland',
+                  })}
+                  completed={newsItem.type === 'president'}
+                  status={hashtag}
+                  pending={newsItem.type === 'liberland'}
+                />
+              ))}
+            </Flex>
+          )}
+        >
+          <Paragraph>
+            <Markdown>
+              {newsItem.text}
+            </Markdown>
+          </Paragraph>
+        </Card>
+      )}
+    />
   );
 }
 

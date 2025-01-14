@@ -6,15 +6,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import ModalRoot from '../ModalRoot';
-import stylesModal from '../styles.module.scss';
 import Button from '../../Button/Button';
 import MinusIcon from '../../../assets/icons/minus.svg';
 import { calculatePooled, getDecimalsForAsset } from '../../../utils/dexFormatter';
 import { AssetsPropTypes, ReservedAssetPropTypes } from '../../Wallet/Exchange/proptypes';
-import styles from './styles.module.scss';
 import { dexActions } from '../../../redux/actions';
 import { blockchainSelectors, dexSelectors } from '../../../redux/selectors';
 import { calculateAmountMin, formatAssets } from '../../../utils/walletHelpers';
+import styles from '../styles.module.scss';
 
 function RemoveLiquidityModal({
   closeModal,
@@ -98,7 +97,6 @@ function RemoveLiquidityModal({
 
   return (
     <Form
-      className={stylesModal.getCitizenshipModal}
       onFinish={onSubmit}
       form={form}
       layout="vertical"
@@ -111,6 +109,28 @@ function RemoveLiquidityModal({
           { required: true, message: 'Enter a value' },
           { type: 'number' },
         ]}
+        extra={(
+          <Flex wrap gap="15px">
+            <div>
+              Pooled
+              {' '}
+              {formatAssets(
+                asset1Amount,
+                decimals1,
+                { symbol: asset1ToShow, withAll: true },
+              )}
+            </div>
+            <div>
+              Pooled
+              {' '}
+              {formatAssets(
+                asset2Amount,
+                decimals2,
+                { symbol: asset2ToShow, withAll: true },
+              )}
+            </div>
+          </Flex>
+        )}
       >
         <Slider
           min={1}
@@ -123,35 +143,6 @@ function RemoveLiquidityModal({
           }}
         />
       </Form.Item>
-
-      <div className={styles.pooledAssetsToBurn}>
-        <div className={styles.assetToBurn}>
-          <span>
-            Pooled
-            {' '}
-          </span>
-          <span>
-            {formatAssets(
-              asset1Amount,
-              decimals1,
-              { symbol: asset1ToShow, withAll: true },
-            )}
-          </span>
-        </div>
-        <div className={styles.assetToBurn}>
-          <span>
-            Pooled
-            {' '}
-          </span>
-          <span>
-            {formatAssets(
-              asset2Amount,
-              decimals2,
-              { symbol: asset2ToShow, withAll: true },
-            )}
-          </span>
-        </div>
-      </div>
 
       <Flex gap="15px" wrap>
         <Button onClick={closeModal} disabled={loading}>

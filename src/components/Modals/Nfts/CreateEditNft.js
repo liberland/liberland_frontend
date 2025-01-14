@@ -1,40 +1,32 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Flex from 'antd/es/flex';
+import Input from 'antd/es/input';
+import Upload from 'antd/es/upload';
+import Spin from 'antd/es/spin';
+import InboxOutlined from '@ant-design/icons/InboxOutlined';
 import { useDispatch, useSelector } from 'react-redux';
-import stylesModal from '../styles.module.scss';
 import ModalRoot from '../ModalRoot';
 import Button from '../../Button/Button';
-import { TextInput } from '../../InputComponents';
 import { blockchainSelectors } from '../../../redux/selectors';
-import stylesNfts from '../../Nfts/Overview/styles.module.scss';
+import styles from './styles.module.scss';
 import { nftsActions } from '../../../redux/actions';
 
 function CreatEditNFTModal({
-  closeModal, collectionId, nftId,
+  closeModal,
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setPreviewImage(imageUrl);
-    }
-  };
-
-  const {
-    handleSubmit,
-    formState: { errors, isValid },
-    register,
-  } = useForm({
-    mode: 'all',
-  });
+  const [form] = Form.useForm();
 
   const uploadImageToIPFS = async (file) => {
+    setUploading(true);
     const formData = new FormData();
     formData.append('file', file);
 
@@ -49,14 +41,17 @@ function CreatEditNFTModal({
 
     if (!response.ok) {
       const error = await response.json();
+      setUploading(false);
       throw new Error(error.message || 'Failed to upload image');
     }
 
     const data = await response.json();
+    setUploading(false);
     return data.IpfsHash;
   };
 
   const uploadJsonToIPFS = async (json) => {
+    setUploading(true);
     const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
       method: 'POST',
       headers: {
@@ -69,15 +64,27 @@ function CreatEditNFTModal({
 
     if (!response.ok) {
       const error = await response.json();
+      setUploading(false);
       throw new Error(error.message || 'Failed to upload JSON');
     }
 
     const data = await response.json();
+    setUploading(false);
     return data.IpfsHash;
   };
 
-  const uploadMetadataToIPFS = async (imageFile, name, description) => {
+  const uploadMetadataToIPFS = async (imageFile) => {
     try {
+      const name = form.getFieldValue('name');
+      const description = form.getFieldValue('description');
+      if (!name || !description) {
+        form.setFields([
+          {
+            name: 'imageFile',
+            errors: ['Cannot upload image before setting name and description'],
+          },
+        ]);
+      }
       setUploading(true);
       const imageCID = await uploadImageToIPFS(imageFile);
       const metadata = {
@@ -95,92 +102,115 @@ function CreatEditNFTModal({
   };
 
   const createNFT = async (values) => {
-    if (!isValid) return;
     const {
       name, description, imageFile,
     } = values;
     const metadataCID = await uploadMetadataToIPFS(imageFile[0], name, description);
     dispatch(nftsActions.setMetadataNft.call({
-      collectionId, itemId: nftId, metadataCID, walletAddress,
+      metadataCID, walletAddress,
     }));
     closeModal();
   };
 
+  const getFileFromEvent = (eventOrFile) => {
+    if (Array.isArray(eventOrFile)) {
+      return eventOrFile;
+    }
+    return eventOrFile?.fileList;
+  };
+
   return (
-    <form className={stylesModal.getCitizenshipModal} onSubmit={handleSubmit(createNFT)}>
-      <div className={stylesModal.h3}>
+    <Form form={form} layout="vertical" onFinish={createNFT}>
+      <Title level={3}>
         Create NFT
-      </div>
-      <div className={stylesModal.description}>
+      </Title>
+      <Paragraph>
         Fill out the details to create your NFT.
-      </div>
+      </Paragraph>
+      <Form.Item name="name" label="NFT name" rules={[{ required: true }]}>
+        <Input placeholder="Enter NFT name" />
+      </Form.Item>
+      <Form.Item name="description" label="Description" rules={[{ required: true }]}>
+        <Input placeholder="Enter description" />
+      </Form.Item>
+      <Form.Item
+        name="imageFile"
+        valuePropName="fileList"
+        label="Upload image"
+        rules={[{ required: true }]}
+        getValueFromEvent={getFileFromEvent}
+      >
+        <Upload.Dragger
+          action={uploadImageToIPFS}
+          disabled={uploading}
+          maxCount={1}
+          multiple={false}
+          accept="image/*"
+          previewFile={(file) => {
+            if (file) {
+              setPreviewImage(URL.createObjectURL(file));
+            }
+          }}
+        >
+          <Paragraph className="ant-upload-drag-icon">
+            {uploading ? <Spin /> : <InboxOutlined />}
+          </Paragraph>
+          <Paragraph className="ant-upload-text">
+            Click or drag file to this area to upload
+          </Paragraph>
+        </Upload.Dragger>
+        {previewImage && (
+          <div className={styles.createImageWrapper}>
+            <img className={styles.image} src={previewImage} alt="Preview" />
+          </div>
+        )}
+      </Form.Item>
 
-      <div className={stylesModal.title}>NFT Name</div>
-      <TextInput
-        register={register}
-        name="name"
-        errorTitle="NFT Name"
-        placeholder="Enter NFT name"
-        required
-      />
-      {errors?.name?.message && (
-        <div className={stylesModal.error}>{errors.name.message}</div>
-      )}
-
-      <div className={stylesModal.title}>Description</div>
-      <TextInput
-        register={register}
-        name="description"
-        errorTitle="Description"
-        placeholder="Enter description"
-        required
-      />
-      {errors?.description?.message && (
-        <div className={stylesModal.error}>{errors.description.message}</div>
-      )}
-
-      <div className={stylesModal.title}>Upload Image</div>
-      {previewImage && (
-        <div className={stylesNfts.imageWrapper}>
-          <img className={stylesNfts.image} src={previewImage} alt="Preview" />
-        </div>
-      )}
-      <br />
-      <input
-        type="file"
-        accept="image/*"
-        {...register('imageFile', { required: true })}
-        required
-        onChange={handleImageChange}
-      />
-      {errors?.imageFile?.message && (
-        <div className={stylesModal.error}>{errors.imageFile.message}</div>
-      )}
-
-      <div className={stylesModal.buttonWrapper}>
-        <Button medium onClick={closeModal}>
+      <Flex wrap gap="15px">
+        <Button onClick={closeModal}>
           Cancel
         </Button>
-        <Button primary medium type="submit" disabled={uploading}>
+        <Button primary type="submit" disabled={uploading}>
           {uploading ? 'Uploading...' : 'Mint NFT'}
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
 CreatEditNFTModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
-  nftId: PropTypes.string.isRequired,
-  collectionId: PropTypes.string.isRequired,
 };
 
-function CreateEditNFTModalWrapper(props) {
+function CreateEditNFTModalWrapper({
+  collectionId,
+  nftId,
+}) {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <CreatEditNFTModal {...props} />
-    </ModalRoot>
+    <>
+      <Button
+        onClick={() => setShow(true)}
+        primary
+      >
+        Create NFT
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <CreatEditNFTModal
+            closeModal={() => setShow(false)}
+            collectionId={collectionId}
+            nftId={nftId}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+CreateEditNFTModalWrapper.propTypes = {
+  nftId: PropTypes.string,
+  collectionId: PropTypes.string,
+};
 
 export default CreateEditNFTModalWrapper;

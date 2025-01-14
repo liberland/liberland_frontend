@@ -1,47 +1,18 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import Card from '../../Card';
-import styles from './styles.module.scss';
+import Card from 'antd/es/card';
+import Flex from 'antd/es/flex';
 import Button from '../../Button/Button';
 import truncate from '../../../utils/truncate';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-
-// REDUX
 import {
   blockchainSelectors,
-  identitySelectors,
 } from '../../../redux/selectors';
 import { Proposal } from '../../Proposal';
 import { walletAddress } from '../../../redux/selectors/congress';
-import CopyIconWithAddress from '../../CopyIconWithAddress';
-
-function Voters({ voting }) {
-  const names = useSelector(identitySelectors.selectorIdentityMotions);
-  return (
-    <ul className={styles.list}>
-      {voting.map((item) => {
-        const id = item.toString();
-        const identity = names?.[id]?.identity;
-        return (
-          <li key={id}>
-            <CopyIconWithAddress
-              isTruncate
-              name={identity?.name}
-              legal={identity?.legal}
-              address={id}
-              showAddress
-            />
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-Voters.propTypes = {
-  voting: PropTypes.arrayOf(PropTypes.string).isRequired,
-};
+import Voters from '../Voters';
+import ProposalTable from '../../Proposal/ProposalTable';
+import styles from './styles.module.scss';
 
 export default function Motion({
   proposal,
@@ -72,15 +43,62 @@ export default function Motion({
     };
     dispatch(voteMotion(voteMotionData));
   };
+
   return (
-    <div className={stylesPage.stakingWrapper}>
-      <Card className={stylesPage.overviewWrapper}>
-        <div className={styles.metaInfoLine}>
-          <p>
-            Proposal id:
-            <b>{truncate(proposal, 13)}</b>
-          </p>
-          <span>
+    <Card
+      title={(
+        <>
+          Proposal id:
+          <b>{truncate(proposal, 13)}</b>
+        </>
+      )}
+      className={styles.fullWidth}
+      actions={userIsMember ? [
+        <Flex wrap gap="15px" justify="start" className={styles.actions}>
+          {isClosable && (
+            <Button
+              primary
+              onClick={() => dispatch(
+                closeMotion({ proposal, index: voting.index }),
+              )}
+            >
+              Close & Execute
+            </Button>
+          )}
+          {!voting.nays.map((v) => v.toString()).includes(userAddress)
+            && !isClosable && (
+              <Button
+                onClick={() => voteMotionCall(false)}
+                red
+              >
+                Vote nay
+              </Button>
+          )}
+          {!voting.ayes.map((v) => v.toString()).includes(userAddress)
+            && !isClosable && (
+              <Button
+                onClick={() => voteMotionCall(true)}
+                green
+              >
+                Vote aye
+              </Button>
+          )}
+          {isClosableNaye && (
+            <Button
+              onClick={() => dispatch(
+                closeMotion({ proposal, index: voting.index, walletAddress }),
+              )}
+              primary
+            >
+              Close Motion
+            </Button>
+          )}
+        </Flex>,
+      ] : []}
+    >
+      <Card.Meta
+        description={(
+          <Flex wrap gap="15px">
             <p>
               Aye
               {' '}
@@ -90,7 +108,6 @@ export default function Motion({
                 {threshold}
               </b>
             </p>
-            <Voters voting={voting.ayes} />
             <p>
               Nay
               {' '}
@@ -100,62 +117,22 @@ export default function Motion({
                 {threshold}
               </b>
             </p>
-            <Voters voting={voting.nays} />
-          </span>
-        </div>
-
-        {userIsMember ? (
-          <div className={styles.buttonsContainer}>
-            {isClosable && (
-            <Button
-              medium
-              primary
-              onClick={() => dispatch(
-                closeMotion({ proposal, index: voting.index }),
-              )}
-            >
-              Close & Execute
-            </Button>
-            )}
-            {!voting.ayes.map((v) => v.toString()).includes(userAddress)
-              && !isClosable && (
-                <Button
-                  small
-                  primary
-                  onClick={() => voteMotionCall(true)}
-                >
-                  Vote aye
-                </Button>
-            )}
-            {!voting.nays.map((v) => v.toString()).includes(userAddress)
-              && !isClosable && (
-                <Button
-                  small
-                  secondary
-                  onClick={() => voteMotionCall(false)}
-                >
-                  Vote nay
-                </Button>
-            )}
-            {
-              isClosableNaye && (
-              <Button
-                small
-                secondary
-                onClick={() => dispatch(
-                  closeMotion({ proposal, index: voting.index, walletAddress }),
-                )}
-              >
-                Close Motion
-              </Button>
-              )
-            }
-          </div>
-        )
-          : (<div className={styles.buttonsContainer} />)}
+          </Flex>
+        )}
+      />
+      <Flex vertical gap="15px">
         <Proposal proposal={proposalOf} isTableRow={isTableRow} />
-      </Card>
-    </div>
+        <Flex wrap gap="15px">
+          <Card size="small" title="Voted aye">
+            <Voters voting={voting.ayes} />
+          </Card>
+          <Card size="small" title="Voted nay">
+            <Voters voting={voting.nays} />
+          </Card>
+        </Flex>
+        <ProposalTable />
+      </Flex>
+    </Card>
   );
 }
 

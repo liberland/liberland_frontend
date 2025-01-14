@@ -1,61 +1,104 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-
-// COMPONENTS
+import Flex from 'antd/es/flex';
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import { useDispatch, useSelector } from 'react-redux';
 import ModalRoot from './ModalRoot';
-import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
-import styles from './styles.module.scss';
+import { democracyActions } from '../../redux/actions';
+import { blockchainSelectors } from '../../redux/selectors';
 
 function DelegateModal({
-  closeModal, onSubmitDelegate, delegateAddress, currentlyDelegatingTo,
+  closeModal,
+  delegateAddress,
+  currentlyDelegatingTo,
 }) {
+  const dispatch = useDispatch();
+  const [form] = Form.useForm();
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const handleSubmitDelegate = () => {
+    dispatch(democracyActions.delegate.call({ values: { delegateAddress }, userWalletAddress }));
+    closeModal();
+  };
+
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={() => {}}
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleSubmitDelegate}
     >
-      <div className={styles.h3}>Delegate your votes</div>
+      <Title level={3}>Delegate your votes</Title>
 
+      {currentlyDelegatingTo && (
+        <Paragraph>
+          You&apos;re currently delegating to
+          {' '}
+          {currentlyDelegatingTo}
+        </Paragraph>
+      )}
 
-      { !currentlyDelegatingTo ? null :
-        <div className={styles.title}>You're currently delegating to {currentlyDelegatingTo}</div> }
+      <Paragraph>
+        You will delegate your votes to address
+        {' '}
+        {delegateAddress}
+        {' '}
+        that belongs to a Congress Member.
+      </Paragraph>
 
-      <div className={styles.title}>You will delegate your votes to address {delegateAddress} that belongs to a Congress Member.</div>
-
-      <div className={styles.buttonWrapper}>
+      <Flex wrap gap="15px">
         <Button
-          medium
           onClick={closeModal}
         >
           Cancel
         </Button>
         <Button
           primary
-          medium
           type="submit"
-          onClick={() => onSubmitDelegate(delegateAddress)}
         >
           Delegate
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
 DelegateModal.propTypes = {
-  handleSubmit: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,
-  register: PropTypes.func.isRequired,
-  onSubmitDelegate: PropTypes.func.isRequired,
+  delegateAddress: PropTypes.string.isRequired,
+  currentlyDelegatingTo: PropTypes.string.isRequired,
 };
 
-function DelegateModalWrapper(props) {
+function DelegateModalWrapper({
+  delegateAddress,
+  currentlyDelegatingTo,
+}) {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <DelegateModal {...props} />
-    </ModalRoot>
+    <>
+      <Button
+        primary
+        onClick={() => setShow(true)}
+      >
+        Delegate
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(true)}>
+          <DelegateModal
+            closeModal={() => setShow(false)}
+            delegateAddress={delegateAddress}
+            currentlyDelegatingTo={currentlyDelegatingTo}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+DelegateModalWrapper.propTypes = {
+  delegateAddress: PropTypes.string.isRequired,
+  currentlyDelegatingTo: PropTypes.string.isRequired,
+};
 
 export default DelegateModalWrapper;

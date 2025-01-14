@@ -1,51 +1,51 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Flex from 'antd/es/flex';
 import { useDispatch } from 'react-redux';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
-import styles from './styles.module.scss';
 import { validatorActions } from '../../redux/actions';
 
 function PayoutStakingModal({
   closeModal,
 }) {
   const dispatch = useDispatch();
-
+  const [form] = Form.useForm();
   const payout = () => {
     dispatch(validatorActions.payout.call());
     closeModal();
   };
 
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={payout}
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={payout}
     >
-      <div className={styles.h3}>Payout staking rewards</div>
-      <div className={styles.title}>
+      <Title level={3}>Payout staking rewards</Title>
+      <Paragraph>
         Staking rewards are paid per staking era and validator. These payouts will
         be batched 10 at a time, but it&apos;s still possible that your wallet will ask
         you to sign multiple transactions.
-      </div>
+      </Paragraph>
 
-      <div className={styles.buttonWrapper}>
+      <Flex wrap gap="15px">
         <Button
-          medium
           onClick={closeModal}
         >
           Cancel
         </Button>
         <Button
           primary
-          medium
           type="submit"
         >
           Payout
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
@@ -53,11 +53,19 @@ PayoutStakingModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
-function PayoutStakingModalWrapper(props) {
+function PayoutStakingModalWrapper() {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <PayoutStakingModal {...props} />
-    </ModalRoot>
+    <>
+      <Button onClick={() => setShow(true)}>
+        Payout rewards
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <PayoutStakingModal closeModal={() => setShow(false)} />
+        </ModalRoot>
+      )}
+    </>
   );
 }
 

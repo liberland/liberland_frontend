@@ -27,6 +27,7 @@ function ExchangeSort({
             onSort(key);
           },
         }}
+        trigger={['click']}
       >
         <Button>
           <Space>

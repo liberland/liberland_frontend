@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import Alert from 'antd/es/alert';
+import List from 'antd/es/list';
+import Spin from 'antd/es/spin';
+import Flex from 'antd/es/flex';
+import { useHistory } from 'react-router-dom';
 import routes from '../../../router';
 import Button from '../../Button/Button';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import Card from '../../Card';
-import styles from './styles.module.scss';
-import stylesNft from '../Overview/styles.module.scss';
 import FillNumberWrapper from '../../Modals/FillNumber';
 import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
@@ -15,7 +15,6 @@ import ItemNft from '../ItemNft';
 function OwnedNfts() {
   const dispatch = useDispatch();
   const history = useHistory();
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const userCollections = useSelector(nftsSelectors.userCollections);
   const userWalletAddress = useSelector(
@@ -33,59 +32,21 @@ function OwnedNfts() {
   const nftIds = nfts.map((nft) => Number(nft.nftId));
   const nftsId = nftIds.length > 0 ? Math.max(...nftIds) : 0;
 
+  if (!nfts) {
+    return <Spin />;
+  }
+
   return (
-    <>
-      <div className={stylesPage.contentWrapper}>
-        <div className={stylesPage.sectionWrapper}>
-          <Card className={stylesPage.overviewWrapper}>
-            <div className={styles.topInfo}>
-              <span className={stylesPage.cardTitle}>Your Nfts</span>
-              <Button primary small onClick={() => setIsModalOpen(true)}>
-                MINT NFT
-              </Button>
-            </div>
-            {!nfts || nfts.length < 1 ? (
-              <div className={styles.noNfts}>
-                <span>You dont have any NFTs</span>
-                <Button
-                  primary
-                  small
-                  onClick={() => history.push(routes.nfts.overview)}
-                >
-                  buy some or browse NFTs
-                </Button>
-              </div>
-            ) : (
-              <div className={stylesPage.overViewCard}>
-                <div className={stylesNft.nfts}>
-                  {nfts.map((nft) => {
-                    const {
-                      collectionId,
-                      nftId,
-                      collectionMetadata,
-                      itemMetadata,
-                    } = nft;
-                    return (
-                      <ItemNft
-                        key={collectionId + nftId}
-                        itemMetadata={itemMetadata}
-                        collectionId={collectionId}
-                        nftId={nftId}
-                        collectionMetadata={collectionMetadata}
-                        isOwnItem
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </Card>
-        </div>
-      </div>
-      {isModalOpen && (
+    <Flex vertical gap="20px">
+      <Flex wrap gap="15px" justify="end">
+        <Button
+          primary
+          onClick={() => history.push(routes.nfts.overview)}
+        >
+          Buy and Browse
+        </Button>
         <FillNumberWrapper
           itemList={userCollections}
-          closeModal={() => setIsModalOpen(false)}
           textData={{
             title: 'NFT id',
             description: '',
@@ -101,11 +62,33 @@ function OwnedNfts() {
                 mintTo: userWalletAddress,
               }),
             );
-            setIsModalOpen(false);
           }}
         />
-      )}
-    </>
+      </Flex>
+      {nfts.length ? (
+        <List
+          dataSource={nfts}
+          grid={{
+            gutter: 16,
+          }}
+          renderItem={({
+            collectionId,
+            nftId,
+            collectionMetadata,
+            itemMetadata,
+          }) => (
+            <ItemNft
+              key={collectionId + nftId}
+              itemMetadata={itemMetadata}
+              collectionId={collectionId}
+              nftId={nftId}
+              collectionMetadata={collectionMetadata}
+              isOwnItem
+            />
+          )}
+        />
+      ) : <Alert message="You have no NFTs" type="info" />}
+    </Flex>
   );
 }
 

@@ -1,34 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import cx from 'classnames';
-import PoliticanCard from '../PoliticianCard/Index';
-import Card from '../../../Card';
-import stylesPage from '../../../../utils/pagesBase.module.scss';
-import styles from './styles.module.scss';
+import List from 'antd/es/list';
+import { useSelector } from 'react-redux';
+import PoliticanCard from '../PoliticianCard';
+import { blockchainSelectors, democracySelectors } from '../../../../redux/selectors';
+import DelegateModalWrapper from '../../../Modals/DelegateModal';
 
 function CurrentAssemble({
   currentCongressMembers,
 }) {
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
+  const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
   return (
-    <Card className={stylesPage.overviewWrapper} title="Acting Congressional Assembly">
-
-      <div className={stylesPage.transactionHistoryCard}>
-
-        {
-            currentCongressMembers?.map((currentCongressMember) => (
-              <div
-                className={cx(stylesPage.transactionHistoryCardMain, styles.gridList)}
-                key={`current-congress-member${currentCongressMember.rawIdentity}`}
-              >
-                <PoliticanCard
-                  politician={currentCongressMember}
-                />
-              </div>
-            ))
-          }
-
-      </div>
-    </Card>
+    <List
+      dataSource={currentCongressMembers || []}
+      grid={{ gutter: 16 }}
+      renderItem={(politician) => (
+        <PoliticanCard
+          politician={politician}
+          actions={[
+            politician.rawIdentity === userWalletAddress || delegatingTo === politician.rawIdentity ? (
+              <div />
+            ) : (
+              <DelegateModalWrapper
+                delegateAddress={politician.rawIdentity}
+                currentlyDelegatingTo={delegatingTo}
+              />
+            ),
+          ]}
+        />
+      )}
+    />
   );
 }
 
@@ -37,4 +40,5 @@ CurrentAssemble.propTypes = {
     name: PropTypes.string.isRequired,
   })).isRequired,
 };
+
 export default CurrentAssemble;

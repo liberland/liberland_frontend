@@ -1,73 +1,79 @@
-import React, { useState } from 'react';
-
+import React from 'react';
 import PropTypes from 'prop-types';
-import { RenderRegistryItemDetails } from '../../../utils/registryFormBuilder';
-import Card from '../../Card';
-import Button from '../../Button/Button';
-import styles from './styles.module.scss';
-import stylesPage from '../../../utils/pagesBase.module.scss';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Avatar from 'antd/es/avatar';
+import Flex from 'antd/es/flex';
+import Table from '../../Table';
 
-function InvalidCompany({ id }) {
+import CopyIconWithAddress from '../../CopyIconWithAddress';
+import CompanyActions from '../CompanyActions';
+
+function CompaniesCard({
+  registries,
+  type,
+  hideOwner,
+}) {
   return (
-    <Card title={`ID: ${id}`} className={styles.companyCardContainer}>
-      <div className={styles.companyContentContainer}>
-        This company&apos;s registry data is corrupted. Please contact administration.
-      </div>
-    </Card>
-  );
-}
+    <Table
+      columns={[
+        {
+          Header: 'ID',
+          accessor: 'id',
+        },
+        {
+          Header: 'Company name',
+          accessor: 'name',
+        },
+        {
+          Header: 'Mission',
+          accessor: 'mission',
+        },
+        !hideOwner && {
+          Header: 'Owner',
+          accessor: 'owner',
+        },
+        {
+          Header: 'Actions',
+          accessor: 'actions',
+        },
+      ].filter(Boolean)}
+      data={registries
+        ?.filter((registered) => registered && !registered.invalid)
+        .map((registeredCompany) => {
+          const owner = registeredCompany.principals?.[0]?.name?.value;
+          const address = registeredCompany.principals?.[0]?.walletAddress?.value;
+          const avatar = registeredCompany.logoURL;
 
-InvalidCompany.propTypes = {
-  id: PropTypes.string.isRequired,
-};
-
-function CompaniesCard({ registries }) {
-  const [expandedDetailsForCompany, setExpandedDetailsForCompany] = useState(null);
-  return (
-    <div className={stylesPage.gapFlex}>
-      {registries?.officialRegistryEntries?.map((registeredCompany) => (
-        registeredCompany?.invalid
-          ? <InvalidCompany key={registeredCompany?.id} id={registeredCompany?.id} />
-          : (
-            <Card
-              className={stylesPage.overviewWrapper}
-              title={registeredCompany?.staticFields[0]?.display}
-            >
-              <div
-                key={registeredCompany?.id}
-                className={stylesPage.transactionHistoryCard}
-              >
-                <small>
-                  Company ID:
-                  <b>{registeredCompany.id}</b>
-                </small>
-                <div className={styles.companyContentContainer}>
-                  <RenderRegistryItemDetails
-                    mainDataObject={registeredCompany}
-                    showAll={registeredCompany?.staticFields[0]?.display === expandedDetailsForCompany}
-                  />
-                </div>
-                <Button
-                  green
-                  small
-                  onClick={() => setExpandedDetailsForCompany(registeredCompany?.staticFields[0]?.display)}
-                  className={styles.buttonSeparation}
-                >
-                  View details
-                </Button>
-              </div>
-            </Card>
-          )
-      ))}
-    </div>
+          return {
+            id: registeredCompany.id,
+            name: registeredCompany.name,
+            mission: (
+              <Paragraph ellipsis={{ expandable: true, rows: 2 }}>
+                {registeredCompany.purpose}
+              </Paragraph>
+            ),
+            owner: (
+              <Flex wrap gap="15px">
+                {avatar && (
+                  <Avatar src={avatar} />
+                )}
+                {owner && (
+                  <CopyIconWithAddress name={owner} address={address} isTruncate />
+                )}
+              </Flex>
+            ),
+            actions: <CompanyActions registeredCompany={registeredCompany} type={type} />,
+          };
+        }) || {}}
+    />
   );
 }
 
 CompaniesCard.propTypes = {
-  registries: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    officialRegistryEntries: PropTypes.array.isRequired,
-  }).isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  registries: PropTypes.array.isRequired,
+  type: PropTypes.oneOf(['requested', 'mine', 'all']),
+  hideOwner: PropTypes.bool,
 };
 
 export default CompaniesCard;

@@ -1,9 +1,7 @@
-// LIBS
 import React from 'react';
-import { ScaleLoader } from 'react-spinners';
 import { useSelector } from 'react-redux';
-
-// REDUX
+import Flex from 'antd/es/flex';
+import PropTypes from 'prop-types';
 import {
   walletSelectors,
   democracySelectors,
@@ -20,10 +18,9 @@ import {
   ministryFinanceSelector,
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
-import BackgroundBlocker from '../BackgroundBlocker';
 import NextBlockCountdown from './NextBlockCountdown';
+import ModalRoot from '../Modals/ModalRoot';
 
-// eslint-disable-next-line react/prop-types
 function Loader({ children }) {
   const isGettingWalletInfo = useSelector(walletSelectors.selectorGettingWalletInfo);
   const isGettingDemocracyInfo = useSelector(democracySelectors.selectorGettingDemocracyInfo);
@@ -56,32 +53,23 @@ function Loader({ children }) {
   ].some((isFetching) => isFetching);
 
   return (
-    <div style={{ position: 'relative', backgroundColor: '#fefefe', minHeight: '100vh' }}>
-      { isLoading
-        && (
-          <BackgroundBlocker>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <ScaleLoader
-                loading={isLoading}
-                css={{
-                  margin: '0 auto',
-                  display: 'block',
-                }}
-                height={60}
-                width={6}
-                radius={3}
-                margin={3}
-                color="#8C64B5"
-              />
-              <NextBlockCountdown />
-            </div>
-          </BackgroundBlocker>
-        )}
+    <>
+      {isLoading && (
+        <ModalRoot>
+          <Flex justify="center" align="center">
+            <NextBlockCountdown />
+          </Flex>
+        </ModalRoot>
+      )}
       <ErrorModal>
-        { children }
+        {children}
       </ErrorModal>
-    </div>
+    </>
   );
 }
+
+Loader.propTypes = {
+  children: PropTypes.node,
+};
 
 export default Loader;

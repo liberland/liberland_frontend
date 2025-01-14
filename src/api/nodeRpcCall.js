@@ -1725,7 +1725,6 @@ const congressProposeBudget = async ({
   walletAddress, itemsCouncilPropose, executionBlock,
 }) => {
   const api = await getApi();
-
   const proposeBudget = itemsCouncilPropose.map((itemCouncilPropose) => {
     const { transfer, remark: remarkInfo } = itemCouncilPropose;
     const { index, balance, recipient } = transfer;

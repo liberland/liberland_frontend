@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
+import Card from 'antd/es/card';
+import Dropdown from 'antd/es/dropdown';
 import { useHistory, useLocation } from 'react-router-dom/cjs/react-router-dom.min';
 import { nftsActions } from '../../../redux/actions';
 import FillAddressWrapper from '../../Modals/FillAddress';
 import FillNumberWrapper from '../../Modals/FillNumber';
 import Button from '../../Button/Button';
-import styles from '../Overview/styles.module.scss';
-import CreateEditNFTModalWrapper from '../../Modals/Nfts/CreateEditNft';
-import SetAttributeModalWrapper from '../../Modals/Nfts/SetAttribiute';
+import styles from './styles.module.scss';
+import SetAttributeModalWrapper from '../../Modals/Nfts/SetAttribute';
 import { ReactComponent as FullScreenIcon } from '../../../assets/icons/fullScreen.svg';
 import { ReactComponent as OpenNewTabIcon } from '../../../assets/icons/openNewTab.svg';
 import { ReactComponent as MenuIcon } from '../../../assets/icons/menu.svg';
@@ -33,33 +34,12 @@ function ItemNft({
     image, name, description, itemPrice,
   } = itemMetadata;
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
-  const [isSetPriceModalOpen, setIsSetPriceModalOpen] = useState(false);
-  const [isSetMedatadaOpen, setIsSetMedatadaOpen] = useState(false);
-  const [isSetAttribiutesOpen, setIsSetAttribiutesOpen] = useState(false);
   const [isImageOpen, setIsImageOpen] = useState(false);
-
-  const handleMenuOpen = () => {
-    setIsMenuOpen((prevValue) => !prevValue);
-  };
 
   const onBurn = () => {
     dispatch(
       nftsActions.destroyNft.call({ collectionId, itemId: Number(nftId) }),
     );
-  };
-
-  const onTransfer = () => {
-    setIsTransferModalOpen(true);
-  };
-
-  const onSetPrice = () => {
-    setIsSetPriceModalOpen(true);
-  };
-
-  const onSetAttribiutes = () => {
-    setIsSetAttribiutesOpen(true);
   };
 
   const onBuyNft = () => {
@@ -84,87 +64,24 @@ function ItemNft({
   };
 
   return (
-    <>
-      {isSetAttribiutesOpen && (
-        <SetAttributeModalWrapper
-          closeModal={() => setIsSetAttribiutesOpen(false)}
-          collectionId={collectionId}
-          itemId={nftId}
-        />
-      )}
-      {isSetMedatadaOpen && (
-        <CreateEditNFTModalWrapper
-          collectionId={collectionId}
-          nftId={nftId}
-          closeModal={() => setIsSetMedatadaOpen(false)}
-        />
-      )}
-      {isTransferModalOpen && (
-        <FillAddressWrapper
-          textData={textData}
-          closeModal={() => setIsTransferModalOpen(false)}
-          onAccept={(address) => {
-            dispatch(
-              nftsActions.transferNft.call({
-                collectionId,
-                itemId: Number(nftId),
-                newOwner: address,
-              }),
-            );
-            setIsTransferModalOpen(false);
-          }}
-        />
-      )}
-      {isSetPriceModalOpen && (
-        <FillNumberWrapper
-          closeModal={() => setIsSetPriceModalOpen(false)}
-          textData={{ ...textData, submitButtonText: 'Set Price' }}
-          onAccept={(amount) => {
-            dispatch(
-              nftsActions.sellNft.call({
-                collectionId,
-                itemId: Number(nftId),
-                price: parseDollars(amount),
-              }),
-            );
-            setIsSetPriceModalOpen(false);
-          }}
-        />
-      )}
-      {isImageOpen && (
-        <FullImageWrapper closeModal={() => setIsImageOpen(false)} image={image} />
-      )}
-
-      <div>
-        <p>
-          <b>Collection Id:</b>
-          {' '}
-          {collectionId}
-        </p>
-        {collectionMetadata?.data && (
-          <p>
-            <b>Name:</b>
+    <Card
+      title={collectionMetadata?.data || name || nftId}
+      actions={[
+        isOnSaleItem && itemPrice && (
+          <Button
+            onClick={onBuyNft}
+            primary
+            className={styles.button}
+          >
+            Buy for
             {' '}
-            {collectionMetadata?.data}
-          </p>
-        )}
-        <p>
-          <b>Nft Id:</b>
-          {' '}
-          {nftId}
-        </p>
-        <p>
-          <b>Name:</b>
-          {' '}
-          {name}
-        </p>
-        <p>
-          <b>Description:</b>
-          {' '}
-          {description}
-        </p>
-
-        <br />
+            {formatDollars(itemPrice)}
+            {' '}
+            LLD
+          </Button>
+        ),
+      ].filter(Boolean)}
+      cover={(
         <div
           className={styles.imageWrapper}
         >
@@ -179,12 +96,61 @@ function ItemNft({
             {itemPrice ? `${formatDollars(itemPrice)} LLD` : 'Not for sale'}
           </div>
           {isOwnItem && (
-          <div className={cx(styles.showImage, styles.menu)} onClick={handleMenuOpen}>
-            <MenuIcon className={styles.icon} />
-          </div>
+            <Dropdown
+              trigger={['click']}
+              menu={{
+                items: [
+                  (
+                    <FillAddressWrapper
+                      textData={textData}
+                      onAccept={(address) => {
+                        dispatch(
+                          nftsActions.transferNft.call({
+                            collectionId,
+                            itemId: Number(nftId),
+                            newOwner: address,
+                          }),
+                        );
+                      }}
+                    />
+                  ),
+                  (
+                    <FillNumberWrapper
+                      textData={{ ...textData, submitButtonText: 'Set Price' }}
+                      onAccept={(amount) => {
+                        dispatch(
+                          nftsActions.sellNft.call({
+                            collectionId,
+                            itemId: Number(nftId),
+                            price: parseDollars(amount),
+                          }),
+                        );
+                      }}
+                    />
+                  ),
+                  (
+                    <SetAttributeModalWrapper
+                      collectionId={collectionId}
+                      itemId={nftId}
+                    />
+                  ),
+                  (
+                    <Button onClick={onBurn} red className={styles.button}>
+                      Burn
+                    </Button>
+                  ),
+                ].map((label, index) => ({
+                  label,
+                  index,
+                })),
+              }}
+            >
+              <div className={cx(styles.showImage, styles.menu)}>
+                <MenuIcon className={styles.icon} />
+              </div>
+            </Dropdown>
           )}
-          {image
-            && (
+          {image && (
             <>
               <div className={styles.showImage} onClick={() => setIsImageOpen(true)}>
                 <FullScreenIcon className={styles.icon} />
@@ -193,70 +159,40 @@ function ItemNft({
                 <OpenNewTabIcon className={styles.icon} />
               </a>
             </>
-            )}
+          )}
           {image ? (
             <img src={image} alt={name} className={styles.image} />
           ) : (
             <div className={styles.image} />
           )}
-          {isMenuOpen && isOwnItem && (
-            <div className={styles.buttonContainer}>
-              <Button
-                small
-                onClick={onTransfer}
-                primary
-                className={styles.button}
-              >
-                Transfer
-              </Button>
-              <Button
-                small
-                onClick={onSetPrice}
-                primary
-                className={styles.button}
-              >
-                Set Price
-              </Button>
-              <Button
-                small
-                onClick={() => setIsSetMedatadaOpen(true)}
-                primary
-                className={styles.button}
-              >
-                Set Metadata
-              </Button>
-              <Button
-                small
-                onClick={onSetAttribiutes}
-                primary
-                className={styles.button}
-              >
-                Set Attribute
-              </Button>
-              <Button small onClick={onBurn} red className={styles.button}>
-                Burn
-              </Button>
-            </div>
-          )}
-          {isOnSaleItem && itemPrice && (
-            <div className={styles.buttonContainer}>
-              <Button
-                small
-                onClick={onBuyNft}
-                primary
-                className={styles.button}
-              >
-                Buy for
-                {' '}
-                {formatDollars(itemPrice)}
-                {' '}
-                LLD
-              </Button>
-            </div>
-          )}
         </div>
-      </div>
-    </>
+      )}
+    >
+      <Card.Meta
+        description={(
+          <>
+            <p>
+              <b>Collection Id:</b>
+              {' '}
+              {collectionId}
+            </p>
+            <p>
+              <b>Nft Id:</b>
+              {' '}
+              {nftId}
+            </p>
+            <p>
+              <b>Description:</b>
+              {' '}
+              {description}
+            </p>
+          </>
+        )}
+      />
+      {isImageOpen && (
+        <FullImageWrapper closeModal={() => setIsImageOpen(false)} image={image} />
+      )}
+    </Card>
   );
 }
 

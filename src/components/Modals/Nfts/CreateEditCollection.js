@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
 import { useDispatch, useSelector } from 'react-redux';
-import stylesModal from '../styles.module.scss';
+import Title from 'antd/es/typography/Title';
+import Flex from 'antd/es/flex';
 import ModalRoot from '../ModalRoot';
 import Button from '../../Button/Button';
 import { blockchainSelectors } from '../../../redux/selectors';
@@ -14,35 +15,27 @@ function CreatEditCollectionModal({
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
-  const {
-    handleSubmit,
-    formState: { isValid },
-  } = useForm({
-    mode: 'all',
-  });
+  const [form] = Form.useForm();
 
-  const createCollection = (payload) => {
-    if (!isValid) return;
-    const config = payload;
-    dispatch(nftsActions.createCollection.call({ walletAdmin: walletAddress, config }));
+  const createCollection = () => {
+    dispatch(nftsActions.createCollection.call({ walletAdmin: walletAddress, config: {} }));
     closeModal();
   };
 
   return (
-    <form className={stylesModal.getCitizenshipModal} onSubmit={handleSubmit(createCollection)}>
-      <div className={stylesModal.h3}>
+    <Form form={form} layout="vertical" onFinish={createCollection}>
+      <Title level={3}>
         Create Collection
-      </div>
-
-      <div className={stylesModal.buttonWrapper}>
-        <Button medium onClick={closeModal}>
+      </Title>
+      <Flex wrap gap="15px">
+        <Button onClick={closeModal}>
           Cancel
         </Button>
-        <Button primary medium type="submit">
+        <Button primary type="submit">
           Create
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
@@ -50,11 +43,19 @@ CreatEditCollectionModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
-function CreateEditCollectionModalWrapper(props) {
+function CreateEditCollectionModalWrapper() {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <CreatEditCollectionModal {...props} />
-    </ModalRoot>
+    <>
+      <Button primary onClick={() => setShow(true)}>
+        Create collection
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <CreatEditCollectionModal closeModal={() => setShow(false)} />
+        </ModalRoot>
+      )}
+    </>
   );
 }
 

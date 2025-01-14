@@ -1,19 +1,17 @@
-// LIBS
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Flex from 'antd/es/flex';
+import InputNumber from 'antd/es/input-number';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN_ZERO, BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
-import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
-import InputSearch from '../InputComponents/OldInputSearchAddressName';
-
-// STYLES
+import InputSearch from '../InputComponents/InputSearchAddressName';
 import styles from './styles.module.scss';
-import { parseDollars, parseMerits, isValidSubstrateAddress } from '../../utils/walletHelpers';
+import { parseDollars, parseMerits } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
 import { walletSelectors } from '../../redux/selectors';
 import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
@@ -26,16 +24,7 @@ function SendLLDModal({ closeModal }) {
     new BN(balances?.liquidAmount?.amount ?? 0).sub(parseDollars('2')), // leave at least 2 liquid LLD...
   ) : 0;
 
-  const {
-    handleSubmit,
-    formState: { errors },
-    register,
-    setValue,
-    trigger,
-  } = useForm({
-    mode: 'all',
-  });
-
+  const [form] = Form.useForm();
   const transfer = (values) => {
     dispatch(
       walletActions.sendTransfer.call({
@@ -46,71 +35,59 @@ function SendLLDModal({ closeModal }) {
     closeModal();
   };
 
-  const validateUnbondValue = (textUnbondValue) => {
+  const validateUnbondValue = (_, textUnbondValue) => {
     try {
       const unbondValue = parseMerits(textUnbondValue);
       if (unbondValue.gt(maxUnbond)) {
-        return 'Minimum of 2 LLD must remain after transaction';
+        return Promise.reject('Minimum of 2 LLD must remain after transaction');
       }
       if (unbondValue.lte(BN_ZERO)) {
-        return 'Invalid amount';
+        return Promise.reject('Invalid amount');
       }
-      return true;
+      return Promise.resolve();
     } catch (e) {
-      return 'Invalid amount';
+      return Promise.reject('Invalid amount');
     }
   };
 
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(transfer)}
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={transfer}
     >
-      <div className={styles.h3}>Send LLD</div>
-      <div className={styles.description}>
+      <Title level={3}>Send LLD</Title>
+      <Paragraph>
         You are going to send tokens from your wallet
-      </div>
-
-      <div className={styles.title}>Send to address</div>
-      <InputSearch
-        errorTitle="Recipient"
-        register={register}
+      </Paragraph>
+      <Form.Item
+        label="Send to address"
         name="recipient"
-        placeholder="Send to address"
-        isRequired
-        trigger={trigger}
-        setValue={setValue}
-        validate={(v) => {
-          if (!isValidSubstrateAddress(v)) return 'Invalid Address';
-          return true;
-        }}
-      />
-      {errors?.recipient?.message && (
-        <div className={styles.error}>{errors.recipient.message}</div>
-      )}
-
-      <div className={styles.title}>Amount LLD</div>
-      <TextInput
-        errorTitle="Amount LLD"
-        register={register}
-        validate={validateUnbondValue}
+        rules={[{ required: true }]}
+      >
+        <InputSearch placeholder="Send to address" />
+      </Form.Item>
+      <Form.Item
         name="amount"
-        placeholder="Amount LLD"
-        required
-      />
-      {errors?.amount?.message && (
-        <div className={styles.error}>{errors.amount.message}</div>
-      )}
-
-      <div className={styles.buttonWrapper}>
-        <Button medium onClick={closeModal}>
+        label="Amount LLD"
+        rules={[
+          { required: true },
+          {
+            validator: validateUnbondValue,
+          },
+        ]}
+      >
+        <InputNumber stringMode controls={false} placeholder="Amount LLD" />
+      </Form.Item>
+      <Flex wrap gap="15px">
+        <Button onClick={closeModal}>
           Cancel
         </Button>
-        <Button primary medium type="submit">
+        <Button primary type="submit">
           Make transfer
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 

@@ -9,6 +9,10 @@ export const {
   getErc20Balance,
   getWethLpExchangeRate,
   getBalance,
+  stakeLpWithEth,
+  stakeTokens,
+  withdrawTokens,
+  claimReward,
 } = createActions({
   GET_ETH_WALLET_OPTIONS: {
     call: undefined,
@@ -46,6 +50,26 @@ export const {
     failure: undefined,
   },
   GET_BALANCE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  STAKE_LP_WITH_ETH: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  STAKE_TOKENS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  WITHDRAW_TOKENS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CLAIM_REWARD: {
     call: undefined,
     success: undefined,
     failure: undefined,

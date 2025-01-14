@@ -9,11 +9,17 @@ export default function CreateValidatorButton() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
 
-  if (info.stash) return null; // stash exists - validator already created - use start/stop button instead
+  if (info.stash) {
+    return (
+      <Button primary disabled>
+        Create Validator
+      </Button>
+    ); // stash exists - validator already created - use start/stop button instead
+  }
 
   return (
     <>
-      <Button small primary onClick={handleModalOpen}>
+      <Button primary onClick={handleModalOpen}>
         Create Validator
       </Button>
       {isModalOpen && <CreateValidatorModal closeModal={handleModalOpen} />}

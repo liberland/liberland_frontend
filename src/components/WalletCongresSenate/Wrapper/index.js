@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
-import cx from 'classnames';
+import React from 'react';
+import Flex from 'antd/es/flex';
+import Collapse from 'antd/es/collapse';
 import { BN } from '@polkadot/util';
 import PropTypes from 'prop-types';
-import walletStyles from '../../Wallet/styles.module.scss';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
-import Button from '../../Button/Button';
-import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import styles from './styles.module.scss';
+import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import AssetOverview from '../../Wallet/AssetOverview';
 import SpendModalWrapper from '../../Modals/SpendModal';
 import { valueToBN } from '../../../utils/walletHelpers';
@@ -28,119 +25,91 @@ export default function WalletCongresSenateWrapper({
   const balanceLLD = new BN(balances?.liquidAmount?.amount ?? 0);
   const balanceLLM = valueToBN(balances?.liquidMerits?.amount ?? 0);
 
-  const [isModalOpenLLDSpend, setIsModalOpenLLDSpend] = useState(false);
-  const [isModalOpenLLMSpend, setIsModalOpenLLMSpend] = useState(false);
-  const [isModalOpenPolitipoolLLMSpend, setIsModalOpenPolitipoolLLMSpend] = useState(false);
-
-  if (!congresAccountAddress) return null;
-
-  const toggleModalLLDSpendOpen = () => setIsModalOpenLLDSpend(!isModalOpenLLDSpend);
-  const toggleModalLLMSpendOpen = () => setIsModalOpenLLMSpend(!isModalOpenLLMSpend);
-  const toggleModalPolitipoolLLMSpendOpen = () => setIsModalOpenPolitipoolLLMSpend(!isModalOpenPolitipoolLLMSpend);
+  if (!congresAccountAddress) {
+    return null;
+  }
 
   return (
-    <>
-      <div
-        className={cx(stylesPage.menuAddressWrapper, styles.walletMenuWrapper)}
-      >
-        <div className={cx(walletStyles.walletAddressLineWrapper, styles.walletAddressWrapper)}>
-          <div className={walletStyles.navWallet}>
-            <div className={walletStyles.addressesWrapper}>
-              <div className={walletStyles.singleAddressWrapper}>
-                <span className={walletStyles.addressTitle}>
-                  Wallet address
-                  {' '}
-                </span>
-                <span className={walletStyles.address}>
-                  <CopyIconWithAddress address={congresAccountAddress} />
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={cx(
-            walletStyles.buttonsWrapper,
-            styles.walletButtonsWrapper,
-          )}
-        >
-          {userIsMember && (
-          <>
-            <Button small primary className={walletStyles.button} onClick={toggleModalPolitipoolLLMSpendOpen}>
-              <div className={walletStyles.icon}>
-                <GraphIcon />
-              </div>
-              SPEND LLM (POLITIPOOL)
-            </Button>
-            <Button small primary className={walletStyles.button} onClick={toggleModalLLMSpendOpen}>
-              <div className={walletStyles.icon}>
-                <UploadIcon />
-              </div>
-              SPEND LLM
-            </Button>
-            <Button small primary className={walletStyles.button} onClick={toggleModalLLDSpendOpen}>
-              <div className={walletStyles.icon}>
-                <UploadIcon />
-              </div>
-              SPEND LLD
-            </Button>
-          </>
-          )}
-        </div>
-      </div>
-
-      <BalanceOverview
-        totalBalance={totalBalance}
-        balances={balances}
-        liquidMerits={liquidMerits}
-        showStaked={false}
-      />
-      <AssetOverview
-        additionalAssets={additionalAssets}
-        isRemarkNeeded
-        officeType={officeType}
-        userIsMember={userIsMember}
-        isCongress
-      />
-      {isModalOpenLLDSpend && (
-      <SpendModalWrapper
-        officeType={officeType}
-        closeModal={toggleModalLLDSpendOpen}
-        onSend={LLD}
-        spendData={{
-          name: 'LLD',
-        }}
-        balance={balanceLLD}
-      />
-      )}
-      {isModalOpenLLMSpend
-      && (
-      <SpendModalWrapper
-        officeType={officeType}
-        closeModal={toggleModalLLMSpendOpen}
-        onSend={LLM}
-        spendData={{
-          name: 'LLM',
-        }}
-        balance={balanceLLM}
-      />
-      )}
-      {isModalOpenPolitipoolLLMSpend && (
-      <SpendModalWrapper
-        officeType={officeType}
-        closeModal={toggleModalPolitipoolLLMSpendOpen}
-        spendData={{
-          name: 'LLM to politipool',
-          title: 'Spend LLM to politipool',
-          description: 'You are going to create LLM spend proposal that will transfer LLM to recipients politipool',
-          subtitle: "Spend LLM to address's politipool",
-        }}
-        onSend={LLMPolitipool}
-        balance={balanceLLM}
-      />
-      )}
-    </>
+    <Collapse
+      defaultActiveKey={['actions', 'balance', 'assets']}
+      items={[
+        userIsMember && {
+          label: 'Actions',
+          key: 'actions',
+          children: (
+            <Flex wrap gap="15px">
+              <SpendModalWrapper
+                officeType={officeType}
+                spendData={{
+                  name: 'LLM to politipool',
+                  title: 'Spend LLM to politipool',
+                  description:
+                    'You are going to create LLM spend proposal that will transfer LLM to recipients politipool',
+                  subtitle: "Spend LLM to address's politipool",
+                }}
+                onSend={LLMPolitipool}
+                balance={balanceLLM}
+                label="Spend LLM (Politipool)"
+                icon={<GraphIcon />}
+              />
+              <SpendModalWrapper
+                officeType={officeType}
+                onSend={LLM}
+                spendData={{
+                  name: 'LLM',
+                }}
+                balance={balanceLLM}
+                label="Spend LLM"
+                icon={<GraphIcon />}
+              />
+              <SpendModalWrapper
+                officeType={officeType}
+                onSend={LLD}
+                spendData={{
+                  name: 'LLD',
+                }}
+                balance={balanceLLD}
+                label="Spend LLD"
+                icon={<UploadIcon />}
+              />
+            </Flex>
+          ),
+          extra: (
+            <Flex wrap gap="15px">
+              <span>
+                Wallet address
+              </span>
+              <CopyIconWithAddress address={congresAccountAddress} />
+            </Flex>
+          ),
+        },
+        {
+          label: 'Balance overview',
+          key: 'balance',
+          children: (
+            <BalanceOverview
+              totalBalance={totalBalance}
+              balances={balances}
+              liquidMerits={liquidMerits}
+              showStaked={false}
+            />
+          ),
+        },
+        {
+          label: 'Assets overview',
+          key: 'assets',
+          children: (
+            <AssetOverview
+              additionalAssets={additionalAssets}
+              isRemarkNeeded
+              officeType={officeType}
+              userIsMember={userIsMember}
+              isCongress
+            />
+          ),
+        },
+      ].filter(Boolean)}
+    />
   );
 }
 

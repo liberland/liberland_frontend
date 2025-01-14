@@ -9,7 +9,6 @@ import { walletActions } from '../../../../redux/actions';
 import ModalRoot from '../../../Modals/ModalRoot';
 import Button from '../../../Button/Button';
 import InputSearch from '../../../InputComponents/InputSearchAddressName';
-import styles from './styles.module.scss';
 import { useStockContext } from '../../StockContext';
 
 function MintAssetForm({
@@ -56,7 +55,6 @@ function MintAssetForm({
     <Form
       form={form}
       onFinish={onSubmit}
-      className={styles.form}
       layout="vertical"
     >
       <Form.Item

@@ -490,7 +490,7 @@ function* getAllBalanceForCongressWorker(action) {
 
 function* congressBudgetProposeWorker({
   payload: {
-    bugetProposalItems, executionBlock,
+    budgetProposalItems, executionBlock,
   },
 }) {
   const walletAddress = yield select(
@@ -498,7 +498,7 @@ function* congressBudgetProposeWorker({
   );
 
   yield call(congressProposeBudget, {
-    walletAddress, itemsCouncilPropose: bugetProposalItems, executionBlock,
+    walletAddress, itemsCouncilPropose: budgetProposalItems, executionBlock,
   });
   yield put(congressActions.congressBudgetPropose.success());
   yield put(congressActions.getMotions.call());

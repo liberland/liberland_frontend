@@ -1,32 +1,23 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useState } from 'react';
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Checkbox from 'antd/es/checkbox';
+import Flex from 'antd/es/flex';
+import Input from 'antd/es/input';
+import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
-
 import { useDispatch } from 'react-redux';
 import { BN, isHex } from '@polkadot/util';
+import Divider from 'antd/es/divider';
 import ModalRoot from './ModalRoot';
-import { CheckboxInput, TextInput } from '../InputComponents';
 import Button from '../Button/Button';
-
-import styles from './styles.module.scss';
 import { validatorActions } from '../../redux/actions';
 
 function StartValidatorModal({
   closeModal,
 }) {
   const dispatch = useDispatch();
-
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm({
-    mode: 'all',
-    defaultValues: {
-      commission: '10',
-      allow_nominations: true,
-    },
-  });
+  const [form] = Form.useForm();
 
   const onSubmit = (values) => {
     const commission = (new BN(values.commission)).mul(new BN(10000000));
@@ -36,43 +27,53 @@ function StartValidatorModal({
   };
 
   return (
-    <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
-      <div className={styles.h3}>Start validator</div>
+    <Form
+      form={form}
+      layout="vertical"
+      initialValues={{
+        commission: '10',
+        allow_nominations: true,
+      }}
+      onFinish={onSubmit}
+    >
+      <Title level={3}>Start validator</Title>
 
-      <div className={styles.title}>Reward commission percentage</div>
-      <div className={styles.description}>
-        The commission is deducted from all rewards before the remainder is split with nominators.
-      </div>
-      <TextInput
-        register={register}
-        name="commission"
-        required
-        errorTitle="Commission"
-      />
-      { errors?.commission?.message
-        && <div className={styles.error}>{errors.commission.message}</div> }
-
-      <CheckboxInput
-        register={register}
+      <Form.Item
+        label="Reward commission percentage"
+        extra="The commission is deducted from all rewards before the remainder is split with nominators."
+        rules={[{ required: true }, { min: 0 }, { max: 100 }]}
+      >
+        <InputNumber controls={false} />
+      </Form.Item>
+      <Form.Item
         name="allow_nominations"
         label="Allow new nominations"
-      />
-
-      <div className={styles.title}>Session keys</div>
-      <TextInput
-        register={register}
+        valuePropName="checked"
+        layout="vertical"
+      >
+        <Checkbox />
+      </Form.Item>
+      <Form.Item
+        label="Session keys"
         name="keys"
-        errorTitle="keys"
-        validate={(v) => {
-          if (!isHex(v)) return 'Must be a hex string starting with 0x';
-          return v.length === 258 || 'Invalid length';
-        }}
-        required
-      />
-      { errors?.keys?.message
-        && <div className={styles.error}>{errors.keys.message}</div>}
-
-      <div className={styles.buttonWrapper}>
+        rules={[
+          { required: true },
+          {
+            validator: (_, v) => {
+              if (!isHex(v)) {
+                return Promise.reject('Must be a hex string starting with 0x');
+              }
+              return v.length === 258
+                ? Promise.resolve()
+                : Promise.reject('Invalid length');
+            },
+          },
+        ]}
+      >
+        <Input />
+      </Form.Item>
+      <Divider />
+      <Flex wrap gap="15px">
         <Button
           medium
           onClick={closeModal}
@@ -86,8 +87,8 @@ function StartValidatorModal({
         >
           Start validator
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
@@ -95,10 +96,24 @@ StartValidatorModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
-export default function StartValidatorModalWrapper(props) {
+export default function StartValidatorModalWrapper({
+  label,
+}) {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <StartValidatorModal {...props} />
-    </ModalRoot>
+    <>
+      <Button primary onClick={() => setShow(true)}>
+        {label}
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <StartValidatorModal closeModal={() => setShow(false)} />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+StartValidatorModalWrapper.propTypes = {
+  label: PropTypes.string.isRequired,
+};

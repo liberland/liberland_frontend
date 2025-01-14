@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Flex from 'antd/es/flex';
 import { BN } from '@polkadot/util';
-
-// COMPONENTS
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
@@ -16,7 +18,7 @@ function UnpoolModal({
   closeModal,
 }) {
   const dispatch = useDispatch();
-
+  const [form] = Form.useForm();
   const balances = useSelector(walletSelectors.selectorBalances);
   const unpoolAmount = valueToBN(balances.liberstake.amount).mul(new BN(8742)).div(new BN(1000000));
   const unpoolLiquid = valueToBN(balances.liquidMerits.amount).add(unpoolAmount);
@@ -28,12 +30,13 @@ function UnpoolModal({
   };
 
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmitUnpool}
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleSubmitUnpool}
     >
-      <div className={styles.h3}>Unpool</div>
-      <div className={styles.title}>
+      <Title level={3}>Unpool</Title>
+      <Paragraph>
         Are you sure you want to go on welfare and temporarily forfeit
         {' '}
         your citizenship rights such as voting for a month?
@@ -51,24 +54,22 @@ function UnpoolModal({
         {formatMerits(unpoolLiquid)}
         {' '}
         liquid.
-      </div>
+      </Paragraph>
 
-      <div className={styles.buttonWrapper}>
+      <Flex wrap gap="15px">
         <Button
-          medium
           onClick={closeModal}
         >
           Cancel
         </Button>
         <Button
           primary
-          medium
           type="submit"
         >
           Unpool
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
@@ -85,7 +86,7 @@ function UnpoolModalWrapper() {
         <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {open && (
-        <ModalRoot>
+        <ModalRoot closeModal={() => setOpen(false)}>
           <UnpoolModal closeModal={() => setOpen(false)} />
         </ModalRoot>
       )}

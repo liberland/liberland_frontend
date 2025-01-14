@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Input from 'antd/es/input';
 import Flex from 'antd/es/flex';
+import Spin from 'antd/es/spin';
 import Paragraph from 'antd/es/typography/Paragraph';
 import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
@@ -11,7 +12,6 @@ import { walletActions } from '../../../../redux/actions';
 import ModalRoot from '../../../Modals/ModalRoot';
 import Button from '../../../Button/Button';
 import InputSearch from '../../../InputComponents/InputSearchAddressName';
-import styles from './styles.module.scss';
 import { useStockContext } from '../../StockContext';
 
 function CreateOrUpdateAssetForm({
@@ -72,7 +72,7 @@ function CreateOrUpdateAssetForm({
   const submitButtonText = isCreate ? `Create ${type} (~200 LLD)` : `Update ${type}`;
 
   if (!userWalletAddress || !additionalAssets) {
-    return <div>Loading...</div>;
+    return <Spin />;
   }
 
   return (
@@ -80,7 +80,6 @@ function CreateOrUpdateAssetForm({
       onFinish={onSubmit}
       form={form}
       initialValues={defaultValues}
-      className={styles.form}
       layout="vertical"
     >
       <Form.Item
@@ -189,7 +188,7 @@ function CreateOrUpdateAssetFormModalWrapper({
 }) {
   const [show, setShow] = useState();
   const { isStock } = useStockContext();
-  const modal = (
+  return (
     <>
       <Button
         primary
@@ -210,10 +209,6 @@ function CreateOrUpdateAssetFormModalWrapper({
       )}
     </>
   );
-  if (isCreate) {
-    return <div className={styles.modal}>{modal}</div>;
-  }
-  return modal;
 }
 
 CreateOrUpdateAssetFormModalWrapper.propTypes = {

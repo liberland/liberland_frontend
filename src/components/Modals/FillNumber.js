@@ -1,16 +1,14 @@
-// LIBS
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Flex from 'antd/es/flex';
+import InputNumber from 'antd/es/input-number';
+import Select from 'antd/es/select';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
-
-// STYLES
-import styles from './styles.module.scss';
-import stylesSelect from '../Home/ChangeWallet/styles.module.scss';
-import { TextInput } from '../InputComponents';
+import { valueToBN } from '../../utils/walletHelpers';
 
 function FillNumber({
   closeModal, textData, onAccept, higherThanZero, itemList,
@@ -25,99 +23,69 @@ function FillNumber({
     amount = null,
   } = textData;
 
-  const {
-    handleSubmit,
-    formState: { errors, isValid },
-    register,
-    trigger,
-  } = useForm({
-    mode: 'all',
-    defaultValues: {
-      amount,
-    },
-  });
+  const [form] = Form.useForm();
 
   const formSubmit = async (data) => {
-    if (!isValid || Number.isNaN(data?.amount)) return null;
-    if (itemList) {
-      if (itemList.length < 1) return null;
+    if (itemList?.length) {
       await onAccept(data.collection, data.amount);
     } else {
       await onAccept(data.amount);
     }
-    return true;
+    closeModal();
   };
 
-  useEffect(() => {
-    if (amount) {
-      trigger('amount');
-    }
-  }, [amount, trigger]);
-
   return (
-    <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(formSubmit)}>
-      <div className={styles.h3}>
+    <Form
+      onFinish={formSubmit}
+      form={form}
+      layout="vertical"
+      initialValues={{
+        amount,
+      }}
+    >
+      <Title level={3}>
         {title}
-      </div>
-      <div className={styles.description}>
+      </Title>
+      <Paragraph>
         {description}
-      </div>
-
-      {itemList && (
-        <>
-          <label htmlFor="collection">Choose a Collection</label>
-          <br />
-          <br />
-          {itemList.length > 0 ? (
-            <div className={stylesSelect.selectWrapper}>
-              <select
-                className={stylesSelect.select}
-                id="collection"
-                {...register('collection', { required: 'Please choose a collection' })}
-              >
-                <option value="">Select a collection</option>
-                {itemList.map((item) => {
-                  const { collectionId } = item;
-                  return (
-                    <option key={collectionId} value={collectionId}>
-                      {collectionId}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-          ) : <div className={styles.error}>First you need to create collection</div>}
-          {errors?.collection?.message && (
-          <div className={styles.error}>{errors.collection.message}</div>
-          )}
-        </>
-      )}
-      <br />
-
-      <TextInput
-        errorTitle="Amount"
-        register={register}
-        validate={(value) => {
-          // eslint-disable-next-line no-restricted-globals
-          if (isNaN(value)) {
-            return 'Amount must be a number';
-          }
-          const numValue = parseFloat(value);
-          if (higherThanZero && numValue <= 0) {
-            return 'Amount must be greater than zero';
-          }
-          return true;
-        }}
+      </Paragraph>
+      {itemList?.length ? (
+        <Form.Item name="collection" label="Choose a collection" rules={[{ required: true }]}>
+          <Select
+            options={itemList.map(({ collectionId }) => ({
+              value: collectionId,
+              label: collectionId,
+            }))}
+            placeholder="Choose a collection"
+          />
+        </Form.Item>
+      ) : null}
+      <Form.Item
         name="amount"
-        placeholder="Amount"
-        required
-      />
-      {errors?.amount?.message
-        && <div className={styles.error}>{errors.amount.message}</div>}
-
-      <div className={styles.buttonWrapper}>
+        label="Amount"
+        rules={[
+          { required: true },
+          {
+            validator: (_, val) => {
+              if (val) {
+                try {
+                  const value = valueToBN(val);
+                  if (higherThanZero && value.lt(valueToBN(0))) {
+                    return Promise.reject('Amount must be greater than zero');
+                  }
+                } catch {
+                  return Promise.reject('Amount must be a number');
+                }
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <InputNumber stringMode controls={false} />
+      </Form.Item>
+      <Flex wrap gap="15px">
         <Button
-          medium
           onClick={closeModal}
         >
           Cancel
@@ -125,17 +93,17 @@ function FillNumber({
         <Button
           disabled={itemList?.length < 1}
           primary
-          medium
           type="submit"
         >
           {submitButtonText}
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
 FillNumber.defaultProps = {
+  // eslint-disable-next-line react/default-props-match-prop-types
   textData: {
     title: 'Transfer to',
     description: 'You are going to transfer nft to...',
@@ -144,13 +112,14 @@ FillNumber.defaultProps = {
     collection: null,
     amount: null,
   },
+  // eslint-disable-next-line react/default-props-match-prop-types
   higherThanZero: true,
+  // eslint-disable-next-line react/default-props-match-prop-types
   itemList: null,
 };
 
-FillNumber.propTypes = {
+const commonProps = {
   onAccept: PropTypes.func.isRequired,
-  closeModal: PropTypes.func.isRequired,
   higherThanZero: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types
   itemList: PropTypes.array,
@@ -170,12 +139,45 @@ FillNumber.propTypes = {
   }),
 };
 
-function FillNumberWrapper(props) {
+FillNumber.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+  ...commonProps,
+};
+
+function FillNumberWrapper({
+  isMint,
+  onAccept,
+  higherThanZero,
+  itemList,
+  textData,
+}) {
+  const [show, setShow] = useState();
   return (
-    <ModalRoot>
-      <FillNumber {...props} />
-    </ModalRoot>
+    <>
+      <Button
+        onClick={() => setShow(true)}
+        primary
+      >
+        {isMint ? 'Mint NFT' : 'Set Price'}
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <FillNumber
+            closeModal={() => setShow(false)}
+            onAccept={onAccept}
+            higherThanZero={higherThanZero}
+            itemList={itemList}
+            textData={textData}
+          />
+        </ModalRoot>
+      )}
+    </>
   );
 }
+
+FillNumberWrapper.propTypes = {
+  ...commonProps,
+  isMint: PropTypes.bool,
+};
 
 export default FillNumberWrapper;

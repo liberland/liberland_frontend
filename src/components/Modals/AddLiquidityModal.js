@@ -27,7 +27,6 @@ function AddLiquidityModal({
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
-  const [loading, setLoading] = useState();
   const [form] = Form.useForm();
   const [asset1Focused, setAsset1Focused] = useState();
   const [asset2Focused, setAsset2Focused] = useState();
@@ -47,7 +46,6 @@ function AddLiquidityModal({
   const onSubmit = async ({
     amount1Desired, amount2Desired, minAmountPercent,
   }) => {
-    setLoading(true);
     try {
       const {
         amount1, amount2, amount1Min, amount2Min,
@@ -56,7 +54,7 @@ function AddLiquidityModal({
         amount2Desired,
         decimals1,
         decimals2,
-        minAmountPercent,
+        minAmountPercent || '',
       );
       const mintTo = walletAddress;
       dispatch(dexActions.addLiquidity.call({
@@ -73,7 +71,6 @@ function AddLiquidityModal({
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
-      setLoading(false);
     }
   };
 
@@ -245,11 +242,11 @@ function AddLiquidityModal({
         <Checkbox />
       </Form.Item>
       <Flex gap="15px" wrap>
-        <Button medium onClick={closeModal} disabled={loading}>
+        <Button medium onClick={closeModal}>
           Cancel
         </Button>
-        <Button primary medium type="submit" disabled={loading}>
-          {loading ? 'Loading...' : 'Add Liquidity'}
+        <Button primary medium type="submit">
+          Add Liquidity
         </Button>
       </Flex>
     </Form>

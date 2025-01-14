@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import cx from 'classnames';
-import { useHistory } from 'react-router-dom/cjs/react-router-dom';
-import styles from './styles.module.scss';
+import Popconfirm from 'antd/es/popconfirm';
+import { useHistory } from 'react-router-dom';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList/ValidatorList';
-import Button from '../../Button/Button';
 import { walletActions } from '../../../redux/actions';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import Card from '../../Card';
-import AgreeDisagreeModal from '../../Modals/AgreeDisagreeModal';
-import ModalRoot from '../../Modals/ModalRoot';
-import stylesModal from '../../Modals/styles.module.scss';
 import { areArraysSame } from '../../../utils/staking';
 
 function Nominator() {
@@ -24,9 +17,7 @@ function Nominator() {
 
   const [selectedValidatorsAsTargets, setSelectedValidatorsAsTargets] = useState(nominatorTargets);
   const [isListSelectedValidatorsChanged, setIsListSelectedValidatorsChanged] = useState(false);
-  const [isSideBlocked, setIsSideBlocked] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [navigationToLeave, setNavigationToLeave] = useState(null);
+  const [navigationAction, setNavigationAction] = useState();
 
   const isMaxNumValidatorsSelected = (selectedValidators) => selectedValidators.length > 15;
   const toggleSelectedValidator = (validatorAddress) => {
@@ -46,7 +37,7 @@ function Nominator() {
 
   const updateNominations = (newNominatorTargets) => {
     dispatch(walletActions.setNominatorTargets.call({ newNominatorTargets, walletAddress }));
-    setIsModalOpen(false);
+    setNavigationAction(undefined);
   };
 
   const goToAdvancedPage = () => {
@@ -54,15 +45,10 @@ function Nominator() {
     const stakingLink = `https://polkadotjs.blockchain.liberland.org/?rpc=${process.env.REACT_APP_NODE_ADDRESS}#/staking`;
     window.open(stakingLink);
   };
-  /*
-  * TODO mynominations#/maxnominations
-  * TODO validator oversubscribed or not
-  *
-  * */
 
   const handleDiscardChanges = () => {
-    setIsModalOpen(false);
-    history.push(navigationToLeave);
+    navigationAction?.();
+    setNavigationAction(undefined);
   };
 
   useEffect(() => {
@@ -84,23 +70,20 @@ function Nominator() {
   }, [isListSelectedValidatorsChanged]);
 
   useEffect(() => {
-    let unblock;
-
-    if (isSideBlocked && isListSelectedValidatorsChanged) {
-      unblock = history.block((location) => {
-        setNavigationToLeave(location.pathname);
-        setIsModalOpen(true);
-        setIsSideBlocked(false);
-        return false;
-      });
-    }
-
-    return () => {
-      if (unblock) {
+    const unblock = history.block(({ pathname }) => {
+      const action = () => {
         unblock();
+        history.push(pathname);
+      };
+      if (!isListSelectedValidatorsChanged) {
+        action();
+        return true;
       }
-    };
-  }, [history, isListSelectedValidatorsChanged, isSideBlocked]);
+      setNavigationAction(() => action);
+      return false;
+    });
+    return unblock;
+  }, [history, isListSelectedValidatorsChanged]);
 
   useEffect(() => {
     setSelectedValidatorsAsTargets([...nominatorTargets]);
@@ -119,58 +102,20 @@ function Nominator() {
 
   return (
     <>
-      {isModalOpen
-      && (
-      <ModalRoot>
-        <AgreeDisagreeModal
-          text="You have unsaved changes. What would you like to do with them?"
-          buttonLeft="Discard"
-          buttonRight="Update"
-          style={stylesModal.getCitizenshipModal}
-          onDisagree={handleDiscardChanges}
-          onAgree={() => updateNominations(selectedValidatorsAsTargets)}
-        >
-          <span />
-        </AgreeDisagreeModal>
-      </ModalRoot>
-      )}
-
-      <Card title="Validators" className={cx(stylesPage.overviewWrapper, styles.nominatorWrapper)}>
-        <div className={styles.nominatorsList}>
-          {/* <SearchBar
-          setSearchTerm={setSearchTerm}
-        /> */}
-          <div className={styles.updateNominationsContainer}>
-            <Button
-              className={styles.button}
-              small
-              primary
-              onClick={() => updateNominations(selectedValidatorsAsTargets)}
-            >
-              UPDATE NOMINATIONS
-            </Button>
-          </div>
-          <ValidatorList
-            validators={validators}
-            selectedValidatorsAsTargets={selectedValidatorsAsTargets}
-            selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
-            toggleSelectedValidator={toggleSelectedValidator}
-          />
-        </div>
-        <div className={styles.updateNominationsContainer}>
-          <Button small primary onClick={() => goToAdvancedPage()}>
-            ADVANCED
-          </Button>
-          <Button
-            className={styles.button}
-            small
-            primary
-            onClick={() => updateNominations(selectedValidatorsAsTargets)}
-          >
-            UPDATE NOMINATIONS
-          </Button>
-        </div>
-      </Card>
+      <Popconfirm
+        open={Boolean(navigationAction)}
+        title="You have unsaved changes. What would you like to do with them?"
+        onConfirm={() => updateNominations(selectedValidatorsAsTargets)}
+        onCancel={handleDiscardChanges}
+      />
+      <ValidatorList
+        validators={validators}
+        selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+        selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+        toggleSelectedValidator={toggleSelectedValidator}
+        goToAdvancedPage={goToAdvancedPage}
+        updateNominations={updateNominations}
+      />
     </>
   );
 }

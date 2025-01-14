@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import Alert from 'antd/es/alert';
+import Spin from 'antd/es/spin';
+import Select from 'antd/es/select';
+import Form from 'antd/es/form';
 import { ethSelectors } from '../../../redux/selectors';
 import { ethActions } from '../../../redux/actions';
-import styles from './styles.module.scss';
 
-function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
+function EthereumSelectorAddress({ selectedWallet, form }) {
   const dispatch = useDispatch();
 
   const connected = useSelector(ethSelectors.selectorConnected);
@@ -13,63 +16,48 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
   const error = useSelector(ethSelectors.selectorConnectError);
 
   useEffect(() => {
-    onAccountSelected(undefined);
+    form.resetFields(['selectedAccount']);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connected]);
+  }, [connected]); // Yes required, we want to reset on each new connected
 
   useEffect(() => {
     if (selectedWallet) {
       dispatch(
         ethActions.getConnectedEthWallet.call({
-          walletId: selectedWallet.id,
+          walletId: selectedWallet,
         }),
       );
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedWallet]);
+  }, [dispatch, selectedWallet]);
 
   if (!selectedWallet) {
     return null;
   }
 
   if (connecting) {
-    return <div>Loading...</div>;
+    return <Spin />;
   }
 
   if (connected) {
     return (
-      <label>
-        <div className={styles.label}>Select one of your accounts</div>
-        <div className={styles.selectWrapper}>
-          <select
-            placeholder="Select account"
-            onChange={(event) => {
-              if (event.target.value) {
-                onAccountSelected(event.target.value);
-              }
-            }}
-            className={styles.select}
-          >
-            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-            <option value="" />
-            {connected.accounts.map((account) => (
-              <option value={account} key={account}>
-                {account}
-              </option>
-            ))}
-          </select>
-        </div>
-      </label>
+      <Form.Item
+        label="Select one of your accounts"
+        name="selectedAccount"
+      >
+        <Select
+          placeholder="Select account"
+          options={connected.accounts.map((account) => ({
+            label: account,
+            value: account,
+          }))}
+        />
+      </Form.Item>
     );
   }
 
   if (error) {
     return (
-      <div className={styles.error}>
-        Something went wrong.
-        <br />
-        Try reconnecting provider.
-      </div>
+      <Alert type="error" message="Something went wrong, try reconnecting provider" />
     );
   }
 
@@ -77,11 +65,10 @@ function EthereumSelectorAddress({ selectedWallet, onAccountSelected }) {
 }
 
 EthereumSelectorAddress.propTypes = {
-  onAccountSelected: PropTypes.func.isRequired,
-  selectedWallet: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-  }),
+  selectedWallet: PropTypes.string,
+  form: PropTypes.shape({
+    resetFields: PropTypes.func.isRequired,
+  }).isRequired,
 };
 
 export default EthereumSelectorAddress;
