@@ -21,6 +21,7 @@ export default function FastTrackForm({ form }) {
         <Checkbox />
       </Form.Item>
       <Collapse
+        collapsible="icon"
         activeKey={fastTrack ? ['fastTrack'] : []}
         onChange={() => form.setFieldValue('fastTrack', !fastTrack)}
         items={[

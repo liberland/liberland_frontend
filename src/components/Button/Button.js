@@ -40,16 +40,26 @@ function Button({
     if (primary) {
       return 'primary';
     }
-    if (href || link) {
+    if (link) {
       return 'link';
     }
     return undefined;
   };
 
+  const getOnClick = () => {
+    if (href && onClick) {
+      return (e) => {
+        e.preventDefault();
+        onClick(e);
+      };
+    }
+    return onClick;
+  };
+
   return (
     <ButtonInternal
       disabled={disabled}
-      onClick={onClick}
+      onClick={getOnClick()}
       htmlType={type}
       type={getType()}
       target={newTab ? '_blank' : undefined}

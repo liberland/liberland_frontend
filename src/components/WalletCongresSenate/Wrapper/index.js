@@ -32,6 +32,7 @@ export default function WalletCongresSenateWrapper({
   return (
     <Collapse
       defaultActiveKey={['actions', 'balance', 'assets']}
+      collapsible="icon"
       items={[
         userIsMember && {
           label: 'Actions',

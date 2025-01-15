@@ -30,6 +30,7 @@ function LegislationItem({
 
   return (
     <Collapse
+      collapsible="icon"
       items={[{
         label: `Legislation ${year}/${index}`,
         key: 'legislation',

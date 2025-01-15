@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Spin from 'antd/es/spin';
 import Alert from 'antd/es/alert';
+import Collapse from 'antd/es/collapse';
 import ContractsList from '../ContractsList';
 import { blockchainSelectors, contractsSelectors } from '../../../redux/selectors';
 import { contractsActions } from '../../../redux/actions';
@@ -24,7 +25,19 @@ function HomeContract() {
   }
 
   return (
-    <ContractsList contracts={contracts} />
+    <Collapse
+      collapsible="icon"
+      defaultActiveKey={['all']}
+      items={[
+        {
+          key: 'all',
+          label: 'All contracts',
+          children: (
+            <ContractsList contracts={contracts} />
+          ),
+        },
+      ]}
+    />
   );
 }
 

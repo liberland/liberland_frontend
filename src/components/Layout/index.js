@@ -15,6 +15,7 @@ import FooterLinks from './FooterLinks';
 import Copyright from './Copyright';
 import PageTitle from './PageTitle';
 import Tabs from './Tabs';
+import { HideTitleProvider } from './HideTitle';
 
 function Layout({ children }) {
   const dispatch = useDispatch();
@@ -88,6 +89,8 @@ function Layout({ children }) {
             headerBg: 'white',
             headerPadding: '8px 0',
             colorBorder: 'white',
+            fontSize: 16,
+            colorText: '#243F5F',
           },
           Card: {
             extraColor: '#243F5F',
@@ -119,9 +122,11 @@ function Layout({ children }) {
           <Sider />
           <LayoutInternal>
             <Content className={styles.content}>
-              <PageTitle />
-              <Tabs />
-              {children}
+              <HideTitleProvider>
+                <PageTitle />
+                <Tabs />
+                {children}
+              </HideTitleProvider>
             </Content>
             <Footer className={styles.footer}>
               <div className={styles.footerItem}>

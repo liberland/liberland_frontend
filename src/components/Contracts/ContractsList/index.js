@@ -1,29 +1,31 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import List from 'antd/es/list';
-import Divider from 'antd/es/divider';
-import ContractItem from '../ContractItem';
+import { useMediaQuery } from 'usehooks-ts';
+import ContractListItem from '../ContractListItem';
+import styles from './styles.module.scss';
 
-function ContractsList({ contracts, isOneItem, isMyContracts }) {
+function ContractsList({ contracts, isMyContracts }) {
+  const isLargerThanTable = useMediaQuery('(min-width: 1600px)');
   return (
     <List
       dataSource={contracts}
+      className={styles.contracts}
+      bordered
+      size="small"
+      pagination={{ pageSize: 10 }}
+      itemLayout={isLargerThanTable ? 'horizontal' : 'vertical'}
       renderItem={(contract) => (
-        <>
-          <ContractItem
-            {...contract}
-            isOneItem={isOneItem}
-            isMyContracts={isMyContracts}
-          />
-          <Divider />
-        </>
+        <ContractListItem
+          {...contract}
+          isMyContracts={isMyContracts}
+        />
       )}
     />
   );
 }
 
 ContractsList.defaultProps = {
-  isOneItem: false,
   isMyContracts: false,
 };
 
@@ -39,7 +41,6 @@ ContractsList.propTypes = {
       partiesSignaturesList: PropTypes.arrayOf(PropTypes.string).isRequired,
     }),
   ).isRequired,
-  isOneItem: PropTypes.bool,
 };
 
 export default ContractsList;

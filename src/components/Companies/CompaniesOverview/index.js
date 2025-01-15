@@ -23,6 +23,7 @@ function CompaniesOverview() {
 
   return (
     <Collapse
+      collapsible="icon"
       defaultActiveKey={['registered', 'requested']}
       items={[
         {

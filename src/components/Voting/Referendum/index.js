@@ -64,6 +64,7 @@ function Referendum() {
   return (
     <Collapse
       defaultActiveKey={['referendums', 'proposals', 'dispatches']}
+      collapsible="icon"
       items={[
         {
           key: 'referendums',

@@ -59,6 +59,7 @@ function ExchangeList() {
       {highLiquidity.length > 0 && (
         <Collapse
           defaultActiveKey={['highliq']}
+          collapsible="icon"
           className={styles.exchangePairs}
           items={[
             {
@@ -83,6 +84,7 @@ function ExchangeList() {
       )}
       {lowLiquidity.length > 0 && (
         <Collapse
+          collapsible="icon"
           items={[
             {
               key: 'lowliq',
