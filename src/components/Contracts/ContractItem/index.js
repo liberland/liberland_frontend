@@ -199,7 +199,7 @@ function ContractItem({
                           </Flex>
                         )}
                         avatar={(
-                          <Avatar size={60} style={{ backgroundColor: avatarColor }}>
+                          <Avatar size={54} style={{ backgroundColor: avatarColor }}>
                             {avatarText[0]}
                           </Avatar>
                         )}
