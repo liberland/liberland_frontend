@@ -17,18 +17,6 @@ export const navigationList = [
     subLinks: {},
   },
   {
-    route: router.home.nfts,
-    title: 'NFTs',
-    icon: DocumentsIcon,
-    isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED === 'true',
-    subLinks: {
-      Overview: router.nfts.overview,
-      'Owned NFTs': router.nfts.ownedNfts,
-      Collections: router.nfts.collections,
-      Shop: router.nfts.shop,
-    },
-  },
-  {
     route: router.home.wallet,
     title: 'Wallet',
     icon: WalletIcon,
@@ -40,6 +28,18 @@ export const navigationList = [
       Assets: router.wallet.assets,
       Stocks: router.wallet.stocks,
       Bridge: router.wallet.bridge,
+    },
+  },
+  {
+    route: router.home.nfts,
+    title: 'NFTs',
+    icon: FeedIcon,
+    isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED === 'true',
+    subLinks: {
+      Overview: router.nfts.overview,
+      'Owned NFTs': router.nfts.ownedNfts,
+      Collections: router.nfts.collections,
+      Shop: router.nfts.shop,
     },
   },
   {

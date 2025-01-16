@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import List from 'antd/es/list';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
+import cx from 'classnames';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useHistory } from 'react-router-dom';
 import Markdown from 'markdown-to-jsx';
@@ -66,6 +67,7 @@ function ContractItem({
           {buttons}
         </Flex>,
       ]}
+      className={styles.listItem}
     >
       <List.Item.Meta
         title={(
@@ -75,7 +77,7 @@ function ContractItem({
               {' '}
               {contractId}
             </div>
-            <Title level={3}>
+            <Title level={3} className={styles.title}>
               {title}
             </Title>
           </Flex>
@@ -87,7 +89,7 @@ function ContractItem({
           ellipsis={isOneItem ? undefined : {
             rows: 2,
           }}
-          className="description"
+          className={cx('description', styles.preview)}
         >
           <Markdown>
             {data}

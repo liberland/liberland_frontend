@@ -9,6 +9,7 @@ import Card from 'antd/es/card';
 import Tag from 'antd/es/tag';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
+import Avatar from 'antd/es/avatar';
 import Markdown from 'markdown-to-jsx';
 import { useMediaQuery } from 'usehooks-ts';
 import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
@@ -56,25 +57,65 @@ function ContractItem({
 
   useHideTitle();
 
+  const navigation = (
+    <Flex wrap gap="15px" justify="space-between">
+      <Button
+        href={router.contracts.overview}
+        onClick={() => {
+          history.push(router.contracts.overview);
+        }}
+      >
+        <ArrowLeftOutlined />
+        <Space />
+        Back to Contracts
+      </Button>
+      <CopyInput
+        buttonLabel="Copy link to contract"
+        value={`${window.location.protocol}//${window.location.host}${
+          router.contracts.item.replace(':id', contractId)}`}
+      />
+    </Flex>
+  );
+
+  const actions = (
+    <Flex wrap gap="15px">
+      {!isMeSigned && (
+        <Button
+          primary
+          onClick={() => dispatch(contractsActions.signContract.call({ contractId, isMyContracts }))}
+        >
+          Sign as a party
+        </Button>
+      )}
+
+      {!isMeSignedAsJudge && isUserJudge && (
+        <Button
+          primary
+          onClick={() => dispatch(
+            contractsActions.signContractJudge.call({
+              contractId,
+              isMyContracts,
+            }),
+          )}
+        >
+          Sign as a judge
+        </Button>
+      )}
+
+      {!isContractSign && (
+        <Button
+          red
+          onClick={() => dispatch(contractsActions.removeContract.call({ contractId, isMyContracts }))}
+        >
+          Remove
+        </Button>
+      )}
+    </Flex>
+  );
+
   return (
     <Flex vertical className={styles.wrapper}>
-      <Flex wrap gap="15px" justify="space-between">
-        <Button
-          href={router.contracts.overview}
-          onClick={() => {
-            history.push(router.contracts.overview);
-          }}
-        >
-          <ArrowLeftOutlined />
-          <Space />
-          Back to Contracts
-        </Button>
-        <CopyInput
-          buttonLabel="Copy link to contract"
-          value={`${window.location.protocol}//${window.location.host}${
-            router.contracts.item.replace(':id', contractId)}`}
-        />
-      </Flex>
+      {navigation}
       <Divider className={styles.divider} />
       <Flex wrap gap="15px" className="description">
         <div>
@@ -90,39 +131,7 @@ function ContractItem({
         <Title level={1}>
           {title}
         </Title>
-        <Flex wrap gap="15px">
-          {!isMeSigned && (
-            <Button
-              primary
-              onClick={() => dispatch(contractsActions.signContract.call({ contractId, isMyContracts }))}
-            >
-              Sign as a party
-            </Button>
-          )}
-
-          {!isMeSignedAsJudge && isUserJudge && (
-            <Button
-              primary
-              onClick={() => dispatch(
-                contractsActions.signContractJudge.call({
-                  contractId,
-                  isMyContracts,
-                }),
-              )}
-            >
-              Sign as a judge
-            </Button>
-          )}
-
-          {!isContractSign && (
-            <Button
-              red
-              onClick={() => dispatch(contractsActions.removeContract.call({ contractId, isMyContracts }))}
-            >
-              Remove
-            </Button>
-          )}
-        </Flex>
+        {actions}
       </Flex>
       <Collapse
         defaultActiveKey={['contract', 'relevant']}
@@ -143,6 +152,7 @@ function ContractItem({
           {
             key: 'relevant',
             label: 'Relevant parties',
+            extra: actions,
             children: (
               <List
                 grid={{ gutter: 16, column: isLargerThanTable ? 3 : undefined }}
@@ -171,18 +181,28 @@ function ContractItem({
                         return 'default';
                     }
                   })();
+                  const avatarText = identity?.identity?.legal || identity?.identity?.name || name || 'U';
+                  const avatarColor = `#${
+                    avatarText.split('').map((c) => c.charCodeAt(0).toString(16)).join('').slice(0, 6)}`;
                   return (
                     <Card
                       size="small"
                       className={styles.party}
-                      extra={(
-                        <Tag color={color}>
-                          {name}
-                        </Tag>
-                      )}
-                      title={identity?.identity?.legal}
                     >
                       <Card.Meta
+                        title={(
+                          <Flex wrap gap="15px" justify="space-between">
+                            {identity?.identity?.legal || 'Unknown'}
+                            <Tag color={color} className={styles.tag}>
+                              {name}
+                            </Tag>
+                          </Flex>
+                        )}
+                        avatar={(
+                          <Avatar style={{ backgroundColor: avatarColor }}>
+                            {avatarText[0]}
+                          </Avatar>
+                        )}
                         description={(
                           <CopyIconWithAddress
                             address={item}
@@ -197,6 +217,7 @@ function ContractItem({
           },
         ]}
       />
+      {navigation}
     </Flex>
   );
 }

@@ -11,7 +11,6 @@ function ContractsList({ contracts, isMyContracts }) {
     <List
       dataSource={contracts}
       className={styles.contracts}
-      bordered
       size="small"
       pagination={{ pageSize: 10 }}
       itemLayout={isLargerThanTable ? 'horizontal' : 'vertical'}
