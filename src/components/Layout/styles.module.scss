@@ -130,11 +130,13 @@
   text-decoration-skip-ink: none;
   margin-left: auto;
 
-  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
-    font-size: 12px;
+  @media screen and (min-width: map-get($breakpoints, 'desktop')) {
     line-height: 16.34px;
     text-align: right;
     margin-right: 20px;
+    color: #ACBDC5;
+    width: 100%;
+    font-size: 14px;
   }
 }
 

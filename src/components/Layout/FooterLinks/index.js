@@ -10,19 +10,20 @@ function FooterLinks() {
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
   return (
     <List
-      grid={{ gutter: 16 }}
+      grid={isBiggerThanSmallScreen ? { gutter: 16 } : undefined}
       dataSource={footerList}
       renderItem={([title, links]) => {
         const list = Object.entries(links);
         return (
           <Collapse
             key={title}
-            collapsible="icon"
             expandIcon={isBiggerThanSmallScreen ? () => null : undefined}
             activeKey={isBiggerThanSmallScreen ? [title] : undefined}
             items={[{
               key: title,
-              label: title,
+              label: (
+                <div className="description">{title}</div>
+              ),
               children: (
                 <Menu
                   mode="inline"
