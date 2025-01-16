@@ -25,6 +25,7 @@ import { contractsActions } from '../../../redux/actions';
 import { contractsSelectors } from '../../../redux/selectors';
 import { useHideTitle } from '../../Layout/HideTitle';
 import styles from './styles.module.scss';
+import { getAvatarParameters } from '../../../utils/avatar';
 
 function ContractItem({
   contractId,
@@ -181,9 +182,9 @@ function ContractItem({
                         return 'default';
                     }
                   })();
-                  const avatarText = identity?.identity?.legal || identity?.identity?.name || name || 'U';
-                  const avatarColor = `#${
-                    avatarText.split('').map((c) => c.charCodeAt(0).toString(16)).join('').slice(0, 6)}`;
+                  const { color: avatarColor, text } = getAvatarParameters(
+                    identity?.identity?.legal || identity?.identity?.name || name,
+                  );
                   return (
                     <Card
                       size="small"
@@ -200,7 +201,7 @@ function ContractItem({
                         )}
                         avatar={(
                           <Avatar style={{ backgroundColor: avatarColor }}>
-                            {avatarText[0]}
+                            {text}
                           </Avatar>
                         )}
                         description={(

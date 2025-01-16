@@ -2,14 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
-import Flex from 'antd/es/flex';
 import Button from '../../Button/Button';
 import { registriesActions } from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
 import { generatePdf } from '../../../api/middleware';
 import ManageInfo from '../ManageInfo';
 import ShowInfo from '../ShowInfo';
-import styles from './styles.module.scss';
 
 export default function CompanyActions({
   registeredCompany,
@@ -35,21 +33,21 @@ export default function CompanyActions({
   switch (type) {
     case 'mine':
       return (
-        <Flex className={styles.fit} vertical gap="15px">
+        <>
           <ManageInfo registeredCompany={registeredCompany} />
           <ShowInfo registeredCompany={registeredCompany} />
-        </Flex>
+        </>
       );
     case 'requested':
       return (
-        <Flex className={styles.fit} vertical gap="15px">
+        <>
           <ManageInfo registeredCompany={registeredCompany} />
           <ShowInfo registeredCompany={registeredCompany} />
-        </Flex>
+        </>
       );
     case 'all':
       return (
-        <Flex className={styles.fit} vertical gap="15px">
+        <>
           <ShowInfo registeredCompany={registeredCompany} />
           {website && (
             <Button
@@ -78,7 +76,7 @@ export default function CompanyActions({
           >
             Delete request
           </Button>
-        </Flex>
+        </>
       );
     default:
       return null;
