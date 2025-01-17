@@ -11,7 +11,6 @@ import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Avatar from 'antd/es/avatar';
 import Markdown from 'markdown-to-jsx';
-import { useMediaQuery } from 'usehooks-ts';
 import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -53,8 +52,6 @@ function ContractItem({
     partiesSignaturesList,
   });
   const isUserJudge = useSelector(contractsSelectors.selectorIsUserJudgde);
-  const isLargerThanTable = useMediaQuery('(min-width: 1200px)');
-
   useHideTitle();
 
   const navigation = (
@@ -155,7 +152,8 @@ function ContractItem({
             extra: actions,
             children: (
               <List
-                grid={{ gutter: 16, column: isLargerThanTable ? 3 : undefined }}
+                grid={{ gutter: 16, column: 3 }}
+                className="threeColumnList"
                 dataSource={infoContract.filter(
                   ({ itemsOrItem }) => !Array.isArray(itemsOrItem) || itemsOrItem.length !== 0,
                 ).reduce((items, { itemsOrItem, name }) => {
