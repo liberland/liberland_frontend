@@ -15,6 +15,7 @@ function RegistriesLand() {
 
   return (
     <Collapse
+      collapsible="icon"
       defaultActiveKey={['physicalLand', 'metaverseLand']}
       items={[
         {

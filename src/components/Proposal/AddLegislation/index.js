@@ -30,6 +30,7 @@ function AddLegislation({ proposal, isDetailsHidden }) {
         {show ? '.' : '...'}
       </p>
       <Collapse
+        collapsible="icon"
         onChange={() => setShow(!show)}
         activeKey={show ? ['details'] : []}
         items={[

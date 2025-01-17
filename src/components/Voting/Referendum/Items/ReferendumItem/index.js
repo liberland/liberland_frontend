@@ -42,6 +42,7 @@ function ReferendumItem({
   return (
     <Collapse
       defaultActiveKey={['proposal']}
+      collapsible="icon"
       items={[{
         key: 'proposal',
         label: (

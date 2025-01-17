@@ -25,6 +25,7 @@ export default function StakingOverview() {
     <>
       <StakeManagement />
       <Collapse
+        collapsible="icon"
         defaultActiveKey={['validator', 'nominator']}
         items={[
           info.isStakingValidator && {

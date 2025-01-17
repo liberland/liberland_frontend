@@ -173,6 +173,7 @@ function CongressionalAssemble() {
       </Modal>
       <Collapse
         defaultActiveKey={['current', 'voting', 'preference', 'term']}
+        collapsible="icon"
         items={[
           democracy?.democracy?.currentCongressMembers && {
             key: 'current',

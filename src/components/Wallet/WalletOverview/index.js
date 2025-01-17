@@ -45,6 +45,7 @@ function WalletOverview() {
   return (
     <Collapse
       defaultActiveKey={['Remarks', 'BalanceOverview', 'AssetOverview', 'WalletTransactionHistory']}
+      collapsible="icon"
       items={[
         {
           key: 'BalanceOverview',

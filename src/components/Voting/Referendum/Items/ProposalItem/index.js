@@ -36,6 +36,7 @@ function ProposalItem({
   return (
     <Collapse
       defaultActiveKey={['proposal']}
+      collapsible="icon"
       items={[{
         key: 'proposal',
         label: (
