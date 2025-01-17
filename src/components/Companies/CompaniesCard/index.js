@@ -59,35 +59,48 @@ function CompaniesCard({
                 </Flex>
               )}
             />
-            <Flex wrap gap="15px" justify="space-between" flex={1}>
-              <Paragraph
-                ellipsis={{
-                  rows: 2,
-                }}
-                className={cx('description', styles.preview)}
-              >
-                <Markdown>
-                  {registeredCompany.purpose}
-                </Markdown>
-              </Paragraph>
-              {!hideOwner && owner && (
-                <Flex wrap gap="15px" className={styles.owner}>
-                  <Avatar size={54} style={{ backgroundColor: color }}>
-                    {text}
-                  </Avatar>
-                  <Flex vertical gap="5px" className={styles.ownerName}>
-                    {owner && (
-                      <>
-                        <strong>
-                          {truncate(owner, 20)}
-                        </strong>
-                        <CopyIconWithAddress address={address} isTruncate />
-                      </>
-                    )}
-                  </Flex>
+            {!hideOwner && owner && !isLargerThanTable && (
+              <Flex vertical gap="5px">
+                <div className="description">
+                  Company owner
+                </div>
+                <Flex wrap gap="5px">
+                  <Avatar size={19} style={{ backgroundColor: color }} />
+                  <CopyIconWithAddress address={address} name={owner} isTruncate />
                 </Flex>
-              )}
-            </Flex>
+              </Flex>
+            )}
+            {isLargerThanTable && (
+              <Flex wrap gap="15px" justify="space-between" flex={1}>
+                <Paragraph
+                  ellipsis={{
+                    rows: 2,
+                  }}
+                  className={cx('description', styles.preview)}
+                >
+                  <Markdown>
+                    {registeredCompany.purpose}
+                  </Markdown>
+                </Paragraph>
+                {!hideOwner && owner && (
+                  <Flex wrap gap="15px" className={styles.owner}>
+                    <Avatar size={54} style={{ backgroundColor: color }}>
+                      {text}
+                    </Avatar>
+                    <Flex vertical gap="5px" className={styles.ownerName}>
+                      {owner && (
+                        <>
+                          <strong>
+                            {truncate(owner, 20)}
+                          </strong>
+                          <CopyIconWithAddress address={address} isTruncate />
+                        </>
+                      )}
+                    </Flex>
+                  </Flex>
+                )}
+              </Flex>
+            )}
           </List.Item>
         );
       }}

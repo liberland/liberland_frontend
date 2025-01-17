@@ -1,3 +1,8 @@
+@import '../../../assets/base/variables';
+@import '../../../assets/base/fonts';
+@import '../../../assets/main.scss';
+@import '../../../index.scss';
+
 .companies {
     max-width: 1600px;
 }
@@ -18,7 +23,9 @@
     max-width: 250px!important;
 }
 .action {
-    width: 220px;
+    @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+        width: 220px;
+    }
 }
 .owner {
     width: 240px;
