@@ -11,6 +11,7 @@ import CopyIconWithAddress from '../../CopyIconWithAddress';
 import CompanyActions from '../CompanyActions';
 import styles from './styles.module.scss';
 import { getAvatarParameters } from '../../../utils/avatar';
+import truncate from '../../../utils/truncate';
 
 function CompaniesCard({
   registries,
@@ -38,7 +39,7 @@ function CompaniesCard({
         );
         return (
           <List.Item
-            actions={isLargerThanTable ? buttons : [
+            actions={[
               <Flex wrap gap="15px" className={styles.action}>
                 {buttons}
               </Flex>,
@@ -46,46 +47,47 @@ function CompaniesCard({
             className={styles.listItem}
           >
             <List.Item.Meta
+              className={styles.meta}
               title={(
-                <Flex wrap gap="15px">
+                <Flex align="center" gap="15px">
                   {logo && (
-                    <Avatar src={logo} />
+                    <Avatar size={54} src={logo} />
                   )}
                   <strong>
                     {registeredCompany.name}
                   </strong>
                 </Flex>
               )}
-              description={(
-                <Paragraph
-                  ellipsis={{
-                    rows: 2,
-                  }}
-                  className={cx('description', styles.preview)}
-                >
-                  <Markdown>
-                    {registeredCompany.purpose}
-                  </Markdown>
-                </Paragraph>
-              )}
             />
-            {!hideOwner && (
-              <Flex wrap gap="15px">
-                <Avatar style={{ backgroundColor: color }}>
-                  {text}
-                </Avatar>
-                <Flex vertical gap="15px">
-                  {owner && (
-                    <>
-                      <strong>
-                        {owner}
-                      </strong>
-                      <CopyIconWithAddress address={address} isTruncate />
-                    </>
-                  )}
+            <Flex wrap gap="15px" justify="space-between" flex={1}>
+              <Paragraph
+                ellipsis={{
+                  rows: 2,
+                }}
+                className={cx('description', styles.preview)}
+              >
+                <Markdown>
+                  {registeredCompany.purpose}
+                </Markdown>
+              </Paragraph>
+              {!hideOwner && owner && (
+                <Flex wrap gap="15px" className={styles.owner}>
+                  <Avatar size={54} style={{ backgroundColor: color }}>
+                    {text}
+                  </Avatar>
+                  <Flex vertical gap="5px" className={styles.ownerName}>
+                    {owner && (
+                      <>
+                        <strong>
+                          {truncate(owner, 20)}
+                        </strong>
+                        <CopyIconWithAddress address={address} isTruncate />
+                      </>
+                    )}
+                  </Flex>
                 </Flex>
-              </Flex>
-            )}
+              )}
+            </Flex>
           </List.Item>
         );
       }}

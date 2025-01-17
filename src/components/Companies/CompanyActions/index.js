@@ -32,12 +32,6 @@ export default function CompanyActions({
 
   switch (type) {
     case 'mine':
-      return (
-        <>
-          <ManageInfo registeredCompany={registeredCompany} />
-          <ShowInfo registeredCompany={registeredCompany} />
-        </>
-      );
     case 'requested':
       return (
         <>
@@ -51,7 +45,22 @@ export default function CompanyActions({
           <ShowInfo registeredCompany={registeredCompany} />
           {website && (
             <Button
-              link
+              href={website}
+            >
+              <GlobalOutlined />
+              <span className="hidden">
+                Website
+              </span>
+            </Button>
+          )}
+        </>
+      );
+    case 'detail':
+      return (
+        <>
+          <ShowInfo registeredCompany={registeredCompany} />
+          {website && (
+            <Button
               href={website}
             >
               <GlobalOutlined />

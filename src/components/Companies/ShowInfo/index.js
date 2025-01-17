@@ -1,22 +1,15 @@
 import React from 'react';
-import Popover from 'antd/es/popover';
 import PropTypes from 'prop-types';
 import Button from '../../Button/Button';
-import CompanyDetail from '../CompanyDetail';
+import router from '../../../router';
 
 function ShowInfo({
   registeredCompany,
 }) {
   return (
-    <Popover
-      trigger={['click']}
-      title="Details"
-      content={<CompanyDetail mainDataObject={registeredCompany} showAll />}
-    >
-      <Button link>
-        Show info
-      </Button>
-    </Popover>
+    <Button href={router.companies.view.replace(':companyId', registeredCompany.id)}>
+      Show info
+    </Button>
   );
 }
 

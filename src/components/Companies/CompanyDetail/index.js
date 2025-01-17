@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import PropTypes from 'prop-types';
 import Descriptions from 'antd/es/descriptions';
 import List from 'antd/es/list';
 import styles from './styles.module.scss';
+import { useCompanyDataFromUrl } from '../hooks';
 
 function simplifyList(maybeList) {
   if (Array.isArray(maybeList)) {
@@ -11,41 +11,38 @@ function simplifyList(maybeList) {
   return maybeList;
 }
 
-function CompanyDetail({ mainDataObject, showAll = false }) {
+function CompanyDetail() {
+  const mainDataObject = useCompanyDataFromUrl();
   const details = useMemo(() => (
     mainDataObject?.staticFields || []
   ).map((staticField) => ({
     name: staticField?.name || '',
     display: staticField?.display || '',
-  })).concat(showAll
-    ? (
-      mainDataObject?.dynamicFields || []
-    ).map((dynamicField) => {
-      switch (dynamicField?.data?.length || 0) {
-        case 0:
-          return null;
-        case 1:
-          return {
-            name: dynamicField?.name || '',
-            display: dynamicField.data[0]?.display
-              ? `${
-                simplifyList(dynamicField.data[0].display)
-              }${dynamicField.data[0]?.isEncrypted ? ' (Encrypted)' : ''}`
+  })).concat(mainDataObject?.dynamicFields.map((dynamicField) => {
+    switch (dynamicField?.data?.length || 0) {
+      case 0:
+        return null;
+      case 1:
+        return {
+          name: dynamicField?.name || '',
+          display: dynamicField.data[0]?.display
+            ? `${
+              simplifyList(dynamicField.data[0].display)
+            }${dynamicField.data[0]?.isEncrypted ? ' (Encrypted)' : ''}`
+            : '',
+        };
+      default:
+        return {
+          name: dynamicField?.name || '',
+          children: (dynamicField.data || []).map((formObject, index) => ({
+            name: dynamicField?.name ? `${dynamicField.name} ${index + 1}` : index + 1,
+            display: formObject?.display
+              ? `${simplifyList(formObject.display)}${formObject.isEncrypted ? ' (Encrypted)' : ''}`
               : '',
-          };
-        default:
-          return {
-            name: dynamicField?.name || '',
-            children: (dynamicField.data || []).map((formObject, index) => ({
-              name: dynamicField?.name ? `${dynamicField.name} ${index + 1}` : index + 1,
-              display: formObject?.display
-                ? `${simplifyList(formObject.display)}${formObject.isEncrypted ? ' (Encrypted)' : ''}`
-                : '',
-            })),
-          };
-      }
-    }).filter(Boolean)
-    : []), [mainDataObject, showAll]);
+          })),
+        };
+    }
+  })).filter(Boolean), [mainDataObject]);
 
   return (
     <Descriptions layout="vertical" size="small" className={styles.details}>
@@ -67,11 +64,5 @@ function CompanyDetail({ mainDataObject, showAll = false }) {
     </Descriptions>
   );
 }
-
-CompanyDetail.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  mainDataObject: PropTypes.any.isRequired,
-  showAll: PropTypes.bool.isRequired,
-};
 
 export default CompanyDetail;

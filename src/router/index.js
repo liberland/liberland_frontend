@@ -103,6 +103,7 @@ export default {
     home: '/home/companies',
     create: '/home/companies/create',
     edit: '/home/companies/edit/:companyId',
+    view: '/home/companies/view/:companyId',
     allCompanies: '/home/companies/allCompanies',
   },
 };

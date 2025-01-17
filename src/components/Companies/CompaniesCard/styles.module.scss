@@ -5,6 +5,7 @@
     border: solid 1px #ECEBF0;
     border-radius: 6px;
     margin-bottom: 10px;
+    justify-content: start!important;
 }
 .title {
     margin-bottom: 0!important;
@@ -12,4 +13,16 @@
 }
 .preview {
     margin-bottom: 0!important;
+}
+.meta {
+    max-width: 250px!important;
+}
+.action {
+    width: 220px;
+}
+.owner {
+    width: 240px;
+}
+.ownerName {
+    width: 170px;
 }

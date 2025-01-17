@@ -4,9 +4,9 @@ import { useParams, useHistory } from 'react-router-dom';
 import { BuildRegistryForm } from '../../../../utils/registryFormBuilder';
 import { registriesActions } from '../../../../redux/actions';
 import {
-  registriesSelectors,
   blockchainSelectors,
 } from '../../../../redux/selectors';
+import { useCompanyDataFromUrl } from '../../hooks';
 
 export default function EditCompany() {
   const { companyId } = useParams();
@@ -20,10 +20,7 @@ export default function EditCompany() {
       registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress),
     );
   }, [dispatch, userWalletAddress]);
-  const registries = useSelector(registriesSelectors.registries);
-  const requestType = window.location.hash.substring(1);
-  const companies = registries?.officialUserRegistryEntries?.companies?.[requestType];
-  const registeredCompanyData = companies?.find((item) => item.id === companyId);
+  const registeredCompanyData = useCompanyDataFromUrl();
 
   if (!registeredCompanyData) {
     return (

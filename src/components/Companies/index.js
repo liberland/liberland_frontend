@@ -23,6 +23,11 @@ function Companies() {
       />
       <Route
         exact
+        path={router.companies.view}
+        component={loader(() => import('./CompanyDetail'))}
+      />
+      <Route
+        exact
         path={router.companies.allCompanies}
         component={loader(() => import('./AllCompanies'))}
       />
