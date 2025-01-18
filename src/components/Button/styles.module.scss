@@ -36,8 +36,9 @@
     color: $red;
   }
   &.flex {
-    flex-grow: 1;
-    width: 100%;
+    flex-grow: 1!important;
+    width: 100%!important;
+    display: flex!important;
   }
   &.multiline {
     white-space: wrap;

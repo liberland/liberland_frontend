@@ -6,14 +6,14 @@ import ContractListItem from '../ContractListItem';
 import styles from './styles.module.scss';
 
 function ContractsList({ contracts, isMyContracts }) {
-  const isLargerThanTable = useMediaQuery('(min-width: 1600px)');
+  const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
   return (
     <List
       dataSource={contracts}
       className={styles.contracts}
       size="small"
       pagination={{ pageSize: 10 }}
-      itemLayout={isLargerThanTable ? 'horizontal' : 'vertical'}
+      itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
       renderItem={(contract) => (
         <ContractListItem
           {...contract}

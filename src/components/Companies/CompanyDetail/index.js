@@ -22,43 +22,20 @@ import router from '../../../router';
 import { tryFormatDollars, tryFormatNumber } from '../../../utils/walletHelpers';
 import CompanyPersonas from '../CompanyPersonas';
 
-function simplifyList(maybeList) {
-  if (Array.isArray(maybeList)) {
-    return maybeList.filter(Boolean).join(' ');
-  }
-  return maybeList;
+function simplifyCompanyObject(company) {
+  const copy = JSON.parse(JSON.stringify(company), (_, value) => {
+    if (typeof value === 'object' && value?.value) {
+      return value?.value;
+    }
+    return value;
+  });
+  return copy;
 }
 
 function CompanyDetail() {
-  const isLargerThanTable = useMediaQuery('(min-width: 1600px)');
-  const { mainDataObject, request } = useCompanyDataFromUrl();
-  const details = useMemo(() => mainDataObject?.dynamicFields.map((dynamicField) => {
-    switch (dynamicField?.data?.length || 0) {
-      case 0:
-        return null;
-      case 1:
-        return {
-          name: dynamicField?.name || '',
-          display: dynamicField.data[0]?.display
-            ? `${
-              simplifyList(dynamicField.data[0].display)
-            }${dynamicField.data[0]?.isEncrypted ? ' (Encrypted)' : ''}`
-            : '',
-        };
-      default:
-        return {
-          name: dynamicField?.name || '',
-          children: (dynamicField.data || []).map((formObject, index) => ({
-            name: dynamicField?.name ? `${dynamicField.name} ${index + 1}` : index + 1,
-            display: formObject?.display
-              ? `${simplifyList(formObject.display)}${formObject.isEncrypted ? ' (Encrypted)' : ''}`
-              : '',
-          })),
-        };
-    }
-  }).filter(Boolean).map(
-    ({ name, ...rest }) => ({ name: name.replace(' (optional)', ''), ...rest }),
-  ), [mainDataObject]);
+  const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
+  const { mainDataObject: complexDataObject, request } = useCompanyDataFromUrl();
+  const mainDataObject = useMemo(() => simplifyCompanyObject(complexDataObject || {}), [complexDataObject]);
 
   useHideTitle();
   const history = useHistory();
@@ -71,7 +48,7 @@ function CompanyDetail() {
   const fullLink = `${window.location.protocol}//${window.location.host}${router.companies.allCompanies}`;
 
   return (
-    <>
+    <div className={styles.container}>
       <Flex className={styles.top} wrap gap="15px" justify="space-between">
         <Button onClick={() => history.push(router.companies.allCompanies)}>
           <ArrowLeftOutlined />
@@ -91,10 +68,7 @@ function CompanyDetail() {
             </Avatar>
           )}
 
-          <Flex vertical gap="15px">
-            <Title level={1}>
-              {mainDataObject.name}
-            </Title>
+          <Flex vertical gap="5px">
             <Flex wrap gap="15px">
               <div className="description">
                 Company ID:
@@ -107,6 +81,9 @@ function CompanyDetail() {
                 {mainDataObject.type || 'Liberland'}
               </div>
             </Flex>
+            <Title level={1} className={styles.title}>
+              {mainDataObject.name}
+            </Title>
           </Flex>
         </Flex>
         <Flex wrap gap="15px">
@@ -124,7 +101,6 @@ function CompanyDetail() {
           'UBOs',
           'contracts',
           'assets',
-          ...details.map(({ name }) => name),
         ]}
         items={[
           {
@@ -136,17 +112,21 @@ function CompanyDetail() {
                   className={styles.purpose}
                   title="Company description"
                   actions={mainDataObject.onlineAddresses?.map(
-                    (address, index) => (
+                    ({ description, url }, index) => (
                       <Button
                         primary={index === 0}
-                        href={address}
+                        onClick={() => {
+                          window.location.href = url;
+                        }}
                       >
-                        {address}
+                        {description}
                       </Button>
                     ),
                   )}
                 >
-                  {mainDataObject.purpose || 'Unknown'}
+                  <div className={styles.purposeText}>
+                    {mainDataObject.purpose || 'Unknown'}
+                  </div>
                 </Card>
                 <Flex vertical gap="15px">
                   <Card title="Total capital amount">
@@ -174,23 +154,28 @@ function CompanyDetail() {
             children: (
               <List
                 itemLayout="horizontal"
-                grid={{ gutter: 16 }}
+                grid={{ gutter: 16, column: 3 }}
                 dataSource={mainDataObject.contact}
                 size="small"
-                renderItem={(contact, index) => (
-                  <List.Item className={styles.listItem}>
-                    <List.Item.Meta
+                renderItem={({ contact }, index) => (
+                  <List.Item>
+                    <Card
+                      size="small"
+                      classNames={{
+                        header: styles.header,
+                      }}
                       title={(
-                        <Flex vertical gap="15px">
-                          <div className="description">
-                            {contact.includes('@') ? 'Email' : 'Telephone'}
-                            {' '}
-                            {index + 1}
-                          </div>
-                          {contact}
-                        </Flex>
+                        <div className="description">
+                          {contact.includes('@') ? 'Email' : 'Telephone'}
+                          {' '}
+                          {index + 1}
+                        </div>
                       )}
-                    />
+                    >
+                      <strong>
+                        {contact}
+                      </strong>
+                    </Card>
                   </List.Item>
                 )}
               />
@@ -206,20 +191,25 @@ function CompanyDetail() {
                 dataSource={mainDataObject.physicalAddresses}
                 size="small"
                 renderItem={(address, index) => (
-                  <List.Item className={styles.listItem}>
-                    <List.Item.Meta
+                  <List.Item>
+                    <Card
+                      size="small"
+                      classNames={{
+                        header: styles.header,
+                      }}
                       title={(
-                        <Flex vertical gap="15px">
-                          <div className="description">
-                            Address
-                            {' '}
-                            {index + 1}
-                            {index === 0 ? ' (primary)' : ''}
-                          </div>
-                          {address}
-                        </Flex>
+                        <div className="description">
+                          Address
+                          {' '}
+                          {index + 1}
+                          {index === 0 ? ' (primary)' : ''}
+                        </div>
                       )}
-                    />
+                    >
+                      <strong>
+                        {address}
+                      </strong>
+                    </Card>
                   </List.Item>
                 )}
               />
@@ -251,7 +241,7 @@ function CompanyDetail() {
             label: 'Relevant on-chain contract(s)',
             children: (
               <List
-                itemLayout={isLargerThanTable ? 'horizontal' : 'vertical'}
+                itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
                 dataSource={mainDataObject.relevantContracts}
                 renderItem={({ contractId }) => {
                   const url = router.contracts.item.replace(':id', contractId);
@@ -282,7 +272,7 @@ function CompanyDetail() {
             label: 'Relevant on-chain asset(s)',
             children: (
               <List
-                itemLayout={isLargerThanTable ? 'horizontal' : 'vertical'}
+                itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
                 dataSource={mainDataObject.relevantAssets}
                 renderItem={({ assetId }) => (
                   <List.Item className={styles.listItem}>
@@ -294,32 +284,9 @@ function CompanyDetail() {
               />
             ),
           },
-          ...details.map(({ name, display, children }) => ({
-            key: name,
-            label: name,
-            children: (
-              children?.length ? (
-                <List
-                  grid={{ gutter: 16 }}
-                  itemLayout={isLargerThanTable ? 'horizontal' : 'vertical'}
-                  dataSource={children}
-                  className={styles.listItem}
-                  renderItem={({ name: subName, display: subDisplay }) => (
-                    <List.Item>
-                      <List.Item.Meta title={subName} description={subDisplay || 'None'} />
-                    </List.Item>
-                  )}
-                />
-              ) : (
-                <Card>
-                  <Card.Meta description={display || 'None'} />
-                </Card>
-              )
-            ),
-          })),
         ]}
       />
-    </>
+    </div>
   );
 }
 

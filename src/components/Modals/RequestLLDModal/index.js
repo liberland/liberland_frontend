@@ -62,7 +62,7 @@ function RequestLLDModal({
     }
   };
 
-  const isLargerThanTable = useMediaQuery('(min-width: 768px)');
+  const isLargerThanHdScreen = useMediaQuery('(min-width: 768px)');
 
   if (identityIsLoading) {
     return <Spin />;
@@ -80,7 +80,7 @@ function RequestLLDModal({
     >
       {linkData && (
         <div>
-          {isLargerThanTable ? (
+          {isLargerThanHdScreen ? (
             <Table
               columns={[
                 {

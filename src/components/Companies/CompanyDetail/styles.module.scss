@@ -1,8 +1,5 @@
-.listItem {
-    border: solid 1px #ECEBF0;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    justify-content: start!important;
+.header {
+    border-bottom: none!important;
 }
 .top {
     margin-top: 30px;
@@ -14,4 +11,14 @@
     display: flex;
     flex: 1;
     flex-direction: column;
+}
+.purposeText {
+    min-height: 120px;
+}
+.title {
+    margin-top: 0!important;
+    margin-bottom: 0!important;
+}
+.container {
+    max-width: 1600px;
 }

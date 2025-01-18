@@ -12,10 +12,10 @@ import CopyIconWithAddress from '../../CopyIconWithAddress';
 function CompanyPersonas({
   data,
 }) {
-  const isLargerThanTable = useMediaQuery('(min-width: 1600px)');
+  const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
   return (
     <List
-      itemLayout={isLargerThanTable ? 'horizontal' : 'vertical'}
+      itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
       grid={{ gutter: 16 }}
       dataSource={data}
       size="small"
@@ -26,7 +26,7 @@ function CompanyPersonas({
         shares,
       }) => {
         const { color: ownerColor, text: ownerText } = getAvatarParameters(
-          name || walletAddress,
+          name || walletAddress || 'P',
         );
         return (
           <List.Item
@@ -40,7 +40,7 @@ function CompanyPersonas({
               )}
               title={name}
               description={(
-                <CopyIconWithAddress address={walletAddress} isTruncate />
+                <CopyIconWithAddress address={walletAddress?.value} isTruncate />
               )}
             />
             <Flex wrap gap="15px">
@@ -49,7 +49,7 @@ function CompanyPersonas({
                   Passport number
                 </div>
                 <strong>
-                  {passportNumber}
+                  {passportNumber?.value}
                 </strong>
               </Flex>
               <Flex gap="5px" vertical>
@@ -57,7 +57,7 @@ function CompanyPersonas({
                   Number of shares
                 </div>
                 <strong>
-                  {tryFormatNumber(shares)}
+                  {tryFormatNumber(shares?.value)}
                 </strong>
               </Flex>
             </Flex>

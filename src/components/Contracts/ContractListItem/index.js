@@ -38,7 +38,7 @@ function ContractItem({
     parties,
     partiesSignaturesList,
   });
-  const isLargerThanTable = useMediaQuery('(min-width: 1600px)');
+  const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
   const buttons = [
     <Button
       primary
@@ -61,7 +61,7 @@ function ContractItem({
 
   return (
     <List.Item
-      actions={isLargerThanTable ? buttons : [
+      actions={isLargerThanHdScreen ? buttons : [
         <Flex wrap gap="15px" className={styles.action}>
           {buttons}
         </Flex>,

@@ -54,7 +54,7 @@ function ContractItem({
     partiesSignaturesList,
   });
   const isUserJudge = useSelector(contractsSelectors.selectorIsUserJudgde);
-  const isLargerThanTable = useMediaQuery('(min-width: 1200px)');
+  const isLargerThanHdScreen = useMediaQuery('(min-width: 1200px)');
 
   useHideTitle();
 
@@ -156,7 +156,7 @@ function ContractItem({
             extra: actions,
             children: (
               <List
-                grid={{ gutter: 16, column: isLargerThanTable ? 3 : undefined }}
+                grid={{ gutter: 16, column: isLargerThanHdScreen ? 3 : undefined }}
                 dataSource={infoContract.filter(
                   ({ itemsOrItem }) => !Array.isArray(itemsOrItem) || itemsOrItem.length !== 0,
                 ).reduce((items, { itemsOrItem, name }) => {

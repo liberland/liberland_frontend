@@ -18,14 +18,14 @@ function CompaniesCard({
   type,
   hideOwner,
 }) {
-  const isLargerThanTable = useMediaQuery('(min-width: 1600px)');
+  const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
   return (
     <List
       dataSource={registries?.filter((registered) => registered && !registered.invalid)}
       className={styles.companies}
       size="small"
       pagination={{ pageSize: 10 }}
-      itemLayout={isLargerThanTable ? 'horizontal' : 'vertical'}
+      itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
       renderItem={(registeredCompany) => {
         const owner = registeredCompany.principals?.[0]?.name?.value;
         const address = registeredCompany.principals?.[0]?.walletAddress?.value;
@@ -59,7 +59,7 @@ function CompaniesCard({
                 </Flex>
               )}
             />
-            {!hideOwner && owner && !isLargerThanTable && (
+            {!hideOwner && owner && !isLargerThanHdScreen && (
               <Flex vertical gap="5px">
                 <div className="description">
                   Company owner
@@ -70,7 +70,7 @@ function CompaniesCard({
                 </Flex>
               </Flex>
             )}
-            {isLargerThanTable && (
+            {isLargerThanHdScreen && (
               <Flex wrap gap="15px" justify="space-between" flex={1}>
                 <Paragraph
                   ellipsis={{
