@@ -24,7 +24,7 @@
 }
 .action {
     @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
-        width: 220px;
+        min-width: 220px;
     }
 }
 .owner {

@@ -7,6 +7,7 @@ import { registriesActions } from '../../redux/actions';
 export const useCompanyDataFromUrl = () => {
   const { companyId } = useParams();
   const dispatch = useDispatch();
+  const registries = useSelector(registriesSelectors.registries);
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
@@ -14,9 +15,16 @@ export const useCompanyDataFromUrl = () => {
     dispatch(
       registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress),
     );
+    dispatch(registriesActions.getOfficialRegistryEntries.call());
   }, [dispatch, userWalletAddress]);
-  const registries = useSelector(registriesSelectors.registries);
-  const requestType = window.location.hash.substring(1);
-  const companies = registries?.officialUserRegistryEntries?.companies?.[requestType];
-  return companies?.find((item) => item.id === companyId);
+
+  const allRegistries = useSelector(registriesSelectors.allRegistries);
+
+  const company = allRegistries.officialRegistryEntries?.find((item) => item.id === companyId);
+  const request = registries?.officialUserRegistryEntries?.companies?.requested?.find((item) => item.id === companyId);
+
+  if (company) {
+    return { mainDataObject: company, request: false };
+  }
+  return { mainDataObject: request, request: true };
 };

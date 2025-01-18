@@ -20,9 +20,9 @@ export default function EditCompany() {
       registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress),
     );
   }, [dispatch, userWalletAddress]);
-  const registeredCompanyData = useCompanyDataFromUrl();
+  const { mainDataObject } = useCompanyDataFromUrl();
 
-  if (!registeredCompanyData) {
+  if (!mainDataObject) {
     return (
       <div>
         There is no company with this id
@@ -44,7 +44,7 @@ export default function EditCompany() {
 
   return (
     <BuildRegistryForm
-      formObject={registeredCompanyData}
+      formObject={mainDataObject}
       buttonMessage="Submit Company Application"
       companyId={companyId}
       callback={onSubmit}

@@ -8,13 +8,15 @@ import { blockchainSelectors } from '../../../redux/selectors';
 import { generatePdf } from '../../../api/middleware';
 import ManageInfo from '../ManageInfo';
 import ShowInfo from '../ShowInfo';
+import CopyInput from '../../CopyInput';
+import router from '../../../router';
 
 export default function CompanyActions({
   registeredCompany,
   type,
 }) {
   const dispatch = useDispatch();
-  const website = registeredCompany?.onlineAddresses?.[0]?.url?.value;
+  const website = registeredCompany?.onlineAddresses?.[0]?.url?.value || registeredCompany.charterURL;
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const handleGenerateButton = async (companyId) => {
     const pathName = 'certificate';
@@ -30,8 +32,23 @@ export default function CompanyActions({
     URL.revokeObjectURL(href);
   };
 
+  const companyLink = router.companies.view.replace(':companyId', registeredCompany.id);
+
   switch (type) {
     case 'mine':
+      return (
+        <>
+          <CopyInput
+            buttonLabel="Copy link"
+            value={(
+              `${window.location.protocol}//${window.location.host}${companyLink}`
+            )}
+            hideLink
+          />
+          <ManageInfo registeredCompany={registeredCompany} />
+          <ShowInfo registeredCompany={registeredCompany} />
+        </>
+      );
     case 'requested':
       return (
         <>
@@ -58,7 +75,6 @@ export default function CompanyActions({
     case 'detail':
       return (
         <>
-          <ShowInfo registeredCompany={registeredCompany} />
           {website && (
             <Button
               href={website}
@@ -70,11 +86,25 @@ export default function CompanyActions({
             </Button>
           )}
           <Button
-            secondary
             onClick={() => handleGenerateButton(registeredCompany.id)}
           >
             Generate Certificate
           </Button>
+        </>
+      );
+    case 'detail-request':
+      return (
+        <>
+          {website && (
+            <Button
+              href={website}
+            >
+              <GlobalOutlined />
+              <span className="hidden">
+                Website
+              </span>
+            </Button>
+          )}
           <Button
             red
             onClick={() => dispatch(
@@ -96,6 +126,7 @@ CompanyActions.propTypes = {
   registeredCompany: PropTypes.shape({
     id: PropTypes.string.isRequired,
     onlineAddresses: PropTypes.arrayOf(PropTypes.string),
+    charterURL: PropTypes.string,
   }).isRequired,
-  type: PropTypes.oneOf(['requested', 'mine', 'all']),
+  type: PropTypes.oneOf(['requested', 'mine', 'all', 'detail', 'detail-request']),
 };

@@ -10,12 +10,24 @@ import styles from './styles.module.scss';
 function CopyInput({
   buttonLabel,
   value,
+  hideLink,
 }) {
   const [api, contextHolder] = notification.useNotification();
   const handleCopyClick = () => {
     navigator.clipboard.writeText(value);
     api.success({ message: 'Link copied!' });
   };
+  const button = (
+    <Button onClick={handleCopyClick}>
+      {buttonLabel}
+      <Space />
+      <CopyOutlined />
+    </Button>
+  );
+
+  if (hideLink) {
+    return button;
+  }
 
   return (
     <Space.Compact>
@@ -33,6 +45,7 @@ function CopyInput({
 CopyInput.propTypes = {
   buttonLabel: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
+  hideLink: PropTypes.bool,
 };
 
 export default CopyInput;

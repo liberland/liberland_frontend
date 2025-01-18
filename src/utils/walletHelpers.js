@@ -1,5 +1,5 @@
 import {
-  BN, BN_ONE, BN_ZERO, formatBalance, hexToU8a, isHex,
+  BN, BN_ONE, BN_ZERO, formatBalance, formatNumber, hexToU8a, isHex,
 } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/keyring';
 import { ethers } from 'ethers';
@@ -43,6 +43,22 @@ export const formatCustom = (grains, decimals, withAll = false) => _format(grain
 export const parseMerits = (merits) => _parse(merits, meritDecimals);
 export const parseDollars = (dollars) => _parse(dollars, dollarDecimals);
 export const parseAssets = (assets, assetDecimals) => _parse(assets, assetDecimals);
+
+export const tryFormatDollars = (grains, withAll = false) => {
+  try {
+    return formatDollars(grains, withAll);
+  } catch {
+    return '0';
+  }
+};
+
+export const tryFormatNumber = (value) => {
+  try {
+    return formatNumber(value);
+  } catch {
+    return '0';
+  }
+};
 
 const defaultFormatAssetsSettings = {
   withAll: false,
