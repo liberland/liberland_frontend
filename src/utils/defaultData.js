@@ -258,7 +258,7 @@ export const newCompanyDataObject = {
           key: 'passportNumber',
           display: 'Passport number of shareholder',
           type: 'text',
-          encryptable: false,
+          encryptable: true,
         },
         {
           key: 'shares',

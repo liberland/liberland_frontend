@@ -226,7 +226,14 @@ export function GetFieldsForm({
                       <Col key={fieldName} span={isLargerThanWideScreen ? span : 24}>
                         <Form.Item
                           name={fieldName}
-                          label={`${dynamicField.display} ${index + 1}`}
+                          label={(
+                            `${dynamicField.display.length > 40
+                              ? `${dynamicField.display.slice(0, 40)}...`
+                              : dynamicField.display} ${index + 1}`
+                          )}
+                          extra={dynamicField.display.length > 40 ? (
+                            dynamicField.display
+                          ) : undefined}
                           layout={layout}
                           getValueProps={getValueProps}
                           valuePropName={valuePropName}
@@ -329,8 +336,12 @@ export function BuildRegistryForm({
     >
       <Flex vertical gap="30px">
         <Flex vertical>
-          <Title level={1}>Register a new Liberland company</Title>
-          <Paragraph>
+          <Title level={1}>
+            {companyId
+              ? defaultValues.name
+              : 'Register a new Liberland company'}
+          </Title>
+          <Paragraph className="description">
             For full instructions, check out the
             {' '}
             <a

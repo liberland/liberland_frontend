@@ -8,8 +8,8 @@ import Flex from 'antd/es/flex';
 import Divider from 'antd/es/divider';
 import Space from 'antd/es/space';
 import Title from 'antd/es/typography/Title';
-import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
+import classNames from 'classnames';
 import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
 import styles from './styles.module.scss';
 import { useHideTitle } from '../../Layout/HideTitle';
@@ -33,7 +33,6 @@ function simplifyCompanyObject(company) {
 }
 
 function CompanyDetail() {
-  const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
   const { mainDataObject: complexDataObject, request } = useCompanyDataFromUrl();
   const mainDataObject = useMemo(() => simplifyCompanyObject(complexDataObject || {}), [complexDataObject]);
 
@@ -111,18 +110,23 @@ function CompanyDetail() {
                 <Card
                   className={styles.purpose}
                   title="Company description"
-                  actions={mainDataObject.onlineAddresses?.map(
-                    ({ description, url }, index) => (
-                      <Button
-                        primary={index === 0}
-                        onClick={() => {
-                          window.location.href = url;
-                        }}
-                      >
-                        {description}
-                      </Button>
-                    ),
-                  )}
+                  actions={[
+                    <Flex className={styles.online} wrap gap="15px" justify="start">
+                      {mainDataObject.onlineAddresses?.map(
+                        ({ description, url }, index) => (
+                          <Button
+                            primary={index === 0}
+                            key={url}
+                            onClick={() => {
+                              window.location.href = url;
+                            }}
+                          >
+                            {description}
+                          </Button>
+                        ),
+                      )}
+                    </Flex>,
+                  ]}
                 >
                   <div className={styles.purposeText}>
                     {mainDataObject.purpose || 'Unknown'}
@@ -155,6 +159,7 @@ function CompanyDetail() {
               <List
                 itemLayout="horizontal"
                 grid={{ gutter: 16, column: 3 }}
+                className="threeColumnList"
                 dataSource={mainDataObject.contact}
                 size="small"
                 renderItem={({ contact }, index) => (
@@ -187,10 +192,18 @@ function CompanyDetail() {
             children: (
               <List
                 itemLayout="horizontal"
-                grid={{ gutter: 16 }}
+                grid={{ gutter: 16, column: 3 }}
+                className="threeColumnList"
                 dataSource={mainDataObject.physicalAddresses}
                 size="small"
-                renderItem={(address, index) => (
+                renderItem={({
+                  description,
+                  street,
+                  city,
+                  subdivision,
+                  postalCode,
+                  country,
+                }, index) => (
                   <List.Item>
                     <Card
                       size="small"
@@ -206,9 +219,23 @@ function CompanyDetail() {
                         </div>
                       )}
                     >
-                      <strong>
-                        {address}
-                      </strong>
+                      <Flex vertical gap="5px">
+                        <strong>
+                          {street}
+                          {subdivision ? `, ${subdivision}` : ''}
+                        </strong>
+                        <strong>
+                          {city}
+                          {', '}
+                          {postalCode}
+                        </strong>
+                        <strong>
+                          {country || ''}
+                        </strong>
+                        <strong>
+                          {description || ''}
+                        </strong>
+                      </Flex>
                     </Card>
                   </List.Item>
                 )}
@@ -241,24 +268,29 @@ function CompanyDetail() {
             label: 'Relevant on-chain contract(s)',
             children: (
               <List
-                itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
+                itemLayout="horizontal"
+                grid={{ gutter: 16, column: 3 }}
+                className="threeColumnList"
                 dataSource={mainDataObject.relevantContracts}
+                size="small"
                 renderItem={({ contractId }) => {
                   const url = router.contracts.item.replace(':id', contractId);
                   return (
-                    <List.Item
-                      className={styles.listItem}
-                      actions={[
-                        <Button
-                          link
-                          href={url}
-                          onClick={() => history.push(url)}
-                        >
-                          View contract
-                        </Button>,
-                      ]}
-                    >
-                      <List.Item.Meta
+                    <List.Item>
+                      <Card
+                        size="small"
+                        classNames={{
+                          header: classNames(styles.header, styles.view),
+                          body: styles.noLine,
+                        }}
+                        extra={(
+                          <Button
+                            href={url}
+                            onClick={() => history.push(url)}
+                          >
+                            View contract
+                          </Button>
+                        )}
                         title={`Contract ID: ${contractId}`}
                       />
                     </List.Item>
@@ -272,11 +304,19 @@ function CompanyDetail() {
             label: 'Relevant on-chain asset(s)',
             children: (
               <List
-                itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
+                itemLayout="horizontal"
+                grid={{ gutter: 16, column: 3 }}
+                className="threeColumnList"
                 dataSource={mainDataObject.relevantAssets}
+                size="small"
                 renderItem={({ assetId }) => (
-                  <List.Item className={styles.listItem}>
-                    <List.Item.Meta
+                  <List.Item>
+                    <Card
+                      size="small"
+                      classNames={{
+                        header: classNames(styles.header, styles.view),
+                        body: styles.noLine,
+                      }}
                       title={`Asset ID: ${assetId}`}
                     />
                   </List.Item>

@@ -181,6 +181,28 @@ th.ant-table-cell {
   }
 }
 
+.oneColumnList {
+  .ant-row > div {
+    width: 100%!important;
+    max-width: 100%!important;
+  }
+  .ant-card {
+    max-width: 100%!important;
+  }
+  .ant-card-body {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .ant-card-meta {
+    padding-bottom: 20px;
+    padding-right: 20px;
+    @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
+      min-width: 400px;
+      padding-bottom: 0;
+    }
+  }
+}
+
 .hidden {
   display: none;
 }

@@ -125,7 +125,8 @@ export default function CompanyActions({
 CompanyActions.propTypes = {
   registeredCompany: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    onlineAddresses: PropTypes.arrayOf(PropTypes.string),
+    // eslint-disable-next-line react/forbid-prop-types
+    onlineAddresses: PropTypes.arrayOf(PropTypes.object),
     charterURL: PropTypes.string,
   }).isRequired,
   type: PropTypes.oneOf(['requested', 'mine', 'all', 'detail', 'detail-request']),
