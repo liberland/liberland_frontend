@@ -225,3 +225,17 @@ th.ant-table-cell {
 textarea.ant-input {
   min-height: 400px;
 }
+
+.listWithFooter {
+  @media screen and (min-width: map-get($breakpoints, 'xs-phone')) {
+    .ant-list-footer {
+      display: inline-flex;
+      width: 50%;
+    }
+    .ant-list-pagination {
+        display: inline-flex;
+        width: 50%;
+        justify-content: end;
+    }
+  }
+}

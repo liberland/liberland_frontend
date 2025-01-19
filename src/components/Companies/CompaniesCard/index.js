@@ -4,6 +4,7 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import Avatar from 'antd/es/avatar';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
+import { useHistory } from 'react-router-dom';
 import cx from 'classnames';
 import Markdown from 'markdown-to-jsx';
 import { useMediaQuery } from 'usehooks-ts';
@@ -14,12 +15,15 @@ import { getAvatarParameters } from '../../../utils/avatar';
 import truncate from '../../../utils/truncate';
 import { isValidUrl } from '../../../utils/url';
 import { simplifyCompanyObject } from '../utils';
+import Button from '../../Button/Button';
+import router from '../../../router';
 
 function CompaniesCard({
   registries,
   type,
   hideOwner,
 }) {
+  const history = useHistory();
   const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
   const simplify = useMemo(
     () => registries?.map((registry) => simplifyCompanyObject(registry || {})),
@@ -28,10 +32,18 @@ function CompaniesCard({
   return (
     <List
       dataSource={simplify?.filter((registered) => registered && !registered.invalid)}
-      className={styles.companies}
+      className={cx(styles.companies, 'listWithFooter')}
       size="small"
       pagination={{ pageSize: 10 }}
       itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
+      footer={type === 'mine' ? (
+        <Button
+          primary
+          onClick={() => history.push(router.companies.create)}
+        >
+          Register a new company
+        </Button>
+      ) : undefined}
       renderItem={(registeredCompany) => {
         const owner = !hideOwner && registeredCompany.principals?.[0]?.name;
         const address = registeredCompany.principals?.[0]?.walletAddress;
@@ -126,7 +138,9 @@ function CompaniesCard({
               <strong>
                 {registeredCompany.name}
               </strong>
-              {purpose}
+              <div className={styles.mobilePurpose}>
+                {purpose}
+              </div>
             </Flex>
             {owner && (
               <Flex vertical gap="5px">

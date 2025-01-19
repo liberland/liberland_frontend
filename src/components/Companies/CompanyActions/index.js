@@ -17,9 +17,10 @@ export default function CompanyActions({
 }) {
   const dispatch = useDispatch();
   const website = useMemo(() => {
-    const url = registeredCompany?.onlineAddresses?.[0]?.url
-      || registeredCompany.charterURL;
-
+    const url = registeredCompany?.onlineAddresses?.[0]?.url;
+    if (!url) {
+      return url;
+    }
     const sanitized = url?.includes('http') ? url : `https://${url}`;
     return sanitized;
   }, [registeredCompany]);

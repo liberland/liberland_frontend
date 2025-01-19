@@ -24,7 +24,7 @@ function PageTitle() {
     ([path]) => path === pathname,
   );
   return (
-    <Flex wrap justify="space-between">
+    <Flex wrap justify="space-between" align="center">
       {pageTitle && !hidden ? (
         <Title level={1} className={styles.pageTitle}>{pageTitle}</Title>
       ) : null}

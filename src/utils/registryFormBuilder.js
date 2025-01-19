@@ -183,7 +183,7 @@ export function GetFieldsForm({
         <FormSection
           title={displayName}
           extra={(
-            <Button type="button" onClick={add} green>
+            <Button className="add" type="button" onClick={add} green>
               Add
               {' '}
               {displayName}
