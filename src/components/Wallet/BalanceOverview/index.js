@@ -3,14 +3,19 @@ import PropTypes from 'prop-types';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
 import Card from 'antd/es/card';
+import Avatar from 'antd/es/avatar';
+import Flex from 'antd/es/flex';
+import Title from 'antd/es/typography/Title';
 import { useMediaQuery } from 'usehooks-ts';
-
+import LLD from '../../../assets/icons/lld.svg';
+import LLM from '../../../assets/icons/llm.svg';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import SendLLDModalWrapper from '../../Modals/SendLLDModal';
 import SendLLMModalWrapper from '../../Modals/SendLLMModal';
 import RequestLLDModalWrapper from '../../Modals/RequestLLDModal';
 import UnpoolLLMModalWrapper from '../../Modals/UnpoolModal';
 import PolitipoolLLMModalWrapper from '../../Modals/PolitipoolModal';
+import styles from './styles.module.scss';
 
 function BalanceOverview({
   balances, liquidMerits, showStaked,
@@ -21,15 +26,16 @@ function BalanceOverview({
         amount: formatMerits(balances.liberstake.amount),
         title: 'PolitiPooled LLM',
         currency: 'LLM',
+        icon: LLM,
         actions: [
-          <UnpoolLLMModalWrapper />,
-          <div />,
+          <UnpoolLLMModalWrapper key="unpool" />,
         ],
       },
       {
         amount: formatDollars(balances.polkastake.amount),
         title: 'Validator Staked LLD',
         currency: 'LLD',
+        icon: LLD,
       },
     ]
     : []).concat([
@@ -37,18 +43,20 @@ function BalanceOverview({
       amount: formatMerits(liquidMerits),
       title: 'Liquid LLM',
       currency: 'LLM',
+      icon: LLM,
       actions: [
-        <SendLLMModalWrapper />,
-        <PolitipoolLLMModalWrapper />,
+        <SendLLMModalWrapper key="send" />,
+        <PolitipoolLLMModalWrapper key="pool" />,
       ],
     },
     {
       amount: formatDollars(balances.liquidAmount.amount),
       title: 'Liquid LLD',
       currency: 'LLD',
+      icon: LLD,
       actions: [
-        <SendLLDModalWrapper />,
-        <RequestLLDModalWrapper />,
+        <SendLLDModalWrapper key="send" />,
+        <RequestLLDModalWrapper key="request" />,
       ],
     },
   ]), [balances.liberstake.amount, balances.liquidAmount.amount, balances.polkastake.amount, liquidMerits, showStaked]);
@@ -60,12 +68,33 @@ function BalanceOverview({
       {overviewInfo.map(({
         actions,
         amount,
-        currency,
         title,
+        icon,
+        currency,
       }) => (
         <Col span={isBiggerThanDesktop ? 6 : 24} key={title}>
-          <Card actions={actions}>
-            <Card.Meta title={title} description={`${amount} ${currency}`} />
+          <Card
+            size="small"
+            className={styles.card}
+            actions={[
+              <Flex wrap gap="15px" align="start">
+                {actions}
+              </Flex>,
+            ]}
+          >
+            <Card.Meta
+              title={(
+                <span className={styles.name}>
+                  {title}
+                </span>
+              )}
+            />
+            <Flex wrap gap="5px" align="center">
+              <Title level={5} className={styles.title}>
+                {amount}
+              </Title>
+              <Avatar size={22} src={icon} alt={currency} />
+            </Flex>
           </Card>
         </Col>
       ))}

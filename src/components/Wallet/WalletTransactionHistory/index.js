@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */ // remove after refactoring history back in
 import React from 'react';
-
 import Table from 'antd/es/table';
 import Flex from 'antd/es/flex';
 import Tag from 'antd/es/tag';
-
-import CopyIconWithAddress from '../../CopyIconWithAddress';
+import Avatar from 'antd/es/avatar';
+import AsyncCopyIconWithAddress from '../../AsyncCopyIconWithAddress';
+import styles from './styles.module.scss';
+import WalletHistoryAmount from '../WalletHistoryAmount';
 
 function WalletTransactionHistory({ failure, transactionHistory, filterTransactionsBy }) {
   return (
@@ -19,7 +19,7 @@ function WalletTransactionHistory({ failure, transactionHistory, filterTransacti
           key: 'typeText',
           render: (value, record) => (
             <Flex gap="20px" align="center">
-              <img src={record.iconType} alt={record.imgAlt} />
+              <Avatar size={24} src={record.iconType} alt={record.imgAlt} />
               <span>
                 {value}
               </span>
@@ -27,11 +27,11 @@ function WalletTransactionHistory({ failure, transactionHistory, filterTransacti
           ),
         },
         {
-          title: 'Payment number',
+          title: 'Payment address',
           dataIndex: 'userId',
           key: 'userId',
           render: (value) => (
-            <CopyIconWithAddress
+            <AsyncCopyIconWithAddress
               address={value}
             />
           ),
@@ -45,12 +45,15 @@ function WalletTransactionHistory({ failure, transactionHistory, filterTransacti
           title: 'Amount',
           dataIndex: 'asset',
           key: 'asset',
+          render: (value, { currency }) => (
+            <WalletHistoryAmount currency={currency} value={value} />
+          ),
         },
         {
           title: 'Status',
           dataIndex: 'status',
           render: () => (
-            <Tag color="#79BF2E">
+            <Tag className={styles.success} color="white">
               Successful
             </Tag>
           ),

@@ -7,6 +7,11 @@ const selectorIdentity = createSelector(
   (reducer) => reducer.identity,
 );
 
+const selectorIdentityOf = createSelector(
+  identityReducer,
+  (reducer) => reducer.others,
+);
+
 const selectorIsLoading = createSelector(
   identityReducer,
   (reducer) => reducer.loading,
@@ -17,4 +22,9 @@ const selectorIdentityMotions = createSelector(
   (reducer) => reducer.identityMotions,
 );
 
-export { selectorIdentity, selectorIsLoading, selectorIdentityMotions };
+export {
+  selectorIdentity,
+  selectorIsLoading,
+  selectorIdentityMotions,
+  selectorIdentityOf,
+};

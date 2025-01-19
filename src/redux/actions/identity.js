@@ -3,6 +3,7 @@ import { createActions } from 'redux-actions';
 export const {
   setIdentity,
   getIdentity,
+  getIdentityOf,
   getIdentityMotions,
 } = createActions({
   SET_IDENTITY: {
@@ -11,6 +12,11 @@ export const {
     failure: undefined,
   },
   GET_IDENTITY: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_IDENTITY_OF: {
     call: undefined,
     success: undefined,
     failure: undefined,

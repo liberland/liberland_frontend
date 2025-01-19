@@ -18,11 +18,11 @@ export const navigationList = [
   },
   {
     route: router.home.wallet,
-    title: 'Wallet',
+    title: 'Finances',
     icon: WalletIcon,
     isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED === 'true',
     subLinks: {
-      Overview: router.wallet.overView,
+      Finances: router.wallet.overView,
       Exchange: router.wallet.exchange,
       'Stock exchange': router.wallet.stockExchange,
       Assets: router.wallet.assets,

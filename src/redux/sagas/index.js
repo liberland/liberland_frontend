@@ -69,6 +69,7 @@ export default function* rootSaga() {
     // IDENTITY
     identitySagas.setIdentityWatcher(),
     identitySagas.getIdentityWatcher(),
+    identitySagas.getIdentityOfWatcher(),
     identitySagas.getIdentityMotionsWatcher(),
 
     // OFFICES

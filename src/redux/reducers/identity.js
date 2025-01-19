@@ -4,6 +4,7 @@ import { identityActions } from '../actions';
 const initialState = {
   loading: false,
   identity: null,
+  others: {},
 };
 
 const identityReducer = handleActions(
@@ -47,6 +48,14 @@ const identityReducer = handleActions(
     [identityActions.getIdentityMotions.success]: (state, action) => ({
       ...state,
       identityMotions: action.payload,
+    }),
+
+    [identityActions.getIdentityOf.success]: (state, action) => ({
+      ...state,
+      others: {
+        ...state.others,
+        ...action.payload,
+      },
     }),
   },
   initialState,
