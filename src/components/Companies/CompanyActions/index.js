@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
@@ -16,7 +16,13 @@ export default function CompanyActions({
   type,
 }) {
   const dispatch = useDispatch();
-  const website = registeredCompany?.onlineAddresses?.[0]?.url?.value || registeredCompany.charterURL;
+  const website = useMemo(() => {
+    const url = registeredCompany?.onlineAddresses?.[0]?.url
+      || registeredCompany.charterURL;
+
+    const sanitized = url?.includes('http') ? url : `https://${url}`;
+    return sanitized;
+  }, [registeredCompany]);
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const handleGenerateButton = async (companyId) => {
     const pathName = 'certificate';

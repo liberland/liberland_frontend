@@ -21,16 +21,7 @@ import Button from '../../Button/Button';
 import router from '../../../router';
 import { tryFormatDollars, tryFormatNumber } from '../../../utils/walletHelpers';
 import CompanyPersonas from '../CompanyPersonas';
-
-function simplifyCompanyObject(company) {
-  const copy = JSON.parse(JSON.stringify(company), (_, value) => {
-    if (typeof value === 'object' && value?.value) {
-      return value?.value;
-    }
-    return value;
-  });
-  return copy;
-}
+import { simplifyCompanyObject } from '../utils';
 
 function CompanyDetail() {
   const { mainDataObject: complexDataObject, request } = useCompanyDataFromUrl();
@@ -49,10 +40,10 @@ function CompanyDetail() {
   return (
     <div className={styles.container}>
       <Flex className={styles.top} wrap gap="15px" justify="space-between">
-        <Button onClick={() => history.push(router.companies.allCompanies)}>
+        <Button onClick={() => history.goBack()}>
           <ArrowLeftOutlined />
           <Space />
-          Back to All Companies
+          Back
         </Button>
         <CopyInput buttonLabel="Copy link to company" value={fullLink} />
       </Flex>

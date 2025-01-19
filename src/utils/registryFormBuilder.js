@@ -198,7 +198,7 @@ export function GetFieldsForm({
                 key={field.key}
                 className="dynamicFieldsEntityCard"
                 actions={[
-                  <Flex wrap gap="15px" justify="end" className="delete">
+                  <Flex wrap gap="15px" justify="start" className="delete">
                     <Button red type="button" onClick={() => remove(field.name)}>
                       Delete
                       {' '}
