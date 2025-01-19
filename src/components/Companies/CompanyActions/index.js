@@ -1,22 +1,29 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
-import Flex from 'antd/es/flex';
 import Button from '../../Button/Button';
 import { registriesActions } from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
 import { generatePdf } from '../../../api/middleware';
 import ManageInfo from '../ManageInfo';
 import ShowInfo from '../ShowInfo';
-import styles from './styles.module.scss';
+import CopyInput from '../../CopyInput';
+import router from '../../../router';
 
 export default function CompanyActions({
   registeredCompany,
   type,
 }) {
   const dispatch = useDispatch();
-  const website = registeredCompany?.onlineAddresses?.[0]?.url?.value;
+  const website = useMemo(() => {
+    const url = registeredCompany?.onlineAddresses?.[0]?.url;
+    if (!url) {
+      return url;
+    }
+    const sanitized = url?.includes('http') ? url : `https://${url}`;
+    return sanitized;
+  }, [registeredCompany]);
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const handleGenerateButton = async (companyId) => {
     const pathName = 'certificate';
@@ -32,28 +39,51 @@ export default function CompanyActions({
     URL.revokeObjectURL(href);
   };
 
+  const companyLink = router.companies.view.replace(':companyId', registeredCompany.id);
+
   switch (type) {
     case 'mine':
       return (
-        <Flex className={styles.fit} vertical gap="15px">
+        <>
+          <CopyInput
+            buttonLabel="Copy link"
+            value={(
+              `${window.location.protocol}//${window.location.host}${companyLink}`
+            )}
+            hideLink
+          />
           <ManageInfo registeredCompany={registeredCompany} />
           <ShowInfo registeredCompany={registeredCompany} />
-        </Flex>
+        </>
       );
     case 'requested':
       return (
-        <Flex className={styles.fit} vertical gap="15px">
+        <>
           <ManageInfo registeredCompany={registeredCompany} />
           <ShowInfo registeredCompany={registeredCompany} />
-        </Flex>
+        </>
       );
     case 'all':
       return (
-        <Flex className={styles.fit} vertical gap="15px">
+        <>
           <ShowInfo registeredCompany={registeredCompany} />
           {website && (
             <Button
-              link
+              href={website}
+            >
+              <GlobalOutlined />
+              <span className="hidden">
+                Website
+              </span>
+            </Button>
+          )}
+        </>
+      );
+    case 'detail':
+      return (
+        <>
+          {website && (
+            <Button
               href={website}
             >
               <GlobalOutlined />
@@ -63,11 +93,25 @@ export default function CompanyActions({
             </Button>
           )}
           <Button
-            secondary
             onClick={() => handleGenerateButton(registeredCompany.id)}
           >
             Generate Certificate
           </Button>
+        </>
+      );
+    case 'detail-request':
+      return (
+        <>
+          {website && (
+            <Button
+              href={website}
+            >
+              <GlobalOutlined />
+              <span className="hidden">
+                Website
+              </span>
+            </Button>
+          )}
           <Button
             red
             onClick={() => dispatch(
@@ -78,7 +122,7 @@ export default function CompanyActions({
           >
             Delete request
           </Button>
-        </Flex>
+        </>
       );
     default:
       return null;
@@ -88,7 +132,9 @@ export default function CompanyActions({
 CompanyActions.propTypes = {
   registeredCompany: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    onlineAddresses: PropTypes.arrayOf(PropTypes.string),
+    // eslint-disable-next-line react/forbid-prop-types
+    onlineAddresses: PropTypes.arrayOf(PropTypes.object),
+    charterURL: PropTypes.string,
   }).isRequired,
-  type: PropTypes.oneOf(['requested', 'mine', 'all']),
+  type: PropTypes.oneOf(['requested', 'mine', 'all', 'detail', 'detail-request']),
 };

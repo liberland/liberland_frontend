@@ -85,8 +85,13 @@ export const navigationList = [
     isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED === 'true',
     subLinks: {
       Companies: router.companies.home,
-      Create: router.companies.create,
       'All companies': router.companies.allCompanies,
+    },
+    extra: {
+      [router.companies.home]: {
+        link: router.companies.create,
+        title: 'Register a new company',
+      },
     },
   },
   {

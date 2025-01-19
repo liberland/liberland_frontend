@@ -20,7 +20,6 @@ function ContractItem({
   creator,
   data,
   parties,
-  isOneItem,
   judgesSignaturesList,
   partiesSignaturesList,
   isMyContracts,
@@ -39,7 +38,7 @@ function ContractItem({
     parties,
     partiesSignaturesList,
   });
-  const isLargerThanTable = useMediaQuery('(min-width: 1600px)');
+  const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
   const buttons = [
     <Button
       primary
@@ -62,7 +61,7 @@ function ContractItem({
 
   return (
     <List.Item
-      actions={isLargerThanTable ? buttons : [
+      actions={isLargerThanHdScreen ? buttons : [
         <Flex wrap gap="15px" className={styles.action}>
           {buttons}
         </Flex>,
@@ -86,7 +85,7 @@ function ContractItem({
       <div className={styles.noHeading}>
         <Paragraph
           ref={(p) => deriveAndHideContractTitle(p, title, setTitle)}
-          ellipsis={isOneItem ? undefined : {
+          ellipsis={{
             rows: 2,
           }}
           className={cx('description', styles.preview)}
@@ -101,7 +100,6 @@ function ContractItem({
 }
 
 ContractItem.defaultProps = {
-  isOneItem: false,
   isMyContracts: false,
 };
 
@@ -111,7 +109,6 @@ ContractItem.propTypes = {
   creator: PropTypes.string.isRequired,
   data: PropTypes.string.isRequired,
   parties: PropTypes.arrayOf(PropTypes.string).isRequired,
-  isOneItem: PropTypes.bool,
   judgesSignaturesList: PropTypes.arrayOf(PropTypes.string).isRequired,
   partiesSignaturesList: PropTypes.arrayOf(PropTypes.string).isRequired,
 };

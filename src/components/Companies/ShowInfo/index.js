@@ -1,29 +1,33 @@
 import React from 'react';
-import Popover from 'antd/es/popover';
 import PropTypes from 'prop-types';
+import Space from 'antd/es/space';
+import { useHistory } from 'react-router-dom';
+import RightOutlined from '@ant-design/icons/RightOutlined';
 import Button from '../../Button/Button';
-import CompanyDetail from '../CompanyDetail';
+import router from '../../../router';
 
 function ShowInfo({
   registeredCompany,
 }) {
+  const history = useHistory();
+  const url = router.companies.view.replace(':companyId', registeredCompany.id);
   return (
-    <Popover
-      trigger={['click']}
-      title="Details"
-      content={<CompanyDetail mainDataObject={registeredCompany} showAll />}
+    <Button
+      href={url}
+      onClick={() => history.push(url)}
     >
-      <Button link>
-        Show info
-      </Button>
-    </Popover>
+      Show info
+      <Space />
+      <RightOutlined />
+    </Button>
   );
 }
 
 ShowInfo.propTypes = {
   registeredCompany: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    onlineAddresses: PropTypes.arrayOf(PropTypes.string),
+    // eslint-disable-next-line react/forbid-prop-types
+    onlineAddresses: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
 };
 

@@ -1,0 +1,46 @@
+@import '../../../assets/base/variables';
+@import '../../../assets/base/fonts';
+@import '../../../assets/main.scss';
+@import '../../../index.scss';
+
+.companies {
+    max-width: 1600px;
+}
+.listItem {
+    border: solid 1px #ECEBF0;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    justify-content: start!important;
+}
+.title {
+    margin-bottom: 0!important;
+    margin-top: 0!important;
+}
+.preview {
+    margin-bottom: 0!important;
+}
+.meta {
+    max-width: 250px!important;
+    margin-block-end: 0px!important;
+}
+.avatar {
+    margin-left: 1px;
+    @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+        margin-left: 0;
+    }
+}
+.action {
+    @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+        min-width: 240px;
+    }
+}
+.owner {
+    width: 240px;
+}
+.ownerName {
+    width: 170px;
+}
+.mobilePurpose {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
