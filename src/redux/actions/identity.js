@@ -3,7 +3,6 @@ import { createActions } from 'redux-actions';
 export const {
   setIdentity,
   getIdentity,
-  getIdentityOf,
   getIdentityMotions,
 } = createActions({
   SET_IDENTITY: {

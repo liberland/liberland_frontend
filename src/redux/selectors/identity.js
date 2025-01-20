@@ -7,11 +7,6 @@ const selectorIdentity = createSelector(
   (reducer) => reducer.identity,
 );
 
-const selectorIdentityOf = createSelector(
-  identityReducer,
-  (reducer) => reducer.others,
-);
-
 const selectorIsLoading = createSelector(
   identityReducer,
   (reducer) => reducer.loading,
@@ -26,5 +21,4 @@ export {
   selectorIdentity,
   selectorIsLoading,
   selectorIdentityMotions,
-  selectorIdentityOf,
 };

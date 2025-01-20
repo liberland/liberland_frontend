@@ -49,14 +49,6 @@ const identityReducer = handleActions(
       ...state,
       identityMotions: action.payload,
     }),
-
-    [identityActions.getIdentityOf.success]: (state, action) => ({
-      ...state,
-      others: {
-        ...state.others,
-        ...action.payload,
-      },
-    }),
   },
   initialState,
 );

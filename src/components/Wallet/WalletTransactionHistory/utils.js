@@ -50,9 +50,9 @@ export const transactionHistoryProcessorFactory = (walletAddress) => (transactio
   const typeTextExpanded = (() => {
     switch (typeText) {
       case 'from':
-        return 'Sending assets';
+        return 'Sending';
       case 'to':
-        return 'Receiving assets';
+        return 'Receiving';
       default:
         return typeText;
     }

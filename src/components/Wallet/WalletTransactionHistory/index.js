@@ -4,11 +4,13 @@ import Table from 'antd/es/table';
 import Flex from 'antd/es/flex';
 import Tag from 'antd/es/tag';
 import Avatar from 'antd/es/avatar';
-import AsyncCopyIconWithAddress from '../../AsyncCopyIconWithAddress';
+import HistoryCopyIconWithAddress from '../HistoryCopyIconWithAddress';
 import styles from './styles.module.scss';
 import WalletHistoryAmount from '../WalletHistoryAmount';
+import { useIdentitiesDispatch } from '../HistoryCopyIconWithAddress/hooks';
 
 function WalletTransactionHistory({ failure, transactionHistory, filterTransactionsBy }) {
+  useIdentitiesDispatch(transactionHistory?.map(({ userId }) => userId) || []);
   return (
     <Table
       pagination={{ showSizeChanger: true }}
@@ -31,7 +33,7 @@ function WalletTransactionHistory({ failure, transactionHistory, filterTransacti
           dataIndex: 'userId',
           key: 'userId',
           render: (value) => (
-            <AsyncCopyIconWithAddress
+            <HistoryCopyIconWithAddress
               address={value}
             />
           ),

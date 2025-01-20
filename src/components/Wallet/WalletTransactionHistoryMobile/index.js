@@ -5,11 +5,13 @@ import Avatar from 'antd/es/avatar';
 import List from 'antd/es/list';
 import Card from 'antd/es/card';
 import CheckCircleOutlined from '@ant-design/icons/CheckCircleOutlined';
-import AsyncCopyIconWithAddress from '../../AsyncCopyIconWithAddress';
+import HistoryCopyIconWithAddress from '../HistoryCopyIconWithAddress';
 import styles from './styles.module.scss';
 import WalletHistoryAmount from '../WalletHistoryAmount';
+import { useIdentitiesDispatch } from '../HistoryCopyIconWithAddress/hooks';
 
 function WalletTransactionHistoryMobile({ failure, transactionHistory, filterTransactionsBy }) {
+  useIdentitiesDispatch(transactionHistory?.map(({ userId }) => userId) || []);
   return (
     <List
       pagination={{ pageSize: 5 }}
@@ -49,7 +51,7 @@ function WalletTransactionHistoryMobile({ failure, transactionHistory, filterTra
             )}
             actions={[
               <Flex wrap className={styles.actions} gap="15px" justify="space-between" align="center">
-                <AsyncCopyIconWithAddress
+                <HistoryCopyIconWithAddress
                   address={userId}
                 />
                 <CheckCircleOutlined className={styles.success} />
