@@ -8,10 +8,8 @@ import CheckCircleOutlined from '@ant-design/icons/CheckCircleOutlined';
 import HistoryCopyIconWithAddress from '../HistoryCopyIconWithAddress';
 import styles from './styles.module.scss';
 import WalletHistoryAmount from '../WalletHistoryAmount';
-import { useIdentitiesDispatch } from '../HistoryCopyIconWithAddress/hooks';
 
 function WalletTransactionHistoryMobile({ failure, transactionHistory, filterTransactionsBy }) {
-  useIdentitiesDispatch(transactionHistory?.map(({ userId }) => userId) || []);
   return (
     <List
       pagination={{ pageSize: 5 }}

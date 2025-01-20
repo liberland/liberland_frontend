@@ -5,18 +5,15 @@ import Avatar from 'antd/es/avatar';
 import { useSelector } from 'react-redux';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import { identitySelectors } from '../../../redux/selectors';
-import { decodeAndFilter } from '../../../utils/identityParser';
 import { getAvatarParameters } from '../../../utils/avatar';
 
 function HistoryCopyIconWithAddress({
   address,
   isTruncate,
 }) {
-  const identity = useSelector(identitySelectors.selectorIdentityMotions)[address];
-  const { info } = identity?.isSome ? identity.unwrap() : {};
-  const { legal } = decodeAndFilter(info, ['legal']) || {};
-  const { color, text } = getAvatarParameters(legal || address);
-
+  const { identity } = useSelector(identitySelectors.selectorIdentityMotions)?.[address] || {};
+  const { legal, name } = identity || {};
+  const { color, text } = getAvatarParameters(legal || name || address);
   return (
     <Flex wrap gap="10px">
       <Avatar style={{ backgroundColor: color, fontSize: '12px' }} size={24}>
@@ -26,6 +23,7 @@ function HistoryCopyIconWithAddress({
         address={address}
         isTruncate={isTruncate}
         legal={legal}
+        name={name}
       />
     </Flex>
   );

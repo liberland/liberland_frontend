@@ -7,10 +7,8 @@ import Avatar from 'antd/es/avatar';
 import HistoryCopyIconWithAddress from '../HistoryCopyIconWithAddress';
 import styles from './styles.module.scss';
 import WalletHistoryAmount from '../WalletHistoryAmount';
-import { useIdentitiesDispatch } from '../HistoryCopyIconWithAddress/hooks';
 
 function WalletTransactionHistory({ failure, transactionHistory, filterTransactionsBy }) {
-  useIdentitiesDispatch(transactionHistory?.map(({ userId }) => userId) || []);
   return (
     <Table
       pagination={{ showSizeChanger: true }}

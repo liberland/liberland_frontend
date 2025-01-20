@@ -7,10 +7,12 @@ import Space from 'antd/es/space';
 import uniqBy from 'lodash/uniqBy';
 import { useMediaQuery } from 'usehooks-ts';
 import DownOutlined from '@ant-design/icons/DownOutlined';
+import uniq from 'lodash/uniq';
+import { isAddress } from '@polkadot/util-crypto';
 import BalanceOverview from '../BalanceOverview';
 import WalletTransactionHistory from '../WalletTransactionHistory';
 import AssetOverview from '../AssetOverview';
-import { walletActions } from '../../../redux/actions';
+import { identityActions, walletActions } from '../../../redux/actions';
 import { walletSelectors, blockchainSelectors, congressSelectors } from '../../../redux/selectors';
 import Button from '../../Button/Button';
 import { transactionHistoryProcessorFactory } from '../WalletTransactionHistory/utils';
@@ -72,6 +74,17 @@ function WalletOverview() {
       </Dropdown>
     </Flex>
   );
+
+  useEffect(() => {
+    const addresses = uniq(
+      transactionHistoryTranslated?.map(({ userId }) => userId),
+    ).filter((address) => isAddress(address));
+    if (addresses?.length) {
+      dispatch(identityActions.getIdentityMotions.call(
+        addresses,
+      ));
+    }
+  }, [dispatch, transactionHistoryTranslated]);
 
   return (
     <Collapse
