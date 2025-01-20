@@ -44,16 +44,27 @@ export const transactionHistoryProcessorFactory = (walletAddress) => (transactio
       transactionHistoryInfo.asset,
       transactionHistoryInfo.decimals,
       {
-        isSymbolFirst: true,
         isAsset: true,
       },
     );
+  const typeTextExpanded = (() => {
+    switch (typeText) {
+      case 'from':
+        return 'Sending';
+      case 'to':
+        return 'Receiving';
+      default:
+        return typeText;
+    }
+  })();
+
   return {
     key: index,
     imgAlt,
     dateTransactionHistory,
     userId,
-    typeText,
+    typeText: typeTextExpanded,
+    currency: transactionHistoryInfo.asset,
     iconType,
     asset,
     status: true, // TODO: Add failed transactions?

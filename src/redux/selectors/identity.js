@@ -17,4 +17,8 @@ const selectorIdentityMotions = createSelector(
   (reducer) => reducer.identityMotions,
 );
 
-export { selectorIdentity, selectorIsLoading, selectorIdentityMotions };
+export {
+  selectorIdentity,
+  selectorIsLoading,
+  selectorIdentityMotions,
+};

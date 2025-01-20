@@ -1,11 +1,11 @@
-import { put, takeLatest, call } from 'redux-saga/effects';
-
+import {
+  put,
+  takeLatest,
+  call,
+} from 'redux-saga/effects';
 import { getIdentitiesNames, getIdentity, setIdentity } from '../../api/nodeRpcCall';
-
 import { identityActions } from '../actions';
 import { blockchainWatcher } from './base';
-
-// WORKERS
 
 function* setIdentityWorker(action) {
   yield call(
@@ -60,4 +60,8 @@ function* getIdentityWatcher() {
   }
 }
 
-export { setIdentityWatcher, getIdentityWatcher, getIdentityMotionsWatcher };
+export {
+  setIdentityWatcher,
+  getIdentityWatcher,
+  getIdentityMotionsWatcher,
+};
