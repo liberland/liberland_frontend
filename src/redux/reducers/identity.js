@@ -4,7 +4,6 @@ import { identityActions } from '../actions';
 const initialState = {
   loading: false,
   identity: null,
-  others: {},
 };
 
 const identityReducer = handleActions(
