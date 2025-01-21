@@ -7,6 +7,7 @@ import { AuthProvider } from 'react-oauth2-code-pkce';
 import App from './App';
 import store from './redux/store';
 import { authActions, blockchainActions, onBoardingActions } from './redux/actions';
+import { ModalProvider } from './context/modalContext';
 
 const defaultConfig = {
   tokenEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/token`,
@@ -51,7 +52,9 @@ ReactDOM.createRoot(
 ).render(
   <Provider store={store}>
     <AuthProvider authConfig={useAuthConfig}>
-      <App />
+      <ModalProvider>
+        <App />
+      </ModalProvider>
     </AuthProvider>
   </Provider>,
 );

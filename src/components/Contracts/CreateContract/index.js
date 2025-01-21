@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Form from 'antd/es/form';
 import TextArea from 'antd/es/input/TextArea';
 import Title from 'antd/es/typography/Title';
@@ -11,20 +11,20 @@ import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { contractsActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
-import ModalRoot from '../../Modals/ModalRoot';
 import InputSearch from '../../InputComponents/InputSearchAddressName';
+import { useModal } from '../../../context/modalContext';
 
-function CreateContract({ handleModal, isMyContracts }) {
+export default function CreateContract({ isMyContracts }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-
+  const { closeModal } = useModal();
   const submit = (data) => {
     dispatch(contractsActions.createContract.call({
       data: data.contractData,
       parties: data.parties,
       isMyContracts,
     }));
-    handleModal();
+    closeModal();
   };
 
   return (
@@ -74,7 +74,7 @@ function CreateContract({ handleModal, isMyContracts }) {
       <Divider />
       <Flex wrap gap="15px">
         <Button
-          onClick={handleModal}
+          onClick={closeModal}
         >
           Cancel
         </Button>
@@ -90,36 +90,5 @@ function CreateContract({ handleModal, isMyContracts }) {
 }
 
 CreateContract.propTypes = {
-  handleModal: PropTypes.func.isRequired,
   isMyContracts: PropTypes.bool.isRequired,
 };
-
-function CreateContractModalWrapper({
-  isMyContracts,
-}) {
-  const [show, setShow] = useState();
-  return (
-    <>
-      <Button
-        onClick={() => setShow(true)}
-        primary
-      >
-        Create Contract
-      </Button>
-      {show && (
-        <ModalRoot>
-          <CreateContract
-            handleModal={() => setShow(false)}
-            isMyContracts={isMyContracts}
-          />
-        </ModalRoot>
-      )}
-    </>
-  );
-}
-
-CreateContractModalWrapper.propTypes = {
-  isMyContracts: PropTypes.bool.isRequired,
-};
-
-export default CreateContractModalWrapper;

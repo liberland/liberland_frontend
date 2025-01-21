@@ -6,16 +6,23 @@ import Spin from 'antd/es/spin';
 import { blockchainSelectors, contractsSelectors } from '../../../redux/selectors';
 import { contractsActions } from '../../../redux/actions';
 import ContractsList from '../ContractsList';
-import CreateContractModalWrapper from '../CreateContract';
+import CreateContract from '../CreateContract';
+import { useModal } from '../../../context/modalContext';
+import Button from '../../Button/Button';
 
 function MyContracts() {
   const dispatch = useDispatch();
+  const { showModal, closeModal } = useModal();
   const myContracts = useSelector(contractsSelectors.selectorMyContracts);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   useEffect(() => {
     dispatch(contractsActions.getMyContracts.call());
   }, [dispatch, walletAddress]);
+
+  const handleCreateContract = () => {
+    showModal(<CreateContract isMyContracts closeModal={closeModal} />);
+  };
 
   if (!myContracts) {
     return <Spin />;
@@ -30,7 +37,12 @@ function MyContracts() {
           key: 'all',
           label: 'My contracts',
           extra: (
-            <CreateContractModalWrapper isMyContracts />
+            <Button
+              onClick={handleCreateContract}
+              primary
+            >
+              Create Contract
+            </Button>
           ),
           children: myContracts.length < 1 ? (
             <Alert type="info" message="No contracts found" />
