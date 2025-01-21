@@ -3,12 +3,17 @@ import PropTypes from 'prop-types';
 import { useMediaQuery } from 'usehooks-ts';
 import Checkbox from 'antd/es/checkbox';
 import Flex from 'antd/es/flex';
+import Avatar from 'antd/es/avatar';
+import Tag from 'antd/es/tag';
 import Table from '../../../Table';
 import truncate from '../../../../utils/truncate';
+import CopyIconWithAddress from '../../../CopyIconWithAddress';
 import { formatDollars, sanitizeValue } from '../../../../utils/walletHelpers';
+import LLD from '../../../../assets/icons/lld.svg';
 import Button from '../../../Button/Button';
+import styles from './styles.module.scss';
 
-function ValidatorList({
+function ValidatorListMobile({
   validators,
   selectedValidatorsAsTargets,
   selectingValidatorsDisabled,
@@ -41,7 +46,7 @@ function ValidatorList({
         blocked,
         stakedReturnCmp,
         accountId,
-      }) => {
+      }, index) => {
         const address = accountId?.toString();
         const totalSanitized = bondTotal ? sanitizeValue(bondTotal.toString()) : null;
         const totalValue = totalSanitized ? formatDollars(totalSanitized) : null;
@@ -49,20 +54,53 @@ function ValidatorList({
         const ownValue = ownSanitized ? formatDollars(ownSanitized) : null;
         const otherValue = formatDollars(sanitizeValue(bondOther.toString()));
         const nominatedByMe = selectedValidatorsAsTargets.includes(address);
+        const icon = (
+          <Avatar size={16} src={LLD} alt="LLD" />
+        );
         return {
           name: truncate(displayName || address, isDesktopHigher ? 13 : 20),
-          total: `${totalValue || 0} LLD`,
-          own: `${ownValue || 0} LLD`,
-          other: `${otherValue || 0} LLD`,
+          address: <CopyIconWithAddress address={address} isTruncate />,
+          total: (
+            <Flex gap="5px">
+              {totalValue || 0}
+              {icon}
+            </Flex>
+          ),
+          own: (
+            <Flex gap="5px">
+              {ownValue || 0}
+              {icon}
+            </Flex>
+          ),
+          other: (
+            <Flex gap="5px">
+              {otherValue || 0}
+              {icon}
+            </Flex>
+          ),
           commission,
-          allowed: blocked ? 'Blocked' : 'Available',
+          allowed: blocked ? (
+            <Tag className={styles.error} color="white">
+              Blocked
+            </Tag>
+          ) : (
+            <Tag className={styles.success} color="white">
+              Available
+            </Tag>
+          ),
           return: `${stakedReturnCmp || 0}%`,
           nominated: (
-            <Checkbox
-              disabled={selectingValidatorsDisabled}
-              checked={nominatedByMe}
-              onChange={() => toggleSelectedValidator(address)}
-            />
+            <Flex gap="5px">
+              <label htmlFor={`checkbox_${index}`}>
+                Nominated
+              </label>
+              <Checkbox
+                disabled={selectingValidatorsDisabled}
+                checked={nominatedByMe}
+                onChange={() => toggleSelectedValidator(address)}
+                id={`checkbox_${index}`}
+              />
+            </Flex>
           ),
         };
       })}
@@ -70,6 +108,10 @@ function ValidatorList({
         {
           Header: 'Name',
           accessor: 'name',
+        },
+        {
+          Header: 'Address',
+          accessor: 'address',
         },
         {
           Header: 'Total stake',
@@ -104,7 +146,7 @@ function ValidatorList({
   );
 }
 
-ValidatorList.propTypes = {
+ValidatorListMobile.propTypes = {
   validators: PropTypes.arrayOf(PropTypes.shape({
     displayName: PropTypes.string,
     address: PropTypes.string,
@@ -118,4 +160,4 @@ ValidatorList.propTypes = {
   goToAdvancedPage: PropTypes.func.isRequired,
 };
 
-export default ValidatorList;
+export default ValidatorListMobile;

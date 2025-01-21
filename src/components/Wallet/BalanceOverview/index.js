@@ -2,10 +2,6 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
-import Card from 'antd/es/card';
-import Avatar from 'antd/es/avatar';
-import Flex from 'antd/es/flex';
-import Title from 'antd/es/typography/Title';
 import { useMediaQuery } from 'usehooks-ts';
 import LLD from '../../../assets/icons/lld.svg';
 import LLM from '../../../assets/icons/llm.svg';
@@ -15,7 +11,7 @@ import SendLLMModalWrapper from '../../Modals/SendLLMModal';
 import RequestLLDModalWrapper from '../../Modals/RequestLLDModal';
 import UnpoolLLMModalWrapper from '../../Modals/UnpoolModal';
 import PolitipoolLLMModalWrapper from '../../Modals/PolitipoolModal';
-import styles from './styles.module.scss';
+import MoneyCard from '../../MoneyCard';
 
 function BalanceOverview({
   balances, liquidMerits, showStaked,
@@ -73,29 +69,13 @@ function BalanceOverview({
         currency,
       }) => (
         <Col span={isBiggerThanDesktop ? 6 : 24} key={title}>
-          <Card
-            size="small"
-            className={styles.card}
-            actions={[
-              <Flex wrap gap="15px" align="start">
-                {actions}
-              </Flex>,
-            ]}
-          >
-            <Card.Meta
-              title={(
-                <span className={styles.name}>
-                  {title}
-                </span>
-              )}
-            />
-            <Flex wrap gap="5px" align="center">
-              <Title level={5} className={styles.title}>
-                {amount}
-              </Title>
-              <Avatar size={22} src={icon} alt={currency} />
-            </Flex>
-          </Card>
+          <MoneyCard
+            actions={actions}
+            amount={amount}
+            alt={currency}
+            icon={icon}
+            title={title}
+          />
         </Col>
       ))}
     </Row>

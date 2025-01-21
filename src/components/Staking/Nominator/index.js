@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Popconfirm from 'antd/es/popconfirm';
 import { useHistory } from 'react-router-dom';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
-import ValidatorList from './ValidatorList/ValidatorList';
+import ValidatorList from './ValidatorList';
 import { walletActions } from '../../../redux/actions';
 import { areArraysSame } from '../../../utils/staking';
 

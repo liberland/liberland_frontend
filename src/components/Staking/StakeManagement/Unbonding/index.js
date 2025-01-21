@@ -1,16 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import { BN_ZERO } from '@polkadot/util';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
 import { formatDollars } from '../../../../utils/walletHelpers';
+import ModalRoot from '../../../Modals/ModalRoot';
 import { blockchainSelectors, validatorSelectors } from '../../../../redux/selectors';
 import { blockTimeFormatted, stakingInfoToProgress } from '../../../../utils/staking';
 import { validatorActions } from '../../../../redux/actions';
 import styles from './styles.module.scss';
+import Button from '../../../Button/Button';
 
-export default function Unbonding({ info }) {
+function Unbonding({ info }) {
   const dispatch = useDispatch();
   const { stakingInfo, sessionProgress } = useSelector(validatorSelectors.stakingData);
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
@@ -53,6 +55,22 @@ export default function Unbonding({ info }) {
         )}
       />
     </Card>
+  );
+}
+
+export default function UnbondingModalWrapper(props) {
+  const [show, setShow] = useState();
+  return (
+    <>
+      <Button onClick={() => setShow(true)}>
+        Show unbonding info
+      </Button>
+      {show && (
+        <ModalRoot onClose={() => setShow(false)}>
+          <Unbonding {...props} />
+        </ModalRoot>
+      )}
+    </>
   );
 }
 
