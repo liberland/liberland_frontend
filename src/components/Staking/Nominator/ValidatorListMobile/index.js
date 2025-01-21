@@ -7,6 +7,7 @@ import Row from 'antd/es/row';
 import Col from 'antd/es/col';
 import { getValidatorDisplay } from '../ValidatorList/utils';
 import Actions from '../Actions';
+import styles from './styles.module.scss';
 
 function ValidatorListMobile({
   validators,
@@ -18,19 +19,23 @@ function ValidatorListMobile({
 }) {
   return (
     <Flex vertical gap="20px">
-      <Actions
-        goToAdvancedPage={goToAdvancedPage}
-        selectedValidatorsAsTargets={selectedValidatorsAsTargets}
-        updateNominations={updateNominations}
-      />
+      <Flex wrap gap="15px" justify="start">
+        <Actions
+          goToAdvancedPage={goToAdvancedPage}
+          selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+          updateNominations={updateNominations}
+        />
+      </Flex>
       <List
         size="small"
+        bordered={false}
         dataSource={getValidatorDisplay({
           selectedValidatorsAsTargets,
           selectingValidatorsDisabled,
           toggleSelectedValidator,
           validators,
         })}
+        pagination={{ pageSize: 5 }}
         renderItem={({
           name,
           total,
@@ -41,67 +46,70 @@ function ValidatorListMobile({
           profit,
           nominated,
         }) => (
-          <List.Item>
-            <Card
-              extra={nominated}
-              title={name}
-            >
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Flex wrap gap="5px">
-                    <div className="description">
-                      Total stake
-                    </div>
-                    {total}
-                  </Flex>
-                </Col>
-                <Col span={12}>
-                  <Flex wrap gap="5px">
-                    <div className="description">
-                      Own stake
-                    </div>
-                    {own}
-                  </Flex>
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col span={12} className="description">
-                  <Flex wrap gap="5px">
-                    <div className="description">
-                      Other stake
-                    </div>
-                    {other}
-                  </Flex>
-                </Col>
-                <Col span={12}>
-                  <Flex wrap gap="5px">
-                    <div className="description">
-                      Commission
-                    </div>
-                    {commission}
-                  </Flex>
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <Flex wrap gap="5px">
-                    <div className="description">
-                      Allowed
-                    </div>
-                    {allowed}
-                  </Flex>
-                </Col>
-                <Col span={12}>
-                  <Flex wrap gap="5px">
-                    <div className="description">
-                      Return
-                    </div>
-                    {profit}
-                  </Flex>
-                </Col>
-              </Row>
-            </Card>
-          </List.Item>
+          <Card
+            className={styles.card}
+            classNames={{
+              header: styles.header,
+            }}
+            extra={nominated}
+            title={name}
+            size="small"
+          >
+            <Row gutter={16}>
+              <Col span={11}>
+                <Flex vertical gap="5px">
+                  <div className="description">
+                    Total stake
+                  </div>
+                  {total}
+                </Flex>
+              </Col>
+              <Col span={11}>
+                <Flex vertical gap="5px">
+                  <div className="description">
+                    Own stake
+                  </div>
+                  {own}
+                </Flex>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={11} className="description">
+                <Flex vertical gap="5px">
+                  <div className="description">
+                    Other stake
+                  </div>
+                  {other}
+                </Flex>
+              </Col>
+              <Col span={11}>
+                <Flex vertical gap="5px">
+                  <div className="description">
+                    Commission
+                  </div>
+                  {commission}
+                </Flex>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={11}>
+                <Flex vertical gap="5px">
+                  <div className="description">
+                    Allowed
+                  </div>
+                  {allowed}
+                </Flex>
+              </Col>
+              <Col span={11}>
+                <Flex vertical gap="5px">
+                  <div className="description">
+                    Return
+                  </div>
+                  {profit}
+                </Flex>
+              </Col>
+            </Row>
+          </Card>
         )}
       />
     </Flex>

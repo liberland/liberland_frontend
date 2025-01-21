@@ -21,7 +21,7 @@ function DisplayUser({
         {text}
       </Avatar>
       {isBiggerThanDesktop ? truncate(displayName, 20) : (
-        <Flex vertical gap="5px">
+        <Flex vertical gap="5px" align="center">
           {truncate(displayName, 20)}
           <CopyIconWithAddress address={address} isTruncate />
         </Flex>

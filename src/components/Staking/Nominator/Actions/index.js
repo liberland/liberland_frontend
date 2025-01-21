@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Flex from 'antd/es/flex';
 import Button from '../../../Button/Button';
+import { StartValidatorModal } from '../../../Modals';
 
 function Actions({
   goToAdvancedPage,
@@ -9,7 +9,8 @@ function Actions({
   selectedValidatorsAsTargets,
 }) {
   return (
-    <Flex wrap gap="15px" justify="end">
+    <>
+      <StartValidatorModal label="Switch to Validator" />
       <Button link onClick={() => goToAdvancedPage()}>
         Advanced
       </Button>
@@ -19,7 +20,7 @@ function Actions({
       >
         Update nominations
       </Button>
-    </Flex>
+    </>
   );
 }
 

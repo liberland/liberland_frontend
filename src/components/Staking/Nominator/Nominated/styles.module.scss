@@ -1,0 +1,9 @@
+@import '../../../../assets/main.scss';
+
+.checkbox {
+    zoom: 1.5;
+    @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
+        margin-top: 1.2px;
+        zoom: 1;
+    }
+}

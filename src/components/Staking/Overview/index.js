@@ -14,7 +14,6 @@ import Validator from '../Validator';
 import Nominator from '../Nominator';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
-import { StartValidatorModal } from '../../Modals';
 
 export default function StakingOverview() {
   const dispatch = useDispatch();
@@ -82,7 +81,7 @@ export default function StakingOverview() {
   }
 
   return (
-    <>
+    <Flex vertical gap="20px">
       <StakeManagement />
       <Collapse
         collapsible="icon"
@@ -102,12 +101,9 @@ export default function StakingOverview() {
             key: 'nominator',
             label: 'Nominators',
             children: <Nominator />,
-            extra: (
-              <StartValidatorModal label="Switch to Validator" />
-            ),
           },
         ].filter(Boolean)}
       />
-    </>
+    </Flex>
   );
 }

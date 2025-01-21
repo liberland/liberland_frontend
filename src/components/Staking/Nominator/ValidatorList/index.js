@@ -2,30 +2,26 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
 import Table from '../../../Table';
-import Button from '../../../Button/Button';
 import { getValidatorDisplay } from './utils';
+import Actions from '../Actions';
 
 function ValidatorList({
   validators,
   selectedValidatorsAsTargets,
   selectingValidatorsDisabled,
   toggleSelectedValidator,
-  updateNominations,
   goToAdvancedPage,
+  updateNominations,
 }) {
   return (
     <Table
       footer={(
-        <Flex wrap gap="15px" justify="end">
-          <Button link onClick={() => goToAdvancedPage()}>
-            Advanced
-          </Button>
-          <Button
-            primary
-            onClick={() => updateNominations(selectedValidatorsAsTargets)}
-          >
-            Update nominations
-          </Button>
+        <Flex wrap gap="15px" justify="start">
+          <Actions
+            goToAdvancedPage={goToAdvancedPage}
+            selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+            updateNominations={updateNominations}
+          />
         </Flex>
       )}
       data={getValidatorDisplay({

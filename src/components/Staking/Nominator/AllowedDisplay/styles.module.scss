@@ -4,10 +4,14 @@
     border-color: transparent!important;
     color: #79BF2E!important;
     font-weight: 600;
+    font-size: 15px;
+    padding-inline: 0px!important;
 
     @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
         border-color: #79BF2E!important;
         font-weight: 400;
+        padding-inline: 7px!important;
+        font-size: 12px;
     }
 }
 
@@ -15,9 +19,13 @@
     border-color: transparent!important;
     color: #f5222d!important;
     font-weight: 600;
+    font-size: 15px;
+    padding-inline: 0px!important;
 
     @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
         border-color: #f5222d!important;
         font-weight: 400;
+        padding-inline: 7px!important;
+        font-size: 12px;
     }
 }

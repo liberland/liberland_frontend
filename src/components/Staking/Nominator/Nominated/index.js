@@ -5,6 +5,7 @@ import uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
 import { useMediaQuery } from 'usehooks-ts';
 import classNames from 'classnames';
+import styles from './styles.module.scss';
 
 function Nominated({
   nominatedByMe,
@@ -15,7 +16,7 @@ function Nominated({
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1600px)');
   const id = useMemo(() => uniqueId('checkbox_'), []);
   return (
-    <Flex gap="5px">
+    <Flex gap="10px" align="center">
       <label htmlFor={id} className={classNames({ 'sr-only': !isBiggerThanDesktop })}>
         Nominated
       </label>
@@ -24,6 +25,7 @@ function Nominated({
         checked={nominatedByMe}
         onChange={() => toggleSelectedValidator(address)}
         id={id}
+        className={styles.checkbox}
       />
     </Flex>
   );

@@ -16,7 +16,7 @@ import WithdrawUnbondedButton from './WithdrawUnbondedButton';
 import PayoutRewards from './PayoutRewards';
 import Unbonding from './Unbonding';
 import { validatorActions } from '../../../redux/actions';
-
+import styles from './styles.module.scss';
 import MoneyCard from '../../MoneyCard';
 
 export default function StakeManagement() {
@@ -54,8 +54,8 @@ export default function StakeManagement() {
   })();
 
   return (
-    <Row gutter={16}>
-      <Col span={isBiggerThanDesktop ? 4 : 24}>
+    <Row gutter={16} className={!isBiggerThanDesktop && styles.row}>
+      <Col span={isBiggerThanDesktop ? 6 : 24}>
         <MoneyCard
           actions={[
             <StakeLLDModal label="Stake LLD" />,
@@ -67,7 +67,7 @@ export default function StakeManagement() {
           title="Currently staked"
         />
       </Col>
-      <Col span={isBiggerThanDesktop ? 4 : 24}>
+      <Col span={isBiggerThanDesktop ? 6 : 24}>
         <MoneyCard
           actions={[
             <PayoutRewards />,
@@ -78,7 +78,7 @@ export default function StakeManagement() {
           icon={LLD}
         />
       </Col>
-      <Col span={isBiggerThanDesktop ? 4 : 24}>
+      <Col span={isBiggerThanDesktop ? 6 : 24}>
         <MoneyCard
           amount={payee?.toString() || 'None'}
           title="Rewards destination"
@@ -88,9 +88,9 @@ export default function StakeManagement() {
           ]}
         />
       </Col>
-      <Col span={isBiggerThanDesktop ? 4 : 24}>
+      <Col span={isBiggerThanDesktop ? 6 : 24}>
         <MoneyCard
-          amount={`${formatDollars(stakingInfo.redeemable)} LLD ready to withdraw`}
+          amount={`${formatDollars(stakingInfo?.redeemable || '0')} LLD to withdraw`}
           currency="LLD"
           icon={LLD}
           title="Unstaking"
