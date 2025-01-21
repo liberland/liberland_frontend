@@ -1,17 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useMediaQuery } from 'usehooks-ts';
-import Checkbox from 'antd/es/checkbox';
 import Flex from 'antd/es/flex';
-import Avatar from 'antd/es/avatar';
-import Tag from 'antd/es/tag';
-import Table from '../../../Table';
-import truncate from '../../../../utils/truncate';
-import CopyIconWithAddress from '../../../CopyIconWithAddress';
-import { formatDollars, sanitizeValue } from '../../../../utils/walletHelpers';
-import LLD from '../../../../assets/icons/lld.svg';
-import Button from '../../../Button/Button';
-import styles from './styles.module.scss';
+import List from 'antd/es/list';
+import Card from 'antd/es/card';
+import Row from 'antd/es/row';
+import Col from 'antd/es/col';
+import { getValidatorDisplay } from '../ValidatorList/utils';
+import Actions from '../Actions';
 
 function ValidatorListMobile({
   validators,
@@ -21,128 +16,95 @@ function ValidatorListMobile({
   updateNominations,
   goToAdvancedPage,
 }) {
-  const isDesktopHigher = useMediaQuery('(min-width: 1400px)');
   return (
-    <Table
-      footer={(
-        <Flex wrap gap="15px" justify="end">
-          <Button link onClick={() => goToAdvancedPage()}>
-            Advanced
-          </Button>
-          <Button
-            primary
-            onClick={() => updateNominations(selectedValidatorsAsTargets)}
-          >
-            Update nominations
-          </Button>
-        </Flex>
-      )}
-      data={validators.map(({
-        bondTotal,
-        bondOwn,
-        bondOther,
-        displayName,
-        commission,
-        blocked,
-        stakedReturnCmp,
-        accountId,
-      }, index) => {
-        const address = accountId?.toString();
-        const totalSanitized = bondTotal ? sanitizeValue(bondTotal.toString()) : null;
-        const totalValue = totalSanitized ? formatDollars(totalSanitized) : null;
-        const ownSanitized = bondOwn ? sanitizeValue(bondOwn.toString()) : null;
-        const ownValue = ownSanitized ? formatDollars(ownSanitized) : null;
-        const otherValue = formatDollars(sanitizeValue(bondOther.toString()));
-        const nominatedByMe = selectedValidatorsAsTargets.includes(address);
-        const icon = (
-          <Avatar size={16} src={LLD} alt="LLD" />
-        );
-        return {
-          name: truncate(displayName || address, isDesktopHigher ? 13 : 20),
-          address: <CopyIconWithAddress address={address} isTruncate />,
-          total: (
-            <Flex gap="5px">
-              {totalValue || 0}
-              {icon}
-            </Flex>
-          ),
-          own: (
-            <Flex gap="5px">
-              {ownValue || 0}
-              {icon}
-            </Flex>
-          ),
-          other: (
-            <Flex gap="5px">
-              {otherValue || 0}
-              {icon}
-            </Flex>
-          ),
+    <Flex vertical gap="20px">
+      <Actions
+        goToAdvancedPage={goToAdvancedPage}
+        selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+        updateNominations={updateNominations}
+      />
+      <List
+        size="small"
+        dataSource={getValidatorDisplay({
+          selectedValidatorsAsTargets,
+          selectingValidatorsDisabled,
+          toggleSelectedValidator,
+          validators,
+        })}
+        renderItem={({
+          name,
+          total,
+          own,
+          other,
           commission,
-          allowed: blocked ? (
-            <Tag className={styles.error} color="white">
-              Blocked
-            </Tag>
-          ) : (
-            <Tag className={styles.success} color="white">
-              Available
-            </Tag>
-          ),
-          return: `${stakedReturnCmp || 0}%`,
-          nominated: (
-            <Flex gap="5px">
-              <label htmlFor={`checkbox_${index}`}>
-                Nominated
-              </label>
-              <Checkbox
-                disabled={selectingValidatorsDisabled}
-                checked={nominatedByMe}
-                onChange={() => toggleSelectedValidator(address)}
-                id={`checkbox_${index}`}
-              />
-            </Flex>
-          ),
-        };
-      })}
-      columns={[
-        {
-          Header: 'Name',
-          accessor: 'name',
-        },
-        {
-          Header: 'Address',
-          accessor: 'address',
-        },
-        {
-          Header: 'Total stake',
-          accessor: 'total',
-        },
-        {
-          Header: 'Own stake',
-          accessor: 'own',
-        },
-        {
-          Header: 'Other stake',
-          accessor: 'other',
-        },
-        {
-          Header: 'Commission',
-          accessor: 'commission',
-        },
-        {
-          Header: 'Allowed',
-          accessor: 'allowed',
-        },
-        {
-          Header: 'Return',
-          accessor: 'return',
-        },
-        {
-          Header: 'Nominated',
-          accessor: 'nominated',
-        },
-      ]}
-    />
+          allowed,
+          profit,
+          nominated,
+        }) => (
+          <List.Item>
+            <Card
+              extra={nominated}
+              title={name}
+            >
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Flex wrap gap="5px">
+                    <div className="description">
+                      Total stake
+                    </div>
+                    {total}
+                  </Flex>
+                </Col>
+                <Col span={12}>
+                  <Flex wrap gap="5px">
+                    <div className="description">
+                      Own stake
+                    </div>
+                    {own}
+                  </Flex>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12} className="description">
+                  <Flex wrap gap="5px">
+                    <div className="description">
+                      Other stake
+                    </div>
+                    {other}
+                  </Flex>
+                </Col>
+                <Col span={12}>
+                  <Flex wrap gap="5px">
+                    <div className="description">
+                      Commission
+                    </div>
+                    {commission}
+                  </Flex>
+                </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <Flex wrap gap="5px">
+                    <div className="description">
+                      Allowed
+                    </div>
+                    {allowed}
+                  </Flex>
+                </Col>
+                <Col span={12}>
+                  <Flex wrap gap="5px">
+                    <div className="description">
+                      Return
+                    </div>
+                    {profit}
+                  </Flex>
+                </Col>
+              </Row>
+            </Card>
+          </List.Item>
+        )}
+      />
+    </Flex>
   );
 }
 

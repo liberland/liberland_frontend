@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Popconfirm from 'antd/es/popconfirm';
+import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList';
+import ValidatorListMobile from './ValidatorListMobile';
 import { walletActions } from '../../../redux/actions';
 import { areArraysSame } from '../../../utils/staking';
 
@@ -99,6 +101,7 @@ function Nominator() {
     dispatch(walletActions.getValidators.call());
     dispatch(walletActions.getNominatorTargets.call());
   }, [dispatch]);
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1600px)');
 
   return (
     <>
@@ -108,14 +111,26 @@ function Nominator() {
         onConfirm={() => updateNominations(selectedValidatorsAsTargets)}
         onCancel={handleDiscardChanges}
       />
-      <ValidatorList
-        validators={validators}
-        selectedValidatorsAsTargets={selectedValidatorsAsTargets}
-        selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
-        toggleSelectedValidator={toggleSelectedValidator}
-        goToAdvancedPage={goToAdvancedPage}
-        updateNominations={updateNominations}
-      />
+      {isBiggerThanDesktop ? (
+        <ValidatorList
+          validators={validators}
+          selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+          selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+          toggleSelectedValidator={toggleSelectedValidator}
+          goToAdvancedPage={goToAdvancedPage}
+          updateNominations={updateNominations}
+        />
+      ) : (
+        <ValidatorListMobile
+          validators={validators}
+          selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+          selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+          toggleSelectedValidator={toggleSelectedValidator}
+          goToAdvancedPage={goToAdvancedPage}
+          updateNominations={updateNominations}
+        />
+      )}
+
     </>
   );
 }
