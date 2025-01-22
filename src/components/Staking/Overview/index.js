@@ -21,9 +21,6 @@ export default function StakingOverview() {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const validatorLink = 'https://docs.liberland.org/blockchain/for-validators-nominators-and-stakers/run-a-validator';
   const nominatorLink = 'https://docs.liberland.org/blockchain/for-validators-nominators-and-stakers/staking';
-  const chill = () => {
-    dispatch(validatorActions.chill.call());
-  };
 
   useEffect(() => {
     dispatch(validatorActions.getInfo.call());
@@ -89,13 +86,8 @@ export default function StakingOverview() {
         items={[
           info.isStakingValidator && {
             key: 'validator',
-            label: 'Validator',
+            label: 'My validator status',
             children: <Validator />,
-            extra: (
-              <Button primary onClick={chill}>
-                Switch to Nominator
-              </Button>
-            ),
           },
           info.stash && {
             key: 'nominator',

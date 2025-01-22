@@ -1,6 +1,6 @@
 import React from 'react';
 import { formatDollars, sanitizeValue } from '../../../../utils/walletHelpers';
-import DisplayUser from '../DisplayUser';
+import DisplayUser from '../../DisplayUser';
 import CopyIconWithAddress from '../../../CopyIconWithAddress';
 import DollarValue from '../DollarValue';
 import AllowedDisplay from '../AllowedDisplay';

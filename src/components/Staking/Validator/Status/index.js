@@ -25,8 +25,6 @@ export default function Status() {
       Status:
       {' '}
       {status}
-      {' '}
-      {info.isNextSessionValidator && ' - scheduled for next session'}
     </strong>
   );
 }

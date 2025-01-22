@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
 import Avatar from 'antd/es/avatar';
 import { useMediaQuery } from 'usehooks-ts';
-import { getAvatarParameters } from '../../../../utils/avatar';
-import truncate from '../../../../utils/truncate';
-import NoUser from '../../../../assets/icons/no-user.svg';
-import CopyIconWithAddress from '../../../CopyIconWithAddress';
+import { getAvatarParameters } from '../../../utils/avatar';
+import truncate from '../../../utils/truncate';
+import NoUser from '../../../assets/icons/no-user.svg';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
 
 function DisplayUser({
   displayName,
@@ -21,17 +21,23 @@ function DisplayUser({
         {text}
       </Avatar>
       {isBiggerThanDesktop ? truncate(displayName, 20) : (
-        <Flex vertical gap="5px" align="center">
+        <Flex vertical gap="2px">
           {truncate(displayName, 20)}
-          <CopyIconWithAddress address={address} isTruncate />
+          {address && (
+            <div className="description">
+              <CopyIconWithAddress address={address} isTruncate />
+            </div>
+          )}
         </Flex>
       )}
     </Flex>
   ) : (
-    <Flex wrap gap="5px" align="center">
+    <Flex wrap gap="2px" align="center">
       <Avatar size={size} src={NoUser} alt="No user found" />
-      {!isBiggerThanDesktop && (
-        <CopyIconWithAddress address={address} isTruncate />
+      {!isBiggerThanDesktop && address && (
+        <div className="description">
+          <CopyIconWithAddress address={address} isTruncate />
+        </div>
       )}
     </Flex>
   );
@@ -39,7 +45,7 @@ function DisplayUser({
 
 DisplayUser.propTypes = {
   displayName: PropTypes.string,
-  address: PropTypes.string.isRequired,
+  address: PropTypes.string,
 };
 
 export default DisplayUser;
