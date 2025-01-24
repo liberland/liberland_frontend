@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Button from '../../../Button/Button';
 import { StartValidatorModal } from '../../../Modals';
 
-function Actions({
+function NominatorUpdateActions({
   goToAdvancedPage,
   updateNominations,
   selectedValidatorsAsTargets,
@@ -24,10 +24,10 @@ function Actions({
   );
 }
 
-Actions.propTypes = {
+NominatorUpdateActions.propTypes = {
   goToAdvancedPage: PropTypes.func.isRequired,
   updateNominations: PropTypes.func.isRequired,
   selectedValidatorsAsTargets: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-export default Actions;
+export default NominatorUpdateActions;

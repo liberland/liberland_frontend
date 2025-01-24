@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Tag from 'antd/es/tag';
 import styles from './styles.module.scss';
 
-function AllowedDisplay({
+function IsAvailableForStaking({
   blocked,
 }) {
   return blocked ? (
@@ -17,8 +17,8 @@ function AllowedDisplay({
   );
 }
 
-AllowedDisplay.propTypes = {
+IsAvailableForStaking.propTypes = {
   blocked: PropTypes.bool,
 };
 
-export default AllowedDisplay;
+export default IsAvailableForStaking;

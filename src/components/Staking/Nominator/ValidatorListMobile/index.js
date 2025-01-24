@@ -6,7 +6,7 @@ import Card from 'antd/es/card';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
 import { getValidatorDisplay } from '../ValidatorList/utils';
-import Actions from '../Actions';
+import NominatorUpdateActions from '../NominatorUpdateActions';
 import styles from './styles.module.scss';
 
 function ValidatorListMobile({
@@ -20,7 +20,7 @@ function ValidatorListMobile({
   return (
     <Flex vertical gap="20px">
       <Flex wrap gap="15px" justify="start">
-        <Actions
+        <NominatorUpdateActions
           goToAdvancedPage={goToAdvancedPage}
           selectedValidatorsAsTargets={selectedValidatorsAsTargets}
           updateNominations={updateNominations}

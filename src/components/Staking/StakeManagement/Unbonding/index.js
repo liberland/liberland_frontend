@@ -63,7 +63,7 @@ export default function UnbondingModalWrapper(props) {
   return (
     <>
       <Button onClick={() => setShow(true)}>
-        Show unbonding info
+        Show unbonding details
       </Button>
       {show && (
         <ModalRoot onClose={() => setShow(false)}>

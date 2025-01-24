@@ -4,7 +4,7 @@ import Spin from 'antd/es/spin';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
 import { useMediaQuery } from 'usehooks-ts';
-import { validatorSelectors, walletSelectors } from '../../../redux/selectors';
+import { blockchainSelectors, validatorSelectors, walletSelectors } from '../../../redux/selectors';
 import { formatDollars } from '../../../utils/walletHelpers';
 import LLD from '../../../assets/icons/lld.svg';
 import {
@@ -18,16 +18,25 @@ import Unbonding from './Unbonding';
 import { validatorActions } from '../../../redux/actions';
 import styles from './styles.module.scss';
 import MoneyCard from '../../MoneyCard';
+import { blockTimeFormatted, stakingInfoToProgress } from '../../../utils/staking';
 
 export default function StakeManagement() {
   const balances = useSelector(walletSelectors.selectorBalances);
+  const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const info = useSelector(validatorSelectors.info);
   const pendingRewards = useSelector(validatorSelectors.pendingRewards);
   const payee = useSelector(validatorSelectors.payee);
-  const { stakingInfo } = useSelector(validatorSelectors.stakingData);
+  const { stakingInfo, sessionProgress } = useSelector(validatorSelectors.stakingData);
   const dispatch = useDispatch();
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
+  const stakingData = stakingInfoToProgress(stakingInfo, sessionProgress) ?? [];
+  const { unlock, blocks } = stakingData?.[0] || {};
 
+  useEffect(() => {
+    if (info.unlocking.length !== 0) {
+      dispatch(validatorActions.getStakingData.call());
+    }
+  }, [dispatch, blockNumber, info]);
   useEffect(() => {
     if (info?.unlocking?.length) {
       dispatch(validatorActions.getStakingData.call());
@@ -94,10 +103,13 @@ export default function StakeManagement() {
           currency="LLD"
           icon={LLD}
           title="Unstaking"
+          description={(
+            unlock?.value && blocks && `${formatDollars(unlock?.value)} will unlock in ${blockTimeFormatted(blocks)}`
+          )}
           actions={[
-            <Unbonding info={info} />,
+            stakingInfo?.length > 1 && <Unbonding info={info} />,
             <WithdrawUnbondedButton />,
-          ]}
+          ].filter(Boolean)}
         />
       </Col>
     </Row>

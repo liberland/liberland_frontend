@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Popconfirm from 'antd/es/popconfirm';
+import Button from 'antd/es/button';
+import Flex from 'antd/es/flex';
 import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
+import Alert from 'antd/es/alert';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList';
 import ValidatorListMobile from './ValidatorListMobile';
 import { walletActions } from '../../../redux/actions';
 import { areArraysSame } from '../../../utils/staking';
+import styles from './styles.module.scss';
 
 function Nominator() {
   const dispatch = useDispatch();
@@ -20,6 +23,7 @@ function Nominator() {
   const [selectedValidatorsAsTargets, setSelectedValidatorsAsTargets] = useState(nominatorTargets);
   const [isListSelectedValidatorsChanged, setIsListSelectedValidatorsChanged] = useState(false);
   const [navigationAction, setNavigationAction] = useState();
+  const firstScrollTo = useRef();
 
   const isMaxNumValidatorsSelected = (selectedValidators) => selectedValidators.length > 15;
   const toggleSelectedValidator = (validatorAddress) => {
@@ -104,13 +108,33 @@ function Nominator() {
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1600px)');
 
   return (
-    <>
-      <Popconfirm
-        open={Boolean(navigationAction)}
-        title="You have unsaved changes. What would you like to do with them?"
-        onConfirm={() => updateNominations(selectedValidatorsAsTargets)}
-        onCancel={handleDiscardChanges}
-      />
+    <Flex vertical gap="20px">
+      {navigationAction && (
+        <Alert
+          type="warning"
+          className={styles.alert}
+          id="warning"
+          ref={(alertRef) => {
+            if (alertRef && firstScrollTo.current !== navigationAction) {
+              alertRef.nativeElement?.scrollIntoView({
+                behavior: 'smooth',
+              });
+              firstScrollTo.current = navigationAction;
+            }
+          }}
+          message="You have unsaved changes. What would you like to do with them?"
+          action={(
+            <Flex wrap gap="15px">
+              <Button onClick={handleDiscardChanges}>
+                Discard
+              </Button>
+              <Button primary onClick={() => updateNominations(selectedValidatorsAsTargets)}>
+                Apply
+              </Button>
+            </Flex>
+          )}
+        />
+      )}
       {isBiggerThanDesktop ? (
         <ValidatorList
           validators={validators}
@@ -130,8 +154,7 @@ function Nominator() {
           updateNominations={updateNominations}
         />
       )}
-
-    </>
+    </Flex>
   );
 }
 

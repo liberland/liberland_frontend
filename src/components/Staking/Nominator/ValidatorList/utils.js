@@ -1,9 +1,9 @@
 import React from 'react';
 import { formatDollars, sanitizeValue } from '../../../../utils/walletHelpers';
-import DisplayUser from '../../DisplayUser';
+import StakeParticipantDisplay from '../../StakeParticipantDisplay';
 import CopyIconWithAddress from '../../../CopyIconWithAddress';
 import DollarValue from '../DollarValue';
-import AllowedDisplay from '../AllowedDisplay';
+import IsAvailableForStaking from '../IsAvailableForStaking';
 import Nominated from '../Nominated';
 
 export const getValidatorDisplay = ({
@@ -29,7 +29,7 @@ export const getValidatorDisplay = ({
   const otherValue = bondOther && formatDollars(sanitizeValue(bondOther.toString()));
   const nominatedByMe = selectedValidatorsAsTargets.includes(address);
   return {
-    name: <DisplayUser displayName={displayName} address={address} />,
+    name: <StakeParticipantDisplay displayName={displayName} address={address} />,
     address: <CopyIconWithAddress address={address} isTruncate />,
     total: (
       <DollarValue value={totalValue} />
@@ -41,7 +41,7 @@ export const getValidatorDisplay = ({
       <DollarValue value={otherValue} />
     ),
     commission,
-    allowed: <AllowedDisplay blocked={blocked} />,
+    allowed: <IsAvailableForStaking blocked={blocked} />,
     profit: `${stakedReturnCmp || 0}%`,
     nominated: (
       <Nominated

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
 import Table from '../../../Table';
 import { getValidatorDisplay } from './utils';
-import Actions from '../Actions';
+import NominatorUpdateActions from '../NominatorUpdateActions';
 
 function ValidatorList({
   validators,
@@ -16,8 +16,8 @@ function ValidatorList({
   return (
     <Table
       footer={(
-        <Flex wrap gap="15px" justify="start">
-          <Actions
+        <Flex wrap gap="15px" justify="end">
+          <NominatorUpdateActions
             goToAdvancedPage={goToAdvancedPage}
             selectedValidatorsAsTargets={selectedValidatorsAsTargets}
             updateNominations={updateNominations}

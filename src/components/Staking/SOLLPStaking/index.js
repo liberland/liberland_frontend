@@ -4,7 +4,7 @@ import Col from 'antd/es/col';
 import Row from 'antd/es/row';
 import Button from '../../Button/Button';
 
-const linkRaydium = 'https://raydium.io/clmm/create-position/?pool_id=2AXXcN6oN9bBT5owwmTH53C7QHUXvhLeu718Kqt8rvY2';
+const linkRaydium = 'https://raydium.io/clmm/create-position/?pool_id=3gYXPAYp8xi7wrzC9hpa89d2pQ8jBqT1UUL5wehvz3LY';
 
 export default function SOLLPStaking() {
   return (

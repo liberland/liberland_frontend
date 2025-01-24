@@ -7,7 +7,7 @@ import StartStopButton from '../StartStopButton';
 import Button from '../../../Button/Button';
 import { validatorActions } from '../../../../redux/actions';
 
-function Actions() {
+function ValidatorUpdateActions() {
   const dispatch = useDispatch();
   const onSubmit = ({ keys }) => {
     dispatch(validatorActions.setSessionKeys.call({ keys }));
@@ -16,7 +16,7 @@ function Actions() {
     dispatch(validatorActions.chill.call());
   };
   return (
-    <Flex wrap gap="15px" justify="start">
+    <Flex wrap gap="15px" justify="end">
       <CreateValidatorButton />
       <SetSessionKeysModalWrapper onSubmit={onSubmit} />
       <StartStopButton />
@@ -27,4 +27,4 @@ function Actions() {
   );
 }
 
-export default Actions;
+export default ValidatorUpdateActions;

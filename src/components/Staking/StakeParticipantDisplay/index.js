@@ -8,7 +8,7 @@ import truncate from '../../../utils/truncate';
 import NoUser from '../../../assets/icons/no-user.svg';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 
-function DisplayUser({
+function StakeParticipantDisplay({
   displayName,
   address,
 }) {
@@ -43,9 +43,9 @@ function DisplayUser({
   );
 }
 
-DisplayUser.propTypes = {
+StakeParticipantDisplay.propTypes = {
   displayName: PropTypes.string,
   address: PropTypes.string,
 };
 
-export default DisplayUser;
+export default StakeParticipantDisplay;

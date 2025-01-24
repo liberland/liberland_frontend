@@ -8,8 +8,8 @@ import { validatorSelectors } from '../../../../redux/selectors';
 import { validatorActions } from '../../../../redux/actions';
 import { parseLegal, parseIdentityData } from '../../../../utils/identityParser';
 import Table from '../../../Table';
-import DisplayUser from '../../DisplayUser';
-import Actions from '../Actions';
+import StakeParticipantDisplay from '../../StakeParticipantDisplay';
+import ValidatorUpdateActions from '../ValidatorUpdateActions';
 import styles from './styles.module.scss';
 
 function getNominatorName(identity) {
@@ -24,7 +24,7 @@ function getNominatorName(identity) {
   return '';
 }
 
-export default function NominatorsList() {
+export default function NominatedByList() {
   const dispatch = useDispatch();
   const nominators = useSelector(validatorSelectors.nominators);
   const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
@@ -39,7 +39,7 @@ export default function NominatorsList() {
   }) => ({
     address,
     name: (
-      <DisplayUser
+      <StakeParticipantDisplay
         address={isLargerThanHdScreen ? undefined : address}
         displayName={getNominatorName(identity)}
       />
@@ -59,7 +59,7 @@ export default function NominatorsList() {
           accessor: 'address',
         }, // Here should be date of nomination, not found in the object
       ]}
-      footer={<Actions />}
+      footer={<ValidatorUpdateActions />}
     />
   ) : (
     <Flex vertical gap="20px">
@@ -79,7 +79,7 @@ export default function NominatorsList() {
           />
         )}
       />
-      <Actions />
+      <ValidatorUpdateActions />
     </Flex>
   );
 }

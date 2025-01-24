@@ -7,7 +7,7 @@ import { useMediaQuery } from 'usehooks-ts';
 import { useDispatch, useSelector } from 'react-redux';
 import Slashes from './Slashes';
 import Status from './Status';
-import NominatorsList from './NominatorsList';
+import NominatedByList from './NominatedByList';
 import Stats from './Stats';
 import styles from './styles.module.scss';
 import { validatorActions } from '../../../redux/actions';
@@ -53,7 +53,7 @@ export default function Overview() {
               key: 'by',
               label: 'Nominated by',
               children: (
-                <NominatorsList />
+                <NominatedByList />
               ),
             },
             {

@@ -1,10 +1,7 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import Flex from 'antd/es/flex';
 import Checkbox from 'antd/es/checkbox';
-import uniqueId from 'lodash/uniqueId';
 import PropTypes from 'prop-types';
-import { useMediaQuery } from 'usehooks-ts';
-import classNames from 'classnames';
 import styles from './styles.module.scss';
 
 function Nominated({
@@ -13,18 +10,12 @@ function Nominated({
   toggleSelectedValidator,
   address,
 }) {
-  const isBiggerThanDesktop = useMediaQuery('(min-width: 1600px)');
-  const id = useMemo(() => uniqueId('checkbox_'), []);
   return (
     <Flex gap="10px" align="center">
-      <label htmlFor={id} className={classNames({ 'sr-only': !isBiggerThanDesktop })}>
-        Nominated
-      </label>
       <Checkbox
         disabled={selectingValidatorsDisabled}
         checked={nominatedByMe}
         onChange={() => toggleSelectedValidator(address)}
-        id={id}
         className={styles.checkbox}
       />
     </Flex>
