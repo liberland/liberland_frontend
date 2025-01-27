@@ -15,45 +15,55 @@ export const useModal = () => {
 };
 
 export function ModalProvider({ children }) {
-  const [modalContent, setModalContent] = useState(null);
-  const [modalProps, setModalProps] = useState({});
+  const [modals, setModals] = useState([]);
 
   const showModal = useCallback((content, props = {}) => {
-    setModalContent(content);
-    setModalProps(props);
+    const id = `${Date.now()}-${Math.random()}`;
+    setModals((prevModals) => [
+      ...prevModals,
+      { id, content, props },
+    ]);
+    return id;
   }, []);
 
-  const closeModal = useCallback(() => {
-    if (modalProps?.onClose) {
-      modalProps.onClose();
-    }
-    setModalContent(null);
-    setModalProps({});
-  }, [modalProps]);
+  const closeLastNModals = useCallback((n = 1) => {
+    setModals((prevModals) => prevModals.slice(0, -n));
+  }, []);
 
-  const contextValue = useMemo(
-    () => ({ showModal, closeModal }),
-    [showModal, closeModal],
-  );
+  const closeAllModals = useCallback(() => {
+    setModals([]);
+  }, []);
+
+  const contextValue = useMemo(() => ({
+    showModal,
+    closeLastNModals,
+    closeAllModals,
+  }), [showModal, closeLastNModals, closeAllModals]);
 
   return (
     <ModalContext.Provider value={contextValue}>
       {children}
-
-      <Modal
-        open={!!modalContent}
-        footer={null}
-        closable={!!modalProps?.onClose}
-        maskClosable
-        onCancel={closeModal}
-        {...modalProps}
-      >
-        {modalContent}
-      </Modal>
+      {modals.map(({ id, content, props }) => (
+        <Modal
+          key={id}
+          open
+          footer={null}
+          closable={!!props?.onClose}
+          maskClosable
+          onCancel={() => {
+            if (props?.onClose) props.onClose();
+            setModals((prevModals) => prevModals.filter((modal) => modal.id !== id));
+          }}
+          {...props}
+        >
+          {content}
+        </Modal>
+      ))}
     </ModalContext.Provider>
   );
 }
 
 ModalProvider.propTypes = {
   children: PropTypes.node.isRequired,
+  onClose: PropTypes.func.isRequired,
 };

@@ -9,16 +9,18 @@ import { walletActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import Table from '../../Table';
 import { formatCustom } from '../../../utils/walletHelpers';
-import CreateOrUpdateAssetFormModalWrapper from './CreateOrUpdateAssetForm';
-import ActionsMenuModalWrapper from './ActionsMenu';
 import { useStockContext } from '../StockContext';
 import styles from './styles.module.scss';
+import AssetsMenuModal from './AssetsModal/AssetsMenu';
+import CreateOrUpdateAssetModal from './AssetsModal/CreateOrUpdateAsset';
 
 function Assets() {
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
+  const additionalAssets = useSelector(
+    walletSelectors.selectorAdditionalAssets,
+  );
   const assetDetails = useSelector(walletSelectors.selectorAssetsDetails);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -39,15 +41,19 @@ function Assets() {
   const isBiggerThanLargeScreen = useMediaQuery('(min-width: 1025px)');
   const { isStock } = useStockContext();
   const formatted = useMemo(
-    () => additionalAssets?.map((asset, index) => (
-      {
+    () => additionalAssets
+      ?.map((asset, index) => ({
         ...asset,
         ...asset.metadata,
         ...assetDetails[index]?.identity,
         details: (
           <Popover
             content={(
-              <Descriptions className={styles.details} layout="vertical" size="small">
+              <Descriptions
+                className={styles.details}
+                layout="vertical"
+                size="small"
+              >
                 <Descriptions.Item label="Admin">
                   {assetDetails?.[index]?.admin}
                 </Descriptions.Item>
@@ -69,17 +75,15 @@ function Assets() {
                   {asset.metadata.symbol}
                 </Descriptions.Item>
               </Descriptions>
-            )}
+              )}
             title="Details"
             trigger="click"
           >
-            <Button>
-              Details
-            </Button>
+            <Button>Details</Button>
           </Popover>
         ),
         actions: (
-          <ActionsMenuModalWrapper
+          <AssetsMenuModal
             isAdmin={assetDetails?.[index]?.admin === userWalletAddress}
             isOwner={assetDetails?.[index]?.owner === userWalletAddress}
             isIssuer={assetDetails?.[index]?.issuer === userWalletAddress}
@@ -96,8 +100,8 @@ function Assets() {
             }}
           />
         ),
-      }
-    )).filter(({ isStock: assetIsStock }) => assetIsStock === isStock) || [],
+      }))
+      .filter(({ isStock: assetIsStock }) => assetIsStock === isStock) || [],
     [additionalAssets, assetDetails, userWalletAddress, isStock],
   );
 
@@ -120,39 +124,43 @@ function Assets() {
       </Paragraph>
       <Table
         data={formatted}
-        columns={isBiggerThanLargeScreen ? [
-          {
-            Header: 'Name',
-            accessor: 'name',
-          },
-          {
-            Header: 'Symbol',
-            accessor: 'symbol',
-          },
-          {
-            Header: 'Details',
-            accessor: 'details',
-          },
-          {
-            Header: 'Actions',
-            accessor: 'actions',
-          },
-        ] : [
-          {
-            Header: 'Symbol',
-            accessor: 'symbol',
-          },
-          {
-            Header: 'Owner',
-            accessor: 'owner',
-          },
-          {
-            Header: 'Actions',
-            accessor: 'actions',
-          },
-        ]}
+        columns={
+          isBiggerThanLargeScreen
+            ? [
+              {
+                Header: 'Name',
+                accessor: 'name',
+              },
+              {
+                Header: 'Symbol',
+                accessor: 'symbol',
+              },
+              {
+                Header: 'Details',
+                accessor: 'details',
+              },
+              {
+                Header: 'Actions',
+                accessor: 'actions',
+              },
+            ]
+            : [
+              {
+                Header: 'Symbol',
+                accessor: 'symbol',
+              },
+              {
+                Header: 'Owner',
+                accessor: 'owner',
+              },
+              {
+                Header: 'Actions',
+                accessor: 'actions',
+              },
+            ]
+        }
       />
-      <CreateOrUpdateAssetFormModalWrapper isCreate />
+      <CreateOrUpdateAssetModal isCreate />
     </>
   );
 }

@@ -4,40 +4,36 @@ import TextArea from 'antd/es/input/TextArea';
 import Title from 'antd/es/typography/Title';
 import Divider from 'antd/es/divider';
 import Space from 'antd/es/space';
-import Flex from 'antd/es/flex';
 import MinusCircleOutlined from '@ant-design/icons/MinusCircleOutlined';
 import PlusCircleOutlined from '@ant-design/icons/PlusCircleOutlined';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
-import { contractsActions } from '../../../redux/actions';
-import Button from '../../Button/Button';
-import InputSearch from '../../InputComponents/InputSearchAddressName';
-import { useModal } from '../../../context/modalContext';
+import { contractsActions } from '../../../../redux/actions';
+import Button from '../../../Button/Button';
+import InputSearch from '../../../InputComponents/InputSearchAddressName';
 
-export default function CreateContract({ isMyContracts }) {
+export default function CreateContract({ isMyContracts, onClose }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  const { closeModal } = useModal();
+
   const submit = (data) => {
-    dispatch(contractsActions.createContract.call({
-      data: data.contractData,
-      parties: data.parties,
-      isMyContracts,
-    }));
-    closeModal();
+    dispatch(
+      contractsActions.createContract.call({
+        data: data.contractData,
+        parties: data.parties,
+        isMyContracts,
+      }),
+    );
+    onClose();
   };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={submit}
-    >
+    <Form form={form} layout="vertical" onFinish={submit}>
       <Title level={3}>Create a new Contract</Title>
       <Form.Item
         name="contractData"
         label="Contract data"
-        rules={[{ required: true }]}
+        rules={[{ required: true, message: 'Contract data is required' }]}
       >
         <TextArea />
       </Form.Item>
@@ -49,13 +45,13 @@ export default function CreateContract({ isMyContracts }) {
                 <Form.Item
                   name={field.name}
                   label={`Party user ${index + 1}`}
+                  rules={[
+                    { required: true, message: 'Party user is required' },
+                  ]}
                 >
                   <InputSearch />
                 </Form.Item>
-                <Button
-                  onClick={() => remove(field.name)}
-                  red
-                >
+                <Button onClick={() => remove(field.name)} red>
                   <MinusCircleOutlined />
                   <Space />
                   Remove member
@@ -72,23 +68,17 @@ export default function CreateContract({ isMyContracts }) {
         )}
       </Form.List>
       <Divider />
-      <Flex wrap gap="15px">
-        <Button
-          onClick={closeModal}
-        >
-          Cancel
-        </Button>
-        <Button
-          primary
-          type="submit"
-        >
+      <Space>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button primary type="submit">
           Submit
         </Button>
-      </Flex>
+      </Space>
     </Form>
   );
 }
 
 CreateContract.propTypes = {
   isMyContracts: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
