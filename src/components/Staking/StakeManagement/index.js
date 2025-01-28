@@ -107,7 +107,7 @@ export default function StakeManagement() {
             unlock?.value && blocks && `${formatDollars(unlock?.value)} will unlock in ${blockTimeFormatted(blocks)}`
           )}
           actions={[
-            stakingInfo?.length > 1 && <Unbonding info={info} />,
+            stakingData?.length > 1 && <Unbonding info={info} />,
             <WithdrawUnbondedButton />,
           ].filter(Boolean)}
         />

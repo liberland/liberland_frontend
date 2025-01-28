@@ -1,5 +1,6 @@
 import React from 'react';
 import Flex from 'antd/es/flex';
+import classNames from 'classnames';
 import Checkbox from 'antd/es/checkbox';
 import PropTypes from 'prop-types';
 import styles from './styles.module.scss';
@@ -16,7 +17,7 @@ function Nominated({
         disabled={selectingValidatorsDisabled}
         checked={nominatedByMe}
         onChange={() => toggleSelectedValidator(address)}
-        className={styles.checkbox}
+        className={classNames('big-checkbox', styles.checkbox)}
       />
     </Flex>
   );

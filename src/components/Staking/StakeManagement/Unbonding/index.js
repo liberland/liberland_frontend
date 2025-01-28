@@ -24,7 +24,7 @@ function Unbonding({ info }) {
     }
   }, [dispatch, blockNumber, info]);
 
-  if (stakingData.length === 0 && (!stakingInfo?.redeemable || stakingInfo?.redeemable.lte(BN_ZERO))) {
+  if (stakingData.length === 0) {
     return null;
   }
 

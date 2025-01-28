@@ -91,7 +91,7 @@ export default function StakingOverview() {
           },
           info.stash && {
             key: 'nominator',
-            label: 'Nominators',
+            label: 'Validators',
             children: <Nominator />,
           },
         ].filter(Boolean)}

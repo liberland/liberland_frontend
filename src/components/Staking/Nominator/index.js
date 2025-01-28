@@ -1,16 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Button from 'antd/es/button';
-import Flex from 'antd/es/flex';
 import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
-import Alert from 'antd/es/alert';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList';
 import ValidatorListMobile from './ValidatorListMobile';
 import { walletActions } from '../../../redux/actions';
 import { areArraysSame } from '../../../utils/staking';
-import styles from './styles.module.scss';
 
 function Nominator() {
   const dispatch = useDispatch();
@@ -22,8 +18,6 @@ function Nominator() {
 
   const [selectedValidatorsAsTargets, setSelectedValidatorsAsTargets] = useState(nominatorTargets);
   const [isListSelectedValidatorsChanged, setIsListSelectedValidatorsChanged] = useState(false);
-  const [navigationAction, setNavigationAction] = useState();
-  const firstScrollTo = useRef();
 
   const isMaxNumValidatorsSelected = (selectedValidators) => selectedValidators.length > 15;
   const toggleSelectedValidator = (validatorAddress) => {
@@ -43,18 +37,12 @@ function Nominator() {
 
   const updateNominations = (newNominatorTargets) => {
     dispatch(walletActions.setNominatorTargets.call({ newNominatorTargets, walletAddress }));
-    setNavigationAction(undefined);
   };
 
   const goToAdvancedPage = () => {
     // eslint-disable-next-line max-len
     const stakingLink = `https://polkadotjs.blockchain.liberland.org/?rpc=${process.env.REACT_APP_NODE_ADDRESS}#/staking`;
     window.open(stakingLink);
-  };
-
-  const handleDiscardChanges = () => {
-    navigationAction?.();
-    setNavigationAction(undefined);
   };
 
   useEffect(() => {
@@ -85,8 +73,7 @@ function Nominator() {
         action();
         return true;
       }
-      setNavigationAction(() => action);
-      return false;
+      return window.confirm('You have unsaved changes. Are you sure you want to leave?');
     });
     return unblock;
   }, [history, isListSelectedValidatorsChanged]);
@@ -107,54 +94,24 @@ function Nominator() {
   }, [dispatch]);
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1600px)');
 
-  return (
-    <Flex vertical gap="20px">
-      {navigationAction && (
-        <Alert
-          type="warning"
-          className={styles.alert}
-          id="warning"
-          ref={(alertRef) => {
-            if (alertRef && firstScrollTo.current !== navigationAction) {
-              alertRef.nativeElement?.scrollIntoView({
-                behavior: 'smooth',
-              });
-              firstScrollTo.current = navigationAction;
-            }
-          }}
-          message="You have unsaved changes. What would you like to do with them?"
-          action={(
-            <Flex wrap gap="15px">
-              <Button onClick={handleDiscardChanges}>
-                Discard
-              </Button>
-              <Button primary onClick={() => updateNominations(selectedValidatorsAsTargets)}>
-                Apply
-              </Button>
-            </Flex>
-          )}
-        />
-      )}
-      {isBiggerThanDesktop ? (
-        <ValidatorList
-          validators={validators}
-          selectedValidatorsAsTargets={selectedValidatorsAsTargets}
-          selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
-          toggleSelectedValidator={toggleSelectedValidator}
-          goToAdvancedPage={goToAdvancedPage}
-          updateNominations={updateNominations}
-        />
-      ) : (
-        <ValidatorListMobile
-          validators={validators}
-          selectedValidatorsAsTargets={selectedValidatorsAsTargets}
-          selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
-          toggleSelectedValidator={toggleSelectedValidator}
-          goToAdvancedPage={goToAdvancedPage}
-          updateNominations={updateNominations}
-        />
-      )}
-    </Flex>
+  return isBiggerThanDesktop ? (
+    <ValidatorList
+      validators={validators}
+      selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+      selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+      toggleSelectedValidator={toggleSelectedValidator}
+      goToAdvancedPage={goToAdvancedPage}
+      updateNominations={updateNominations}
+    />
+  ) : (
+    <ValidatorListMobile
+      validators={validators}
+      selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+      selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+      toggleSelectedValidator={toggleSelectedValidator}
+      goToAdvancedPage={goToAdvancedPage}
+      updateNominations={updateNominations}
+    />
   );
 }
 
