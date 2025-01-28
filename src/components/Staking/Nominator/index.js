@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
+import Alert from 'antd/es/alert';
+import Flex from 'antd/es/flex';
+import WarningTwoTone from '@ant-design/icons/WarningTwoTone';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList';
 import ValidatorListMobile from './ValidatorListMobile';
@@ -94,24 +97,41 @@ function Nominator() {
   }, [dispatch]);
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1600px)');
 
-  return isBiggerThanDesktop ? (
-    <ValidatorList
-      validators={validators}
-      selectedValidatorsAsTargets={selectedValidatorsAsTargets}
-      selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
-      toggleSelectedValidator={toggleSelectedValidator}
-      goToAdvancedPage={goToAdvancedPage}
-      updateNominations={updateNominations}
-    />
-  ) : (
-    <ValidatorListMobile
-      validators={validators}
-      selectedValidatorsAsTargets={selectedValidatorsAsTargets}
-      selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
-      toggleSelectedValidator={toggleSelectedValidator}
-      goToAdvancedPage={goToAdvancedPage}
-      updateNominations={updateNominations}
-    />
+  return (
+    <Flex vertical gap="20px">
+      {!selectedValidatorsAsTargets?.length && (
+        <Alert
+          icon={<WarningTwoTone twoToneColor={['#243F5F', 'transparent']} />}
+          showIcon
+          type="warning"
+          message={(
+            <>
+              In order to receive staking rewards you need to nominate at least one validator.
+              See the list of active validators below.
+            </>
+          )}
+        />
+      )}
+      {isBiggerThanDesktop ? (
+        <ValidatorList
+          validators={validators}
+          selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+          selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+          toggleSelectedValidator={toggleSelectedValidator}
+          goToAdvancedPage={goToAdvancedPage}
+          updateNominations={updateNominations}
+        />
+      ) : (
+        <ValidatorListMobile
+          validators={validators}
+          selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+          selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+          toggleSelectedValidator={toggleSelectedValidator}
+          goToAdvancedPage={goToAdvancedPage}
+          updateNominations={updateNominations}
+        />
+      )}
+    </Flex>
   );
 }
 

@@ -165,12 +165,14 @@ CreateValidatorModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
 };
 
-export default function CreateValidatorModalWrapper() {
+export default function CreateValidatorModalWrapper({
+  label,
+}) {
   const [show, setShow] = useState();
   return (
     <>
-      <Button small primary onClick={() => setShow(true)}>
-        Start Validating
+      <Button primary onClick={() => setShow(true)}>
+        {label || 'Start Validating'}
       </Button>
       {show && (
         <ModalRoot onClose={() => setShow(false)}>
@@ -182,3 +184,7 @@ export default function CreateValidatorModalWrapper() {
     </>
   );
 }
+
+CreateValidatorModalWrapper.propTypes = {
+  label: PropTypes.string,
+};
