@@ -65,7 +65,7 @@ SetSessionKeysForm.propTypes = {
 
 function ButtonModal(props) {
   return (
-    <OpenModalButton text="Change session keys" {...props} />
+    <OpenModalButton primary text="Change session keys" {...props} />
   );
 }
 

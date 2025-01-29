@@ -168,7 +168,7 @@ CreateValidatorForm.propTypes = {
 
 function ButtonModal(props) {
   return (
-    <OpenModalButton text="Start Validating" {...props} />
+    <OpenModalButton small primary text="Start Validating" {...props} />
   );
 }
 
