@@ -10,11 +10,7 @@ export default function CreateValidatorButton() {
   const handleModalOpen = () => setIsModalOpen(!isModalOpen);
 
   if (info.stash) {
-    return (
-      <Button primary disabled>
-        Create Validator
-      </Button>
-    ); // stash exists - validator already created - use start/stop button instead
+    return null;
   }
 
   return (
