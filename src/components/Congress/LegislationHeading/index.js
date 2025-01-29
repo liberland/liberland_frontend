@@ -6,7 +6,7 @@ import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
 import dayjs from 'dayjs';
 
-function ReadOnlyLegislation({ section }) {
+function LegislationHeading({ section }) {
   return (
     <>
       <Form.Item name="tier" label="Legislation tier">
@@ -28,22 +28,22 @@ function ReadOnlyLegislation({ section }) {
         label="Legislation year"
         getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
       >
-        <DatePicker picker="year" disabled />
+        <DatePicker picker="year" />
       </Form.Item>
       <Form.Item name="index" label="Legislation Index">
-        <InputNumber controls={false} disabled />
+        <InputNumber controls={false} />
       </Form.Item>
       {typeof section === 'number' && (
         <Form.Item name="section" label="Legislation section">
-          <InputNumber controls={false} disabled />
+          <InputNumber controls={false} />
         </Form.Item>
       )}
     </>
   );
 }
 
-ReadOnlyLegislation.propTypes = {
+LegislationHeading.propTypes = {
   section: PropTypes.number,
 };
 
-export default ReadOnlyLegislation;
+export default LegislationHeading;

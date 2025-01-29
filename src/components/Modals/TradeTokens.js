@@ -25,7 +25,11 @@ import { formatAssets, parseAssets, sanitizeValue } from '../../utils/walletHelp
 import { useStockContext } from '../Wallet/StockContext';
 
 function TradeTokensModal({
-  closeModal, assets, isBuy,
+  closeModal,
+  assets,
+  isBuy,
+  name1,
+  name2,
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -263,11 +267,12 @@ function TradeTokensModal({
       <Form.Item
         name="amount1In"
         label={(
-          <>
-            Amount In
-            {' '}
-            {isBuy ? asset2ToShow : asset1ToShow}
-          </>
+          <Flex wrap gap="10px">
+            <div>
+              Amount In
+            </div>
+            {isBuy ? name2 : name1}
+          </Flex>
         )}
         extra={(
           <>
@@ -308,11 +313,12 @@ function TradeTokensModal({
       <Form.Item
         name="amountIn2"
         label={(
-          <>
-            Amount Out
-            {' '}
-            {!isBuy ? asset2ToShow : asset1ToShow}
-          </>
+          <Flex wrap gap="10px">
+            <div>
+              Amount Out
+            </div>
+            {isBuy ? name1 : name2}
+          </Flex>
         )}
         extra={(
           <>
@@ -384,6 +390,8 @@ TradeTokensModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
   isBuy: PropTypes.bool,
+  name1: PropTypes.node.isRequired,
+  name2: PropTypes.node.isRequired,
 };
 
 function TradeTokensModalWrapper({
@@ -391,6 +399,8 @@ function TradeTokensModalWrapper({
   isBuy,
   asset1ToShow,
   asset2ToShow,
+  name1,
+  name2,
 }) {
   const [show, setShow] = useState(false);
   return (
@@ -410,7 +420,13 @@ function TradeTokensModalWrapper({
       </Button>
       {show && (
         <ModalRoot>
-          <TradeTokensModal assets={assets} closeModal={() => setShow(false)} isBuy={isBuy} />
+          <TradeTokensModal
+            assets={assets}
+            closeModal={() => setShow(false)}
+            isBuy={isBuy}
+            name1={name1}
+            name2={name2}
+          />
         </ModalRoot>
       )}
     </>
@@ -422,6 +438,8 @@ TradeTokensModalWrapper.propTypes = {
   isBuy: PropTypes.bool,
   asset1ToShow: PropTypes.string.isRequired,
   asset2ToShow: PropTypes.string.isRequired,
+  name1: PropTypes.node.isRequired,
+  name2: PropTypes.node.isRequired,
 };
 
 export default TradeTokensModalWrapper;

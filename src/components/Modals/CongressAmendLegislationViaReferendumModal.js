@@ -12,7 +12,7 @@ import { congressActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
+import LegislationHeading from '../Congress/LegislationHeading';
 
 function CongressAmendLegislationViaReferendumModal({
   closeModal, tier, id, section,
@@ -31,13 +31,22 @@ function CongressAmendLegislationViaReferendumModal({
     fastTrack,
     fastTrackVotingPeriod,
     fastTrackEnactmentPeriod,
+    year,
+    index,
+    // eslint-disable-next-line no-shadow
+    tier,
+    // eslint-disable-next-line no-shadow
+    section,
   }) => {
     dispatch(congressActions.congressAmendLegislationViaReferendum.call({
       discussionName,
       discussionDescription,
       discussionLink,
       tier,
-      id,
+      id: {
+        year: year.year(),
+        index,
+      },
       section: section || null,
       content,
       fastTrack,
@@ -55,7 +64,7 @@ function CongressAmendLegislationViaReferendumModal({
       initialValues={{
         tier,
         year: dayjs(new Date(id.year, 0, 1)),
-        index: id.index,
+        index: parseInt(id.index) || 1,
         section,
         content: sectionContent,
         ...FastTrackDefaults,
@@ -66,7 +75,7 @@ function CongressAmendLegislationViaReferendumModal({
         {legislation.sections?.[section] ? 'amend legislation' : 'add legislation section'}
       </Title>
 
-      <ReadOnlyLegislation section={section} />
+      <LegislationHeading section={section} />
       <Form.Item name="content" label="Legislation content" rules={[{ required: true }]}>
         <TextArea />
       </Form.Item>

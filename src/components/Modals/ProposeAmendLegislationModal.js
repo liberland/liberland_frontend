@@ -12,7 +12,7 @@ import Button from '../Button/Button';
 import { democracyActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
+import LegislationHeading from '../Congress/LegislationHeading';
 
 function ProposeAmendLegislationModal({
   closeModal, tier, id, section,
@@ -28,6 +28,12 @@ function ProposeAmendLegislationModal({
     discussionDescription,
     discussionLink,
     content,
+    // eslint-disable-next-line no-shadow
+    tier,
+    index,
+    year,
+    // eslint-disable-next-line no-shadow
+    section,
   }) => {
     dispatch(
       democracyActions.proposeAmendLegislation.call({
@@ -35,7 +41,10 @@ function ProposeAmendLegislationModal({
         discussionDescription,
         discussionLink,
         tier,
-        id,
+        id: {
+          year: year.year(),
+          index,
+        },
         section,
         content,
       }),
@@ -50,7 +59,7 @@ function ProposeAmendLegislationModal({
       initialValues={{
         tier,
         year: dayjs(new Date(id.year, 0, 1)),
-        index: id.index,
+        index: parseInt(id.index) || 1,
         section,
         content: sectionContent,
       }}
@@ -63,7 +72,7 @@ function ProposeAmendLegislationModal({
           : 'add legislation section'}
       </Title>
 
-      <ReadOnlyLegislation section={section} />
+      <LegislationHeading section={section} />
       <Form.Item
         name="content"
         label="Legislation Content"

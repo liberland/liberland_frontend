@@ -10,7 +10,7 @@ import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { democracyActions } from '../../redux/actions';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
+import LegislationHeading from '../Congress/LegislationHeading';
 
 function CitizenRepealLegislationModal({
   closeModal, tier, id, section,
@@ -22,6 +22,8 @@ function CitizenRepealLegislationModal({
     discussionName,
     discussionDescription,
     discussionLink,
+    year,
+    index,
   }) => {
     dispatch(
       democracyActions.citizenProposeRepealLegislation.call({
@@ -29,7 +31,10 @@ function CitizenRepealLegislationModal({
         discussionDescription,
         discussionLink,
         tier,
-        id,
+        id: {
+          year: year.year(),
+          index,
+        },
         section: section || null,
       }),
     );
@@ -44,14 +49,14 @@ function CitizenRepealLegislationModal({
       initialValues={{
         tier,
         year: dayjs(new Date(id.year.toString(), 0, 1)),
-        index: id.index,
+        index: parseInt(id.index) || 1,
         section,
       }}
     >
       <Title level={3}>
         Propose referendum for legislation repeal
       </Title>
-      <ReadOnlyLegislation section={section} />
+      <LegislationHeading section={section} />
       <ProposalDiscussionFields />
       <Flex wrap gap="15px">
         <Button medium onClick={closeModal}>

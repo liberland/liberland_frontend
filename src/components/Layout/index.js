@@ -33,7 +33,12 @@ function Layout({ children }) {
       theme={{
         token: {
           colorText: '#243F5F',
-          fontSize: 15,
+          fontSize: 18,
+          fontSizeHeading5: 25,
+          fontSizeHeading4: 29,
+          fontSizeHeading3: 33,
+          fontSizeHeading2: 37,
+          fontSizeHeading1: 41,
           fontFamily: 'Open Sans',
         },
         components: {
@@ -89,7 +94,7 @@ function Layout({ children }) {
             headerBg: 'white',
             headerPadding: '8px 0',
             colorBorder: 'white',
-            fontSize: 16,
+            fontSize: 20,
             colorText: '#243F5F',
           },
           Card: {

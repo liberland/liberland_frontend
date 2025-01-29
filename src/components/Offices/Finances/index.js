@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Flex from 'antd/es/flex';
+import Spin from 'antd/es/spin';
+import Title from 'antd/es/typography/Title';
 import { officesActions, financesActions } from '../../../redux/actions';
 import { officesSelectors, financesSelectors } from '../../../redux/selectors';
 import Table from '../../Table';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import { palletIdToAddress } from '../../../utils/pallet';
+import CurrencyIcon from '../../CurrencyIcon';
 
 const DEFAULT_ACCOUNTS = [
   {
@@ -91,8 +95,8 @@ export default function Finances() {
   const formatPercent = (value) => `${Math.round(10000 * value) / 100}%`;
 
   return (
-    <>
-      <h3>Wallet addresses</h3>
+    <Flex vertical gap="20px">
+      <Title level={2}>Wallet addresses</Title>
       <Table
         columns={[
           {
@@ -115,14 +119,24 @@ export default function Finances() {
         data={accountsAddresses.map((a) => ({
           ...a,
           address: a.address,
-          llm: `${formatMerits(balances.LLM[a.address] ?? 0)} LLM`,
-          lld: `${formatDollars(balances.LLD[a.address] ?? 0)} LLD`,
+          llm: (
+            <Flex wrap gap="10px" align="center">
+              {formatMerits(balances.LLM[a.address] ?? 0)}
+              <CurrencyIcon size={20} symbol="LLM" />
+            </Flex>
+          ),
+          lld: (
+            <Flex wrap gap="10px" align="center">
+              {formatDollars(balances.LLD[a.address] ?? 0)}
+              <CurrencyIcon size={20} symbol="LLD" />
+            </Flex>
+          ),
         }))}
         noPagination
       />
-      <h3>Financial metrics</h3>
+      <Title level={2}>Financial metrics</Title>
       {financesLoading && (
-      <div>Loading...</div>
+        <Spin />
       )}
       {finances && (
       <Table
@@ -143,11 +157,21 @@ export default function Finances() {
           },
           {
             metric: 'Congress rewards from last week',
-            value: `${formatDollars(finances.lastWeekCongressRewards ?? 0)} LLD`,
+            value: (
+              <Flex wrap gap="10px" align="center">
+                {formatDollars(finances.lastWeekCongressRewards ?? 0)}
+                <CurrencyIcon size={20} symbol="LLD" />
+              </Flex>
+            ),
           },
           {
             metric: 'Staker rewards from last week',
-            value: `${formatDollars(finances.lastWeekStakersRewards ?? 0)} LLD`,
+            value: (
+              <Flex wrap gap="10px" align="center">
+                {formatDollars(finances.lastWeekStakersRewards ?? 0)}
+                <CurrencyIcon size={20} symbol="LLD" />
+              </Flex>
+            ),
           },
           {
             metric: 'Staker APY',
@@ -157,6 +181,6 @@ export default function Finances() {
         noPagination
       />
       )}
-    </>
+    </Flex>
   );
 }

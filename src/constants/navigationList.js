@@ -95,17 +95,11 @@ export const navigationList = [
     },
   },
   {
-    route: router.home.registries,
-    title: 'Registries',
+    route: router.home.profile,
+    title: 'Profile',
     icon: DocumentsIcon,
-    isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED === 'true',
-    subLinks: {
-      Overview: router.registries.overview,
-      'All companies': router.registries.allCompanies,
-      Land: router.registries.land,
-      Assets: router.registries.assets,
-      Other: router.registries.other,
-    },
+    isDiscouraged: process.env.REACT_APP_IS_PROFILE_DISCOURAGED === 'true',
+    subLinks: {},
   },
   {
     route: router.home.staking,
@@ -134,9 +128,23 @@ export const navigationList = [
     },
   },
   {
+    route: router.home.registries,
+    title: 'Registries',
+    icon: WalletIcon,
+    isGovt: true,
+    isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED === 'true',
+    subLinks: {
+      Overview: router.registries.overview,
+      'All companies': router.registries.allCompanies,
+      Land: router.registries.land,
+      Assets: router.registries.assets,
+      Other: router.registries.other,
+    },
+  },
+  {
     route: router.home.congress,
     title: 'Congress',
-    icon: WalletIcon,
+    icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
@@ -151,7 +159,7 @@ export const navigationList = [
   {
     route: router.home.senate,
     title: 'Senate',
-    icon: DocumentsIcon,
+    icon: WalletIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
