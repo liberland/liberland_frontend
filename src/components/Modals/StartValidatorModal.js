@@ -31,7 +31,7 @@ function StartValidatorModal({
       form={form}
       layout="vertical"
       initialValues={{
-        commission: '10',
+        commission: '20',
         allow_nominations: true,
       }}
       onFinish={onSubmit}
@@ -42,6 +42,7 @@ function StartValidatorModal({
         label="Reward commission percentage"
         extra="The commission is deducted from all rewards before the remainder is split with nominators."
         rules={[{ required: true }, { min: 0 }, { max: 100 }]}
+        name="commission"
       >
         <InputNumber controls={false} />
       </Form.Item>

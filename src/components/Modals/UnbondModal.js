@@ -53,7 +53,7 @@ function UnbondModal({
       form={form}
       layout="vertical"
       initialValues={{
-        unbondValue: formatDollars(maxUnbond),
+        unbondValue: formatDollars(maxUnbond).replaceAll(',', ''),
       }}
     >
       <Title level={3}>Unstake LLD</Title>

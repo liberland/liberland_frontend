@@ -1,44 +1,78 @@
-import React from 'react';
-import Card from 'antd/es/card';
+import React, { useEffect } from 'react';
 import Flex from 'antd/es/flex';
-import { useDispatch } from 'react-redux';
+import Row from 'antd/es/row';
+import Collapse from 'antd/es/collapse';
+import Col from 'antd/es/col';
+import { useMediaQuery } from 'usehooks-ts';
+import { useDispatch, useSelector } from 'react-redux';
 import Slashes from './Slashes';
 import Status from './Status';
-import NominatorsList from './NominatorsList';
+import NominatedByList from './NominatedByList';
 import Stats from './Stats';
-import StartStopButton from './StartStopButton';
-import CreateValidatorButton from './CreateValidatorButton';
-import SetSessionKeysModalWrapper from '../../Modals/SetSessionKeysModal';
 import styles from './styles.module.scss';
 import { validatorActions } from '../../../redux/actions';
+import MoneyCard from '../../MoneyCard';
+import { validatorSelectors } from '../../../redux/selectors';
 
 export default function Overview() {
   const dispatch = useDispatch();
-  const onSubmit = ({ keys }) => {
-    dispatch(validatorActions.setSessionKeys.call({ keys }));
-  };
+  const info = useSelector(validatorSelectors.info);
+  const nominators = useSelector(validatorSelectors.nominators);
+
+  useEffect(() => {
+    dispatch(validatorActions.getNominators.call());
+  }, [dispatch]);
+
+  const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
+  const appliedSlashes = useSelector(validatorSelectors.appliedSlashes);
+  const unappliedSlashes = useSelector(validatorSelectors.unappliedSlashes);
 
   return (
-    <Card
-      title="Validator status"
-      extra={<Status />}
-      cover={(
-        <Stats />
+    <Flex vertical gap="20px">
+      <Row gutter={16} className={styles.row}>
+        <Col span={isLargerThanHdScreen ? 12 : 24}>
+          <MoneyCard
+            title="My validator status"
+            amount={<Status />}
+            description={info.isNextSessionValidator && 'Scheduled for next session'}
+          />
+        </Col>
+        <Col span={isLargerThanHdScreen ? 12 : 24}>
+          <MoneyCard
+            title="Nominated by"
+            amount={`${nominators?.length || 0} nominators`}
+            description={nominators?.length ? 'See list of nominators below' : undefined}
+          />
+        </Col>
+      </Row>
+      {nominators?.length && (
+        <Collapse
+          defaultActiveKey={['by', 'staking']}
+          items={[
+            {
+              key: 'by',
+              label: 'Nominated by',
+              children: (
+                <NominatedByList />
+              ),
+            },
+            {
+              key: 'staking',
+              label: 'Staking rewards',
+              children: (
+                <Stats />
+              ),
+            },
+            (appliedSlashes?.length || unappliedSlashes?.length) && {
+              key: 'slash',
+              label: 'Slashes',
+              children: (
+                <Slashes />
+              ),
+            },
+          ].filter(Boolean)}
+        />
       )}
-      actions={[
-        <Flex wrap gap="15px" justify="end" className={styles.actions}>
-          <CreateValidatorButton />
-          <SetSessionKeysModalWrapper onSubmit={onSubmit} />
-          <StartStopButton />
-        </Flex>,
-      ]}
-    >
-      <Card.Meta
-        description={(
-          <NominatorsList />
-        )}
-      />
-      <Slashes />
-    </Card>
+    </Flex>
   );
 }

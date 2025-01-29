@@ -2,15 +2,13 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
-import Card from 'antd/es/card';
 import Avatar from 'antd/es/avatar';
-import Flex from 'antd/es/flex';
-import Title from 'antd/es/typography/Title';
 import { useMediaQuery } from 'usehooks-ts';
 import { formatAssets } from '../../../utils/walletHelpers';
 import SendAssetModalWrapper from '../../Modals/SendAssetModal';
 import { getAvatarParameters } from '../../../utils/avatar';
 import styles from './styles.module.scss';
+import MoneyCard from '../../MoneyCard';
 
 function AssetOverview({
   additionalAssets,
@@ -27,28 +25,16 @@ function AssetOverview({
   const renderItem = (assetData) => {
     const { color, text } = getAvatarParameters(assetData.metadata.name || 'A');
     return (
-      <Card
+      <MoneyCard
         actions={!isCongress || userIsMember ? [
-          <Flex wrap justify="start">
-            <SendAssetModalWrapper
-              isRemarkNeeded={isRemarkNeeded}
-              assetData={assetData}
-              officeType={officeType}
-            />
-          </Flex>,
+          <SendAssetModalWrapper
+            isRemarkNeeded={isRemarkNeeded}
+            assetData={assetData}
+            officeType={officeType}
+          />,
         ] : undefined}
-        size="small"
-        className={styles.card}
-      >
-        <Card.Meta
-          title={(
-            <span className={styles.name}>
-              {assetData.metadata.name}
-            </span>
-          )}
-        />
-        <Flex wrap gap="5px" align="center">
-          <Title level={5} className={styles.title}>
+        amount={(
+          <>
             {formatAssets(
               assetData.balance?.balance || '0',
               assetData.metadata.decimals,
@@ -56,12 +42,20 @@ function AssetOverview({
             )}
             {' '}
             {assetData.metadata.symbol}
-          </Title>
+          </>
+        )}
+        title={(
+          <span className={styles.name}>
+            {assetData.metadata.name}
+          </span>
+        )}
+        alt={assetData.metadata.symbol}
+        icon={(
           <Avatar style={{ backgroundColor: color, fontSize: 12 }} alt={assetData.metadata.symbol} size={22}>
             {text}
           </Avatar>
-        </Flex>
-      </Card>
+        )}
+      />
     );
   };
 

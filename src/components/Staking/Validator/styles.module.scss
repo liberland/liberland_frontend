@@ -1,3 +1,8 @@
-.actions {
-  padding-right: 15px;
+@import '../../../assets/main.scss';
+
+.row {
+  gap: 20px;
+  @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
+    gap: 0;
+  }
 }
