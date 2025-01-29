@@ -5,18 +5,25 @@ import { BN, BN_HUNDRED, BN_MILLION } from '@polkadot/util';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
-import ModalRoot from '../ModalRoot';
 import Button from '../../Button/Button';
 import MinusIcon from '../../../assets/icons/minus.svg';
-import { calculatePooled, getDecimalsForAsset } from '../../../utils/dexFormatter';
-import { AssetsPropTypes, ReservedAssetPropTypes } from '../../Wallet/Exchange/proptypes';
+import {
+  calculatePooled,
+  getDecimalsForAsset,
+} from '../../../utils/dexFormatter';
+import {
+  AssetsPropTypes,
+  ReservedAssetPropTypes,
+} from '../../Wallet/Exchange/proptypes';
 import { dexActions } from '../../../redux/actions';
 import { blockchainSelectors, dexSelectors } from '../../../redux/selectors';
 import { calculateAmountMin, formatAssets } from '../../../utils/walletHelpers';
 import styles from '../styles.module.scss';
+import modalWrapper from '../components/ModalWrapper';
+import OpenModalButton from '../components/OpenModalButton';
 
-function RemoveLiquidityModal({
-  closeModal,
+function RemoveLiquidityForm({
+  onClose,
   assets,
   reserved,
   lpTokensBalance,
@@ -25,15 +32,12 @@ function RemoveLiquidityModal({
   const [form] = Form.useForm();
   const [loading, setLoading] = useState();
   const dispatch = useDispatch();
-  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const userWalletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
   const withdrawalFee = useSelector(dexSelectors.selectorWithdrawalFee);
   const {
-    asset1,
-    asset2,
-    assetData1,
-    assetData2,
-    asset1ToShow,
-    asset2ToShow,
+    asset1, asset2, assetData1, assetData2, asset1ToShow, asset2ToShow,
   } = assets;
   const [asset1Amount, setAsset1Amount] = useState(0);
   const [asset2Amount, setAsset2Amount] = useState(0);
@@ -42,16 +46,39 @@ function RemoveLiquidityModal({
   const decimals1 = getDecimalsForAsset(asset1, assetData1?.decimals);
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
 
-  const calculateAssetToBurn = React.useCallback((numberValue) => {
-    const tokensToBurn = new BN(lpTokensBalance).mul(new BN(numberValue)).div(BN_HUNDRED);
-    setTokensToBurnState(tokensToBurn);
-    const fee = new BN(withdrawalFee);
-    const calculatedAmount1 = calculatePooled(tokensToBurn, liquidity, reserved.asset1);
-    const calculatedAmount2 = calculatePooled(tokensToBurn, liquidity, reserved.asset2);
-    const asset1Data = calculatedAmount1.sub(calculatedAmount1.mul(fee).div(BN_MILLION));
-    const asset2Data = calculatedAmount2.sub(calculatedAmount2.mul(fee).div(BN_MILLION));
-    return { asset1Data, asset2Data };
-  }, [liquidity, lpTokensBalance, reserved.asset1, reserved.asset2, withdrawalFee]);
+  const calculateAssetToBurn = React.useCallback(
+    (numberValue) => {
+      const tokensToBurn = new BN(lpTokensBalance)
+        .mul(new BN(numberValue))
+        .div(BN_HUNDRED);
+      setTokensToBurnState(tokensToBurn);
+      const fee = new BN(withdrawalFee);
+      const calculatedAmount1 = calculatePooled(
+        tokensToBurn,
+        liquidity,
+        reserved.asset1,
+      );
+      const calculatedAmount2 = calculatePooled(
+        tokensToBurn,
+        liquidity,
+        reserved.asset2,
+      );
+      const asset1Data = calculatedAmount1.sub(
+        calculatedAmount1.mul(fee).div(BN_MILLION),
+      );
+      const asset2Data = calculatedAmount2.sub(
+        calculatedAmount2.mul(fee).div(BN_MILLION),
+      );
+      return { asset1Data, asset2Data };
+    },
+    [
+      liquidity,
+      lpTokensBalance,
+      reserved.asset1,
+      reserved.asset2,
+      withdrawalFee,
+    ],
+  );
 
   const onSubmit = async () => {
     setLoading(true);
@@ -59,8 +86,8 @@ function RemoveLiquidityModal({
       const amount1MinReceive = calculateAmountMin(asset1Amount);
       const amount2MinReceive = calculateAmountMin(asset2Amount);
       const withdrawTo = userWalletAddress;
-      dispatch(dexActions.removeLiquidity.call(
-        {
+      dispatch(
+        dexActions.removeLiquidity.call({
           asset1,
           asset2,
           lpTokenBurn: tokensToBurnState,
@@ -68,9 +95,9 @@ function RemoveLiquidityModal({
           amount2MinReceive,
           userWalletAddress,
           withdrawTo,
-        },
-      ));
-      closeModal();
+        }),
+      );
+      onClose();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -96,11 +123,7 @@ function RemoveLiquidityModal({
   }, [calculateAssetToBurn, lpTokenBurn]);
 
   return (
-    <Form
-      onFinish={onSubmit}
-      form={form}
-      layout="vertical"
-    >
+    <Form onFinish={onSubmit} form={form} layout="vertical">
       <Form.Item
         name="lpTokenBurn"
         label="Remove liquidity for pair"
@@ -114,20 +137,18 @@ function RemoveLiquidityModal({
             <div>
               Pooled
               {' '}
-              {formatAssets(
-                asset1Amount,
-                decimals1,
-                { symbol: asset1ToShow, withAll: true },
-              )}
+              {formatAssets(asset1Amount, decimals1, {
+                symbol: asset1ToShow,
+                withAll: true,
+              })}
             </div>
             <div>
               Pooled
               {' '}
-              {formatAssets(
-                asset2Amount,
-                decimals2,
-                { symbol: asset2ToShow, withAll: true },
-              )}
+              {formatAssets(asset2Amount, decimals2, {
+                symbol: asset2ToShow,
+                withAll: true,
+              })}
             </div>
           </Flex>
         )}
@@ -145,7 +166,7 @@ function RemoveLiquidityModal({
       </Form.Item>
 
       <Flex gap="15px" wrap>
-        <Button onClick={closeModal} disabled={loading}>
+        <Button onClick={onClose} disabled={loading}>
           Cancel
         </Button>
         <Button disabled={isPercentZero || loading} primary type="submit">
@@ -158,8 +179,8 @@ function RemoveLiquidityModal({
   );
 }
 
-RemoveLiquidityModal.propTypes = {
-  closeModal: PropsTypes.func.isRequired,
+RemoveLiquidityForm.propTypes = {
+  onClose: PropsTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
   reserved: ReservedAssetPropTypes,
   // eslint-disable-next-line react/forbid-prop-types
@@ -168,41 +189,14 @@ RemoveLiquidityModal.propTypes = {
   liquidity: PropsTypes.object.isRequired,
 };
 
-function RemoveLiquidityModalWrapper({
-  assets,
-  reserved,
-  lpTokensBalance,
-  liquidity,
-}) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button onClick={() => setShow(true)}>
-        Remove Liquidity
-        <img src={MinusIcon} className={styles.backIcon} alt="button icon" />
-      </Button>
-      {show && (
-        <ModalRoot>
-          <RemoveLiquidityModal
-            assets={assets}
-            closeModal={() => setShow(false)}
-            liquidity={liquidity}
-            lpTokensBalance={lpTokensBalance}
-            reserved={reserved}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text="Remove Liquidity" {...props}>
+      <img src={MinusIcon} className={styles.backIcon} alt="button icon" />
+    </OpenModalButton>
   );
 }
 
-RemoveLiquidityModalWrapper.propTypes = {
-  assets: AssetsPropTypes.isRequired,
-  reserved: ReservedAssetPropTypes,
-  // eslint-disable-next-line react/forbid-prop-types
-  lpTokensBalance: PropsTypes.object.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  liquidity: PropsTypes.object.isRequired,
-};
+const RemoveLiquidityModal = modalWrapper(RemoveLiquidityForm, ButtonModal);
 
-export default RemoveLiquidityModalWrapper;
+export default RemoveLiquidityModal;

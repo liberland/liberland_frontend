@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -7,12 +7,13 @@ import Flex from 'antd/es/flex';
 import Input from 'antd/es/input';
 import Select from 'antd/es/select';
 import { useDispatch, useSelector } from 'react-redux';
-import ModalRoot from '../ModalRoot';
 import Button from '../../Button/Button';
 import { blockchainSelectors } from '../../../redux/selectors';
 import { nftsActions } from '../../../redux/actions';
+import OpenModalButton from '../components/OpenModalButton';
+import modalWrapper from '../components/ModalWrapper';
 
-function SetAttributeModal({ closeModal, collectionId, itemId }) {
+function SetAttributeForm({ onClose, collectionId, itemId }) {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const dispatch = useDispatch();
 
@@ -23,7 +24,7 @@ function SetAttributeModal({ closeModal, collectionId, itemId }) {
     dispatch(nftsActions.setAttributesNft.call({
       collectionId, itemId, namespace, key, value, walletAddress,
     }));
-    closeModal();
+    onClose();
   };
 
   return (
@@ -58,7 +59,7 @@ function SetAttributeModal({ closeModal, collectionId, itemId }) {
         <Input placeholder="Enter value for attribute" />
       </Form.Item>
       <Flex wrap gap="15px">
-        <Button onClick={closeModal}>
+        <Button onClick={onClose}>
           Cancel
         </Button>
         <Button primary type="submit">
@@ -69,41 +70,16 @@ function SetAttributeModal({ closeModal, collectionId, itemId }) {
   );
 }
 
-SetAttributeModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+SetAttributeForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   collectionId: PropTypes.string.isRequired,
   itemId: PropTypes.string.isRequired,
 };
 
-function SetAttributeModalWrapper({
-  collectionId,
-  itemId,
-}) {
-  const [show, setShow] = useState();
-  return (
-    <>
-      <Button
-        onClick={() => setShow(true)}
-        primary
-      >
-        Set Attribute
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <SetAttributeModal
-            closeModal={() => setShow(false)}
-            collectionId={collectionId}
-            itemId={itemId}
-          />
-        </ModalRoot>
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  return <OpenModalButton primary text="Set Attribute" {...props} />;
 }
 
-SetAttributeModalWrapper.propTypes = {
-  collectionId: PropTypes.string.isRequired,
-  itemId: PropTypes.string.isRequired,
-};
+const SetAttributeModal = modalWrapper(SetAttributeForm, ButtonModal);
 
-export default SetAttributeModalWrapper;
+export default SetAttributeModal;

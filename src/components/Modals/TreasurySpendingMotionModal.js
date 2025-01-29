@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -7,13 +7,14 @@ import Flex from 'antd/es/flex';
 import InputNumber from 'antd/es/input-number';
 import { useDispatch } from 'react-redux';
 import { BN_ZERO, BN } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
 import { parseDollars } from '../../utils/walletHelpers';
 import InputSearch from '../InputComponents/InputSearchAddressName';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function TreasurySpendingMotionModal({ closeModal, budget }) {
+function TreasurySpendingMotionForm({ onClose, budget }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
@@ -24,7 +25,7 @@ function TreasurySpendingMotionModal({ closeModal, budget }) {
         transferAmount: parseDollars(transferAmount),
       }),
     );
-    closeModal();
+    onClose();
   };
 
   const validateUnbondValue = (_, textUnbondValue) => {
@@ -67,7 +68,7 @@ function TreasurySpendingMotionModal({ closeModal, budget }) {
         <InputNumber stringMode controls={false} />
       </Form.Item>
       <Flex wrap gap="15px">
-        <Button medium onClick={closeModal}>
+        <Button medium onClick={onClose}>
           Cancel
         </Button>
         <Button primary medium type="submit">
@@ -78,29 +79,22 @@ function TreasurySpendingMotionModal({ closeModal, budget }) {
   );
 }
 
-TreasurySpendingMotionModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+TreasurySpendingMotionForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   budget: PropTypes.instanceOf(BN).isRequired,
 };
 
-export default function TreasurySpendingMotionModalWrapper({
-  budget,
-}) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button primary onClick={() => setShow(true)}>
-        Propose spend
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <TreasurySpendingMotionModal budget={budget} closeModal={() => setShow(false)} />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton primary text="Propose spend" {...props} />
   );
 }
 
-TreasurySpendingMotionModalWrapper.propTypes = {
-  budget: PropTypes.instanceOf(BN).isRequired,
+ButtonModal.propTypes = {
+  label: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
 };
+
+const TreasurySpendingMotionModal = modalWrapper(TreasurySpendingMotionForm, ButtonModal);
+
+export default TreasurySpendingMotionModal;

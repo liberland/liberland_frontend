@@ -7,12 +7,13 @@ import PropTypes from 'prop-types';
 import { useStockContext } from '../../StockContext';
 import { createNewPool } from '../../../../api/nodeRpcCall';
 import Button from '../../../Button/Button';
-import ModalRoot from '../../../Modals/ModalRoot';
 import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
 import { walletActions, dexActions } from '../../../../redux/actions';
 import { ExchangeItemPropTypes } from '../proptypes';
+import OpenModalButton from '../../../Modals/components/OpenModalButton';
+import modalWrapper from '../../../Modals/components/ModalWrapper';
 
-function AddAssetFormDisplay({
+function AddAssetForm({
   poolsData,
   onClose,
 }) {
@@ -187,27 +188,17 @@ function AddAssetFormDisplay({
   );
 }
 
-AddAssetFormDisplay.propTypes = {
+AddAssetForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   poolsData: PropTypes.arrayOf(
     PropTypes.shape(ExchangeItemPropTypes).isRequired,
   ).isRequired,
 };
 
-function AddAssetForm(props) {
-  const [show, setShow] = useState();
-  return (
-    <>
-      <Button primary medium onClick={() => setShow(true)}>
-        Create pool
-      </Button>
-      {show && (
-        <ModalRoot>
-          <AddAssetFormDisplay {...props} onClose={() => setShow(false)} />
-        </ModalRoot>
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  return <OpenModalButton text="Create pool" medium primary {...props} />;
 }
 
-export default AddAssetForm;
+const AddAssetModal = modalWrapper(AddAssetForm, ButtonModal);
+
+export default AddAssetModal;

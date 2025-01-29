@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Flex from 'antd/es/flex';
 import PropTypes from 'prop-types';
@@ -19,9 +19,19 @@ import {
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
 import NextBlockCountdown from './NextBlockCountdown';
-import ModalRoot from '../Modals/ModalRoot';
+import { useModal } from '../../context/modalContext';
+
+function LoadingModal() {
+  return (
+    <Flex justify="center" align="center">
+      <NextBlockCountdown />
+    </Flex>
+  );
+}
 
 function Loader({ children }) {
+  const { showModal, closeLastNModals } = useModal();
+
   const isGettingWalletInfo = useSelector(walletSelectors.selectorGettingWalletInfo);
   const isGettingDemocracyInfo = useSelector(democracySelectors.selectorGettingDemocracyInfo);
   const isLoadingOffices = useSelector(officesSelectors.selectorIsLoading);
@@ -52,19 +62,18 @@ function Loader({ children }) {
     isLoadingMinistryFinance,
   ].some((isFetching) => isFetching);
 
+  useEffect(() => {
+    if (isLoading) {
+      showModal(<LoadingModal />);
+    } else {
+      closeLastNModals(1);
+    }
+  }, [isLoading, showModal, closeLastNModals]);
+
   return (
-    <>
-      {isLoading && (
-        <ModalRoot>
-          <Flex justify="center" align="center">
-            <NextBlockCountdown />
-          </Flex>
-        </ModalRoot>
-      )}
-      <ErrorModal>
-        {children}
-      </ErrorModal>
-    </>
+    <ErrorModal>
+      {children}
+    </ErrorModal>
   );
 }
 

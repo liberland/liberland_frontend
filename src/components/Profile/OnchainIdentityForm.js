@@ -10,7 +10,6 @@ import DatePicker from 'antd/es/date-picker';
 import Flex from 'antd/es/flex';
 import Select from 'antd/es/select';
 import dayjs from 'dayjs';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import {
@@ -20,9 +19,9 @@ import {
   decodeAndFilter,
 } from '../../utils/identityParser';
 
-function OnchainIdentityModal({
+function OnchainIdentityForm({
   onSubmit,
-  closeModal,
+  onClose,
   identity,
   blockNumber,
   name,
@@ -159,7 +158,7 @@ function OnchainIdentityModal({
         />
       </Paragraph>
       <Flex wrap gap="15px">
-        <Button className={styles.button} onClick={closeModal}>
+        <Button className={styles.button} onClick={onClose}>
           Cancel
         </Button>
         <Button className={styles.button} primary type="submit">
@@ -170,9 +169,9 @@ function OnchainIdentityModal({
   );
 }
 
-OnchainIdentityModal.propTypes = {
+OnchainIdentityForm.propTypes = {
   onSubmit: PropTypes.func.isRequired,
-  closeModal: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
   identity: PropTypes.shape({
     isSome: PropTypes.bool.isRequired,
     unwrap: PropTypes.func.isRequired,
@@ -181,35 +180,4 @@ OnchainIdentityModal.propTypes = {
   name: PropTypes.string.isRequired,
 };
 
-function OnchainIdentityModalWrapper({
-  onSubmit,
-  closeModal,
-  identity,
-  blockNumber,
-  name,
-}) {
-  return (
-    <ModalRoot onClose={closeModal}>
-      <OnchainIdentityModal
-        blockNumber={blockNumber}
-        closeModal={closeModal}
-        identity={identity}
-        name={name}
-        onSubmit={onSubmit}
-      />
-    </ModalRoot>
-  );
-}
-
-OnchainIdentityModalWrapper.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-  closeModal: PropTypes.func.isRequired,
-  identity: PropTypes.shape({
-    isSome: PropTypes.bool.isRequired,
-    unwrap: PropTypes.func.isRequired,
-  }).isRequired,
-  blockNumber: PropTypes.number.isRequired,
-  name: PropTypes.string.isRequired,
-};
-
-export default OnchainIdentityModalWrapper;
+export default OnchainIdentityForm;

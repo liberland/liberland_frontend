@@ -1,18 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
-import ModalRoot from '../../Modals/ModalRoot';
+import modalWrapper from '../../Modals/components/ModalWrapper';
 
 export function GuidedSetupWrapper({ children }) {
   return (
-    <ModalRoot>
-      <Flex justify="center" align="center">
-        {children}
-      </Flex>
-    </ModalRoot>
+    <Flex justify="center" align="center">
+      {children}
+    </Flex>
   );
 }
 
 GuidedSetupWrapper.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+const GuidedSetupModal = modalWrapper(GuidedSetupWrapper);
+
+export default GuidedSetupModal;

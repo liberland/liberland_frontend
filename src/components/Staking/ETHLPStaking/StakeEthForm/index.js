@@ -6,7 +6,6 @@ import Flex from 'antd/es/flex';
 import InputNumber from 'antd/es/input-number';
 import Slider from 'antd/es/slider';
 import PropTypes from 'prop-types';
-import ModalRoot from '../../../Modals/ModalRoot';
 import { ethSelectors } from '../../../../redux/selectors';
 import { ethActions } from '../../../../redux/actions';
 import Button from '../../../Button/Button';
@@ -15,6 +14,8 @@ import {
   parseAssets as parseAssetsUnsafe,
 } from '../../../../utils/walletHelpers';
 import styles from './styles.module.scss';
+import OpenModalButton from '../../../Modals/components/OpenModalButton';
+import modalWrapper from '../../../Modals/components/ModalWrapper';
 
 const formatCustom = (value) => {
   try {
@@ -206,20 +207,17 @@ StakeEthForm.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-function StakeEthFormModalWrapper(props) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <div className={styles.modal}>
-      <Button primary medium onClick={() => setShow(true)}>
-        Stake ETH & LLD
-      </Button>
-      {show && (
-        <ModalRoot>
-          <StakeEthForm {...props} onClose={() => setShow(false)} />
-        </ModalRoot>
-      )}
-    </div>
+    <OpenModalButton primary medium text="Stake ETH & LLD" {...props} />
   );
 }
 
-export default StakeEthFormModalWrapper;
+ButtonModal.propTypes = {
+  label: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
+};
+
+const StakeEthFormModal = modalWrapper(StakeEthForm, ButtonModal);
+
+export default StakeEthFormModal;

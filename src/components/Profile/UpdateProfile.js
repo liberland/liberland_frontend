@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { blockchainSelectors } from '../../redux/selectors';
 import { identityActions } from '../../redux/actions';
-import { OnchainIdentityModal } from '../Modals';
-import Button from '../Button/Button';
+import OnchainIdentityForm from './OnchainIdentityForm';
+import OpenModalButton from '../Modals/components/OpenModalButton';
+import modalWrapper from '../Modals/components/ModalWrapper';
 
 function UpdateProfile({
-  closeModal,
+  onClose,
   userName,
   lastName,
   identity,
@@ -47,7 +48,7 @@ function UpdateProfile({
     dispatch(
       identityActions.setIdentity.call({ userWalletAddress, values: params, isGuidedUpdate }),
     );
-    closeModal();
+    onClose();
   };
 
   if (!identity || !blockNumber) {
@@ -55,8 +56,8 @@ function UpdateProfile({
   }
 
   return (
-    <OnchainIdentityModal
-      closeModal={closeModal}
+    <OnchainIdentityForm
+      onClose={onClose}
       onSubmit={handleSubmitOnchainIdentity}
       identity={identity}
       blockNumber={blockNumber}
@@ -73,7 +74,7 @@ UpdateProfile.defaultProps = {
 
 UpdateProfile.propTypes = {
   isGuidedUpdate: PropTypes.bool,
-  closeModal: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
   userName: PropTypes.string,
   lastName: PropTypes.string,
   identity: PropTypes.shape({
@@ -83,46 +84,10 @@ UpdateProfile.propTypes = {
   blockNumber: PropTypes.number.isRequired,
 };
 
-function UpdateProfileWrapper({
-  userName,
-  lastName,
-  identity,
-  blockNumber,
-  isGuidedUpdate,
-}) {
-  const [show, setShow] = useState();
-
-  return (
-    <>
-      <Button
-        primary
-        onClick={() => setShow(true)}
-      >
-        Update identity
-      </Button>
-      {show && (
-        <UpdateProfile
-          blockNumber={blockNumber}
-          closeModal={() => setShow(false)}
-          identity={identity}
-          isGuidedUpdate={isGuidedUpdate}
-          lastName={lastName}
-          userName={userName}
-        />
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  return <OpenModalButton primary text="Update identity" {...props} />;
 }
 
-UpdateProfileWrapper.propTypes = {
-  isGuidedUpdate: PropTypes.bool,
-  userName: PropTypes.string,
-  lastName: PropTypes.string,
-  identity: PropTypes.shape({
-    isSome: PropTypes.bool.isRequired,
-    unwrap: PropTypes.func.isRequired,
-  }).isRequired,
-  blockNumber: PropTypes.number.isRequired,
-};
+const UpdateProfileModal = modalWrapper(UpdateProfile, ButtonModal);
 
-export default UpdateProfileWrapper;
+export default UpdateProfileModal;

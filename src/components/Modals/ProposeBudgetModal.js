@@ -8,7 +8,6 @@ import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
 import { congressSelectors } from '../../redux/selectors';
@@ -17,13 +16,15 @@ import { extractItemsFromObject } from '../../utils/council/councilHelper';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
 const defaultValueSpending = {
   select: 'LLD',
 };
 
-function ProposeBudgetModal({
-  closeModal,
+function ProposeBudgetForm({
+  onClose,
 }) {
   const dispatch = useDispatch();
   const allBalance = useSelector(congressSelectors.allBalance);
@@ -47,7 +48,7 @@ function ProposeBudgetModal({
   const onSubmit = async (data) => {
     const budgetProposalItems = extractItemsFromObject(data.spendings, optionsInputDefault);
     dispatch(congressActions.congressBudgetPropose.call({ budgetProposalItems, executionBlock }));
-    closeModal();
+    onClose();
   };
 
   useEffect(() => {
@@ -164,7 +165,7 @@ function ProposeBudgetModal({
         .
       </Paragraph>
       <Flex wrap gap="15px">
-        <Button onClick={closeModal}>
+        <Button onClick={onClose}>
           Cancel
         </Button>
         <Button primary type="submit" disabled={isLoading}>
@@ -175,24 +176,16 @@ function ProposeBudgetModal({
   );
 }
 
-ProposeBudgetModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+ProposeBudgetForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-function ProposeBudgetModalWrapper() {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button primary onClick={() => setShow(true)}>
-        Propose budget
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <ProposeBudgetModal closeModal={() => setShow(false)} />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton primary text="Propose budget" {...props} />
   );
 }
 
-export default ProposeBudgetModalWrapper;
+const ProposeBudgetModal = modalWrapper(ProposeBudgetForm, ButtonModal);
+
+export default ProposeBudgetModal;

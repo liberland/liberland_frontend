@@ -4,12 +4,10 @@ import Form from 'antd/es/form';
 import InputNumber from 'antd/es/input-number';
 import Flex from 'antd/es/flex';
 import PropTypes from 'prop-types';
-import { blockchainSelectors } from '../../../../redux/selectors';
-import { walletActions } from '../../../../redux/actions';
-import ModalRoot from '../../../Modals/ModalRoot';
-import Button from '../../../Button/Button';
-import InputSearch from '../../../InputComponents/InputSearchAddressName';
-import { useStockContext } from '../../StockContext';
+import { blockchainSelectors } from '../../../../../redux/selectors';
+import { walletActions } from '../../../../../redux/actions';
+import Button from '../../../../Button/Button';
+import InputSearch from '../../../../InputComponents/InputSearchAddressName';
 
 function MintAssetForm({
   assetId,
@@ -114,38 +112,4 @@ MintAssetForm.propTypes = {
   isStock: PropTypes.bool,
 };
 
-function MintAssetFormModalWrapper({
-  assetId,
-  minimumBalance,
-}) {
-  const [show, setShow] = useState();
-  const { isStock } = useStockContext();
-  return (
-    <>
-      <Button
-        primary
-        medium
-        onClick={() => setShow(true)}
-      >
-        {isStock ? 'Issue stock' : 'Mint asset'}
-      </Button>
-      {show && (
-        <ModalRoot>
-          <MintAssetForm
-            assetId={assetId}
-            minimumBalance={minimumBalance}
-            onClose={() => setShow(false)}
-            isStock={isStock}
-          />
-        </ModalRoot>
-      )}
-    </>
-  );
-}
-
-MintAssetFormModalWrapper.propTypes = {
-  assetId: PropTypes.number.isRequired,
-  minimumBalance: PropTypes.number.isRequired,
-};
-
-export default MintAssetFormModalWrapper;
+export default MintAssetForm;

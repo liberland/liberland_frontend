@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Flex from 'antd/es/flex';
 import Input from 'antd/es/input';
 import PropTypes from 'prop-types';
 import { isHex } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
+import modalWrapper from './components/ModalWrapper';
+import OpenModalButton from './components/OpenModalButton';
 
-function SetSessionKeysModal({
-  onSubmit, closeModal,
+function SetSessionKeysForm({
+  onSubmit, onClose,
 }) {
   const [form] = Form.useForm();
 
@@ -19,7 +20,7 @@ function SetSessionKeysModal({
       layout="vertical"
       onFinish={(values) => {
         onSubmit(values);
-        closeModal();
+        onClose();
       }}
     >
       <Title level={3}>Change session keys</Title>
@@ -42,7 +43,7 @@ function SetSessionKeysModal({
       </Form.Item>
       <Flex wrap gap="15px">
         <Button
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -57,35 +58,17 @@ function SetSessionKeysModal({
   );
 }
 
-SetSessionKeysModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+SetSessionKeysForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
 };
 
-export default function SetSessionKeysModalWrapper({
-  onSubmit,
-}) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button
-        primary
-        onClick={() => setShow(true)}
-      >
-        Change session keys
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <SetSessionKeysModal
-            closeModal={() => setShow(false)}
-            onSubmit={onSubmit}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text="Change session keys" {...props} />
   );
 }
 
-SetSessionKeysModalWrapper.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
-};
+const ProposeBudgetModal = modalWrapper(SetSessionKeysForm, ButtonModal);
+
+export default ProposeBudgetModal;

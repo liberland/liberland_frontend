@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -7,15 +7,16 @@ import Flex from 'antd/es/flex';
 import Popconfirm from 'antd/es/popconfirm';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { democracyActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
 import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function ProposeAmendLegislationModal({
-  closeModal, tier, id, section,
+function ProposeAmendLegislationForm({
+  onClose, tier, id, section,
 }) {
   const dispatch = useDispatch();
   const allLegislation = useSelector(legislationSelectors.legislation);
@@ -40,7 +41,7 @@ function ProposeAmendLegislationModal({
         content,
       }),
     );
-    closeModal();
+    onClose();
   };
 
   return (
@@ -72,7 +73,7 @@ function ProposeAmendLegislationModal({
       </Form.Item>
       <ProposalDiscussionFields />
       <Flex wrap gap="15px">
-        <Button onClick={closeModal}>
+        <Button onClick={onClose}>
           Cancel
         </Button>
         <Popconfirm
@@ -89,8 +90,8 @@ function ProposeAmendLegislationModal({
   );
 }
 
-ProposeAmendLegislationModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+ProposeAmendLegislationForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
@@ -101,42 +102,22 @@ ProposeAmendLegislationModal.propTypes = {
   section: PropTypes.number,
 };
 
-function ProposeAmendLegislationModalWrapper({
-  add,
-  tier,
-  id,
-  section,
-}) {
-  const [show, setShow] = useState();
+ProposeAmendLegislationForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
+};
+
+function ButtonModal(props) {
+  const { add } = props;
+  const text = add ? 'Add section' : 'Amend';
   return (
-    <>
-      <Button onClick={() => setShow(true)}>
-        {add ? 'Add section' : 'Amend'}
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <ProposeAmendLegislationModal
-            closeModal={() => setShow(false)}
-            id={id}
-            section={section}
-            tier={tier}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text={text} {...props} />
   );
 }
 
-ProposeAmendLegislationModalWrapper.propTypes = {
+ButtonModal.propTypes = {
   add: PropTypes.bool,
-  tier: PropTypes.string.isRequired,
-  id: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    year: PropTypes.object.isRequired,
-    // eslint-disable-next-line react/forbid-prop-types
-    index: PropTypes.object.isRequired,
-  }).isRequired,
-  section: PropTypes.number,
 };
 
-export default ProposeAmendLegislationModalWrapper;
+const ProposeAmendLegislationModal = modalWrapper(ProposeAmendLegislationForm, ButtonModal);
+
+export default ProposeAmendLegislationModal;

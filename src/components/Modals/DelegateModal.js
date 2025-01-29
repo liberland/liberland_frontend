@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useDispatch, useSelector } from 'react-redux';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { democracyActions } from '../../redux/actions';
 import { blockchainSelectors } from '../../redux/selectors';
+import modalWrapper from './components/ModalWrapper';
+import OpenModalButton from './components/OpenModalButton';
 
-function DelegateModal({
-  closeModal,
+function DelegateForm({
+  onClose,
   delegateAddress,
   currentlyDelegatingTo,
 }) {
@@ -20,7 +21,7 @@ function DelegateModal({
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const handleSubmitDelegate = () => {
     dispatch(democracyActions.delegate.call({ values: { delegateAddress }, userWalletAddress }));
-    closeModal();
+    onClose();
   };
 
   return (
@@ -49,7 +50,7 @@ function DelegateModal({
 
       <Flex wrap gap="15px">
         <Button
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -64,41 +65,17 @@ function DelegateModal({
   );
 }
 
-DelegateModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+DelegateForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   delegateAddress: PropTypes.string.isRequired,
   currentlyDelegatingTo: PropTypes.string.isRequired,
 };
 
-function DelegateModalWrapper({
-  delegateAddress,
-  currentlyDelegatingTo,
-}) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button
-        primary
-        onClick={() => setShow(true)}
-      >
-        Delegate
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(true)}>
-          <DelegateModal
-            closeModal={() => setShow(false)}
-            delegateAddress={delegateAddress}
-            currentlyDelegatingTo={currentlyDelegatingTo}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton primary text="Delegate" {...props} />
   );
 }
+const DelegateModal = modalWrapper(DelegateForm, ButtonModal);
 
-DelegateModalWrapper.propTypes = {
-  delegateAddress: PropTypes.string.isRequired,
-  currentlyDelegatingTo: PropTypes.string.isRequired,
-};
-
-export default DelegateModalWrapper;
+export default DelegateModal;

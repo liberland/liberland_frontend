@@ -8,7 +8,7 @@ import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import { useMediaQuery } from 'usehooks-ts';
 import { formatAssets } from '../../../utils/walletHelpers';
-import SendAssetModalWrapper from '../../Modals/SendAssetModal';
+import SendAssetModal from '../../Modals/SendAssetModal';
 import { getAvatarParameters } from '../../../utils/avatar';
 import styles from './styles.module.scss';
 
@@ -30,7 +30,7 @@ function AssetOverview({
       <Card
         actions={!isCongress || userIsMember ? [
           <Flex wrap justify="start">
-            <SendAssetModalWrapper
+            <SendAssetModal
               isRemarkNeeded={isRemarkNeeded}
               assetData={assetData}
               officeType={officeType}

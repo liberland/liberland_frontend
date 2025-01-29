@@ -10,11 +10,11 @@ import { useMediaQuery } from 'usehooks-ts';
 import LLD from '../../../assets/icons/lld.svg';
 import LLM from '../../../assets/icons/llm.svg';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
-import SendLLDModalWrapper from '../../Modals/SendLLDModal';
-import SendLLMModalWrapper from '../../Modals/SendLLMModal';
-import RequestLLDModalWrapper from '../../Modals/RequestLLDModal';
-import UnpoolLLMModalWrapper from '../../Modals/UnpoolModal';
-import PolitipoolLLMModalWrapper from '../../Modals/PolitipoolModal';
+import SendLLDModal from '../../Modals/SendLLDModal';
+import SendLLMModal from '../../Modals/SendLLMModal';
+import RequestLLDModal from '../../Modals/RequestLLDModal';
+import UnpoolModal from '../../Modals/UnpoolModal';
+import PolitipoolLLMModal from '../../Modals/PolitipoolModal';
 import styles from './styles.module.scss';
 
 function BalanceOverview({
@@ -28,7 +28,7 @@ function BalanceOverview({
         currency: 'LLM',
         icon: LLM,
         actions: [
-          <UnpoolLLMModalWrapper key="unpool" />,
+          <UnpoolModal key="unpool" />,
         ],
       },
       {
@@ -45,8 +45,8 @@ function BalanceOverview({
       currency: 'LLM',
       icon: LLM,
       actions: [
-        <SendLLMModalWrapper key="send" />,
-        <PolitipoolLLMModalWrapper key="pool" />,
+        <SendLLMModal key="send" />,
+        <PolitipoolLLMModal key="pool" />,
       ],
     },
     {
@@ -55,8 +55,8 @@ function BalanceOverview({
       currency: 'LLD',
       icon: LLD,
       actions: [
-        <SendLLDModalWrapper key="send" />,
-        <RequestLLDModalWrapper key="request" />,
+        <SendLLDModal key="send" />,
+        <RequestLLDModal key="request" />,
       ],
     },
   ]), [balances.liberstake.amount, balances.liquidAmount.amount, balances.polkastake.amount, liquidMerits, showStaked]);

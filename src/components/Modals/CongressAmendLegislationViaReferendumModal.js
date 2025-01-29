@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
@@ -6,15 +6,16 @@ import Title from 'antd/es/typography/Title';
 import TextArea from 'antd/es/input/TextArea';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
 import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function CongressAmendLegislationViaReferendumModal({
+function CongressAmendLegislationViaReferendumForm({
   closeModal, tier, id, section,
 }) {
   const dispatch = useDispatch();
@@ -93,7 +94,7 @@ function CongressAmendLegislationViaReferendumModal({
   );
 }
 
-CongressAmendLegislationViaReferendumModal.propTypes = {
+CongressAmendLegislationViaReferendumForm.propTypes = {
   closeModal: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
@@ -105,42 +106,20 @@ CongressAmendLegislationViaReferendumModal.propTypes = {
   section: PropTypes.number,
 };
 
-export default function CongressAmendLegislationViaReferendumModalWrapper({
-  add,
-  tier,
-  id,
-  section,
-}) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
+  const { add } = props;
+  const text = add
+    ? 'Propose add section referendum as congress'
+    : 'Propose amend referendum as congress';
   return (
-    <>
-      <Button onClick={() => setShow(true)}>
-        {add
-          ? 'Propose add section referendum as congress'
-          : 'Propose amend referendum as congress'}
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <CongressAmendLegislationViaReferendumModal
-            closeModal={() => setShow(false)}
-            id={id}
-            section={section}
-            tier={tier}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text={text} {...props} />
   );
 }
 
-CongressAmendLegislationViaReferendumModalWrapper.propTypes = {
+ButtonModal.propTypes = {
   add: PropTypes.bool,
-  tier: PropTypes.string.isRequired,
-  id: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    year: PropTypes.object.isRequired,
-    // eslint-disable-next-line react/forbid-prop-types
-    index: PropTypes.object.isRequired,
-  }).isRequired,
-  section: PropTypes.number,
 };
+
+const CongressAmendLegislationViaReferendumModal = modalWrapper(CongressAmendLegislationViaReferendumForm, ButtonModal);
+
+export default CongressAmendLegislationViaReferendumModal;

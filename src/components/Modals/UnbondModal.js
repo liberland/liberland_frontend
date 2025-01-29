@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -7,7 +7,6 @@ import Flex from 'antd/es/flex';
 import InputNumber from 'antd/es/input-number';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN_ZERO } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { eraToDays } from '../../utils/staking';
 import { validatorActions } from '../../redux/actions';
@@ -15,9 +14,11 @@ import { validatorSelectors, walletSelectors } from '../../redux/selectors';
 import {
   parseDollars, formatDollars, valueToBN,
 } from '../../utils/walletHelpers';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function UnbondModal({
-  closeModal,
+function UnbondForm({
+  onClose,
 }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
@@ -32,7 +33,7 @@ function UnbondModal({
   const onSubmit = (values) => {
     const unbondValue = parseDollars(values.unbondValue);
     dispatch(validatorActions.unbond.call({ unbondValue }));
-    closeModal();
+    onClose();
   };
 
   const validateUnbondValue = (_, textUnbondValue) => {
@@ -81,7 +82,7 @@ function UnbondModal({
       <Flex wrap gap="15px">
         <Button
           medium
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -97,22 +98,21 @@ function UnbondModal({
   );
 }
 
-UnbondModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+UnbondForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-export default function UnbondModalWrapper() {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button onClick={() => setShow(true)}>
-        Unstake
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <UnbondModal closeModal={() => setShow(false)} />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text="Unstake" {...props} />
   );
 }
+
+ButtonModal.propTypes = {
+  label: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
+};
+
+const UnbondModal = modalWrapper(UnbondForm, ButtonModal);
+
+export default UnbondModal;

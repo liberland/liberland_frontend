@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Flex from 'antd/es/flex';
 import Paragraph from 'antd/es/typography/Paragraph';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import InputSearch from '../InputComponents/InputSearchAddressName';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function FillAddress({
-  closeModal, textData, onAccept,
+function FillAddressForm({
+  onClose, textData, onAccept,
 }) {
   const {
     nft,
@@ -24,7 +25,7 @@ function FillAddress({
 
   const formSubmit = async (data) => {
     await onAccept(data.recipient);
-    closeModal();
+    onClose();
   };
 
   return (
@@ -49,7 +50,7 @@ function FillAddress({
 
       <Flex wrap gap="15px">
         <Button
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -64,7 +65,7 @@ function FillAddress({
   );
 }
 
-FillAddress.defaultProps = {
+FillAddressForm.defaultProps = {
   textData: {
     title: 'Transfer to',
     description: 'You are going to transfer nft to...',
@@ -74,9 +75,9 @@ FillAddress.defaultProps = {
   },
 };
 
-FillAddress.propTypes = {
+FillAddressForm.propTypes = {
   onAccept: PropTypes.func.isRequired,
-  closeModal: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
   textData: PropTypes.shape({
     title: PropTypes.string,
     description: PropTypes.string,
@@ -92,23 +93,14 @@ FillAddress.propTypes = {
   }),
 };
 
-function FillAddressWrapper(props) {
-  const [show, setShow] = useState();
-  return (
-    <>
-      <Button
-        onClick={() => setShow(true)}
-        primary
-      >
-        Transfer
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <FillAddress {...props} closeModal={() => setShow(false)} />
-        </ModalRoot>
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  return <OpenModalButton text="Transfer" primary {...props} />;
 }
 
-export default FillAddressWrapper;
+ButtonModal.propTypes = {
+  isMint: PropTypes.bool.isRequired,
+};
+
+const FillAddressModal = modalWrapper(FillAddressForm, ButtonModal);
+
+export default FillAddressModal;

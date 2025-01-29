@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN, BN_ZERO } from '@polkadot/util';
-import TransferWithRemarkModalWrapper from '../../Modals/TransferWithRemarkModal';
 import { calculateProperBalance, parseDollars } from '../../../utils/walletHelpers';
 import { walletActions } from '../../../redux/actions';
 import { encodeRemarkUser } from '../../../api/nodeRpcCall';
 import { walletSelectors } from '../../../redux/selectors';
-import ButtonArrowIcon from '../../../assets/icons/button-arrow.svg';
-import Button from '../../Button/Button';
-import ModalRoot from '../../Modals/ModalRoot';
-import styles from '../../Modals/styles.module.scss';
+import TransferWithRemarkForm from '../../Modals/TransferWithRemarkModal';
+import ButtonModalArrow from '../../Modals/components/OpenModalButtonWithArrow';
+import modalWrapper from '../../Modals/components/ModalWrapper';
 
-function RemarkTransferWrapper({ closeModal }) {
+function RemarkTransferWrapper({ onClose }) {
   const dispatch = useDispatch();
   const onSubmit = async (data, options) => {
     const transferItem = options.find(((item) => data.select === item.value));
@@ -31,7 +29,7 @@ function RemarkTransferWrapper({ closeModal }) {
     const encodedRemark = await encodeRemarkUser(remartInfo);
     const transferData = { index, balance: properBalance, recipient };
     dispatch(walletActions.sendTransferRemark.call({ remarkInfo: encodedRemark, transferData }));
-    closeModal();
+    onClose();
   };
 
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
@@ -47,8 +45,8 @@ function RemarkTransferWrapper({ closeModal }) {
   }, [dispatch]);
 
   return (
-    <TransferWithRemarkModalWrapper
-      closeModal={closeModal}
+    <TransferWithRemarkForm
+      onClose={onClose}
       userRemark
       submit={onSubmit}
       additionalAssets={additionalAssets}
@@ -59,29 +57,13 @@ function RemarkTransferWrapper({ closeModal }) {
 }
 
 RemarkTransferWrapper.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
-function RemarkTransferModalWrapper() {
-  const [show, setShow] = useState(false);
-  return (
-    <>
-      <Button
-        onClick={() => setShow(true)}
-        className={styles.button}
-      >
-        Transfer remark
-        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
-      </Button>
-      {show && (
-        <ModalRoot>
-          <RemarkTransferWrapper
-            closeModal={() => setShow(false)}
-          />
-        </ModalRoot>
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  return <ButtonModalArrow text="Transfer remark" {...props} />;
 }
 
-export default RemarkTransferModalWrapper;
+const RemarkTransferModal = modalWrapper(RemarkTransferWrapper, ButtonModal);
+
+export default RemarkTransferModal;
