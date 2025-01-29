@@ -1,7 +1,6 @@
 import React from 'react';
 import Flex from 'antd/es/flex';
 import { useDispatch } from 'react-redux';
-import CreateValidatorButton from '../CreateValidatorButton';
 import SetSessionKeysModalWrapper from '../../../Modals/SetSessionKeysModal';
 import StartStopButton from '../StartStopButton';
 import Button from '../../../Button/Button';
@@ -17,7 +16,6 @@ function ValidatorUpdateActions() {
   };
   return (
     <Flex wrap gap="15px" justify="end">
-      <CreateValidatorButton />
       <SetSessionKeysModalWrapper onSubmit={onSubmit} />
       <StartStopButton />
       <Button primary onClick={chill}>
