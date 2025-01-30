@@ -103,8 +103,6 @@ function ExchangeItem({ poolData, assetsPoolData }) {
               assets={assets}
               asset1ToShow={asset1ToShow}
               asset2ToShow={asset2ToShow}
-              name1={name1}
-              name2={name2}
               isBuy
             />
             <div>
@@ -124,8 +122,6 @@ function ExchangeItem({ poolData, assetsPoolData }) {
               assets={assets}
               asset1ToShow={asset1ToShow}
               asset2ToShow={asset2ToShow}
-              name1={name1}
-              name2={name2}
             />
             <div>
               <div className={styles.description}>

@@ -23,6 +23,19 @@
     max-width: initial;
   }
 }
+.switchContainer {
+  &:hover,
+  &:focus,
+  &:active {
+    background-color: transparent!important;
+  }
+  height: 50px!important;
+}
+.switch {
+  margin-top: 5px;
+  height: 25px;
+  width: 100%;
+}
 .content {
   min-height: 280px;
   margin: 0;

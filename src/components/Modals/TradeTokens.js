@@ -23,13 +23,12 @@ import { AssetsPropTypes } from '../Wallet/Exchange/proptypes';
 import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } from '../../api/nodeRpcCall';
 import { formatAssets, parseAssets, sanitizeValue } from '../../utils/walletHelpers';
 import { useStockContext } from '../Wallet/StockContext';
+import CurrencyIcon from '../CurrencyIcon';
 
 function TradeTokensModal({
   closeModal,
   assets,
   isBuy,
-  name1,
-  name2,
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -50,7 +49,7 @@ function TradeTokensModal({
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
 
   const reservesThisAssets = useMemo(() => {
-    if (reserves && asset1 && asset2 && reserves[asset1][asset2]) {
+    if (reserves && asset1 && asset2 && reserves?.[asset1]?.[asset2]) {
       const asset1Value = reserves[asset1][asset2].asset1;
       const asset2Value = reserves[asset1][asset2].asset2;
       return { ...reserves[asset1][asset2], asset1: asset1Value, asset2: asset2Value };
@@ -248,6 +247,13 @@ function TradeTokensModal({
 
   const submitText = isStock ? 'Trade stock' : 'Exchange tokens';
 
+  const symbolHelper = (symbol, size) => (
+    <Flex wrap gap="5px" align="center">
+      {symbol}
+      <CurrencyIcon size={size} symbol={symbol} />
+    </Flex>
+  );
+
   return (
     <Form
       className={styles.getCitizenshipModal}
@@ -256,13 +262,16 @@ function TradeTokensModal({
       layout="vertical"
     >
       <Title level={3}>
-        {isBuy ? 'Buy' : 'Sell'}
-        {' '}
-        {asset1ToShow}
-        {' '}
-        for
-        {' '}
-        {asset2ToShow}
+        <Flex wrap gap="10px">
+          <span>
+            {isBuy ? 'Buy' : 'Sell'}
+          </span>
+          {symbolHelper(asset1ToShow, 32)}
+          <span>
+            for
+          </span>
+          {symbolHelper(asset2ToShow, 32)}
+        </Flex>
       </Title>
       <Form.Item
         name="amount1In"
@@ -271,7 +280,7 @@ function TradeTokensModal({
             <div>
               Amount In
             </div>
-            {isBuy ? name2 : name1}
+            {isBuy ? symbolHelper(asset2ToShow, 20) : symbolHelper(asset1ToShow, 20)}
           </Flex>
         )}
         extra={(
@@ -317,7 +326,7 @@ function TradeTokensModal({
             <div>
               Amount Out
             </div>
-            {isBuy ? name1 : name2}
+            {isBuy ? symbolHelper(asset1ToShow, 20) : symbolHelper(asset2ToShow, 20)}
           </Flex>
         )}
         extra={(
@@ -390,8 +399,6 @@ TradeTokensModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
   isBuy: PropTypes.bool,
-  name1: PropTypes.node.isRequired,
-  name2: PropTypes.node.isRequired,
 };
 
 function TradeTokensModalWrapper({
@@ -399,8 +406,6 @@ function TradeTokensModalWrapper({
   isBuy,
   asset1ToShow,
   asset2ToShow,
-  name1,
-  name2,
 }) {
   const [show, setShow] = useState(false);
   return (
@@ -424,8 +429,6 @@ function TradeTokensModalWrapper({
             assets={assets}
             closeModal={() => setShow(false)}
             isBuy={isBuy}
-            name1={name1}
-            name2={name2}
           />
         </ModalRoot>
       )}
@@ -438,8 +441,6 @@ TradeTokensModalWrapper.propTypes = {
   isBuy: PropTypes.bool,
   asset1ToShow: PropTypes.string.isRequired,
   asset2ToShow: PropTypes.string.isRequired,
-  name1: PropTypes.node.isRequired,
-  name2: PropTypes.node.isRequired,
 };
 
 export default TradeTokensModalWrapper;
