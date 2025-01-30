@@ -3,14 +3,31 @@ import classNames from 'classnames';
 import Menu from 'antd/es/menu';
 import MenuIcon from '@ant-design/icons/MenuOutlined';
 import { useLocation, useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
 import styles from '../styles.module.scss';
 import { useNavigationList } from '../hooks';
 import { navigationList } from '../../../constants/navigationList';
+import { blockchainSelectors, userSelectors } from '../../../redux/selectors';
+import { blockchainActions, validatorActions } from '../../../redux/actions';
+import Button from '../../Button/Button';
 
 function UrlMenu() {
   const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
+  const dispatch = useDispatch();
+  const user = useSelector(userSelectors.selectUser);
+  const isWalletAdressSame = useSelector(
+    blockchainSelectors.isUserWalletAddressSameAsUserAdress,
+  );
+  const walletAddress = useSelector(userSelectors.selectWalletAddress);
+  const hasSwitchWallet = user && !isWalletAdressSame;
+  const switchToRegisteredWallet = () => {
+    dispatch(blockchainActions.setUserWallet.success(walletAddress));
+    dispatch(validatorActions.getInfo.call());
+    localStorage.removeItem('BlockchainAdress');
+  };
+
   const { pathname } = useLocation();
   const history = useHistory();
   const getMenuKey = () => {
@@ -47,6 +64,16 @@ function UrlMenu() {
     };
   };
 
+  const switcher = hasSwitchWallet ? [{
+    label: (
+      <Button primary nano onClick={switchToRegisteredWallet} className={styles.switch}>
+        Switch to registered wallet
+      </Button>
+    ),
+    key: 'switch',
+    className: styles.switchContainer,
+  }] : [];
+
   return (
     <Menu
       mode={isBiggerThanSmallScreen ? 'inline' : 'horizontal'}
@@ -55,18 +82,21 @@ function UrlMenu() {
       selectedKeys={isBiggerThanDesktop ? [pathname] : undefined}
       key={getMenuKey()}
       overflowedIndicator={isBiggerThanSmallScreen ? undefined : <MenuIcon />}
-      items={isBiggerThanSmallScreen ? [
-        {
-          label: 'For Citizens',
-          key: 'citizen',
-          children: navigationList.filter(({ isGovt }) => !isBiggerThanSmallScreen || !isGovt).map(createMenu),
-        },
-        {
-          label: 'For State Officials',
-          key: 'state',
-          children: navigationList.filter(({ isGovt }) => isGovt).map(createMenu),
-        },
-      ] : navigationList.map(createMenu)}
+      items={[
+        ...switcher,
+        ...isBiggerThanSmallScreen ? [
+          {
+            label: 'For Citizens',
+            key: 'citizen',
+            children: navigationList.filter(({ isGovt }) => !isBiggerThanSmallScreen || !isGovt).map(createMenu),
+          },
+          {
+            label: 'For State Officials',
+            key: 'state',
+            children: navigationList.filter(({ isGovt }) => isGovt).map(createMenu),
+          },
+        ] : navigationList.map(createMenu),
+      ]}
     />
   );
 }

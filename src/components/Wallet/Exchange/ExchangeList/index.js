@@ -4,6 +4,7 @@ import Alert from 'antd/es/alert';
 import Collapse from 'antd/es/collapse';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
+import Flex from 'antd/es/flex';
 import { blockchainSelectors, dexSelectors } from '../../../../redux/selectors';
 import { dexActions } from '../../../../redux/actions';
 import { useStockContext } from '../../StockContext';
@@ -52,7 +53,7 @@ function ExchangeList() {
   }
 
   return (
-    <>
+    <Flex vertical gap="20px">
       {!highLiquidity.length && !lowLiquidity.length && (
         <Alert type="error" className={styles.noneFound} message="No pools were found" />
       )}
@@ -106,8 +107,10 @@ function ExchangeList() {
           ]}
         />
       )}
-      <AddAssetForm poolsData={poolsData} />
-    </>
+      <Flex wrap gap="15px">
+        <AddAssetForm poolsData={poolsData} />
+      </Flex>
+    </Flex>
   );
 }
 

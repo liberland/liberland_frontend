@@ -2,13 +2,12 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
-import Avatar from 'antd/es/avatar';
 import { useMediaQuery } from 'usehooks-ts';
 import { formatAssets } from '../../../utils/walletHelpers';
 import SendAssetModalWrapper from '../../Modals/SendAssetModal';
-import { getAvatarParameters } from '../../../utils/avatar';
 import styles from './styles.module.scss';
 import MoneyCard from '../../MoneyCard';
+import CurrencyIcon from '../../CurrencyIcon';
 
 function AssetOverview({
   additionalAssets,
@@ -22,42 +21,37 @@ function AssetOverview({
     [additionalAssets],
   );
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
-  const renderItem = (assetData) => {
-    const { color, text } = getAvatarParameters(assetData.metadata.name || 'A');
-    return (
-      <MoneyCard
-        actions={!isCongress || userIsMember ? [
-          <SendAssetModalWrapper
-            isRemarkNeeded={isRemarkNeeded}
-            assetData={assetData}
-            officeType={officeType}
-          />,
-        ] : undefined}
-        amount={(
-          <>
-            {formatAssets(
-              assetData.balance?.balance || '0',
-              assetData.metadata.decimals,
-              true,
-            )}
-            {' '}
-            {assetData.metadata.symbol}
-          </>
-        )}
-        title={(
-          <span className={styles.name}>
-            {assetData.metadata.name}
-          </span>
-        )}
-        alt={assetData.metadata.symbol}
-        icon={(
-          <Avatar style={{ backgroundColor: color, fontSize: 12 }} alt={assetData.metadata.symbol} size={22}>
-            {text}
-          </Avatar>
-        )}
-      />
-    );
-  };
+  const renderItem = (assetData) => (
+    <MoneyCard
+      actions={!isCongress || userIsMember ? [
+        <SendAssetModalWrapper
+          isRemarkNeeded={isRemarkNeeded}
+          assetData={assetData}
+          officeType={officeType}
+        />,
+      ] : undefined}
+      amount={(
+        <>
+          {formatAssets(
+            assetData.balance?.balance || '0',
+            assetData.metadata.decimals,
+            true,
+          )}
+          {' '}
+          {assetData.metadata.symbol}
+        </>
+      )}
+      title={(
+        <span className={styles.name}>
+          {assetData.metadata.name}
+        </span>
+      )}
+      alt={assetData.metadata.symbol}
+      icon={(
+        <CurrencyIcon size={22} symbol={assetData.metadata.symbol} />
+      )}
+    />
+  );
 
   return (
     <Row gutter={[16, 16]} wrap>

@@ -4,6 +4,7 @@ import Collapse from 'antd/es/collapse';
 import Descriptions from 'antd/es/descriptions';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
+import { useMediaQuery } from 'usehooks-ts';
 import Button from '../Button/Button';
 import {
   userSelectors,
@@ -28,6 +29,9 @@ import CopyIconWithAddress from '../CopyIconWithAddress';
 function Profile() {
   const userName = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
+  const spanSize = isBiggerThanDesktop ? 12 : 24;
   const walletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
@@ -135,22 +139,26 @@ function Profile() {
             </Flex>
           ),
           children: (
-            <Descriptions title="Information">
-              <Descriptions.Item label="LLM (liquid)">
+            <Descriptions
+              column={24}
+              layout={isBiggerThanSmallScreen ? 'horizontal' : 'vertical'}
+              title="Information"
+            >
+              <Descriptions.Item span={spanSize} label="LLM (liquid)">
                 {formatMerits(liquidMerits)}
               </Descriptions.Item>
-              <Descriptions.Item label="LLM (Politipooled)">
+              <Descriptions.Item span={spanSize} label="LLM (Politipooled)">
                 {formatMerits(
                   balances.liberstake.amount,
                 )}
               </Descriptions.Item>
-              <Descriptions.Item label="LLD">
+              <Descriptions.Item span={spanSize} label="LLD">
                 {formatDollars(balances.liquidAmount.amount)}
               </Descriptions.Item>
-              <Descriptions.Item label="Wallet">
+              <Descriptions.Item span={spanSize} label="Wallet">
                 <CopyIconWithAddress address={walletAddress} />
               </Descriptions.Item>
-              <Descriptions.Item label="Unpooling in effect">
+              <Descriptions.Item span={spanSize} label="Unpooling in effect">
                 {lockDays.toFixed(2)}
                 {' '}
                 days remaining.
@@ -161,49 +169,49 @@ function Profile() {
         {
           key: 'onchain',
           label: 'On-chain identity',
-          extra: (
-            <Flex wrap gap="15px">
-              <UpdateProfile
-                blockNumber={blockNumber}
-                identity={identity}
-                lastName={lastName}
-                userName={userName}
-              />
-              <Button
-                primary={isUserEligibleForComplimentaryLLD && !isLoading}
-                onClick={handleGetFreeLLD}
-                grey={!isUserEligibleForComplimentaryLLD}
-                disabled={isLoading}
-              >
-                {isUserEligibleForComplimentaryLLD || !user
-                  ? 'Claim complimentary LLD'
-                  : ineligibleForComplimentaryLLDReason}
-              </Button>
-            </Flex>
-          ),
           children: (
-            <List
-              dataSource={onChainIdenityList}
-              renderItem={({ isDataToShow, title, dataFunction }) => {
-                const dataFromFunction = dataFunction();
-                const yesOrNo = dataFromFunction ? 'Yes' : 'No';
-                const htmlElement = isDataToShow
-                  ? dataFromFunction
-                  : yesOrNo;
-                return (
-                  <List.Item>
-                    <List.Item.Meta
-                      title={title}
-                      description={htmlElement ? (
-                        <strong>{htmlElement}</strong>
-                      ) : (
-                        emptyElement
-                      )}
-                    />
-                  </List.Item>
-                );
-              }}
-            />
+            <Flex vertical gap="20px">
+              <List
+                dataSource={onChainIdenityList}
+                renderItem={({ isDataToShow, title, dataFunction }) => {
+                  const dataFromFunction = dataFunction();
+                  const yesOrNo = dataFromFunction ? 'Yes' : 'No';
+                  const htmlElement = isDataToShow
+                    ? dataFromFunction
+                    : yesOrNo;
+                  return (
+                    <List.Item>
+                      <List.Item.Meta
+                        title={title}
+                        description={htmlElement ? (
+                          <strong>{htmlElement}</strong>
+                        ) : (
+                          emptyElement
+                        )}
+                      />
+                    </List.Item>
+                  );
+                }}
+              />
+              <Flex wrap gap="15px">
+                <UpdateProfile
+                  blockNumber={blockNumber}
+                  identity={identity}
+                  lastName={lastName}
+                  userName={userName}
+                />
+                <Button
+                  primary={isUserEligibleForComplimentaryLLD && !isLoading}
+                  onClick={handleGetFreeLLD}
+                  grey={!isUserEligibleForComplimentaryLLD}
+                  disabled={isLoading}
+                >
+                  {isUserEligibleForComplimentaryLLD || !user
+                    ? 'Claim complimentary LLD'
+                    : ineligibleForComplimentaryLLDReason}
+                </Button>
+              </Flex>
+            </Flex>
           ),
         },
       ]}

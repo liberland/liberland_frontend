@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Popover from 'antd/es/popover';
+import Flex from 'antd/es/flex';
 import Descriptions from 'antd/es/descriptions';
 import { useSelector, useDispatch } from 'react-redux';
 import { walletSelectors, blockchainSelectors } from '../../../redux/selectors';
@@ -13,6 +14,7 @@ import CreateOrUpdateAssetFormModalWrapper from './CreateOrUpdateAssetForm';
 import ActionsMenuModalWrapper from './ActionsMenu';
 import { useStockContext } from '../StockContext';
 import styles from './styles.module.scss';
+import CurrencyIcon from '../../CurrencyIcon';
 
 function Assets() {
   const userWalletAddress = useSelector(
@@ -39,65 +41,74 @@ function Assets() {
   const isBiggerThanLargeScreen = useMediaQuery('(min-width: 1025px)');
   const { isStock } = useStockContext();
   const formatted = useMemo(
-    () => additionalAssets?.map((asset, index) => (
-      {
-        ...asset,
-        ...asset.metadata,
-        ...assetDetails[index]?.identity,
-        details: (
-          <Popover
-            content={(
-              <Descriptions className={styles.details} layout="vertical" size="small">
-                <Descriptions.Item label="Admin">
-                  {assetDetails?.[index]?.admin}
-                </Descriptions.Item>
-                <Descriptions.Item label="Owner">
-                  {assetDetails?.[index]?.owner}
-                </Descriptions.Item>
-                <Descriptions.Item label="Issuer">
-                  {assetDetails?.[index]?.issuer}
-                </Descriptions.Item>
-                <Descriptions.Item label="Freezer">
-                  {assetDetails?.[index]?.freezer}
-                </Descriptions.Item>
-                <Descriptions.Item label="Supply">
-                  {formatCustom(
-                    assetDetails?.[index]?.supply ?? '0',
-                    parseInt(asset.metadata.decimals),
-                  )}
-                  {' '}
-                  {asset.metadata.symbol}
-                </Descriptions.Item>
-              </Descriptions>
-            )}
-            title="Details"
-            trigger="click"
-          >
-            <Button>
-              Details
-            </Button>
-          </Popover>
-        ),
-        actions: (
-          <ActionsMenuModalWrapper
-            isAdmin={assetDetails?.[index]?.admin === userWalletAddress}
-            isOwner={assetDetails?.[index]?.owner === userWalletAddress}
-            isIssuer={assetDetails?.[index]?.issuer === userWalletAddress}
-            assetId={asset.index}
-            defaultValues={{
-              admin: assetDetails?.[index]?.admin,
-              balance: assetDetails?.[index]?.minBalance,
-              decimals: parseInt(asset.metadata.decimals) || 0,
-              freezer: assetDetails?.[index]?.freezer,
-              id: asset.index,
-              issuer: assetDetails?.[index]?.issuer,
-              name: asset.metadata.name,
-              symbol: asset.metadata.symbol,
-            }}
-          />
-        ),
-      }
-    )).filter(({ isStock: assetIsStock }) => assetIsStock === isStock) || [],
+    () => additionalAssets?.map((asset, index) => {
+      const symbol = (
+        <Flex wrap gap="15px" align="center">
+          {asset.metadata.symbol}
+          <CurrencyIcon size={20} symbol={asset.metadata.symbol} />
+        </Flex>
+      );
+      return (
+        {
+          ...asset,
+          ...asset.metadata,
+          ...assetDetails[index]?.identity,
+          symbol,
+          details: (
+            <Popover
+              content={(
+                <Descriptions className={styles.details} layout="vertical" size="small">
+                  <Descriptions.Item label="Admin">
+                    {assetDetails?.[index]?.admin}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Owner">
+                    {assetDetails?.[index]?.owner}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Issuer">
+                    {assetDetails?.[index]?.issuer}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Freezer">
+                    {assetDetails?.[index]?.freezer}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Supply">
+                    {formatCustom(
+                      assetDetails?.[index]?.supply ?? '0',
+                      parseInt(asset.metadata.decimals),
+                    )}
+                    {' '}
+                    {symbol}
+                  </Descriptions.Item>
+                </Descriptions>
+              )}
+              title="Details"
+              trigger="click"
+            >
+              <Button>
+                Details
+              </Button>
+            </Popover>
+          ),
+          actions: (
+            <ActionsMenuModalWrapper
+              isAdmin={assetDetails?.[index]?.admin === userWalletAddress}
+              isOwner={assetDetails?.[index]?.owner === userWalletAddress}
+              isIssuer={assetDetails?.[index]?.issuer === userWalletAddress}
+              assetId={asset.index}
+              defaultValues={{
+                admin: assetDetails?.[index]?.admin,
+                balance: assetDetails?.[index]?.minBalance,
+                decimals: parseInt(asset.metadata.decimals) || 0,
+                freezer: assetDetails?.[index]?.freezer,
+                id: asset.index,
+                issuer: assetDetails?.[index]?.issuer,
+                name: asset.metadata.name,
+                symbol: asset.metadata.symbol,
+              }}
+            />
+          ),
+        }
+      );
+    }).filter(({ isStock: assetIsStock }) => assetIsStock === isStock) || [],
     [additionalAssets, assetDetails, userWalletAddress, isStock],
   );
 

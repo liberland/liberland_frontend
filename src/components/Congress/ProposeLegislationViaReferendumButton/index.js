@@ -4,7 +4,7 @@ import router from '../../../router';
 
 export default function ProposeLegislationViaReferendumButton() {
   return (
-    <Button link href={router.congress.addLegislationViaReferendum}>
+    <Button primary href={router.congress.addLegislationViaReferendum}>
       Propose Referendum
     </Button>
   );

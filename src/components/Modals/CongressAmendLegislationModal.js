@@ -10,7 +10,7 @@ import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
-import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
+import LegislationHeading from '../Congress/LegislationHeading';
 
 function CongressAmendLegislationModal({
   closeModal, tier, id, section,
@@ -21,9 +21,17 @@ function CongressAmendLegislationModal({
   const sectionContent = legislation.sections?.[section]?.content.toHuman() ?? '';
   const [form] = Form.useForm();
 
-  const onSubmit = ({ content }) => {
+  const onSubmit = ({
+    content,
+    // eslint-disable-next-line no-shadow
+    tier,
+    year,
+    index,
+    // eslint-disable-next-line no-shadow
+    section,
+  }) => {
     dispatch(congressActions.congressAmendLegislation.call({
-      tier, id, section, content,
+      tier, id: { year: year.year(), index }, section, content,
     }));
     closeModal();
   };
@@ -35,7 +43,7 @@ function CongressAmendLegislationModal({
       initialValues={{
         tier,
         year: dayjs(new Date(id.year.toString(), 0, 1)),
-        index: id.index,
+        index: parseInt(id.index) || 1,
         section,
         content: sectionContent,
       }}
@@ -45,7 +53,7 @@ function CongressAmendLegislationModal({
         Propose a Motion -
         {legislation?.sections?.[section] ? 'amend legislation' : 'add legislation section'}
       </Title>
-      <ReadOnlyLegislation section={section} />
+      <LegislationHeading section={section} />
       <Form.Item name="content" label="Legislation content" rules={[{ required: true }]}>
         <TextArea />
       </Form.Item>

@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
-import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
+import LegislationHeading from '../Congress/LegislationHeading';
 import { congressSelectors } from '../../redux/selectors';
 
 function CongressRepealLegislationModal({
@@ -17,8 +17,22 @@ function CongressRepealLegislationModal({
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
-  const onSubmitRepeal = () => {
-    dispatch(congressActions.congressRepealLegislation.call({ tier, id, section }));
+  const onSubmitRepeal = ({
+    // eslint-disable-next-line no-shadow
+    tier,
+    year,
+    index,
+    // eslint-disable-next-line no-shadow
+    section,
+  }) => {
+    dispatch(congressActions.congressRepealLegislation.call({
+      tier,
+      id: {
+        year: year.year(),
+        index,
+      },
+      section,
+    }));
     closeModal();
   };
 
@@ -30,7 +44,7 @@ function CongressRepealLegislationModal({
       initialValues={{
         tier,
         year: dayjs(new Date(id.year, 0, 1)),
-        index: id.index,
+        index: parseInt(id.index) || 1,
         section,
       }}
     >
@@ -38,7 +52,7 @@ function CongressRepealLegislationModal({
         Propose a Congress Motion - repeal legislation
       </Title>
 
-      <ReadOnlyLegislation section={section} />
+      <LegislationHeading section={section} />
 
       <Flex wrap gap="15px">
         <Button

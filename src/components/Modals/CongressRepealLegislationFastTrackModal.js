@@ -11,7 +11,7 @@ import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
+import LegislationHeading from '../Congress/LegislationHeading';
 
 function CongressRepealLegislationFastTrackModal({
   closeModal,
@@ -29,6 +29,12 @@ function CongressRepealLegislationFastTrackModal({
     fastTrack,
     fastTrackVotingPeriod,
     fastTrackEnactmentPeriod,
+    index,
+    year,
+    // eslint-disable-next-line no-shadow
+    tier,
+    // eslint-disable-next-line no-shadow
+    section,
   }) => {
     dispatch(
       congressActions.congressProposeRepealLegislation.call({
@@ -36,7 +42,10 @@ function CongressRepealLegislationFastTrackModal({
         discussionDescription,
         discussionLink,
         tier,
-        id,
+        id: {
+          index,
+          year: year.year(),
+        },
         section: section || null,
         fastTrack,
         fastTrackVotingPeriod,
@@ -53,7 +62,7 @@ function CongressRepealLegislationFastTrackModal({
       initialValues={{
         tier,
         year: dayjs(new Date(id.year, 0, 1)),
-        index: id.index,
+        index: parseInt(id.index) || 1,
         section,
         ...FastTrackDefaults,
       }}
@@ -64,7 +73,7 @@ function CongressRepealLegislationFastTrackModal({
         repeal
       </Title>
 
-      <ReadOnlyLegislation section={section} />
+      <LegislationHeading section={section} />
       <ProposalDiscussionFields />
       <FastTrackForm form={form} />
 

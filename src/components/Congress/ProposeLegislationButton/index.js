@@ -4,7 +4,7 @@ import router from '../../../router';
 
 export default function ProposeLegislationButton() {
   return (
-    <Button link href={router.congress.addLegislation}>
+    <Button primary href={router.congress.addLegislation}>
       Propose International Treaty
     </Button>
   );
