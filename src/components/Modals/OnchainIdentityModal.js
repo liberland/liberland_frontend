@@ -16,6 +16,7 @@ import styles from './styles.module.scss';
 import {
   parseDOB,
   parseAdditionalFlag,
+  parseCitizenshipJudgement,
   decodeAndFilter,
 } from '../../utils/identityParser';
 
@@ -28,7 +29,7 @@ function OnchainIdentityModal({
 }) {
   const defaultValues = useMemo(() => {
     if (identity.isSome) {
-      const { info } = identity.unwrap();
+      const { judgements, info } = identity.unwrap();
       const identityCitizen = parseAdditionalFlag(info.additional, 'citizen');
       const eResident = parseAdditionalFlag(info.additional, 'eresident');
       const company = parseAdditionalFlag(info.additional, 'company');
@@ -50,11 +51,11 @@ function OnchainIdentityModal({
         date_of_birth: dayjs(identityDOB) ?? undefined,
         older_than_15: !identityDOB,
         onChainIdentity,
-        hasIdentity: true,
+        hasUserWarn: parseCitizenshipJudgement(judgements),
       };
     }
     return {
-      hasIdentity: false,
+      hasUserWarn: false,
     };
   }, [identity, blockNumber, name]);
 
@@ -76,7 +77,7 @@ function OnchainIdentityModal({
         You are going to update your identity stored on blockchain. This needs
         to be up-to-date for your citizenship or e-residency.
       </Paragraph>
-      {defaultValues.hasIdentity && !isUserWarnAccepted && (
+      {defaultValues.hasUserWarn && !isUserWarnAccepted && (
         <Paragraph>
           <Alert
             type="warning"
@@ -140,19 +141,21 @@ function OnchainIdentityModal({
           )}
         </>
       )}
-      <Form.Item
-        layout="horizontal"
-        name="isUserWarnAccepted"
-        label="I want to change my identity"
-        valuePropName="checked"
-        rules={[{
-          validator: (_, val) => (
-            val ? Promise.resolve() : Promise.reject('Check if identity changes are intentional')
-          ),
-        }]}
-      >
-        <Checkbox />
-      </Form.Item>
+      {defaultValues.hasUserWarn && (
+        <Form.Item
+          layout="horizontal"
+          name="isUserWarnAccepted"
+          label="I want to change my identity"
+          valuePropName="checked"
+          rules={[{
+            validator: (_, val) => (
+              val ? Promise.resolve() : Promise.reject('Check if identity changes are intentional')
+            ),
+          }]}
+        >
+          <Checkbox />
+        </Form.Item>
+      )}
       <Flex wrap gap="15px">
         <Button className={styles.button} onClick={closeModal}>
           Cancel
