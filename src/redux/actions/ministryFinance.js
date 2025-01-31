@@ -7,6 +7,7 @@ export const {
   ministryFinanceSendLlm,
   ministryFinanceSendAssets,
   ministryFinanceSendLlmToPolitipool,
+  spending,
 } = createActions({
   MINISTRY_FINANCE_GET_WALLET: {
     call: undefined,
@@ -34,6 +35,11 @@ export const {
     failure: undefined,
   },
   MINISTRY_FINANCE_SEND_LLM_TO_POLITIPOOL: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SPENDING: {
     call: undefined,
     success: undefined,
     failure: undefined,

@@ -130,3 +130,8 @@ export const allBalance = createSelector(
   congressReducer,
   (reducer) => reducer.allBalance,
 );
+
+export const spendingSelector = createSelector(
+  congressReducer,
+  (reducer) => reducer.spending,
+);

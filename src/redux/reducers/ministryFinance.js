@@ -31,6 +31,7 @@ const initialState = {
     clerksIds: null,
   },
   scheduledCalls: [],
+  spending: null,
 };
 
 const ministryFinanceReducer = handleActions(
@@ -42,6 +43,7 @@ const ministryFinanceReducer = handleActions(
       ministryFinanceActions.ministryFinanceSendLlm.call,
       ministryFinanceActions.ministryFinanceSendAssets.call,
       ministryFinanceActions.ministryFinanceSendLlmToPolitipool.call,
+      ministryFinanceActions.spending.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -60,6 +62,8 @@ const ministryFinanceReducer = handleActions(
       ministryFinanceActions.ministryFinanceSendAssets.failure,
       ministryFinanceActions.ministryFinanceSendLlmToPolitipool.success,
       ministryFinanceActions.ministryFinanceSendLlmToPolitipool.failure,
+      ministryFinanceActions.spending.success,
+      ministryFinanceActions.spending.failure,
     )]: (state) => ({
       ...state,
       loading: false,
@@ -73,6 +77,11 @@ const ministryFinanceReducer = handleActions(
     [ministryFinanceActions.ministryFinanceGetWallet.success]: (state, action) => ({
       ...state,
       walletInfo: action.payload,
+    }),
+
+    [ministryFinanceActions.spending.success]: (state, action) => ({
+      ...state,
+      spending: action.payload,
     }),
   },
   initialState,

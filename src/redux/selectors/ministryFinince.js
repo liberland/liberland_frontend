@@ -53,3 +53,8 @@ export const totalBalance = createSelector(
     reducer.totalAmount.amount
   ),
 );
+
+export const spendingSelector = createSelector(
+  ministryFinanceReducer,
+  (reducer) => reducer.spending,
+);
