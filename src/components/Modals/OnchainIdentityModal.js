@@ -77,9 +77,17 @@ function OnchainIdentityModal({
       </Paragraph>
       {!isUserWarnAccepted && (
         <Paragraph>
-          Warning! Your identity is currently confirmed by citizenship office
-          as valid. Changing it will require reapproval - you&apos;ll
-          temporarily lose citizenship or e-resident rights onchain.
+          <Alert
+            type="warning"
+            message={(
+              <>
+                Warning! Your identity is currently confirmed by citizenship office
+                as valid. Changing it will require reapproval - you&apos;ll
+                temporarily lose citizenship or e-resident rights onchain.
+                Until its manually handled by ministry of interior which takes about two days.
+              </>
+            )}
+          />
         </Paragraph>
       )}
 
@@ -145,19 +153,6 @@ function OnchainIdentityModal({
       >
         <Checkbox />
       </Form.Item>
-      <Paragraph>
-        <Alert
-          type="warning"
-          message={(
-            <>
-              Warning! Your identity is currently confirmed by citizenship office
-              as valid. Changing it will require reapproval - you&apos;ll
-              temporarily lose citizenship or e-resident rights onchain.
-              Until its manually handled by ministry of interior which takes about two days.
-            </>
-          )}
-        />
-      </Paragraph>
       <Flex wrap gap="15px">
         <Button className={styles.button} onClick={closeModal}>
           Cancel
