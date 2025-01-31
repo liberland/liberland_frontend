@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Menu from 'antd/es/menu';
 import MenuIcon from '@ant-design/icons/MenuOutlined';
@@ -12,7 +13,9 @@ import { blockchainSelectors, userSelectors } from '../../../redux/selectors';
 import { blockchainActions, validatorActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 
-function UrlMenu() {
+function UrlMenu({
+  onNavigate,
+}) {
   const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
   const dispatch = useDispatch();
@@ -30,6 +33,10 @@ function UrlMenu() {
 
   const { pathname } = useLocation();
   const history = useHistory();
+  const navigate = (route) => {
+    history.push(route);
+    onNavigate?.();
+  };
   const getMenuKey = () => {
     if (isBiggerThanDesktop) {
       return 'large';
@@ -49,18 +56,35 @@ function UrlMenu() {
     };
   }, [matchedSubLink, pathname]);
   const createMenu = (navigation) => {
-    const subs = Object.entries(navigation.subLinks).map(([name, link]) => ({
-      label: name,
-      key: link,
-      onClick: () => history.push(link),
-    }));
+    if (isBiggerThanSmallScreen) {
+      const subs = Object.entries(navigation.subLinks).map(([name, link]) => ({
+        label: name,
+        key: link,
+        onClick: () => navigate(link),
+      }));
+      return {
+        icon: <img src={navigation.icon} alt="icon" className={styles.icon} />,
+        label: (
+          <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>
+            {navigation.title}
+          </span>
+        ),
+        key: navigation.route,
+        onClick: subs.length ? undefined : () => navigate(navigation.route),
+        onTitleClick: !subs.length ? undefined : () => navigate(navigation.route),
+        children: subs.length ? subs : undefined,
+      };
+    }
     return {
       icon: <img src={navigation.icon} alt="icon" className={styles.icon} />,
-      label: <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>{navigation.title}</span>,
+      label: (
+        <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>
+          {navigation.title}
+        </span>
+      ),
       key: navigation.route,
-      onClick: subs.length ? undefined : () => history.push(navigation.route),
-      onTitleClick: !subs.length ? undefined : () => history.push(navigation.route),
-      children: subs.length ? subs : undefined,
+      onClick: () => navigate(navigation.route),
+      onTitleClick: () => navigate(navigation.route),
     };
   };
 
@@ -76,7 +100,7 @@ function UrlMenu() {
 
   return (
     <Menu
-      mode={isBiggerThanSmallScreen ? 'inline' : 'horizontal'}
+      mode="inline"
       className={styles.sider}
       defaultOpenKeys={isBiggerThanDesktop ? Object.keys(openKeys) : undefined}
       selectedKeys={isBiggerThanDesktop ? [pathname] : undefined}
@@ -100,5 +124,9 @@ function UrlMenu() {
     />
   );
 }
+
+UrlMenu.propTypes = {
+  onNavigate: PropTypes.func,
+};
 
 export default UrlMenu;
