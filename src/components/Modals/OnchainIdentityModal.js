@@ -51,10 +51,13 @@ function OnchainIdentityModal({
         date_of_birth: dayjs(identityDOB) ?? undefined,
         older_than_15: !identityDOB,
         onChainIdentity,
-        isUserWarnAccepted: !parseCitizenshipJudgement(judgements),
+        hasIdentity: true,
+        knowGood: parseCitizenshipJudgement(judgements),
       };
     }
-    return {};
+    return {
+      hasIdentity: false,
+    };
   }, [identity, blockNumber, name]);
 
   const [form] = Form.useForm();
@@ -75,7 +78,7 @@ function OnchainIdentityModal({
         You are going to update your identity stored on blockchain. This needs
         to be up-to-date for your citizenship or e-residency.
       </Paragraph>
-      {!isUserWarnAccepted && (
+      {defaultValues.hasIdentity && !isUserWarnAccepted && (
         <Paragraph>
           <Alert
             type="warning"
@@ -139,7 +142,6 @@ function OnchainIdentityModal({
           )}
         </>
       )}
-
       <Form.Item
         layout="horizontal"
         name="isUserWarnAccepted"
