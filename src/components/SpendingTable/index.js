@@ -51,6 +51,18 @@ export default function SpendingTable({ spending }) {
           }) => index === parseInt(asset))?.metadata?.symbol || asset;
       }
     })();
+    const assetDecimals = (() => {
+      switch (asset) {
+        case '-':
+        case 'LLD':
+        case 'LLM':
+          return 12;
+        default:
+          return additionalAssets?.find(({
+            index,
+          }) => index === parseInt(asset))?.metadata?.decimals || 12;
+      }
+    })();
     return {
       timestamp: formatDate(timestamp, ' '),
       recipient: recipient !== '-' && (
@@ -59,7 +71,7 @@ export default function SpendingTable({ spending }) {
       asset: (
         <Flex wrap gap="7px" align="center">
           <div>
-            {value !== '-' && formatAssets(value, 12)}
+            {value !== '-' && formatAssets(value, assetDecimals)}
           </div>
           {assetSymbol !== '-' && (
             <>
