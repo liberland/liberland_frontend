@@ -7,12 +7,13 @@ import formatDate from '../../utils/formatDate';
 import CurrencyIcon from '../CurrencyIcon';
 import Table from '../Table';
 import CopyIconWithAddress from '../CopyIconWithAddress';
-import { identityActions } from '../../redux/actions';
-import { identitySelectors } from '../../redux/selectors';
+import { identityActions, walletActions } from '../../redux/actions';
+import { identitySelectors, walletSelectors } from '../../redux/selectors';
 import { formatAssets } from '../../utils/walletHelpers';
 
 export default function SpendingTable({ spending }) {
   const names = useSelector(identitySelectors.selectorIdentityMotions);
+  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -20,6 +21,10 @@ export default function SpendingTable({ spending }) {
       spending.map(({ recipient }) => recipient).filter((recipient) => recipient !== '-'),
     ));
   }, [dispatch, spending]);
+
+  useEffect(() => {
+    dispatch(walletActions.getAdditionalAssets.call());
+  }, [dispatch]);
 
   const displayData = useMemo(() => spending.map(({
     timestamp,
@@ -33,32 +38,48 @@ export default function SpendingTable({ spending }) {
     finalDestination,
     amountInUsd,
     date,
-    textRemark,
-  }) => ({
-    timestamp: formatDate(timestamp, ' '),
-    recipient: recipient !== '-' && (
-      <CopyIconWithAddress address={recipient} name={names?.[recipient]?.name} />
-    ),
-    asset: (
-      <Flex wrap gap="10px" align="center">
-        {value !== '-' && formatAssets(value, 12)}
-        {asset !== '-' && (
-          <>
-            {asset}
-            <CurrencyIcon size={20} symbol={asset} />
-          </>
-        )}
-      </Flex>
-    ),
-    category,
-    project,
-    supplier,
-    description,
-    finalDestination,
-    amountInUsd,
-    date: date !== '-' ? formatDate(date, ' ') : '-',
-    textRemark,
-  })), [spending, names]);
+  }) => {
+    const assetSymbol = (() => {
+      switch (asset) {
+        case '-':
+        case 'LLD':
+        case 'LLM':
+          return asset;
+        default:
+          return additionalAssets?.find(({
+            index,
+          }) => index === parseInt(asset))?.metadata?.symbol || asset;
+      }
+    })();
+    return {
+      timestamp: formatDate(timestamp, ' '),
+      recipient: recipient !== '-' && (
+        <CopyIconWithAddress address={recipient} name={names?.[recipient]?.name} />
+      ),
+      asset: (
+        <Flex wrap gap="7px" align="center">
+          <div>
+            {value !== '-' && formatAssets(value, 12)}
+          </div>
+          {assetSymbol !== '-' && (
+            <>
+              <div>
+                {assetSymbol}
+              </div>
+              <CurrencyIcon size={20} symbol={assetSymbol} />
+            </>
+          )}
+        </Flex>
+      ),
+      category,
+      project,
+      supplier,
+      description,
+      finalDestination,
+      amountInUsd,
+      date: date !== '-' ? formatDate(date, ' ') : '-',
+    };
+  }), [additionalAssets, spending, names]);
 
   return (
     <Collapse
@@ -105,10 +126,6 @@ export default function SpendingTable({ spending }) {
                 {
                   Header: 'Date',
                   accessor: 'date',
-                },
-                {
-                  Header: 'Remark',
-                  accessor: 'textRemark',
                 },
               ]}
               data={displayData}
