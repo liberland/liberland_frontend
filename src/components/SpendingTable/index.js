@@ -35,7 +35,7 @@ export default function SpendingTable({ spending }) {
     date,
     textRemark,
   }) => ({
-    timestamp: formatDate(timestamp),
+    timestamp: formatDate(timestamp, ' '),
     recipient: recipient !== '-' && (
       <CopyIconWithAddress address={recipient} name={names?.[recipient]?.name} />
     ),
@@ -56,7 +56,7 @@ export default function SpendingTable({ spending }) {
     description,
     finalDestination,
     amountInUsd,
-    date: date !== '-' ? formatDate(date) : '-',
+    date: date !== '-' ? formatDate(date, ' ') : '-',
     textRemark,
   })), [spending, names]);
 
