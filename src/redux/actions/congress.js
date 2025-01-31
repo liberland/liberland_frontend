@@ -28,6 +28,7 @@ export const {
   congressSendAssets,
   getAllBalanceForCongress,
   congressBudgetPropose,
+  spending,
 } = createActions({
   CONGRESS_BUDGET_PROPOSE: {
     call: undefined,
@@ -160,6 +161,11 @@ export const {
     failure: undefined,
   },
   CONGRESS_SEND_ASSETS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  SPENDING: {
     call: undefined,
     success: undefined,
     failure: undefined,

@@ -137,6 +137,7 @@ export default function* rootSaga() {
     congressSagas.getWalletWatcher(),
     congressSagas.getAllBalanceForCongressWatcher(),
     congressSagas.congressBudgetProposeWatcher(),
+    congressSagas.congressSpendingWatcher(),
 
     // ONBOARDING
     onboardingSagas.claimComplimentaryLLDWatcher(),
@@ -213,5 +214,6 @@ export default function* rootSaga() {
     ministryFinanceSagas.sendLldWatcher(),
     ministryFinanceSagas.sendLlmToPolitipoolWatcher(),
     ministryFinanceSagas.sendLlmWatcher(),
+    ministryFinanceSagas.ministryOfFinanceSpendingWatcher(),
   ]);
 }

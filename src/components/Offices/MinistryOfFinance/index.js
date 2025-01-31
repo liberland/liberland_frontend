@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import Flex from 'antd/es/flex';
 import { ministryFinanceActions, officesActions } from '../../../redux/actions';
 import { blockchainSelectors, ministryFinanceSelector, officesSelectors } from '../../../redux/selectors';
 import WalletCongresSenateWrapper from '../../WalletCongresSenate/Wrapper';
 import { OfficeType } from '../../../utils/officeTypeEnum';
+import SpendingTable from '../../SpendingTable';
 
 export default function Wallet() {
   const dispatch = useDispatch();
@@ -15,8 +17,11 @@ export default function Wallet() {
   const additionalAssets = useSelector(ministryFinanceSelector.additionalAssets);
   const balances = useSelector(ministryFinanceSelector.balances);
   const clerksIds = useSelector(ministryFinanceSelector.clerksMinistryFinance);
+  const spending = useSelector(ministryFinanceSelector.spendingSelector);
+  const userIsMember = clerksIds?.includes(walletAddress) || false;
 
   useEffect(() => {
+    dispatch(ministryFinanceActions.spending.call());
     dispatch(officesActions.getPalletIds.call());
   }, [dispatch]);
 
@@ -28,10 +33,12 @@ export default function Wallet() {
     dispatch(ministryFinanceActions.ministryFinanceGetAdditionalAssets.call());
   }, [dispatch, ministryFinanceWallet]);
 
-  if (!ministryFinanceWallet) return null;
-  const userIsMember = clerksIds.includes(walletAddress);
+  if (!ministryFinanceWallet) {
+    return null;
+  }
+
   return (
-    <div>
+    <Flex vertical gap="20px">
       <WalletCongresSenateWrapper
         userIsMember={userIsMember}
         totalBalance={totalBalance}
@@ -46,6 +53,9 @@ export default function Wallet() {
           LLMPolitipool: (data) => ministryFinanceActions.ministryFinanceSendLlmToPolitipool.call(data),
         }}
       />
-    </div>
+      {spending && (
+        <SpendingTable spending={spending} />
+      )}
+    </Flex>
   );
 }
