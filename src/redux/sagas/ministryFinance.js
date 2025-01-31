@@ -11,7 +11,7 @@ import { palletIdToAddress } from '../../utils/pallet';
 import { ministryFinanceActions } from '../actions';
 import { blockchainSelectors, ministryFinanceSelector, officesSelectors } from '../selectors';
 import { OfficeType } from '../../utils/officeTypeEnum';
-import { fetchMinistryOfFinanceSpending } from '../../api/backend';
+import { fetchMinistryOfFinanceSpending } from '../../api/middleware';
 
 const officeType = OfficeType.MINISTRY_FINANCE;
 

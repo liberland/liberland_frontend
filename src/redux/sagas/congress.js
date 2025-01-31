@@ -48,7 +48,7 @@ import { palletIdToAddress } from '../../utils/pallet';
 import { formatMerits } from '../../utils/walletHelpers';
 import { IndexHelper } from '../../utils/council/councilEnum';
 import { OfficeType } from '../../utils/officeTypeEnum';
-import { fetchCongressSpending } from '../../api/backend';
+import { fetchCongressSpending } from '../../api/middleware';
 
 const officeType = OfficeType.CONGRESS;
 

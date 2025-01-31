@@ -16,7 +16,9 @@ export default function SpendingTable({ spending }) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(identityActions.getIdentityMotions.call(spending.map(({ recipient }) => recipient)));
+    dispatch(identityActions.getIdentityMotions.call(
+      spending.map(({ recipient }) => recipient).filter((recipient) => recipient !== '-'),
+    ));
   }, [dispatch, spending]);
 
   const displayData = useMemo(() => spending.map(({
@@ -34,14 +36,18 @@ export default function SpendingTable({ spending }) {
     textRemark,
   }) => ({
     timestamp: formatDate(timestamp),
-    recipient: (
+    recipient: recipient !== '-' && (
       <CopyIconWithAddress address={recipient} name={names?.[recipient]?.name} />
     ),
     asset: (
-      <Flex wrap gap="10px">
-        {formatAssets(value, 12)}
-        {asset}
-        <CurrencyIcon size={20} symbol={asset} />
+      <Flex wrap gap="10px" align="center">
+        {value !== '-' && formatAssets(value, 12)}
+        {asset !== '-' && (
+          <>
+            {asset}
+            <CurrencyIcon size={20} symbol={asset} />
+          </>
+        )}
       </Flex>
     ),
     category,
@@ -50,7 +56,7 @@ export default function SpendingTable({ spending }) {
     description,
     finalDestination,
     amountInUsd,
-    date: formatDate(date),
+    date: date !== '-' ? formatDate(date) : '-',
     textRemark,
   })), [spending, names]);
 
