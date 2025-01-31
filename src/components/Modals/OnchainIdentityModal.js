@@ -16,7 +16,6 @@ import styles from './styles.module.scss';
 import {
   parseDOB,
   parseAdditionalFlag,
-  parseCitizenshipJudgement,
   decodeAndFilter,
 } from '../../utils/identityParser';
 
@@ -29,7 +28,7 @@ function OnchainIdentityModal({
 }) {
   const defaultValues = useMemo(() => {
     if (identity.isSome) {
-      const { judgements, info } = identity.unwrap();
+      const { info } = identity.unwrap();
       const identityCitizen = parseAdditionalFlag(info.additional, 'citizen');
       const eResident = parseAdditionalFlag(info.additional, 'eresident');
       const company = parseAdditionalFlag(info.additional, 'company');
@@ -52,7 +51,6 @@ function OnchainIdentityModal({
         older_than_15: !identityDOB,
         onChainIdentity,
         hasIdentity: true,
-        knowGood: parseCitizenshipJudgement(judgements),
       };
     }
     return {
