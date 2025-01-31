@@ -291,11 +291,6 @@ export const getDefaultValuesFromDataObject = (formObject, editMode = false) => 
     });
     defaultValues[dynamicField.key] = defaultValuesForField;
   });
-  Object.values(defaultValues).forEach((value) => {
-    if (Array.isArray(value) && value.length === 0) {
-      value.push({});
-    }
-  });
   return defaultValues;
 };
 
@@ -400,99 +395,101 @@ export function BuildRegistryForm({
             </React.Fragment>
           ))}
         </Flex>
-      </Flex>
-      <Form.Item
-        name="companyType"
-        label="Choose company type"
-        rules={[{ required: true }]}
-      >
-        <Radio.Group>
-          <Row gutter={16}>
-            <Col span={isLargerThanHdScreen ? 8 : 24}>
-              <Card
-                title={(
-                  <Radio value="Dormant">
-                    Dormant company
-                  </Radio>
-                )}
-              >
-                <Flex vertical gap="5px" align="stretch">
-                  <Paragraph className="signature">
-                    If you are registering a dormant company for reserving brand name,
-                    establishing presence in Liberland,
-                    using this company to drive Liberland traffic to some other business,
-                    or any other reason for which you do not intend to do any transactions or hold
-                    assets with this company until further notice (can change this at any time)
-                  </Paragraph>
-                  <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/12">
-                    Sign the Dormant Company contract
-                  </Button>
-                </Flex>
-              </Card>
-            </Col>
-            <Col span={isLargerThanHdScreen ? 8 : 24}>
-              <Card
-                title={(
-                  <Radio value="Liberland">
-                    Pure Liberland company
-                  </Radio>
-                )}
-              >
-                <Flex vertical gap="5px" align="stretch">
-                  <Paragraph className="signature">
-                    If you are registering a pure Liberland company, only operating under the jurisdiction of Liberland,
-                    such as the territory of Liberland, Liberland ecosystem, Liberland blockchain, or doing business
-                    only with Liberland citizens and e-residents
-                  </Paragraph>
-                  <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/14">
-                    Sign the Pure Liberland Company contract
-                  </Button>
-                </Flex>
-              </Card>
-            </Col>
-            <Col span={isLargerThanHdScreen ? 8 : 24}>
-              <Card
-                title={(
-                  <Radio value="International">
-                    Internationally operating company
-                  </Radio>
-                )}
-              >
-                <Flex vertical gap="5px" align="stretch">
-                  <Paragraph className="signature">
-                    If you are registering a Liberland company intended to do business internationally,
-                    within jurisdictions other than Liberland,
-                    you will need to comply with additional requirements and sign the
-                    &quot;GoodBoi&quot; contract
-                  </Paragraph>
-                  <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/13">
-                    Sign the International Operating Company contract
-                  </Button>
-                </Flex>
-              </Card>
-            </Col>
-          </Row>
-        </Radio.Group>
-      </Form.Item>
-      <Form.Item
-        label="I have signed the relevant company type contract"
-        name="signedContract"
-        rules={[{ required: true }]}
-        layout="horizontal"
-        valuePropName="checked"
-      >
-        <Checkbox disabled={!companyType} />
-      </Form.Item>
-      <Flex wrap gap="15px">
-        <Button onClick={() => history.push(router.companies.allCompanies)}>
-          Cancel
-        </Button>
-        <Button
-          primary
-          type="submit"
+        <Form.Item
+          name="companyType"
+          label="Choose company type"
+          rules={[{ required: true }]}
         >
-          {buttonMessage}
-        </Button>
+          <Radio.Group>
+            <Row gutter={16}>
+              <Col span={isLargerThanHdScreen ? 8 : 24}>
+                <Card
+                  title={(
+                    <Radio value="Dormant">
+                      Dormant company
+                    </Radio>
+                  )}
+                >
+                  <Flex vertical gap="5px" align="stretch">
+                    <Paragraph className="signature">
+                      If you are registering a dormant company for reserving brand name,
+                      establishing presence in Liberland,
+                      using this company to drive Liberland traffic to some other business,
+                      or any other reason for which you do not intend to do any transactions or hold
+                      assets with this company until further notice (can change this at any time)
+                    </Paragraph>
+                    <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/12">
+                      Sign the Dormant Company contract
+                    </Button>
+                  </Flex>
+                </Card>
+              </Col>
+              <Col span={isLargerThanHdScreen ? 8 : 24}>
+                <Card
+                  title={(
+                    <Radio value="Liberland">
+                      Pure Liberland company
+                    </Radio>
+                  )}
+                >
+                  <Flex vertical gap="5px" align="stretch">
+                    <Paragraph className="signature">
+                      If you are registering a pure Liberland company,
+                      only operating under the jurisdiction of Liberland,
+                      such as the territory of Liberland, Liberland ecosystem, Liberland blockchain, or doing business
+                      only with Liberland citizens and e-residents
+                    </Paragraph>
+                    <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/14">
+                      Sign the Pure Liberland Company contract
+                    </Button>
+                  </Flex>
+                </Card>
+              </Col>
+              <Col span={isLargerThanHdScreen ? 8 : 24}>
+                <Card
+                  title={(
+                    <Radio value="International">
+                      Internationally operating company
+                    </Radio>
+                  )}
+                >
+                  <Flex vertical gap="5px" align="stretch">
+                    <Paragraph className="signature">
+                      If you are registering a Liberland company intended to do business internationally,
+                      within jurisdictions other than Liberland,
+                      you will need to comply with additional requirements and sign the
+                      &quot;GoodBoi&quot; contract
+                    </Paragraph>
+                    <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/13">
+                      Sign the International Operating Company contract
+                    </Button>
+                  </Flex>
+                </Card>
+              </Col>
+            </Row>
+          </Radio.Group>
+        </Form.Item>
+        <Form.Item
+          label="I have signed the relevant company type contract"
+          name="signedContract"
+          rules={[{ required: true }]}
+          layout="horizontal"
+          valuePropName="checked"
+          className="big-checkbox-item"
+        >
+          <Checkbox disabled={!companyType} className="big-checkbox" />
+        </Form.Item>
+        <Flex wrap gap="15px">
+          <Button onClick={() => history.push(router.companies.allCompanies)}>
+            Cancel
+          </Button>
+          <Button
+            primary
+            type="submit"
+          >
+            {buttonMessage}
+          </Button>
+        </Flex>
       </Flex>
     </Form>
   );
