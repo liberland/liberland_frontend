@@ -39,7 +39,7 @@ const initialState = {
     budget: BN_ZERO,
     period: BN_ZERO,
   },
-  spending: null,
+  congressSpending: null,
 };
 
 const congressReducer = handleActions(
@@ -65,7 +65,7 @@ const congressReducer = handleActions(
       congressActions.renounceCandidacy.call,
       congressActions.getAllBalanceForCongress.call,
       congressActions.congressBudgetPropose.call,
-      congressActions.spending.call,
+      congressActions.congressSpending.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -100,8 +100,8 @@ const congressReducer = handleActions(
       congressActions.getAllBalanceForCongress.success,
       congressActions.congressBudgetPropose.failure,
       congressActions.congressBudgetPropose.success,
-      congressActions.spending.success,
-      congressActions.spending.failure,
+      congressActions.congressSpending.success,
+      congressActions.congressSpending.failure,
     )]: (state) => ({
       ...state,
       loading: false,
@@ -138,9 +138,9 @@ const congressReducer = handleActions(
       ...state,
       additionalAssets: action.payload,
     }),
-    [congressActions.spending.success]: (state, action) => ({
+    [congressActions.congressSpending.success]: (state, action) => ({
       ...state,
-      spending: action.payload,
+      congressSpending: action.payload,
     }),
   },
   initialState,

@@ -37,7 +37,6 @@ export default function SpendingTable({ spending }) {
     description,
     finalDestination,
     amountInUsd,
-    date,
   }) => {
     const assetSymbol = (() => {
       switch (asset) {
@@ -89,7 +88,6 @@ export default function SpendingTable({ spending }) {
       description,
       finalDestination,
       amountInUsd,
-      date: date !== '-' ? formatDate(date, ' ') : '-',
     };
   }), [additionalAssets, spending, names]);
 
@@ -135,10 +133,6 @@ export default function SpendingTable({ spending }) {
                   Header: 'Amount in USD',
                   accessor: 'amountInUsd',
                 },
-                {
-                  Header: 'Date',
-                  accessor: 'date',
-                },
               ]}
               data={displayData}
             />
@@ -161,8 +155,5 @@ SpendingTable.propTypes = {
     description: PropTypes.string.isRequired,
     finalDestination: PropTypes.string.isRequired,
     amountInUsd: PropTypes.string.isRequired,
-    date: PropTypes.instanceOf(Date).isRequired,
-    currency: PropTypes.string.isRequired,
-    textRemark: PropTypes.string.isRequired,
   }).isRequired).isRequired,
 };

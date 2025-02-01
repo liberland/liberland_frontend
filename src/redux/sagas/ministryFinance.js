@@ -32,7 +32,7 @@ function* getWalletWorker() {
 
 function* spendingWorker() {
   const spending = yield call(fetchMinistryOfFinanceSpending);
-  yield put(ministryFinanceActions.spending.success(spending));
+  yield put(ministryFinanceActions.ministryFinanceSpending.success(spending));
 }
 
 export function* getWalletWatcher() {
@@ -170,7 +170,7 @@ export function* sendAssetsTransferWatcher() {
 
 export function* ministryOfFinanceSpendingWatcher() {
   yield* blockchainWatcher(
-    ministryFinanceActions.spending,
+    ministryFinanceActions.ministryFinanceSpending,
     spendingWorker,
   );
 }
