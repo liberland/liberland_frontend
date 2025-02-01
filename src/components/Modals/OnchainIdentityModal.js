@@ -77,22 +77,6 @@ function OnchainIdentityModal({
         You are going to update your identity stored on blockchain. This needs
         to be up-to-date for your citizenship or e-residency.
       </Paragraph>
-      {defaultValues.hasUserWarn && !isUserWarnAccepted && (
-        <Paragraph>
-          <Alert
-            type="warning"
-            message={(
-              <>
-                Warning! Your identity is currently confirmed by citizenship office
-                as valid. Changing it will require reapproval - you&apos;ll
-                temporarily lose citizenship or e-resident rights onchain.
-                Until its manually handled by ministry of interior which takes about two days.
-              </>
-            )}
-          />
-        </Paragraph>
-      )}
-
       <Form.Item name="display" label="Display name" rules={[{ required: true }]}>
         <Input placeholder="Display name" />
       </Form.Item>
@@ -140,6 +124,21 @@ function OnchainIdentityModal({
             </Form.Item>
           )}
         </>
+      )}
+      {defaultValues.hasUserWarn && !isUserWarnAccepted && (
+        <Paragraph>
+          <Alert
+            type="warning"
+            message={(
+              <>
+                Warning! Your identity is currently confirmed by citizenship office
+                as valid. Changing it will require reapproval - you&apos;ll
+                temporarily lose citizenship or e-resident rights onchain.
+                Until its manually handled by ministry of interior which takes about two days.
+              </>
+            )}
+          />
+        </Paragraph>
       )}
       {defaultValues.hasUserWarn && (
         <Form.Item
