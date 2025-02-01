@@ -21,7 +21,7 @@ export default function Wallet() {
   const userIsMember = clerksIds?.includes(walletAddress) || false;
 
   useEffect(() => {
-    dispatch(ministryFinanceActions.spending.call());
+    dispatch(ministryFinanceActions.ministryFinanceSpending.call());
     dispatch(officesActions.getPalletIds.call());
   }, [dispatch]);
 

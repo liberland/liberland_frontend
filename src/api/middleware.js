@@ -55,8 +55,6 @@ const fetchSpending = async (wallet) => {
       description: spending[7],
       finalDestination: spending[8],
       amountInUsd: spending[9],
-      date: spending[10] === '-' ? '-' : new Date(spending[10]),
-      currency: spending[11],
     }));
   } catch (e) {
     // eslint-disable-next-line no-console

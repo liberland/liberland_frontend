@@ -45,7 +45,7 @@ export default function Overview() {
           />
         </Col>
       </Row>
-      {nominators?.length && (
+      {nominators?.length ? (
         <Collapse
           defaultActiveKey={['by', 'staking']}
           items={[
@@ -72,7 +72,7 @@ export default function Overview() {
             },
           ].filter(Boolean)}
         />
-      )}
+      ) : null}
     </Flex>
   );
 }

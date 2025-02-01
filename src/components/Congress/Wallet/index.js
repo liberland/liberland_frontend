@@ -18,7 +18,7 @@ export default function Wallet() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(congressActions.spending.call());
+    dispatch(congressActions.congressSpending.call());
   }, [dispatch]);
 
   if (!congresAccountAddress || !balances) {

@@ -133,5 +133,5 @@ export const allBalance = createSelector(
 
 export const spendingSelector = createSelector(
   congressReducer,
-  (reducer) => reducer.spending,
+  (reducer) => reducer.congressSpending,
 );

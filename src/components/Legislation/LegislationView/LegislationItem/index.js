@@ -30,7 +30,6 @@ function LegislationItem({
 
   return (
     <Collapse
-      collapsible="icon"
       items={[{
         label: `Legislation ${year}/${index}`,
         key: 'legislation',
@@ -110,7 +109,7 @@ function LegislationItem({
               }, section) => (
                 <SectionItem
                   tier={tier}
-                  content={content.unwrap()}
+                  content={content}
                   id={id}
                   section={section}
                   repealProposalReferendum={{

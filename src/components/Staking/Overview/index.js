@@ -77,7 +77,7 @@ export default function StakingOverview() {
             label: 'My validator status',
             children: <Validator />,
           },
-          info.stash && {
+          !info.isStakingValidator && info.stash && {
             key: 'nominator',
             label: 'Validators',
             children: <Nominator />,

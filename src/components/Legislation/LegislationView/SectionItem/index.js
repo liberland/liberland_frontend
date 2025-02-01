@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { hexToString, isHex } from '@polkadot/util';
 import { useMediaQuery } from 'usehooks-ts';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Card from 'antd/es/card';
@@ -15,7 +16,11 @@ const checkTextToShow = (content) => {
   if (!content.isSome) {
     return 'Repealed';
   }
-  return content.unwrap().toHuman();
+  const human = content.unwrap().toHuman();
+  if (isHex(human)) {
+    return hexToString(human);
+  }
+  return human;
 };
 
 function SectionItem({
