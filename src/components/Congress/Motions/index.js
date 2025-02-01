@@ -30,10 +30,8 @@ function Motions({
   }, [dispatch, isSenate]);
 
   useEffect(() => {
-    if (motionIds.length > 0) {
-      const votes = motions.map((item) => item.votes);
-      dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds.concat(votes.flat())))));
-    }
+    const votes = motions.map((item) => item.votes);
+    dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds.concat(votes.flat())))));
   }, [motions, motionIds, dispatch]);
 
   if (!motions || motions.length < 1) {

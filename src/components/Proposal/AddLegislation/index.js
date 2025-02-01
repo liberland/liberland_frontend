@@ -1,6 +1,9 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Collapse from 'antd/es/collapse';
+import List from 'antd/es/list';
+import Card from 'antd/es/card';
+import Markdown from 'markdown-to-jsx';
 import PropTypes from 'prop-types';
 import router from '../../../router';
 import styles from '../styles.module.scss';
@@ -38,18 +41,20 @@ function AddLegislation({ proposal, isDetailsHidden }) {
             label: 'Details',
             key: 'details',
             children: (
-              <>
-                {sections.map((section, idx) => (
-                // eslint-disable-next-line react/no-array-index-key
-                  <Fragment key={idx}>
-                    <p>
-                      Section #
-                      {idx}
-                    </p>
-                    <p className={styles.legislationContent}>{new TextDecoder('utf-8').decode(section)}</p>
-                  </Fragment>
-                ))}
-              </>
+              <List
+                dataSource={sections}
+                renderItem={(section, idx) => (
+                  <List.Item>
+                    <Card title={`Section #${idx}`}>
+                      <div className={styles.legislationContent}>
+                        <Markdown>
+                          {new TextDecoder('utf-8').decode(section)}
+                        </Markdown>
+                      </div>
+                    </Card>
+                  </List.Item>
+                )}
+              />
             ),
           },
         ]}

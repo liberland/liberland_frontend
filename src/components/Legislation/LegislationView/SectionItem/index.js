@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { hexToString, isHex } from '@polkadot/util';
-import { useMediaQuery } from 'usehooks-ts';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
+import Markdown from 'markdown-to-jsx';
 import VetoStats from '../VetoStats';
 import ProposeButton from '../ProposeButton';
 import AmendButton from '../AmendButton';
@@ -31,8 +31,6 @@ function SectionItem({
     repealReferendum,
     repealProposal,
   } = repealProposalReferendum;
-  const isBigScreen = useMediaQuery('(min-width: 1025px)');
-
   const text = useMemo(() => checkTextToShow(
     content,
   ), [content]);
@@ -47,6 +45,7 @@ function SectionItem({
           section={section}
         />
       )}
+      className={styles.card}
       actions={[
         <Flex className={styles.actions} justify="end" wrap gap="15px">
           <ExistingMotionsAndReferendums
@@ -72,13 +71,13 @@ function SectionItem({
         </Flex>,
       ]}
     >
-      <Card.Meta
-        description={(
-          <Paragraph ellipsis={{ rows: isBigScreen ? 60 : 40, expandable: true }}>
-            {text}
-          </Paragraph>
-        )}
-      />
+      <Paragraph
+        className={styles.paragraph}
+      >
+        <Markdown>
+          {text}
+        </Markdown>
+      </Paragraph>
     </Card>
   );
 }
