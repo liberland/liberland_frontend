@@ -4,6 +4,7 @@ import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
 import Alert from 'antd/es/alert';
 import Flex from 'antd/es/flex';
+import Modal from 'antd/es/modal';
 import WarningTwoTone from '@ant-design/icons/WarningTwoTone';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList';
@@ -21,6 +22,7 @@ function Nominator() {
 
   const [selectedValidatorsAsTargets, setSelectedValidatorsAsTargets] = useState(nominatorTargets);
   const [isListSelectedValidatorsChanged, setIsListSelectedValidatorsChanged] = useState(false);
+  const [navigationAction, setNavigationAction] = useState();
 
   const isMaxNumValidatorsSelected = (selectedValidators) => selectedValidators.length > 15;
   const toggleSelectedValidator = (validatorAddress) => {
@@ -40,12 +42,18 @@ function Nominator() {
 
   const updateNominations = (newNominatorTargets) => {
     dispatch(walletActions.setNominatorTargets.call({ newNominatorTargets, walletAddress }));
+    setNavigationAction(undefined);
   };
 
   const goToAdvancedPage = () => {
     // eslint-disable-next-line max-len
     const stakingLink = `https://polkadotjs.blockchain.liberland.org/?rpc=${process.env.REACT_APP_NODE_ADDRESS}#/staking`;
     window.open(stakingLink);
+  };
+
+  const handleDiscardChanges = () => {
+    navigationAction?.();
+    setNavigationAction(undefined);
   };
 
   useEffect(() => {
@@ -76,7 +84,8 @@ function Nominator() {
         action();
         return true;
       }
-      return window.confirm('You have unsaved changes. Are you sure you want to leave?');
+      setNavigationAction(() => action);
+      return false;
     });
     return unblock;
   }, [history, isListSelectedValidatorsChanged]);
@@ -99,6 +108,16 @@ function Nominator() {
 
   return (
     <Flex vertical gap="20px">
+      <Modal
+        open={Boolean(navigationAction)}
+        title="Are you certain you want to leave?"
+        onOk={() => updateNominations(selectedValidatorsAsTargets)}
+        onCancel={handleDiscardChanges}
+        okText="Update nominations"
+        cancelText="Cancel and leave"
+      >
+        Your nominations haven&#96;t been saved, would you like to save them?
+      </Modal>
       {!selectedValidatorsAsTargets?.length && (
         <Alert
           icon={<WarningTwoTone twoToneColor={['#243F5F', 'transparent']} />}

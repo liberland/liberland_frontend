@@ -241,9 +241,16 @@ textarea.ant-input {
 }
 
 .big-checkbox {
+  zoom: 1.5;
+
   .ant-checkbox-inner {
     border: solid 1.2px #243F5F;
     box-shadow: 0 0 2px #243F5F;
+  }
+}
+.big-checkbox-item {
+  .ant-form-item-label {
+    align-content: center;
   }
 }
 
