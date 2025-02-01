@@ -602,7 +602,7 @@ const buildAdditionals = (values, blockNumber) => {
 
 const setIdentity = async (values, walletAddress) => {
   const asData = (v) => (v ? { Raw: v } : null);
-  const truncate = (v) => (v.length > 32 ? v.substring(0, 32) : v);
+  const truncate = (v) => (v?.length > 32 ? v.substring(0, 32) : v);
   const api = await getApi();
   const blockNumber = await api.derive.chain.bestNumber();
   const info = {
