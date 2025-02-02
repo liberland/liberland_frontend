@@ -26,7 +26,6 @@ function Congress() {
     <Switch>
       <Route exact path={router.congress.overview} component={loader(() => import('./Overview'))} />
       <Route exact path={router.congress.motions} component={MotionsWrapper} />
-      <Route exact path={router.congress.treasury} component={loader(() => import('./Treasury'))} />
       <Route exact path={router.congress.wallet} component={loader(() => import('./Wallet'))} />
       <Route
         exact

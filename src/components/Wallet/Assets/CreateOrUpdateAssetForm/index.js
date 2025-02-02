@@ -192,7 +192,6 @@ function CreateOrUpdateAssetFormModalWrapper({
     <>
       <Button
         primary
-        medium
         onClick={() => setShow(true)}
       >
         {isCreate ? `Create ${isStock ? 'stock' : 'asset'}` : 'Update'}

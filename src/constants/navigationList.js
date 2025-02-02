@@ -154,7 +154,6 @@ export const navigationList = [
     subLinks: {
       Overview: router.congress.overview,
       Motions: router.congress.motions,
-      Treasury: router.congress.treasury,
       'Propose International treaty': router.congress.addLegislation,
       'Propose legislaton': router.congress.addLegislationViaReferendum,
       Wallet: router.congress.wallet,

@@ -5,9 +5,11 @@ import List from 'antd/es/list';
 import Card from 'antd/es/card';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
+import { useSelector } from 'react-redux';
 import { getValidatorDisplay } from '../ValidatorList/utils';
 import NominatorUpdateActions from '../NominatorUpdateActions';
 import styles from './styles.module.scss';
+import { identitySelectors } from '../../../../redux/selectors';
 
 function ValidatorListMobile({
   validators,
@@ -17,6 +19,7 @@ function ValidatorListMobile({
   updateNominations,
   goToAdvancedPage,
 }) {
+  const identities = useSelector(identitySelectors.selectorIdentityMotions);
   return (
     <Flex vertical gap="20px">
       <Flex wrap gap="15px" justify="start">
@@ -34,6 +37,7 @@ function ValidatorListMobile({
           selectingValidatorsDisabled,
           toggleSelectedValidator,
           validators,
+          identities,
         })}
         pagination={{ pageSize: 5 }}
         renderItem={({

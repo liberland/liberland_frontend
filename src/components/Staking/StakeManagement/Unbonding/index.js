@@ -19,7 +19,7 @@ function Unbonding({ info }) {
   const stakingData = stakingInfoToProgress(stakingInfo, sessionProgress) ?? [];
 
   useEffect(() => {
-    if (info.unlocking.length !== 0) {
+    if (info?.unlocking?.length) {
       dispatch(validatorActions.getStakingData.call());
     }
   }, [dispatch, blockNumber, info]);

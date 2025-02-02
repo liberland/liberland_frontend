@@ -9,7 +9,7 @@ import WarningTwoTone from '@ant-design/icons/WarningTwoTone';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList';
 import ValidatorListMobile from './ValidatorListMobile';
-import { walletActions } from '../../../redux/actions';
+import { identityActions, walletActions } from '../../../redux/actions';
 import { areArraysSame } from '../../../utils/staking';
 
 function Nominator() {
@@ -104,6 +104,13 @@ function Nominator() {
     dispatch(walletActions.getValidators.call());
     dispatch(walletActions.getNominatorTargets.call());
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(identityActions.getIdentityMotions.call(
+      validators.map(({ accountId }) => accountId.toString()),
+    ));
+  }, [validators, dispatch]);
+
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1600px)');
 
   return (

@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
+import { useSelector } from 'react-redux';
 import Table from '../../../Table';
 import { getValidatorDisplay } from './utils';
 import NominatorUpdateActions from '../NominatorUpdateActions';
+import { identitySelectors } from '../../../../redux/selectors';
 
 function ValidatorList({
   validators,
@@ -13,6 +15,8 @@ function ValidatorList({
   goToAdvancedPage,
   updateNominations,
 }) {
+  const identities = useSelector(identitySelectors.selectorIdentityMotions);
+
   return (
     <Table
       footer={(
@@ -29,6 +33,7 @@ function ValidatorList({
         selectingValidatorsDisabled,
         toggleSelectedValidator,
         validators,
+        identities,
       })}
       columns={[
         {
