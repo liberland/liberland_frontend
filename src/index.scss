@@ -276,5 +276,17 @@ textarea.ant-input {
 .centeredList {
   .ant-row {
     justify-content: center;
+
+    & > * {
+      flex: 1;
+    }
+
+    @media screen and (min-width: map-get($breakpoints, 'widescreen')) {
+      justify-content: start;
+
+      & > * {
+        flex: unset;
+      }
+    }
   }
 }

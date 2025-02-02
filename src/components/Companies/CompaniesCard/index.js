@@ -12,12 +12,12 @@ import { useMediaQuery } from 'usehooks-ts';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import CompanyActions from '../CompanyActions';
 import styles from './styles.module.scss';
-import { getAvatarParameters } from '../../../utils/avatar';
 import truncate from '../../../utils/truncate';
 import { isValidUrl } from '../../../utils/url';
 import { simplifyCompanyObject } from '../utils';
 import Button from '../../Button/Button';
 import router from '../../../router';
+import ColorAvatar from '../../ColorAvatar';
 
 function CompaniesCard({
   registries,
@@ -53,10 +53,6 @@ function CompaniesCard({
         const owner = !hideOwner && registeredCompany.principals?.[0]?.name;
         const address = registeredCompany.principals?.[0]?.walletAddress;
         const logo = registeredCompany.logoURL;
-        const { color: ownerColor, text: ownerText } = getAvatarParameters(owner);
-        const { color: companyColor, text: companyText } = getAvatarParameters(
-          registeredCompany.name || registeredCompany.id || 'C',
-        );
         const buttons = (
           <CompanyActions
             registeredCompany={registeredCompany}
@@ -79,9 +75,11 @@ function CompaniesCard({
         const companyLogo = isValidUrl(logo) ? (
           <Avatar size={companyLogoSize} src={logo} className={styles.avatar} />
         ) : (
-          <Avatar size={companyLogoSize} className={styles.avatar} style={{ backgroundColor: companyColor }}>
-            {companyText}
-          </Avatar>
+          <ColorAvatar
+            size={companyLogoSize}
+            className={styles.avatar}
+            name={registeredCompany.name || registeredCompany.id || 'C'}
+          />
         );
         if (isLargerThanHdScreen) {
           return (
@@ -108,9 +106,7 @@ function CompaniesCard({
               <Flex wrap gap="15px">
                 {owner && (
                   <Flex wrap gap="15px" className={styles.owner}>
-                    <Avatar size={54} style={{ backgroundColor: ownerColor }}>
-                      {ownerText}
-                    </Avatar>
+                    <ColorAvatar size={54} name={owner} />
                     <Flex vertical gap="5px" className={styles.ownerName}>
                       {owner && (
                         <>
@@ -153,7 +149,7 @@ function CompaniesCard({
                   Company owner
                 </div>
                 <Flex wrap gap="5px" align="center">
-                  <Avatar size={19} style={{ backgroundColor: ownerColor }} />
+                  <ColorAvatar size={19} name={owner} />
                   <CopyIconWithAddress address={address} name={owner} isTruncate />
                 </Flex>
               </Flex>

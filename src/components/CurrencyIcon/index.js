@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Avatar from 'antd/es/avatar';
-import { getAvatarParameters } from '../../utils/avatar';
 import LLD from '../../assets/icons/lld.svg';
 import LLM from '../../assets/icons/llm.svg';
 import ACA from '../../assets/icons/aca.svg';
@@ -16,6 +15,7 @@ import USDT from '../../assets/icons/usdt.svg';
 import VAL from '../../assets/icons/val.svg';
 import WBTC from '../../assets/icons/wbtc.svg';
 import XOR from '../../assets/icons/xor.svg';
+import ColorAvatar from '../ColorAvatar';
 
 const defaultIcons = {
   LLD,
@@ -38,15 +38,12 @@ export default function CurrencyIcon({
   symbol,
   size,
 }) {
-  const { color, text } = getAvatarParameters(symbol);
   const icon = defaultIcons[symbol.toUpperCase()];
   if (icon) {
     return <Avatar size={size} src={icon} alt={symbol} />;
   }
   return (
-    <Avatar size={size} style={{ backgroundColor: color, fontSize: 12 }}>
-      {text}
-    </Avatar>
+    <ColorAvatar name={symbol} fontSize={12} size={size} />
   );
 }
 

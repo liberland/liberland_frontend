@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import List from 'antd/es/list';
-import Avatar from 'antd/es/avatar';
 import Flex from 'antd/es/flex';
 import { identitySelectors } from '../../../redux/selectors';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
-import { getAvatarParameters } from '../../../utils/avatar';
+import ColorAvatar from '../../ColorAvatar';
 
 function Voters({ voting }) {
   const names = useSelector(identitySelectors.selectorIdentityMotions);
@@ -18,15 +17,10 @@ function Voters({ voting }) {
       renderItem={(item) => {
         const id = item.toString();
         const identity = names?.[id]?.identity;
-        const { color, text } = getAvatarParameters(
-          identity?.name || identity?.legal || id,
-        );
         return (
           <List.Item>
             <Flex wrap align="center" gap="10px">
-              <Avatar size={50} style={{ backgroundColor: color }}>
-                {text}
-              </Avatar>
+              <ColorAvatar size={50} name={identity?.name || identity?.legal || id} />
               <Flex vertical gap="5px">
                 <div className="description">
                   {identity?.legal || identity?.name || 'Unknown'}

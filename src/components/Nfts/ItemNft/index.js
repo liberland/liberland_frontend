@@ -66,6 +66,7 @@ function ItemNft({
   return (
     <Card
       title={collectionMetadata?.data || name || nftId}
+      className={styles.card}
       actions={[
         isOnSaleItem && itemPrice && (
           <Button

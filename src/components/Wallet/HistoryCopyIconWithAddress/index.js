@@ -1,11 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
-import Avatar from 'antd/es/avatar';
 import { useSelector } from 'react-redux';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import { identitySelectors } from '../../../redux/selectors';
-import { getAvatarParameters } from '../../../utils/avatar';
+import ColorAvatar from '../../ColorAvatar';
 
 function HistoryCopyIconWithAddress({
   address,
@@ -13,12 +12,9 @@ function HistoryCopyIconWithAddress({
 }) {
   const { identity } = useSelector(identitySelectors.selectorIdentityMotions)?.[address] || {};
   const { legal, name } = identity || {};
-  const { color, text } = getAvatarParameters(legal || name || address);
   return (
     <Flex wrap gap="10px">
-      <Avatar style={{ backgroundColor: color, fontSize: '12px' }} size={24}>
-        {text}
-      </Avatar>
+      <ColorAvatar size={24} name={legal || name || address} fontSize={12} />
       <CopyIconWithAddress
         address={address}
         isTruncate={isTruncate}
