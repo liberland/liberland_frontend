@@ -100,19 +100,13 @@ p {
 }
 
 .description {
-  font-family: Open Sans;
   font-weight: 600;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
   color: #ACBDC5;
 }
 
 .values {
-  font-family: Open Sans;
   text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
+  font-weight: 600;
 }
 
 .ant-card {
@@ -264,4 +258,23 @@ textarea.ant-input {
   overflow: hidden;
   clip: rect(0,0,0,0);
   border: 0;
+}
+
+.ant-tabs-card {
+  .ant-tabs-nav-list {
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  .ant-tabs-tab {
+    background: none!important;
+    border-radius: 8px!important;
+    border: none!important;
+  }
+}
+
+.centeredList {
+  .ant-row {
+    justify-content: center;
+  }
 }

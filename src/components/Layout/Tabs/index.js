@@ -26,6 +26,7 @@ function Tabs() {
 
   return tabs?.length && hasTab ? (
     <TabsInternal
+      type="card"
       activeKey={pathname}
       onChange={(activeKey) => {
         history.push(activeKey);

@@ -7,7 +7,6 @@ import { calculateProperBalance, parseDollars } from '../../../utils/walletHelpe
 import { walletActions } from '../../../redux/actions';
 import { encodeRemarkUser } from '../../../api/nodeRpcCall';
 import { walletSelectors } from '../../../redux/selectors';
-import ButtonArrowIcon from '../../../assets/icons/button-arrow.svg';
 import Button from '../../Button/Button';
 import ModalRoot from '../../Modals/ModalRoot';
 import styles from '../../Modals/styles.module.scss';
@@ -71,7 +70,6 @@ function RemarkTransferModalWrapper() {
         className={styles.button}
       >
         Transfer remark
-        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>

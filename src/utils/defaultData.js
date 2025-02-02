@@ -9,7 +9,7 @@ export const newCompanyDataObject = {
     },
     {
       key: 'purpose',
-      name: 'Purpose',
+      name: 'Description',
       display: 'Truthful scope of business',
       type: 'text',
       encryptable: false,

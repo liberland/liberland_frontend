@@ -18,6 +18,10 @@
 }
 .preview {
     margin-bottom: 0!important;
+    @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
+        margin-left: 15px;
+        margin-right: 15px;
+    }
 }
 .meta {
     max-width: 250px!important;
@@ -25,17 +29,17 @@
 }
 .avatar {
     margin-left: 1px;
-    @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+    @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
         margin-left: 0;
     }
 }
 .action {
-    @media screen and (min-width: map-get($breakpoints, 'hd-screen')){
+    @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
         min-width: 240px;
     }
 }
 .owner {
-    width: 240px;
+    width: 260px;
 }
 .ownerName {
     width: 170px;

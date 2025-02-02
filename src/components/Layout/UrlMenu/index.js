@@ -12,6 +12,7 @@ import { navigationList } from '../../../constants/navigationList';
 import { blockchainSelectors, userSelectors } from '../../../redux/selectors';
 import { blockchainActions, validatorActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
+import ChangeWallet from '../../Home/ChangeWallet';
 
 function UrlMenu({
   onNavigate,
@@ -56,12 +57,12 @@ function UrlMenu({
     };
   }, [matchedSubLink, pathname]);
   const createMenu = (navigation) => {
+    const subs = Object.entries(navigation.subLinks).map(([name, link]) => ({
+      label: name,
+      key: link,
+      onClick: () => navigate(link),
+    }));
     if (isBiggerThanSmallScreen) {
-      const subs = Object.entries(navigation.subLinks).map(([name, link]) => ({
-        label: name,
-        key: link,
-        onClick: () => navigate(link),
-      }));
       return {
         icon: <img src={navigation.icon} alt="icon" className={styles.icon} />,
         label: (
@@ -83,8 +84,8 @@ function UrlMenu({
         </span>
       ),
       key: navigation.route,
-      onClick: () => navigate(navigation.route),
-      onTitleClick: () => navigate(navigation.route),
+      children: subs.length ? subs : undefined,
+      onClick: subs.length ? undefined : () => navigate(navigation.route),
     };
   };
 
@@ -98,6 +99,18 @@ function UrlMenu({
     className: styles.switchContainer,
   }] : [];
 
+  const changeWallet = isBiggerThanSmallScreen ? [] : [
+    {
+      label: (
+        <ChangeWallet />
+      ),
+      key: 'wallets',
+      className: styles.switchContainer,
+      onClick: (e) => e.preventDefault(),
+      onTitleClick: (e) => e.preventDefault(),
+    },
+  ];
+
   return (
     <Menu
       mode="inline"
@@ -108,6 +121,7 @@ function UrlMenu({
       overflowedIndicator={isBiggerThanSmallScreen ? undefined : <MenuIcon />}
       items={[
         ...switcher,
+        ...changeWallet,
         ...isBiggerThanSmallScreen ? [
           {
             label: 'For Citizens',

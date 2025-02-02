@@ -28,6 +28,7 @@ function OnSale() {
       grid={{
         gutter: 16,
       }}
+      className="centeredList"
       renderItem={({
         collectionId,
         nftId,

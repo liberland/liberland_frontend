@@ -19,7 +19,6 @@ import Validator from '../../utils/validator';
 import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { encodeRemark } from '../../api/nodeRpcCall';
-import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 import { OfficeType } from '../../utils/officeTypeEnum';
 
 function SendAssetModal({
@@ -188,7 +187,6 @@ function SendAssetModalWrapper({
         Send
         {' '}
         {assetData.metadata.symbol}
-        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>

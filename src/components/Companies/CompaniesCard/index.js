@@ -6,6 +6,7 @@ import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
 import { useHistory } from 'react-router-dom';
 import cx from 'classnames';
+import Alert from 'antd/es/alert';
 import Markdown from 'markdown-to-jsx';
 import { useMediaQuery } from 'usehooks-ts';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
@@ -29,14 +30,15 @@ function CompaniesCard({
     () => registries?.map((registry) => simplifyCompanyObject(registry || {})),
     [registries],
   );
+  const dataSource = simplify?.filter((registered) => registered && !registered.invalid);
   return (
     <List
-      dataSource={simplify?.filter((registered) => registered && !registered.invalid)}
+      dataSource={dataSource}
       className={cx(styles.companies, 'listWithFooter')}
       size="small"
-      pagination={{ pageSize: 10 }}
+      pagination={dataSource?.length ? { pageSize: 10 } : false}
       itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
-      footer={type === 'mine' ? (
+      footer={type === 'mine' && dataSource?.length > 0 ? (
         <Button
           primary
           onClick={() => history.push(router.companies.create)}
@@ -44,6 +46,9 @@ function CompaniesCard({
           Register a new company
         </Button>
       ) : undefined}
+      locale={{
+        emptyText: <Alert type="info" message="No companies found" />,
+      }}
       renderItem={(registeredCompany) => {
         const owner = !hideOwner && registeredCompany.principals?.[0]?.name;
         const address = registeredCompany.principals?.[0]?.walletAddress;

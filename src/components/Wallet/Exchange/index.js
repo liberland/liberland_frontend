@@ -1,10 +1,11 @@
 import React from 'react';
 import Alert from 'antd/es/alert';
+import Flex from 'antd/es/flex';
 import ExchangeList from './ExchangeList';
 
 function Exchange() {
   return (
-    <>
+    <Flex vertical gap="20px">
       <Alert
         message={(
           <>
@@ -19,7 +20,7 @@ function Exchange() {
         type="warning"
       />
       <ExchangeList />
-    </>
+    </Flex>
   );
 }
 

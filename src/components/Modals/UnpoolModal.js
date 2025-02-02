@@ -12,7 +12,6 @@ import styles from './styles.module.scss';
 import { walletSelectors } from '../../redux/selectors';
 import { valueToBN, formatMerits } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
-import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 
 function UnpoolModal({
   closeModal,
@@ -83,7 +82,6 @@ function UnpoolModalWrapper() {
     <>
       <Button className={styles.button} onClick={() => setOpen(true)}>
         Unpool
-        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
       </Button>
       {open && (
         <ModalRoot closeModal={() => setOpen(false)}>

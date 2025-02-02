@@ -7,13 +7,11 @@ import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import ModalRoot from '../ModalRoot';
 import Button from '../../Button/Button';
-import MinusIcon from '../../../assets/icons/minus.svg';
 import { calculatePooled, getDecimalsForAsset } from '../../../utils/dexFormatter';
 import { AssetsPropTypes, ReservedAssetPropTypes } from '../../Wallet/Exchange/proptypes';
 import { dexActions } from '../../../redux/actions';
 import { blockchainSelectors, dexSelectors } from '../../../redux/selectors';
 import { calculateAmountMin, formatAssets } from '../../../utils/walletHelpers';
-import styles from '../styles.module.scss';
 
 function RemoveLiquidityModal({
   closeModal,
@@ -179,7 +177,6 @@ function RemoveLiquidityModalWrapper({
     <>
       <Button onClick={() => setShow(true)}>
         Remove Liquidity
-        <img src={MinusIcon} className={styles.backIcon} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>

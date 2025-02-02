@@ -67,6 +67,7 @@ function OwnedNfts() {
       </Flex>
       {nfts.length ? (
         <List
+          className="centeredList"
           dataSource={nfts}
           grid={{
             gutter: 16,
