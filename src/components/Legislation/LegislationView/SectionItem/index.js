@@ -18,9 +18,9 @@ const checkTextToShow = (content) => {
   }
   const human = content.unwrap().toHuman();
   if (isHex(human)) {
-    return hexToString(human);
+    return hexToString(human) || '';
   }
-  return human;
+  return human || '';
 };
 
 function SectionItem({
