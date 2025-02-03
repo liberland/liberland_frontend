@@ -6,14 +6,12 @@ import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import InputNumber from 'antd/es/input-number';
 import Checkbox from 'antd/es/checkbox/Checkbox';
-import cx from 'classnames';
 import { BN } from '@polkadot/util';
 import ModalRoot from './ModalRoot';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
 import { dexSelectors, walletSelectors, blockchainSelectors } from '../../redux/selectors';
-import PlusIcon from '../../assets/icons/plus-dark.svg';
 import {
   convertTransferData,
   convertToEnumDex,
@@ -421,7 +419,6 @@ function TradeTokensModalWrapper({
         {asset1ToShow}
         {' for '}
         {asset2ToShow}
-        <img src={PlusIcon} className={cx(styles.backIcon, styles.darken)} alt="button icon" />
       </Button>
       {show && (
         <ModalRoot>

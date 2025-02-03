@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import { useHistory } from 'react-router-dom';
-import { useMediaQuery } from 'usehooks-ts';
 import Avatar from 'antd/es/avatar';
 import Dropdown from 'antd/es/dropdown';
 import Flex from 'antd/es/flex';
@@ -11,7 +10,6 @@ import UserIcon from '../../assets/icons/user.svg';
 import { userSelectors } from '../../redux/selectors';
 import { authActions } from '../../redux/actions';
 import Button from '../Button/Button';
-import ChangeWallet from '../Home/ChangeWallet';
 import styles from './styles.module.scss';
 
 function UserMenu() {
@@ -19,7 +17,6 @@ function UserMenu() {
   const history = useHistory();
   const user = useSelector(userSelectors.selectUser);
   const dispatch = useDispatch();
-  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 576px)');
 
   const logoutAction = {
     key: 'logout',
@@ -41,10 +38,7 @@ function UserMenu() {
       menu={{
         items: [
           logoutAction,
-        ].concat(isBiggerThanSmallScreen ? [] : [{
-          key: 'wallets',
-          label: <ChangeWallet />,
-        }]),
+        ],
         onClick: ({ key }) => {
           switch (key) {
             case logoutAction.key:

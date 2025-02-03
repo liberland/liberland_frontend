@@ -14,7 +14,6 @@ import styles from './styles.module.scss';
 import { walletActions } from '../../redux/actions';
 import { parseMerits, valueToBN } from '../../utils/walletHelpers';
 import { walletSelectors } from '../../redux/selectors';
-import ButtonArrowIcon from '../../assets/icons/button-arrow.svg';
 
 function SendLLMModal({
   closeModal,
@@ -98,8 +97,7 @@ function SendLLMModalWrapper() {
   return (
     <>
       <Button className={styles.button} onClick={() => setOpen(true)}>
-        Send LLM
-        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
+        Send
       </Button>
       {open && (
         <ModalRoot>

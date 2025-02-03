@@ -9,7 +9,6 @@ import Card from 'antd/es/card';
 import Tag from 'antd/es/tag';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
-import Avatar from 'antd/es/avatar';
 import Markdown from 'markdown-to-jsx';
 import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
 import { useHistory } from 'react-router-dom';
@@ -24,7 +23,7 @@ import { contractsActions, identityActions } from '../../../redux/actions';
 import { contractsSelectors, identitySelectors } from '../../../redux/selectors';
 import { useHideTitle } from '../../Layout/HideTitle';
 import styles from './styles.module.scss';
-import { getAvatarParameters } from '../../../utils/avatar';
+import ColorAvatar from '../../ColorAvatar';
 
 function ContractItem({
   contractId,
@@ -192,9 +191,7 @@ function ContractItem({
                     || identities?.[item]?.identity?.name
                     || identities?.[item]?.identity?.legal
                     || 'Unknown';
-                  const { color: avatarColor, text } = getAvatarParameters(
-                    displayName,
-                  );
+
                   return (
                     <Card
                       size="small"
@@ -210,9 +207,7 @@ function ContractItem({
                           </Flex>
                         )}
                         avatar={(
-                          <Avatar style={{ backgroundColor: avatarColor }}>
-                            {text}
-                          </Avatar>
+                          <ColorAvatar name={displayName} />
                         )}
                         description={(
                           <CopyIconWithAddress

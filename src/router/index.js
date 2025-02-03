@@ -82,7 +82,6 @@ export default {
   congress: {
     overview: '/home/congress/overview',
     motions: '/home/congress/motions',
-    treasury: '/home/congress/treasury',
     addLegislation: '/home/congress/add-legislation',
     addLegislationViaReferendum:
       '/home/congress/add-legislation-via-referendum',

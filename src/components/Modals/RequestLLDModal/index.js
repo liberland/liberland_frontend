@@ -16,7 +16,6 @@ import { identitySelectors } from '../../../redux/selectors';
 import { identityActions } from '../../../redux/actions';
 import { formatDollars, parseDollars } from '../../../utils/walletHelpers';
 import Table from '../../Table';
-import ButtonArrowIcon from '../../../assets/icons/button-arrow.svg';
 import router from '../../../router';
 import styles from '../styles.module.scss';
 import CopyLink from './CopyLink';
@@ -244,8 +243,7 @@ function RequestLLDModalWrapper(props) {
   return (
     <>
       <Button className={styles.button} onClick={() => setShow(true)}>
-        Request LLD
-        <img src={ButtonArrowIcon} className={styles.arrowIcon} alt="button icon" />
+        Request
       </Button>
       {show && (
         <ModalRoot>

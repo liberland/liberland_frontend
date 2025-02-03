@@ -33,7 +33,7 @@ export default function StakeManagement() {
   const { unlock, blocks } = stakingData?.[0] || {};
 
   useEffect(() => {
-    if (info.unlocking.length !== 0) {
+    if (info?.unlocking?.length) {
       dispatch(validatorActions.getStakingData.call());
     }
   }, [dispatch, blockNumber, info]);

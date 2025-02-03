@@ -124,7 +124,6 @@ function MintAssetFormModalWrapper({
     <>
       <Button
         primary
-        medium
         onClick={() => setShow(true)}
       >
         {isStock ? 'Issue stock' : 'Mint asset'}

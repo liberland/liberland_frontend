@@ -107,17 +107,19 @@ function LegislationItem({
               renderItem={({
                 content, repealMotion, repealReferendum, repealProposal,
               }, section) => (
-                <SectionItem
-                  tier={tier}
-                  content={content}
-                  id={id}
-                  section={section}
-                  repealProposalReferendum={{
-                    repealMotion,
-                    repealReferendum,
-                    repealProposal,
-                  }}
-                />
+                <List.Item>
+                  <SectionItem
+                    tier={tier}
+                    content={content}
+                    id={id}
+                    section={section}
+                    repealProposalReferendum={{
+                      repealMotion,
+                      repealReferendum,
+                      repealProposal,
+                    }}
+                  />
+                </List.Item>
               )}
             />
           </Card>

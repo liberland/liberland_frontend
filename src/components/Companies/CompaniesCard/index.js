@@ -6,17 +6,18 @@ import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
 import { useHistory } from 'react-router-dom';
 import cx from 'classnames';
+import Alert from 'antd/es/alert';
 import Markdown from 'markdown-to-jsx';
 import { useMediaQuery } from 'usehooks-ts';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import CompanyActions from '../CompanyActions';
 import styles from './styles.module.scss';
-import { getAvatarParameters } from '../../../utils/avatar';
 import truncate from '../../../utils/truncate';
 import { isValidUrl } from '../../../utils/url';
 import { simplifyCompanyObject } from '../utils';
 import Button from '../../Button/Button';
 import router from '../../../router';
+import ColorAvatar from '../../ColorAvatar';
 
 function CompaniesCard({
   registries,
@@ -29,14 +30,15 @@ function CompaniesCard({
     () => registries?.map((registry) => simplifyCompanyObject(registry || {})),
     [registries],
   );
+  const dataSource = simplify?.filter((registered) => registered && !registered.invalid);
   return (
     <List
-      dataSource={simplify?.filter((registered) => registered && !registered.invalid)}
+      dataSource={dataSource}
       className={cx(styles.companies, 'listWithFooter')}
       size="small"
-      pagination={{ pageSize: 10 }}
+      pagination={dataSource?.length ? { pageSize: 10 } : false}
       itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
-      footer={type === 'mine' ? (
+      footer={type === 'mine' && dataSource?.length > 0 ? (
         <Button
           primary
           onClick={() => history.push(router.companies.create)}
@@ -44,14 +46,13 @@ function CompaniesCard({
           Register a new company
         </Button>
       ) : undefined}
+      locale={{
+        emptyText: <Alert type="info" message="No companies found" />,
+      }}
       renderItem={(registeredCompany) => {
         const owner = !hideOwner && registeredCompany.principals?.[0]?.name;
         const address = registeredCompany.principals?.[0]?.walletAddress;
         const logo = registeredCompany.logoURL;
-        const { color: ownerColor, text: ownerText } = getAvatarParameters(owner);
-        const { color: companyColor, text: companyText } = getAvatarParameters(
-          registeredCompany.name || registeredCompany.id || 'C',
-        );
         const buttons = (
           <CompanyActions
             registeredCompany={registeredCompany}
@@ -74,9 +75,11 @@ function CompaniesCard({
         const companyLogo = isValidUrl(logo) ? (
           <Avatar size={companyLogoSize} src={logo} className={styles.avatar} />
         ) : (
-          <Avatar size={companyLogoSize} className={styles.avatar} style={{ backgroundColor: companyColor }}>
-            {companyText}
-          </Avatar>
+          <ColorAvatar
+            size={companyLogoSize}
+            className={styles.avatar}
+            name={registeredCompany.name || registeredCompany.id || 'C'}
+          />
         );
         if (isLargerThanHdScreen) {
           return (
@@ -103,9 +106,7 @@ function CompaniesCard({
               <Flex wrap gap="15px">
                 {owner && (
                   <Flex wrap gap="15px" className={styles.owner}>
-                    <Avatar size={54} style={{ backgroundColor: ownerColor }}>
-                      {ownerText}
-                    </Avatar>
+                    <ColorAvatar size={54} name={owner} />
                     <Flex vertical gap="5px" className={styles.ownerName}>
                       {owner && (
                         <>
@@ -148,7 +149,7 @@ function CompaniesCard({
                   Company owner
                 </div>
                 <Flex wrap gap="5px" align="center">
-                  <Avatar size={19} style={{ backgroundColor: ownerColor }} />
+                  <ColorAvatar size={19} name={owner} />
                   <CopyIconWithAddress address={address} name={owner} isTruncate />
                 </Flex>
               </Flex>

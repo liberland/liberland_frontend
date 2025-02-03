@@ -84,11 +84,15 @@ export const navigationList = [
     icon: WalletIcon,
     isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED === 'true',
     subLinks: {
-      Companies: router.companies.home,
       'All companies': router.companies.allCompanies,
+      'My companies': router.companies.home,
     },
     extra: {
       [router.companies.home]: {
+        link: router.companies.create,
+        title: 'Register a new company',
+      },
+      [router.companies.allCompanies]: {
         link: router.companies.create,
         title: 'Register a new company',
       },
@@ -150,7 +154,6 @@ export const navigationList = [
     subLinks: {
       Overview: router.congress.overview,
       Motions: router.congress.motions,
-      Treasury: router.congress.treasury,
       'Propose International treaty': router.congress.addLegislation,
       'Propose legislaton': router.congress.addLegislationViaReferendum,
       Wallet: router.congress.wallet,
@@ -206,7 +209,6 @@ export const footerLinks = {
     Blockchain: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}blockchain`,
     Contributions: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}contribution`,
     Contacts: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}contact`,
-    'Space programme': 'https://app.charmverse.io/liberland-space-program/liberland-space-program-7985497939281838',
   },
   Legal: {
     Constitution: `${process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}constitution`,

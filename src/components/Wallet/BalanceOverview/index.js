@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
@@ -12,39 +13,14 @@ import RequestLLDModalWrapper from '../../Modals/RequestLLDModal';
 import UnpoolLLMModalWrapper from '../../Modals/UnpoolModal';
 import PolitipoolLLMModalWrapper from '../../Modals/PolitipoolModal';
 import MoneyCard from '../../MoneyCard';
+import Button from '../../Button/Button';
+import router from '../../../router';
 
 function BalanceOverview({
   balances, liquidMerits, showStaked,
 }) {
-  const overviewInfo = useMemo(() => (showStaked
-    ? [
-      {
-        amount: formatMerits(balances.liberstake.amount),
-        title: 'PolitiPooled LLM',
-        currency: 'LLM',
-        icon: LLM,
-        actions: [
-          <UnpoolLLMModalWrapper key="unpool" />,
-        ],
-      },
-      {
-        amount: formatDollars(balances.polkastake.amount),
-        title: 'Validator Staked LLD',
-        currency: 'LLD',
-        icon: LLD,
-      },
-    ]
-    : []).concat([
-    {
-      amount: formatMerits(liquidMerits),
-      title: 'Liquid LLM',
-      currency: 'LLM',
-      icon: LLM,
-      actions: [
-        <SendLLMModalWrapper key="send" />,
-        <PolitipoolLLMModalWrapper key="pool" />,
-      ],
-    },
+  const history = useHistory();
+  const overviewInfo = useMemo(() => [
     {
       amount: formatDollars(balances.liquidAmount.amount),
       title: 'Liquid LLD',
@@ -55,7 +31,44 @@ function BalanceOverview({
         <RequestLLDModalWrapper key="request" />,
       ],
     },
-  ]), [balances.liberstake.amount, balances.liquidAmount.amount, balances.polkastake.amount, liquidMerits, showStaked]);
+    showStaked && {
+      amount: formatDollars(balances.polkastake.amount),
+      title: 'Validator Staked LLD',
+      currency: 'LLD',
+      icon: LLD,
+      actions: [
+        <Button primary onClick={() => history.push(router.staking.overview)}>
+          Stake
+        </Button>,
+      ],
+    },
+    {
+      amount: formatMerits(liquidMerits),
+      title: 'Liquid LLM',
+      currency: 'LLM',
+      icon: LLM,
+      actions: [
+        <SendLLMModalWrapper key="send" />,
+        <PolitipoolLLMModalWrapper key="pool" />,
+      ],
+    },
+    showStaked && {
+      amount: formatMerits(balances.liberstake.amount),
+      title: 'PolitiPooled LLM',
+      currency: 'LLM',
+      icon: LLM,
+      actions: [
+        <UnpoolLLMModalWrapper key="unpool" />,
+      ],
+    },
+  ].filter(Boolean), [
+    balances.liberstake.amount,
+    balances.liquidAmount.amount,
+    balances.polkastake.amount,
+    liquidMerits,
+    showStaked,
+    history,
+  ]);
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
 

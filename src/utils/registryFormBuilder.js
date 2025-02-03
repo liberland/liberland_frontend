@@ -192,6 +192,7 @@ export function GetFieldsForm({
         >
           <List
             dataSource={fields}
+            locale={{ emptyText: 'No data found' }}
             renderItem={(field, index) => (
               <Card
                 title={`${displayName} ${index + 1}`}
@@ -329,7 +330,7 @@ export function BuildRegistryForm({
       onFinish={callback}
       layout="vertical"
     >
-      <Flex vertical gap="30px">
+      <Flex vertical gap="15px">
         <Flex vertical>
           <Title level={1}>
             {companyId
@@ -395,6 +396,7 @@ export function BuildRegistryForm({
             </React.Fragment>
           ))}
         </Flex>
+        <Divider />
         <Form.Item
           name="companyType"
           label="Choose company type"
@@ -402,7 +404,7 @@ export function BuildRegistryForm({
         >
           <Radio.Group>
             <Row gutter={16}>
-              <Col span={isLargerThanHdScreen ? 8 : 24}>
+              <Col span={isLargerThanHdScreen ? 8 : 23}>
                 <Card
                   title={(
                     <Radio value="Dormant">
@@ -419,12 +421,13 @@ export function BuildRegistryForm({
                       assets with this company until further notice (can change this at any time)
                     </Paragraph>
                     <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/12">
-                      Sign the Dormant Company contract
+                      Sign contract
                     </Button>
                   </Flex>
                 </Card>
               </Col>
-              <Col span={isLargerThanHdScreen ? 8 : 24}>
+              {!isLargerThanHdScreen ? <Divider /> : null}
+              <Col span={isLargerThanHdScreen ? 8 : 23}>
                 <Card
                   title={(
                     <Radio value="Liberland">
@@ -440,12 +443,13 @@ export function BuildRegistryForm({
                       only with Liberland citizens and e-residents
                     </Paragraph>
                     <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/14">
-                      Sign the Pure Liberland Company contract
+                      Sign contract
                     </Button>
                   </Flex>
                 </Card>
               </Col>
-              <Col span={isLargerThanHdScreen ? 8 : 24}>
+              {!isLargerThanHdScreen ? <Divider /> : null}
+              <Col span={isLargerThanHdScreen ? 8 : 23}>
                 <Card
                   title={(
                     <Radio value="International">
@@ -461,7 +465,7 @@ export function BuildRegistryForm({
                       &quot;GoodBoi&quot; contract
                     </Paragraph>
                     <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/13">
-                      Sign the International Operating Company contract
+                      Sign contract
                     </Button>
                   </Flex>
                 </Card>
@@ -469,8 +473,9 @@ export function BuildRegistryForm({
             </Row>
           </Radio.Group>
         </Form.Item>
+        <Divider />
         <Form.Item
-          label="I have signed the relevant company type contract"
+          label="Signed company contract"
           name="signedContract"
           rules={[{ required: true }]}
           layout="horizontal"

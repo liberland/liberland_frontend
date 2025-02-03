@@ -25,7 +25,7 @@ function ActionsMenu({
           minimumBalance={defaultValues.balance}
         />
       )}
-      <Button medium onClick={onClose}>
+      <Button onClick={onClose}>
         Close
       </Button>
     </Flex>
@@ -66,7 +66,7 @@ function ActionsMenuModalWrapper({
 
   return (
     <div>
-      <Button primary nano onClick={() => setShow(true)}>
+      <Button primary onClick={() => setShow(true)}>
         Actions menu
       </Button>
       {show && (

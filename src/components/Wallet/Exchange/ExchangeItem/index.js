@@ -58,11 +58,11 @@ function ExchangeItem({ poolData, assetsPoolData }) {
 
   const liqPoolDescription = (
     <div className={styles.liquidityPool}>
-      <span className={styles.description}>
+      <span className="description">
         Liquidity pool
       </span>
       &nbsp;
-      <span className={styles.values}>
+      <span className="values">
         {formatAssets(reserved?.asset1 || '0', decimals1, { symbol: asset1ToShow, optionalAll: true })}
         {' / '}
         {formatAssets(reserved?.asset2 || '0', decimals2, { symbol: asset2ToShow, optionalAll: true })}
@@ -98,7 +98,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
       {!isBiggerThanDesktop && liqPoolDescription}
       <Flex wrap gap="15px">
         <Flex wrap gap="15px" flex={0.8} justify="space-between">
-          <Flex wrap gap="15px" flex={0.5}>
+          <Flex wrap gap="15px" align="center" flex={0.5}>
             <TradeTokensModalWrapper
               assets={assets}
               asset1ToShow={asset1ToShow}
@@ -106,29 +106,29 @@ function ExchangeItem({ poolData, assetsPoolData }) {
               isBuy
             />
             <div>
-              <div className={styles.description}>
+              <div className="description">
                 {'1 '}
                 {asset1Name}
               </div>
-              <div className={styles.values}>
+              <div className="values">
                 {asset2AmountForAsset1}
                 {' '}
                 {asset2Name}
               </div>
             </div>
           </Flex>
-          <Flex wrap gap="15px" flex={0.5}>
+          <Flex wrap gap="15px" align="center" flex={0.5}>
             <TradeTokensModalWrapper
               assets={assets}
               asset1ToShow={asset1ToShow}
               asset2ToShow={asset2ToShow}
             />
             <div>
-              <div className={styles.description}>
+              <div className="description">
                 {'1 '}
                 {asset2Name}
               </div>
-              <div className={styles.values}>
+              <div className="values">
                 {asset1AmountForAsset2}
                 {' '}
                 {asset1Name}

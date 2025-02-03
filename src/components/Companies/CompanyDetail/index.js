@@ -15,13 +15,13 @@ import styles from './styles.module.scss';
 import { useHideTitle } from '../../Layout/HideTitle';
 import CopyInput from '../../CopyInput';
 import { useCompanyDataFromUrl } from '../hooks';
-import { getAvatarParameters } from '../../../utils/avatar';
 import CompanyActions from '../CompanyActions';
 import Button from '../../Button/Button';
 import router from '../../../router';
 import { tryFormatDollars, tryFormatNumber } from '../../../utils/walletHelpers';
 import CompanyPersonas from '../CompanyPersonas';
 import { simplifyCompanyObject } from '../utils';
+import ColorAvatar from '../../ColorAvatar';
 
 function CompanyDetail() {
   const { mainDataObject: complexDataObject, request } = useCompanyDataFromUrl();
@@ -34,7 +34,6 @@ function CompanyDetail() {
     return <Alert type="error" message="Company data invalid!" />;
   }
 
-  const { color, text } = getAvatarParameters(mainDataObject.name || mainDataObject.id || 'C');
   const fullLink = `${window.location.protocol}//${window.location.host}${router.companies.allCompanies}`;
 
   return (
@@ -53,9 +52,10 @@ function CompanyDetail() {
           {mainDataObject.logoURL ? (
             <Avatar size={70} src={mainDataObject.logoURL} />
           ) : (
-            <Avatar size={70} style={{ backgroundColor: color }}>
-              {text}
-            </Avatar>
+            <ColorAvatar
+              name={mainDataObject.name || mainDataObject.id || 'C'}
+              size={70}
+            />
           )}
 
           <Flex vertical gap="5px">

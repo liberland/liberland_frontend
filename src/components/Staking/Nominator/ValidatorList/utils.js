@@ -11,11 +11,11 @@ export const getValidatorDisplay = ({
   selectedValidatorsAsTargets,
   toggleSelectedValidator,
   selectingValidatorsDisabled,
+  identities,
 }) => validators.map(({
   bondTotal,
   bondOwn,
   bondOther,
-  displayName,
   commission,
   blocked,
   stakedReturnCmp,
@@ -29,7 +29,12 @@ export const getValidatorDisplay = ({
   const otherValue = bondOther && formatDollars(sanitizeValue(bondOther.toString()));
   const nominatedByMe = selectedValidatorsAsTargets.includes(address);
   return {
-    name: <StakeParticipantDisplay displayName={displayName} address={address} />,
+    name: (
+      <StakeParticipantDisplay
+        address={address}
+        displayName={identities?.[address]?.identity?.legal || identities?.[address]?.identity?.name}
+      />
+    ),
     address: <CopyIconWithAddress address={address} isTruncate />,
     total: (
       <DollarValue value={totalValue} />

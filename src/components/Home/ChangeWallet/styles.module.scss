@@ -14,3 +14,14 @@
   width: 14px;
   height: 14px;
 }
+.button {
+  margin-top: 5px;
+  height: 25px;
+  width: 100%;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
+    margin-top: 0px;
+    height: initial;
+    width: initial;
+  }
+}

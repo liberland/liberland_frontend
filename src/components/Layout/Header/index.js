@@ -7,7 +7,7 @@ import LiberlandLettermark from '../../../assets/icons/Liberland_Lettermark.svg'
 import LiberlandLettermarkMobile from '../../../assets/icons/Liberland_Lettermark_Mobile.svg';
 import ChangeWallet from '../../Home/ChangeWallet';
 import UserMenu from '../../UserMenu';
-import UrlMenu from '../UrlMenu';
+import MobileMenu from '../MobileMenu';
 
 function Header() {
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
@@ -25,7 +25,7 @@ function Header() {
         </>
       ) : (
         <>
-          <UrlMenu />
+          <MobileMenu />
           <img alt="logo" src={LiberlandLettermarkMobile} className={styles.mobileLogo} />
           <div className={styles.mobileUser}>
             <UserMenu />

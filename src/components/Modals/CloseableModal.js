@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import Modal from 'antd/es/modal';
 import PropTypes from 'prop-types';
 
-function CloseableModal({ children, onClose }) {
+function CloseableModal({
+  children,
+  onClose,
+  className,
+  classNames,
+}) {
   const [open, setOpen] = useState(true);
   return (
     <Modal
@@ -10,6 +15,8 @@ function CloseableModal({ children, onClose }) {
       footer={null}
       closable
       maskClosable
+      classNames={classNames}
+      className={className}
       onCancel={() => {
         setOpen(false);
         onClose();
@@ -23,6 +30,9 @@ function CloseableModal({ children, onClose }) {
 CloseableModal.propTypes = {
   children: PropTypes.node,
   onClose: PropTypes.func.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  classNames: PropTypes.object,
+  className: PropTypes.string,
 };
 
 export default CloseableModal;
