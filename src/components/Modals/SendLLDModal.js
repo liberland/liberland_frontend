@@ -13,7 +13,7 @@ import { parseDollars, parseMerits } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
 import { walletSelectors } from '../../redux/selectors';
 import modalWrapper from './components/ModalWrapper';
-import ButtonModalArrow from './components/OpenModalButtonWithArrow';
+import OpenModalButton from './components/OpenModalButton';
 
 function SendLLDForm({ onClose }) {
   const dispatch = useDispatch();
@@ -89,7 +89,7 @@ SendLLDForm.propTypes = {
 };
 
 function ButtonModal(props) {
-  return <ButtonModalArrow text="Send" {...props} />;
+  return <OpenModalButton text="Send" {...props} />;
 }
 
 const SendLLDModal = modalWrapper(SendLLDForm, ButtonModal);

@@ -18,8 +18,8 @@ import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { encodeRemark } from '../../api/nodeRpcCall';
 import { OfficeType } from '../../utils/officeTypeEnum';
-import ButtonModalArrow from './components/OpenModalButtonWithArrow';
 import modalWrapper from './components/ModalWrapper';
+import OpenModalButton from './components/OpenModalButton';
 
 function SendAssetForm({
   onClose, assetData, isRemarkNeeded, officeType,
@@ -176,7 +176,7 @@ function ButtonModal(props) {
   const { assetData } = props;
   const { metadata } = assetData;
 
-  return <ButtonModalArrow text={`Send ${metadata.symbol}`} {...props} />;
+  return <OpenModalButton text={`Send ${metadata.symbol}`} {...props} />;
 }
 
 ButtonModal.propTypes = {

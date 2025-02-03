@@ -64,7 +64,7 @@ function Loader({ children }) {
 
   useEffect(() => {
     if (isLoading) {
-      showModal(<LoadingModal />);
+      showModal(<LoadingModal />, { maskClosable: false });
     } else {
       closeLastNModals(1);
     }

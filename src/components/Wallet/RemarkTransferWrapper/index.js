@@ -7,8 +7,8 @@ import { walletActions } from '../../../redux/actions';
 import { encodeRemarkUser } from '../../../api/nodeRpcCall';
 import { walletSelectors } from '../../../redux/selectors';
 import TransferWithRemarkForm from '../../Modals/TransferWithRemarkModal';
-import ButtonModalArrow from '../../Modals/components/OpenModalButtonWithArrow';
 import modalWrapper from '../../Modals/components/ModalWrapper';
+import OpenModalButton from '../../Modals/components/OpenModalButton';
 
 function RemarkTransferWrapper({ onClose }) {
   const dispatch = useDispatch();
@@ -61,7 +61,7 @@ RemarkTransferWrapper.propTypes = {
 };
 
 function ButtonModal(props) {
-  return <ButtonModalArrow text="Transfer remark" {...props} />;
+  return <OpenModalButton text="Transfer remark" {...props} />;
 }
 
 const RemarkTransferModal = modalWrapper(RemarkTransferWrapper, ButtonModal);

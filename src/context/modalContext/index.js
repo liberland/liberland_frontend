@@ -45,7 +45,7 @@ export function ModalProvider({ children }) {
           open
           footer={null}
           closable={!!props?.onClose}
-          maskClosable
+          maskClosable={props.maskClosable !== false}
           onCancel={() => {
             if (props?.onClose) props.onClose();
             setModals((prevModals) => prevModals.filter((modal) => modal.id !== id));
@@ -62,4 +62,5 @@ export function ModalProvider({ children }) {
 ModalProvider.propTypes = {
   children: PropTypes.node.isRequired,
   onClose: PropTypes.func.isRequired,
+  maskClosable: PropTypes.bool,
 };

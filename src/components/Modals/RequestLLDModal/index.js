@@ -19,7 +19,7 @@ import router from '../../../router';
 import styles from '../styles.module.scss';
 import CopyLink from './CopyLink';
 import modalWrapper from '../components/ModalWrapper';
-import ButtonModalArrow from '../components/OpenModalButtonWithArrow';
+import OpenModalButton from '../components/OpenModalButton';
 
 function RequestLLDForm({ onClose, walletAddress }) {
   const [form] = Form.useForm();
@@ -229,7 +229,7 @@ RequestLLDForm.propTypes = {
 };
 
 function ButtonModal(props) {
-  return <ButtonModalArrow text="Request LLD" {...props} />;
+  return <OpenModalButton text="Request LLD" {...props} />;
 }
 
 const RequestLLDModal = modalWrapper(RequestLLDForm, ButtonModal);

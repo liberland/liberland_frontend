@@ -13,7 +13,7 @@ import { walletActions } from '../../redux/actions';
 import { parseMerits, valueToBN } from '../../utils/walletHelpers';
 import { walletSelectors } from '../../redux/selectors';
 import modalWrapper from './components/ModalWrapper';
-import ButtonModalArrow from './components/OpenModalButtonWithArrow';
+import OpenModalButton from './components/OpenModalButton';
 
 function SendLLMForm({ onClose }) {
   const dispatch = useDispatch();
@@ -77,7 +77,7 @@ SendLLMForm.propTypes = {
 };
 
 function ButtonModal(props) {
-  return <ButtonModalArrow text="Send" {...props} />;
+  return <OpenModalButton text="Send" {...props} />;
 }
 
 const SendLLMModal = modalWrapper(SendLLMForm, ButtonModal);

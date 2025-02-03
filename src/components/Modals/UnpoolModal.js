@@ -11,7 +11,7 @@ import { walletSelectors } from '../../redux/selectors';
 import { valueToBN, formatMerits } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
 import modalWrapper from './components/ModalWrapper';
-import ButtonModalArrow from './components/OpenModalButtonWithArrow';
+import OpenModalButton from './components/OpenModalButton';
 
 function UnpoolForm({ onClose }) {
   const dispatch = useDispatch();
@@ -64,7 +64,7 @@ UnpoolForm.propTypes = {
 };
 
 function ButtonModal(props) {
-  return <ButtonModalArrow text="Unpool" {...props} />;
+  return <OpenModalButton text="Unpool" {...props} />;
 }
 
 const UnpoolModal = modalWrapper(UnpoolForm, ButtonModal);

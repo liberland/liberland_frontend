@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Button from '../../Button/Button';
-import MinusIcon from '../../../assets/icons/minus.svg';
 import {
   calculatePooled,
   getDecimalsForAsset,
@@ -18,7 +17,6 @@ import {
 import { dexActions } from '../../../redux/actions';
 import { blockchainSelectors, dexSelectors } from '../../../redux/selectors';
 import { calculateAmountMin, formatAssets } from '../../../utils/walletHelpers';
-import styles from '../styles.module.scss';
 import modalWrapper from '../components/ModalWrapper';
 import OpenModalButton from '../components/OpenModalButton';
 
@@ -191,9 +189,7 @@ RemoveLiquidityForm.propTypes = {
 
 function ButtonModal(props) {
   return (
-    <OpenModalButton text="Remove Liquidity" {...props}>
-      <img src={MinusIcon} className={styles.backIcon} alt="button icon" />
-    </OpenModalButton>
+    <OpenModalButton text="Remove Liquidity" {...props} />
   );
 }
 
