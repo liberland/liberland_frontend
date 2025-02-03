@@ -23,32 +23,36 @@ function PoliticanCard({
     <Card
       size="small"
       className={styles.candidate}
-      title={(
-        <Flex wrap gap="15px" align="center">
-          {isBigScreen && preActions?.length ? (
-            <Flex wrap gap="15px">
-              {preActions}
-            </Flex>
-          ) : null}
-          <ColorAvatar size={32} name={politician.name} />
-          <Flex vertical gap="15px">
+    >
+      <Flex wrap gap="15px" align="center">
+        {isBigScreen && preActions?.length ? (
+          <Flex wrap gap="15px">
+            {preActions}
+          </Flex>
+        ) : null}
+        <ColorAvatar size={50} name={politician.name} />
+        <Flex vertical flex={1} gap="5px">
+          <strong>
             {truncate(politician.name, 15)}
+          </strong>
+          <div className="description">
             <CopyIconWithAddress
               address={politician.rawIdentity}
             />
-          </Flex>
+          </div>
         </Flex>
-      )}
-      extra={(
-        <Button href={sanitizeUrlHelper(politician.website)}>
-          <GlobalOutlined aria-label="Web" />
+        <Flex wrap gap="15px" align="center" justify="end">
+          {!isBigScreen && preActions?.length ? preActions : null}
+          {actions}
+          <Button href={sanitizeUrlHelper(politician.website)}>
+            <GlobalOutlined aria-label="Web" />
+          </Button>
           {isElected && (
             <img src={libertarianTorch} alt="Libertarian torch" className={styles.torch} />
           )}
-        </Button>
-      )}
-      actions={[...(!isBigScreen && preActions?.length ? preActions : []), ...actions]}
-    />
+        </Flex>
+      </Flex>
+    </Card>
   );
 }
 

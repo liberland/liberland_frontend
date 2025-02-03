@@ -151,7 +151,7 @@ function CongressionalAssemble() {
   const termDuration = democracy?.democracy?.electionsInfo?.termDuration;
 
   return (
-    <>
+    <Flex vertical gap="20px" className={styles.assembly}>
       <Modal
         open={isModalOpen}
         title="Are you certain you want to leave the page?"
@@ -162,37 +162,38 @@ function CongressionalAssemble() {
       >
         Your voting preferences haven&#96;t been saved, would you like to save them?
       </Modal>
+      <Card
+        title={(
+          <Title level={4}>
+            Unhappy with the way Liberland is run?
+          </Title>
+        )}
+        className={styles.splash}
+        actions={[
+          <Button
+            onClick={() => {
+              window.location.href = 'https://docs.liberland.org/primers/congress';
+            }}
+          >
+            Learn how on the Wiki
+            <Space />
+            <GlobalOutlined />
+          </Button>,
+        ]}
+      >
+        <Card.Meta
+          description="Help lead the way by registering your candidacy for a seat in Liberland Congress."
+        />
+      </Card>
       <Collapse
         defaultActiveKey={['current', 'preference', 'term']}
         collapsible="icon"
-        className={styles.assembly}
         items={[
           {
             key: 'current',
             label: 'Acting Congressional Assembly',
             children: (
-              <Flex vertical gap="15px">
-                <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers || []} />
-                <Card
-                  title={(
-                    <Title level={2}>
-                      Unhappy with the way Liberland is run?
-                    </Title>
-                  )}
-                  className={styles.splash}
-                  actions={[
-                    <Button href="https://docs.liberland.org/primers/congress">
-                      Learn how on the Wiki
-                      <Space />
-                      <GlobalOutlined />
-                    </Button>,
-                  ]}
-                >
-                  <Card.Meta
-                    description="Help lead the way by registering your candidacy for a seat in Liberland Congress."
-                  />
-                </Card>
-              </Flex>
+              <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers || []} />
             ),
           },
           termDuration && {
@@ -217,7 +218,11 @@ function CongressionalAssemble() {
                 <Button
                   red
                   onClick={() => {
-                    selectedCandidates?.forEach(unselectCandidate);
+                    setSelectedCandidates([]);
+                    setEligibleUnselectedCandidates([
+                      ...selectedCandidates,
+                      ...eligibleUnselectedCandidates,
+                    ]);
                   }}
                 >
                   Clear my votes
@@ -259,7 +264,7 @@ function CongressionalAssemble() {
           },
         ].filter(Boolean)}
       />
-    </>
+    </Flex>
   );
 }
 
