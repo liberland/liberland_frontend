@@ -1,0 +1,28 @@
+@import "../../assets/base/variables";
+@import "../../assets/main.scss";
+
+.icon {
+  max-height: 20px;
+  margin-right: 10px;
+}
+.torch {
+  width: 50px!important;
+  margin: 20px auto;
+}
+
+.countdown {
+    width: 100%;
+    max-width: 100%!important;
+}
+.assembly {
+    max-width: 1600px;
+}
+.candidate {
+    width: 100%;
+    max-width: 100%!important;
+}
+.splash {
+    width: 100%;
+    max-width: 100%!important;
+    min-height: 500px;
+}

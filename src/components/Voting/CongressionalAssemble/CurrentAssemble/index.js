@@ -14,22 +14,25 @@ function CurrentAssemble({
   const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
   return (
     <List
-      dataSource={currentCongressMembers || []}
-      grid={{ gutter: 16 }}
+      dataSource={currentCongressMembers}
+      locale={{ emptyText: 'No current assemble' }}
       renderItem={(politician) => (
-        <PoliticanCard
-          politician={politician}
-          actions={[
-            politician.rawIdentity === userWalletAddress || delegatingTo === politician.rawIdentity ? (
-              <div />
-            ) : (
-              <DelegateModalWrapper
-                delegateAddress={politician.rawIdentity}
-                currentlyDelegatingTo={delegatingTo}
-              />
-            ),
-          ]}
-        />
+        <List.Item>
+          <PoliticanCard
+            politician={politician}
+            actions={[
+              politician.rawIdentity === userWalletAddress || delegatingTo === politician.rawIdentity ? (
+                <div />
+              ) : (
+                <DelegateModalWrapper
+                  delegateAddress={politician.rawIdentity}
+                  currentlyDelegatingTo={delegatingTo}
+                />
+              ),
+            ]}
+            isElected
+          />
+        </List.Item>
       )}
     />
   );

@@ -11,15 +11,17 @@ function SelectedCandidateCard({
   return (
     <PoliticanCard
       politician={politician}
+      preActions={[
+        <Button link onClick={() => moveSelectedCandidate(politician, 'up')}>
+          <ArrowUpOutlined aria-label="Move up" />
+        </Button>,
+        <Button link onClick={() => moveSelectedCandidate(politician, 'down')}>
+          <ArrowDownOutlined aria-label="Move down" />
+        </Button>,
+      ]}
       actions={[
         <Button red onClick={() => unselectCandidate(politician)}>
           Remove
-        </Button>,
-        <Button link onClick={() => moveSelectedCandidate(politician, 'up')}>
-          <ArrowUpOutlined color="green" aria-label="Move up" />
-        </Button>,
-        <Button link onClick={() => moveSelectedCandidate(politician, 'down')}>
-          <ArrowDownOutlined color="red" aria-label="Move down" />
         </Button>,
       ]}
     />
