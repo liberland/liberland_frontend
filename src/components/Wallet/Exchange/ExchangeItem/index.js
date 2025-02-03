@@ -10,6 +10,7 @@ import AddLiquidityModal from '../../../Modals/AddLiquidityModal';
 import styles from './styles.module.scss';
 import { ExchangeItemPropTypes } from '../proptypes';
 import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
+import CurrencyIcon from '../../../CurrencyIcon';
 
 function ExchangeItem({ poolData, assetsPoolData }) {
   const {
@@ -57,11 +58,11 @@ function ExchangeItem({ poolData, assetsPoolData }) {
 
   const liqPoolDescription = (
     <div className={styles.liquidityPool}>
-      <span className={styles.description}>
+      <span className="description">
         Liquidity pool
       </span>
       &nbsp;
-      <span className={styles.values}>
+      <span className="values">
         {formatAssets(reserved?.asset1 || '0', decimals1, { symbol: asset1ToShow, optionalAll: true })}
         {' / '}
         {formatAssets(reserved?.asset2 || '0', decimals2, { symbol: asset2ToShow, optionalAll: true })}
@@ -70,50 +71,70 @@ function ExchangeItem({ poolData, assetsPoolData }) {
   );
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
+  const name1 = (
+    <Flex wrap gap="5px" align="center">
+      {asset1ToShow}
+      <CurrencyIcon size={20} symbol={asset1ToShow} />
+    </Flex>
+  );
+  const name2 = (
+    <Flex wrap gap="5px" align="center">
+      {asset2ToShow}
+      <CurrencyIcon size={20} symbol={asset2ToShow} />
+    </Flex>
+  );
 
   return (
     <Card
-      title={`${asset1ToShow} / ${asset2ToShow}`}
+      title={(
+        <Flex wrap gap="15px">
+          {name1}
+          <span>/</span>
+          {name2}
+        </Flex>
+      )}
       extra={isBiggerThanDesktop ? liqPoolDescription : undefined}
     >
       {!isBiggerThanDesktop && liqPoolDescription}
       <Flex wrap gap="15px">
-        <Flex wrap gap="15px">
-          <TradeTokensModalWrapper
-            assets={assets}
-            asset1ToShow={asset1ToShow}
-            asset2ToShow={asset2ToShow}
-            isBuy
-          />
-          <div>
-            <div className={styles.description}>
-              {'1 '}
-              {asset1Name}
+        <Flex wrap gap="15px" flex={0.8} justify="space-between">
+          <Flex wrap gap="15px" align="center" flex={0.5}>
+            <TradeTokensModalWrapper
+              assets={assets}
+              asset1ToShow={asset1ToShow}
+              asset2ToShow={asset2ToShow}
+              isBuy
+            />
+            <div>
+              <div className="description">
+                {'1 '}
+                {asset1Name}
+              </div>
+              <div className="values">
+                {asset2AmountForAsset1}
+                {' '}
+                {asset2Name}
+              </div>
             </div>
-            <div className={styles.values}>
-              {asset2AmountForAsset1}
-              {' '}
-              {asset2Name}
+          </Flex>
+          <Flex wrap gap="15px" align="center" flex={0.5}>
+            <TradeTokensModalWrapper
+              assets={assets}
+              asset1ToShow={asset1ToShow}
+              asset2ToShow={asset2ToShow}
+            />
+            <div>
+              <div className="description">
+                {'1 '}
+                {asset2Name}
+              </div>
+              <div className="values">
+                {asset1AmountForAsset2}
+                {' '}
+                {asset1Name}
+              </div>
             </div>
-          </div>
-        </Flex>
-        <Flex wrap gap="15px">
-          <TradeTokensModalWrapper
-            assets={assets}
-            asset1ToShow={asset1ToShow}
-            asset2ToShow={asset2ToShow}
-          />
-          <div>
-            <div className={styles.description}>
-              {'1 '}
-              {asset2Name}
-            </div>
-            <div className={styles.values}>
-              {asset1AmountForAsset2}
-              {' '}
-              {asset1Name}
-            </div>
-          </div>
+          </Flex>
         </Flex>
         <div className={styles.liquidityWrapper}>
           <Flex gap="15px" wrap>

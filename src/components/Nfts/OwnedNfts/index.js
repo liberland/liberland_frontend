@@ -4,6 +4,7 @@ import Alert from 'antd/es/alert';
 import List from 'antd/es/list';
 import Spin from 'antd/es/spin';
 import Flex from 'antd/es/flex';
+import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
 import routes from '../../../router';
 import Button from '../../Button/Button';
@@ -15,7 +16,7 @@ import FillNumberModal from '../../Modals/FillNumber';
 function OwnedNfts() {
   const dispatch = useDispatch();
   const history = useHistory();
-
+  const isBiggerThanMediumScreen = useMediaQuery('(min-width: 1200px)');
   const userCollections = useSelector(nftsSelectors.userCollections);
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
@@ -67,10 +68,11 @@ function OwnedNfts() {
       </Flex>
       {nfts.length ? (
         <List
+          className="centeredList"
           dataSource={nfts}
-          grid={{
+          grid={isBiggerThanMediumScreen ? {
             gutter: 16,
-          }}
+          } : undefined}
           renderItem={({
             collectionId,
             nftId,

@@ -21,7 +21,7 @@ export default function NextBlockCountdown() {
 
   const progress = new BN((Math.trunc(nextBlockCounter / 100) / 60) * 100);
   const progressBarRatio = new BN(progress).gt(BN_ZERO)
-    ? progress.toString()
+    ? (100 - parseInt(progress.toString()))
     : 0;
 
   return (

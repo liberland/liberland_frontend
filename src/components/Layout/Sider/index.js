@@ -5,9 +5,8 @@ import UrlMenu from '../UrlMenu';
 
 function Sider() {
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
-
   return isBiggerThanSmallScreen ? (
-    <SiderInternal width={250} breakpoint="md" collapsedWidth="60px">
+    <SiderInternal width={300} collapsible={false}>
       <UrlMenu />
     </SiderInternal>
   ) : null;

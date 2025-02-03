@@ -10,9 +10,9 @@ function Table({
   footer,
   title,
 }) {
-  const identityData = useMemo(() => data?.map((d) => ({
+  const identityData = useMemo(() => data?.map((d, index) => ({
     ...d,
-    hash: d.hash || Object.values(d).map((val) => val.toString()).join('|'),
+    hash: d.hash || (index + Object.values(d).map((val) => val.toString()).join('|')),
   })) || [], [data]);
   return (
     <TableInternal

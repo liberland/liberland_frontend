@@ -89,7 +89,7 @@ SendLLDForm.propTypes = {
 };
 
 function ButtonModal(props) {
-  return <ButtonModalArrow text="Send LLD" {...props} />;
+  return <ButtonModalArrow text="Send" {...props} />;
 }
 
 const SendLLDModal = modalWrapper(SendLLDForm, ButtonModal);

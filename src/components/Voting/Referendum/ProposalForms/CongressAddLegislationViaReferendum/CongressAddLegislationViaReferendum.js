@@ -60,6 +60,7 @@ function CongressAddLegislationViaReferendum() {
       onFinish={propose}
       initialValues={{
         year: dayjs(new Date()),
+        index: 1,
         FastTrackDefaults,
         sections: [
           { value: 'Paste markdown to autosplit sections' },

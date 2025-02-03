@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import List from 'antd/es/list';
 import Flex from 'antd/es/flex';
@@ -9,7 +9,6 @@ import Card from 'antd/es/card';
 import Tag from 'antd/es/tag';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
-import Avatar from 'antd/es/avatar';
 import Markdown from 'markdown-to-jsx';
 import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
 import { useHistory } from 'react-router-dom';
@@ -20,11 +19,11 @@ import { useContractItem } from '../hooks';
 import Button from '../../Button/Button';
 import router from '../../../router';
 import CopyInput from '../../CopyInput';
-import { contractsActions } from '../../../redux/actions';
-import { contractsSelectors } from '../../../redux/selectors';
+import { contractsActions, identityActions } from '../../../redux/actions';
+import { contractsSelectors, identitySelectors } from '../../../redux/selectors';
 import { useHideTitle } from '../../Layout/HideTitle';
 import styles from './styles.module.scss';
-import { getAvatarParameters } from '../../../utils/avatar';
+import ColorAvatar from '../../ColorAvatar';
 
 function ContractItem({
   contractId,
@@ -37,6 +36,7 @@ function ContractItem({
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
+  const identities = useSelector(identitySelectors.selectorIdentityMotions);
   const {
     identitiesContracts,
     infoContract,
@@ -52,6 +52,23 @@ function ContractItem({
     parties,
     partiesSignaturesList,
   });
+  const signatories = useMemo(() => infoContract.filter(
+    ({ itemsOrItem }) => !Array.isArray(itemsOrItem) || itemsOrItem.length !== 0,
+  ).reduce((items, { itemsOrItem, name }) => {
+    if (Array.isArray(itemsOrItem)) {
+      items.push(...itemsOrItem.map((item) => ({
+        name,
+        item,
+      })));
+    } else {
+      items.push({ item: itemsOrItem, name });
+    }
+    return items;
+  }, []), [infoContract]);
+  useEffect(() => {
+    dispatch(identityActions.getIdentityMotions.call(signatories.map(({ item }) => item)));
+  }, [dispatch, signatories]);
+
   const isUserJudge = useSelector(contractsSelectors.selectorIsUserJudgde);
 
   useHideTitle();
@@ -156,34 +173,25 @@ function ContractItem({
               <List
                 grid={{ gutter: 16, column: 3 }}
                 className="threeColumnList"
-                dataSource={infoContract.filter(
-                  ({ itemsOrItem }) => !Array.isArray(itemsOrItem) || itemsOrItem.length !== 0,
-                ).reduce((items, { itemsOrItem, name }) => {
-                  if (Array.isArray(itemsOrItem)) {
-                    items.push(...itemsOrItem.map((item) => ({
-                      name,
-                      item,
-                    })));
-                  } else {
-                    items.push({ item: itemsOrItem, name });
-                  }
-                  return items;
-                }, [])}
+                dataSource={signatories}
                 renderItem={({ item, name }) => {
-                  const identity = identitiesContracts[item];
+                  const contractIdentity = identitiesContracts[item];
                   const color = (() => {
                     switch (name) {
                       case 'Creator':
                         return 'success';
-                      case 'Judge':
+                      case 'Judges Signatures':
                         return 'warning';
                       default:
                         return 'default';
                     }
                   })();
-                  const { color: avatarColor, text } = getAvatarParameters(
-                    identity?.identity?.legal || identity?.identity?.name || name,
-                  );
+                  const displayName = contractIdentity?.identity?.name
+                    || contractIdentity?.identity?.legal
+                    || identities?.[item]?.identity?.name
+                    || identities?.[item]?.identity?.legal
+                    || 'Unknown';
+
                   return (
                     <Card
                       size="small"
@@ -192,16 +200,14 @@ function ContractItem({
                       <Card.Meta
                         title={(
                           <Flex wrap gap="15px" justify="space-between">
-                            {identity?.identity?.legal || 'Unknown'}
+                            {displayName}
                             <Tag color={color} className={styles.tag}>
                               {name}
                             </Tag>
                           </Flex>
                         )}
                         avatar={(
-                          <Avatar style={{ backgroundColor: avatarColor }}>
-                            {text}
-                          </Avatar>
+                          <ColorAvatar name={displayName} />
                         )}
                         description={(
                           <CopyIconWithAddress

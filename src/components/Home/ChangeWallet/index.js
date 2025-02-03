@@ -14,7 +14,7 @@ import styles from './styles.module.scss';
 import Button from '../../Button/Button';
 
 function ChangeWallet() {
-  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 576px)');
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
   const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const walletAdressSelector = useSelector(
     blockchainSelectors.userWalletAddressSelector,
@@ -81,7 +81,12 @@ function ChangeWallet() {
       }}
       className={styles.dropdown}
     >
-      <Button link>
+      <Button
+        link={isBiggerThanSmallScreen}
+        primary={!isBiggerThanSmallScreen}
+        nano={!isBiggerThanSmallScreen}
+        className={styles.button}
+      >
         {isBiggerThanSmallScreen && (
           <img src={Polkadot} className={styles.polkadot} alt="Polkadot icon" />
         )}

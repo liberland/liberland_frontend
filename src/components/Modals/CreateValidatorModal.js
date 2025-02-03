@@ -66,7 +66,7 @@ function CreateValidatorForm({
       layout="vertical"
       initialValues={{
         bondValue: formatDollars(maxBond).replaceAll(',', ''),
-        commission: '10',
+        commission: '20',
         allow_nominations: true,
         payee: payee ? payee.toString() : 'Staked',
       }}
@@ -167,10 +167,15 @@ CreateValidatorForm.propTypes = {
 };
 
 function ButtonModal(props) {
+  const { label } = props;
   return (
-    <OpenModalButton small primary text="Start Validating" {...props} />
+    <OpenModalButton small primary text={label || 'Start Validating'} {...props} />
   );
 }
+
+ButtonModal.propTypes = {
+  label: PropTypes.string,
+};
 
 const CreateValidatorModal = modalWrapper(CreateValidatorForm, ButtonModal);
 

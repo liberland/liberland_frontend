@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
-import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
+import LegislationHeading from '../Congress/LegislationHeading';
 import { congressSelectors } from '../../redux/selectors';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
@@ -18,8 +18,19 @@ function CongressRepealLegislationForm({
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
-  const onSubmitRepeal = () => {
-    dispatch(congressActions.congressRepealLegislation.call({ tier, id, section }));
+  const onSubmitRepeal = ({
+    // eslint-disable-next-line no-shadow
+    tier,
+    year,
+    index,
+    // eslint-disable-next-line no-shadow
+    section,
+  }) => {
+    const idData = {
+      year: year.year(),
+      index,
+    };
+    dispatch(congressActions.congressRepealLegislation.call({ tier, id: idData, section }));
     onClose();
   };
 
@@ -31,7 +42,7 @@ function CongressRepealLegislationForm({
       initialValues={{
         tier,
         year: dayjs(new Date(id.year, 0, 1)),
-        index: id.index,
+        index: parseInt(id.index) || 1,
         section,
       }}
     >
@@ -39,7 +50,7 @@ function CongressRepealLegislationForm({
         Propose a Congress Motion - repeal legislation
       </Title>
 
-      <ReadOnlyLegislation section={section} />
+      <LegislationHeading section={section} />
 
       <Flex wrap gap="15px">
         <Button

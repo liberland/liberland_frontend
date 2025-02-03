@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
-import cx from 'classnames';
 import Title from 'antd/es/typography/Title';
 import InputNumber from 'antd/es/input-number';
 import Checkbox from 'antd/es/checkbox';
@@ -12,7 +11,6 @@ import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
 import { blockchainSelectors, walletSelectors } from '../../redux/selectors';
-import PlusIcon from '../../assets/icons/plus-dark.svg';
 import {
   convertLiquidityData,
   convertToEnumDex,
@@ -301,13 +299,7 @@ AddLiquidityForm.propTypes = {
 
 function ButtonModal(props) {
   return (
-    <OpenModalButton text="Add liquidity" {...props}>
-      <img
-        src={PlusIcon}
-        className={cx(styles.backIcon, styles.darken)}
-        alt="button icon"
-      />
-    </OpenModalButton>
+    <OpenModalButton text="Add liquidity" {...props} />
   );
 }
 

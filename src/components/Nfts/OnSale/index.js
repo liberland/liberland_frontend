@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'antd/es/alert';
 import List from 'antd/es/list';
 import Spin from 'antd/es/spin';
+import { useMediaQuery } from 'usehooks-ts';
 import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import ItemNft from '../ItemNft';
@@ -13,6 +14,7 @@ function OnSale() {
     blockchainSelectors.userWalletAddressSelector,
   );
   const nftsOnSale = useSelector(nftsSelectors.nftsOnSale);
+  const isBiggerThanMediumScreen = useMediaQuery('(min-width: 1200px)');
 
   useEffect(() => {
     dispatch(nftsActions.getNftsOnSale.call(userWalletAddress));
@@ -25,9 +27,10 @@ function OnSale() {
   return nftsOnSale.length ? (
     <List
       dataSource={nftsOnSale}
-      grid={{
+      grid={isBiggerThanMediumScreen ? {
         gutter: 16,
-      }}
+      } : undefined}
+      className="centeredList"
       renderItem={({
         collectionId,
         nftId,

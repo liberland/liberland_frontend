@@ -9,9 +9,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
-import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
+import LegislationHeading from '../Congress/LegislationHeading';
 
 function CongressAmendLegislationForm({
   onClose, tier, id, section,
@@ -22,10 +22,23 @@ function CongressAmendLegislationForm({
   const sectionContent = legislation.sections?.[section]?.content.toHuman() ?? '';
   const [form] = Form.useForm();
 
-  const onSubmit = ({ content }) => {
-    dispatch(congressActions.congressAmendLegislation.call({
-      tier, id, section, content,
-    }));
+  const onSubmit = ({
+    content,
+    // eslint-disable-next-line no-shadow
+    tier,
+    year,
+    index,
+    // eslint-disable-next-line no-shadow
+    section,
+  }) => {
+    dispatch(
+      congressActions.congressAmendLegislation.call({
+        tier,
+        id: { year: year.year(), index },
+        section,
+        content,
+      }),
+    );
     onClose();
   };
 
@@ -36,7 +49,7 @@ function CongressAmendLegislationForm({
       initialValues={{
         tier,
         year: dayjs(new Date(id.year.toString(), 0, 1)),
-        index: id.index,
+        index: parseInt(id.index) || 1,
         section,
         content: sectionContent,
       }}
@@ -44,25 +57,24 @@ function CongressAmendLegislationForm({
     >
       <Title level={3}>
         Propose a Motion -
-        {legislation?.sections?.[section] ? 'amend legislation' : 'add legislation section'}
+        {legislation?.sections?.[section]
+          ? 'amend legislation'
+          : 'add legislation section'}
       </Title>
-      <ReadOnlyLegislation section={section} />
-      <Form.Item name="content" label="Legislation content" rules={[{ required: true }]}>
+      <LegislationHeading section={section} />
+      <Form.Item
+        name="content"
+        label="Legislation content"
+        rules={[{ required: true }]}
+      >
         <TextArea />
       </Form.Item>
 
       <Flex wrap gap="15px">
-        <Button
-          medium
-          onClick={onClose}
-        >
+        <Button medium onClick={onClose}>
           Cancel
         </Button>
-        <Button
-          primary
-          medium
-          type="submit"
-        >
+        <Button primary medium type="submit">
           Submit
         </Button>
       </Flex>
@@ -85,15 +97,16 @@ CongressAmendLegislationForm.propTypes = {
 function ButtonModal(props) {
   const { add } = props;
   const text = add ? 'Add section as congress' : 'Amend as congress';
-  return (
-    <OpenModalButton text={text} {...props} />
-  );
+  return <OpenModalButton text={text} {...props} />;
 }
 
 ButtonModal.propTypes = {
   add: PropTypes.bool,
 };
 
-const CongressAmendLegislationModal = modalWrapper(CongressAmendLegislationForm, ButtonModal);
+const CongressAmendLegislationModal = modalWrapper(
+  CongressAmendLegislationForm,
+  ButtonModal,
+);
 
 export default CongressAmendLegislationModal;

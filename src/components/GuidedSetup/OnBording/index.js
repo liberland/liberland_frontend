@@ -42,10 +42,6 @@ function OnBoarding({ setIsSkippedOnBoardingGetLLD }) {
   const ineligibleForComplimentaryLLDReason = useSelector(
     onboardingSelectors.selectorIneligibleForComplimentaryLLDReason,
   );
-  const [isModalOpenOnchainIdentity, setIsModalOpenOnchainIdentity] = useState(false);
-  const toggleModalOnchainIdentity = () => {
-    setIsModalOpenOnchainIdentity((prevState) => !prevState);
-  };
   const isLoading = useSelector(onboardingSelectors.selectorIneligibleForComplimentaryLLDIsLoading);
 
   useEffect(() => {
@@ -83,43 +79,30 @@ function OnBoarding({ setIsSkippedOnBoardingGetLLD }) {
   }
 
   return (
-    <>
-      <div className={styles.wrapper}>
-        <h3>Update identity to claim tokens, e-residency and citizenship.</h3>
-        <h4>Once you do, it will take about a day for the Ministry of Interior to onboard you.</h4>
-        <div className={styles.buttons}>
-          <Button
-            className={styles.textColor}
-            medium
-            primary
-            onClick={toggleModalOnchainIdentity}
-          >
-            Update identity
-          </Button>
-          <Button
-            medium
-            gray
-            onClick={() => {
-              setIsSkippedOnBoardingGetLLD('true');
-              sessionStorage.setItem('SkippedOnBoardingGetLLD', true);
-              history.push(router.home);
-            }}
-          >
-            Skip
-          </Button>
-        </div>
-      </div>
-      {isModalOpenOnchainIdentity && (
+    <div className={styles.wrapper}>
+      <h3>Update identity to claim tokens, e-residency and citizenship.</h3>
+      <h4>Once you do, it will take about a day for the Ministry of Interior to onboard you.</h4>
+      <div className={styles.buttons}>
         <UpdateProfile
           isGuidedUpdate
           blockNumber={blockNumber}
           identity={identity}
-          toggleModalOnchainIdentity={toggleModalOnchainIdentity}
           lastName={lastName}
           userName={userName}
         />
-      )}
-    </>
+        <Button
+          medium
+          gray
+          onClick={() => {
+            setIsSkippedOnBoardingGetLLD('true');
+            sessionStorage.setItem('SkippedOnBoardingGetLLD', true);
+            history.push(router.home);
+          }}
+        >
+          Skip
+        </Button>
+      </div>
+    </div>
   );
 }
 

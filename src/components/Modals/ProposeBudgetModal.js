@@ -6,6 +6,7 @@ import Divider from 'antd/es/divider';
 import Flex from 'antd/es/flex';
 import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
+import uniqBy from 'lodash/uniqBy';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../Button/Button';
@@ -81,7 +82,7 @@ function ProposeBudgetForm({
                 >
                   <Select
                     defaultActiveFirstOption
-                    options={[
+                    options={uniqBy([
                       {
                         label: 'LLD',
                         value: 'LLD',
@@ -90,7 +91,11 @@ function ProposeBudgetForm({
                         label: 'Politipool LLM',
                         value: 'POLITIPOOL_LLM',
                       },
-                    ]}
+                      ...optionsInputDefault.map(({ value, display }) => ({
+                        label: display,
+                        value,
+                      })),
+                    ], ({ value }) => value)} // The uniqBy is good for testing env since we can have weird assets there
                   />
                 </Form.Item>
                 <Form.Item

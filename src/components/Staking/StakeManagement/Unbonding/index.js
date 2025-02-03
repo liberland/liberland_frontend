@@ -9,20 +9,22 @@ import { blockchainSelectors, validatorSelectors } from '../../../../redux/selec
 import { blockTimeFormatted, stakingInfoToProgress } from '../../../../utils/staking';
 import { validatorActions } from '../../../../redux/actions';
 import styles from './styles.module.scss';
+import OpenModalButton from '../../../Modals/components/OpenModalButton';
+import modalWrapper from '../../../Modals/components/ModalWrapper';
 
-export default function Unbonding({ info }) {
+function Unbonding({ info }) {
   const dispatch = useDispatch();
   const { stakingInfo, sessionProgress } = useSelector(validatorSelectors.stakingData);
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const stakingData = stakingInfoToProgress(stakingInfo, sessionProgress) ?? [];
 
   useEffect(() => {
-    if (info.unlocking.length !== 0) {
+    if (info?.unlocking?.length) {
       dispatch(validatorActions.getStakingData.call());
     }
   }, [dispatch, blockNumber, info]);
 
-  if (stakingData.length === 0 && (!stakingInfo?.redeemable || stakingInfo?.redeemable.lte(BN_ZERO))) {
+  if (stakingData.length === 0) {
     return null;
   }
 
@@ -55,6 +57,16 @@ export default function Unbonding({ info }) {
     </Card>
   );
 }
+
+function ButtonModal(props) {
+  return (
+    <OpenModalButton text="Show unbonding details" primary {...props} />
+  );
+}
+
+const UnbondingModal = modalWrapper(Unbonding, ButtonModal);
+
+export default UnbondingModal;
 
 Unbonding.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types

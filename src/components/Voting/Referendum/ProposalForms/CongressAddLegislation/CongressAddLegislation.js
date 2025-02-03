@@ -44,12 +44,13 @@ function CongressAddLegislation() {
       initialValues={{
         tier: 'InternationalTreaty',
         year: dayjs(new Date()),
+        index: 1,
         sections: [
           { value: 'Paste markdown to autosplit sections' },
         ],
       }}
     >
-      <Title level={3}>Propose a new Referendum</Title>
+      <Title level={3}>Propose a new International Treaty</Title>
 
       <Form.Item
         name="tier"
@@ -57,7 +58,6 @@ function CongressAddLegislation() {
         rules={[{ required: true }]}
       >
         <Select
-          disabled
           options={[
             { value: 'InternationalTreaty', label: 'International Treaty' },
           ]}
@@ -68,7 +68,7 @@ function CongressAddLegislation() {
         label="Legislation index"
         rules={[{ required: true }]}
       >
-        <InputNumber disabled controls={false} />
+        <InputNumber controls={false} />
       </Form.Item>
       <Form.Item
         name="year"
@@ -76,7 +76,7 @@ function CongressAddLegislation() {
         rules={[{ required: true }]}
         getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
       >
-        <DatePicker picker="year" disabled />
+        <DatePicker picker="year" />
       </Form.Item>
       <AddLegislationFields form={form} />
       <Flex wrap gap="15px">

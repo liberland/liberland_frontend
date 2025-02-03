@@ -14,11 +14,11 @@ export default function WithdrawUnbondedButton() {
   if (!stakingInfo?.redeemable || stakingInfo?.redeemable.lte(BN_ZERO)) {
     return null;
   }
-  if (!info || info.unlocking.length <= 0) {
+  if (!info || info?.unlocking?.length <= 0) {
     return null;
   }
 
-  const anyReady = info.unlocking.some(({ era }) => activeEra.index.gte(era.unwrap()));
+  const anyReady = info?.unlocking?.some(({ era }) => activeEra.index.gte(era.unwrap()));
   if (!anyReady) {
     return null;
   }

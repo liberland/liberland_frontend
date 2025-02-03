@@ -30,7 +30,6 @@ function LegislationItem({
 
   return (
     <Collapse
-      collapsible="icon"
       items={[{
         label: `Legislation ${year}/${index}`,
         key: 'legislation',
@@ -108,17 +107,19 @@ function LegislationItem({
               renderItem={({
                 content, repealMotion, repealReferendum, repealProposal,
               }, section) => (
-                <SectionItem
-                  tier={tier}
-                  content={content.unwrap()}
-                  id={id}
-                  section={section}
-                  repealProposalReferendum={{
-                    repealMotion,
-                    repealReferendum,
-                    repealProposal,
-                  }}
-                />
+                <List.Item>
+                  <SectionItem
+                    tier={tier}
+                    content={content}
+                    id={id}
+                    section={section}
+                    repealProposalReferendum={{
+                      repealMotion,
+                      repealReferendum,
+                      repealProposal,
+                    }}
+                  />
+                </List.Item>
               )}
             />
           </Card>

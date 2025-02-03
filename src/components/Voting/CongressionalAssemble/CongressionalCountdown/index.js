@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { intervalToDuration, format } from 'date-fns';
+import { intervalToDuration, formatDuration, format } from 'date-fns';
 import Card from 'antd/es/card';
 import Progress from 'antd/es/progress';
 import Paragraph from 'antd/es/typography/Paragraph';
@@ -18,7 +18,7 @@ function CongressionalCountdown({ termDuration }) {
 
   const ratio = Math.round(100 * (1 - (remaining / termDuration)));
 
-  const { days, hours } = intervalToDuration(
+  const duration = intervalToDuration(
     {
       start: new Date(currentBlockTimestamp),
       end: untilEnd,
@@ -35,11 +35,7 @@ function CongressionalCountdown({ termDuration }) {
             <Paragraph>
               Election ends in
               {' '}
-              {days === 1 && '1 day'}
-              {days > 1 && `${days} days`}
-              {hours === 1 && ' 1 hour'}
-              {hours > 1 && ` ${hours} hours`}
-              {!days && !hours && 'less than 1 hour'}
+              {formatDuration(duration)}
             </Paragraph>
             <Paragraph>
               <time dateTime={untilEnd.toString()}>
@@ -51,7 +47,7 @@ function CongressionalCountdown({ termDuration }) {
           </>
         )}
       />
-      <Progress type="circle" percent={ratio} />
+      <Progress type="circle" percent={100 - ratio} />
     </Card>
   );
 }

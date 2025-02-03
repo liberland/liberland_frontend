@@ -15,10 +15,6 @@ export default function Slashes() {
     dispatch(validatorActions.getSlashes.call());
   }, [dispatch]);
 
-  if (!appliedSlashes?.length && !unappliedSlashes?.length) {
-    return null;
-  }
-
   return (
     <Card
       title="Slashes"

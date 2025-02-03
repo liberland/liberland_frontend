@@ -6,13 +6,11 @@ import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import InputNumber from 'antd/es/input-number';
 import Checkbox from 'antd/es/checkbox/Checkbox';
-import cx from 'classnames';
 import { BN } from '@polkadot/util';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
 import { dexSelectors, walletSelectors, blockchainSelectors } from '../../redux/selectors';
-import PlusIcon from '../../assets/icons/plus-dark.svg';
 import {
   convertTransferData,
   convertToEnumDex,
@@ -22,6 +20,7 @@ import { AssetsPropTypes } from '../Wallet/Exchange/proptypes';
 import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } from '../../api/nodeRpcCall';
 import { formatAssets, parseAssets, sanitizeValue } from '../../utils/walletHelpers';
 import { useStockContext } from '../Wallet/StockContext';
+import CurrencyIcon from '../CurrencyIcon';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
 
@@ -47,7 +46,7 @@ function TradeTokensForm({
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
 
   const reservesThisAssets = useMemo(() => {
-    if (reserves && asset1 && asset2 && reserves[asset1][asset2]) {
+    if (reserves && asset1 && asset2 && reserves?.[asset1]?.[asset2]) {
       const asset1Value = reserves[asset1][asset2].asset1;
       const asset2Value = reserves[asset1][asset2].asset2;
       return { ...reserves[asset1][asset2], asset1: asset1Value, asset2: asset2Value };
@@ -245,6 +244,13 @@ function TradeTokensForm({
 
   const submitText = isStock ? 'Trade stock' : 'Exchange tokens';
 
+  const symbolHelper = (symbol, size) => (
+    <Flex wrap gap="5px" align="center">
+      {symbol}
+      <CurrencyIcon size={size} symbol={symbol} />
+    </Flex>
+  );
+
   return (
     <Form
       className={styles.getCitizenshipModal}
@@ -253,22 +259,26 @@ function TradeTokensForm({
       layout="vertical"
     >
       <Title level={3}>
-        {isBuy ? 'Buy' : 'Sell'}
-        {' '}
-        {asset1ToShow}
-        {' '}
-        for
-        {' '}
-        {asset2ToShow}
+        <Flex wrap gap="10px">
+          <span>
+            {isBuy ? 'Buy' : 'Sell'}
+          </span>
+          {symbolHelper(asset1ToShow, 32)}
+          <span>
+            for
+          </span>
+          {symbolHelper(asset2ToShow, 32)}
+        </Flex>
       </Title>
       <Form.Item
         name="amount1In"
         label={(
-          <>
-            Amount In
-            {' '}
-            {isBuy ? asset2ToShow : asset1ToShow}
-          </>
+          <Flex wrap gap="10px">
+            <div>
+              Amount In
+            </div>
+            {isBuy ? symbolHelper(asset2ToShow, 20) : symbolHelper(asset1ToShow, 20)}
+          </Flex>
         )}
         extra={(
           <>
@@ -309,11 +319,12 @@ function TradeTokensForm({
       <Form.Item
         name="amountIn2"
         label={(
-          <>
-            Amount Out
-            {' '}
-            {!isBuy ? asset2ToShow : asset1ToShow}
-          </>
+          <Flex wrap gap="10px">
+            <div>
+              Amount Out
+            </div>
+            {isBuy ? symbolHelper(asset1ToShow, 20) : symbolHelper(asset2ToShow, 20)}
+          </Flex>
         )}
         extra={(
           <>
@@ -391,9 +402,7 @@ function ButtonModal(props) {
   const { isBuy, asset1ToShow, asset2ToShow } = props;
   const text = `${isBuy ? 'Buy' : 'Sell'} ${asset1ToShow} for ${asset2ToShow}`;
   return (
-    <OpenModalButton text={text} primary {...props}>
-      <img src={PlusIcon} className={cx(styles.backIcon, styles.darken)} alt="button icon" />
-    </OpenModalButton>
+    <OpenModalButton text={text} primary {...props} />
   );
 }
 

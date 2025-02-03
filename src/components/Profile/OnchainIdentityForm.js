@@ -50,10 +50,12 @@ function OnchainIdentityForm({
         date_of_birth: dayjs(identityDOB) ?? undefined,
         older_than_15: !identityDOB,
         onChainIdentity,
-        isUserWarnAccepted: !parseCitizenshipJudgement(judgements),
+        hasUserWarn: parseCitizenshipJudgement(judgements),
       };
     }
-    return {};
+    return {
+      hasUserWarn: false,
+    };
   }, [identity, blockNumber, name]);
 
   const [form] = Form.useForm();
@@ -74,14 +76,6 @@ function OnchainIdentityForm({
         You are going to update your identity stored on blockchain. This needs
         to be up-to-date for your citizenship or e-residency.
       </Paragraph>
-      {!isUserWarnAccepted && (
-        <Paragraph>
-          Warning! Your identity is currently confirmed by citizenship office
-          as valid. Changing it will require reapproval - you&apos;ll
-          temporarily lose citizenship or e-resident rights onchain.
-        </Paragraph>
-      )}
-
       <Form.Item name="display" label="Display name" rules={[{ required: true }]}>
         <Input placeholder="Display name" />
       </Form.Item>
@@ -130,33 +124,36 @@ function OnchainIdentityForm({
           )}
         </>
       )}
-
-      <Form.Item
-        layout="horizontal"
-        name="isUserWarnAccepted"
-        label="I want to change my identity"
-        valuePropName="checked"
-        rules={[{
-          validator: (_, val) => (
-            val ? Promise.resolve() : Promise.reject('Check if identity changes are intentional')
-          ),
-        }]}
-      >
-        <Checkbox />
-      </Form.Item>
-      <Paragraph>
-        <Alert
-          type="warning"
-          message={(
-            <>
-              Warning! Your identity is currently confirmed by citizenship office
-              as valid. Changing it will require reapproval - you&apos;ll
-              temporarily lose citizenship or e-resident rights onchain.
-              Until its manually handled by ministry of interior which takes about two days.
-            </>
-          )}
-        />
-      </Paragraph>
+      {defaultValues.hasUserWarn && !isUserWarnAccepted && (
+        <Paragraph>
+          <Alert
+            type="warning"
+            message={(
+              <>
+                Warning! Your identity is currently confirmed by citizenship office
+                as valid. Changing it will require reapproval - you&apos;ll
+                temporarily lose citizenship or e-resident rights onchain.
+                Until its manually handled by ministry of interior which takes about two days.
+              </>
+            )}
+          />
+        </Paragraph>
+      )}
+      {defaultValues.hasUserWarn && (
+        <Form.Item
+          layout="horizontal"
+          name="isUserWarnAccepted"
+          label="I want to change my identity"
+          valuePropName="checked"
+          rules={[{
+            validator: (_, val) => (
+              val ? Promise.resolve() : Promise.reject('Check if identity changes are intentional')
+            ),
+          }]}
+        >
+          <Checkbox />
+        </Form.Item>
+      )}
       <Flex wrap gap="15px">
         <Button className={styles.button} onClick={onClose}>
           Cancel

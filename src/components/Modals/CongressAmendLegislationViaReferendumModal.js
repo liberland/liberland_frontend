@@ -11,12 +11,15 @@ import { congressActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
+import LegislationHeading from '../Congress/LegislationHeading';
 
 function CongressAmendLegislationViaReferendumForm({
-  closeModal, tier, id, section,
+  closeModal,
+  tier,
+  id,
+  section,
 }) {
   const dispatch = useDispatch();
   const allLegislation = useSelector(legislationSelectors.legislation);
@@ -32,19 +35,30 @@ function CongressAmendLegislationViaReferendumForm({
     fastTrack,
     fastTrackVotingPeriod,
     fastTrackEnactmentPeriod,
+    year,
+    index,
+    // eslint-disable-next-line no-shadow
+    tier,
+    // eslint-disable-next-line no-shadow
+    section,
   }) => {
-    dispatch(congressActions.congressAmendLegislationViaReferendum.call({
-      discussionName,
-      discussionDescription,
-      discussionLink,
-      tier,
-      id,
-      section: section || null,
-      content,
-      fastTrack,
-      fastTrackVotingPeriod,
-      fastTrackEnactmentPeriod,
-    }));
+    dispatch(
+      congressActions.congressAmendLegislationViaReferendum.call({
+        discussionName,
+        discussionDescription,
+        discussionLink,
+        tier,
+        id: {
+          year: year.year(),
+          index,
+        },
+        section: section || null,
+        content,
+        fastTrack,
+        fastTrackVotingPeriod,
+        fastTrackEnactmentPeriod,
+      }),
+    );
     closeModal();
   };
 
@@ -56,7 +70,7 @@ function CongressAmendLegislationViaReferendumForm({
       initialValues={{
         tier,
         year: dayjs(new Date(id.year, 0, 1)),
-        index: id.index,
+        index: parseInt(id.index) || 1,
         section,
         content: sectionContent,
         ...FastTrackDefaults,
@@ -64,11 +78,17 @@ function CongressAmendLegislationViaReferendumForm({
     >
       <Title level={3}>
         Propose a Motion for Referendum -
-        {legislation.sections?.[section] ? 'amend legislation' : 'add legislation section'}
+        {legislation.sections?.[section]
+          ? 'amend legislation'
+          : 'add legislation section'}
       </Title>
 
-      <ReadOnlyLegislation section={section} />
-      <Form.Item name="content" label="Legislation content" rules={[{ required: true }]}>
+      <LegislationHeading section={section} />
+      <Form.Item
+        name="content"
+        label="Legislation content"
+        rules={[{ required: true }]}
+      >
         <TextArea />
       </Form.Item>
 
@@ -76,17 +96,10 @@ function CongressAmendLegislationViaReferendumForm({
       <FastTrackForm form={form} />
 
       <Flex wrap gap="15px">
-        <Button
-          medium
-          onClick={closeModal}
-        >
+        <Button medium onClick={closeModal}>
           Cancel
         </Button>
-        <Button
-          primary
-          medium
-          type="submit"
-        >
+        <Button primary medium type="submit">
           Submit
         </Button>
       </Flex>
@@ -111,15 +124,16 @@ function ButtonModal(props) {
   const text = add
     ? 'Propose add section referendum as congress'
     : 'Propose amend referendum as congress';
-  return (
-    <OpenModalButton text={text} {...props} />
-  );
+  return <OpenModalButton text={text} {...props} />;
 }
 
 ButtonModal.propTypes = {
   add: PropTypes.bool,
 };
 
-const CongressAmendLegislationViaReferendumModal = modalWrapper(CongressAmendLegislationViaReferendumForm, ButtonModal);
+const CongressAmendLegislationViaReferendumModal = modalWrapper(
+  CongressAmendLegislationViaReferendumForm,
+  ButtonModal,
+);
 
 export default CongressAmendLegislationViaReferendumModal;

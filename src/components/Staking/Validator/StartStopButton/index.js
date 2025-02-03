@@ -30,11 +30,7 @@ export default function StartStopButton() {
   const info = useSelector(validatorSelectors.info); // something else must call getInfo action
 
   if (!info.stash) {
-    return (
-      <Button disabled primary>
-        Start validating
-      </Button>
-    );
+    return null;
   }
 
   if (info.isStakingValidator) {

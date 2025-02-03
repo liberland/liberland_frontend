@@ -11,9 +11,9 @@ import Button from '../Button/Button';
 import { democracyActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import ReadOnlyLegislation from '../Congress/ReadOnlyLegislation';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
+import LegislationHeading from '../Congress/LegislationHeading';
 
 function ProposeAmendLegislationForm({
   onClose, tier, id, section,
@@ -29,6 +29,12 @@ function ProposeAmendLegislationForm({
     discussionDescription,
     discussionLink,
     content,
+    // eslint-disable-next-line no-shadow
+    tier,
+    index,
+    year,
+    // eslint-disable-next-line no-shadow
+    section,
   }) => {
     dispatch(
       democracyActions.proposeAmendLegislation.call({
@@ -36,7 +42,10 @@ function ProposeAmendLegislationForm({
         discussionDescription,
         discussionLink,
         tier,
-        id,
+        id: {
+          year: year.year(),
+          index,
+        },
         section,
         content,
       }),
@@ -51,7 +60,7 @@ function ProposeAmendLegislationForm({
       initialValues={{
         tier,
         year: dayjs(new Date(id.year, 0, 1)),
-        index: id.index,
+        index: parseInt(id.index) || 1,
         section,
         content: sectionContent,
       }}
@@ -64,7 +73,7 @@ function ProposeAmendLegislationForm({
           : 'add legislation section'}
       </Title>
 
-      <ReadOnlyLegislation section={section} />
+      <LegislationHeading section={section} />
       <Form.Item
         name="content"
         label="Legislation Content"
