@@ -175,7 +175,7 @@ function CongressionalAssemble() {
               window.location.href = 'https://docs.liberland.org/primers/congress';
             }}
           >
-            Learn how on the Wiki
+            Learn how
             <Space />
             <GlobalOutlined />
           </Button>,
@@ -205,9 +205,9 @@ function CongressionalAssemble() {
           },
           {
             key: 'preference',
-            label: 'My votes by order of preference',
+            label: 'Candidates',
             extra: (
-              <Flex wrap gap="15px">
+              <Flex wrap gap="15px" justify="end">
                 <Button
                   primary
                   disabled={!didChangeSelectedCandidates}
@@ -231,21 +231,26 @@ function CongressionalAssemble() {
             ),
             children: (
               <Flex vertical gap="5px">
+                <Divider>
+                  Selected candidates
+                </Divider>
                 <List
                   dataSource={selectedCandidates}
                   locale={{ emptyText: 'No selected candidates' }}
-                  renderItem={(currentCandidateVoteByUser) => (
+                  renderItem={(currentCandidateVoteByUser, index) => (
                     <List.Item>
                       <SelectedCandidateCard
                         politician={currentCandidateVoteByUser}
                         unselectCandidate={unselectCandidate}
                         moveSelectedCandidate={moveSelectedCandidate}
+                        candidateIndex={index}
+                        candidatesLength={selectedCandidates.length}
                       />
                     </List.Item>
                   )}
                 />
                 <Divider>
-                  Eligible unselected candidates
+                  Eligible candidates
                 </Divider>
                 <List
                   dataSource={eligibleUnselectedCandidates}

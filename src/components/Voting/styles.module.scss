@@ -14,7 +14,8 @@
     width: 100%;
     max-width: 100%!important;
 }
-.assembly {
+.assembly,
+.referenda {
     max-width: 1600px;
 }
 .candidate {
@@ -24,4 +25,18 @@
 .splash {
     width: 100%;
     max-width: 100%!important;
+}
+.proposal {
+  width: 100%;
+  max-width: 100%!important;
+}
+.intro {
+  h1,h2,h3,h4,h5 {
+    font-size: 18px!important;
+    color: #ACBDC5;
+    font-weight: 600!important;
+    margin-bottom: 0!important;
+    margin-top: 0!important;
+  }
+  margin-bottom: 0!important;
 }

@@ -1,74 +1,96 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { blake2AsHex } from '@polkadot/util-crypto';
-import { hexToU8a } from '@polkadot/util';
-import Collapse from 'antd/es/collapse';
+import { hexToU8a, hexToString } from '@polkadot/util';
 import Flex from 'antd/es/flex';
+import Card from 'antd/es/card';
+import classNames from 'classnames';
+import Paragraph from 'antd/es/typography/Paragraph';
 import { useHistory } from 'react-router-dom';
+import Markdown from 'markdown-to-jsx';
 import Button from '../../../../Button/Button';
-import truncate from '../../../../../utils/truncate';
-import Discussions from '../Discussions';
-import Details from '../Details';
 import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 import router from '../../../../../router';
-import BlacklistButton from '../BlacklistButton';
+import styles from '../../../styles.module.scss';
+import Preimage from '../../../../Proposal/Preimage';
+
+const getHashAndLength = (boundedCall) => {
+  if (boundedCall.lookup) {
+    return [boundedCall.lookup.hash, boundedCall.lookup.len];
+  }
+  if (boundedCall.legacy) {
+    return [boundedCall.legacy.hash, 0];
+  }
+  return [blake2AsHex(hexToU8a(boundedCall.inline)), 0];
+};
 
 function ProposalItem({
-  centralizedDatas,
   boundedCall,
-  blacklistMotion,
-  userIsMember,
 }) {
-  let hash;
-  let len;
-  if ('lookup' in boundedCall) {
-    hash = boundedCall.lookup.hash;
-    len = boundedCall.lookup.len;
-  } else if ('legacy' in boundedCall) {
-    hash = boundedCall.legacy.hash;
-  } else {
-    // this sux but we have no other way until we refactor it to NOT use toJSON/toHuman
-    hash = blake2AsHex(hexToU8a(boundedCall.inline));
-  }
-
+  const [hash, len] = useMemo(() => getHashAndLength(boundedCall), [boundedCall]);
   const history = useHistory();
+  const [title, setTitle] = useState('Proposal');
+
+  const titleSetter = (paragraphRef) => {
+    const firstTitle = paragraphRef?.querySelector('h1,h2,h3,h4,h5');
+    const titleContents = firstTitle?.innerText;
+    if (titleContents && title !== titleContents) {
+      setTitle(titleContents);
+    }
+    firstTitle?.classList.add('hidden');
+  };
 
   return (
-    <Collapse
-      defaultActiveKey={['proposal']}
-      collapsible="icon"
-      items={[{
-        key: 'proposal',
-        label: (
-          <Flex wrap gap="15px">
-            Proposal
-            <CopyIconWithAddress address={hash} />
-          </Flex>
-        ),
-        extra: (
-          <Flex wrap gap="15px">
-            {blacklistMotion && (
-              <Button link onClick={() => history.push(`${router.congress.motions}#${blacklistMotion}`)}>
-                Blacklist motion:
-                {' '}
-                {truncate(blacklistMotion, 13)}
-              </Button>
-            )}
-            {!blacklistMotion && userIsMember && (
-              <BlacklistButton hash={boundedCall?.lookup?.hash ?? boundedCall?.legacy?.hash} />
-            )}
-          </Flex>
-        ),
-        children: (
-          <>
-            {hash && len && (
-              <Details proposal={{ hash, len }} isProposal />
-            )}
-            {centralizedDatas?.length > 0 && <Discussions centralizedDatas={centralizedDatas} />}
-          </>
-        ),
-      }]}
-    />
+    <Card
+      size="small"
+      className={styles.proposal}
+    >
+      <Flex wrap gap="20px" align="center">
+        <Card.Meta
+          title={(
+            <Flex vertical gap="5px">
+              {hash && (
+                <div className="description">
+                  <CopyIconWithAddress address={hash} />
+                </div>
+              )}
+              <strong>
+                {title}
+              </strong>
+            </Flex>
+          )}
+        />
+        <Flex flex={1}>
+          <Paragraph ellipsis={{ rows: 2 }} className={classNames('description', styles.intro)}>
+            {hash && len ? (
+              <Preimage hash={hash} len={len}>
+                {(proposal) => {
+                  const { args } = proposal.toJSON() || {};
+                  const { sections } = args || {};
+                  const [firstSection] = sections || [];
+                  try {
+                    return (
+                      <span ref={titleSetter}>
+                        <Markdown>
+                          {hexToString(firstSection) || ''}
+                        </Markdown>
+                      </span>
+                    );
+                  } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error(e);
+                  }
+                  return null;
+                }}
+              </Preimage>
+            ) : null}
+          </Paragraph>
+        </Flex>
+        <Button onClick={() => history.push(router.voting.proposalItem.replace(':id', hash))}>
+          Show more
+        </Button>
+      </Flex>
+    </Card>
   );
 }
 
@@ -91,17 +113,7 @@ const call = PropTypes.oneOfType([
 ]);
 
 ProposalItem.propTypes = {
-  centralizedDatas: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    link: PropTypes.string.isRequired,
-    proposerAddress: PropTypes.string.isRequired,
-    created: PropTypes.string.isRequired,
-    id: PropTypes.number.isRequired,
-  })).isRequired,
   boundedCall: call.isRequired,
-  blacklistMotion: PropTypes.string.isRequired,
-  userIsMember: PropTypes.string.isRequired,
 };
 
 export default ProposalItem;

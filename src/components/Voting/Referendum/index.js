@@ -104,22 +104,24 @@ function Referendum() {
             <List
               dataSource={democracy.democracy.crossReferencedReferendumsData}
               renderItem={(referendum) => (
-                <ReferendumItem
-                  centralizedDatas={referendum.centralizedDatas}
-                  voted={{
-                    yayVotes: referendum.votedAye,
-                    nayVotes: referendum.votedNay,
-                    votedTotal: referendum.votedTotal,
-                  }}
-                  hash={referendum.imageHash}
-                  delegating={delegatingTo !== undefined}
-                  alreadyVoted={alreadyVoted(referendum)}
-                  proposal={referendum.image.proposal}
-                  buttonVoteCallback={handleSubmitVoteForm}
-                  referendumIndex={parseInt(referendum.index)}
-                  blacklistMotion={referendum.blacklistMotion}
-                  userIsMember={userIsMember}
-                />
+                <List.Item>
+                  <ReferendumItem
+                    centralizedDatas={referendum.centralizedDatas}
+                    voted={{
+                      yayVotes: referendum.votedAye,
+                      nayVotes: referendum.votedNay,
+                      votedTotal: referendum.votedTotal,
+                    }}
+                    hash={referendum.imageHash}
+                    delegating={delegatingTo !== undefined}
+                    alreadyVoted={alreadyVoted(referendum)}
+                    proposal={referendum.image.proposal}
+                    buttonVoteCallback={handleSubmitVoteForm}
+                    referendumIndex={parseInt(referendum.index)}
+                    blacklistMotion={referendum.blacklistMotion}
+                    userIsMember={userIsMember}
+                  />
+                </List.Item>
               )}
             />
           ) : <Alert type="info" message="There are no active Referendums" />,
@@ -131,12 +133,14 @@ function Referendum() {
             <List
               dataSource={democracy.democracy.crossReferencedProposalsData}
               renderItem={(proposal) => (
-                <ProposalItem
-                  centralizedDatas={proposal.centralizedDatas}
-                  boundedCall={proposal.boundedCall}
-                  blacklistMotion={proposal.blacklistMotion}
-                  userIsMember={userIsMember}
-                />
+                <List.Item>
+                  <ProposalItem
+                    centralizedDatas={proposal.centralizedDatas}
+                    boundedCall={proposal.boundedCall}
+                    blacklistMotion={proposal.blacklistMotion}
+                    userIsMember={userIsMember}
+                  />
+                </List.Item>
               )}
             />
           ) : <Alert type="info" message="There are no active Proposals" />,
@@ -148,9 +152,11 @@ function Referendum() {
             <List
               dataSource={democracy.democracy.scheduledCalls}
               renderItem={(item) => (
-                <DispatchItem
-                  item={item}
-                />
+                <List.Item>
+                  <DispatchItem
+                    item={item}
+                  />
+                </List.Item>
               )}
             />
           ) : <Alert type="info" message="There are no active Dispatches" />,

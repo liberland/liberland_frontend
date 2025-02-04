@@ -30,6 +30,7 @@ function CongressionalCountdown({ termDuration }) {
   return (
     <Flex vertical gap="20px">
       <Card
+        size="small"
         title={`Election ends in ${formatDuration(duration)}`}
         className={styles.countdown}
       >

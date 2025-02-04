@@ -16,7 +16,7 @@ function Details({ proposal, isProposal }) {
           checkedChildren="Hide"
           unCheckedChildren="Show"
           checked={!isDetailsHidden}
-          onChange={(checked) => setIsDetailsHidden(checked)}
+          onChange={(checked) => setIsDetailsHidden(!checked)}
         />,
       ]}
     >
