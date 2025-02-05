@@ -135,10 +135,8 @@ function Referendum() {
               renderItem={(proposal) => (
                 <List.Item>
                   <ProposalItem
-                    centralizedDatas={proposal.centralizedDatas}
                     boundedCall={proposal.boundedCall}
-                    blacklistMotion={proposal.blacklistMotion}
-                    userIsMember={userIsMember}
+                    id={proposal.index}
                   />
                 </List.Item>
               )}

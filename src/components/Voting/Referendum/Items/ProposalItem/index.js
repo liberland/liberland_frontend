@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { blake2AsHex } from '@polkadot/util-crypto';
-import { hexToU8a, hexToString } from '@polkadot/util';
+import { hexToString } from '@polkadot/util';
 import Flex from 'antd/es/flex';
 import Card from 'antd/es/card';
 import classNames from 'classnames';
@@ -13,23 +12,16 @@ import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 import router from '../../../../../router';
 import styles from '../../../styles.module.scss';
 import Preimage from '../../../../Proposal/Preimage';
-
-const getHashAndLength = (boundedCall) => {
-  if (boundedCall.lookup) {
-    return [boundedCall.lookup.hash, boundedCall.lookup.len];
-  }
-  if (boundedCall.legacy) {
-    return [boundedCall.legacy.hash, 0];
-  }
-  return [blake2AsHex(hexToU8a(boundedCall.inline)), 0];
-};
+import { getHashAndLength } from '../ProposalPage/utils';
 
 function ProposalItem({
   boundedCall,
+  id,
 }) {
   const [hash, len] = useMemo(() => getHashAndLength(boundedCall), [boundedCall]);
   const history = useHistory();
   const [title, setTitle] = useState('Proposal');
+  const linkTo = router.voting.proposalItem.replace(':id', id);
 
   const titleSetter = (paragraphRef) => {
     const firstTitle = paragraphRef?.querySelector('h1,h2,h3,h4,h5');
@@ -86,7 +78,7 @@ function ProposalItem({
             ) : null}
           </Paragraph>
         </Flex>
-        <Button onClick={() => history.push(router.voting.proposalItem.replace(':id', hash))}>
+        <Button href={linkTo} onClick={() => history.push(linkTo)}>
           Show more
         </Button>
       </Flex>
@@ -114,6 +106,7 @@ const call = PropTypes.oneOfType([
 
 ProposalItem.propTypes = {
   boundedCall: call.isRequired,
+  id: PropTypes.number.isRequired,
 };
 
 export default ProposalItem;

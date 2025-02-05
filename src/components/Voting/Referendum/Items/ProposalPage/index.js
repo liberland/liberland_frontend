@@ -1,10 +1,8 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { blake2AsHex } from '@polkadot/util-crypto';
-import { hexToU8a } from '@polkadot/util';
+import React, { useEffect, useMemo } from 'react';
 import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
-import { useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { useHistory, useParams } from 'react-router-dom';
 import Button from '../../../../Button/Button';
 import truncate from '../../../../../utils/truncate';
 import Discussions from '../Discussions';
@@ -12,25 +10,32 @@ import Details from '../Details';
 import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 import router from '../../../../../router';
 import BlacklistButton from '../BlacklistButton';
+import { blockchainSelectors, democracySelectors } from '../../../../../redux/selectors';
+import { democracyActions } from '../../../../../redux/actions';
+import { getHashAndLength } from './utils';
+import { useHideTitle } from '../../../../Layout/HideTitle';
 
-const getHashAndLength = (boundedCall) => {
-  if (boundedCall.lookup) {
-    return [boundedCall.lookup.hash, boundedCall.lookup.len];
-  }
-  if (boundedCall.legacy) {
-    return [boundedCall.legacy.hash, 0];
-  }
-  return [blake2AsHex(hexToU8a(boundedCall.inline)), 0];
-};
-
-function ProposalPage({
-  centralizedDatas,
-  boundedCall,
-  blacklistMotion,
-  userIsMember,
-}) {
-  const [hash, len] = getHashAndLength(boundedCall);
+function ProposalPage() {
   const history = useHistory();
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  useHideTitle();
+  useEffect(() => {
+    dispatch(democracyActions.getDemocracy.call(userWalletAddress));
+  }, [dispatch, userWalletAddress]);
+
+  const {
+    centralizedDatas,
+    boundedCall,
+    blacklistMotion,
+    userIsMember,
+  } = useMemo(() => democracy?.democracy?.crossReferencedProposalsData?.find(({
+    index,
+  }) => index === parseInt(id)) || {}, [democracy, id]);
+
+  const [hash, len] = useMemo(() => getHashAndLength(boundedCall), [boundedCall]);
 
   return (
     <Collapse
@@ -70,37 +75,5 @@ function ProposalPage({
     />
   );
 }
-
-const call = PropTypes.oneOfType([
-  PropTypes.shape({
-    legacy: PropTypes.shape({
-      hash: PropTypes.string.isRequired,
-    }).isRequired,
-  }),
-  PropTypes.shape({
-    lookup: PropTypes.shape({
-      hash: PropTypes.string.isRequired,
-      len: PropTypes.number.isRequired,
-    }).isRequired,
-  }),
-  PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    inline: PropTypes.any.isRequired,
-  }),
-]);
-
-ProposalPage.propTypes = {
-  centralizedDatas: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    link: PropTypes.string.isRequired,
-    proposerAddress: PropTypes.string.isRequired,
-    created: PropTypes.string.isRequired,
-    id: PropTypes.number.isRequired,
-  })).isRequired,
-  boundedCall: call.isRequired,
-  blacklistMotion: PropTypes.string.isRequired,
-  userIsMember: PropTypes.string.isRequired,
-};
 
 export default ProposalPage;

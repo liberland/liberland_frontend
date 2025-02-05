@@ -25,6 +25,10 @@ function Voting() {
         component={loader(() => import('./CongressionalAssemble'))}
       />
       <Route
+        path={router.voting.proposalItem}
+        component={loader(() => import('./Referendum/Items/ProposalPage'))}
+      />
+      <Route
         path={router.voting.referendum}
         component={ReferendumWrapper}
       />
