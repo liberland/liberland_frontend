@@ -27,6 +27,10 @@ export function ModalProvider({ children }) {
     return id;
   }, []);
 
+  const closeIdModal = useCallback((id) => {
+    setModals((prevModals) => prevModals.filter((modal) => modal.id !== id));
+  }, []);
+
   const closeLastNModals = useCallback((n = 1) => {
     setModals((prevModals) => prevModals.slice(0, -n));
   }, []);
@@ -34,7 +38,8 @@ export function ModalProvider({ children }) {
   const contextValue = useMemo(() => ({
     showModal,
     closeLastNModals,
-  }), [showModal, closeLastNModals]);
+    closeIdModal,
+  }), [showModal, closeLastNModals, closeIdModal]);
   return (
     <ModalContext.Provider value={contextValue}>
       {children}

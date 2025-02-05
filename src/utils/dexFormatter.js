@@ -75,19 +75,17 @@ export const convertTransferData = async (
 
   let amount = null;
   let amountData = null;
-
-  const getSwapPrice = isAsset1 ? getSwapPriceExactTokensForTokens : getSwapPriceTokensForExactTokens;
-  const isAmountMax = !isAsset1;
+  const isAmountMax = isAsset1;
   const amountIn = isAsset1 ? amount1Desired : amount2Desired;
 
   if (isBuy) {
     const decimals = isAsset1 ? asset2Decimals : asset1Decimals;
     amount = parseAssets(amountIn, decimals);
-    amountData = await getSwapPrice(enum2, enum1, amount);
+    amountData = await getSwapPriceTokensForExactTokens(enum2, enum1, amount);
   } else {
     const decimals = isAsset1 ? asset1Decimals : asset2Decimals;
     amount = parseAssets(amountIn, decimals);
-    amountData = await getSwapPrice(enum1, enum2, amount);
+    amountData = await getSwapPriceExactTokensForTokens(enum2, enum1, amount);
   }
 
   const calculateFunc = isAmountMax ? calculateAmountMax : calculateAmountMin;
