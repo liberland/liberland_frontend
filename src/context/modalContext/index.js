@@ -2,7 +2,7 @@ import React, {
   createContext, useContext, useState, useCallback, useMemo,
 } from 'react';
 import PropTypes from 'prop-types';
-import { Modal } from 'antd';
+import Modal from 'antd/es/modal';
 import uniqueId from 'lodash/uniqueId';
 
 const ModalContext = createContext();
@@ -35,7 +35,6 @@ export function ModalProvider({ children }) {
     showModal,
     closeLastNModals,
   }), [showModal, closeLastNModals]);
-
   return (
     <ModalContext.Provider value={contextValue}>
       {children}
@@ -61,6 +60,8 @@ export function ModalProvider({ children }) {
 
 ModalProvider.propTypes = {
   children: PropTypes.node.isRequired,
-  onClose: PropTypes.func.isRequired,
+  onClose: PropTypes.func,
   maskClosable: PropTypes.bool,
+  className: PropTypes.string,
+  classNames: PropTypes.string,
 };
