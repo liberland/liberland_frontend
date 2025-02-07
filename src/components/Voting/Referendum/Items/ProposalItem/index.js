@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { hexToString } from '@polkadot/util';
 import Flex from 'antd/es/flex';
 import Card from 'antd/es/card';
+import { useMediaQuery } from 'usehooks-ts';
 import classNames from 'classnames';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useHistory } from 'react-router-dom';
@@ -13,6 +14,8 @@ import router from '../../../../../router';
 import styles from '../../../styles.module.scss';
 import Preimage from '../../../../Proposal/Preimage';
 import { getHashAndLength } from '../ProposalPage/utils';
+import { useTitleFromMarkdown } from '../hooks';
+import truncate from '../../../../../utils/truncate';
 
 function ProposalItem({
   boundedCall,
@@ -20,25 +23,18 @@ function ProposalItem({
 }) {
   const [hash, len] = useMemo(() => getHashAndLength(boundedCall), [boundedCall]);
   const history = useHistory();
-  const [title, setTitle] = useState('Proposal');
+  const { title, setTitleFromRef } = useTitleFromMarkdown(true, 'Proposal');
   const linkTo = router.voting.proposalItem.replace(':id', id);
-
-  const titleSetter = (paragraphRef) => {
-    const firstTitle = paragraphRef?.querySelector('h1,h2,h3,h4,h5');
-    const titleContents = firstTitle?.innerText;
-    if (titleContents && title !== titleContents) {
-      setTitle(titleContents);
-    }
-    firstTitle?.classList.add('hidden');
-  };
+  const isBigScreen = useMediaQuery('(min-width: 1200px)');
 
   return (
     <Card
       size="small"
       className={styles.proposal}
     >
-      <Flex wrap gap="20px" align="center">
+      <Flex vertical={!isBigScreen} wrap gap="20px" align={isBigScreen ? 'center' : undefined}>
         <Card.Meta
+          className={styles.cardTitle}
           title={(
             <Flex vertical gap="5px">
               {hash && (
@@ -47,7 +43,7 @@ function ProposalItem({
                 </div>
               )}
               <strong>
-                {title}
+                {truncate(title, 30)}
               </strong>
             </Flex>
           )}
@@ -62,7 +58,7 @@ function ProposalItem({
                   const [firstSection] = sections || [];
                   try {
                     return (
-                      <span ref={titleSetter}>
+                      <span ref={setTitleFromRef}>
                         <Markdown>
                           {hexToString(firstSection) || ''}
                         </Markdown>

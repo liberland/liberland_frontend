@@ -4,6 +4,7 @@ import Collapse from 'antd/es/collapse';
 import List from 'antd/es/list';
 import Card from 'antd/es/card';
 import Markdown from 'markdown-to-jsx';
+import Paragraph from 'antd/es/typography/Paragraph';
 import PropTypes from 'prop-types';
 import router from '../../../router';
 import styles from '../styles.module.scss';
@@ -18,7 +19,7 @@ function AddLegislation({ proposal, isDetailsHidden }) {
 
   return (
     <div>
-      <p>
+      <Paragraph>
         Add new legislation
         {' '}
         <Link to={`${router.home.legislation}/${tier.toString()}`} className={styles.blue}>
@@ -30,8 +31,7 @@ function AddLegislation({ proposal, isDetailsHidden }) {
         {year.toNumber()}
         /
         {index.toNumber()}
-        {show ? '.' : '...'}
-      </p>
+      </Paragraph>
       <Collapse
         collapsible="icon"
         onChange={() => setShow(!show)}
@@ -43,9 +43,9 @@ function AddLegislation({ proposal, isDetailsHidden }) {
             children: (
               <List
                 dataSource={sections}
-                renderItem={(section, idx) => (
+                renderItem={(section) => (
                   <List.Item>
-                    <Card title={`Section #${idx}`}>
+                    <Card>
                       <div className={styles.legislationContent}>
                         <Markdown>
                           {new TextDecoder('utf-8').decode(section)}

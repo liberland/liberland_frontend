@@ -1,6 +1,9 @@
 @import "../../assets/base/variables";
 @import "../../assets/main.scss";
 
+.nav {
+  margin-top: 25px;
+}
 .icon {
   max-height: 20px;
   margin-right: 10px;
@@ -9,7 +12,12 @@
   width: 15px!important;
   margin: 20px auto;
 }
-
+.cardTitle {
+  @media screen and (min-width: map-get($breakpoints, 'widescreen')) {
+    max-width: 350px;
+    min-width: 350px;
+  }
+}
 .countdown {
     width: 100%;
     max-width: 100%!important;
