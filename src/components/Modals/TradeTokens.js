@@ -29,7 +29,7 @@ import modalWrapper from './components/ModalWrapper';
 
 function TradeTokensFormWrapper({ onClose, assets: initialAssets }) {
   const dispatch = useDispatch();
-  const reserves = useSelector(dexSelectors.selectorReserves);
+
   const [assets, setAssets] = useState(initialAssets);
   const {
     asset1,
@@ -40,16 +40,7 @@ function TradeTokensFormWrapper({ onClose, assets: initialAssets }) {
   const decimals1 = useMemo(() => getDecimalsForAsset(asset1, assetData1?.decimals), [asset1, assetData1?.decimals]);
   const decimals2 = useMemo(() => getDecimalsForAsset(asset2, assetData2?.decimals), [asset2, assetData2?.decimals]);
 
-  const reservesThisAssets = useMemo(() => {
-    if (reserves && asset1 && asset2 && reserves?.[asset1]?.[asset2]) {
-      const asset1Value = reserves[asset1][asset2].asset1;
-      const asset2Value = reserves[asset1][asset2].asset2;
-      return { ...reserves[asset1][asset2], asset1: asset1Value, asset2: asset2Value };
-    }
-    return null;
-  }, [asset1, asset2, reserves]);
-
-  const handleSwap = useCallback(() => {
+  const handleSwap = () => {
     setAssets((prev) => ({
       asset1: prev.asset2,
       asset2: prev.asset1,
@@ -58,7 +49,7 @@ function TradeTokensFormWrapper({ onClose, assets: initialAssets }) {
       asset1ToShow: prev.asset2ToShow,
       asset2ToShow: prev.asset1ToShow,
     }));
-  }, []);
+  };
 
   useEffect(() => {
     dispatch(dexActions.getDexReserves.call({ asset1, asset2 }));
@@ -75,7 +66,6 @@ function TradeTokensFormWrapper({ onClose, assets: initialAssets }) {
       decimals1={decimals1}
       decimals2={decimals2}
       onClose={onClose}
-      reservesThisAssets={reservesThisAssets}
     />
   );
 }
@@ -86,12 +76,13 @@ TradeTokensFormWrapper.propTypes = {
 };
 
 function TradeTokensForm({
-  onClose, assets, decimals1, decimals2, handleSwap, reservesThisAssets,
+  onClose, assets, decimals1, decimals2, handleSwap,
 }) {
   const [isBuy, setIsBuy] = useState(true);
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
+  const reserves = useSelector(dexSelectors.selectorReserves);
 
   const [isAsset1State, setIsAsset1State] = useState(false);
   const [formatedValue, setFormatedValue] = useState({});
@@ -102,6 +93,15 @@ function TradeTokensForm({
     asset1ToShow,
     asset2ToShow,
   } = assets;
+
+  const reservesThisAssets = useMemo(() => {
+    if (reserves && asset1 && asset2 && reserves?.[asset1]?.[asset2]) {
+      const asset1Value = reserves[asset1][asset2].asset1;
+      const asset2Value = reserves[asset1][asset2].asset2;
+      return { ...reserves[asset1][asset2], asset1: asset1Value, asset2: asset2Value };
+    }
+    return null;
+  }, [asset1, asset2, reserves]);
 
   const [loading, setLoading] = useState();
   const [amount1Focused, setAmount1Focused] = useState();
@@ -167,7 +167,6 @@ function TradeTokensForm({
 
       const sanitizedValue = sanitizeValue(formatedValueData);
       form.setFieldValue('amountIn2', sanitizedValue);
-
       form.validateFields();
 
       if (!tradeData) {
@@ -196,6 +195,7 @@ function TradeTokensForm({
   }, [asset1, asset2, reservesThisAssets, decimals1, decimals2, asset2ToShow, form]);
 
   const amount2In = Form.useWatch('amountIn2', form);
+
   const handleInputSell = useCallback(async (value) => {
     setIsAsset1State(false);
     try {
@@ -291,6 +291,12 @@ function TradeTokensForm({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount2In]);
 
+  useEffect(() => {
+    if (reservesThisAssets) {
+      handleInputBuy(form.getFieldValue('amount1In'));
+    }
+  }, [assets, form, handleInputBuy, reservesThisAssets]);
+
   const submitText = isStock ? 'Trade stock' : 'Exchange tokens';
 
   const symbolHelper = (symbol, size) => (
@@ -353,7 +359,6 @@ function TradeTokensForm({
           setIsBuy(false);
           setIsAsset1State(false);
           handleSwap();
-          form.setFieldValue('amountIn2', '');
         }}
       >
         <div className={styles.circle}>
