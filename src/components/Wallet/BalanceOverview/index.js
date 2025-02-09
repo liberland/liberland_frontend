@@ -17,12 +17,12 @@ import Button from '../../Button/Button';
 import router from '../../../router';
 
 function BalanceOverview({
-  balances, liquidMerits, showStaked,
+  balances, liquidMerits, showStaked, isCongress,
 }) {
   const history = useHistory();
   const overviewInfo = useMemo(() => [
     {
-      amount: formatDollars(balances.liquidAmount.amount),
+      amount: formatDollars(balances.liquidAmount.amount, false, 2),
       title: 'Liquid LLD',
       currency: 'LLD',
       icon: LLD,
@@ -32,7 +32,7 @@ function BalanceOverview({
       ],
     },
     showStaked && {
-      amount: formatDollars(balances.polkastake.amount),
+      amount: formatDollars(balances.polkastake.amount, false, 2),
       title: 'Validator Staked LLD',
       currency: 'LLD',
       icon: LLD,
@@ -43,7 +43,7 @@ function BalanceOverview({
       ],
     },
     {
-      amount: formatMerits(liquidMerits),
+      amount: formatMerits(liquidMerits, false, 2),
       title: 'Liquid LLM',
       currency: 'LLM',
       icon: LLM,
@@ -53,7 +53,7 @@ function BalanceOverview({
       ],
     },
     showStaked && {
-      amount: formatMerits(balances.liberstake.amount),
+      amount: formatMerits(balances.liberstake.amount, false, 2),
       title: 'PolitiPooled LLM',
       currency: 'LLM',
       icon: LLM,
@@ -83,7 +83,7 @@ function BalanceOverview({
       }) => (
         <Col span={isBiggerThanDesktop ? 6 : 24} key={title}>
           <MoneyCard
-            actions={actions}
+            actions={isCongress ? undefined : actions}
             amount={amount}
             alt={currency}
             icon={icon}
@@ -122,6 +122,7 @@ BalanceOverview.propTypes = {
     }),
   }),
   liquidMerits: PropTypes.string,
+  isCongress: PropTypes.bool,
 };
 
 export default BalanceOverview;

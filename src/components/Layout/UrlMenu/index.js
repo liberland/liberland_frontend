@@ -102,7 +102,7 @@ function UrlMenu({
   const changeWallet = isBiggerThanSmallScreen ? [] : [
     {
       label: (
-        <ChangeWallet />
+        <ChangeWallet onSelect={() => onNavigate()} />
       ),
       key: 'wallets',
       className: styles.switchContainer,

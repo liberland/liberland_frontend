@@ -39,7 +39,7 @@ function ValidatorListMobile({
           validators,
           identities,
         })}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 20 }}
         renderItem={({
           name,
           total,

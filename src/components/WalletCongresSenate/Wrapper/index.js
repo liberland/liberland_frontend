@@ -93,6 +93,7 @@ export default function WalletCongresSenateWrapper({
               balances={balances}
               liquidMerits={liquidMerits}
               showStaked={false}
+              isCongress
             />
           ),
         },

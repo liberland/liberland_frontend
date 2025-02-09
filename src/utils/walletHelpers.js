@@ -18,17 +18,20 @@ export const valueToBN = (i) => {
   return new BN(s);
 };
 
-const _format = ((value, decimals, withAll = false) => formatBalance(
-  valueToBN(value),
-  {
-    decimals,
-    forceUnit: '-',
-    withSi: false,
-    locale: 'en',
-    withZero: false,
-    withAll,
-  },
-));
+const _format = (value, decimals, withAll = false, precision = undefined) => {
+  const round = precision && new BN(10 ** (decimals - precision));
+  return formatBalance(
+    round ? valueToBN(value).divRound(round).mul(round) : valueToBN(value),
+    {
+      decimals,
+      forceUnit: '-',
+      withSi: false,
+      locale: 'en',
+      withZero: false,
+      withAll,
+    },
+  );
+};
 
 export const sanitizeValue = (value) => value.replace(/,/g, '');
 
@@ -37,9 +40,24 @@ const _parse = (value, decimals) => {
   return new BN(ethersBN.toHexString().replace(/^0x/, ''), 'hex');
 };
 
-export const formatMerits = (grains, withAll = false) => _format(grains, meritDecimals, withAll);
-export const formatDollars = (grains, withAll = false) => _format(grains, dollarDecimals, withAll);
-export const formatCustom = (grains, decimals, withAll = false) => _format(grains, decimals, withAll);
+export const formatMerits = (grains, withAll = false, precision = undefined) => _format(
+  grains,
+  meritDecimals,
+  withAll,
+  precision,
+);
+export const formatDollars = (grains, withAll = false, precision = undefined) => _format(
+  grains,
+  dollarDecimals,
+  withAll,
+  precision,
+);
+export const formatCustom = (grains, decimals, withAll = false, precision = undefined) => _format(
+  grains,
+  decimals,
+  withAll,
+  precision,
+);
 export const parseMerits = (merits) => _parse(merits, meritDecimals);
 export const parseDollars = (dollars) => _parse(dollars, dollarDecimals);
 export const parseAssets = (assets, assetDecimals) => _parse(assets, assetDecimals);
