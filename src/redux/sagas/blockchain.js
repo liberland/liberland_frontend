@@ -1,5 +1,5 @@
 import {
-  put, call, takeLatest, take,
+  put, call, takeLatest, take, race, delay,
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
@@ -71,9 +71,16 @@ export function* subscribeWalletsSaga() {
     setTimeout(() => clearInterval(interval), 120000);
     return () => clearInterval(interval);
   });
-
   while (true) {
-    const { extensions, wallets } = yield take(channel);
+    const { data, timeout } = yield race({
+      data: take(channel),
+      timeout: delay(20000),
+    });
+    if (timeout) {
+      yield put(blockchainActions.setExtensions.value([]));
+      yield put(blockchainActions.setWallets.value([]));
+    }
+    const { extensions, wallets } = data;
     yield put(blockchainActions.setExtensions.value(extensions));
     yield put(blockchainActions.setWallets.value(wallets));
   }
