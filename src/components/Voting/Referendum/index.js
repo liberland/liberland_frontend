@@ -8,7 +8,7 @@ import Alert from 'antd/es/alert';
 import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
-import { NavLink } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { AuthContext } from 'react-oauth2-code-pkce';
 import {
   blockchainSelectors,
@@ -26,6 +26,7 @@ import Button from '../../Button/Button';
 import router from '../../../router';
 
 function Referendum() {
+  const history = useHistory();
   const dispatch = useDispatch();
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -85,11 +86,9 @@ function Referendum() {
                 </>
               )}
               {user ? (
-                <NavLink
-                  to={router.voting.addLegislation}
-                >
+                <Button primary onClick={() => history.push(router.voting.addLegislation)}>
                   Propose
-                </NavLink>
+                </Button>
               ) : (
                 <Button
                   onClick={() => login()}
