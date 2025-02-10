@@ -71,8 +71,7 @@ function ReferendumItem({
                 Cancel as congress
               </Button>
             )}
-            <CounterItem votedTotal={votedTotal} votes={yayVotes} />
-            <CounterItem votedTotal={votedTotal} votes={nayVotes} isNay />
+            <CounterItem votedTotal={votedTotal} ayes={yayVotes} nays={nayVotes} />
           </Flex>
         ),
         children: (
