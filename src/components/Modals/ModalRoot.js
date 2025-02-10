@@ -16,9 +16,8 @@ function ModalRoot({ children, onClose }) {
     <Modal
       open
       footer={null}
-      closable={Boolean(onClose)}
-      maskClosable={Boolean(onClose)}
-      onClose={onClose}
+      closable={false}
+      maskClosable={false}
     >
       {children}
     </Modal>
