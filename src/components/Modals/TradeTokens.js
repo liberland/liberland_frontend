@@ -27,81 +27,45 @@ import CurrencyIcon from '../CurrencyIcon';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
 
-function TradeTokensFormWrapper({ onClose, assets: initialAssets }) {
-  const dispatch = useDispatch();
-
-  const [assets, setAssets] = useState(initialAssets);
-  const {
-    asset1,
-    asset2,
-    assetData1,
-    assetData2,
-  } = assets;
-  const decimals1 = useMemo(() => getDecimalsForAsset(asset1, assetData1?.decimals), [asset1, assetData1?.decimals]);
-  const decimals2 = useMemo(() => getDecimalsForAsset(asset2, assetData2?.decimals), [asset2, assetData2?.decimals]);
-
-  const handleSwap = () => {
-    setAssets((prev) => ({
-      asset1: prev.asset2,
-      asset2: prev.asset1,
-      assetData1: prev.assetData2,
-      assetData2: prev.assetData1,
-      asset1ToShow: prev.asset2ToShow,
-      asset2ToShow: prev.asset1ToShow,
-    }));
-  };
-
-  useEffect(() => {
-    dispatch(dexActions.getDexReserves.call({ asset1, asset2 }));
-  }, [dispatch, asset1, asset2]);
-
-  useEffect(() => {
-    dispatch(walletActions.getAssetsBalance.call([asset1, asset2]));
-  }, [dispatch, asset1, asset2]);
-
-  return (
-    <TradeTokensForm
-      assets={assets}
-      handleSwap={handleSwap}
-      decimals1={decimals1}
-      decimals2={decimals2}
-      onClose={onClose}
-    />
-  );
-}
-
-TradeTokensFormWrapper.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  assets: AssetsPropTypes.isRequired,
-};
-
 function TradeTokensForm({
-  onClose, assets, decimals1, decimals2, handleSwap,
+  onClose, assets: initialAssets,
 }) {
-  const [isBuy, setIsBuy] = useState(true);
+  const [isBuy, setIsBuy] = useState(false);
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
   const reserves = useSelector(dexSelectors.selectorReserves);
-
+  const [assets, setAssets] = useState(initialAssets);
+  const [input1Error, setInput1Error] = useState(null);
+  const [input2Error, setInput2Error] = useState(null);
   const [isAsset1State, setIsAsset1State] = useState(false);
-  const [formatedValue, setFormatedValue] = useState({});
 
   const {
     asset1,
     asset2,
     asset1ToShow,
     asset2ToShow,
+    assetData1,
+    assetData2,
   } = assets;
 
   const reservesThisAssets = useMemo(() => {
-    if (reserves && asset1 && asset2 && reserves?.[asset1]?.[asset2]) {
-      const asset1Value = reserves[asset1][asset2].asset1;
-      const asset2Value = reserves[asset1][asset2].asset2;
-      return { ...reserves[asset1][asset2], asset1: asset1Value, asset2: asset2Value };
+    if (reserves && asset1 && asset2) {
+      if (reserves?.[asset1]?.[asset2]) {
+        const asset1Value = reserves[asset1][asset2].asset1;
+        const asset2Value = reserves[asset1][asset2].asset2;
+        return { ...reserves[asset1][asset2], asset1: asset1Value, asset2: asset2Value };
+      } if (reserves?.[asset2]?.[asset1]) {
+        const asset1Value = reserves[asset2][asset1].asset1;
+        const asset2Value = reserves[asset2][asset1].asset2;
+        return { ...reserves[asset2][asset1], asset1: asset1Value, asset2: asset2Value };
+      }
     }
     return null;
   }, [asset1, asset2, reserves]);
+
+  const decimals1 = useMemo(() => getDecimalsForAsset(asset1, assetData1?.decimals), [asset1, assetData1?.decimals]);
+  const decimals2 = useMemo(() => getDecimalsForAsset(asset2, assetData2?.decimals), [asset2, assetData2?.decimals]);
 
   const [loading, setLoading] = useState();
   const [amount1Focused, setAmount1Focused] = useState();
@@ -127,7 +91,7 @@ function TradeTokensForm({
         minAmountPercent,
         isAsset1State,
       );
-      const path = [asset2, asset1];
+      const path = [asset1, asset2];
       const swapData = {
         path,
         amount,
@@ -148,64 +112,25 @@ function TradeTokensForm({
     }
   };
 
-  const amount1In = Form.useWatch('amount1In', form);
+  const amount2In = Form.useWatch('amountIn2', form);
   const handleInputBuy = useCallback(async (value) => {
     try {
-      setIsAsset1State(true);
-      const { enum1, enum2 } = convertToEnumDex(asset2, asset1);
-      const tradeData = await getSwapPriceTokensForExactTokens(enum1, enum2, parseAssets(value, decimals1));
+      setIsAsset1State(false);
+      setInput1Error(null);
+      const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
+      const inputValue = parseAssets(value, decimals2);
+      const tradeData = await getSwapPriceTokensForExactTokens(enum1, enum2, inputValue);
+
       const showReserve = formatAssets(
         reservesThisAssets.asset2,
         decimals2,
         { symbol: asset2ToShow, withAll: true },
       );
-
-      const formatedValueData = tradeData ? formatAssets(
-        tradeData,
-        decimals2,
-      ) : '';
-
-      const sanitizedValue = sanitizeValue(formatedValueData);
-      form.setFieldValue('amountIn2', sanitizedValue);
-      form.validateFields();
-
-      if (!tradeData) {
-        const msg = `No trade data from api for ${asset1}`;
-        form.setFields([{
-          name: 'amountIn2',
-          errors: [msg],
-        }]);
-        setFormatedValue({ [asset1]: { value: tradeData, msg } });
-      }
-
-      const priceBN = new BN(tradeData);
-
-      if (priceBN.gte(new BN(reservesThisAssets.asset2))) {
+      if (inputValue.gte(new BN(reservesThisAssets.asset2))) {
         const msg = `Input value exceeds reserves max ${showReserve}`;
-        form.setFields([{
-          name: 'amountIn2',
-          errors: [msg],
-        }]);
-        setFormatedValue({ [asset1]: { value: tradeData, msg } });
+        setInput2Error(msg);
+        return;
       }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error('Error fetching API data:', err);
-    }
-  }, [asset1, asset2, reservesThisAssets, decimals1, decimals2, asset2ToShow, form]);
-
-  const amount2In = Form.useWatch('amountIn2', form);
-
-  const handleInputSell = useCallback(async (value) => {
-    setIsAsset1State(false);
-    try {
-      const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
-      const tradeData = await getSwapPriceExactTokensForTokens(enum1, enum2, parseAssets(value, decimals1));
-      const showReserve = formatAssets(
-        reservesThisAssets.asset1,
-        decimals1,
-        { symbol: asset1ToShow, withAll: true },
-      );
 
       const formatedValueData = tradeData ? formatAssets(
         tradeData,
@@ -214,88 +139,79 @@ function TradeTokensForm({
 
       const sanitizedValue = sanitizeValue(formatedValueData);
       form.setFieldValue('amount1In', sanitizedValue);
-
       form.validateFields();
 
       if (!tradeData) {
-        const msg = `No trade data from api for ${asset2}`;
-        form.setFields([{
-          name: 'amount1In',
-          errors: [msg],
-        }]);
-        setFormatedValue({ [asset2]: { value: tradeData, msg } });
+        const msg = `No trade data from api for ${asset1}`;
+        setInput1Error(msg);
+        return;
       }
 
       const priceBN = new BN(tradeData);
+      const assetBN = new BN(assetsBalance[asset1]);
 
-      if (priceBN.gte(new BN(reservesThisAssets.asset1))) {
-        const msg = `Input value exceeds reserves max ${showReserve}`;
-        form.setFields([{
-          name: 'amount1In',
-          errors: [msg],
-        }]);
-        setFormatedValue({ [asset2]: { value: tradeData, msg } });
+      if (priceBN.gt(assetBN)) {
+        const msg = 'Input greater than balance';
+        setInput1Error(msg);
+        return;
       }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Error fetching API data:', err);
     }
-  }, [asset1, asset2, reservesThisAssets, decimals1, asset1ToShow, form]);
+  }, [asset1, asset2, decimals2, reservesThisAssets, decimals1, asset2ToShow, form, assetsBalance]);
 
-  const validate = (v, assetBalance, decimals, asset) => {
+  const amount1In = Form.useWatch('amount1In', form);
+  const handleInputSell = useCallback(async (value) => {
+    try {
+      setIsAsset1State(true);
+      setInput2Error(null);
+      const assetBN = new BN(assetsBalance[asset1]);
+      const inputValue = parseAssets(value, decimals1);
+
+      if (amount1Focused && inputValue.gt(assetBN)) {
+        const msg = 'Input greater than balance';
+        setInput1Error(msg);
+        return;
+      }
+      const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
+      const tradeData = await getSwapPriceExactTokensForTokens(enum1, enum2, inputValue);
+
+      const formatedValueData = tradeData ? formatAssets(
+        tradeData,
+        decimals2,
+      ) : '';
+
+      const sanitizedValue = sanitizeValue(formatedValueData);
+      form.setFieldValue('amountIn2', sanitizedValue);
+
+      form.validateFields();
+
+      if (!tradeData) {
+        const msg = `No trade data from api for ${asset1}`;
+        setInput2Error(msg);
+        return;
+      }
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching API data:', err);
+    }
+  }, [assetsBalance, asset1, decimals1, decimals2, amount1Focused, asset2, form]);
+
+  const validate = (v, assetToShow, decimals) => {
     if (!v) {
       return 'Required';
     }
     if (Number.isNaN(Number(v))) {
       return 'Not a valid number';
     }
-    const isAsset1 = asset1 !== asset;
 
     if ((v.split('.')[1]?.length || 0) > decimals) {
-      return `${isAsset1 ? asset2ToShow : asset1ToShow} don't have this amount of decimals`;
-    }
-    const tradeValue = formatedValue[asset];
-    if (tradeValue) {
-      const { msg, value: valueData } = tradeValue;
-      const priceBN = new BN(valueData);
-      const reserve = reservesThisAssets[isBuy ? 'asset1' : 'asset2'];
-
-      if (priceBN.gte(new BN(reserve.toString()))) {
-        return msg;
-      }
+      return `${assetToShow} don't have this amount of decimals`;
     }
 
-    if (isBuy ? asset !== asset1 : asset === asset1) {
-      const inputBN = parseAssets(v, decimals);
-      const assetBN = new BN(assetBalance.toString());
-      if (inputBN.gt(assetBN)) {
-        return 'Input greater than balance';
-      }
-    }
     return undefined;
   };
-
-  useEffect(() => {
-    if (amount1In && amount1Focused) {
-      setIsBuy(true);
-      handleInputBuy(amount1In);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount1In]);
-
-  useEffect(() => {
-    if (amount2In && amount2Focused) {
-      setIsBuy(false);
-      handleInputSell(amount2In);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amount2In]);
-
-  useEffect(() => {
-    if (reservesThisAssets) {
-      handleInputBuy(form.getFieldValue('amount1In'));
-    }
-  }, [assets, form, handleInputBuy, reservesThisAssets]);
 
   const submitText = isStock ? 'Trade stock' : 'Exchange tokens';
 
@@ -305,6 +221,94 @@ function TradeTokensForm({
       <CurrencyIcon size={size} symbol={symbol} />
     </Flex>
   );
+
+  const handleSwap = () => {
+    setIsBuy((prev) => !prev);
+    const newAsset = {
+      asset1: asset2,
+      asset2: asset1,
+      assetData1: assetData2,
+      assetData2: assetData1,
+      asset1ToShow: asset2ToShow,
+      asset2ToShow: asset1ToShow,
+    };
+    setAssets(newAsset);
+    setInput1Error(null);
+    setInput2Error(null);
+  };
+
+  useEffect(() => {
+    if (input1Error) {
+      form.setFields([
+        {
+          name: 'amount1In',
+          errors: [input1Error],
+        },
+      ]);
+    } else {
+      form.setFields([
+        {
+          name: 'amount1In',
+          errors: [],
+        },
+      ]);
+    }
+  }, [input1Error, form]);
+
+  useEffect(() => {
+    if (input2Error) {
+      form.setFields([
+        {
+          name: 'amountIn2',
+          errors: [input2Error],
+        },
+      ]);
+    } else {
+      form.setFields([
+        {
+          name: 'amountIn2',
+          errors: [],
+        },
+      ]);
+    }
+  }, [input2Error, form]);
+
+  useEffect(() => {
+    if (amount1In && amount1Focused) {
+      setIsBuy(false);
+      handleInputSell(amount1In);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amount1In]);
+
+  useEffect(() => {
+    if (amount2In && amount2Focused) {
+      setIsBuy(true);
+      handleInputBuy(amount2In);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amount2In]);
+
+  useEffect(() => {
+    dispatch(dexActions.getDexReserves.call({ asset1, asset2 }));
+  }, [dispatch, asset1, asset2]);
+
+  useEffect(() => {
+    dispatch(walletActions.getAssetsBalance.call([asset1, asset2]));
+  }, [dispatch, asset1, asset2]);
+
+  useEffect(() => {
+    if (isBuy) {
+      const value = form.getFieldValue('amount1In');
+      form.setFieldValue('amountIn2', value);
+      handleInputBuy(value);
+    } else {
+      const value = form.getFieldValue('amountIn2');
+      form.setFieldValue('amount1In', value);
+      handleInputSell(value);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assets]);
 
   return (
     <Form
@@ -325,7 +329,7 @@ function TradeTokensForm({
         label={(
           <Flex wrap gap="10px">
             <div>
-              Buy
+              Sell
             </div>
             {symbolHelper(asset1ToShow, 20)}
           </Flex>
@@ -334,55 +338,10 @@ function TradeTokensForm({
           <>
             Balance
             {' '}
-            {(assetsBalance && assetsBalance.length > 0)
-              ? formatAssets(
-                assetsBalance[0],
-                decimals1,
-                { symbol: asset1ToShow, withAll: true },
-              ) : 0}
-          </>
-        )}
-        rules={[
-          { required: true },
-        ]}
-      >
-        <InputNumber
-          stringMode
-          controls={false}
-          onFocus={() => setAmount1Focused(true)}
-          onBlur={() => setAmount1Focused(false)}
-        />
-      </Form.Item>
-      <div
-        className={styles.swapButton}
-        onClick={() => {
-          setIsBuy(false);
-          setIsAsset1State(false);
-          handleSwap();
-        }}
-      >
-        <div className={styles.circle}>
-          <SwapOutlined className={styles.swapIcon} />
-        </div>
-      </div>
-      <Form.Item
-        name="amountIn2"
-        label={(
-          <Flex wrap gap="10px">
-            <div>
-              Sell
-            </div>
-            {symbolHelper(asset2ToShow, 20)}
-          </Flex>
-        )}
-        extra={(
-          <>
-            Balance
-            {' '}
-            {assetsBalance && assetsBalance.length > 0 ? formatAssets(
-              assetsBalance[1],
-              decimals2,
-              { symbol: asset2ToShow, withAll: true },
+            {assetsBalance?.[asset1] ? formatAssets(
+              assetsBalance[asset1],
+              decimals1,
+              { symbol: asset1ToShow, withAll: true },
             ) : 0}
           </>
         )}
@@ -391,11 +350,65 @@ function TradeTokensForm({
           {
             validator: (_, v) => {
               if (v) {
-                const validated = validate(v, assetsBalance[1], decimals2, asset1);
+                const validated = validate(v, asset1ToShow, decimals1);
                 if (validated) {
                   return Promise.reject(validated);
                 }
               }
+              if (input1Error) return Promise.reject(input1Error);
+              return Promise.resolve();
+            },
+          },
+        ]}
+      >
+        <InputNumber
+          stringMode
+          controls={false}
+          onFocus={() => setAmount1Focused(true)}
+          onBlur={() => setAmount1Focused(false)}
+          onChange={() => setInput1Error(null)}
+        />
+      </Form.Item>
+      <div
+        className={styles.swapButton}
+      >
+        <div className={styles.circle} onClick={handleSwap}>
+          <SwapOutlined className={styles.swapIcon} />
+        </div>
+      </div>
+      <Form.Item
+        name="amountIn2"
+        label={(
+          <Flex wrap gap="10px">
+            <div>
+              Buy
+            </div>
+            {symbolHelper(asset2ToShow, 20)}
+          </Flex>
+        )}
+        extra={(
+          <>
+            Balance
+            {' '}
+            {assetsBalance?.[asset2]
+              ? formatAssets(
+                assetsBalance[asset2],
+                decimals2,
+                { symbol: asset2ToShow, withAll: true },
+              ) : 0}
+          </>
+        )}
+        rules={[
+          { required: true },
+          {
+            validator: (_, v) => {
+              if (v) {
+                const validated = validate(v, asset2ToShow, decimals2);
+                if (validated) {
+                  return Promise.reject(validated);
+                }
+              }
+              if (input2Error) return Promise.reject(input2Error);
               return Promise.resolve();
             },
           },
@@ -406,6 +419,7 @@ function TradeTokensForm({
           controls={false}
           onFocus={() => setAmount2Focused(true)}
           onBlur={() => setAmount2Focused(false)}
+          onChange={() => setInput2Error(null)}
         />
       </Form.Item>
       {details && (
@@ -442,13 +456,6 @@ function TradeTokensForm({
 TradeTokensForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
-  decimals1: PropTypes.number.isRequired,
-  decimals2: PropTypes.number.isRequired,
-  handleSwap: PropTypes.func.isRequired,
-  reservesThisAssets: PropTypes.shape({
-    asset1: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    asset2: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  }).isRequired,
 };
 
 function ButtonModal(props) {
@@ -457,6 +464,6 @@ function ButtonModal(props) {
   );
 }
 
-const TradeTokensModal = modalWrapper(TradeTokensFormWrapper, ButtonModal);
+const TradeTokensModal = modalWrapper(TradeTokensForm, ButtonModal);
 
 export default TradeTokensModal;
