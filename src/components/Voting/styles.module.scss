@@ -26,7 +26,8 @@
 .referenda {
     max-width: 1600px;
 }
-.candidate {
+.candidate,
+.referendum {
     width: 100%;
     max-width: 100%!important;
 }
@@ -53,4 +54,10 @@
     margin-top: 0!important;
   }
   margin-bottom: 0!important;
+}
+.for {
+  color: #7DC035;
+}
+.against {
+  color: #FF0000;
 }

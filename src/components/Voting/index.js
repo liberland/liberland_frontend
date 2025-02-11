@@ -33,6 +33,14 @@ function Voting() {
         component={ReferendumWrapper}
       />
       <Route
+        path={router.voting.referendumItem}
+        component={loader(() => import('./Referendum/Items/ReferendumPage'))}
+      />
+      <Route
+        path={router.voting.dispatchItem}
+        component={loader(() => import('./Referendum/Items/DispatchPage'))}
+      />
+      <Route
         path={router.voting.addLegislation}
         component={loader(() => import('./Referendum/ProposalForms/AddLegislation/AddLegislation'))}
       />
