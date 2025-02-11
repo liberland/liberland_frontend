@@ -9,10 +9,10 @@ import ProposeRepealLegislationButton from '../../../Congress/ProposeRepealLegis
 import CitizenRepealLegislationModalWrapper from '../../../Modals/CitizenRepealLegislationModal';
 
 function ProposeButton({
-  tier, id, section, repealMotion,
+  tier, id, section,
 }) {
-  const isRepealOption = (tier === 'InternationalTreaty' && !repealMotion);
-  const isProposeButton = isRepealOption || tier !== 'Constitution';
+  const isRepealOption = tier === 'InternationalTreaty';
+  const isProposeButton = tier !== 'Constitution';
 
   return isProposeButton ? (
     <Dropdown
@@ -62,7 +62,6 @@ ProposeButton.propTypes = {
     index: PropTypes.object.isRequired,
   }).isRequired,
   section: PropTypes.number,
-  repealMotion: PropTypes.bool,
 };
 
 export default ProposeButton;

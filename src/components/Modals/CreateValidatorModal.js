@@ -17,7 +17,7 @@ import Button from '../Button/Button';
 
 import { validatorActions } from '../../redux/actions';
 import { validatorSelectors, walletSelectors } from '../../redux/selectors';
-import { formatDollars, parseDollars } from '../../utils/walletHelpers';
+import { formatDollars, parseDollars, valueToBN } from '../../utils/walletHelpers';
 
 function CreateValidatorModal({
   closeModal,
@@ -27,7 +27,7 @@ function CreateValidatorModal({
   const payee = useSelector(validatorSelectors.payee);
   const maxBond = BN.max(
     new BN(0),
-    (new BN(balances?.liquidAmount?.amount ?? 0))
+    valueToBN(balances?.liquidAmount?.amount ?? 0)
       .sub(parseDollars('2')), // leave at least 2 liquid LLD...
   );
 

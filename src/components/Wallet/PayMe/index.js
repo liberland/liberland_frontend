@@ -48,7 +48,7 @@ function PayMe() {
     );
   };
 
-  if (identityIsLoading) {
+  if (identityIsLoading || !linkData) {
     return <Spin />;
   }
 

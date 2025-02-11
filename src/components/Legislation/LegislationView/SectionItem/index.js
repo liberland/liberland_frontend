@@ -9,7 +9,6 @@ import VetoStats from '../VetoStats';
 import ProposeButton from '../ProposeButton';
 import AmendButton from '../AmendButton';
 import CastVeto from '../CastVeto';
-import ExistingMotionsAndReferendums from '../ExistingMotionsAndReferendums';
 import styles from '../styles.module.scss';
 
 const checkTextToShow = (content) => {
@@ -24,13 +23,8 @@ const checkTextToShow = (content) => {
 };
 
 function SectionItem({
-  section, repealProposalReferendum, content, tier, id,
+  section, content, tier, id,
 }) {
-  const {
-    repealMotion,
-    repealReferendum,
-    repealProposal,
-  } = repealProposalReferendum;
   const text = useMemo(() => checkTextToShow(
     content,
   ), [content]);
@@ -48,11 +42,6 @@ function SectionItem({
       className={styles.card}
       actions={[
         <Flex className={styles.actions} justify="end" wrap gap="15px">
-          <ExistingMotionsAndReferendums
-            motion={repealMotion}
-            proposal={repealReferendum}
-            referendum={repealProposal}
-          />
           <CastVeto
             id={id}
             tier={tier}
@@ -62,7 +51,6 @@ function SectionItem({
             id={id}
             tier={tier}
             section={section}
-            repealMotion={repealMotion}
           />
           <AmendButton
             id={id}
@@ -88,8 +76,6 @@ SectionItem.defaultProps = {
 
 SectionItem.propTypes = {
   section: PropTypes.number,
-  // eslint-disable-next-line react/forbid-prop-types
-  repealProposalReferendum: PropTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   content: PropTypes.object.isRequired,
   tier: PropTypes.string.isRequired,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -7,11 +7,12 @@ import Flex from 'antd/es/flex';
 import Input from 'antd/es/input';
 import Upload from 'antd/es/upload';
 import Spin from 'antd/es/spin';
+import Select from 'antd/es/select';
 import InboxOutlined from '@ant-design/icons/InboxOutlined';
 import { useDispatch, useSelector } from 'react-redux';
 import ModalRoot from '../ModalRoot';
 import Button from '../../Button/Button';
-import { blockchainSelectors } from '../../../redux/selectors';
+import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import styles from './styles.module.scss';
 import { nftsActions } from '../../../redux/actions';
 
@@ -20,10 +21,15 @@ function CreatEditNFTModal({
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const userCollections = useSelector(nftsSelectors.userCollections);
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    dispatch(nftsActions.getUserCollections.call(walletAddress));
+  }, [dispatch, walletAddress]);
 
   const uploadImageToIPFS = async (file) => {
     setUploading(true);
@@ -101,13 +107,15 @@ function CreatEditNFTModal({
     }
   };
 
-  const createNFT = async (values) => {
-    const {
-      name, description, imageFile,
-    } = values;
+  const createNFT = async ({
+    name,
+    description,
+    collectionId,
+    imageFile,
+  }) => {
     const metadataCID = await uploadMetadataToIPFS(imageFile[0], name, description);
     dispatch(nftsActions.setMetadataNft.call({
-      metadataCID, walletAddress,
+      metadataCID, walletAddress, collectionId,
     }));
     closeModal();
   };
@@ -118,6 +126,10 @@ function CreatEditNFTModal({
     }
     return eventOrFile?.fileList;
   };
+
+  if (!userCollections) {
+    return <Spin />;
+  }
 
   return (
     <Form form={form} layout="vertical" onFinish={createNFT}>
@@ -132,6 +144,16 @@ function CreatEditNFTModal({
       </Form.Item>
       <Form.Item name="description" label="Description" rules={[{ required: true }]}>
         <Input placeholder="Enter description" />
+      </Form.Item>
+      <Form.Item name="collectionId" label="Collection ID" rules={[{ required: true }]}>
+        <Select
+          disabled={!userCollections.length}
+          options={userCollections.map(({ collectionId }) => ({
+            label: collectionId,
+            value: collectionId,
+          }))}
+          placeholder={userCollections.length ? 'Select collection to add' : 'Create collection for NFT first'}
+        />
       </Form.Item>
       <Form.Item
         name="imageFile"
