@@ -4,6 +4,7 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import Avatar from 'antd/es/avatar';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
+import { isAddress } from '@polkadot/util-crypto';
 import { useHistory } from 'react-router-dom';
 import cx from 'classnames';
 import Alert from 'antd/es/alert';
@@ -96,7 +97,7 @@ function CompaniesCard({
                 title={(
                   <Flex align="center" gap="15px">
                     {companyLogo}
-                    {registeredCompany.name}
+                    {truncate(registeredCompany.name, 20)}
                   </Flex>
                 )}
               />
@@ -107,13 +108,15 @@ function CompaniesCard({
                 {owner && (
                   <Flex wrap gap="15px" className={styles.owner}>
                     <ColorAvatar size={54} name={owner} />
-                    <Flex vertical gap="5px" className={styles.ownerName}>
+                    <Flex vertical gap="5px" justify="center" className={styles.ownerName}>
                       {owner && (
                         <>
                           <strong>
                             {truncate(owner, 20)}
                           </strong>
-                          <CopyIconWithAddress address={address} isTruncate />
+                          {isAddress(address) && (
+                            <CopyIconWithAddress address={address} isTruncate />
+                          )}
                         </>
                       )}
                     </Flex>
