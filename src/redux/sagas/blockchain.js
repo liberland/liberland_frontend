@@ -76,12 +76,14 @@ export function* subscribeWalletsSaga() {
       data: take(channel),
       timeout: delay(20000),
     });
+
     if (timeout) {
       yield put(blockchainActions.setExtensions.value([]));
       yield put(blockchainActions.setWallets.value([]));
+    } else if (data) {
+      const { extensions, wallets } = data;
+      yield put(blockchainActions.setExtensions.value(extensions));
+      yield put(blockchainActions.setWallets.value(wallets));
     }
-    const { extensions, wallets } = data;
-    yield put(blockchainActions.setExtensions.value(extensions));
-    yield put(blockchainActions.setWallets.value(wallets));
   }
 }
