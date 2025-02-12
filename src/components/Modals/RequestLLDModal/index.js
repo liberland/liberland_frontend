@@ -52,7 +52,7 @@ function RequestLLDForm({ onClose }) {
       const subwalletLink = `https://mobile.subwallet.app/browser?url=${window.encodeURIComponent(
         link,
       )}`;
-      const edgeLink = `https://deep.edge.app/pay/liberland/${walletAddress}?amount=${realAmount}`;
+      const edgeLink = `https://deep.edge.app/pay/liberland/${walletAddress}?amount=${amount}`;
       setLinkData({
         amount: realAmount,
         note,
