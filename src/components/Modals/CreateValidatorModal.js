@@ -8,15 +8,12 @@ import Input from 'antd/es/input';
 import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
 import PropTypes from 'prop-types';
-
 import { useDispatch, useSelector } from 'react-redux';
 import { BN, BN_ZERO, isHex } from '@polkadot/util';
 import Button from '../Button/Button';
-
 import { validatorActions } from '../../redux/actions';
 import { validatorSelectors, walletSelectors } from '../../redux/selectors';
 import { formatDollars, parseDollars, valueToBN } from '../../utils/walletHelpers';
-import { formatDollars, parseDollars } from '../../utils/walletHelpers';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
 
