@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -7,14 +7,15 @@ import Flex from 'antd/es/flex';
 import InputNumber from 'antd/es/input-number';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN, BN_ZERO } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { validatorActions } from '../../redux/actions';
 import { walletSelectors } from '../../redux/selectors';
 import { parseDollars, formatDollars, valueToBN } from '../../utils/walletHelpers';
+import modalWrapper from './components/ModalWrapper';
+import OpenModalButton from './components/OpenModalButton';
 
-function StakeLLDModal({
-  closeModal,
+function StakeLLDForm({
+  onClose,
 }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
@@ -30,7 +31,7 @@ function StakeLLDModal({
   const onSubmit = (values) => {
     const bondValue = parseDollars(values.bondValue);
     dispatch(validatorActions.stakeLld.call({ bondValue }));
-    closeModal();
+    onClose();
   };
 
   const validateBondValue = (_, textBondValue) => {
@@ -85,7 +86,7 @@ function StakeLLDModal({
       </Form.Item>
       <Flex wrap gap="15px">
         <Button
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -100,29 +101,21 @@ function StakeLLDModal({
   );
 }
 
-StakeLLDModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+StakeLLDForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-export default function StakeLLDModalWrapper({
-  label,
-}) {
-  const [show, setShow] = useState();
-
+function ButtonModal(props) {
+  const { label } = props;
   return (
-    <>
-      <Button primary onClick={() => setShow(true)}>
-        {label}
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <StakeLLDModal closeModal={() => setShow(false)} />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text={label} {...props} />
   );
 }
 
-StakeLLDModalWrapper.propTypes = {
+ButtonModal.propTypes = {
   label: PropTypes.string.isRequired,
 };
+
+const StakeLLDModal = modalWrapper(StakeLLDForm, ButtonModal);
+
+export default StakeLLDModal;

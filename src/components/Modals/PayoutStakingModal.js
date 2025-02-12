@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Flex from 'antd/es/flex';
 import { useDispatch } from 'react-redux';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { validatorActions } from '../../redux/actions';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function PayoutStakingModal({
-  closeModal,
+function PayoutStakingForm({
+  onClose,
 }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const payout = () => {
     dispatch(validatorActions.payout.call());
-    closeModal();
+    onClose();
   };
 
   return (
@@ -34,7 +35,7 @@ function PayoutStakingModal({
 
       <Flex wrap gap="15px">
         <Button
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -49,24 +50,15 @@ function PayoutStakingModal({
   );
 }
 
-PayoutStakingModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+PayoutStakingForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-function PayoutStakingModalWrapper() {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button onClick={() => setShow(true)}>
-        Payout rewards
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <PayoutStakingModal closeModal={() => setShow(false)} />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text="Payout rewards" {...props} />
   );
 }
+const PayoutStakingModal = modalWrapper(PayoutStakingForm, ButtonModal);
 
-export default PayoutStakingModalWrapper;
+export default PayoutStakingModal;

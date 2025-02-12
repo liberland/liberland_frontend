@@ -15,7 +15,7 @@ import Button from '../../Button/Button';
 import ChangeWallet from '../../Home/ChangeWallet';
 
 function UrlMenu({
-  onNavigate,
+  onClose,
 }) {
   const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
@@ -39,7 +39,7 @@ function UrlMenu({
   const history = useHistory();
   const navigate = (route) => {
     history.push(route);
-    onNavigate?.();
+    onClose?.();
   };
   const getMenuKey = () => {
     if (isBiggerThanDesktop) {
@@ -143,7 +143,7 @@ function UrlMenu({
 }
 
 UrlMenu.propTypes = {
-  onNavigate: PropTypes.func,
+  onClose: PropTypes.func,
 };
 
 export default UrlMenu;

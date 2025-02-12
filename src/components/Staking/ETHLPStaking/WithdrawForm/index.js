@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
-import ModalRoot from '../../../Modals/ModalRoot';
 import { ethSelectors } from '../../../../redux/selectors';
 import Button from '../../../Button/Button';
 import { formatCustom } from '../../../../utils/walletHelpers';
-import styles from './styles.module.scss';
 import { ethActions } from '../../../../redux/actions';
+import OpenModalButton from '../../../Modals/components/OpenModalButton';
+import modalWrapper from '../../../Modals/components/ModalWrapper';
 
 function WithdrawForm({
   account,
@@ -75,20 +75,17 @@ WithdrawForm.propTypes = {
   }).isRequired,
 };
 
-function WithdrawFormModalWrapper(props) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <div className={styles.modal}>
-      <Button primary medium onClick={() => setShow(true)}>
-        Withdraw tokens
-      </Button>
-      {show && (
-        <ModalRoot>
-          <WithdrawForm {...props} onClose={() => setShow(false)} />
-        </ModalRoot>
-      )}
-    </div>
+    <OpenModalButton primary medium text="Withdraw tokens" {...props} />
   );
 }
 
-export default WithdrawFormModalWrapper;
+ButtonModal.propTypes = {
+  label: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
+};
+
+const WithdrawFormModal = modalWrapper(WithdrawForm, ButtonModal);
+
+export default WithdrawFormModal;

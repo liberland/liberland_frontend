@@ -10,25 +10,26 @@ import InputNumber from 'antd/es/input-number';
 import Divider from 'antd/es/divider';
 import TextArea from 'antd/es/input/TextArea';
 import PropTypes from 'prop-types';
-import ModalRoot from '../ModalRoot';
 import Button from '../../Button/Button';
-import { identitySelectors } from '../../../redux/selectors';
+import { blockchainSelectors, identitySelectors } from '../../../redux/selectors';
 import { identityActions } from '../../../redux/actions';
 import { formatDollars, parseDollars } from '../../../utils/walletHelpers';
 import Table from '../../Table';
 import router from '../../../router';
 import styles from '../styles.module.scss';
 import CopyLink from './CopyLink';
+import modalWrapper from '../components/ModalWrapper';
+import OpenModalButton from '../components/OpenModalButton';
 
-function RequestLLDModal({
-  onClose,
-  walletAddress,
-}) {
+function RequestLLDForm({ onClose }) {
   const [form] = Form.useForm();
 
   const dispatch = useDispatch();
   const identity = useSelector(identitySelectors.selectorIdentity);
   const identityIsLoading = useSelector(identitySelectors.selectorIsLoading);
+  const walletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
   const [linkData, setLinkData] = useState();
 
   useEffect(() => {
@@ -40,13 +41,17 @@ function RequestLLDModal({
   const onSubmit = async ({ amount, note }) => {
     try {
       const realAmount = parseDollars(amount).toString();
-      const data = window.btoa(JSON.stringify({
-        amount: realAmount,
-        note,
-        recipient: walletAddress,
-      }));
+      const data = window.btoa(
+        JSON.stringify({
+          amount: realAmount,
+          note,
+          recipient: walletAddress,
+        }),
+      );
       const link = `${window.location.protocol}//${window.location.host}${router.wallet.payMe}?data=${data}`;
-      const subwalletLink = `https://mobile.subwallet.app/browser?url=${window.encodeURIComponent(link)}`;
+      const subwalletLink = `https://mobile.subwallet.app/browser?url=${window.encodeURIComponent(
+        link,
+      )}`;
       const edgeLink = `https://deep.edge.app/pay/liberland/${walletAddress}?amount=${realAmount}`;
       setLinkData({
         amount: realAmount,
@@ -67,16 +72,12 @@ function RequestLLDModal({
     return <Spin />;
   }
 
-  const { info } = identity?.unwrap() || {};
+  const { info } = identity?.isSome ? identity.unwrap() : {};
   const displayName = info?.display?.toHuman()?.Raw || walletAddress || 'No name';
   const submitText = linkData ? 'Update payment link' : 'Create payment link';
 
   return (
-    <Form
-      form={form}
-      onFinish={onSubmit}
-      layout="vertical"
-    >
+    <Form form={form} onFinish={onSubmit} layout="vertical">
       {linkData && (
         <div>
           {isLargerThanHdScreen ? (
@@ -123,21 +124,15 @@ function RequestLLDModal({
                 dataSource={[
                   {
                     title: 'Direct',
-                    content: (
-                      <CopyLink link={linkData.link} />
-                    ),
+                    content: <CopyLink link={linkData.link} />,
                   },
                   {
                     title: 'Subwallet',
-                    content: (
-                      <CopyLink link={linkData.subwalletLink} />
-                    ),
+                    content: <CopyLink link={linkData.subwalletLink} />,
                   },
                   {
                     title: 'Edge',
-                    content: (
-                      <CopyLink link={linkData.edgeLink} />
-                    ),
+                    content: <CopyLink link={linkData.edgeLink} />,
                   },
                 ]}
                 renderItem={({ title, content }) => (
@@ -192,10 +187,16 @@ function RequestLLDModal({
                 name: 'Amount',
                 value: `${formatDollars(linkData.amount, true)} LLD`,
               },
-            ].concat(linkData.note ? [{
-              name: 'Note',
-              value: linkData.note,
-            }] : [])}
+            ].concat(
+              linkData.note
+                ? [
+                  {
+                    name: 'Note',
+                    value: linkData.note,
+                  },
+                ]
+                : [],
+            )}
           />
           <Divider />
         </div>
@@ -210,22 +211,14 @@ function RequestLLDModal({
       >
         <InputNumber placeholder="LLD" stringMode controls={false} />
       </Form.Item>
-      <Form.Item
-        label="Note"
-        name="note"
-        extra="Optional"
-      >
+      <Form.Item label="Note" name="note" extra="Optional">
         <TextArea className={styles.textarea} />
       </Form.Item>
       <Flex wrap gap="15px">
         <Button medium onClick={onClose}>
           Close
         </Button>
-        <Button
-          primary
-          medium
-          type="submit"
-        >
+        <Button primary medium type="submit">
           {submitText}
         </Button>
       </Flex>
@@ -233,25 +226,14 @@ function RequestLLDModal({
   );
 }
 
-RequestLLDModal.propTypes = {
+RequestLLDForm.propTypes = {
   onClose: PropTypes.func.isRequired,
-  walletAddress: PropTypes.string.isRequired,
 };
 
-function RequestLLDModalWrapper(props) {
-  const [show, setShow] = useState();
-  return (
-    <>
-      <Button className={styles.button} onClick={() => setShow(true)}>
-        Request
-      </Button>
-      {show && (
-        <ModalRoot>
-          <RequestLLDModal {...props} onClose={() => setShow(false)} />
-        </ModalRoot>
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  return <OpenModalButton text="Request LLD" {...props} />;
 }
 
-export default RequestLLDModalWrapper;
+const RequestLLDModal = modalWrapper(RequestLLDForm, ButtonModal);
+
+export default RequestLLDModal;

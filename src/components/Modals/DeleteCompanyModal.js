@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { registriesActions } from '../../redux/actions';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function DeleteCompanyModal({
-  closeModal, companyId,
+function DeleteCompanyForm({
+  onClose, companyId,
 }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -24,7 +25,7 @@ function DeleteCompanyModal({
             companyId,
           }),
         );
-        closeModal();
+        onClose();
       }}
     >
       <Title level={4}>
@@ -34,44 +35,22 @@ function DeleteCompanyModal({
         <Button red type="submit">
           Yes
         </Button>
-        <Button green onClick={closeModal}>No</Button>
+        <Button green onClick={onClose}>No</Button>
       </Flex>
     </Form>
   );
 }
 
-DeleteCompanyModal.propTypes = {
+DeleteCompanyForm.propTypes = {
   companyId: PropTypes.string.isRequired,
-  closeModal: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
-function DeleteCompanyModalWrapper({
-  companyId,
-}) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button
-        red
-        small
-        onClick={() => setShow(true)}
-      >
-        Request Deletion
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <DeleteCompanyModal
-            closeModal={() => setShow(false)}
-            companyId={companyId}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text="Request Deletion" {...props} />
   );
 }
+const DeleteCompanyModal = modalWrapper(DeleteCompanyForm, ButtonModal);
 
-DeleteCompanyModalWrapper.propTypes = {
-  companyId: PropTypes.string.isRequired,
-};
-
-export default DeleteCompanyModalWrapper;
+export default DeleteCompanyModal;

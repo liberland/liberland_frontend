@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import PropsTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
@@ -7,42 +7,49 @@ import Title from 'antd/es/typography/Title';
 import InputNumber from 'antd/es/input-number';
 import Checkbox from 'antd/es/checkbox';
 import { BN } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
 import { blockchainSelectors, walletSelectors } from '../../redux/selectors';
 import {
-  convertLiquidityData, convertToEnumDex, getDecimalsForAsset,
+  convertLiquidityData,
+  convertToEnumDex,
+  getDecimalsForAsset,
 } from '../../utils/dexFormatter';
 import { AssetsPropTypes } from '../Wallet/Exchange/proptypes';
-import { formatAssets, parseAssets, sanitizeValue } from '../../utils/walletHelpers';
-import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } from '../../api/nodeRpcCall';
+import {
+  formatAssets,
+  parseAssets,
+  sanitizeValue,
+} from '../../utils/walletHelpers';
+import {
+  getSwapPriceExactTokensForTokens,
+  getSwapPriceTokensForExactTokens,
+} from '../../api/nodeRpcCall';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function AddLiquidityModal({
-  closeModal, assets, isReservedDataEmpty,
-}) {
+function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
   const dispatch = useDispatch();
-  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const walletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
   const assetsBalance = useSelector(walletSelectors.selectorAssetsBalance);
   const [form] = Form.useForm();
   const [asset1Focused, setAsset1Focused] = useState();
   const [asset2Focused, setAsset2Focused] = useState();
 
   const {
-    asset1,
-    asset2,
-    assetData1,
-    assetData2,
-    asset1ToShow,
-    asset2ToShow,
+    asset1, asset2, assetData1, assetData2, asset1ToShow, asset2ToShow,
   } = assets;
 
   const decimals1 = getDecimalsForAsset(asset1, assetData1?.decimals);
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
 
   const onSubmit = async ({
-    amount1Desired, amount2Desired, minAmountPercent,
+    amount1Desired,
+    amount2Desired,
+    minAmountPercent,
   }) => {
     try {
       const {
@@ -55,17 +62,19 @@ function AddLiquidityModal({
         minAmountPercent || '',
       );
       const mintTo = walletAddress;
-      dispatch(dexActions.addLiquidity.call({
-        amount1Desired: amount1,
-        amount1Min,
-        amount2Desired: amount2,
-        amount2Min,
-        asset1,
-        asset2,
-        walletAddress,
-        mintTo,
-      }));
-      closeModal();
+      dispatch(
+        dexActions.addLiquidity.call({
+          amount1Desired: amount1,
+          amount1Min,
+          amount2Desired: amount2,
+          amount2Min,
+          asset1,
+          asset2,
+          walletAddress,
+          mintTo,
+        }),
+      );
+      onClose();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error(e);
@@ -75,7 +84,9 @@ function AddLiquidityModal({
   const validate = (v, assetBalance, decimals, asset) => {
     const isAsset1 = asset === asset1;
     if ((v.split('.')[1]?.length || 0) > decimals) {
-      return `${isAsset1 ? asset1ToShow : asset2ToShow} don't have this amount of decimals`;
+      return `${
+        isAsset1 ? asset1ToShow : asset2ToShow
+      } don't have this amount of decimals`;
     }
     const inputBN = parseAssets(v, decimals);
     if (Number.isNaN(Number(inputBN))) {
@@ -90,35 +101,43 @@ function AddLiquidityModal({
   };
   const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
 
-  const handleChangeInput = React.useCallback(async (value, isAsset1) => {
-    if (!value || value === 0
-      || (value.split('.')[1]?.length || 0) > (isAsset1 ? decimals1 : decimals2)) {
-      return;
-    }
+  const handleChangeInput = React.useCallback(
+    async (value, isAsset1) => {
+      if (
+        !value
+        || value === 0
+        || (value.split('.')[1]?.length || 0) > (isAsset1 ? decimals1 : decimals2)
+      ) {
+        return;
+      }
 
-    if (isReservedDataEmpty) {
-      form.setFieldValue(isAsset1 ? 'amount1Desired' : 'amount2Desired', value);
-      return;
-    }
+      if (isReservedDataEmpty) {
+        form.setFieldValue(
+          isAsset1 ? 'amount1Desired' : 'amount2Desired',
+          value,
+        );
+        return;
+      }
 
-    const amount = parseAssets(
-      value,
-      isAsset1 ? decimals1 : decimals2,
-    );
-    const getSwapPrice = isAsset1 ? getSwapPriceExactTokensForTokens : getSwapPriceTokensForExactTokens;
+      const amount = parseAssets(value, isAsset1 ? decimals1 : decimals2);
+      const getSwapPrice = isAsset1
+        ? getSwapPriceExactTokensForTokens
+        : getSwapPriceTokensForExactTokens;
 
-    const tradeData = await getSwapPrice(enum1, enum2, amount);
+      const tradeData = await getSwapPrice(enum1, enum2, amount);
 
-    const decimalsOut = isAsset1 ? decimals2 : decimals1;
-    const formatedValue = formatAssets(tradeData, decimalsOut);
-    const sanitizedValue = sanitizeValue(formatedValue.toString());
-    if (isAsset1) {
-      form.setFieldValue('amount2Desired', sanitizedValue);
-    } else {
-      form.setFieldValue('amount1Desired', sanitizedValue);
-    }
-    form.validateFields();
-  }, [decimals1, decimals2, enum1, enum2, form, isReservedDataEmpty]);
+      const decimalsOut = isAsset1 ? decimals2 : decimals1;
+      const formatedValue = formatAssets(tradeData, decimalsOut);
+      const sanitizedValue = sanitizeValue(formatedValue.toString());
+      if (isAsset1) {
+        form.setFieldValue('amount2Desired', sanitizedValue);
+      } else {
+        form.setFieldValue('amount1Desired', sanitizedValue);
+      }
+      form.validateFields();
+    },
+    [decimals1, decimals2, enum1, enum2, form, isReservedDataEmpty],
+  );
 
   const amount1Desired = Form.useWatch('amount1Desired', form);
   const amount2Desired = Form.useWatch('amount2Desired', form);
@@ -157,20 +176,32 @@ function AddLiquidityModal({
       <Form.Item
         name="amount1Desired"
         label={`Amount ${asset1ToShow} desired`}
-        extra={assetsBalance && assetsBalance.length > 0 && (
-          <span>
-            Balance
-            {' '}
-            {assetsBalance[0]
-              ? formatAssets(assetsBalance[0], decimals1, { symbol: asset1ToShow, withAll: true }) : 0}
-          </span>
-        )}
+        extra={
+          assetsBalance
+          && assetsBalance.length > 0 && (
+            <span>
+              Balance
+              {' '}
+              {assetsBalance[0]
+                ? formatAssets(assetsBalance[0], decimals1, {
+                  symbol: asset1ToShow,
+                  withAll: true,
+                })
+                : 0}
+            </span>
+          )
+        }
         rules={[
           { required: true },
           {
             validator: (_, v) => {
               if (v) {
-                const validated = validate(v, assetsBalance[0], decimals1, asset1);
+                const validated = validate(
+                  v,
+                  assetsBalance[0],
+                  decimals1,
+                  asset1,
+                );
                 if (validated) {
                   return Promise.reject(validated);
                 }
@@ -190,20 +221,32 @@ function AddLiquidityModal({
       <Form.Item
         name="amount2Desired"
         label={`Amount ${asset2ToShow} desired`}
-        extra={assetsBalance && assetsBalance.length > 0 && (
-          <span>
-            Balance
-            {' '}
-            {assetsBalance[1]
-              ? formatAssets(assetsBalance[1], decimals2, { symbol: asset2ToShow, withAll: true }) : 0}
-          </span>
-        )}
+        extra={
+          assetsBalance
+          && assetsBalance.length > 0 && (
+            <span>
+              Balance
+              {' '}
+              {assetsBalance[1]
+                ? formatAssets(assetsBalance[1], decimals2, {
+                  symbol: asset2ToShow,
+                  withAll: true,
+                })
+                : 0}
+            </span>
+          )
+        }
         rules={[
           { required: true },
           {
             validator: (_, v) => {
               if (v) {
-                const validated = validate(v, assetsBalance[1], decimals2, asset2);
+                const validated = validate(
+                  v,
+                  assetsBalance[1],
+                  decimals2,
+                  asset2,
+                );
                 if (validated) {
                   return Promise.reject(validated);
                 }
@@ -224,10 +267,7 @@ function AddLiquidityModal({
         <Form.Item
           label="Max Slippage (in percent %)"
           name="minAmountPercent"
-          rules={[
-            { required: true },
-            { type: 'number' },
-          ]}
+          rules={[{ required: true }, { type: 'number' }]}
         >
           <InputNumber controls={false} />
         </Form.Item>
@@ -240,7 +280,7 @@ function AddLiquidityModal({
         <Checkbox />
       </Form.Item>
       <Flex gap="15px" wrap>
-        <Button medium onClick={closeModal}>
+        <Button medium onClick={onClose}>
           Cancel
         </Button>
         <Button primary medium type="submit">
@@ -251,38 +291,22 @@ function AddLiquidityModal({
   );
 }
 
-AddLiquidityModal.propTypes = {
-  closeModal: PropsTypes.func.isRequired,
+AddLiquidityForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
-  isReservedDataEmpty: PropsTypes.bool.isRequired,
+  isReservedDataEmpty: PropTypes.bool.isRequired,
 };
 
-function AddLiquidityModalWrapper({
-  assets,
-  isReservedDataEmpty,
-}) {
-  const [show, setShow] = useState(false);
+function ButtonModal(props) {
   return (
-    <>
-      <Button onClick={() => setShow(true)}>
-        Add liquidity
-      </Button>
-      {show && (
-        <ModalRoot>
-          <AddLiquidityModal
-            assets={assets}
-            closeModal={() => setShow(false)}
-            isReservedDataEmpty={isReservedDataEmpty}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text="Add liquidity" {...props} />
   );
 }
 
-AddLiquidityModalWrapper.propTypes = {
-  assets: AssetsPropTypes.isRequired,
-  isReservedDataEmpty: PropsTypes.bool.isRequired,
+ButtonModal.propTypes = {
+  isMint: PropTypes.bool.isRequired,
 };
 
-export default AddLiquidityModalWrapper;
+const AddLiquidityModal = modalWrapper(AddLiquidityForm, ButtonModal);
+
+export default AddLiquidityModal;

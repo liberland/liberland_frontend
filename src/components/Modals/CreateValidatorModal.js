@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
@@ -11,15 +11,17 @@ import PropTypes from 'prop-types';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { BN, BN_ZERO, isHex } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 
 import { validatorActions } from '../../redux/actions';
 import { validatorSelectors, walletSelectors } from '../../redux/selectors';
 import { formatDollars, parseDollars, valueToBN } from '../../utils/walletHelpers';
+import { formatDollars, parseDollars } from '../../utils/walletHelpers';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function CreateValidatorModal({
-  closeModal,
+function CreateValidatorForm({
+  onClose,
 }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
@@ -39,7 +41,7 @@ function CreateValidatorModal({
     dispatch(validatorActions.createValidator.call({
       bondValue, commission, blocked, keys: values.keys, payee: values.payee,
     }));
-    closeModal();
+    onClose();
   };
 
   const validateBondValue = (textBondValue) => {
@@ -141,7 +143,7 @@ function CreateValidatorModal({
       <Flex wrap gap="15px">
         <Button
           medium
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -157,30 +159,21 @@ function CreateValidatorModal({
   );
 }
 
-CreateValidatorModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+CreateValidatorForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-export default function CreateValidatorModalWrapper({
-  label,
-}) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
+  const { label } = props;
   return (
-    <>
-      <Button primary onClick={() => setShow(true)}>
-        {label || 'Start Validating'}
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <CreateValidatorModal
-            closeModal={() => setShow(false)}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton small primary text={label || 'Start Validating'} {...props} />
   );
 }
 
-CreateValidatorModalWrapper.propTypes = {
+ButtonModal.propTypes = {
   label: PropTypes.string,
 };
+
+const CreateValidatorModal = modalWrapper(CreateValidatorForm, ButtonModal);
+
+export default CreateValidatorModal;

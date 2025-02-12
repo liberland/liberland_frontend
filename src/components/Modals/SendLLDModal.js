@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -7,21 +7,23 @@ import Flex from 'antd/es/flex';
 import InputNumber from 'antd/es/input-number';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN_ZERO, BN } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import InputSearch from '../InputComponents/InputSearchAddressName';
-import styles from './styles.module.scss';
 import { parseDollars, parseMerits } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
 import { walletSelectors } from '../../redux/selectors';
+import modalWrapper from './components/ModalWrapper';
+import OpenModalButton from './components/OpenModalButton';
 
-function SendLLDModal({ closeModal }) {
+function SendLLDForm({ onClose }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
-  const maxUnbond = balances?.liquidAmount?.amount !== '0x0' ? BN.max(
-    BN_ZERO,
-    new BN(balances?.liquidAmount?.amount ?? 0).sub(parseDollars('2')), // leave at least 2 liquid LLD...
-  ) : 0;
+  const maxUnbond = balances?.liquidAmount?.amount !== '0x0'
+    ? BN.max(
+      BN_ZERO,
+      new BN(balances?.liquidAmount?.amount ?? 0).sub(parseDollars('2')), // leave at least 2 liquid LLD...
+    )
+    : 0;
 
   const [form] = Form.useForm();
   const transfer = (values) => {
@@ -31,7 +33,7 @@ function SendLLDModal({ closeModal }) {
         amount: parseDollars(values.amount),
       }),
     );
-    closeModal();
+    onClose();
   };
 
   const validateUnbondValue = (_, textUnbondValue) => {
@@ -50,15 +52,9 @@ function SendLLDModal({ closeModal }) {
   };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={transfer}
-    >
+    <Form form={form} layout="vertical" onFinish={transfer}>
       <Title level={3}>Send LLD</Title>
-      <Paragraph>
-        You are going to send tokens from your wallet
-      </Paragraph>
+      <Paragraph>You are going to send tokens from your wallet</Paragraph>
       <Form.Item
         label="Send to address"
         name="recipient"
@@ -79,9 +75,7 @@ function SendLLDModal({ closeModal }) {
         <InputNumber stringMode controls={false} placeholder="Amount LLD" />
       </Form.Item>
       <Flex wrap gap="15px">
-        <Button onClick={closeModal}>
-          Cancel
-        </Button>
+        <Button onClick={onClose}>Cancel</Button>
         <Button primary type="submit">
           Make transfer
         </Button>
@@ -90,24 +84,14 @@ function SendLLDModal({ closeModal }) {
   );
 }
 
-SendLLDModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+SendLLDForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-function SendLLDModalWrapper() {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Button className={styles.button} onClick={() => setOpen(true)}>
-        Send
-      </Button>
-      {open && (
-        <ModalRoot>
-          <SendLLDModal closeModal={() => setOpen(false)} />
-        </ModalRoot>
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  return <OpenModalButton text="Send" {...props} />;
 }
 
-export default SendLLDModalWrapper;
+const SendLLDModal = modalWrapper(SendLLDForm, ButtonModal);
+
+export default SendLLDModal;

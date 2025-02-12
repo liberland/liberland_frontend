@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Select from 'antd/es/select';
 import Title from 'antd/es/typography/Title';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { validatorActions } from '../../redux/actions';
 import { validatorSelectors } from '../../redux/selectors';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function StakingRewardsDestinationModal({
-  closeModal,
+function StakingRewardsDestinationForm({
+  onClose,
 }) {
   const dispatch = useDispatch();
   const payee = useSelector(validatorSelectors.payee);
@@ -20,7 +21,7 @@ function StakingRewardsDestinationModal({
 
   const onSubmit = (values) => {
     dispatch(validatorActions.setPayee.call(values));
-    closeModal();
+    onClose();
   };
 
   return (
@@ -47,7 +48,7 @@ function StakingRewardsDestinationModal({
       </Form.Item>
       <Flex wrap gap="15px">
         <Button
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -62,24 +63,16 @@ function StakingRewardsDestinationModal({
   );
 }
 
-StakingRewardsDestinationModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+StakingRewardsDestinationForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-export default function StakingRewardsDestinationModalWrapper() {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button onClick={() => setShow(true)}>
-        Change destination
-      </Button>
-      {show && (
-        <ModalRoot>
-          <StakingRewardsDestinationModal
-            closeModal={() => setShow(false)}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text="Change destination" {...props} />
   );
 }
+
+const StakingRewardsDestinationModal = modalWrapper(StakingRewardsDestinationForm, ButtonModal);
+
+export default StakingRewardsDestinationModal;

@@ -10,14 +10,15 @@ import Spin from 'antd/es/spin';
 import Select from 'antd/es/select';
 import InboxOutlined from '@ant-design/icons/InboxOutlined';
 import { useDispatch, useSelector } from 'react-redux';
-import ModalRoot from '../ModalRoot';
 import Button from '../../Button/Button';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import styles from './styles.module.scss';
 import { nftsActions } from '../../../redux/actions';
+import OpenModalButton from '../components/OpenModalButton';
+import modalWrapper from '../components/ModalWrapper';
 
-function CreatEditNFTModal({
-  closeModal,
+function CreatEditNFTForm({
+  onClose,
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -117,7 +118,7 @@ function CreatEditNFTModal({
     dispatch(nftsActions.setMetadataNft.call({
       metadataCID, walletAddress, collectionId,
     }));
-    closeModal();
+    onClose();
   };
 
   const getFileFromEvent = (eventOrFile) => {
@@ -189,7 +190,7 @@ function CreatEditNFTModal({
       </Form.Item>
 
       <Flex wrap gap="15px">
-        <Button onClick={closeModal}>
+        <Button onClick={onClose}>
           Cancel
         </Button>
         <Button primary type="submit" disabled={uploading}>
@@ -200,39 +201,14 @@ function CreatEditNFTModal({
   );
 }
 
-CreatEditNFTModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+CreatEditNFTForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-function CreateEditNFTModalWrapper({
-  collectionId,
-  nftId,
-}) {
-  const [show, setShow] = useState();
-  return (
-    <>
-      <Button
-        onClick={() => setShow(true)}
-        primary
-      >
-        Create NFT
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <CreatEditNFTModal
-            closeModal={() => setShow(false)}
-            collectionId={collectionId}
-            nftId={nftId}
-          />
-        </ModalRoot>
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  return <OpenModalButton text="Create NFT" primary {...props} />;
 }
 
-CreateEditNFTModalWrapper.propTypes = {
-  nftId: PropTypes.string,
-  collectionId: PropTypes.string,
-};
+const CreateEditNFTModal = modalWrapper(CreatEditNFTForm, ButtonModal);
 
-export default CreateEditNFTModalWrapper;
+export default CreateEditNFTModal;

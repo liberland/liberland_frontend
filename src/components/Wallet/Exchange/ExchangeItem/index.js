@@ -6,7 +6,7 @@ import { useMediaQuery } from 'usehooks-ts';
 import { getDecimalsForAsset, getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormatter';
 import { formatAssets } from '../../../../utils/walletHelpers';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
-import AddLiquidityModalWrapper from '../../../Modals/AddLiquidityModal';
+import AddLiquidityModal from '../../../Modals/AddLiquidityModal';
 import styles from './styles.module.scss';
 import { ExchangeItemPropTypes } from '../proptypes';
 import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
@@ -138,7 +138,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
         </Flex>
         <div className={styles.liquidityWrapper}>
           <Flex gap="15px" wrap>
-            <AddLiquidityModalWrapper
+            <AddLiquidityModal
               assets={assets}
               isReservedDataEmpty={isReservedDataEmpty}
             />

@@ -20,6 +20,7 @@ import { authActions } from './redux/actions';
 import GuidedSetup from './components/GuidedSetup';
 import { CheckExtensionWalletProvider } from './components/CheckExtenstionWalletProvider';
 import { loader } from './utils/loader';
+import { ModalProvider } from './context/modalContext';
 
 function App() {
   const dispatch = useDispatch();
@@ -44,15 +45,17 @@ function App() {
 
   return (
     <Router>
-      <Loader>
-        {user ? (
-          <CheckExtensionWalletProvider>
-            <GuidedSetup>{appRouter}</GuidedSetup>
-          </CheckExtensionWalletProvider>
-        ) : (
-          <CheckExtensionWalletProvider>{appRouter}</CheckExtensionWalletProvider>
-        )}
-      </Loader>
+      <ModalProvider>
+        <Loader>
+          {user ? (
+            <CheckExtensionWalletProvider>
+              <GuidedSetup>{appRouter}</GuidedSetup>
+            </CheckExtensionWalletProvider>
+          ) : (
+            <CheckExtensionWalletProvider>{appRouter}</CheckExtensionWalletProvider>
+          )}
+        </Loader>
+      </ModalProvider>
     </Router>
   );
 }
