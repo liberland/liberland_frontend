@@ -11,7 +11,7 @@ import Divider from 'antd/es/divider';
 import TextArea from 'antd/es/input/TextArea';
 import PropTypes from 'prop-types';
 import Button from '../../Button/Button';
-import { identitySelectors } from '../../../redux/selectors';
+import { blockchainSelectors, identitySelectors } from '../../../redux/selectors';
 import { identityActions } from '../../../redux/actions';
 import { formatDollars, parseDollars } from '../../../utils/walletHelpers';
 import Table from '../../Table';
@@ -21,12 +21,15 @@ import CopyLink from './CopyLink';
 import modalWrapper from '../components/ModalWrapper';
 import OpenModalButton from '../components/OpenModalButton';
 
-function RequestLLDForm({ onClose, walletAddress }) {
+function RequestLLDForm({ onClose }) {
   const [form] = Form.useForm();
 
   const dispatch = useDispatch();
   const identity = useSelector(identitySelectors.selectorIdentity);
   const identityIsLoading = useSelector(identitySelectors.selectorIsLoading);
+  const walletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
   const [linkData, setLinkData] = useState();
 
   useEffect(() => {
@@ -69,7 +72,7 @@ function RequestLLDForm({ onClose, walletAddress }) {
     return <Spin />;
   }
 
-  const { info } = identity?.unwrap() || {};
+  const { info } = identity?.isSome ? identity.unwrap() : {};
   const displayName = info?.display?.toHuman()?.Raw || walletAddress || 'No name';
   const submitText = linkData ? 'Update payment link' : 'Create payment link';
 
@@ -225,7 +228,6 @@ function RequestLLDForm({ onClose, walletAddress }) {
 
 RequestLLDForm.propTypes = {
   onClose: PropTypes.func.isRequired,
-  walletAddress: PropTypes.string.isRequired,
 };
 
 function ButtonModal(props) {
