@@ -65,7 +65,7 @@ function CreateValidatorModal({
       layout="vertical"
       initialValues={{
         bondValue: formatDollars(maxBond).replaceAll(',', ''),
-        commission: '20',
+        commission: 20,
         allow_nominations: true,
         payee: payee ? payee.toString() : 'Staked',
       }}
