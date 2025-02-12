@@ -374,6 +374,9 @@ textarea.ant-input {
   }
 }
 
+.formCollapse .ant-collapse-header {
+  display: none!important;
+}
 .ant-collapse-header {
   align-items: center!important;
 }
