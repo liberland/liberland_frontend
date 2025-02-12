@@ -7,7 +7,6 @@ import Flex from 'antd/es/flex';
 import Input from 'antd/es/input';
 import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
-import Slider from 'antd/es/slider';
 import PropTypes from 'prop-types';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -90,15 +89,12 @@ function CreateValidatorModal({
         <InputNumber stringMode controls={false} />
       </Form.Item>
       <Form.Item
-        name="comission"
         label="Reward commission percentage"
-        rules={[{ required: true }]}
         extra="The commission is deducted from all rewards before the remainder is split with nominators."
+        rules={[{ required: true }, { type: 'number', min: 0, max: 100 }]}
+        name="commission"
       >
-        <Slider
-          min={0}
-          max={100}
-        />
+        <InputNumber controls={false} />
       </Form.Item>
       <Form.Item
         name="allow_nominations"
