@@ -5,11 +5,11 @@ import React, {
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Spin from 'antd/es/spin';
+import uniq from 'lodash/uniq';
 import {
   blockchainSelectors,
   democracySelectors,
   congressSelectors,
-  identitySelectors,
 } from '../../../../../redux/selectors';
 import { democracyActions, congressActions, identityActions } from '../../../../../redux/actions';
 import ReferendumPageDisplay from '../ReferendumPageDisplay';
@@ -38,12 +38,17 @@ function ReferendumPage() {
 
   const ayeList = useMemo(() => referendum?.allAye.map(({ accountId }) => accountId.toString()) || [], [referendum]);
   const nayList = useMemo(() => referendum?.allNay.map(({ accountId }) => accountId.toString()) || [], [referendum]);
-
   useEffect(() => {
-    dispatch(identityActions.getIdentityMotions.call([...ayeList, ...nayList]));
-  }, [ayeList, dispatch, nayList]);
-
-  const identities = useSelector(identitySelectors.selectorIdentityMotions);
+    if (referendum) {
+      dispatch(identityActions.getIdentityMotions.call(
+        uniq([
+          ...ayeList,
+          ...nayList,
+          ...referendum?.centralizedDatas.map(({ proposerAddress }) => proposerAddress) || [],
+        ]),
+      ));
+    }
+  }, [referendum, ayeList, dispatch, nayList]);
 
   if (!referendum) {
     return <Spin />;
@@ -74,7 +79,6 @@ function ReferendumPage() {
       allAye={ayeList}
       allNay={nayList}
       userIsMember={userIsMember}
-      identity={identities}
     />
   );
 }

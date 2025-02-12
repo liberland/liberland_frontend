@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
+import uniq from 'lodash/uniq';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import Title from 'antd/es/typography/Title';
@@ -14,7 +15,7 @@ import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 import router from '../../../../../router';
 import BlacklistButton from '../BlacklistButton';
 import { blockchainSelectors, democracySelectors } from '../../../../../redux/selectors';
-import { democracyActions } from '../../../../../redux/actions';
+import { democracyActions, identityActions } from '../../../../../redux/actions';
 import { getHashAndLength } from './utils';
 import { useHideTitle } from '../../../../Layout/HideTitle';
 import CopyInput from '../../../../CopyInput';
@@ -26,7 +27,9 @@ function ProposalPage() {
   const dispatch = useDispatch();
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+
   useHideTitle();
+
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call(userWalletAddress));
   }, [dispatch, userWalletAddress]);
@@ -39,6 +42,12 @@ function ProposalPage() {
   } = useMemo(() => democracy?.democracy?.crossReferencedProposalsData?.find(({
     index,
   }) => index === parseInt(id)) || {}, [democracy, id]);
+
+  useEffect(() => {
+    dispatch(identityActions.getIdentityMotions.call(
+      uniq(centralizedDatas.map(({ proposerAddress }) => proposerAddress)),
+    ));
+  }, [dispatch, centralizedDatas]);
 
   const [hash, len] = useMemo(() => (boundedCall ? getHashAndLength(boundedCall) : []), [boundedCall]);
 

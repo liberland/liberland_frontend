@@ -6,6 +6,7 @@ import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
 import Space from 'antd/es/space';
 import Title from 'antd/es/typography/Title';
+import { useSelector } from 'react-redux';
 import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
 import { useHistory } from 'react-router-dom';
 import Details from '../Details';
@@ -20,6 +21,7 @@ import styles from '../../../styles.module.scss';
 import Button from '../../../../Button/Button';
 import CopyInput from '../../../../CopyInput';
 import router from '../../../../../router';
+import { identitySelectors } from '../../../../../redux/selectors';
 
 function ReferendumPageDisplay({
   centralizedDatas,
@@ -34,8 +36,8 @@ function ReferendumPageDisplay({
   userIsMember,
   allAye,
   allNay,
-  identities,
 }) {
+  const identities = useSelector(identitySelectors.selectorIdentityMotions);
   const { yayVotes, nayVotes } = voted;
   const history = useHistory();
   useHideTitle();
@@ -43,7 +45,7 @@ function ReferendumPageDisplay({
     router.voting.referendumItem.replace(':referendumHash', hash.toString())}`;
 
   return (
-    <Flex vertical gap="20px">
+    <Flex vertical gap="20px" className={styles.referenda}>
       <Flex className={styles.nav} wrap gap="15px" align="center">
         <Flex flex={1}>
           <Button onClick={() => history.goBack()}>
@@ -111,11 +113,11 @@ function ReferendumPageDisplay({
                   ...allNay.map((address) => ({ address })),
                 ]}
                 renderItem={({ address, aye }) => {
-                  const { name, legal } = identities?.[address] || {};
+                  const { name, legal } = identities?.[address]?.identity || {};
                   return (
                     <PersonBox
                       address={address}
-                      displayName={legal || name || 'Unknown'}
+                      displayName={truncate(legal || name || 'Unknown', 20)}
                       role={aye ? {
                         name: 'Voted for',
                         color: '#7DC035',
@@ -154,8 +156,6 @@ ReferendumPageDisplay.propTypes = {
   userIsMember: PropTypes.bool.isRequired,
   allAye: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
   allNay: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  identities: PropTypes.object,
 };
 
 export default ReferendumPageDisplay;

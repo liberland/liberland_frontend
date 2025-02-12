@@ -1,31 +1,22 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import List from 'antd/es/list';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
-import uniq from 'lodash/uniq';
+import { useSelector } from 'react-redux';
 import classNames from 'classnames';
 import Paragraph from 'antd/es/typography/Paragraph';
-import { useDispatch, useSelector } from 'react-redux';
 import sanitizeUrlHelper from '../../../../../utils/sanitizeUrlHelper';
 import { centralizedDatasType } from '../types';
 import Button from '../../../../Button/Button';
 import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 import { identitySelectors } from '../../../../../redux/selectors';
-import { identityActions } from '../../../../../redux/actions';
 import ColorAvatar from '../../../../ColorAvatar';
 import styles from '../../../styles.module.scss';
 import truncate from '../../../../../utils/truncate';
 
 function Discussions({ centralizedDatas }) {
-  const dispatch = useDispatch();
   const identities = useSelector(identitySelectors.selectorIdentityMotions);
-
-  useEffect(() => {
-    dispatch(
-      identityActions.getIdentityMotions.call(uniq(centralizedDatas.map(({ proposerAddress }) => proposerAddress))),
-    );
-  }, [dispatch, centralizedDatas]);
 
   return (
     <Card title="Discussions">
