@@ -7,7 +7,7 @@ import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
 import PropTypes from 'prop-types';
 import { BN } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
+
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 import {
@@ -30,8 +30,8 @@ const optionsInput = [{
   index: IndexHelper.POLITIPOOL_LLM,
 }];
 
-function TransferWithRemarkModal({
-  closeModal,
+function TransferWithRemarkForm({
+  onClose,
   submit,
   userRemark,
   additionalAssets,
@@ -141,7 +141,7 @@ function TransferWithRemarkModal({
       </div>
 
       <Flex wrap gap="15px">
-        <Button onClick={closeModal}>
+        <Button onClick={onClose}>
           Cancel
         </Button>
         <Button disabled={isLoading} primary type="submit">
@@ -152,12 +152,12 @@ function TransferWithRemarkModal({
   );
 }
 
-TransferWithRemarkModal.defaultProps = {
+TransferWithRemarkForm.defaultProps = {
   userRemark: false,
 };
 
-TransferWithRemarkModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+TransferWithRemarkForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   userRemark: PropTypes.bool,
   submit: PropTypes.func.isRequired,
   additionalAssets: PropTypes.arrayOf(PropTypes.shape({
@@ -174,12 +174,4 @@ TransferWithRemarkModal.propTypes = {
   politipoolLlm: PropTypes.number.isRequired,
 };
 
-function TransferWithRemarkModalWrapper(props) {
-  return (
-    <ModalRoot>
-      <TransferWithRemarkModal {...props} />
-    </ModalRoot>
-  );
-}
-
-export default TransferWithRemarkModalWrapper;
+export default TransferWithRemarkForm;

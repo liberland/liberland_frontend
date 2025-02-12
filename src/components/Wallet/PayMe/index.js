@@ -2,15 +2,40 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useHistory } from 'react-router-dom';
 import Spin from 'antd/es/spin';
+import PropTypes from 'prop-types';
 import { identityActions, walletActions } from '../../../redux/actions';
 import { identitySelectors, walletSelectors } from '../../../redux/selectors';
 import { formatDollars } from '../../../utils/walletHelpers';
-import ModalRoot from '../../Modals/ModalRoot';
 import Table from '../../Table';
 import routes from '../../../router';
 import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
+import modalWrapper from '../../Modals/components/ModalWrapper';
+
+function SuccessModal({ onClose }) {
+  const history = useHistory();
+  return (
+    <div className={styles.successModal}>
+      <h2>Transfer successful!</h2>
+      <Button
+        primary
+        medium
+        green
+        onClick={() => {
+          onClose();
+          history.push(routes.wallet.overView);
+        }}
+      >
+        Get back to wallet
+      </Button>
+    </div>
+  );
+}
+
+SuccessModal.propTypes = {
+  onClose: PropTypes.func.isRequired,
+};
 
 function PayMe() {
   const dispatch = useDispatch();
@@ -19,7 +44,6 @@ function PayMe() {
   const transferState = useSelector(walletSelectors.selectorTransferState);
   const [linkData, setLinkData] = useState();
   const { search } = useLocation();
-  const history = useHistory();
 
   useEffect(() => {
     try {
@@ -51,7 +75,7 @@ function PayMe() {
   if (identityIsLoading) {
     return <Spin />;
   }
-
+  const SuccessModalWrapper = modalWrapper(SuccessModal);
   return (
     <>
       <Table
@@ -88,21 +112,7 @@ function PayMe() {
         )}
       />
       {transferState === 'success' ? (
-        <ModalRoot>
-          <div className={styles.successModal}>
-            <h2>Transfer successful!</h2>
-            <Button
-              primary
-              medium
-              green
-              onClick={() => {
-                history.push(routes.wallet.overView);
-              }}
-            >
-              Get back to wallet
-            </Button>
-          </div>
-        </ModalRoot>
+        <SuccessModalWrapper />
       ) : null}
     </>
   );

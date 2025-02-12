@@ -1,34 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import ModalRoot from '../ModalRoot';
+import modalWrapper from '../components/ModalWrapper';
+import { ReactComponent as FullScreenIcon } from '../../../assets/icons/fullScreen.svg';
 import styles from './styles.module.scss';
+import stylesNft from '../../Nfts/ItemNft/styles.module.scss';
+import { ReactComponent as Close } from '../../../assets/icons/close.svg';
 
-function FullImageModal({ image }) {
+function FullImage({ image, onClose }) {
   return (
-    <div className={styles.imageWrapper}>
-      <img className={styles.image} src={image} alt="nft" />
+    <div>
+      <div className={styles.close} onClick={onClose}><Close className={styles.icon} /></div>
+      <div className={styles.imageWrapper}>
+        <img className={styles.image} src={image} alt="nft" />
+      </div>
     </div>
   );
 }
 
-FullImageModal.propTypes = {
+FullImage.propTypes = {
   image: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
-function FullImageWrapper({
-  closeModal,
-  image,
-}) {
+function ButtonModal(props) {
+  const { onClick } = props;
   return (
-    <ModalRoot onClose={closeModal}>
-      <FullImageModal image={image} />
-    </ModalRoot>
+    <div className={stylesNft.showImage} onClick={onClick}>
+      <FullScreenIcon className={stylesNft.icon} />
+    </div>
   );
 }
 
-export default FullImageWrapper;
-
-FullImageWrapper.propTypes = {
-  closeModal: PropTypes.func.isRequired,
-  image: PropTypes.string.isRequired,
+ButtonModal.propTypes = {
+  onClick: PropTypes.func.isRequired,
 };
+
+const FullImageModal = modalWrapper(FullImage, ButtonModal);
+
+export default FullImageModal;

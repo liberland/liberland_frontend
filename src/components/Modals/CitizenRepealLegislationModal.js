@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -6,14 +6,15 @@ import Popconfirm from 'antd/es/popconfirm';
 import Flex from 'antd/es/flex';
 import { useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { democracyActions } from '../../redux/actions';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 import LegislationHeading from '../Congress/LegislationHeading';
 
-function CitizenRepealLegislationModal({
-  closeModal, tier, id, section,
+function CitizenRepealLegislationForm({
+  onClose, tier, id, section,
 }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -38,7 +39,7 @@ function CitizenRepealLegislationModal({
         section: section || null,
       }),
     );
-    closeModal();
+    onClose();
   };
 
   return (
@@ -53,13 +54,11 @@ function CitizenRepealLegislationModal({
         section,
       }}
     >
-      <Title level={3}>
-        Propose referendum for legislation repeal
-      </Title>
+      <Title level={3}>Propose referendum for legislation repeal</Title>
       <LegislationHeading section={section} />
       <ProposalDiscussionFields />
       <Flex wrap gap="15px">
-        <Button medium onClick={closeModal}>
+        <Button medium onClick={onClose}>
           Cancel
         </Button>
         <Popconfirm
@@ -67,17 +66,15 @@ function CitizenRepealLegislationModal({
           description="This operation costs 100 LLD."
           onConfirm={() => form.submit()}
         >
-          <Button primary>
-            Submit
-          </Button>
+          <Button primary>Submit</Button>
         </Popconfirm>
       </Flex>
     </Form>
   );
 }
 
-CitizenRepealLegislationModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+CitizenRepealLegislationForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
@@ -88,40 +85,19 @@ CitizenRepealLegislationModal.propTypes = {
   section: PropTypes.number,
 };
 
-function CitizenRepealLegislationModalWrapper({
-  tier,
-  id,
-  section,
-}) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button onClick={() => setShow(true)}>
-        Propose citizen referendum to repeal
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <CitizenRepealLegislationModal
-            closeModal={() => setShow(false)}
-            id={id}
-            section={section}
-            tier={tier}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text="Propose citizen referendum to repeal" {...props} />
   );
 }
 
-CitizenRepealLegislationModalWrapper.propTypes = {
-  tier: PropTypes.string.isRequired,
-  id: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    year: PropTypes.object.isRequired,
-    // eslint-disable-next-line react/forbid-prop-types
-    index: PropTypes.object.isRequired,
-  }).isRequired,
-  section: PropTypes.number,
+ButtonModal.propTypes = {
+  isMint: PropTypes.bool.isRequired,
 };
 
-export default CitizenRepealLegislationModalWrapper;
+const AddLiquidityModal = modalWrapper(
+  CitizenRepealLegislationForm,
+  ButtonModal,
+);
+
+export default AddLiquidityModal;

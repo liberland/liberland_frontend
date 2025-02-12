@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Checkbox from 'antd/es/checkbox';
@@ -9,12 +9,13 @@ import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import { BN, isHex } from '@polkadot/util';
 import Divider from 'antd/es/divider';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { validatorActions } from '../../redux/actions';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function StartValidatorModal({
-  closeModal,
+function StartValidatorForm({
+  onClose,
 }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -23,7 +24,7 @@ function StartValidatorModal({
     const commission = (new BN(values.commission)).mul(new BN(10000000));
     const blocked = !values.allow_nominations;
     dispatch(validatorActions.validate.call({ commission, blocked, keys: values.keys }));
-    closeModal();
+    onClose();
   };
 
   return (
@@ -77,7 +78,7 @@ function StartValidatorModal({
       <Flex wrap gap="15px">
         <Button
           medium
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -93,28 +94,21 @@ function StartValidatorModal({
   );
 }
 
-StartValidatorModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+StartValidatorForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-export default function StartValidatorModalWrapper({
-  label,
-}) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
+  const { label } = props;
   return (
-    <>
-      <Button primary onClick={() => setShow(true)}>
-        {label}
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <StartValidatorModal closeModal={() => setShow(false)} />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton primary text={label} {...props} />
   );
 }
 
-StartValidatorModalWrapper.propTypes = {
+ButtonModal.propTypes = {
   label: PropTypes.string.isRequired,
 };
+
+const StartValidatorModal = modalWrapper(StartValidatorForm, ButtonModal);
+
+export default StartValidatorModal;

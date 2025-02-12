@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Flex from 'antd/es/flex';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function UndelegateModal({
-  closeModal, delegatee, onSubmitUndelegate,
+function UndelegateForm({
+  onClose, delegatee, onSubmitUndelegate,
 }) {
   const [form] = Form.useForm();
   return (
@@ -17,7 +18,7 @@ function UndelegateModal({
       layout="vertical"
       onFinish={(values) => {
         onSubmitUndelegate(values);
-        closeModal();
+        onClose();
       }}
     >
       <Title level={3}>Undelegate your votes</Title>
@@ -30,7 +31,7 @@ function UndelegateModal({
       <Flex wrap gap="15px">
         <Button
           medium
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -46,42 +47,23 @@ function UndelegateModal({
   );
 }
 
-UndelegateModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+UndelegateForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   delegatee: PropTypes.string.isRequired,
   onSubmitUndelegate: PropTypes.func.isRequired,
 };
 
-function UndelegateModalWrapper({
-  delegatee,
-  onSubmitUndelegate,
-}) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button
-        small
-        primary
-        onClick={() => setShow(true)}
-      >
-        Undelegate
-      </Button>
-      <ModalRoot onClose={() => setShow(false)}>
-        {show && (
-          <UndelegateModal
-            delegatee={delegatee}
-            onSubmitUndelegate={onSubmitUndelegate}
-            closeModal={() => setShow(false)}
-          />
-        )}
-      </ModalRoot>
-    </>
+    <OpenModalButton small primary text="Undelegate" {...props} />
   );
 }
 
-UndelegateModalWrapper.propTypes = {
-  delegatee: PropTypes.string.isRequired,
-  onSubmitUndelegate: PropTypes.func.isRequired,
+ButtonModal.propTypes = {
+  label: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
 };
 
-export default UndelegateModalWrapper;
+const UndelegateModal = modalWrapper(UndelegateForm, ButtonModal);
+
+export default UndelegateModal;

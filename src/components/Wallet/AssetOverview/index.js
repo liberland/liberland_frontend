@@ -4,7 +4,7 @@ import Row from 'antd/es/row';
 import Col from 'antd/es/col';
 import { useMediaQuery } from 'usehooks-ts';
 import { formatAssets } from '../../../utils/walletHelpers';
-import SendAssetModalWrapper from '../../Modals/SendAssetModal';
+import SendAssetModal from '../../Modals/SendAssetModal';
 import styles from './styles.module.scss';
 import MoneyCard from '../../MoneyCard';
 import CurrencyIcon from '../../CurrencyIcon';
@@ -24,7 +24,7 @@ function AssetOverview({
   const renderItem = (assetData) => (
     <MoneyCard
       actions={!isCongress || userIsMember ? [
-        <SendAssetModalWrapper
+        <SendAssetModal
           isRemarkNeeded={isRemarkNeeded}
           assetData={assetData}
           officeType={officeType}

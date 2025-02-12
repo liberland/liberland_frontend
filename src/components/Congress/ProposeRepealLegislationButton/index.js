@@ -1,46 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import CongressRepealLegislationFastTrackModal from '../../Modals/CongressRepealLegislationFastTrackModal';
 import {
   congressSelectors,
 } from '../../../redux/selectors';
-import Button from '../../Button/Button';
+import OpenModalButton from '../../Modals/components/OpenModalButton';
+import modalWrapper from '../../Modals/components/ModalWrapper';
+import CongressRepealLegislationFastTrackForm from '../../Modals/CongressRepealLegislationFastTrackModal';
 
-export default function ProposeRepealLegislationButton({ tier, id, section }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleModalOpen = () => setIsModalOpen(!isModalOpen);
-
-  // requires parent to dispatch getMembers action
+function ButtonModal(props) {
   const userIsMember = useSelector(congressSelectors.userIsMember);
   if (!userIsMember) {
     return null;
   }
-
   return (
-    <>
-      <Button onClick={handleModalOpen}>
-        Propose referendum to repeal
-      </Button>
-      {isModalOpen && (
-        <CongressRepealLegislationFastTrackModal
-          closeModal={handleModalOpen}
-          tier={tier}
-          id={id}
-          section={section}
-        />
-      )}
-    </>
+    <OpenModalButton text="Propose referendum to repeal" {...props} />
   );
 }
 
-ProposeRepealLegislationButton.propTypes = {
-  tier: PropTypes.string.isRequired,
-  id: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    year: PropTypes.object.isRequired,
-    // eslint-disable-next-line react/forbid-prop-types
-    index: PropTypes.object.isRequired,
-  }).isRequired,
-  section: PropTypes.number,
+ButtonModal.propTypes = {
+  add: PropTypes.bool,
 };
+
+const ProposeRepealLegislationButton = modalWrapper(CongressRepealLegislationFastTrackForm, ButtonModal);
+
+export default ProposeRepealLegislationButton;

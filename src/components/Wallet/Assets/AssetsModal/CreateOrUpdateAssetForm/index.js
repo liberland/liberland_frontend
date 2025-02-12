@@ -7,12 +7,13 @@ import Spin from 'antd/es/spin';
 import Paragraph from 'antd/es/typography/Paragraph';
 import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
-import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
-import { walletActions } from '../../../../redux/actions';
-import ModalRoot from '../../../Modals/ModalRoot';
-import Button from '../../../Button/Button';
-import InputSearch from '../../../InputComponents/InputSearchAddressName';
-import { useStockContext } from '../../StockContext';
+import {
+  walletSelectors,
+  blockchainSelectors,
+} from '../../../../../redux/selectors';
+import { walletActions } from '../../../../../redux/actions';
+import Button from '../../../../Button/Button';
+import InputSearch from '../../../../InputComponents/InputSearchAddressName';
 
 function CreateOrUpdateAssetForm({
   onClose,
@@ -26,7 +27,9 @@ function CreateOrUpdateAssetForm({
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
+  const additionalAssets = useSelector(
+    walletSelectors.selectorAdditionalAssets,
+  );
   const type = isStock ? 'stock' : 'asset';
   const typeCapitalized = isStock ? 'Stock' : 'Asset';
 
@@ -41,26 +44,29 @@ function CreateOrUpdateAssetForm({
   }) => {
     setLoading(true);
     try {
-      const nextId = isCreate ? (
-        additionalAssets.map((asset) => asset.index)
+      const nextId = isCreate
+        ? additionalAssets
+          .map((asset) => asset.index)
           .filter(Boolean)
           .sort((a, b) => b - a)[0] + 1
-      ) : defaultValues.id;
+        : defaultValues.id;
 
-      dispatch(walletActions.createOrUpdateAsset.call({
-        id: nextId,
-        name,
-        symbol,
-        decimals,
-        minBalance: balance,
-        admin,
-        issuer,
-        freezer,
-        owner: userWalletAddress,
-        isCreate,
-        defaultValues,
-        isStock,
-      }));
+      dispatch(
+        walletActions.createOrUpdateAsset.call({
+          id: nextId,
+          name,
+          symbol,
+          decimals,
+          minBalance: balance,
+          admin,
+          issuer,
+          freezer,
+          owner: userWalletAddress,
+          isCreate,
+          defaultValues,
+          isStock,
+        }),
+      );
       onClose();
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -69,7 +75,9 @@ function CreateOrUpdateAssetForm({
     }
   };
 
-  const submitButtonText = isCreate ? `Create ${type} (~200 LLD)` : `Update ${type}`;
+  const submitButtonText = isCreate
+    ? `Create ${type} (~200 LLD)`
+    : `Update ${type}`;
 
   if (!userWalletAddress || !additionalAssets) {
     return <Spin />;
@@ -145,19 +153,12 @@ function CreateOrUpdateAssetForm({
       >
         <InputSearch />
       </Form.Item>
-      <Paragraph>
-        May ask you to sign up to 4 transactions
-      </Paragraph>
+      <Paragraph>May ask you to sign up to 4 transactions</Paragraph>
       <Flex wrap gap="15px">
         <Button disabled={loading} medium onClick={onClose}>
           Close
         </Button>
-        <Button
-          primary
-          medium
-          type="submit"
-          disabled={loading}
-        >
+        <Button primary medium type="submit" disabled={loading}>
           {loading ? 'Loading...' : submitButtonText}
         </Button>
       </Flex>
@@ -183,36 +184,4 @@ CreateOrUpdateAssetForm.propTypes = {
   defaultValues,
 };
 
-function CreateOrUpdateAssetFormModalWrapper({
-  isCreate, defaultValues: dV,
-}) {
-  const [show, setShow] = useState();
-  const { isStock } = useStockContext();
-  return (
-    <>
-      <Button
-        primary
-        onClick={() => setShow(true)}
-      >
-        {isCreate ? `Create ${isStock ? 'stock' : 'asset'}` : 'Update'}
-      </Button>
-      {show && (
-        <ModalRoot>
-          <CreateOrUpdateAssetForm
-            defaultValues={dV}
-            isCreate={isCreate}
-            onClose={() => setShow(false)}
-            isStock={isStock}
-          />
-        </ModalRoot>
-      )}
-    </>
-  );
-}
-
-CreateOrUpdateAssetFormModalWrapper.propTypes = {
-  isCreate: PropTypes.bool,
-  defaultValues,
-};
-
-export default CreateOrUpdateAssetFormModalWrapper;
+export default CreateOrUpdateAssetForm;

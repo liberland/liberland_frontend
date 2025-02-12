@@ -3,15 +3,20 @@ import { useSelector, useDispatch } from 'react-redux';
 import Alert from 'antd/es/alert';
 import Collapse from 'antd/es/collapse';
 import Spin from 'antd/es/spin';
-import { blockchainSelectors, contractsSelectors } from '../../../redux/selectors';
+import {
+  blockchainSelectors,
+  contractsSelectors,
+} from '../../../redux/selectors';
 import { contractsActions } from '../../../redux/actions';
 import ContractsList from '../ContractsList';
-import CreateContractModalWrapper from '../CreateContract';
+import CreateContractModal from '../Modals/CreateContractModal';
 
 function MyContracts() {
   const dispatch = useDispatch();
   const myContracts = useSelector(contractsSelectors.selectorMyContracts);
-  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const walletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
 
   useEffect(() => {
     dispatch(contractsActions.getMyContracts.call());
@@ -29,14 +34,13 @@ function MyContracts() {
         {
           key: 'all',
           label: 'My contracts',
-          extra: (
-            <CreateContractModalWrapper isMyContracts />
-          ),
-          children: myContracts.length < 1 ? (
-            <Alert type="info" message="No contracts found" />
-          ) : (
-            <ContractsList contracts={myContracts} isMyContracts />
-          ),
+          extra: <CreateContractModal isMyContracts />,
+          children:
+            myContracts.length < 1 ? (
+              <Alert type="info" message="No contracts found" />
+            ) : (
+              <ContractsList contracts={myContracts} isMyContracts />
+            ),
         },
       ]}
     />

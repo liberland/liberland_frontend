@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -6,14 +6,15 @@ import TextArea from 'antd/es/input/TextArea';
 import Flex from 'antd/es/flex';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 import LegislationHeading from '../Congress/LegislationHeading';
 
-function CongressAmendLegislationModal({
-  closeModal, tier, id, section,
+function CongressAmendLegislationForm({
+  onClose, tier, id, section,
 }) {
   const dispatch = useDispatch();
   const allLegislation = useSelector(legislationSelectors.legislation);
@@ -30,10 +31,15 @@ function CongressAmendLegislationModal({
     // eslint-disable-next-line no-shadow
     section,
   }) => {
-    dispatch(congressActions.congressAmendLegislation.call({
-      tier, id: { year: year.year(), index }, section, content,
-    }));
-    closeModal();
+    dispatch(
+      congressActions.congressAmendLegislation.call({
+        tier,
+        id: { year: year.year(), index },
+        section,
+        content,
+      }),
+    );
+    onClose();
   };
 
   return (
@@ -51,25 +57,24 @@ function CongressAmendLegislationModal({
     >
       <Title level={3}>
         Propose a Motion -
-        {legislation?.sections?.[section] ? 'amend legislation' : 'add legislation section'}
+        {legislation?.sections?.[section]
+          ? 'amend legislation'
+          : 'add legislation section'}
       </Title>
       <LegislationHeading section={section} />
-      <Form.Item name="content" label="Legislation content" rules={[{ required: true }]}>
+      <Form.Item
+        name="content"
+        label="Legislation content"
+        rules={[{ required: true }]}
+      >
         <TextArea />
       </Form.Item>
 
       <Flex wrap gap="15px">
-        <Button
-          medium
-          onClick={closeModal}
-        >
+        <Button medium onClick={onClose}>
           Cancel
         </Button>
-        <Button
-          primary
-          medium
-          type="submit"
-        >
+        <Button primary medium type="submit">
           Submit
         </Button>
       </Flex>
@@ -77,8 +82,8 @@ function CongressAmendLegislationModal({
   );
 }
 
-CongressAmendLegislationModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+CongressAmendLegislationForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
@@ -89,42 +94,19 @@ CongressAmendLegislationModal.propTypes = {
   section: PropTypes.string.isRequired,
 };
 
-function CongressAmendLegislationModalWrapper({
-  tier,
-  id,
-  section,
-  add,
-}) {
-  const [show, setShow] = useState();
-  return (
-    <>
-      <Button onClick={() => setShow(true)}>
-        {add ? 'Add section as congress' : 'Amend as congress'}
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <CongressAmendLegislationModal
-            closeModal={() => setShow(false)}
-            id={id}
-            tier={tier}
-            section={section}
-          />
-        </ModalRoot>
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  const { add } = props;
+  const text = add ? 'Add section as congress' : 'Amend as congress';
+  return <OpenModalButton text={text} {...props} />;
 }
 
-CongressAmendLegislationModalWrapper.propTypes = {
-  tier: PropTypes.string.isRequired,
-  id: PropTypes.shape({
-    // eslint-disable-next-line react/forbid-prop-types
-    year: PropTypes.object.isRequired,
-    // eslint-disable-next-line react/forbid-prop-types
-    index: PropTypes.object.isRequired,
-  }).isRequired,
-  section: PropTypes.string.isRequired,
+ButtonModal.propTypes = {
   add: PropTypes.bool,
 };
 
-export default CongressAmendLegislationModalWrapper;
+const CongressAmendLegislationModal = modalWrapper(
+  CongressAmendLegislationForm,
+  ButtonModal,
+);
+
+export default CongressAmendLegislationModal;

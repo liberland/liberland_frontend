@@ -6,7 +6,6 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import InputNumber from 'antd/es/input-number';
 import Flex from 'antd/es/flex';
 import { useDispatch } from 'react-redux';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import { parseMerits } from '../../utils/walletHelpers';
@@ -16,9 +15,11 @@ import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { encodeRemark } from '../../api/nodeRpcCall';
 import { OfficeType } from '../../utils/officeTypeEnum';
 import styles from './styles.module.scss';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function SpendModal({
-  closeModal, onSend, spendData, officeType, balance,
+function SpendForm({
+  onClose, onSend, spendData, officeType, balance,
 }) {
   const dispatch = useDispatch();
   const {
@@ -55,7 +56,7 @@ function SpendModal({
       remarkInfo: encodedRemark,
       executionBlock,
     }));
-    closeModal();
+    onClose();
   };
 
   return (
@@ -120,7 +121,7 @@ function SpendModal({
 
       <Flex wrap gap="15px">
         <Button
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -136,7 +137,7 @@ function SpendModal({
   );
 }
 
-SpendModal.defaultProps = {
+SpendForm.defaultProps = {
   spendData: {
     title: '',
     description: '',
@@ -145,8 +146,8 @@ SpendModal.defaultProps = {
   },
 };
 
-SpendModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+SpendForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   onSend: PropTypes.func.isRequired,
   spendData: PropTypes.shape({
     name: PropTypes.string.isRequired,
@@ -160,56 +161,24 @@ SpendModal.propTypes = {
   balance: PropTypes.object.isRequired,
 };
 
-function SpendModalWrapper({
-  label,
-  icon,
-  onSend,
-  spendData,
-  officeType,
-  balance,
-}) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
+  const { icon, label } = props;
+
   return (
-    <>
-      <Button
-        primary
-        className={styles.button}
-        onClick={() => setShow(true)}
-      >
-        <div className={styles.icon}>
-          {icon}
-        </div>
-        {label}
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <SpendModal
-            balance={balance}
-            closeModal={() => setShow(false)}
-            officeType={officeType}
-            onSend={onSend}
-            spendData={spendData}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton primary {...props}>
+      <div className={styles.icon}>
+        {icon}
+      </div>
+      {label}
+    </OpenModalButton>
   );
 }
 
-SpendModalWrapper.propTypes = {
+ButtonModal.propTypes = {
   label: PropTypes.string.isRequired,
   icon: PropTypes.node.isRequired,
-  onSend: PropTypes.func.isRequired,
-  spendData: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    title: PropTypes.string,
-    description: PropTypes.string,
-    subtitle: PropTypes.string,
-    submitButtonText: PropTypes.string,
-  }),
-  officeType: PropTypes.string.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  balance: PropTypes.object.isRequired,
 };
 
-export default SpendModalWrapper;
+const ProposeBudgetModal = modalWrapper(SpendForm, ButtonModal);
+
+export default ProposeBudgetModal;

@@ -6,15 +6,14 @@ import Flex from 'antd/es/flex';
 import Popconfirm from 'antd/es/popconfirm';
 import { useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { congressActions } from '../../redux/actions';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
 import LegislationHeading from '../Congress/LegislationHeading';
 
-function CongressRepealLegislationFastTrackModal({
-  closeModal,
+function CongressRepealLegislationFastTrackForm({
+  onClose,
   tier,
   id,
   section,
@@ -52,7 +51,7 @@ function CongressRepealLegislationFastTrackModal({
         fastTrackEnactmentPeriod,
       }),
     );
-    closeModal();
+    onClose();
   };
 
   return (
@@ -78,7 +77,7 @@ function CongressRepealLegislationFastTrackModal({
       <FastTrackForm form={form} />
 
       <Flex wrap gap="15px">
-        <Button medium onClick={closeModal}>
+        <Button medium onClick={onClose}>
           Cancel
         </Button>
         <Popconfirm
@@ -95,8 +94,8 @@ function CongressRepealLegislationFastTrackModal({
   );
 }
 
-CongressRepealLegislationFastTrackModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+CongressRepealLegislationFastTrackForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
@@ -107,12 +106,4 @@ CongressRepealLegislationFastTrackModal.propTypes = {
   section: PropTypes.number,
 };
 
-function CongressRepealLegislationFastTrackModalWrapper(props) {
-  return (
-    <ModalRoot>
-      <CongressRepealLegislationFastTrackModal {...props} />
-    </ModalRoot>
-  );
-}
-
-export default CongressRepealLegislationFastTrackModalWrapper;
+export default CongressRepealLegislationFastTrackForm;

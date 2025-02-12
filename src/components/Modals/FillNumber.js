@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
@@ -6,12 +6,13 @@ import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { valueToBN } from '../../utils/walletHelpers';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function FillNumber({
-  closeModal, textData, onAccept, higherThanZero, itemList,
+function FillNumberForm({
+  onClose, textData, onAccept, higherThanZero, itemList,
 }) {
   const {
     nft,
@@ -31,7 +32,7 @@ function FillNumber({
     } else {
       await onAccept(data.amount);
     }
-    closeModal();
+    onClose();
   };
 
   return (
@@ -86,7 +87,7 @@ function FillNumber({
       </Form.Item>
       <Flex wrap gap="15px">
         <Button
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -102,7 +103,7 @@ function FillNumber({
   );
 }
 
-FillNumber.defaultProps = {
+FillNumberForm.defaultProps = {
   // eslint-disable-next-line react/default-props-match-prop-types
   textData: {
     title: 'Transfer to',
@@ -139,45 +140,21 @@ const commonProps = {
   }),
 };
 
-FillNumber.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+FillNumberForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   ...commonProps,
 };
 
-function FillNumberWrapper({
-  isMint,
-  onAccept,
-  higherThanZero,
-  itemList,
-  textData,
-}) {
-  const [show, setShow] = useState();
-  return (
-    <>
-      <Button
-        onClick={() => setShow(true)}
-        primary
-      >
-        {isMint ? 'Mint NFT' : 'Set Price'}
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <FillNumber
-            closeModal={() => setShow(false)}
-            onAccept={onAccept}
-            higherThanZero={higherThanZero}
-            itemList={itemList}
-            textData={textData}
-          />
-        </ModalRoot>
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  const { isMint } = props;
+  const text = isMint ? 'Mint NFT' : 'Set Price';
+  return <OpenModalButton text={text} primary {...props} />;
 }
 
-FillNumberWrapper.propTypes = {
-  ...commonProps,
-  isMint: PropTypes.bool,
+ButtonModal.propTypes = {
+  isMint: PropTypes.bool.isRequired,
 };
 
-export default FillNumberWrapper;
+const FillNumberModal = modalWrapper(FillNumberForm, ButtonModal);
+
+export default FillNumberModal;

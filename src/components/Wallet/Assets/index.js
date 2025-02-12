@@ -13,17 +13,19 @@ import CopyIconWithAddress from '../../CopyIconWithAddress';
 import Button from '../../Button/Button';
 import Table from '../../Table';
 import { formatCustom } from '../../../utils/walletHelpers';
-import CreateOrUpdateAssetFormModalWrapper from './CreateOrUpdateAssetForm';
-import ActionsMenuModalWrapper from './ActionsMenu';
 import { useStockContext } from '../StockContext';
 import styles from './styles.module.scss';
+import AssetsMenuModal from './AssetsModal/AssetsMenu';
+import CreateOrUpdateAssetModal from './AssetsModal/CreateOrUpdateAsset';
 import CurrencyIcon from '../../CurrencyIcon';
 
 function Assets() {
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
+  const additionalAssets = useSelector(
+    walletSelectors.selectorAdditionalAssets,
+  );
   const assetDetails = useSelector(walletSelectors.selectorAssetsDetails);
   const identities = useSelector(identitySelectors.selectorIdentityMotions);
   const dispatch = useDispatch();
@@ -146,7 +148,7 @@ function Assets() {
             </Descriptions>
           ),
           actions: (
-            <ActionsMenuModalWrapper
+            <AssetsMenuModal
               isAdmin={assetDetails?.[index]?.admin === userWalletAddress}
               isOwner={assetDetails?.[index]?.owner === userWalletAddress}
               isIssuer={assetDetails?.[index]?.issuer === userWalletAddress}
@@ -234,7 +236,7 @@ function Assets() {
           )}
         />
       )}
-      <CreateOrUpdateAssetFormModalWrapper isCreate />
+      <CreateOrUpdateAssetModal isCreate />
     </>
   );
 }

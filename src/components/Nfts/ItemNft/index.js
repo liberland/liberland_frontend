@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
@@ -7,17 +7,16 @@ import Dropdown from 'antd/es/dropdown';
 import { useHistory, useLocation } from 'react-router-dom/cjs/react-router-dom.min';
 import { nftsActions } from '../../../redux/actions';
 import FillAddressWrapper from '../../Modals/FillAddress';
-import FillNumberWrapper from '../../Modals/FillNumber';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
 import SetAttributeModalWrapper from '../../Modals/Nfts/SetAttribute';
-import { ReactComponent as FullScreenIcon } from '../../../assets/icons/fullScreen.svg';
+import FullImageModal from '../../Modals/Nfts/FullImage';
 import { ReactComponent as OpenNewTabIcon } from '../../../assets/icons/openNewTab.svg';
 import { ReactComponent as MenuIcon } from '../../../assets/icons/menu.svg';
 
-import FullImageWrapper from '../../Modals/Nfts/FullImage';
 import { formatDollars, parseDollars } from '../../../utils/walletHelpers';
 import router from '../../../router';
+import FillNumberModal from '../../Modals/FillNumber';
 
 function ItemNft({
   itemMetadata,
@@ -33,8 +32,6 @@ function ItemNft({
   const {
     image, name, description, itemPrice,
   } = itemMetadata;
-
-  const [isImageOpen, setIsImageOpen] = useState(false);
 
   const onBurn = () => {
     dispatch(
@@ -116,7 +113,7 @@ function ItemNft({
                     />
                   ),
                   (
-                    <FillNumberWrapper
+                    <FillNumberModal
                       textData={{ ...textData, submitButtonText: 'Set Price' }}
                       onAccept={(amount) => {
                         dispatch(
@@ -153,9 +150,7 @@ function ItemNft({
           )}
           {image && (
             <>
-              <div className={styles.showImage} onClick={() => setIsImageOpen(true)}>
-                <FullScreenIcon className={styles.icon} />
-              </div>
+              <FullImageModal image={image} />
               <a href={image} target="blank" className={cx(styles.showImage, styles.openNewTab)}>
                 <OpenNewTabIcon className={styles.icon} />
               </a>
@@ -190,9 +185,6 @@ function ItemNft({
           </>
         )}
       />
-      {isImageOpen && (
-        <FullImageWrapper closeModal={() => setIsImageOpen(false)} image={image} />
-      )}
     </Card>
   );
 }
