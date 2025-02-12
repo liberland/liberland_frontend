@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
 import MenuOutlined from '@ant-design/icons/MenuOutlined';
+import PropTypes from 'prop-types';
 import styles from '../styles.module.scss';
-import CloseableModal from '../../Modals/CloseableModal';
 import UrlMenu from '../UrlMenu';
+import modalWrapper from '../../Modals/components/ModalWrapper';
 
-export default function MobileMenu() {
-  const [open, setOpen] = useState();
+function Button(props) {
+  const { onClick } = props;
   return (
-    <>
-      <MenuOutlined
-        className={styles.menuIcon}
-        onClick={() => setOpen(true)}
-        aria-label="Open pagination menu"
-      />
-      {open && (
-        <CloseableModal
-          onClose={() => setOpen(false)}
-          className={styles.mobileMenuOpen}
-          classNames={{
-            content: styles.mobileMenuOpenContent,
-          }}
-        >
-          <UrlMenu onNavigate={() => setOpen(false)} />
-        </CloseableModal>
-      )}
-    </>
+    <MenuOutlined
+      className={styles.menuIcon}
+      onClick={onClick}
+      aria-label="Open pagination menu"
+    />
   );
 }
+
+Button.propTypes = {
+  onClick: PropTypes.func.isRequired,
+};
+
+const ModalMenu = modalWrapper(
+  UrlMenu,
+  Button,
+  { className: styles.mobileMenuOpen, classNames: { content: styles.mobileMenuOpenContent }, closable: true },
+);
+
+export default ModalMenu;

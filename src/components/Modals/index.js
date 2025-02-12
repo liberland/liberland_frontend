@@ -1,6 +1,5 @@
 import SendLLDModal from './SendLLDModal';
 import SendLLMModal from './SendLLMModal';
-import OnchainIdentityModal from './OnchainIdentityModal';
 import DelegateModal from './DelegateModal';
 import UndelegateModal from './UndelegateModal';
 import StakingRewardsDestinationModal from './StakingRewardsDestinationModal';
@@ -14,7 +13,6 @@ import UnpoolModal from './UnpoolModal';
 export {
   SendLLDModal,
   SendLLMModal,
-  OnchainIdentityModal,
   DelegateModal,
   UndelegateModal,
   StakingRewardsDestinationModal,

@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import { BN_ZERO } from '@polkadot/util';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
 import { formatDollars } from '../../../../utils/walletHelpers';
-import ModalRoot from '../../../Modals/ModalRoot';
 import { blockchainSelectors, validatorSelectors } from '../../../../redux/selectors';
 import { blockTimeFormatted, stakingInfoToProgress } from '../../../../utils/staking';
 import { validatorActions } from '../../../../redux/actions';
 import styles from './styles.module.scss';
-import Button from '../../../Button/Button';
+import OpenModalButton from '../../../Modals/components/OpenModalButton';
+import modalWrapper from '../../../Modals/components/ModalWrapper';
 
 function Unbonding({ info }) {
   const dispatch = useDispatch();
@@ -58,21 +58,15 @@ function Unbonding({ info }) {
   );
 }
 
-export default function UnbondingModalWrapper(props) {
-  const [show, setShow] = useState();
+function ButtonModal(props) {
   return (
-    <>
-      <Button onClick={() => setShow(true)}>
-        Show unbonding details
-      </Button>
-      {show && (
-        <ModalRoot onClose={() => setShow(false)}>
-          <Unbonding {...props} />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text="Show unbonding details" primary {...props} />
   );
 }
+
+const UnbondingModal = modalWrapper(Unbonding, ButtonModal);
+
+export default UnbondingModal;
 
 Unbonding.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types

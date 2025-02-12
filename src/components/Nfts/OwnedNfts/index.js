@@ -8,10 +8,10 @@ import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
 import routes from '../../../router';
 import Button from '../../Button/Button';
-import FillNumberWrapper from '../../Modals/FillNumber';
 import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import ItemNft from '../ItemNft';
+import FillNumberModal from '../../Modals/FillNumber';
 
 function OwnedNfts() {
   const dispatch = useDispatch();
@@ -46,7 +46,7 @@ function OwnedNfts() {
         >
           Buy and Browse
         </Button>
-        <FillNumberWrapper
+        <FillNumberModal
           itemList={userCollections}
           textData={{
             title: 'NFT id',

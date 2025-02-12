@@ -4,7 +4,7 @@ import Space from 'antd/es/space';
 import Dropdown from 'antd/es/dropdown';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import Button from '../../../Button/Button';
-import CongressRepealLegislationModalWrapper from '../../../Modals/CongressRepealLegislationModal';
+import CongressRepealLegislationModal from '../../../Modals/CongressRepealLegislationModal';
 import ProposeRepealLegislationButton from '../../../Congress/ProposeRepealLegislationButton';
 import CitizenRepealLegislationModalWrapper from '../../../Modals/CitizenRepealLegislationModal';
 
@@ -20,7 +20,7 @@ function ProposeButton({
       menu={{
         items: [
           isRepealOption && (
-            <CongressRepealLegislationModalWrapper
+            <CongressRepealLegislationModal
               tier={tier}
               id={id}
               section={section}

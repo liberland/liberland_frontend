@@ -7,9 +7,9 @@ import { useMediaQuery } from 'usehooks-ts';
 import LLD from '../../../assets/icons/lld.svg';
 import LLM from '../../../assets/icons/llm.svg';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
-import SendLLDModalWrapper from '../../Modals/SendLLDModal';
+import SendLLDModal from '../../Modals/SendLLDModal';
+import RequestLLDModal from '../../Modals/RequestLLDModal';
 import SendLLMModalWrapper from '../../Modals/SendLLMModal';
-import RequestLLDModalWrapper from '../../Modals/RequestLLDModal';
 import UnpoolLLMModalWrapper from '../../Modals/UnpoolModal';
 import PolitipoolLLMModalWrapper from '../../Modals/PolitipoolModal';
 import MoneyCard from '../../MoneyCard';
@@ -27,8 +27,8 @@ function BalanceOverview({
       currency: 'LLD',
       icon: LLD,
       actions: [
-        <SendLLDModalWrapper key="send" />,
-        <RequestLLDModalWrapper key="request" />,
+        <SendLLDModal key="send" />,
+        <RequestLLDModal key="request" />,
       ],
     },
     showStaked && {

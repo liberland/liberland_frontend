@@ -7,7 +7,6 @@ import Title from 'antd/es/typography/Title';
 import InputNumber from 'antd/es/input-number';
 import Checkbox from 'antd/es/checkbox/Checkbox';
 import { BN } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
@@ -22,11 +21,11 @@ import { getSwapPriceExactTokensForTokens, getSwapPriceTokensForExactTokens } fr
 import { formatAssets, parseAssets, sanitizeValue } from '../../utils/walletHelpers';
 import { useStockContext } from '../Wallet/StockContext';
 import CurrencyIcon from '../CurrencyIcon';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function TradeTokensModal({
-  closeModal,
-  assets,
-  isBuy,
+function TradeTokensForm({
+  onClose, assets, isBuy,
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -99,7 +98,7 @@ function TradeTokensModal({
           : dexActions.swapTokensForExactTokens.call(swapData));
       }
 
-      closeModal();
+      onClose();
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err);
@@ -382,7 +381,7 @@ function TradeTokensModal({
         <Checkbox />
       </Form.Item>
       <Flex gap="15px" wrap>
-        <Button medium onClick={closeModal} disabled={loading}>
+        <Button medium onClick={onClose} disabled={loading}>
           Cancel
         </Button>
         <Button primary medium type="submit" disabled={loading}>
@@ -393,51 +392,26 @@ function TradeTokensModal({
   );
 }
 
-TradeTokensModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+TradeTokensForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
   isBuy: PropTypes.bool,
 };
 
-function TradeTokensModalWrapper({
-  assets,
-  isBuy,
-  asset1ToShow,
-  asset2ToShow,
-}) {
-  const [show, setShow] = useState(false);
+function ButtonModal(props) {
+  const { isBuy, asset1ToShow, asset2ToShow } = props;
+  const text = `${isBuy ? 'Buy' : 'Sell'} ${asset1ToShow} for ${asset2ToShow}`;
   return (
-    <>
-      <Button
-        primary
-        onClick={() => {
-          setShow(true);
-        }}
-      >
-        {isBuy ? 'Buy' : 'Sell'}
-        {' '}
-        {asset1ToShow}
-        {' for '}
-        {asset2ToShow}
-      </Button>
-      {show && (
-        <ModalRoot>
-          <TradeTokensModal
-            assets={assets}
-            closeModal={() => setShow(false)}
-            isBuy={isBuy}
-          />
-        </ModalRoot>
-      )}
-    </>
+    <OpenModalButton text={text} primary {...props} />
   );
 }
 
-TradeTokensModalWrapper.propTypes = {
-  assets: AssetsPropTypes.isRequired,
+ButtonModal.propTypes = {
   isBuy: PropTypes.bool,
   asset1ToShow: PropTypes.string.isRequired,
   asset2ToShow: PropTypes.string.isRequired,
 };
 
-export default TradeTokensModalWrapper;
+const TradeTokensModal = modalWrapper(TradeTokensForm, ButtonModal);
+
+export default TradeTokensModal;

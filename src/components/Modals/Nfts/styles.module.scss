@@ -1,6 +1,20 @@
 @import '/src/assets/main.scss';
+.close{
+  position: relative;
+  margin-left: 97%;
+
+  .icon{
+    cursor: pointer;
+    width: 25px;
+    height: 30px;
+  }
+}
+
 .imageWrapper{
   padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
     padding: 15px 35px 40px 35px;

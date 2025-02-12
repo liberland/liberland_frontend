@@ -16,7 +16,7 @@ import { identityActions, walletActions } from '../../../redux/actions';
 import { walletSelectors, blockchainSelectors, congressSelectors } from '../../../redux/selectors';
 import Button from '../../Button/Button';
 import { transactionHistoryProcessorFactory } from '../WalletTransactionHistory/utils';
-import RemarkTransferModalWrapper from '../RemarkTransferWrapper';
+import RemarkTransferModal from '../RemarkTransferWrapper';
 import styles from './styles.module.scss';
 import WalletTransactionHistoryMobile from '../WalletTransactionHistoryMobile';
 
@@ -116,7 +116,7 @@ function WalletOverview() {
           label: 'Remarks',
           key: 'Remarks',
           children: (
-            <RemarkTransferModalWrapper />
+            <RemarkTransferModal />
           ),
         },
         {

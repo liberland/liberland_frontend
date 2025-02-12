@@ -7,9 +7,7 @@ import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useDispatch } from 'react-redux';
 import { BN } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
-import styles from './styles.module.scss';
 import { parseAssets } from '../../utils/walletHelpers';
 import {
   congressActions, ministryFinanceActions, senateActions, walletActions,
@@ -20,9 +18,11 @@ import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { encodeRemark } from '../../api/nodeRpcCall';
 import { OfficeType } from '../../utils/officeTypeEnum';
+import modalWrapper from './components/ModalWrapper';
+import OpenModalButton from './components/OpenModalButton';
 
-function SendAssetModal({
-  closeModal, assetData, isRemarkNeeded, officeType,
+function SendAssetForm({
+  onClose, assetData, isRemarkNeeded, officeType,
 }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -67,7 +67,7 @@ function SendAssetModal({
         dispatch(ministryFinanceActions.ministryFinanceSendAssets.call({ ...data, officeType }));
       }
     }
-    closeModal();
+    onClose();
   };
   const { balance } = assetData.balance;
   return (
@@ -144,7 +144,7 @@ function SendAssetModal({
 
       <Flex wrap gap="15px">
         <Button
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -160,53 +160,33 @@ function SendAssetModal({
   );
 }
 
-SendAssetModal.defaultProps = {
+SendAssetForm.defaultProps = {
   isRemarkNeeded: false,
 };
 
-SendAssetModal.propTypes = {
+SendAssetForm.propTypes = {
   officeType: PropTypes.string,
   isRemarkNeeded: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
   assetData: PropTypes.any,
-  closeModal: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
-function SendAssetModalWrapper({
-  isRemarkNeeded,
-  assetData,
-  officeType,
-}) {
-  const [show, setShow] = useState(false);
-  return (
-    <>
-      <Button
-        className={styles.button}
-        onClick={() => setShow(true)}
-      >
-        Send
-        {' '}
-        {assetData.metadata.symbol}
-      </Button>
-      {show && (
-        <ModalRoot>
-          <SendAssetModal
-            closeModal={() => setShow(false)}
-            assetData={assetData}
-            isRemarkNeeded={isRemarkNeeded}
-            officeType={officeType}
-          />
-        </ModalRoot>
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  const { assetData } = props;
+  const { metadata } = assetData;
+
+  return <OpenModalButton text={`Send ${metadata.symbol}`} {...props} />;
 }
 
-SendAssetModalWrapper.propTypes = {
-  isRemarkNeeded: PropTypes.bool,
-  // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
-  assetData: PropTypes.any,
-  officeType: PropTypes.string,
+ButtonModal.propTypes = {
+  assetData: PropTypes.shape({
+    metadata: PropTypes.shape({
+      symbol: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
 };
 
-export default SendAssetModalWrapper;
+const SendAssetModal = modalWrapper(SendAssetForm, ButtonModal);
+
+export default SendAssetModal;

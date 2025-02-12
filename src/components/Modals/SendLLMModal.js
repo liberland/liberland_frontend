@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import InputNumber from 'antd/es/input-number';
@@ -7,17 +7,15 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import Flex from 'antd/es/flex';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN_ZERO } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import InputSearch from '../InputComponents/InputSearchAddressName';
-import styles from './styles.module.scss';
 import { walletActions } from '../../redux/actions';
 import { parseMerits, valueToBN } from '../../utils/walletHelpers';
 import { walletSelectors } from '../../redux/selectors';
+import modalWrapper from './components/ModalWrapper';
+import OpenModalButton from './components/OpenModalButton';
 
-function SendLLMModal({
-  closeModal,
-}) {
+function SendLLMForm({ onClose }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
   const maxUnbond = valueToBN(balances?.liquidMerits?.amount ?? 0);
@@ -25,11 +23,13 @@ function SendLLMModal({
   const [form] = Form.useForm();
 
   const transfer = (values) => {
-    dispatch(walletActions.sendTransferLLM.call({
-      recipient: values.recipient,
-      amount: parseMerits(values.amount),
-    }));
-    closeModal();
+    dispatch(
+      walletActions.sendTransferLLM.call({
+        recipient: values.recipient,
+        amount: parseMerits(values.amount),
+      }),
+    );
+    onClose();
   };
 
   const validateUnbondValue = (_, textUnbondValue) => {
@@ -45,15 +45,9 @@ function SendLLMModal({
   };
 
   return (
-    <Form
-      onFinish={transfer}
-      form={form}
-      layout="vertical"
-    >
+    <Form onFinish={transfer} form={form} layout="vertical">
       <Title level={3}>Send LLM</Title>
-      <Paragraph>
-        You are going to send tokens from your wallet
-      </Paragraph>
+      <Paragraph>You are going to send tokens from your wallet</Paragraph>
       <Form.Item
         name="recipient"
         label="Send to address"
@@ -64,23 +58,13 @@ function SendLLMModal({
       <Form.Item
         label="Amount LLM"
         name="amount"
-        rules={[
-          { required: true },
-          { validator: validateUnbondValue },
-        ]}
+        rules={[{ required: true }, { validator: validateUnbondValue }]}
       >
         <InputNumber stringMode controls={false} />
       </Form.Item>
       <Flex wrap gap="15px">
-        <Button
-          onClick={closeModal}
-        >
-          Cancel
-        </Button>
-        <Button
-          primary
-          type="submit"
-        >
+        <Button onClick={onClose}>Cancel</Button>
+        <Button primary type="submit">
           Make transfer
         </Button>
       </Flex>
@@ -88,24 +72,14 @@ function SendLLMModal({
   );
 }
 
-SendLLMModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+SendLLMForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-function SendLLMModalWrapper() {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Button className={styles.button} onClick={() => setOpen(true)}>
-        Send
-      </Button>
-      {open && (
-        <ModalRoot>
-          <SendLLMModal closeModal={() => setOpen(false)} />
-        </ModalRoot>
-      )}
-    </>
-  );
+function ButtonModal(props) {
+  return <OpenModalButton text="Send" {...props} />;
 }
 
-export default SendLLMModalWrapper;
+const SendLLMModal = modalWrapper(SendLLMForm, ButtonModal);
+
+export default SendLLMModal;
