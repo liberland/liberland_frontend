@@ -6,12 +6,15 @@ import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import Avatar from 'antd/es/avatar';
 import Card from 'antd/es/card';
+import LLM from '../../../../../assets/icons/llm.svg';
 import Button from '../../../../Button/Button';
 import { HashIndexType } from '../constants';
 import router from '../../../../../router';
 import truncate from '../../../../../utils/truncate';
 import { congressActions } from '../../../../../redux/actions';
 import styles from '../../../styles.module.scss';
+import { votePercentage } from '../util';
+import { formatMerits } from '../../../../../utils/walletHelpers';
 
 function CounterItem({
   ayes,
@@ -37,21 +40,35 @@ function CounterItem({
     <Card className={styles.referendum}>
       <Flex vertical gap="15px">
         <Flex align="center" wrap gap="15px">
-          <Flex vertical gap="5px">
-            <div className="description">
-              Votes for
-            </div>
-            <Avatar size={19} style={{ backgroundColor: '#7DC035' }}>
-              +
-            </Avatar>
-          </Flex>
-          <Flex vertical gap="5px">
-            <div className="description">
-              Votes against
-            </div>
-            <Avatar size={19} style={{ backgroundColor: '#FF0000' }}>
-              &#10005;
-            </Avatar>
+          <Flex flex={1} align="center" gap="20px">
+            <Flex vertical gap="5px">
+              <Flex wrap gap="5px" align="center">
+                <Avatar size={24} style={{ backgroundColor: '#7DC035' }}>
+                  +
+                </Avatar>
+                <div className="description">
+                  Votes for
+                </div>
+              </Flex>
+              <Flex wrap gap="5px" align="center">
+                {formatMerits(ayes.toBigInt())}
+                <Avatar size={24} src={LLM} />
+              </Flex>
+            </Flex>
+            <Flex vertical gap="5px">
+              <Flex wrap gap="5px" align="center">
+                <Avatar size={24} style={{ backgroundColor: '#FF0000' }}>
+                  &#10005;
+                </Avatar>
+                <div className="description">
+                  Votes against
+                </div>
+              </Flex>
+              <Flex wrap gap="5px" align="center">
+                {formatMerits(nays.toBigInt())}
+                <Avatar size={24} src={LLM} />
+              </Flex>
+            </Flex>
           </Flex>
           {!delegating && (
             <Flex gap="15px" justify="end">
@@ -82,7 +99,10 @@ function CounterItem({
         </Flex>
         <Progress
           percent={100}
-          success={{ percent: Math.round((100 * ayes) / (ayes + nays)), strokeColor: '#7DC035' }}
+          success={{
+            percent: votePercentage({ nayVotes: nays, yayVotes: ayes }),
+            strokeColor: '#7DC035',
+          }}
           strokeColor="#FF0000"
         />
       </Flex>

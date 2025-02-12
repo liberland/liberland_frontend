@@ -4,13 +4,22 @@ import Divider from 'antd/es/divider';
 import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
+import Space from 'antd/es/space';
 import Title from 'antd/es/typography/Title';
+import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
+import { useHistory } from 'react-router-dom';
 import Details from '../Details';
 import { centralizedDatasType } from '../types';
 import Discussions from '../Discussions';
 import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 import CounterItem from '../CounterItem';
 import PersonBox from '../../../../PersonBox';
+import truncate from '../../../../../utils/truncate';
+import { useHideTitle } from '../../../../Layout/HideTitle';
+import styles from '../../../styles.module.scss';
+import Button from '../../../../Button/Button';
+import CopyInput from '../../../../CopyInput';
+import router from '../../../../../router';
 
 function ReferendumPageDisplay({
   centralizedDatas,
@@ -25,18 +34,33 @@ function ReferendumPageDisplay({
   userIsMember,
   allAye,
   allNay,
-  identity,
+  identities,
 }) {
   const { yayVotes, nayVotes } = voted;
-  const { name, legal } = identity || {};
+  const history = useHistory();
+  useHideTitle();
+  const fullLink = `${window.location.protocol}//${window.location.host}${
+    router.voting.referendumItem.replace(':referendumHash', hash.toString())}`;
 
   return (
     <Flex vertical gap="20px">
+      <Flex className={styles.nav} wrap gap="15px" align="center">
+        <Flex flex={1}>
+          <Button onClick={() => history.goBack()}>
+            <ArrowLeftOutlined />
+            <Space />
+            Back
+          </Button>
+        </Flex>
+        <div>
+          <CopyInput buttonLabel="Copy link to proposal" value={fullLink} />
+        </div>
+      </Flex>
       <Flex wrap gap="15px">
         <Title level={1}>
           Proposal
-          {' #'}
-          {referendumIndex}
+          {' '}
+          {truncate(referendumIndex.toString(), 5)}
           <CopyIconWithAddress address={hash} />
         </Title>
       </Flex>
@@ -86,19 +110,22 @@ function ReferendumPageDisplay({
                   ...allAye.map((address) => ({ aye: true, address })),
                   ...allNay.map((address) => ({ address })),
                 ]}
-                renderItem={({ address, aye }) => (
-                  <PersonBox
-                    address={address}
-                    displayName={legal || name || 'Unknown'}
-                    role={aye ? {
-                      name: 'Voted for',
-                      color: '#7DC035',
-                    } : {
-                      name: 'Voted against',
-                      color: '#FF0000',
-                    }}
-                  />
-                )}
+                renderItem={({ address, aye }) => {
+                  const { name, legal } = identities?.[address] || {};
+                  return (
+                    <PersonBox
+                      address={address}
+                      displayName={legal || name || 'Unknown'}
+                      role={aye ? {
+                        name: 'Voted for',
+                        color: '#7DC035',
+                      } : {
+                        name: 'Voted against',
+                        color: '#FF0000',
+                      }}
+                    />
+                  );
+                }}
               />
             ),
           },
@@ -127,7 +154,8 @@ ReferendumPageDisplay.propTypes = {
   userIsMember: PropTypes.bool.isRequired,
   allAye: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
   allNay: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
-  identity: PropTypes.shape({ name: PropTypes.string, legal: PropTypes.string }),
+  // eslint-disable-next-line react/forbid-prop-types
+  identities: PropTypes.object,
 };
 
 export default ReferendumPageDisplay;

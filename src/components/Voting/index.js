@@ -30,6 +30,7 @@ function Voting() {
       />
       <Route
         path={router.voting.referendum}
+        exact
         component={ReferendumWrapper}
       />
       <Route

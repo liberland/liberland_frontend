@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
 import Card from 'antd/es/card';
+import Avatar from 'antd/es/avatar';
 import Progress from 'antd/es/progress';
 import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
@@ -10,12 +11,15 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import { hexToString } from '@polkadot/util';
 import Markdown from 'markdown-to-jsx';
 import Alert from 'antd/es/alert';
+import LLM from '../../../../../assets/icons/llm.svg';
 import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 import { useTitleFromMarkdown } from '../hooks';
 import styles from '../../../styles.module.scss';
 import router from '../../../../../router';
 import truncate from '../../../../../utils/truncate';
 import Button from '../../../../Button/Button';
+import { votePercentage } from '../util';
+import { formatMerits } from '../../../../../utils/walletHelpers';
 
 function ReferendumItem({
   voted,
@@ -66,25 +70,30 @@ function ReferendumItem({
         <Flex vertical gap="5px">
           <Progress
             percent={100}
-            success={{ percent: Math.round((100 * yayVotes) / (yayVotes + nayVotes)), strokeColor: '#7DC035' }}
+            success={{
+              percent: votePercentage({ nayVotes, yayVotes }),
+              strokeColor: '#7DC035',
+            }}
             strokeColor="#FF0000"
           />
           <Flex gap="5px" wrap>
             <Flex wrap gap="5px">
               <strong className={styles.for}>For:</strong>
-              <strong>
-                {yayVotes}
-                {' '}
-                votes
-              </strong>
+              <Flex wrap gap="5px" align="center">
+                <strong>
+                  {formatMerits(yayVotes)}
+                </strong>
+                <Avatar src={LLM} size={24} />
+              </Flex>
             </Flex>
             <Flex wrap gap="5px">
               <strong className={styles.against}>Against:</strong>
-              <strong>
-                {nayVotes}
-                {' '}
-                votes
-              </strong>
+              <Flex wrap gap="5px" align="center">
+                <strong>
+                  {formatMerits(nayVotes)}
+                </strong>
+                <Avatar src={LLM} size={24} />
+              </Flex>
             </Flex>
           </Flex>
         </Flex>

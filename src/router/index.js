@@ -46,8 +46,8 @@ export default {
     congressionalAssemble: '/home/voting/congressional-assemble',
     referendum: '/home/voting/referendum',
     proposalItem: '/home/voting/proposal/:id',
-    referendumItem: '/home/voting/proposal/:referendumHash',
-    dispatchItem: '/home/voting/proposal/:dispatchId',
+    referendumItem: '/home/voting/referendum/:referendumHash',
+    dispatchItem: '/home/voting/dispatch/:dispatchId',
     addLegislation: '/home/voting/add-legislation',
   },
   legislation: {

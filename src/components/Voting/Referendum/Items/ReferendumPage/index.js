@@ -1,5 +1,6 @@
 import React, {
   useEffect,
+  useMemo,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
@@ -8,9 +9,10 @@ import {
   blockchainSelectors,
   democracySelectors,
   congressSelectors,
+  identitySelectors,
 } from '../../../../../redux/selectors';
-import { democracyActions, congressActions } from '../../../../../redux/actions';
-import ReferendumPageDisplay from '../ReferendumItem';
+import { democracyActions, congressActions, identityActions } from '../../../../../redux/actions';
+import ReferendumPageDisplay from '../ReferendumPageDisplay';
 
 function ReferendumPage() {
   const dispatch = useDispatch();
@@ -34,14 +36,23 @@ function ReferendumPage() {
     imageHash,
   }) => imageHash === referendumHash);
 
+  const ayeList = useMemo(() => referendum?.allAye.map(({ accountId }) => accountId.toString()) || [], [referendum]);
+  const nayList = useMemo(() => referendum?.allNay.map(({ accountId }) => accountId.toString()) || [], [referendum]);
+
+  useEffect(() => {
+    dispatch(identityActions.getIdentityMotions.call([...ayeList, ...nayList]));
+  }, [ayeList, dispatch, nayList]);
+
+  const identities = useSelector(identitySelectors.selectorIdentityMotions);
+
   if (!referendum) {
     return <Spin />;
   }
 
-  const aye = referendum.allAye.some(({ accountId }) => accountId.toString() === userWalletAddress)
+  const aye = ayeList.includes(userWalletAddress)
     ? 'Aye'
     : undefined;
-  const nay = referendum.allNay.some(({ accountId }) => accountId.toString() === userWalletAddress)
+  const nay = nayList.includes(userWalletAddress)
     ? 'Nay'
     : undefined;
 
@@ -60,9 +71,10 @@ function ReferendumPage() {
       buttonVoteCallback={handleSubmitVoteForm}
       referendumIndex={parseInt(referendum.index)}
       blacklistMotion={referendum.blacklistMotion}
-      allAye={referendum.allAye.map(({ accountId }) => accountId.toString())}
-      allNay={referendum.allNay.map(({ accountId }) => accountId.toString())}
+      allAye={ayeList}
+      allNay={nayList}
       userIsMember={userIsMember}
+      identity={identities}
     />
   );
 }

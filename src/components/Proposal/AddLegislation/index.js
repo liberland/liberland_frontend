@@ -45,7 +45,7 @@ function AddLegislation({ proposal, isDetailsHidden }) {
                 dataSource={sections}
                 renderItem={(section) => (
                   <List.Item>
-                    <Card>
+                    <Card className={styles.section}>
                       <div className={styles.legislationContent}>
                         <Markdown>
                           {new TextDecoder('utf-8').decode(section)}
