@@ -290,3 +290,7 @@ textarea.ant-input {
     }
   }
 }
+
+.formCollapse .ant-collapse-header {
+  display: none!important;
+}
