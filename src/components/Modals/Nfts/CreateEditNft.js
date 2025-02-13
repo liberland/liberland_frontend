@@ -57,6 +57,11 @@ function CreatEditNFTForm({
     return data.IpfsHash;
   };
 
+  const uploadImageWithLink = async (file) => {
+    const ipfsHash = await uploadImageToIPFS(file);
+    return `https://${process.env.REACT_APP_PINATA_GATEWAY}/ipfs/${ipfsHash}`;
+  };
+
   const uploadJsonToIPFS = async (json) => {
     setUploading(true);
     const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
@@ -80,7 +85,7 @@ function CreatEditNFTForm({
     return data.IpfsHash;
   };
 
-  const uploadMetadataToIPFS = async (imageFile) => {
+  const uploadMetadataToIPFS = async () => {
     try {
       const name = form.getFieldValue('name');
       const description = form.getFieldValue('description');
@@ -93,7 +98,7 @@ function CreatEditNFTForm({
         ]);
       }
       setUploading(true);
-      const imageCID = await uploadImageToIPFS(imageFile);
+      const imageCID = previewImage.split('/ipfs/')[1];
       const metadata = {
         name,
         description,
@@ -109,12 +114,9 @@ function CreatEditNFTForm({
   };
 
   const createNFT = async ({
-    name,
-    description,
     collectionId,
-    imageFile,
   }) => {
-    const metadataCID = await uploadMetadataToIPFS(imageFile[0], name, description);
+    const metadataCID = await uploadMetadataToIPFS();
     dispatch(nftsActions.setMetadataNft.call({
       metadataCID, walletAddress, collectionId,
     }));
@@ -164,16 +166,15 @@ function CreatEditNFTForm({
         getValueFromEvent={getFileFromEvent}
       >
         <Upload.Dragger
-          action={uploadImageToIPFS}
+          customRequest={async (options) => {
+            const ipfsUrl = await uploadImageWithLink(options.file);
+            setPreviewImage(ipfsUrl);
+            options.onSuccess(ipfsUrl);
+          }}
           disabled={uploading}
           maxCount={1}
           multiple={false}
           accept="image/*"
-          previewFile={(file) => {
-            if (file) {
-              setPreviewImage(URL.createObjectURL(file));
-            }
-          }}
         >
           <Paragraph className="ant-upload-drag-icon">
             {uploading ? <Spin /> : <InboxOutlined />}
@@ -181,14 +182,16 @@ function CreatEditNFTForm({
           <Paragraph className="ant-upload-text">
             Click or drag file to this area to upload
           </Paragraph>
+          {previewImage && (
+            <div className={styles.createImageWrapper}>
+              <img className={styles.image} src={previewImage} alt="Preview" />
+            </div>
+          )}
         </Upload.Dragger>
-        {previewImage && (
-          <div className={styles.createImageWrapper}>
-            <img className={styles.image} src={previewImage} alt="Preview" />
-          </div>
-        )}
       </Form.Item>
-
+      <Paragraph>
+        Will ask you to sign 2 transactions
+      </Paragraph>
       <Flex wrap gap="15px">
         <Button onClick={onClose}>
           Cancel
