@@ -9,17 +9,22 @@ import UserMenu from '../../UserMenu';
 
 function MobileHeader() {
   const [open, setOpen] = useState(false);
-
   return (
-    <HeaderInternal
-      className={styles.header}
-      onClick={() => setOpen(true)}
-    >
-      <MenuOutlined
-        className={styles.menuIcon}
+    <>
+      <HeaderInternal
+        className={styles.header}
         onClick={() => setOpen(true)}
-        aria-label="Open pagination menu"
-      />
+      >
+        <MenuOutlined
+          className={styles.menuIcon}
+          onClick={() => setOpen(true)}
+          aria-label="Open pagination menu"
+        />
+        <img alt="logo" src={LiberlandLettermarkMobile} className={styles.mobileLogo} />
+        <div className={styles.mobileUser}>
+          <UserMenu />
+        </div>
+      </HeaderInternal>
       <Modal
         open={open}
         footer={null}
@@ -34,13 +39,9 @@ function MobileHeader() {
           content: styles.mobileMenuOpenContent,
         }}
       >
-        <UrlMenu onNavigate={() => setOpen(false)} />
+        <UrlMenu onClose={() => setOpen(false)} />
       </Modal>
-      <img alt="logo" src={LiberlandLettermarkMobile} className={styles.mobileLogo} />
-      <div className={styles.mobileUser}>
-        <UserMenu />
-      </div>
-    </HeaderInternal>
+    </>
   );
 }
 

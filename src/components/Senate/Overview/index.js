@@ -7,7 +7,6 @@ import { blockchainActions, senateActions, validatorActions } from '../../../red
 import { senateSelectors } from '../../../redux/selectors';
 import Button from '../../Button/Button';
 import Table from '../../Table';
-import ProposeBudgetModalWrapper from '../../Modals/ProposeBudgetModal';
 
 function Overview() {
   const dispatch = useDispatch();
@@ -34,9 +33,6 @@ function Overview() {
       )}
       footer={(
         <Flex wrap gap="15px" justify="end">
-          {userIsMember && (
-            <ProposeBudgetModalWrapper />
-          )}
           {!userIsMember && userHasWalletSenateMember && (
             <Button
               primary

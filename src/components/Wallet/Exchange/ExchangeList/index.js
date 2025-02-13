@@ -5,6 +5,7 @@ import Collapse from 'antd/es/collapse';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
 import Flex from 'antd/es/flex';
+import { useMediaQuery } from 'usehooks-ts';
 import { blockchainSelectors, dexSelectors } from '../../../../redux/selectors';
 import { dexActions } from '../../../../redux/actions';
 import { useStockContext } from '../../StockContext';
@@ -21,6 +22,7 @@ function ExchangeList() {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const [highLiquiditySort, setHighLiquiditySort] = useState(Object.keys(sortByMap)[0]);
   const [lowLiquiditySort, setLowLiquiditySort] = useState(Object.keys(sortByMap)[0]);
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
   const { isStock } = useStockContext();
 
   useEffect(() => {
@@ -66,9 +68,18 @@ function ExchangeList() {
             {
               key: 'highliq',
               label: 'Exchange pairs',
-              extra: <ExchangeSort onSort={setHighLiquiditySort} sortBy={highLiquiditySort} />,
+              extra: isBiggerThanDesktop && (
+                <ExchangeSort onSort={setHighLiquiditySort} sortBy={highLiquiditySort} />
+              ),
               children: (
                 <Row gutter={[16, 16]}>
+                  {!isBiggerThanDesktop && (
+                    <Col span={24}>
+                      <Flex justify="start">
+                        <ExchangeSort onSort={setHighLiquiditySort} sortBy={highLiquiditySort} />
+                      </Flex>
+                    </Col>
+                  )}
                   {sortPool(highLiquidity, highLiquiditySort).map((pool) => (
                     <Col span={24} key={pool.asset1 + pool.asset2}>
                       <ExchangeItem
@@ -90,9 +101,18 @@ function ExchangeList() {
             {
               key: 'lowliq',
               label: 'Low liquidity exchange pairs',
-              extra: <ExchangeSort onSort={setLowLiquiditySort} sortBy={lowLiquiditySort} />,
+              extra: isBiggerThanDesktop && (
+                <ExchangeSort onSort={setLowLiquiditySort} sortBy={lowLiquiditySort} />
+              ),
               children: (
                 <Row gutter={[16, 16]}>
+                  {!isBiggerThanDesktop && (
+                    <Col span={24}>
+                      <Flex justify="start">
+                        <ExchangeSort onSort={setLowLiquiditySort} sortBy={lowLiquiditySort} />
+                      </Flex>
+                    </Col>
+                  )}
                   {sortPool(lowLiquidity, lowLiquiditySort).map((pool) => (
                     <Col span={24} key={pool.asset1 + pool.asset2}>
                       <ExchangeItem

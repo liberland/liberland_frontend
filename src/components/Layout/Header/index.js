@@ -5,7 +5,6 @@ import MobileHeader from '../MobileHeader';
 
 function Header() {
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
-
   return isBiggerThanSmallScreen ? <DesktopHeader /> : <MobileHeader />;
 }
 

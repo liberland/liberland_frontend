@@ -31,7 +31,7 @@ function UrlMenu({
     dispatch(validatorActions.getInfo.call());
     localStorage.removeItem('BlockchainAdress');
     if (isBiggerThanSmallScreen) {
-      onNavigate?.();
+      onClose?.();
     }
   };
 
@@ -105,7 +105,7 @@ function UrlMenu({
   const changeWallet = isBiggerThanSmallScreen ? [] : [
     {
       label: (
-        <ChangeWallet onSelect={() => onNavigate()} />
+        <ChangeWallet onSelect={() => onClose?.()} />
       ),
       key: 'wallets',
       className: styles.switchContainer,
