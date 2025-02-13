@@ -50,18 +50,19 @@ function TradeTokensForm({
   } = assets;
 
   const reservesThisAssets = useMemo(() => {
-    if (reserves && asset1 && asset2) {
-      if (reserves?.[asset1]?.[asset2]) {
-        const asset1Value = reserves[asset1][asset2].asset1;
-        const asset2Value = reserves[asset1][asset2].asset2;
-        return { ...reserves[asset1][asset2], asset1: asset1Value, asset2: asset2Value };
-      } if (reserves?.[asset2]?.[asset1]) {
-        const asset1Value = reserves[asset2][asset1].asset1;
-        const asset2Value = reserves[asset2][asset1].asset2;
-        return { ...reserves[asset2][asset1], asset1: asset1Value, asset2: asset2Value };
-      }
-    }
-    return null;
+    if (!(reserves && asset1 && asset2)) return null;
+
+    const getReserves = (primary, secondary) => {
+      const reserve = reserves?.[primary]?.[secondary];
+      if (!reserve) return null;
+      return {
+        ...reserve,
+        [primary]: reserve.asset1,
+        [secondary]: reserve.asset2,
+      };
+    };
+
+    return getReserves(asset1, asset2) || getReserves(asset2, asset1);
   }, [asset1, asset2, reserves]);
 
   const decimals1 = useMemo(() => getDecimalsForAsset(asset1, assetData1?.decimals), [asset1, assetData1?.decimals]);
@@ -78,7 +79,6 @@ function TradeTokensForm({
     amount1In, amountIn2, minAmountPercent,
   }) => {
     setLoading(true);
-
     try {
       const { amount, amountMin } = await convertTransferData(
         asset1,
@@ -120,13 +120,12 @@ function TradeTokensForm({
       const { enum1, enum2 } = convertToEnumDex(asset1, asset2);
       const inputValue = parseAssets(value, decimals2);
       const tradeData = await getSwapPriceTokensForExactTokens(enum1, enum2, inputValue);
-
       const showReserve = formatAssets(
-        reservesThisAssets.asset2,
+        reservesThisAssets[asset2],
         decimals2,
         { symbol: asset2ToShow, withAll: true },
       );
-      if (inputValue.gte(new BN(reservesThisAssets.asset2))) {
+      if (inputValue.gte(new BN(reservesThisAssets[asset2]))) {
         const msg = `Input value exceeds reserves max ${showReserve}`;
         setInput2Error(msg);
         return;
