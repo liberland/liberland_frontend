@@ -50,14 +50,16 @@ function* getAssetDetailsWorker(action) {
 function* getAssetsBalanceWorker(action) {
   const assets = action.payload;
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  const assetsBalance = yield Promise.all(assets.map(async (asset) => {
-    if (asset === 'Native') {
-      const { liquidAmount } = await getBalanceByAddress(walletAddress);
-      return liquidAmount?.amount || 0;
-    }
-    const assetData = await getAssetData(asset, walletAddress);
-    return assetData || 0;
-  }));
+  const assetsBalance = yield Promise.all(
+    assets.map(async (asset) => {
+      if (asset === 'Native') {
+        const { liquidAmount } = await getBalanceByAddress(walletAddress);
+        return { [asset]: liquidAmount?.amount || 0 };
+      }
+      const assetData = await getAssetData(asset, walletAddress);
+      return { [asset]: assetData || 0 };
+    }),
+  ).then((balancesArray) => balancesArray.reduce((acc, curr) => ({ ...acc, ...curr }), {}));
   yield put(walletActions.getAssetsBalance.success(assetsBalance));
 }
 

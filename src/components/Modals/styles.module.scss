@@ -42,3 +42,34 @@
 .whiten {
   filter: brightness(100);
 }
+
+.swapButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+
+  .circle{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: $grey;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    &:hover {
+      background-color: $primary;
+      transform: scale(1.1);
+    }
+
+    .swapIcon {
+      font-size: 20px;
+      color: #333;
+    }
+  }
+}
+

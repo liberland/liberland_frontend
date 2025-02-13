@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Flex from 'antd/es/flex';
 import PropTypes from 'prop-types';
@@ -30,7 +30,8 @@ function LoadingModal() {
 }
 
 function Loader({ children }) {
-  const { showModal, closeLastNModals } = useModal();
+  const { showModal, closeIdModal } = useModal();
+  const [modalId, setModalsId] = useState();
 
   const isGettingWalletInfo = useSelector(walletSelectors.selectorGettingWalletInfo);
   const isGettingDemocracyInfo = useSelector(democracySelectors.selectorGettingDemocracyInfo);
@@ -64,11 +65,16 @@ function Loader({ children }) {
 
   useEffect(() => {
     if (isLoading) {
-      showModal(<LoadingModal />, { maskClosable: false });
-    } else {
-      closeLastNModals(1);
+      const id = showModal(<LoadingModal />, { maskClosable: false });
+      setModalsId(id);
     }
-  }, [isLoading, showModal, closeLastNModals]);
+  }, [isLoading, showModal]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      closeIdModal(modalId);
+    }
+  }, [closeIdModal, isLoading, modalId]);
 
   return (
     <ErrorModal>

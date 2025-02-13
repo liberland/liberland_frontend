@@ -60,6 +60,7 @@ export function* fetchPreimageWatcher() {
 }
 
 export function* subscribeWalletsSaga() {
+  let checkTimeout = true;
   const channel = eventChannel((emitter) => {
     const updateWallets = async () => {
       const extensions = await web3Enable('Liberland dApp');
@@ -68,7 +69,10 @@ export function* subscribeWalletsSaga() {
     };
     setTimeout(updateWallets, 500);
     const interval = setInterval(updateWallets, 5000);
-    setTimeout(() => clearInterval(interval), 120000);
+    setTimeout(() => {
+      clearInterval(interval);
+      checkTimeout = false;
+    }, 120000);
     return () => clearInterval(interval);
   });
   while (true) {
@@ -76,7 +80,7 @@ export function* subscribeWalletsSaga() {
       data: take(channel),
       timeout: delay(20000),
     });
-    if (timeout) {
+    if (timeout && checkTimeout) {
       yield put(blockchainActions.setExtensions.value([]));
       yield put(blockchainActions.setWallets.value([]));
     }

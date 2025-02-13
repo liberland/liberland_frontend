@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
 import { useMediaQuery } from 'usehooks-ts';
+import { useLocation } from 'react-router-dom';
 import { getDecimalsForAsset, getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormatter';
 import { formatAssets } from '../../../../utils/walletHelpers';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
@@ -13,6 +14,7 @@ import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
 import CurrencyIcon from '../../../CurrencyIcon';
 
 function ExchangeItem({ poolData, assetsPoolData }) {
+  const location = useLocation();
   const {
     asset1,
     asset2,
@@ -84,6 +86,23 @@ function ExchangeItem({ poolData, assetsPoolData }) {
     </Flex>
   );
 
+  const areDexQuerySamePair = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    const dexQuery = params.get('dex');
+
+    if (!dexQuery) return false;
+
+    const pair = dexQuery.split('/').map((item) => item.toLowerCase());
+
+    const asset1Text = asset1ToShow.toLowerCase();
+    const asset2Text = asset2ToShow.toLowerCase();
+
+    return (
+      (pair[0] === asset1Text && pair[1] === asset2Text)
+      || (pair[0] === asset2Text && pair[1] === asset1Text)
+    );
+  }, [asset1ToShow, asset2ToShow, location.search]);
+
   return (
     <Card
       title={(
@@ -99,12 +118,6 @@ function ExchangeItem({ poolData, assetsPoolData }) {
       <Flex wrap gap="15px">
         <Flex wrap gap="15px" flex={0.8} justify="space-between">
           <Flex wrap gap="15px" align="center" flex={0.5}>
-            <TradeTokensModalWrapper
-              assets={assets}
-              asset1ToShow={asset1ToShow}
-              asset2ToShow={asset2ToShow}
-              isBuy
-            />
             <div>
               <div className="description">
                 {'1 '}
@@ -118,11 +131,6 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             </div>
           </Flex>
           <Flex wrap gap="15px" align="center" flex={0.5}>
-            <TradeTokensModalWrapper
-              assets={assets}
-              asset1ToShow={asset1ToShow}
-              asset2ToShow={asset2ToShow}
-            />
             <div>
               <div className="description">
                 {'1 '}
@@ -138,6 +146,12 @@ function ExchangeItem({ poolData, assetsPoolData }) {
         </Flex>
         <div className={styles.liquidityWrapper}>
           <Flex gap="15px" wrap>
+            <TradeTokensModalWrapper
+              assets={assets}
+              asset1ToShow={asset1ToShow}
+              asset2ToShow={asset2ToShow}
+              isOpenOnRender={areDexQuerySamePair}
+            />
             <AddLiquidityModal
               assets={assets}
               isReservedDataEmpty={isReservedDataEmpty}

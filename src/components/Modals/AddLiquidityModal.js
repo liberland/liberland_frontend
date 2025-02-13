@@ -177,13 +177,12 @@ function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
         name="amount1Desired"
         label={`Amount ${asset1ToShow} desired`}
         extra={
-          assetsBalance
-          && assetsBalance.length > 0 && (
+          assetsBalance?.[asset1] && (
             <span>
               Balance
               {' '}
-              {assetsBalance[0]
-                ? formatAssets(assetsBalance[0], decimals1, {
+              {assetsBalance?.[asset1]
+                ? formatAssets(assetsBalance[asset1], decimals1, {
                   symbol: asset1ToShow,
                   withAll: true,
                 })
@@ -198,7 +197,7 @@ function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
               if (v) {
                 const validated = validate(
                   v,
-                  assetsBalance[0],
+                  assetsBalance[asset1],
                   decimals1,
                   asset1,
                 );
@@ -222,13 +221,12 @@ function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
         name="amount2Desired"
         label={`Amount ${asset2ToShow} desired`}
         extra={
-          assetsBalance
-          && assetsBalance.length > 0 && (
+          assetsBalance?.[asset2] && (
             <span>
               Balance
               {' '}
-              {assetsBalance[1]
-                ? formatAssets(assetsBalance[1], decimals2, {
+              {assetsBalance[asset2]
+                ? formatAssets(assetsBalance[asset2], decimals2, {
                   symbol: asset2ToShow,
                   withAll: true,
                 })
@@ -243,7 +241,7 @@ function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
               if (v) {
                 const validated = validate(
                   v,
-                  assetsBalance[1],
+                  assetsBalance[asset2],
                   decimals2,
                   asset2,
                 );
