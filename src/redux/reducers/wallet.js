@@ -37,7 +37,7 @@ const initialState = {
   validators: [],
   nominatorTargets: [],
   assetBalance: null,
-  assetsBalance: [],
+  assetsBalance: {},
   transferState: null,
 };
 
