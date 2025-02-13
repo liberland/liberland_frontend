@@ -1,4 +1,5 @@
 import { put, call, select } from 'redux-saga/effects';
+import maxBy from 'lodash/maxBy';
 
 import {
   createCollectionNfts,
@@ -78,7 +79,17 @@ function* setMetadataWorker(action) {
   const walletAddress = yield select(
     blockchainSelectors.userWalletAddressSelector,
   );
-  yield call(setMetadataNFT, collectionId, itemId, metadataCID, walletAddress);
+  if (itemId) {
+    yield call(setMetadataNFT, collectionId, itemId, metadataCID, walletAddress);
+  } else {
+    const nfts = yield call(
+      getAllNfts,
+      walletAddress,
+    );
+    const last = maxBy(nfts, ({ nftId }) => Number(nftId));
+    const nextId = last ? Number(last.nftId) + 1 : 1;
+    yield call(setMetadataNFT, collectionId, nextId, metadataCID, walletAddress);
+  }
   yield put(nftsActions.setMetadataNft.success());
   yield put(nftsActions.getNfts.call(walletAddress));
 }

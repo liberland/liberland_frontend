@@ -41,7 +41,7 @@ export default function WalletCongresSenateWrapper({
           key: 'actions',
           children: (
             <Flex wrap gap="15px">
-              {(officeType === OfficeType.CONGRESS || officeType === OfficeType.SENATE) && userIsMember && (
+              {officeType === OfficeType.CONGRESS && userIsMember && (
                 <ProposeBudgetModalWrapper />
               )}
               <SpendModalWrapper

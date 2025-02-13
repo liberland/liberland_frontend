@@ -8,7 +8,6 @@ import Input from 'antd/es/input';
 import Upload from 'antd/es/upload';
 import Spin from 'antd/es/spin';
 import Select from 'antd/es/select';
-import InputNumber from 'antd/es/input-number';
 import InboxOutlined from '@ant-design/icons/InboxOutlined';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../Button/Button';
@@ -113,12 +112,11 @@ function CreatEditNFTForm({
     name,
     description,
     collectionId,
-    itemId,
     imageFile,
   }) => {
     const metadataCID = await uploadMetadataToIPFS(imageFile[0], name, description);
     dispatch(nftsActions.setMetadataNft.call({
-      metadataCID, walletAddress, collectionId, itemId,
+      metadataCID, walletAddress, collectionId,
     }));
     onClose();
   };
@@ -147,9 +145,6 @@ function CreatEditNFTForm({
       </Form.Item>
       <Form.Item name="description" label="Description" rules={[{ required: true }]}>
         <Input placeholder="Enter description" />
-      </Form.Item>
-      <Form.Item name="itemId" label="Item ID" rules={[{ required: true }]}>
-        <InputNumber stringMode controls={false} />
       </Form.Item>
       <Form.Item name="collectionId" label="Collection ID" rules={[{ required: true }]}>
         <Select
