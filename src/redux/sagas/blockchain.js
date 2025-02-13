@@ -80,8 +80,10 @@ export function* subscribeWalletsSaga() {
       yield put(blockchainActions.setExtensions.value([]));
       yield put(blockchainActions.setWallets.value([]));
     }
-    const { extensions, wallets } = data;
-    yield put(blockchainActions.setExtensions.value(extensions));
-    yield put(blockchainActions.setWallets.value(wallets));
+    if (data) {
+      const { extensions, wallets } = data;
+      yield put(blockchainActions.setExtensions.value(extensions));
+      yield put(blockchainActions.setWallets.value(wallets));
+    }
   }
 }
