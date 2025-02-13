@@ -21,18 +21,33 @@ import GuidedSetup from './components/GuidedSetup';
 import { CheckExtensionWalletProvider } from './components/CheckExtenstionWalletProvider';
 import { loader } from './utils/loader';
 import { ModalProvider } from './context/modalContext';
+import useLogin from './hooks/useLogin';
 
 function App() {
   const dispatch = useDispatch();
+  const login = useLogin(true);
+
   useEffect(() => {
     dispatch(authActions.verifySession.call());
   }, [dispatch]);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.get('mobileLogin');
+    if (urlParams.get('mobileLogin') === 'true') {
+      urlParams.delete('mobileLogin');
+      const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
+      window.history.replaceState({}, '', newUrl);
+      login();
+    }
+  }, [login]);
 
   const user = useSelector(userSelectors.selectUser);
 
   const appRouter = (
     <Switch>
       <Route path={routes.signUp} component={loader(() => import('./components/AuthComponents/SignUp'))} />
+      <Route path={routes.callback} component={loader(() => import('./components/AuthComponents/Callback'))} />
       <Route path={routes.home.index} component={loader(() => import('./components/Home'))} />
       <Route
         key={routes.signIn}

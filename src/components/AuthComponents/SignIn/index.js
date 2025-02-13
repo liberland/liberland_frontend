@@ -1,8 +1,8 @@
-import { useContext, useEffect } from 'react';
-import { AuthContext } from 'react-oauth2-code-pkce';
+import { useEffect } from 'react';
+import useLogin from '../../../hooks/useLogin';
 
 function SignIn() {
-  const { login } = useContext(AuthContext);
+  const login = useLogin();
   useEffect(() => {
     login?.();
   }, [login]);

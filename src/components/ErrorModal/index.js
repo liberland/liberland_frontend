@@ -1,18 +1,18 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { AuthContext } from 'react-oauth2-code-pkce';
 import { blockchainSelectors } from '../../redux/selectors';
 import Button from '../Button/Button';
 import { blockchainActions } from '../../redux/actions';
 import styles from './styles.module.scss';
+import useLogin from '../../hooks/useLogin';
 
 function ErrorModal({ children }) {
   const errorExistsAndUnacknowledged = useSelector(blockchainSelectors.errorExistsAndUnacknowledgedByUser);
   const blockchainError = useSelector(blockchainSelectors.blockchainError);
   const dispatch = useDispatch();
-  const { login } = useContext(AuthContext);
+  const login = useLogin();
   return (
     <div className={styles.content} style={{ position: 'relative' }}>
       { errorExistsAndUnacknowledged

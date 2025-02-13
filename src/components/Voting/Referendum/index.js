@@ -1,5 +1,4 @@
 import React, {
-  useContext,
   useEffect,
   useRef,
 } from 'react';
@@ -9,7 +8,6 @@ import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
 import { NavLink } from 'react-router-dom';
-import { AuthContext } from 'react-oauth2-code-pkce';
 import {
   blockchainSelectors,
   democracySelectors,
@@ -24,13 +22,14 @@ import { democracyActions, congressActions, identityActions } from '../../../red
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 import Button from '../../Button/Button';
 import router from '../../../router';
+import useLogin from '../../../hooks/useLogin';
 
 function Referendum() {
   const dispatch = useDispatch();
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const userIsMember = useSelector(congressSelectors.userIsMember);
-  const { login } = useContext(AuthContext);
+  const login = useLogin();
   const user = useSelector(userSelectors.selectUser);
 
   useEffect(() => {

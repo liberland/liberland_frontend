@@ -11,9 +11,11 @@ import { userSelectors } from '../../redux/selectors';
 import { authActions } from '../../redux/actions';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
+import useLogin from '../../hooks/useLogin';
 
 function UserMenu() {
-  const { logOut, login } = useContext(AuthContext);
+  const { logOut } = useContext(AuthContext);
+  const login = useLogin();
   const history = useHistory();
   const user = useSelector(userSelectors.selectUser);
   const dispatch = useDispatch();
