@@ -1,91 +1,107 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import Divider from 'antd/es/divider';
-import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
-import Button from '../../../../Button/Button';
-import truncate from '../../../../../utils/truncate';
-import { congressActions } from '../../../../../redux/actions';
-import Details from '../Details';
-import { centralizedDatasType } from '../types';
-import Discussions from '../Discussions';
-import VoteButtonsContainer from '../VoteButtonsContainer';
-import router from '../../../../../router';
+import Card from 'antd/es/card';
+import Avatar from 'antd/es/avatar';
+import Progress from 'antd/es/progress';
+import { useMediaQuery } from 'usehooks-ts';
+import { useHistory } from 'react-router-dom';
+import classNames from 'classnames';
+import Paragraph from 'antd/es/typography/Paragraph';
+import { hexToString } from '@polkadot/util';
+import Markdown from 'markdown-to-jsx';
+import Alert from 'antd/es/alert';
+import LLM from '../../../../../assets/icons/llm.svg';
 import CopyIconWithAddress from '../../../../CopyIconWithAddress';
-import CounterItem from '../CounterItem';
+import { useTitleFromMarkdown } from '../hooks';
+import styles from '../../../styles.module.scss';
+import router from '../../../../../router';
+import truncate from '../../../../../utils/truncate';
+import Button from '../../../../Button/Button';
+import { votePercentage } from '../util';
+import { formatMerits } from '../../../../../utils/walletHelpers';
 
 function ReferendumItem({
-  centralizedDatas,
   voted,
   hash,
-  alreadyVoted,
-  buttonVoteCallback,
-  referendumIndex,
-  delegating,
   proposal,
-  blacklistMotion,
-  userIsMember,
 }) {
+  const { yayVotes, nayVotes } = voted;
   const history = useHistory();
-  const dispatch = useDispatch();
-  const { yayVotes, nayVotes, votedTotal } = voted;
-
-  const blacklist = () => dispatch(
-    congressActions.congressDemocracyBlacklist.call({
-      hash,
-      referendumIndex,
-    }),
-  );
+  const { title, setTitleFromRef } = useTitleFromMarkdown(true, 'Referendum');
+  const linkTo = router.voting.referendumItem.replace(':referendumHash', hash);
+  const isBigScreen = useMediaQuery('(min-width: 1200px)');
+  const { args } = proposal.toJSON() || {};
+  const { sections } = args || {};
+  const [firstSection] = sections || [];
 
   return (
-    <Collapse
-      defaultActiveKey={['proposal']}
-      collapsible="icon"
-      items={[{
-        key: 'proposal',
-        label: (
-          <Flex wrap gap="15px">
-            Proposal
-            <CopyIconWithAddress address={hash} />
+    <Card
+      size="small"
+      className={styles.proposal}
+    >
+      <Flex vertical={!isBigScreen} wrap gap="20px" align={isBigScreen ? 'center' : undefined}>
+        <Card.Meta
+          className={styles.cardTitle}
+          title={(
+            <Flex vertical gap="5px">
+              {hash && (
+                <div className="description">
+                  <CopyIconWithAddress address={hash} />
+                </div>
+              )}
+              <strong>
+                {truncate(title, 30)}
+              </strong>
+            </Flex>
+          )}
+        />
+        <Flex flex={1}>
+          <Paragraph ellipsis={{ rows: 2 }} className={classNames('description', styles.intro)}>
+            <Alert.ErrorBoundary>
+              <span ref={setTitleFromRef}>
+                <Markdown>
+                  {hexToString(firstSection) || ''}
+                </Markdown>
+              </span>
+            </Alert.ErrorBoundary>
+          </Paragraph>
+        </Flex>
+        <Flex vertical gap="5px">
+          <Progress
+            percent={100}
+            success={{
+              percent: votePercentage({ nayVotes, yayVotes }),
+              strokeColor: '#7DC035',
+            }}
+            strokeColor="#FF0000"
+          />
+          <Flex gap="5px" wrap>
+            <Flex wrap gap="5px">
+              <strong className={styles.for}>For:</strong>
+              <Flex wrap gap="5px" align="center">
+                <strong>
+                  {formatMerits(yayVotes)}
+                </strong>
+                <Avatar src={LLM} size={24} />
+              </Flex>
+            </Flex>
+            <Flex wrap gap="5px">
+              <strong className={styles.against}>Against:</strong>
+              <Flex wrap gap="5px" align="center">
+                <strong>
+                  {formatMerits(nayVotes)}
+                </strong>
+                <Avatar src={LLM} size={24} />
+              </Flex>
+            </Flex>
           </Flex>
-        ),
-        extra: (
-          <Flex wrap gap="15px">
-            <VoteButtonsContainer
-              alreadyVoted={alreadyVoted}
-              buttonVoteCallback={buttonVoteCallback}
-              delegating={delegating}
-              referendumData={{ id: hash, referendumIndex }}
-            />
-            {blacklistMotion && (
-              <Button link onClick={() => history.push(`${router.congress.motions}#${blacklistMotion}`)}>
-                Blacklist motion:
-                {' '}
-                {truncate(blacklistMotion, 13)}
-              </Button>
-            )}
-            {!blacklistMotion && userIsMember && (
-              <Button onClick={blacklist}>
-                Cancel as congress
-              </Button>
-            )}
-            <CounterItem votedTotal={votedTotal} votes={yayVotes} />
-            <CounterItem votedTotal={votedTotal} votes={nayVotes} isNay />
-          </Flex>
-        ),
-        children: (
-          <>
-            <Details proposal={proposal} />
-            <Divider />
-            {centralizedDatas?.length > 0 && (
-              <Discussions centralizedDatas={centralizedDatas} />
-            )}
-          </>
-        ),
-      }]}
-    />
+        </Flex>
+        <Button href={linkTo} onClick={() => history.push(linkTo)}>
+          Show more
+        </Button>
+      </Flex>
+    </Card>
   );
 }
 
@@ -96,16 +112,10 @@ const votesTypes = {
 };
 
 ReferendumItem.propTypes = {
-  centralizedDatas: PropTypes.arrayOf(centralizedDatasType).isRequired,
   voted: votesTypes.isRequired,
   hash: PropTypes.string.isRequired,
-  alreadyVoted: PropTypes.bool.isRequired,
-  buttonVoteCallback: PropTypes.func.isRequired,
-  referendumIndex: PropTypes.number.isRequired,
-  delegating: PropTypes.bool.isRequired,
-  blacklistMotion: PropTypes.string.isRequired,
-  proposal: PropTypes.instanceOf(Map).isRequired,
-  userIsMember: PropTypes.bool.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  proposal: PropTypes.object.isRequired,
 };
 
 export default ReferendumItem;

@@ -1,35 +1,32 @@
 import React, {
   useContext,
   useEffect,
-  useRef,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Alert from 'antd/es/alert';
 import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
-import { NavLink } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { AuthContext } from 'react-oauth2-code-pkce';
 import {
   blockchainSelectors,
   democracySelectors,
-  congressSelectors,
   userSelectors,
 } from '../../../redux/selectors';
 import ProposalItem from './Items/ProposalItem';
-import ReferendumItem from './Items/ReferendumItem';
 import DispatchItem from './Items/DispatchItem';
 import { UndelegateModal } from '../../Modals';
-import { democracyActions, congressActions, identityActions } from '../../../redux/actions';
-import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
+import { democracyActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import router from '../../../router';
+import ReferendumItem from './Items/ReferendumItem';
 
 function Referendum() {
+  const history = useHistory();
   const dispatch = useDispatch();
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const userIsMember = useSelector(congressSelectors.userIsMember);
   const { login } = useContext(AuthContext);
   const user = useSelector(userSelectors.selectUser);
 
@@ -37,29 +34,10 @@ function Referendum() {
     dispatch(democracyActions.getDemocracy.call(userWalletAddress));
   }, [dispatch, userWalletAddress]);
 
-  useEffect(() => {
-    dispatch(congressActions.getMembers.call());
-  }, [dispatch]);
-
-  const handleSubmitVoteForm = (voteType, referendumInfo) => {
-    dispatch(democracyActions.voteOnReferendum.call({ ...referendumInfo, voteType }));
-  };
   const handleSubmitUndelegate = () => {
     dispatch(democracyActions.undelegate.call({ userWalletAddress }));
   };
   const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
-  const alreadyVoted = (referendum) => {
-    if (referendum.allAye.map((v) => v.accountId.toString()).includes(userWalletAddress)) return 'Aye';
-    if (referendum.allNay.map((v) => v.accountId.toString()).includes(userWalletAddress)) return 'Nay';
-    return false;
-  };
-  const dispatchRef = useRef(null);
-  const proposalRef = useRef(null);
-  const { motionIds } = useMotionContext();
-
-  useEffect(() => {
-    dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds))));
-  }, [motionIds, dispatch, proposalRef, dispatchRef]);
 
   return (
     <Collapse
@@ -72,24 +50,22 @@ function Referendum() {
           extra: (
             <Flex wrap gap="15px">
               {delegatingTo && (
-                <>
-                  <UndelegateModal
-                    delegatee={delegatingTo}
-                    onSubmitUndelegate={handleSubmitUndelegate}
-                  />
-                  <div>
+                <Flex vertical gap="20px">
+                  <div className="description">
                     Delegating to:
                     {' '}
                     {delegatingTo}
                   </div>
-                </>
+                  <UndelegateModal
+                    delegatee={delegatingTo}
+                    onSubmitUndelegate={handleSubmitUndelegate}
+                  />
+                </Flex>
               )}
               {user ? (
-                <NavLink
-                  to={router.voting.addLegislation}
-                >
+                <Button primary onClick={() => history.push(router.voting.addLegislation)}>
                   Propose
-                </NavLink>
+                </Button>
               ) : (
                 <Button
                   onClick={() => login()}
@@ -104,22 +80,17 @@ function Referendum() {
             <List
               dataSource={democracy.democracy.crossReferencedReferendumsData}
               renderItem={(referendum) => (
-                <ReferendumItem
-                  centralizedDatas={referendum.centralizedDatas}
-                  voted={{
-                    yayVotes: referendum.votedAye,
-                    nayVotes: referendum.votedNay,
-                    votedTotal: referendum.votedTotal,
-                  }}
-                  hash={referendum.imageHash}
-                  delegating={delegatingTo !== undefined}
-                  alreadyVoted={alreadyVoted(referendum)}
-                  proposal={referendum.image.proposal}
-                  buttonVoteCallback={handleSubmitVoteForm}
-                  referendumIndex={parseInt(referendum.index)}
-                  blacklistMotion={referendum.blacklistMotion}
-                  userIsMember={userIsMember}
-                />
+                <List.Item>
+                  <ReferendumItem
+                    voted={{
+                      yayVotes: referendum.votedAye,
+                      nayVotes: referendum.votedNay,
+                      votedTotal: referendum.votedTotal,
+                    }}
+                    hash={referendum.imageHash}
+                    proposal={referendum.image.proposal}
+                  />
+                </List.Item>
               )}
             />
           ) : <Alert type="info" message="There are no active Referendums" />,
@@ -131,12 +102,12 @@ function Referendum() {
             <List
               dataSource={democracy.democracy.crossReferencedProposalsData}
               renderItem={(proposal) => (
-                <ProposalItem
-                  centralizedDatas={proposal.centralizedDatas}
-                  boundedCall={proposal.boundedCall}
-                  blacklistMotion={proposal.blacklistMotion}
-                  userIsMember={userIsMember}
-                />
+                <List.Item>
+                  <ProposalItem
+                    boundedCall={proposal.boundedCall}
+                    id={proposal.index}
+                  />
+                </List.Item>
               )}
             />
           ) : <Alert type="info" message="There are no active Proposals" />,
@@ -148,9 +119,11 @@ function Referendum() {
             <List
               dataSource={democracy.democracy.scheduledCalls}
               renderItem={(item) => (
-                <DispatchItem
-                  item={item}
-                />
+                <List.Item>
+                  <DispatchItem
+                    item={item}
+                  />
+                </List.Item>
               )}
             />
           ) : <Alert type="info" message="There are no active Dispatches" />,

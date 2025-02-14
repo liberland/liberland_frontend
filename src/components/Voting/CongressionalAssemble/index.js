@@ -4,7 +4,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import Collapse from 'antd/es/collapse';
 import List from 'antd/es/list';
 import Modal from 'antd/es/modal';
-import Alert from 'antd/es/alert';
+import Divider from 'antd/es/divider';
+import Flex from 'antd/es/flex';
+import Card from 'antd/es/card';
+import Space from 'antd/es/space';
+import Title from 'antd/es/typography/Title';
+import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
 import { useHistory } from 'react-router-dom';
 import { blockchainSelectors, democracySelectors } from '../../../redux/selectors';
 import CurrentAssemble from './CurrentAssemble';
@@ -13,6 +18,7 @@ import CongressionalCountdown from './CongressionalCountdown';
 import CandidateCard from './CandidateCard';
 import Button from '../../Button/Button';
 import SelectedCandidateCard from './SelectedCandidateCard';
+import styles from '../styles.module.scss';
 
 function CongressionalAssemble() {
   const history = useHistory();
@@ -34,43 +40,28 @@ function CongressionalAssemble() {
   }, [dispatch, userWalletAddress]);
 
   const selectCandidate = (politician) => {
-    const newSelectedCandidates = selectedCandidates;
-    newSelectedCandidates.push(politician);
-    setSelectedCandidates(newSelectedCandidates);
-    let newEligibleUnselectedCandidates = eligibleUnselectedCandidates;
-    newEligibleUnselectedCandidates = newEligibleUnselectedCandidates.filter((candidate) => {
-      if (candidate.rawIdentity === politician.rawIdentity) { return false; }
-      return true;
-    });
-    setEligibleUnselectedCandidates(newEligibleUnselectedCandidates);
+    setSelectedCandidates([...selectedCandidates, politician]);
+    setEligibleUnselectedCandidates(eligibleUnselectedCandidates.filter((candidate) => (
+      candidate.rawIdentity !== politician.rawIdentity
+    )));
     setDidChangeSelectedCandidates(true);
   };
 
   const unselectCandidate = (politician) => {
-    const newEligibleUnselectedCandidates = eligibleUnselectedCandidates;
-    newEligibleUnselectedCandidates.push(politician);
-    setEligibleUnselectedCandidates(newEligibleUnselectedCandidates);
-    let newSelectedCandidates = selectedCandidates;
-    newSelectedCandidates = newSelectedCandidates.filter((candidate) => {
-      if (candidate.rawIdentity === politician.rawIdentity) { return false; }
-      return true;
-    });
-    setSelectedCandidates(newSelectedCandidates);
+    setEligibleUnselectedCandidates([...eligibleUnselectedCandidates, politician]);
+    setSelectedCandidates(selectedCandidates.filter((candidate) => (
+      candidate.rawIdentity !== politician.rawIdentity
+    )));
     setDidChangeSelectedCandidates(true);
   };
 
-  const findPoliticianIndex = (ar, el) => {
-    // FIXME refactor to use ar.findIndex
-    let indexOfPolitician = false;
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < ar.length; i++) {
-      if (ar[i].rawIdentity === el.rawIdentity) { indexOfPolitician = i; }
-    }
-    return indexOfPolitician;
+  const findPoliticianIndex = (politicians, politician) => {
+    const index = politicians.findIndex(({ rawIdentity }) => rawIdentity === politician.rawIdentity);
+    return index === -1 ? false : index;
   };
 
   const moveSelectedCandidate = (politician, direction) => {
-    const newSelectedCandidates = selectedCandidates.slice();
+    const newSelectedCandidates = [...selectedCandidates];
     const selectedPoliticianArrayIndex = findPoliticianIndex(selectedCandidates, politician);
     const swapPlaceWithIndex = direction === 'up' ? selectedPoliticianArrayIndex - 1 : selectedPoliticianArrayIndex + 1;
     if (swapPlaceWithIndex < 0 || swapPlaceWithIndex > (newSelectedCandidates.length - 1)) {
@@ -160,7 +151,7 @@ function CongressionalAssemble() {
   const termDuration = democracy?.democracy?.electionsInfo?.termDuration;
 
   return (
-    <>
+    <Flex vertical gap="20px" className={styles.assembly}>
       <Modal
         open={isModalOpen}
         title="Are you certain you want to leave the page?"
@@ -172,57 +163,15 @@ function CongressionalAssemble() {
         Your voting preferences haven&#96;t been saved, would you like to save them?
       </Modal>
       <Collapse
-        defaultActiveKey={['current', 'voting', 'preference', 'term']}
+        defaultActiveKey={['current', 'preference', 'term']}
         collapsible="icon"
         items={[
-          democracy?.democracy?.currentCongressMembers && {
+          {
             key: 'current',
             label: 'Acting Congressional Assembly',
             children: (
-              <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers} />
+              <CurrentAssemble currentCongressMembers={democracy?.democracy?.currentCongressMembers || []} />
             ),
-          },
-          eligibleUnselectedCandidates?.length && {
-            key: 'voting',
-            label: 'Eligible Candidates (including current congressmen)',
-            children: (
-              <List
-                grid={{ gutter: 16 }}
-                dataSource={eligibleUnselectedCandidates}
-                renderItem={(unSelectedCandidate) => (
-                  <CandidateCard
-                    politician={unSelectedCandidate}
-                    selectCandidate={selectCandidate}
-                  />
-                )}
-              />
-            ),
-          },
-          {
-            key: 'preference',
-            label: 'My preference ordered Votes',
-            extra: (
-              <Button
-                primary
-                disabled={!didChangeSelectedCandidates}
-                onClick={() => handleUpdate()}
-              >
-                Update vote
-              </Button>
-            ),
-            children: selectedCandidates?.length ? (
-              <List
-                dataSource={selectedCandidates}
-                grid={{ gutter: 16 }}
-                renderItem={(currentCandidateVoteByUser) => (
-                  <SelectedCandidateCard
-                    politician={currentCandidateVoteByUser}
-                    unselectCandidate={unselectCandidate}
-                    moveSelectedCandidate={moveSelectedCandidate}
-                  />
-                )}
-              />
-            ) : <Alert type="info" message="No selected candidates" />,
           },
           termDuration && {
             label: 'Term duration',
@@ -231,9 +180,96 @@ function CongressionalAssemble() {
               <CongressionalCountdown termDuration={termDuration.toNumber()} />
             ),
           },
+          {
+            key: 'preference',
+            label: 'Candidates',
+            extra: (
+              <Flex wrap gap="15px" justify="end">
+                <Button
+                  primary
+                  disabled={!didChangeSelectedCandidates}
+                  onClick={() => handleUpdate()}
+                >
+                  Update vote
+                </Button>
+                <Button
+                  red
+                  onClick={() => {
+                    setSelectedCandidates([]);
+                    setEligibleUnselectedCandidates([
+                      ...selectedCandidates,
+                      ...eligibleUnselectedCandidates,
+                    ]);
+                  }}
+                >
+                  Clear my votes
+                </Button>
+              </Flex>
+            ),
+            children: (
+              <Flex vertical gap="5px">
+                <Divider>
+                  Selected candidates
+                </Divider>
+                <List
+                  dataSource={selectedCandidates}
+                  locale={{ emptyText: 'No selected candidates' }}
+                  renderItem={(currentCandidateVoteByUser, index) => (
+                    <List.Item>
+                      <SelectedCandidateCard
+                        politician={currentCandidateVoteByUser}
+                        unselectCandidate={unselectCandidate}
+                        moveSelectedCandidate={moveSelectedCandidate}
+                        candidateIndex={index}
+                        candidatesLength={selectedCandidates.length}
+                      />
+                    </List.Item>
+                  )}
+                />
+                <Divider>
+                  Eligible candidates
+                </Divider>
+                <List
+                  dataSource={eligibleUnselectedCandidates}
+                  locale={{ emptyText: 'No eligible candidates' }}
+                  renderItem={(unSelectedCandidate) => (
+                    <List.Item>
+                      <CandidateCard
+                        politician={unSelectedCandidate}
+                        selectCandidate={selectCandidate}
+                      />
+                    </List.Item>
+                  )}
+                />
+              </Flex>
+            ),
+          },
         ].filter(Boolean)}
       />
-    </>
+      <Card
+        title={(
+          <Title level={4}>
+            Unhappy with the way Liberland is run?
+          </Title>
+        )}
+        className={styles.splash}
+        actions={[
+          <Button
+            onClick={() => {
+              window.location.href = 'https://docs.liberland.org/primers/congress';
+            }}
+          >
+            Learn how
+            <Space />
+            <GlobalOutlined />
+          </Button>,
+        ]}
+      >
+        <Card.Meta
+          description="Help lead the way by registering your candidacy for a seat in Liberland Congress."
+        />
+      </Card>
+    </Flex>
   );
 }
 
