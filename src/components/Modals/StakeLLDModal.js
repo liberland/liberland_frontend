@@ -10,7 +10,7 @@ import { BN, BN_ZERO } from '@polkadot/util';
 import Button from '../Button/Button';
 import { validatorActions } from '../../redux/actions';
 import { walletSelectors } from '../../redux/selectors';
-import { parseDollars, formatDollars } from '../../utils/walletHelpers';
+import { parseDollars, formatDollars, valueToBN } from '../../utils/walletHelpers';
 import modalWrapper from './components/ModalWrapper';
 import OpenModalButton from './components/OpenModalButton';
 
@@ -22,7 +22,7 @@ function StakeLLDForm({
 
   const maxBond = BN.max(
     BN_ZERO,
-    (new BN(balances?.liquidAmount?.amount ?? 0))
+    valueToBN(balances?.liquidAmount?.amount ?? 0)
       .sub(parseDollars('2')), // leave at least 2 liquid LLD...
   );
 

@@ -6,6 +6,7 @@ function Table({
   columns,
   data,
   noPagination,
+  pageSize,
   showHeader,
   footer,
   title,
@@ -22,7 +23,7 @@ function Table({
       footer={() => footer}
       onRow={() => ({ tabIndex: '0' })}
       showHeader={showHeader}
-      pagination={noPagination ? false : undefined}
+      pagination={noPagination ? false : { pageSize: pageSize || 10 }}
       columns={columns.filter(Boolean).map(({ Header, accessor }) => ({
         dataIndex: accessor,
         key: accessor,
@@ -41,6 +42,7 @@ Table.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({})),
   data: PropTypes.arrayOf(PropTypes.shape({})),
   noPagination: PropTypes.bool,
+  pageSize: PropTypes.number,
   showHeader: PropTypes.bool,
   footer: PropTypes.node,
   title: PropTypes.node,

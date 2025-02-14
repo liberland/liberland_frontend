@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -7,10 +7,11 @@ import Flex from 'antd/es/flex';
 import Input from 'antd/es/input';
 import Upload from 'antd/es/upload';
 import Spin from 'antd/es/spin';
+import Select from 'antd/es/select';
 import InboxOutlined from '@ant-design/icons/InboxOutlined';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../Button/Button';
-import { blockchainSelectors } from '../../../redux/selectors';
+import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import styles from './styles.module.scss';
 import { nftsActions } from '../../../redux/actions';
 import OpenModalButton from '../components/OpenModalButton';
@@ -21,10 +22,15 @@ function CreatEditNFTForm({
 }) {
   const dispatch = useDispatch();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const userCollections = useSelector(nftsSelectors.userCollections);
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    dispatch(nftsActions.getUserCollections.call(walletAddress));
+  }, [dispatch, walletAddress]);
 
   const uploadImageToIPFS = async (file) => {
     setUploading(true);
@@ -51,6 +57,11 @@ function CreatEditNFTForm({
     return data.IpfsHash;
   };
 
+  const uploadImageWithLink = async (file) => {
+    const ipfsHash = await uploadImageToIPFS(file);
+    return `https://${process.env.REACT_APP_PINATA_GATEWAY}/ipfs/${ipfsHash}`;
+  };
+
   const uploadJsonToIPFS = async (json) => {
     setUploading(true);
     const response = await fetch('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
@@ -74,7 +85,7 @@ function CreatEditNFTForm({
     return data.IpfsHash;
   };
 
-  const uploadMetadataToIPFS = async (imageFile) => {
+  const uploadMetadataToIPFS = async () => {
     try {
       const name = form.getFieldValue('name');
       const description = form.getFieldValue('description');
@@ -87,7 +98,7 @@ function CreatEditNFTForm({
         ]);
       }
       setUploading(true);
-      const imageCID = await uploadImageToIPFS(imageFile);
+      const imageCID = previewImage.split('/ipfs/')[1];
       const metadata = {
         name,
         description,
@@ -102,13 +113,12 @@ function CreatEditNFTForm({
     }
   };
 
-  const createNFT = async (values) => {
-    const {
-      name, description, imageFile,
-    } = values;
-    const metadataCID = await uploadMetadataToIPFS(imageFile[0], name, description);
+  const createNFT = async ({
+    collectionId,
+  }) => {
+    const metadataCID = await uploadMetadataToIPFS();
     dispatch(nftsActions.setMetadataNft.call({
-      metadataCID, walletAddress,
+      metadataCID, walletAddress, collectionId,
     }));
     onClose();
   };
@@ -119,6 +129,10 @@ function CreatEditNFTForm({
     }
     return eventOrFile?.fileList;
   };
+
+  if (!userCollections) {
+    return <Spin />;
+  }
 
   return (
     <Form form={form} layout="vertical" onFinish={createNFT}>
@@ -134,6 +148,16 @@ function CreatEditNFTForm({
       <Form.Item name="description" label="Description" rules={[{ required: true }]}>
         <Input placeholder="Enter description" />
       </Form.Item>
+      <Form.Item name="collectionId" label="Collection ID" rules={[{ required: true }]}>
+        <Select
+          disabled={!userCollections.length}
+          options={userCollections.map(({ collectionId }) => ({
+            label: collectionId,
+            value: collectionId,
+          }))}
+          placeholder={userCollections.length ? 'Select collection to add' : 'Create collection for NFT first'}
+        />
+      </Form.Item>
       <Form.Item
         name="imageFile"
         valuePropName="fileList"
@@ -142,16 +166,15 @@ function CreatEditNFTForm({
         getValueFromEvent={getFileFromEvent}
       >
         <Upload.Dragger
-          action={uploadImageToIPFS}
+          customRequest={async (options) => {
+            const ipfsUrl = await uploadImageWithLink(options.file);
+            setPreviewImage(ipfsUrl);
+            options.onSuccess(ipfsUrl);
+          }}
           disabled={uploading}
           maxCount={1}
           multiple={false}
           accept="image/*"
-          previewFile={(file) => {
-            if (file) {
-              setPreviewImage(URL.createObjectURL(file));
-            }
-          }}
         >
           <Paragraph className="ant-upload-drag-icon">
             {uploading ? <Spin /> : <InboxOutlined />}
@@ -159,14 +182,16 @@ function CreatEditNFTForm({
           <Paragraph className="ant-upload-text">
             Click or drag file to this area to upload
           </Paragraph>
+          {previewImage && (
+            <div className={styles.createImageWrapper}>
+              <img className={styles.image} src={previewImage} alt="Preview" />
+            </div>
+          )}
         </Upload.Dragger>
-        {previewImage && (
-          <div className={styles.createImageWrapper}>
-            <img className={styles.image} src={previewImage} alt="Preview" />
-          </div>
-        )}
       </Form.Item>
-
+      <Paragraph>
+        Will ask you to sign 2 transactions
+      </Paragraph>
       <Flex wrap gap="15px">
         <Button onClick={onClose}>
           Cancel

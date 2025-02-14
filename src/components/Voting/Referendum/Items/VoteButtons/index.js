@@ -11,13 +11,13 @@ function VoteButtons({ buttonVoteCallback, referendumInfo }) {
         green
         onClick={() => { buttonVoteCallback('Aye', referendumInfo); }}
       >
-        VOTE AYE
+        Vote aye
       </Button>
       <Button
         red
         onClick={() => { buttonVoteCallback('Nay', referendumInfo); }}
       >
-        VOTE NAY
+        Vote nay
       </Button>
     </Flex>
   );

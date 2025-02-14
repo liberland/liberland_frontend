@@ -26,7 +26,13 @@ function UserMenu() {
   if (!user) {
     return (
       <Flex wrap gap="15px" justify="center" align="center">
-        <Button primary onClick={login}>
+        <Button
+          primary
+          onClick={(event) => {
+            event.stopPropagation();
+            login();
+          }}
+        >
           Login
         </Button>
       </Flex>
@@ -39,7 +45,8 @@ function UserMenu() {
         items: [
           logoutAction,
         ],
-        onClick: ({ key }) => {
+        onClick: ({ key, domEvent }) => {
+          domEvent.stopPropagation();
           switch (key) {
             case logoutAction.key:
               logOut();

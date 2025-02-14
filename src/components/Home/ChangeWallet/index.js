@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
 import Dropdown from 'antd/es/dropdown/dropdown';
@@ -13,7 +14,9 @@ import Polkadot from '../../../assets/icons/polkadot.svg';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
 
-function ChangeWallet() {
+function ChangeWallet({
+  onSelect,
+}) {
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
   const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const walletAdressSelector = useSelector(
@@ -28,8 +31,10 @@ function ChangeWallet() {
       dispatch(walletActions.getWallet.call());
       dispatch(democracyActions.getDemocracy.call());
       localStorage.setItem('BlockchainAdress', address);
+      onSelect?.(address);
     }
-  }, [dispatch]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (wallets?.length === 1 && !walletAdressSelector) {
@@ -96,5 +101,9 @@ function ChangeWallet() {
     </Dropdown>
   );
 }
+
+ChangeWallet.propTypes = {
+  onSelect: PropTypes.func,
+};
 
 export default ChangeWallet;

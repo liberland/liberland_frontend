@@ -10,6 +10,8 @@ import AssetOverview from '../../Wallet/AssetOverview';
 import SpendModalWrapper from '../../Modals/SpendModal';
 import { valueToBN } from '../../../utils/walletHelpers';
 import BalanceOverview from '../../Wallet/BalanceOverview';
+import { OfficeType } from '../../../utils/officeTypeEnum';
+import ProposeBudgetModalWrapper from '../../Modals/ProposeBudgetModal';
 
 export default function WalletCongresSenateWrapper({
   totalBalance,
@@ -39,6 +41,9 @@ export default function WalletCongresSenateWrapper({
           key: 'actions',
           children: (
             <Flex wrap gap="15px">
+              {officeType === OfficeType.CONGRESS && userIsMember && (
+                <ProposeBudgetModalWrapper />
+              )}
               <SpendModalWrapper
                 officeType={officeType}
                 spendData={{
@@ -93,6 +98,7 @@ export default function WalletCongresSenateWrapper({
               balances={balances}
               liquidMerits={liquidMerits}
               showStaked={false}
+              isCongress
             />
           ),
         },

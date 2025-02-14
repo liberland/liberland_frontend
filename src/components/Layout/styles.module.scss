@@ -8,6 +8,16 @@
   height: 50px;
   border-top: solid 3px #F3CB28;
   border-bottom: 1px solid #ECEBF0;
+  position: sticky;
+  z-index: 999;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
+    position: initial;
+    cursor: initial;
+  }
 }
 .menu {
   flex: 1;

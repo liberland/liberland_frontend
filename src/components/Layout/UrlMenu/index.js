@@ -30,6 +30,9 @@ function UrlMenu({
     dispatch(blockchainActions.setUserWallet.success(walletAddress));
     dispatch(validatorActions.getInfo.call());
     localStorage.removeItem('BlockchainAdress');
+    if (isBiggerThanSmallScreen) {
+      onClose?.();
+    }
   };
 
   const { pathname } = useLocation();
@@ -102,12 +105,12 @@ function UrlMenu({
   const changeWallet = isBiggerThanSmallScreen ? [] : [
     {
       label: (
-        <ChangeWallet />
+        <ChangeWallet onSelect={() => onClose?.()} />
       ),
       key: 'wallets',
       className: styles.switchContainer,
-      onClick: (e) => e.preventDefault(),
-      onTitleClick: (e) => e.preventDefault(),
+      onClick: ({ domEvent }) => domEvent.preventDefault(),
+      onTitleClick: ({ domEvent }) => domEvent.preventDefault(),
     },
   ];
 

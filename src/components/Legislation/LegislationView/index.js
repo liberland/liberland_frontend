@@ -25,9 +25,6 @@ function LegislationView() {
     Object.entries(legislations).map(([index, {
       id,
       sections,
-      mainRepealMotion,
-      mainRepealReferendum,
-      mainRepealProposal,
     }]) => (
       <LegislationItem
         year={year}
@@ -35,11 +32,6 @@ function LegislationView() {
         tier={tier}
         id={id}
         sections={sections}
-        mainRepealProposalReferendum={{
-          mainRepealMotion,
-          mainRepealReferendum,
-          mainRepealProposal,
-        }}
         key={`${year}-${index}`}
       />
     )))), [legislation, tier]);

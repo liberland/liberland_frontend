@@ -31,16 +31,18 @@ function Overview() {
           Senate members
         </Title>
       )}
-      footer={!userIsMember && userHasWalletSenateMember ? (
+      footer={(
         <Flex wrap gap="15px" justify="end">
-          <Button
-            primary
-            onClick={() => switchWallet(userHasWalletSenateMember)}
-          >
-            Switch wallet to Senate Member
-          </Button>
+          {!userIsMember && userHasWalletSenateMember && (
+            <Button
+              primary
+              onClick={() => switchWallet(userHasWalletSenateMember)}
+            >
+              Switch wallet to Senate Member
+            </Button>
+          )}
         </Flex>
-      ) : undefined}
+      )}
       data={members?.map(
         ({ member, identity }) => ({
           address: <CopyIconWithAddress address={member} />,
