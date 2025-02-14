@@ -60,7 +60,7 @@ function PayMe() {
     }
   }, [dispatch, linkData]);
 
-  const { info } = identity?.unwrap() || {};
+  const { info } = (identity && identity.isSome) ? identity.unwrap() : {};
   const displayName = info?.display?.toHuman()?.Raw || linkData?.recipient || 'No name';
 
   const payRecipient = () => {
@@ -96,9 +96,9 @@ function PayMe() {
           },
           {
             name: 'Amount',
-            value: `${formatDollars(linkData.amount)} LLD`,
+            value: `${linkData?.amount ? formatDollars(linkData.amount) : 0} LLD`,
           },
-        ].concat(linkData.note ? [{
+        ].concat(linkData?.note ? [{
           name: 'Note',
           value: linkData.note,
         }] : [])}
