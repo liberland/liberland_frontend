@@ -162,29 +162,6 @@ function CongressionalAssemble() {
       >
         Your voting preferences haven&#96;t been saved, would you like to save them?
       </Modal>
-      <Card
-        title={(
-          <Title level={4}>
-            Unhappy with the way Liberland is run?
-          </Title>
-        )}
-        className={styles.splash}
-        actions={[
-          <Button
-            onClick={() => {
-              window.location.href = 'https://docs.liberland.org/primers/congress';
-            }}
-          >
-            Learn how
-            <Space />
-            <GlobalOutlined />
-          </Button>,
-        ]}
-      >
-        <Card.Meta
-          description="Help lead the way by registering your candidacy for a seat in Liberland Congress."
-        />
-      </Card>
       <Collapse
         defaultActiveKey={['current', 'preference', 'term']}
         collapsible="icon"
@@ -269,6 +246,29 @@ function CongressionalAssemble() {
           },
         ].filter(Boolean)}
       />
+      <Card
+        title={(
+          <Title level={4}>
+            Unhappy with the way Liberland is run?
+          </Title>
+        )}
+        className={styles.splash}
+        actions={[
+          <Button
+            onClick={() => {
+              window.location.href = 'https://docs.liberland.org/primers/congress';
+            }}
+          >
+            Learn how
+            <Space />
+            <GlobalOutlined />
+          </Button>,
+        ]}
+      >
+        <Card.Meta
+          description="Help lead the way by registering your candidacy for a seat in Liberland Congress."
+        />
+      </Card>
     </Flex>
   );
 }
