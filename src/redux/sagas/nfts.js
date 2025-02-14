@@ -82,7 +82,7 @@ function* setMetadataWorker(action) {
     getAllNfts,
     walletAddress,
   );
-  const latest = maxBy(nfts, ({ nftId }) => nftId);
+  const latest = maxBy(nfts, ({ nftId }) => Number(nftId));
   const itemId = latest ? Number(latest.nftId) + 1 : 1;
   yield call(mintNFT, collectionId, itemId, walletAddress, walletAddress);
   yield call(setMetadataNFT, collectionId, itemId, metadataCID, walletAddress);
