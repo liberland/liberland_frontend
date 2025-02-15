@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import List from 'antd/es/list';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import { congressActions, identityActions, senateActions } from '../../../redux/actions';
 import { congressSelectors, senateSelectors } from '../../../redux/selectors';
 import Motion from '../../WalletCongresSenate/Motion';
@@ -35,7 +35,7 @@ function Motions({
   }, [motions, motionIds, dispatch]);
 
   if (!motions || motions.length < 1) {
-    return <Alert type="info" message="There are no open motions" />;
+    return <Result status={404} title="There are no open motions" />;
   }
 
   return (

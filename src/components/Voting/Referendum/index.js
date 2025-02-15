@@ -3,7 +3,7 @@ import React, {
   useEffect,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
@@ -93,7 +93,7 @@ function Referendum() {
                 </List.Item>
               )}
             />
-          ) : <Alert type="info" message="There are no active Referendums" />,
+          ) : <Result status={404} title="There are no active Referendums" />,
         },
         {
           key: 'proposals',
@@ -110,7 +110,7 @@ function Referendum() {
                 </List.Item>
               )}
             />
-          ) : <Alert type="info" message="There are no active Proposals" />,
+          ) : <Result status={404} title="There are no active Proposals" />,
         },
         {
           key: 'dispatches',
@@ -126,7 +126,7 @@ function Referendum() {
                 </List.Item>
               )}
             />
-          ) : <Alert type="info" message="There are no active Dispatches" />,
+          ) : <Result status={404} title="There are no active Dispatches" />,
         },
       ]}
     />

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Collapse from 'antd/es/collapse';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
@@ -57,7 +57,7 @@ function ExchangeList() {
   return (
     <Flex vertical gap="20px">
       {!highLiquidity.length && !lowLiquidity.length && (
-        <Alert type="error" className={styles.noneFound} message="No pools were found" />
+        <Result status="error" title="No pools were found" />
       )}
       {highLiquidity.length > 0 && (
         <Collapse

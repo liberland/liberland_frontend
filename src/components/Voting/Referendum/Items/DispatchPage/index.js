@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Spin from 'antd/es/spin';
 import Collapse from 'antd/es/collapse';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Title from 'antd/es/typography/Title';
 import Flex from 'antd/es/flex';
 import { useParams } from 'react-router-dom';
@@ -79,7 +79,7 @@ function DispatchPage() {
           ),
           children: (
             <>
-              {isError && <Alert type="error" message="Could not display dispatch" />}
+              {isError && <Result status="error" title="Could not display dispatch" />}
               {needCallPreImage && preimage && <Proposal proposal={preimage} />}
               {!needCallPreImage && <Proposal proposal={proposal} />}
             </>

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Collapse from 'antd/es/collapse';
 import Spin from 'antd/es/spin';
 import {
@@ -10,6 +10,7 @@ import {
 import { contractsActions } from '../../../redux/actions';
 import ContractsList from '../ContractsList';
 import CreateContractModal from '../Modals/CreateContractModal';
+import styles from './styles.module.scss';
 
 function MyContracts() {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ function MyContracts() {
     <Collapse
       defaultActiveKey={['all']}
       collapsible="icon"
+      className={styles.mine}
       items={[
         {
           key: 'all',
@@ -37,7 +39,7 @@ function MyContracts() {
           extra: <CreateContractModal isMyContracts />,
           children:
             myContracts.length < 1 ? (
-              <Alert type="info" message="No contracts found" />
+              <Result status={404} title="No contracts found" />
             ) : (
               <ContractsList contracts={myContracts} isMyContracts />
             ),

@@ -27,7 +27,7 @@ function Layout({ children }) {
       <Header />
       <LayoutInternal>
         <Sider />
-        <LayoutInternal>
+        <LayoutInternal className={styles.contentWrapper}>
           <Content className={styles.content}>
             <HideTitleProvider>
               <PageTitle />

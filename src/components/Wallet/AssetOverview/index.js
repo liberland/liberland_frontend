@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
+import Result from 'antd/es/result';
 import { useMediaQuery } from 'usehooks-ts';
 import { formatAssets } from '../../../utils/walletHelpers';
 import SendAssetModal from '../../Modals/SendAssetModal';
@@ -52,6 +53,15 @@ function AssetOverview({
       )}
     />
   );
+
+  if (!filteredAssets.length) {
+    return (
+      <Result
+        status={404}
+        title="No additional assets found"
+      />
+    );
+  }
 
   return (
     <Row gutter={[16, 16]} wrap>

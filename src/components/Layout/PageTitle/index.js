@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import { useNavigationList } from '../hooks';
-import styles from '../styles.module.scss';
 import { useHasHiddenTitle } from '../HideTitle';
 import Button from '../../Button/Button';
 
@@ -26,7 +25,7 @@ function PageTitle() {
   return (
     <Flex wrap justify="space-between" align="center">
       {pageTitle && !hidden ? (
-        <Title level={1} className={styles.pageTitle}>{pageTitle}</Title>
+        <Title level={1}>{pageTitle}</Title>
       ) : null}
       {extra && (
         <Button primary onClick={() => history.push(extra[1].link)}>

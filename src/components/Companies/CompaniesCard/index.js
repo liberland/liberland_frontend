@@ -7,7 +7,7 @@ import List from 'antd/es/list';
 import { isAddress } from '@polkadot/util-crypto';
 import { useHistory } from 'react-router-dom';
 import cx from 'classnames';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Markdown from 'markdown-to-jsx';
 import { useMediaQuery } from 'usehooks-ts';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
@@ -48,7 +48,7 @@ function CompaniesCard({
         </Button>
       ) : undefined}
       locale={{
-        emptyText: <Alert type="info" message="No companies found" />,
+        emptyText: <Result status={404} title="No companies found" />,
       }}
       renderItem={(registeredCompany) => {
         const owner = !hideOwner && registeredCompany.principals?.[0]?.name;

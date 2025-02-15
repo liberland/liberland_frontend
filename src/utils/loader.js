@@ -7,9 +7,20 @@ const cache = {};
 export function loader(imported) {
   const key = imported.toString();
   const Component = lazy(async () => {
-    const loaded = await imported();
-    cache[key] = loaded.default;
-    return loaded;
+    const hasLoadedBefore = localStorage.getItem('refreshed') || false;
+    try {
+      const loaded = await imported();
+      localStorage.removeItem('refreshed');
+      cache[key] = loaded.default;
+      return loaded;
+    } catch (e) {
+      if (!hasLoadedBefore) {
+        localStorage.setItem('refreshed', 'true');
+        window.location.reload();
+        return null;
+      }
+      throw e;
+    }
   });
   return function render() {
     const Cached = cache[key];

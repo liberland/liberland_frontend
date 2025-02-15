@@ -5,12 +5,25 @@
 $openSans: 'Open Sans', sans-serif;
 $playfairDisplay: 'Playfair Display', serif;
 
+h1.ant-typography {
+  font-family: $playfairDisplay;
+}
+
 body {
   margin: 0;
   font-family: $openSans;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #243F5F;
+  font-weight: 500;
+
+  [class*=ant-] {
+    font-weight: 500;
+  }
+
+  h1,h2,h3,h4,h5,strong {
+    font-weight: 600!important;
+  }
 }
 
 p {
@@ -68,6 +81,17 @@ p {
 
 // ANTD overrides
 
+.ant-table-wrapper {
+  background-color: white;
+  border-radius: 6px;
+  border: solid 1px #F2F2F2;
+  padding: 0 18px;
+}
+
+.ant-btn {
+  padding: 18px!important;
+}
+
 .ant-btn-primary {
   background: linear-gradient(135deg, #e4d6a0, #EDC007,#e4d6a0);
   transition: all 0.3s;
@@ -90,7 +114,6 @@ p {
 }
 
 .ant-collapse-header-text {
-  font-family: Open Sans;
   text-align: left;
   text-underline-position: from-font;
   text-decoration-skip-ink: none;

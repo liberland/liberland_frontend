@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import Card from 'antd/es/card';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Flex from 'antd/es/flex';
 import { useHistory } from 'react-router-dom';
 import Button from '../../../Button/Button';
@@ -18,11 +18,14 @@ function CompanyRegistration({ registration }) {
   }
   if (registration.invalid) {
     return (
-      <Alert type="error" message="Failed to fetch registered data for this company. Maybe it contains invalid data?" />
+      <Result
+        status="error"
+        title="Failed to fetch registered data for this company. Maybe it contains invalid data?"
+      />
     );
   }
   if (!registration.registration) {
-    return <Alert type="error" message="Company not registered yet" />;
+    return <Result status="error" title="Company not registered yet" />;
   }
 
   const unregisterCompany = (entityId) => {

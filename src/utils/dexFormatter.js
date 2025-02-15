@@ -4,6 +4,7 @@ import {
   calculateAmountMax,
   calculateAmountMin,
   formatAssets,
+  formatCustom,
   parseAssets,
   sanitizeValue,
 } from './walletHelpers';
@@ -163,8 +164,12 @@ export const getExchangeRate = (reserved1, reserved2, decimals1, decimals2) => {
   }
 
   const finalValue = removeTrailingZerosFromString(resultString);
-
-  return finalValue;
+  const roundingIndex = decimal?.length;
+  if (!roundingIndex) {
+    return finalValue;
+  }
+  const parsed = parseAssets(finalValue, roundingIndex);
+  return formatCustom(parsed, roundingIndex, false, 4);
 };
 
 export const calculatePooled = (

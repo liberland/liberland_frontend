@@ -104,8 +104,6 @@ ReactDOM.createRoot(
               defaultShadow: '0',
               primaryColor: '#243F5F',
               primaryShadow: '0',
-              paddingBlock: '18px',
-              paddingInline: '12px',
             },
             Typography: {
               colorText: '#243F5F',
@@ -118,10 +116,10 @@ ReactDOM.createRoot(
               itemHoverColor: '#243F5F',
             },
             Collapse: {
-              contentPadding: '16px 0',
+              contentPadding: '20px',
               headerBg: 'white',
-              headerPadding: '8px 0',
-              colorBorder: 'white',
+              headerPadding: '20px',
+              colorBorder: '#F2F2F2',
               fontSize: 20,
               colorText: '#243F5F',
             },
@@ -145,6 +143,11 @@ ReactDOM.createRoot(
             },
             Progress: {
               defaultColor: '#243F5F',
+            },
+            Table: {
+              headerBg: '#ffffff',
+              borderColor: '#F2F2F2',
+              headerColor: '#ACBDC5',
             },
           },
         }}

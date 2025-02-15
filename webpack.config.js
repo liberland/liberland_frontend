@@ -51,6 +51,7 @@ module.exports = (env, argv) => {
     },
     devServer: {
       historyApiFallback: true,
+      port: 8060,
     },
     optimization: {
       moduleIds: 'deterministic',
@@ -164,6 +165,7 @@ module.exports = (env, argv) => {
       alias: {
         buffer: 'buffer',
         stream: 'stream-browserify',
+        '../fonts/PlayfairDisplay-Regular.ttf': path.resolve(__dirname, './src/assets/fonts/PlayfairDisplay-Regular.ttf'),
       },
     },
   };

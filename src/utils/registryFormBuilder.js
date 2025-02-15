@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Checkbox from 'antd/es/checkbox';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import ColorPicker from 'antd/es/color-picker';
 import DatePicker from 'antd/es/date-picker';
 import Flex from 'antd/es/flex';
@@ -309,9 +309,10 @@ export function BuildRegistryForm({
 
   if (formObject.invalid) {
     return (
-      <Alert
-        type="error"
-        message={(
+      <Result
+        title="Corrupted data"
+        status="error"
+        subTitle={(
           <>
             This company&apos;s registry data is corrupted. Please contact administration.
           </>

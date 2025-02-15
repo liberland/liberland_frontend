@@ -188,55 +188,59 @@ function Assets() {
           </a>
         </p>
       </Paragraph>
-      {isBiggerThanLargeScreen ? (
-        <Table
-          data={formatted}
-          columns={[
-            {
-              Header: 'Name',
-              accessor: 'name',
-            },
-            {
-              Header: 'Symbol',
-              accessor: 'symbol',
-            },
-            {
-              Header: 'Details',
-              accessor: 'details',
-            },
-            {
-              Header: 'Actions',
-              accessor: 'actions',
-            },
-          ]}
-        />
-      ) : (
-        <List
-          dataSource={formatted}
-          className="centeredList"
-          pagination={formatted.length ? { pageSize: 10 } : undefined}
-          renderItem={({
-            symbol,
-            details,
-            actions,
-          }) => (
-            <List.Item>
-              <Card
-                title={symbol}
-                actions={[
-                  <Flex wrap gap="15px" className={styles.actions}>
-                    {actions}
-                  </Flex>,
-                ]}
-                className={styles.card}
-              >
-                {details}
-              </Card>
-            </List.Item>
-          )}
-        />
-      )}
-      <CreateOrUpdateAssetModal isCreate />
+      <Flex vertical gap="20px">
+        {isBiggerThanLargeScreen ? (
+          <Table
+            data={formatted}
+            columns={[
+              {
+                Header: 'Name',
+                accessor: 'name',
+              },
+              {
+                Header: 'Symbol',
+                accessor: 'symbol',
+              },
+              {
+                Header: 'Details',
+                accessor: 'details',
+              },
+              {
+                Header: 'Actions',
+                accessor: 'actions',
+              },
+            ]}
+          />
+        ) : (
+          <List
+            dataSource={formatted}
+            className="centeredList"
+            pagination={formatted.length ? { pageSize: 10 } : undefined}
+            renderItem={({
+              symbol,
+              details,
+              actions,
+            }) => (
+              <List.Item>
+                <Card
+                  title={symbol}
+                  actions={[
+                    <Flex wrap gap="15px" className={styles.actions}>
+                      {actions}
+                    </Flex>,
+                  ]}
+                  className={styles.card}
+                >
+                  {details}
+                </Card>
+              </List.Item>
+            )}
+          />
+        )}
+        <Flex wrap gap="15px">
+          <CreateOrUpdateAssetModal isCreate />
+        </Flex>
+      </Flex>
     </>
   );
 }

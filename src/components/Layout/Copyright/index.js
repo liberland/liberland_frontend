@@ -8,8 +8,8 @@ function Copyright() {
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
 
   return (
-    <Flex>
-      <div>
+    <Flex align="center">
+      <div className={styles.copyright}>
         ©2023 Liberland. All rights reserved.
         {!isBiggerThanSmallScreen && <div className={styles.slogan}>To Live and let Live</div>}
       </div>
@@ -19,7 +19,7 @@ function Copyright() {
         </Flex>
       )}
       <div className={styles.donate}>
-        <Button href="https://liberland.org/contribution">
+        <Button href="https://liberland.org/contribution" className={styles.donateButton}>
           {isBiggerThanSmallScreen ? 'Donate to Liberland' : 'Donate'}
         </Button>
       </div>

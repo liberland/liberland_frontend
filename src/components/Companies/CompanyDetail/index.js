@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import Collapse from 'antd/es/collapse';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Avatar from 'antd/es/avatar';
 import Flex from 'antd/es/flex';
 import Divider from 'antd/es/divider';
@@ -31,7 +31,7 @@ function CompanyDetail() {
   const history = useHistory();
 
   if (!mainDataObject) {
-    return <Alert type="error" message="Company data invalid!" />;
+    return <Result status="error" title="Company data invalid" />;
   }
 
   const fullLink = `${window.location.protocol}//${window.location.host}${router.companies.allCompanies}`;
