@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import Flex from 'antd/es/flex';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
 import Dropdown from 'antd/es/dropdown/dropdown';
+import Avatar from 'antd/es/avatar';
 import DownOutlined from '@ant-design/icons/DownOutlined';
-import CopyIconWithAddress from '../../CopyIconWithAddress';
 import {
   blockchainActions, democracyActions, validatorActions, walletActions,
 } from '../../../redux/actions';
@@ -46,12 +47,6 @@ function ChangeWallet({
     const found = wallets.find(({ address }) => walletAdressSelector === address);
     if (found) {
       const { meta, address } = found;
-      const copy = (
-        <CopyIconWithAddress
-          address={address}
-          noDetails
-        />
-      );
       return meta?.name
         ? (
           <>
@@ -60,13 +55,11 @@ function ChangeWallet({
             (
             {truncate(address, 10)}
             )
-            {copy}
           </>
         )
         : (
           <>
             {truncate(address, 24)}
-            {copy}
           </>
         );
     }
@@ -92,11 +85,13 @@ function ChangeWallet({
         nano={!isBiggerThanSmallScreen}
         className={styles.button}
       >
-        {isBiggerThanSmallScreen && (
-          <img src={Polkadot} className={styles.polkadot} alt="Polkadot icon" />
-        )}
-        {displaySelected}
-        <DownOutlined />
+        <Flex gap="5px" align="center">
+          {isBiggerThanSmallScreen && (
+            <Avatar size={20} src={Polkadot} alt="Polkadot icon" />
+          )}
+          {displaySelected}
+          <DownOutlined />
+        </Flex>
       </Button>
     </Dropdown>
   );

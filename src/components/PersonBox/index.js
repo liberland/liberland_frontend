@@ -20,7 +20,9 @@ function PersonBox({
       <Card.Meta
         title={(
           <Flex wrap gap="15px" justify="space-between">
-            {displayName}
+            <strong className={styles.display}>
+              {displayName}
+            </strong>
             <Tag color={role.color} className={styles.tag}>
               {role.name}
             </Tag>

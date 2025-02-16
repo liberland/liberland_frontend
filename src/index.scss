@@ -86,6 +86,14 @@ p {
   border-radius: 6px;
   border: solid 1px #F2F2F2;
   padding: 0 18px;
+
+  tbody {
+    .ant-table-row:last-child {
+      .ant-table-cell {
+        border-bottom: none!important;
+      }
+    }
+  }
 }
 
 .ant-btn {
@@ -93,12 +101,11 @@ p {
 }
 
 .ant-btn-primary {
-  background: linear-gradient(135deg, #e4d6a0, #EDC007,#e4d6a0);
+  background: #F6CA31;
   transition: all 0.3s;
 
   &:focus,&:active,&:hover {
-    background: linear-gradient(135deg, #e4d6a0, #EDC007,#e4d6a0)!important;
-    filter: brightness(120%);
+    background: #E3B517!important;
   }
 }
 
@@ -312,4 +319,8 @@ textarea.ant-input {
       }
     }
   }
+}
+
+.ant-collapse-header {
+  align-items: center!important;
 }

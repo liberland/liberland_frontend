@@ -2,12 +2,14 @@ import React from 'react';
 import { useMediaQuery } from 'usehooks-ts';
 import PropTypes from 'prop-types';
 import notification from 'antd/es/notification';
-import { ReactComponent as CopyIcon } from '../../assets/icons/copy.svg';
+import Avatar from 'antd/es/avatar';
+import Flex from 'antd/es/flex';
+import CopyInputIcon from '../../assets/icons/copy-input.svg';
 import truncate from '../../utils/truncate';
 import styles from './styles.module.scss';
 
 function CopyIconWithAddress({
-  address, name, isTruncate, legal, showAddress, noDetails,
+  address, name, isTruncate, legal, showAddress,
 }) {
   const [api, contextHolder] = notification.useNotification();
   const isBigScreen = useMediaQuery('(min-width: 1200px)');
@@ -16,21 +18,8 @@ function CopyIconWithAddress({
     api.success({ message: 'Address was copied' });
   };
 
-  if (noDetails) {
-    return (
-      <>
-        {contextHolder}
-        <CopyIcon
-          className={styles.copyIcon}
-          name="walletAddress"
-          onClick={() => handleCopyClick(address)}
-        />
-      </>
-    );
-  }
-
   return (
-    <div className={styles.copyIconWithAdress}>
+    <Flex gap="10px" className={styles.copyIconWithAdress}>
       {contextHolder}
       {name || legal ? (
         <span>
@@ -50,12 +39,14 @@ function CopyIconWithAddress({
           )
         </span>
       )}
-      <CopyIcon
+      <Avatar
+        size={20}
+        shape="square"
         className={styles.copyIcon}
-        name="walletAddress"
+        src={CopyInputIcon}
         onClick={() => handleCopyClick(address)}
       />
-    </div>
+    </Flex>
   );
 }
 
@@ -65,7 +56,6 @@ CopyIconWithAddress.defaultProps = {
   isTruncate: true,
   legal: null,
   showAddress: false,
-  noDetails: false,
 };
 
 CopyIconWithAddress.propTypes = {
@@ -74,7 +64,6 @@ CopyIconWithAddress.propTypes = {
   isTruncate: PropTypes.bool,
   legal: PropTypes.string,
   showAddress: PropTypes.bool,
-  noDetails: PropTypes.bool,
 };
 
 export default CopyIconWithAddress;

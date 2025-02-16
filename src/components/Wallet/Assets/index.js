@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
-import Paragraph from 'antd/es/typography/Paragraph';
 import Popover from 'antd/es/popover';
 import Flex from 'antd/es/flex';
 import Card from 'antd/es/card';
@@ -175,73 +174,74 @@ function Assets() {
     return <div>Loading...</div>;
   }
 
-  return (
+  const title = (
     <>
-      <Paragraph>
-        <p>
-          {isStock ? 'Stocks' : 'Assets'}
-          {' '}
-          on the Liberland blockchain.
-          {' '}
-          <a href="https://docs.liberland.org/blockchain/for-citizens/assets-and-stocks">
-            Learn more
-          </a>
-        </p>
-      </Paragraph>
-      <Flex vertical gap="20px">
-        {isBiggerThanLargeScreen ? (
-          <Table
-            data={formatted}
-            columns={[
-              {
-                Header: 'Name',
-                accessor: 'name',
-              },
-              {
-                Header: 'Symbol',
-                accessor: 'symbol',
-              },
-              {
-                Header: 'Details',
-                accessor: 'details',
-              },
-              {
-                Header: 'Actions',
-                accessor: 'actions',
-              },
-            ]}
-          />
-        ) : (
-          <List
-            dataSource={formatted}
-            className="centeredList"
-            pagination={formatted.length ? { pageSize: 10 } : undefined}
-            renderItem={({
-              symbol,
-              details,
-              actions,
-            }) => (
-              <List.Item>
-                <Card
-                  title={symbol}
-                  actions={[
-                    <Flex wrap gap="15px" className={styles.actions}>
-                      {actions}
-                    </Flex>,
-                  ]}
-                  className={styles.card}
-                >
-                  {details}
-                </Card>
-              </List.Item>
-            )}
-          />
-        )}
-        <Flex wrap gap="15px">
-          <CreateOrUpdateAssetModal isCreate />
-        </Flex>
-      </Flex>
+      {isStock ? 'Stocks' : 'Assets'}
+      {' '}
+      on the Liberland blockchain.
+      {' '}
+      <a href="https://docs.liberland.org/blockchain/for-citizens/assets-and-stocks">
+        Learn more
+      </a>
     </>
+  );
+
+  return (
+    <Flex vertical gap="20px" className={styles.assets}>
+      {isBiggerThanLargeScreen ? (
+        <Table
+          data={formatted}
+          title={title}
+          columns={[
+            {
+              Header: 'Name',
+              accessor: 'name',
+            },
+            {
+              Header: 'Symbol',
+              accessor: 'symbol',
+            },
+            {
+              Header: 'Details',
+              accessor: 'details',
+            },
+            {
+              Header: 'Actions',
+              accessor: 'actions',
+            },
+          ]}
+        />
+      ) : (
+        <List
+          dataSource={formatted}
+          className="centeredList"
+          header={title}
+          pagination={formatted.length ? { pageSize: 10 } : undefined}
+          renderItem={({
+            symbol,
+            details,
+            actions,
+          }) => (
+            <List.Item>
+              <Card
+                title={symbol}
+                actions={[
+                  <Flex wrap gap="15px" className={styles.actions}>
+                    {actions}
+                  </Flex>,
+                ]}
+                className={styles.card}
+              >
+                {details}
+              </Card>
+            </List.Item>
+          )}
+        />
+      )}
+      <Flex wrap gap="15px">
+        <CreateOrUpdateAssetModal isCreate />
+      </Flex>
+    </Flex>
   );
 }
 

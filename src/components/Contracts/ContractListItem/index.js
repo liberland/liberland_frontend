@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import List from 'antd/es/list';
 import Flex from 'antd/es/flex';
-import Title from 'antd/es/typography/Title';
 import cx from 'classnames';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useHistory } from 'react-router-dom';
@@ -76,9 +75,11 @@ function ContractItem({
               {' '}
               {contractId}
             </div>
-            <Title level={3} className={styles.title}>
-              {title}
-            </Title>
+            {title && (
+              <strong className={styles.title}>
+                {title}
+              </strong>
+            )}
           </Flex>
         )}
       />

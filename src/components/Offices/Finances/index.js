@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Flex from 'antd/es/flex';
 import Spin from 'antd/es/spin';
-import Title from 'antd/es/typography/Title';
+import Collapse from 'antd/es/collapse';
 import { officesActions, financesActions } from '../../../redux/actions';
 import { officesSelectors, financesSelectors } from '../../../redux/selectors';
 import Table from '../../Table';
@@ -95,92 +95,100 @@ export default function Finances() {
   const formatPercent = (value) => `${Math.round(10000 * value) / 100}%`;
 
   return (
-    <Flex vertical gap="20px">
-      <Title level={2}>Wallet addresses</Title>
-      <Table
-        columns={[
-          {
-            Header: 'Name',
-            accessor: 'name',
-          },
-          {
-            Header: 'Address',
-            accessor: 'address',
-          },
-          {
-            Header: 'LLM Balance',
-            accessor: 'llm',
-          },
-          {
-            Header: 'LLD Balance',
-            accessor: 'lld',
-          },
-        ]}
-        data={accountsAddresses.map((a) => ({
-          ...a,
-          address: a.address,
-          llm: (
-            <Flex wrap gap="10px" align="center">
-              {formatMerits(balances.LLM[a.address] ?? 0)}
-              <CurrencyIcon size={20} symbol="LLM" />
-            </Flex>
+    <Collapse
+      defaultActiveKey={['wallet', 'finance']}
+      items={[
+        {
+          label: 'Wallet addresses',
+          key: 'wallet',
+          children: (
+            <Table
+              columns={[
+                {
+                  Header: 'Name',
+                  accessor: 'name',
+                },
+                {
+                  Header: 'Address',
+                  accessor: 'address',
+                },
+                {
+                  Header: 'LLM Balance',
+                  accessor: 'llm',
+                },
+                {
+                  Header: 'LLD Balance',
+                  accessor: 'lld',
+                },
+              ]}
+              data={accountsAddresses.map((a) => ({
+                ...a,
+                address: a.address,
+                llm: (
+                  <Flex wrap gap="10px" align="center">
+                    {formatMerits(balances.LLM[a.address] ?? 0)}
+                    <CurrencyIcon size={20} symbol="LLM" />
+                  </Flex>
+                ),
+                lld: (
+                  <Flex wrap gap="10px" align="center">
+                    {formatDollars(balances.LLD[a.address] ?? 0)}
+                    <CurrencyIcon size={20} symbol="LLD" />
+                  </Flex>
+                ),
+              }))}
+              noPagination
+            />
           ),
-          lld: (
-            <Flex wrap gap="10px" align="center">
-              {formatDollars(balances.LLD[a.address] ?? 0)}
-              <CurrencyIcon size={20} symbol="LLD" />
-            </Flex>
+        },
+        {
+          label: 'Financial metrics',
+          key: 'finance',
+          children: financesLoading ? <Spin /> : finances && (
+            <Table
+              columns={[
+                {
+                  Header: 'Metric name',
+                  accessor: 'metric',
+                },
+                {
+                  Header: 'Metric value',
+                  accessor: 'value',
+                },
+              ]}
+              data={[
+                {
+                  metric: 'Inflation',
+                  value: formatPercent(finances.inflation),
+                },
+                {
+                  metric: 'Congress rewards from last week',
+                  value: (
+                    <Flex wrap gap="10px" align="center">
+                      {formatDollars(finances.lastWeekCongressRewards ?? 0)}
+                      <CurrencyIcon size={20} symbol="LLD" />
+                    </Flex>
+                  ),
+                },
+                {
+                  metric: 'Staker rewards from last week',
+                  value: (
+                    <Flex wrap gap="10px" align="center">
+                      {formatDollars(finances.lastWeekStakersRewards ?? 0)}
+                      <CurrencyIcon size={20} symbol="LLD" />
+                    </Flex>
+                  ),
+                },
+                {
+                  metric: 'Staker APY',
+                  value: formatPercent(finances.stakerApyWeeklyPayouts),
+                },
+              ]}
+              noPagination
+            />
           ),
-        }))}
-        noPagination
-      />
-      <Title level={2}>Financial metrics</Title>
-      {financesLoading && (
-        <Spin />
-      )}
-      {finances && (
-      <Table
-        columns={[
-          {
-            Header: 'Metric name',
-            accessor: 'metric',
-          },
-          {
-            Header: 'Metric value',
-            accessor: 'value',
-          },
-        ]}
-        data={[
-          {
-            metric: 'Inflation',
-            value: formatPercent(finances.inflation),
-          },
-          {
-            metric: 'Congress rewards from last week',
-            value: (
-              <Flex wrap gap="10px" align="center">
-                {formatDollars(finances.lastWeekCongressRewards ?? 0)}
-                <CurrencyIcon size={20} symbol="LLD" />
-              </Flex>
-            ),
-          },
-          {
-            metric: 'Staker rewards from last week',
-            value: (
-              <Flex wrap gap="10px" align="center">
-                {formatDollars(finances.lastWeekStakersRewards ?? 0)}
-                <CurrencyIcon size={20} symbol="LLD" />
-              </Flex>
-            ),
-          },
-          {
-            metric: 'Staker APY',
-            value: formatPercent(finances.stakerApyWeeklyPayouts),
-          },
-        ]}
-        noPagination
-      />
-      )}
-    </Flex>
+        },
+      ]}
+    />
   );
 }

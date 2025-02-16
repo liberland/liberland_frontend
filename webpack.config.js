@@ -51,7 +51,6 @@ module.exports = (env, argv) => {
     },
     devServer: {
       historyApiFallback: true,
-      port: 8060,
     },
     optimization: {
       moduleIds: 'deterministic',

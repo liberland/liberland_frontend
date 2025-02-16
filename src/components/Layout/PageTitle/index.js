@@ -5,6 +5,7 @@ import Title from 'antd/es/typography/Title';
 import { useNavigationList } from '../hooks';
 import { useHasHiddenTitle } from '../HideTitle';
 import Button from '../../Button/Button';
+import styles from '../styles.module.scss';
 
 function PageTitle() {
   const { matchedRoute, matchedSubLink, pathname } = useNavigationList();
@@ -23,7 +24,7 @@ function PageTitle() {
     ([path]) => path === pathname,
   );
   return (
-    <Flex wrap justify="space-between" align="center">
+    <Flex wrap justify="space-between" align="center" className={styles.pageTitleWrapper}>
       {pageTitle && !hidden ? (
         <Title level={1}>{pageTitle}</Title>
       ) : null}

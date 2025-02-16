@@ -7,6 +7,7 @@ import {
 } from '../../../redux/selectors';
 import { registriesActions } from '../../../redux/actions';
 import CompaniesCard from '../CompaniesCard';
+import styles from './styles.module.scss';
 
 function CompaniesOverview() {
   const dispatch = useDispatch();
@@ -25,6 +26,7 @@ function CompaniesOverview() {
     <Collapse
       collapsible="icon"
       defaultActiveKey={['registered', 'requested']}
+      className={styles.overview}
       items={[
         {
           label: 'My registered companies',

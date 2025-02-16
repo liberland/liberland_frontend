@@ -7,6 +7,7 @@ import Result from 'antd/es/result';
 import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
+import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
 import { AuthContext } from 'react-oauth2-code-pkce';
 import {
@@ -29,6 +30,7 @@ function Referendum() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const { login } = useContext(AuthContext);
   const user = useSelector(userSelectors.selectUser);
+  const isBiggerThanMediumScreen = useMediaQuery('(min-width: 1200px)');
 
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call(userWalletAddress));
@@ -39,6 +41,36 @@ function Referendum() {
   };
   const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
 
+  const controls = (
+    <Flex wrap gap="15px" justify="center">
+      {delegatingTo && (
+        <Flex vertical gap="20px">
+          <div className="description">
+            Delegating to:
+            {' '}
+            {delegatingTo}
+          </div>
+          <UndelegateModal
+            delegatee={delegatingTo}
+            onSubmitUndelegate={handleSubmitUndelegate}
+          />
+        </Flex>
+      )}
+      {user ? (
+        <Button primary onClick={() => history.push(router.voting.addLegislation)}>
+          Propose
+        </Button>
+      ) : (
+        <Button
+          onClick={() => login()}
+          primary
+        >
+          Log in to propose referenda
+        </Button>
+      )}
+    </Flex>
+  );
+
   return (
     <Collapse
       defaultActiveKey={['referendums', 'proposals', 'dispatches']}
@@ -47,38 +79,11 @@ function Referendum() {
         {
           key: 'referendums',
           label: 'Referendums',
-          extra: (
-            <Flex wrap gap="15px">
-              {delegatingTo && (
-                <Flex vertical gap="20px">
-                  <div className="description">
-                    Delegating to:
-                    {' '}
-                    {delegatingTo}
-                  </div>
-                  <UndelegateModal
-                    delegatee={delegatingTo}
-                    onSubmitUndelegate={handleSubmitUndelegate}
-                  />
-                </Flex>
-              )}
-              {user ? (
-                <Button primary onClick={() => history.push(router.voting.addLegislation)}>
-                  Propose
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => login()}
-                  primary
-                >
-                  Log in to propose referenda
-                </Button>
-              )}
-            </Flex>
-          ),
+          extra: isBiggerThanMediumScreen ? controls : undefined,
           children: democracy.democracy?.crossReferencedReferendumsData?.length ? (
             <List
               dataSource={democracy.democracy.crossReferencedReferendumsData}
+              footer={!isBiggerThanMediumScreen ? controls : undefined}
               renderItem={(referendum) => (
                 <List.Item>
                   <ReferendumItem
@@ -93,7 +98,13 @@ function Referendum() {
                 </List.Item>
               )}
             />
-          ) : <Result status={404} title="There are no active Referendums" />,
+          ) : (
+            <Result
+              status={404}
+              title="There are no active Referendums"
+              extra={!isBiggerThanMediumScreen ? controls : undefined}
+            />
+          ),
         },
         {
           key: 'proposals',

@@ -10,7 +10,7 @@ import Space from 'antd/es/space';
 import Title from 'antd/es/typography/Title';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
-import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
+import ArrowLeft from '../../../assets/icons/arrow-left.svg';
 import styles from './styles.module.scss';
 import { useHideTitle } from '../../Layout/HideTitle';
 import CopyInput from '../../CopyInput';
@@ -40,7 +40,7 @@ function CompanyDetail() {
     <div className={styles.container}>
       <Flex className={styles.top} wrap gap="15px" justify="space-between">
         <Button onClick={() => history.goBack()}>
-          <ArrowLeftOutlined />
+          <Avatar src={ArrowLeft} size={12} shape="square" />
           <Space />
           Back
         </Button>

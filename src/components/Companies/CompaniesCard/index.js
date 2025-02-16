@@ -32,14 +32,15 @@ function CompaniesCard({
     [registries],
   );
   const dataSource = simplify?.filter((registered) => registered && !registered.invalid);
+  const hasFooter = type === 'mine' && dataSource?.length > 0;
   return (
     <List
       dataSource={dataSource}
-      className={cx(styles.companies, 'listWithFooter')}
+      className={cx(styles.companies, { listWithFooter: hasFooter })}
       size="small"
       pagination={dataSource?.length ? { pageSize: 10 } : false}
       itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
-      footer={type === 'mine' && dataSource?.length > 0 ? (
+      footer={hasFooter ? (
         <Button
           primary
           onClick={() => history.push(router.companies.create)}
@@ -72,7 +73,7 @@ function CompaniesCard({
             </Markdown>
           </Paragraph>
         );
-        const companyLogoSize = isLargerThanHdScreen ? 54 : 40;
+        const companyLogoSize = isLargerThanHdScreen ? 40 : 32;
         const companyLogo = isValidUrl(logo) ? (
           <Avatar size={companyLogoSize} src={logo} className={styles.avatar} />
         ) : (
@@ -107,7 +108,7 @@ function CompaniesCard({
               <Flex wrap gap="15px">
                 {owner && (
                   <Flex wrap gap="15px" className={styles.owner}>
-                    <ColorAvatar size={54} name={owner} />
+                    <ColorAvatar size={companyLogoSize} name={owner} />
                     <Flex vertical gap="5px" justify="center" className={styles.ownerName}>
                       {owner && (
                         <>
@@ -115,7 +116,9 @@ function CompaniesCard({
                             {truncate(owner, 20)}
                           </strong>
                           {isAddress(address) && (
-                            <CopyIconWithAddress address={address} isTruncate />
+                            <div className="description">
+                              <CopyIconWithAddress address={address} isTruncate />
+                            </div>
                           )}
                         </>
                       )}
@@ -152,8 +155,14 @@ function CompaniesCard({
                   Company owner
                 </div>
                 <Flex wrap gap="5px" align="center">
-                  <ColorAvatar size={19} name={owner} />
-                  <CopyIconWithAddress address={address} name={owner} isTruncate />
+                  <ColorAvatar size={32} name={owner} />
+                  {isAddress(address) ? (
+                    <CopyIconWithAddress address={address} name={owner} isTruncate />
+                  ) : (
+                    <strong>
+                      {truncate(owner, 20)}
+                    </strong>
+                  )}
                 </Flex>
               </Flex>
             )}

@@ -9,8 +9,9 @@ import Flex from 'antd/es/flex';
 import Card from 'antd/es/card';
 import Space from 'antd/es/space';
 import Title from 'antd/es/typography/Title';
-import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
 import { useHistory } from 'react-router-dom';
+import Avatar from 'antd/es/avatar';
+import Globe from '../../../assets/icons/globe.svg';
 import { blockchainSelectors, democracySelectors } from '../../../redux/selectors';
 import CurrentAssemble from './CurrentAssemble';
 import { democracyActions } from '../../../redux/actions';
@@ -261,7 +262,7 @@ function CongressionalAssemble() {
           >
             Learn how
             <Space />
-            <GlobalOutlined />
+            <Avatar size={18} src={Globe} />
           </Button>,
         ]}
       >

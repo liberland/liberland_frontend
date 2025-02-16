@@ -9,7 +9,7 @@ import Title from 'antd/es/typography/Title';
 import InputNumber from 'antd/es/input-number';
 import Checkbox from 'antd/es/checkbox/Checkbox';
 import { BN } from '@polkadot/util';
-import { SwapOutlined } from '@ant-design/icons';
+import SwapOutlined from '@ant-design/icons/SwapOutlined';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';

@@ -331,25 +331,31 @@ export function BuildRegistryForm({
       onFinish={callback}
       layout="vertical"
     >
-      <Flex vertical gap="15px">
-        <Flex vertical>
-          <Title level={1}>
+      <Card
+        className="registryCard"
+        title={(
+          <Title className="registryTitle" level={1}>
             {companyId
               ? defaultValues.name
               : 'Register a new Liberland company'}
           </Title>
-          <Paragraph className="description">
-            For full instructions, check out the
-            {' '}
-            <a
-              href="https://docs.liberland.org/blockchain/for-citizens/how-to-run-liberland-company"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Company registration guide
-            </a>
-          </Paragraph>
-        </Flex>
+        )}
+      >
+        <Card.Meta
+          description={(
+            <Paragraph className="description">
+              For full instructions, check out the
+              {' '}
+              <a
+                href="https://docs.liberland.org/blockchain/for-citizens/how-to-run-liberland-company"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Company registration guide
+              </a>
+            </Paragraph>
+          )}
+        />
         <Flex vertical gap="40px">
           <FormSection title="Basic information">
             <Row gutter={16} wrap>
@@ -496,7 +502,7 @@ export function BuildRegistryForm({
             {buttonMessage}
           </Button>
         </Flex>
-      </Flex>
+      </Card>
     </Form>
   );
 }

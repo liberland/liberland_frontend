@@ -122,6 +122,7 @@ function Profile() {
     <Collapse
       defaultActiveKey={['profile', 'account', 'onchain']}
       collapsible="icon"
+      className={styles.main}
       items={[
         {
           key: 'account',
