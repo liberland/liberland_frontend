@@ -24,7 +24,6 @@ function LandRegistry() {
 
   return (
     <Card
-      className={styles.form}
       title={(
         <Title className={styles.title} level={3}>Set metadata for NFT</Title>
       )}

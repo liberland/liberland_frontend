@@ -14,7 +14,6 @@ export default function SOLLPStaking() {
           SOL LP Staking
         </Title>
       )}
-      className={styles.card}
     >
       <Button href={linkRaydium} primary newTab>
         Add liquidity on raydium

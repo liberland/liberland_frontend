@@ -23,7 +23,6 @@
   }
 }
 .pageTitleWrapper {
-  max-width: 1600px;
   margin-bottom: 15px;
 }
 .menu {
@@ -74,6 +73,7 @@
   width: 100%;
 }
 .content {
+  max-width: 1600px;
   min-height: 280px;
   margin: 0;
   padding: 10px 25px;

@@ -8,7 +8,7 @@ const formatDate = (date, isSeparator = false, addTime = true) => {
   const datePart = [date.getFullYear(), date.getMonth() + 1, date.getDate()].map(dateComponentPad);
   const timePart = [date.getHours(), date.getMinutes()].map(dateComponentPad);
 
-  return `${datePart.join('-')}${isSeparator ? ' at ' : ''}${addTime ? timePart.join(':') : ''}`;
+  return `${datePart.join('-')}${isSeparator ? ' at ' : ' '}${addTime ? timePart.join(':') : ''}`;
 };
 
 export default formatDate;

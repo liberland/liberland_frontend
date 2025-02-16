@@ -37,7 +37,7 @@ function CompanyDetail() {
   const fullLink = `${window.location.protocol}//${window.location.host}${router.companies.allCompanies}`;
 
   return (
-    <div className={styles.container}>
+    <>
       <Flex className={styles.top} wrap gap="15px" justify="space-between">
         <Button onClick={() => history.goBack()}>
           <Avatar src={ArrowLeft} size={12} shape="square" />
@@ -317,7 +317,7 @@ function CompanyDetail() {
           },
         ]}
       />
-    </div>
+    </>
   );
 }
 

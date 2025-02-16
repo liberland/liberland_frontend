@@ -1,5 +1,5 @@
 import {
-  BN, BN_ONE, BN_ZERO, formatBalance, formatNumber, hexToU8a, isHex,
+  BN, formatBalance, formatNumber, hexToU8a, isHex,
 } from '@polkadot/util';
 import { decodeAddress, encodeAddress } from '@polkadot/keyring';
 import { ethers } from 'ethers';
@@ -99,28 +99,19 @@ const configDefault = {
   isAsset: false,
 };
 
-export const formatTransaction = (value_raw, bigSymbol, smallSymbol, decimals, config = configDefault) => {
+export const formatTransaction = (value_raw, bigSymbol, decimals, config = configDefault) => {
   const value = valueToBN(value_raw);
-  const prefix = value.gt(BN_ZERO) ? '+' : '-';
   const absIntvalue = value.abs();
-
-  if (_parse(absIntvalue.toString(), decimals).gt(BN_ONE)) {
-    const formatValue = _format(absIntvalue, config.isAsset ? parseInt(decimals) : decimals, true);
-
-    return config.isSymbolFirst
-      ? `${bigSymbol} ${prefix}${formatValue}`
-      : `${prefix} ${formatValue} ${bigSymbol}`;
-  }
+  const formatValue = _format(absIntvalue, config.isAsset ? parseInt(decimals) : decimals, true, config.precision);
 
   return config.isSymbolFirst
-    ? `${smallSymbol} ${prefix}${_format(absIntvalue, 0)}`
-    : `${prefix} ${_format(absIntvalue, 0)} ${smallSymbol}`;
+    ? `${bigSymbol} ${formatValue}`
+    : `${formatValue} ${bigSymbol}`;
 };
 
 export const formatMeritTransaction = (merits_raw, config = configDefault) => formatTransaction(
   merits_raw,
   'LLM',
-  'grains',
   meritDecimals,
   config,
 );
@@ -128,14 +119,12 @@ export const formatMeritTransaction = (merits_raw, config = configDefault) => fo
 export const formatDollarTransaction = (dollars_raw, config = configDefault) => formatTransaction(
   dollars_raw,
   'LLD',
-  'picoLLD',
   dollarDecimals,
   config,
 );
 
 export const formatAssetTransaction = (dollars_raw, asset, decimals, config = configDefault) => formatTransaction(
   dollars_raw,
-  asset,
   asset,
   decimals,
   config,

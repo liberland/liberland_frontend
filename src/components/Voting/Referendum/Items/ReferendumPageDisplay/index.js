@@ -45,7 +45,7 @@ function ReferendumPageDisplay({
     router.voting.referendumItem.replace(':referendumHash', hash.toString())}`;
 
   return (
-    <Flex vertical gap="20px" className={styles.referenda}>
+    <Flex vertical gap="20px">
       <Flex className={styles.nav} wrap gap="15px" align="center">
         <Flex flex={1}>
           <Button onClick={() => history.goBack()}>

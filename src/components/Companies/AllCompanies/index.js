@@ -5,7 +5,6 @@ import Collapse from 'antd/es/collapse';
 import { registriesSelectors } from '../../../redux/selectors';
 import { registriesActions } from '../../../redux/actions';
 import CompaniesCard from '../CompaniesCard';
-import styles from './styles.module.scss';
 
 function AllCompanies() {
   const dispatch = useDispatch();
@@ -25,7 +24,6 @@ function AllCompanies() {
     <Collapse
       collapsible="icon"
       defaultActiveKey={['all']}
-      className={styles.all}
       items={[{
         key: 'all',
         label: 'Companies',

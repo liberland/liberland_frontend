@@ -10,7 +10,7 @@ import SpendingTable from '../../SpendingTable';
 export default function Wallet() {
   const totalBalance = useSelector(congressSelectors.totalBalance);
   const liquidMerits = useSelector(congressSelectors.liquidMeritsBalance);
-  const congresAccountAddress = useSelector(congressSelectors.walletAddress);
+  const congressAccountAddress = useSelector(congressSelectors.walletAddress);
   const additionalAssets = useSelector(congressSelectors.additionalAssets);
   const userIsMember = useSelector(congressSelectors.userIsMember);
   const balances = useSelector(congressSelectors.balances);
@@ -19,19 +19,20 @@ export default function Wallet() {
 
   useEffect(() => {
     dispatch(congressActions.congressSpending.call());
+    dispatch(congressActions.getMembers.call());
   }, [dispatch]);
 
-  if (!congresAccountAddress || !balances) {
+  if (!congressAccountAddress || !balances) {
     return null;
   }
 
   return (
     <Flex vertical gap="20px">
-      {congresAccountAddress && balances && (
+      {congressAccountAddress && balances && (
         <WalletCongresSenateWrapper
           userIsMember={userIsMember}
           totalBalance={totalBalance}
-          congresAccountAddress={congresAccountAddress}
+          congressAccountAddress={congressAccountAddress}
           liquidMerits={liquidMerits}
           additionalAssets={additionalAssets}
           balances={balances}

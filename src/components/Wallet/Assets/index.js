@@ -187,7 +187,7 @@ function Assets() {
   );
 
   return (
-    <Flex vertical gap="20px" className={styles.assets}>
+    <Flex vertical gap="20px">
       {isBiggerThanLargeScreen ? (
         <Table
           data={formatted}

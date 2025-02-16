@@ -6,7 +6,6 @@ import Collapse from 'antd/es/collapse';
 import ContractsList from '../ContractsList';
 import { blockchainSelectors, contractsSelectors } from '../../../redux/selectors';
 import { contractsActions } from '../../../redux/actions';
-import styles from './styles.module.scss';
 
 function HomeContract() {
   const dispatch = useDispatch();
@@ -29,7 +28,6 @@ function HomeContract() {
     <Collapse
       collapsible="icon"
       defaultActiveKey={['all']}
-      className={styles.home}
       items={[
         {
           key: 'all',

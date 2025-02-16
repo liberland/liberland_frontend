@@ -3,14 +3,12 @@ import PropTypes from 'prop-types';
 import List from 'antd/es/list';
 import { useMediaQuery } from 'usehooks-ts';
 import ContractListItem from '../ContractListItem';
-import styles from './styles.module.scss';
 
 function ContractsList({ contracts, isMyContracts }) {
   const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
   return (
     <List
       dataSource={contracts}
-      className={styles.contracts}
       size="small"
       pagination={{ pageSize: 10 }}
       itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}

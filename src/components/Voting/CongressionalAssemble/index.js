@@ -152,7 +152,7 @@ function CongressionalAssemble() {
   const termDuration = democracy?.democracy?.electionsInfo?.termDuration;
 
   return (
-    <Flex vertical gap="20px" className={styles.assembly}>
+    <Flex vertical gap="20px">
       <Modal
         open={isModalOpen}
         title="Are you certain you want to leave the page?"

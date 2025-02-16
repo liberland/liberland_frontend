@@ -11,13 +11,14 @@ export default function Wallet() {
   const pallets = useSelector(officesSelectors.selectorPallets);
   const totalBalance = useSelector(senateSelectors.totalBalance);
   const liquidMerits = useSelector(senateSelectors.liquidMeritsBalance);
-  const congresAccountAddress = useSelector(senateSelectors.walletAddress);
+  const congressAccountAddress = useSelector(senateSelectors.walletAddress);
   const additionalAssets = useSelector(senateSelectors.additionalAssets);
   const userIsMember = useSelector(senateSelectors.userIsMember);
   const balances = useSelector(senateSelectors.balances);
 
   useEffect(() => {
     dispatch(officesActions.getPalletIds.call());
+    dispatch(senateActions.senateGetMembers.call());
   }, [dispatch]);
 
   useEffect(() => {
@@ -26,16 +27,16 @@ export default function Wallet() {
 
   useEffect(() => {
     dispatch(senateActions.senateGetAdditionalAssets.call());
-  }, [dispatch, congresAccountAddress]);
+  }, [dispatch, congressAccountAddress]);
 
-  if (!congresAccountAddress) return null;
+  if (!congressAccountAddress) return null;
 
   return (
     <div>
       <WalletCongresSenateWrapper
         userIsMember={userIsMember}
         totalBalance={totalBalance}
-        congresAccountAddress={congresAccountAddress}
+        congressAccountAddress={congressAccountAddress}
         liquidMerits={liquidMerits}
         additionalAssets={additionalAssets}
         balances={balances}

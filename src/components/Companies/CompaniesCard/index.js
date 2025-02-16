@@ -36,7 +36,7 @@ function CompaniesCard({
   return (
     <List
       dataSource={dataSource}
-      className={cx(styles.companies, { listWithFooter: hasFooter })}
+      className={cx({ listWithFooter: hasFooter })}
       size="small"
       pagination={dataSource?.length ? { pageSize: 10 } : false}
       itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
@@ -150,18 +150,19 @@ function CompaniesCard({
               </div>
             </Flex>
             {owner && (
-              <Flex vertical gap="5px">
-                <div className="description">
+              <Flex vertical gap="7px">
+                <div className={cx('description', styles.mobileOwner)}>
                   Company owner
                 </div>
                 <Flex wrap gap="5px" align="center">
-                  <ColorAvatar size={32} name={owner} />
-                  {isAddress(address) ? (
-                    <CopyIconWithAddress address={address} name={owner} isTruncate />
-                  ) : (
-                    <strong>
-                      {truncate(owner, 20)}
-                    </strong>
+                  <ColorAvatar size={24} fontSize={12} name={owner} />
+                  <strong>
+                    {truncate(owner, 20)}
+                  </strong>
+                  {isAddress(address) && (
+                    <div className="description">
+                      <CopyIconWithAddress address={address} isTruncate />
+                    </div>
                   )}
                 </Flex>
               </Flex>

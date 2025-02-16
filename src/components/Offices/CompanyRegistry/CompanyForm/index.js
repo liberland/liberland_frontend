@@ -29,7 +29,6 @@ function CompanyForm() {
 
   return (
     <Card
-      className={styles.form}
       title={(
         <Title className={styles.title} level={3}>Verify company registration request</Title>
       )}

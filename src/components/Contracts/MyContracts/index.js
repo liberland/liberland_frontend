@@ -10,7 +10,6 @@ import {
 import { contractsActions } from '../../../redux/actions';
 import ContractsList from '../ContractsList';
 import CreateContractModal from '../Modals/CreateContractModal';
-import styles from './styles.module.scss';
 
 function MyContracts() {
   const dispatch = useDispatch();
@@ -31,7 +30,6 @@ function MyContracts() {
     <Collapse
       defaultActiveKey={['all']}
       collapsible="icon"
-      className={styles.mine}
       items={[
         {
           key: 'all',
