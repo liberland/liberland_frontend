@@ -60,11 +60,7 @@ function ContractItem({
 
   return (
     <List.Item
-      actions={isLargerThanHdScreen ? buttons : [
-        <Flex wrap gap="15px" className={styles.action}>
-          {buttons}
-        </Flex>,
-      ]}
+      actions={isLargerThanHdScreen ? buttons : undefined}
       className={styles.listItem}
     >
       <List.Item.Meta
@@ -83,7 +79,7 @@ function ContractItem({
           </Flex>
         )}
       />
-      <div className={styles.noHeading}>
+      <Flex vertical gap="20px" className={styles.noHeading}>
         <Paragraph
           ref={(p) => deriveAndHideContractTitle(p, title, setTitle)}
           ellipsis={{
@@ -95,7 +91,12 @@ function ContractItem({
             {data}
           </Markdown>
         </Paragraph>
-      </div>
+        {!isLargerThanHdScreen && (
+          <Flex wrap gap="15px" className={styles.action}>
+            {buttons}
+          </Flex>
+        )}
+      </Flex>
     </List.Item>
   );
 }
