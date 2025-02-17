@@ -105,7 +105,7 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if ((!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true')) {
+  if (!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true') {
     return (
       <GuidedSetupWrapper>
         <InstructionOnBoard setIsClicked={setNotResidentAcceptedByUser} />
