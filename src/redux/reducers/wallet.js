@@ -8,10 +8,10 @@ const initialState = {
         amount: '0x0',
       },
       polkastake: {
-        amount: 0,
+        amount: '0',
       },
       liquidMerits: {
-        amount: 0,
+        amount: '0',
       },
       totalAmount: {
         amount: '0x0',
@@ -20,7 +20,7 @@ const initialState = {
         amount: '0x0',
       },
       meritsTotalAmount: {
-        amount: 0,
+        amount: '0',
       },
       electionLock: 0,
     },

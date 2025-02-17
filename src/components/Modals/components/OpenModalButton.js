@@ -12,7 +12,6 @@ function OpenModalButton({ text, children, ...props }) {
 }
 
 OpenModalButton.propTypes = {
-  onClose: PropTypes.func.isRequired,
   text: PropTypes.string,
   children: PropTypes.node,
 };

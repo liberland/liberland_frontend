@@ -29,6 +29,7 @@ function AssetOverview({
           isRemarkNeeded={isRemarkNeeded}
           assetData={assetData}
           officeType={officeType}
+          key="send"
         />,
       ] : undefined}
       amount={(
@@ -89,14 +90,12 @@ AssetOverview.propTypes = {
   officeType: PropTypes.string,
   isRemarkNeeded: PropTypes.bool,
   additionalAssets: PropTypes.arrayOf(PropTypes.shape({
-    metadata: {
+    metadata: PropTypes.shape({
       symbol: PropTypes.string,
       name: PropTypes.string,
-      decimals: PropTypes.number,
-    },
-    balance: {
-      balance: PropTypes.number,
-    },
+      decimals: PropTypes.string,
+    }),
+    balance: PropTypes.string,
   })),
 };
 

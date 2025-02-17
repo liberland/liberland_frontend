@@ -5,6 +5,7 @@ import Collapse from 'antd/es/collapse';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
 import Flex from 'antd/es/flex';
+import Spin from 'antd/es/spin';
 import { useMediaQuery } from 'usehooks-ts';
 import { blockchainSelectors, dexSelectors } from '../../../../redux/selectors';
 import { dexActions } from '../../../../redux/actions';
@@ -50,7 +51,7 @@ function ExchangeList() {
 
   if (!dexs) {
     return (
-      <div>Loading...</div>
+      <Spin />
     );
   }
 

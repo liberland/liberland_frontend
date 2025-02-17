@@ -69,13 +69,13 @@ export const navigationList = [
     icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED === 'true',
     subLinks: {
-      Constitution: router.legislation.constitution,
+      Decisions: router.legislation.decisions,
       'International treaty': router.legislation.internationalTreaty,
       Law: router.legislation.law,
       'Tier 3': router.legislation.tier3,
       'Tier 4': router.legislation.tier4,
       'Tier 5': router.legislation.tier5,
-      Decisions: router.legislation.decisions,
+      Constitution: router.legislation.constitution,
     },
   },
   {
@@ -123,12 +123,12 @@ export const navigationList = [
     isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
+      'Ministry Of Finance': router.offices.ministryOfFinance,
       Identity: router.offices.identity,
       'Company registry': router.offices.companyRegistry.home,
       'Land registry': router.offices.landRegistry,
       Finances: router.offices.finances,
       'Scheduled Congress Spending': router.offices.scheduledCongressSpending,
-      'Ministry Of Finance': router.offices.ministryOfFinance,
     },
   },
   {

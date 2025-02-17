@@ -4,6 +4,7 @@ import Popover from 'antd/es/popover';
 import Flex from 'antd/es/flex';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
+import Spin from 'antd/es/spin';
 import Descriptions from 'antd/es/descriptions';
 import { useSelector, useDispatch } from 'react-redux';
 import { walletSelectors, blockchainSelectors, identitySelectors } from '../../../redux/selectors';
@@ -17,6 +18,7 @@ import styles from './styles.module.scss';
 import AssetsMenuModal from './AssetsModal/AssetsMenu';
 import CreateOrUpdateAssetModal from './AssetsModal/CreateOrUpdateAsset';
 import CurrencyIcon from '../../CurrencyIcon';
+import truncate from '../../../utils/truncate';
 
 function Assets() {
   const userWalletAddress = useSelector(
@@ -59,7 +61,7 @@ function Assets() {
     ));
   }, [dispatch, assetDetails]);
 
-  const isBiggerThanLargeScreen = useMediaQuery('(min-width: 1025px)');
+  const isBiggerThanLargeScreen = useMediaQuery('(min-width: 1200px)');
   const { isStock } = useStockContext();
   const formatted = useMemo(
     () => additionalAssets?.map((asset, index) => {
@@ -73,39 +75,29 @@ function Assets() {
         identities?.[wallet]?.identity.legal
           || identities?.[wallet]?.identity.name
       );
+      const getIdentity = (address) => (
+        <Flex vertical gap="7px">
+          <strong>
+            {truncate(getName(address) || 'Unknown', isBiggerThanLargeScreen ? 20 : 15)}
+          </strong>
+          <div className="description">
+            <CopyIconWithAddress address={address} truncateBy={{ bigScreen: 12, smallScreen: 7 }} />
+          </div>
+        </Flex>
+      );
       const details = (
         <>
           <Descriptions.Item label="Admin">
-            {assetDetails?.[index]?.admin && (
-              <CopyIconWithAddress
-                address={assetDetails[index].admin}
-                name={getName(assetDetails[index].admin)}
-              />
-            )}
+            {assetDetails?.[index]?.admin && getIdentity(assetDetails?.[index]?.admin)}
           </Descriptions.Item>
           <Descriptions.Item label="Owner">
-            {assetDetails?.[index]?.owner && (
-              <CopyIconWithAddress
-                address={assetDetails?.[index]?.owner}
-                name={getName(assetDetails[index].owner)}
-              />
-            )}
+            {assetDetails?.[index]?.owner && getIdentity(assetDetails?.[index]?.owner)}
           </Descriptions.Item>
           <Descriptions.Item label="Issuer">
-            {assetDetails?.[index]?.issuer && (
-              <CopyIconWithAddress
-                address={assetDetails?.[index]?.issuer}
-                name={getName(assetDetails[index].issuer)}
-              />
-            )}
+            {assetDetails?.[index]?.issuer && getIdentity(assetDetails?.[index]?.issuer)}
           </Descriptions.Item>
           <Descriptions.Item label="Freezer">
-            {assetDetails?.[index]?.freezer && (
-              <CopyIconWithAddress
-                address={assetDetails?.[index]?.freezer}
-                name={getName(assetDetails[index].freezer)}
-              />
-            )}
+            {assetDetails?.[index]?.freezer && getIdentity(assetDetails?.[index]?.freezer)}
           </Descriptions.Item>
           <Descriptions.Item label="Supply">
             <Flex wrap gap="7px" align="center">
@@ -170,8 +162,8 @@ function Assets() {
     [isBiggerThanLargeScreen, identities, additionalAssets, assetDetails, userWalletAddress, isStock],
   );
 
-  if (!assetDetails || !additionalAssets || !userWalletAddress) {
-    return <div>Loading...</div>;
+  if (!assetDetails || !additionalAssets) {
+    return <Spin />;
   }
 
   const title = (

@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-
+import Modal from 'antd/es/modal';
+import Flex from 'antd/es/flex';
 import { useDispatch, useSelector } from 'react-redux';
 import { AuthContext } from 'react-oauth2-code-pkce';
 import { blockchainSelectors } from '../../redux/selectors';
@@ -13,17 +14,21 @@ function ErrorModal({ children }) {
   const blockchainError = useSelector(blockchainSelectors.blockchainError);
   const dispatch = useDispatch();
   const { login } = useContext(AuthContext);
+  const close = () => dispatch(blockchainActions.setErrorExistsAndUnacknowledgedByUser.call(false));
   return (
-    <div className={styles.content} style={{ position: 'relative' }}>
-      { errorExistsAndUnacknowledged
-    && (
-      <div className={styles.modalWrapper}>
-        <div className={styles.modal}>
-          <p className={styles.text}>
-            {blockchainError?.details}
-          </p>
-          {
-            blockchainError?.type !== 'LOGIN_ERROR'
+    <Modal
+      open
+      onClose={close}
+      onCancel={close}
+      footer={null}
+      closable
+      maskClosable
+    >
+      <Flex vertical gap="15px">
+        {children}
+        {errorExistsAndUnacknowledged && (
+          <Flex wrap gap="15px">
+            {blockchainError?.type !== 'LOGIN_ERROR'
               ? (
                 <Button
                   primary
@@ -42,14 +47,11 @@ function ErrorModal({ children }) {
                   </Button>
                   <Button primary onClick={login}>Login</Button>
                 </div>
-              )
-          }
-
-        </div>
-      </div>
-    )}
-      { children }
-    </div>
+              )}
+          </Flex>
+        )}
+      </Flex>
+    </Modal>
   );
 }
 

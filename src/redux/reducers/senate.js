@@ -14,10 +14,10 @@ const initialState = {
         amount: BN_ZERO,
       },
       polkastake: {
-        amount: 0,
+        amount: '0',
       },
       liquidMerits: {
-        amount: 0,
+        amount: '0',
       },
       totalAmount: {
         amount: BN_ZERO,
@@ -26,7 +26,7 @@ const initialState = {
         amount: BN_ZERO,
       },
       meritsTotalAmount: {
-        amount: 0,
+        amount: '0',
       },
       electionLock: 0,
     },

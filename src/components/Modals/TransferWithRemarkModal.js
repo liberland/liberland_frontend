@@ -161,14 +161,14 @@ TransferWithRemarkForm.propTypes = {
   userRemark: PropTypes.bool,
   submit: PropTypes.func.isRequired,
   additionalAssets: PropTypes.arrayOf(PropTypes.shape({
-    metadata: {
+    metadata: PropTypes.shape({
       symbol: PropTypes.string,
       name: PropTypes.string,
       decimals: PropTypes.number,
-    },
-    balance: {
+    }),
+    balance: PropTypes.shape({
       balance: PropTypes.number,
-    },
+    }),
   })),
   maxUnbond: PropTypes.number.isRequired,
   politipoolLlm: PropTypes.number.isRequired,

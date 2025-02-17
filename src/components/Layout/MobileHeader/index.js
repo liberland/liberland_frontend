@@ -21,7 +21,7 @@ function MobileHeader() {
           aria-label="Open pagination menu"
         />
         <img alt="logo" src={LiberlandLettermarkMobile} className={styles.mobileLogo} />
-        <div className={styles.mobileUser}>
+        <div className={styles.mobileUser} onClick={(e) => e.stopPropagation()}>
           <UserMenu />
         </div>
       </HeaderInternal>

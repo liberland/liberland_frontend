@@ -20,6 +20,7 @@ import styles from '../styles.module.scss';
 import CopyLink from './CopyLink';
 import modalWrapper from '../components/ModalWrapper';
 import OpenModalButton from '../components/OpenModalButton';
+import ScrollTo from '../../ScrollTo';
 
 function RequestLLDForm({ onClose }) {
   const [form] = Form.useForm();
@@ -79,7 +80,7 @@ function RequestLLDForm({ onClose }) {
   return (
     <Form form={form} onFinish={onSubmit} layout="vertical">
       {linkData && (
-        <div>
+        <ScrollTo deps={[linkData]}>
           {isLargerThanHdScreen ? (
             <Table
               columns={[
@@ -199,7 +200,7 @@ function RequestLLDForm({ onClose }) {
             )}
           />
           <Divider />
-        </div>
+        </ScrollTo>
       )}
       <Form.Item
         label="Requested payment amount in LLD"
