@@ -97,7 +97,7 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if (false && !wallets.map((w) => w.address).includes(userWalletAddress)) {
+  if (!wallets.map((w) => w.address).includes(userWalletAddress)) {
     return (
       <GuidedSetupWrapper>
         <MissingWalletComponent />
@@ -105,7 +105,7 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if (true || (!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true')) {
+  if ((!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true')) {
     return (
       <GuidedSetupWrapper>
         <InstructionOnBoard setIsClicked={setNotResidentAcceptedByUser} />
@@ -113,8 +113,7 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if (
-    (isUserEligibleForComplimentaryLLD
+  if ((isUserEligibleForComplimentaryLLD
       || isIdentityEmpty
       || isSkippedOnBoardingGetLLD === 'secondStep')
     && isSkippedOnBoardingGetLLD !== 'true'
