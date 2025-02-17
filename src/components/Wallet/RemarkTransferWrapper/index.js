@@ -21,12 +21,12 @@ function RemarkTransferWrapper({ onClose }) {
       description, id, recipient, select, transfer,
     } = data;
 
-    const remartInfo = {
+    const remarkInfo = {
       description, id: Number(id), recipient, select, transfer,
     };
 
     const properBalance = calculateProperBalance(transfer, index, decimals);
-    const encodedRemark = await encodeRemarkUser(remartInfo);
+    const encodedRemark = await encodeRemarkUser(remarkInfo);
     const transferData = { index, balance: properBalance, recipient };
     dispatch(walletActions.sendTransferRemark.call({ remarkInfo: encodedRemark, transferData }));
     onClose();

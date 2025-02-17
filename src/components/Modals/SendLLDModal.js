@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Flex from 'antd/es/flex';
+import Checkbox from 'antd/es/checkbox';
+import Collapse from 'antd/es/collapse';
 import InputNumber from 'antd/es/input-number';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN_ZERO, BN } from '@polkadot/util';
@@ -14,10 +16,13 @@ import { walletActions } from '../../redux/actions';
 import { walletSelectors } from '../../redux/selectors';
 import modalWrapper from './components/ModalWrapper';
 import OpenModalButton from './components/OpenModalButton';
+import RemarkFormUser from '../Wallet/RemarkFormUser';
+import { IndexHelper } from '../../utils/council/councilEnum';
 
 function SendLLDForm({ onClose }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
+  const [isLoading, setIsLoading] = useState();
   const maxUnbond = balances?.liquidAmount?.amount !== '0x0'
     ? BN.max(
       BN_ZERO,
@@ -26,13 +31,29 @@ function SendLLDForm({ onClose }) {
     : 0;
 
   const [form] = Form.useForm();
-  const transfer = (values) => {
-    dispatch(
-      walletActions.sendTransfer.call({
-        recipient: values.recipient,
-        amount: parseDollars(values.amount),
-      }),
-    );
+  const transfer = ({
+    recipient,
+    amount,
+    remark,
+    combined,
+  }) => {
+    if (remark) {
+      dispatch(walletActions.sendTransferRemark.call({
+        remarkInfo: combined,
+        transferData: {
+          index: IndexHelper.LLD,
+          balance: parseDollars(amount),
+          recipient,
+        },
+      }));
+    } else {
+      dispatch(
+        walletActions.sendTransfer.call({
+          recipient,
+          amount: parseDollars(amount),
+        }),
+      );
+    }
     onClose();
   };
 
@@ -50,6 +71,7 @@ function SendLLDForm({ onClose }) {
       return Promise.reject('Invalid amount');
     }
   };
+  const remark = Form.useWatch('remark', form);
 
   return (
     <Form form={form} layout="vertical" onFinish={transfer}>
@@ -74,10 +96,32 @@ function SendLLDForm({ onClose }) {
       >
         <InputNumber stringMode controls={false} placeholder="Amount LLD" />
       </Form.Item>
+      <Form.Item
+        name="remark"
+        label="Include remark"
+        layout="horizontal"
+        valuePropName="checked"
+      >
+        <Checkbox />
+      </Form.Item>
+      <Collapse
+        className="formCollapse"
+        activeKey={remark ? ['remark'] : []}
+        destroyInactivePanel
+        items={[{
+          key: 'remark',
+          children: (
+            <RemarkFormUser
+              form={form}
+              setIsLoading={setIsLoading}
+            />
+          ),
+        }]}
+      />
       <Flex wrap gap="15px">
         <Button onClick={onClose}>Cancel</Button>
-        <Button primary type="submit">
-          Make transfer
+        <Button primary disabled={isLoading} type="submit">
+          {isLoading ? 'Loading...' : 'Make transfer'}
         </Button>
       </Flex>
     </Form>

@@ -16,7 +16,6 @@ import { identityActions, walletActions } from '../../../redux/actions';
 import { walletSelectors, blockchainSelectors, congressSelectors } from '../../../redux/selectors';
 import Button from '../../Button/Button';
 import { transactionHistoryProcessorFactory } from '../WalletTransactionHistory/utils';
-import RemarkTransferModal from '../RemarkTransferWrapper';
 import styles from './styles.module.scss';
 import WalletTransactionHistoryMobile from '../WalletTransactionHistoryMobile';
 
@@ -88,7 +87,7 @@ function WalletOverview() {
 
   return (
     <Collapse
-      defaultActiveKey={['Remarks', 'BalanceOverview', 'AssetOverview', 'WalletTransactionHistory']}
+      defaultActiveKey={['BalanceOverview', 'AssetOverview', 'WalletTransactionHistory']}
       collapsible="icon"
       items={[
         {
@@ -110,13 +109,6 @@ function WalletOverview() {
               additionalAssets={additionalAssets}
               userIsMember={userIsMember}
             />
-          ),
-        },
-        {
-          label: 'Remarks',
-          key: 'Remarks',
-          children: (
-            <RemarkTransferModal />
           ),
         },
         {
