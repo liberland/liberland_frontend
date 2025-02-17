@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Input from 'antd/es/input';
 import Flex from 'antd/es/flex';
 import Spin from 'antd/es/spin';
+import Select from 'antd/es/select';
 import Paragraph from 'antd/es/typography/Paragraph';
 import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
 import {
   walletSelectors,
   blockchainSelectors,
+  registriesSelectors,
 } from '../../../../../redux/selectors';
-import { walletActions } from '../../../../../redux/actions';
+import { registriesActions, walletActions } from '../../../../../redux/actions';
 import Button from '../../../../Button/Button';
 import InputSearch from '../../../../InputComponents/InputSearchAddressName';
+import CompanyDetail from '../../CompanyDisplay';
 
 function CreateOrUpdateAssetForm({
   onClose,
@@ -33,6 +36,12 @@ function CreateOrUpdateAssetForm({
   const type = isStock ? 'stock' : 'asset';
   const typeCapitalized = isStock ? 'Stock' : 'Asset';
 
+  useEffect(() => {
+    dispatch(registriesActions.getOfficialRegistryEntries.call());
+  }, [dispatch]);
+
+  const allRegistries = useSelector(registriesSelectors.allRegistries)?.officialRegistryEntries;
+
   const onSubmit = async ({
     name,
     symbol,
@@ -41,6 +50,7 @@ function CreateOrUpdateAssetForm({
     admin,
     issuer,
     freezer,
+    companyId,
   }) => {
     setLoading(true);
     try {
@@ -62,6 +72,7 @@ function CreateOrUpdateAssetForm({
           issuer,
           freezer,
           owner: userWalletAddress,
+          companyId,
           isCreate,
           defaultValues,
           isStock,
@@ -153,7 +164,25 @@ function CreateOrUpdateAssetForm({
       >
         <InputSearch />
       </Form.Item>
-      <Paragraph>May ask you to sign up to 4 transactions</Paragraph>
+      <Form.Item
+        name="companyId"
+        label="Related company"
+      >
+        <Select
+          disabled={!allRegistries?.length}
+          placeholder={!allRegistries?.length ? 'No companies found' : 'Select related company'}
+          options={allRegistries?.map(({
+            id,
+            name,
+            logoURL,
+          }) => ({
+            value: id,
+            label: name || id || 'Unknown',
+            children: <CompanyDetail id={id} size={20} logo={logoURL} name={name} />,
+          })) || []}
+        />
+      </Form.Item>
+      <Paragraph>May ask you to sign up to 5 transactions</Paragraph>
       <Flex wrap gap="15px">
         <Button disabled={loading} medium onClick={onClose}>
           Close

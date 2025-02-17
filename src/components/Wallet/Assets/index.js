@@ -7,8 +7,13 @@ import List from 'antd/es/list';
 import Spin from 'antd/es/spin';
 import Descriptions from 'antd/es/descriptions';
 import { useSelector, useDispatch } from 'react-redux';
-import { walletSelectors, blockchainSelectors, identitySelectors } from '../../../redux/selectors';
-import { identityActions, walletActions } from '../../../redux/actions';
+import {
+  walletSelectors,
+  blockchainSelectors,
+  identitySelectors,
+  registriesSelectors,
+} from '../../../redux/selectors';
+import { identityActions, registriesActions, walletActions } from '../../../redux/actions';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import Button from '../../Button/Button';
 import Table from '../../Table';
@@ -19,6 +24,7 @@ import AssetsMenuModal from './AssetsModal/AssetsMenu';
 import CreateOrUpdateAssetModal from './AssetsModal/CreateOrUpdateAsset';
 import CurrencyIcon from '../../CurrencyIcon';
 import truncate from '../../../utils/truncate';
+import CompanyDetail from './CompanyDisplay';
 
 function Assets() {
   const userWalletAddress = useSelector(
@@ -32,7 +38,16 @@ function Assets() {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(walletActions.getAdditionalAssets.call());
+    dispatch(registriesActions.getOfficialRegistryEntries.call());
   }, [dispatch]);
+
+  const allRegistries = useSelector(registriesSelectors.allRegistries)?.officialRegistryEntries;
+  const mappedRegistries = useMemo(() => allRegistries?.reduce(
+    (mapped, registry) => {
+      mapped[registry.id] = registry;
+      return mapped;
+    },
+  ) || {}, [allRegistries]);
 
   const ids = useMemo(
     () => additionalAssets?.map((asset) => asset.index),
@@ -85,6 +100,8 @@ function Assets() {
           </div>
         </Flex>
       );
+      console.log(asset.companyId);
+      const { id: companyId, name: companyName, logoURL } = mappedRegistries[asset.companyId] || {};
       const details = (
         <>
           <Descriptions.Item label="Admin">
@@ -107,6 +124,16 @@ function Assets() {
               )}
               {symbol}
             </Flex>
+          </Descriptions.Item>
+          <Descriptions.Item label="Related company">
+            {asset.companyId ? (
+              <CompanyDetail
+                id={companyId}
+                size={isBiggerThanLargeScreen ? 32 : 20}
+                logo={logoURL}
+                name={companyName}
+              />
+            ) : 'None'}
           </Descriptions.Item>
         </>
       );
@@ -150,6 +177,7 @@ function Assets() {
               defaultValues={{
                 admin: assetDetails?.[index]?.admin,
                 balance: assetDetails?.[index]?.minBalance,
+                companyId: asset.companyId,
                 decimals: parseInt(asset.metadata.decimals) || 0,
                 freezer: assetDetails?.[index]?.freezer,
                 id: asset.index,
@@ -162,7 +190,7 @@ function Assets() {
         }
       );
     }).filter(({ isStock: assetIsStock }) => assetIsStock === isStock) || [],
-    [isBiggerThanLargeScreen, identities, additionalAssets, assetDetails, userWalletAddress, isStock],
+    [additionalAssets, mappedRegistries, assetDetails, isBiggerThanLargeScreen, userWalletAddress, identities, isStock],
   );
 
   if (!assetDetails || !additionalAssets) {

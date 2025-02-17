@@ -283,6 +283,7 @@ const createOrUpdateAsset = async ({
   issuer,
   freezer,
   owner,
+  companyId,
   isCreate,
   isStock,
   defaultValues,
@@ -300,6 +301,10 @@ const createOrUpdateAsset = async ({
     if (defaultValues?.issuer !== issuer || defaultValues?.admin !== admin || defaultValues?.freezer !== freezer) {
       const setTeam = await api.tx.assets.setTeam(id, issuer, admin, freezer);
       await submitExtrinsic(setTeam, owner, api);
+    }
+    if (defaultValues?.companyId !== companyId) {
+      const setCompanyId = await api.tx.assets.setRelatedCompany(id, companyId);
+      await submitExtrinsic(setCompanyId, owner, api);
     }
     if (isStock && isCreate) {
       const params = await api.tx.assets.setParameters(id, { eresidencyRequired: true });
@@ -436,15 +441,25 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
     const assets = [];
     const assetQueries = [];
     const parametersQueries = [];
+    const relatedCompanyQueries = [];
     processedMetadatas.forEach((asset) => {
       // Disregard LLM, asset of ID 1 because it has special treatment already
-      const isLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
-      if (isLLM) {
+      const isNotLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
+      if (isNotLLM) {
+        relatedCompanyQueries.push([api.query.assets.relatedCompany, [asset.index]]);
         assetQueries.push([api.query.assets.account, [asset.index, address]]);
         parametersQueries.push([api.query.assets.parameters, [asset.index]]);
         assets.push(asset);
       }
     });
+
+    if (relatedCompanyQueries.length !== 0) {
+      const relatedCompanyResults = await api.queryMulti(relatedCompanyQueries);
+
+      relatedCompanyResults.forEach((relatedCompanyId, index) => {
+        assets[index].companyId = relatedCompanyId;
+      });
+    }
 
     if (assetQueries.length !== 0) {
       const assetResults = await api.queryMulti(assetQueries);
