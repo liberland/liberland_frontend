@@ -1,25 +1,25 @@
 import React from 'react';
+import Title from 'antd/es/typography/Title';
+import Flex from 'antd/es/flex';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Link from 'antd/es/typography/Link';
 import WalletListComponent from '../WalletListComponent';
-import { propsWalletListUserID } from '../propsTypes/propTypes';
+import styles from './styles.module.scss';
 
-function NoConnectedWalletComponent({ walletList, userId }) {
+function NoConnectedWalletComponent() {
   return (
-    <div>
-      <h2>Register wallet</h2>
-      <p>
+    <Flex vertical>
+      <Title className={styles.heading} level={2}>Register wallet</Title>
+      <Paragraph>
         You do not yet have a connected wallet address on
         {' '}
-        <a href={process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}>liberland.org</a>
+        <Link href={process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}>liberland.org</Link>
         .
-      </p>
-      <br />
-      <p>You can connect one of the detected wallets now</p>
-      <br />
-      <WalletListComponent walletList={walletList} userId={userId} />
-    </div>
+      </Paragraph>
+      <Paragraph>You can connect one of the detected wallets now</Paragraph>
+      <WalletListComponent />
+    </Flex>
   );
 }
-
-NoConnectedWalletComponent.propTypes = propsWalletListUserID;
 
 export default NoConnectedWalletComponent;

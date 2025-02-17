@@ -1,4 +1,8 @@
-.wrapper{
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.45);
+.wrapper {
+  top: 0;
+}
+.loader {
+  top: calc(50% - 70px);
+  width: 70px!important;
+  height: 70px!important;
 }

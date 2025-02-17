@@ -11,7 +11,7 @@ import styles from '../styles.module.scss';
 
 function AddLegislation({ proposal, isDetailsHidden }) {
   const { args: [tier, { year, index }, sections] } = proposal;
-  const [show, setShow] = useState(isDetailsHidden);
+  const [show, setShow] = useState(!isDetailsHidden);
 
   useEffect(() => {
     setShow(!isDetailsHidden);
@@ -33,7 +33,6 @@ function AddLegislation({ proposal, isDetailsHidden }) {
         {index.toNumber()}
       </Paragraph>
       <Collapse
-        collapsible="icon"
         onChange={() => setShow(!show)}
         activeKey={show ? ['details'] : []}
         items={[

@@ -23,9 +23,9 @@ function Motions({
 
   useEffect(() => {
     if (isSenate) {
-      dispatch(congressActions.getMembers.call());
-    } else {
       dispatch(senateActions.senateGetMembers.call());
+    } else {
+      dispatch(congressActions.getMembers.call());
     }
   }, [dispatch, isSenate]);
 

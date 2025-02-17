@@ -47,7 +47,7 @@ function App() {
     <Router>
       <ModalProvider>
         <Loader>
-          {user ? (
+          {true || user ? (
             <CheckExtensionWalletProvider>
               <GuidedSetup>{appRouter}</GuidedSetup>
             </CheckExtensionWalletProvider>

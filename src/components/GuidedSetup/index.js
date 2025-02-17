@@ -75,7 +75,7 @@ function GuidedSetup({ children }) {
 
   if (isLoading) {
     return (
-      <GuidedSetupWrapper>
+      <GuidedSetupWrapper isLoading>
         <LoadingComponent />
       </GuidedSetupWrapper>
     );
@@ -97,7 +97,7 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if (!wallets.map((w) => w.address).includes(userWalletAddress)) {
+  if (false && !wallets.map((w) => w.address).includes(userWalletAddress)) {
     return (
       <GuidedSetupWrapper>
         <MissingWalletComponent />
@@ -105,7 +105,7 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if (!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true') {
+  if (true || (!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true')) {
     return (
       <GuidedSetupWrapper>
         <InstructionOnBoard setIsClicked={setNotResidentAcceptedByUser} />
