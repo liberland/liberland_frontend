@@ -5,13 +5,13 @@ import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
+import Link from 'antd/es/typography/Link';
 import { blockchainSelectors, validatorSelectors } from '../../../redux/selectors';
 import { validatorActions } from '../../../redux/actions';
 import StakeManagement from '../StakeManagement';
 import Validator from '../Validator';
 import Nominator from '../Nominator';
 import styles from './styles.module.scss';
-import Button from '../../Button/Button';
 import { CreateValidatorModal, StakeLLDModal } from '../../Modals';
 
 export default function StakingOverview() {
@@ -48,12 +48,9 @@ export default function StakingOverview() {
             Validators receive rewards for staking (about 15% APY), take a commission,
             and distribute the remaining rewards to the nominators. Learn more
             {' '}
-            <Button
-              href={infoLink}
-              link
-            >
+            <Link href={infoLink}>
               here
-            </Button>
+            </Link>
             .
           </Paragraph>
           <Flex wrap gap="15px" justify="center">

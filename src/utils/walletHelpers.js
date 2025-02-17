@@ -148,7 +148,7 @@ export const calculateSlippage = (
   amount,
   minAmountPercent,
 ) => {
-  const defaultMinPercent = 0.5;
+  const defaultMinPercent = 10;
   const denominator = 10000;
   const slippagePercentBN = new BN(((Number(minAmountPercent) || defaultMinPercent) * denominator) / 100);
   return new BN(amount).mul(slippagePercentBN).div(new BN(denominator));

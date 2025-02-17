@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Select from 'antd/es/select';
+import Spin from 'antd/es/spin';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { useStockContext } from '../../StockContext';
@@ -118,7 +119,7 @@ function AddAssetForm({
   const firstAsset = Form.useWatch('firstAsset', form);
 
   if (!filtered) {
-    return <div>Loading...</div>;
+    return <Spin />;
   }
 
   return (

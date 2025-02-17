@@ -75,7 +75,7 @@ function GuidedSetup({ children }) {
 
   if (isLoading) {
     return (
-      <GuidedSetupWrapper>
+      <GuidedSetupWrapper isLoading>
         <LoadingComponent />
       </GuidedSetupWrapper>
     );
@@ -113,8 +113,7 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if (
-    (isUserEligibleForComplimentaryLLD
+  if ((isUserEligibleForComplimentaryLLD
       || isIdentityEmpty
       || isSkippedOnBoardingGetLLD === 'secondStep')
     && isSkippedOnBoardingGetLLD !== 'true'

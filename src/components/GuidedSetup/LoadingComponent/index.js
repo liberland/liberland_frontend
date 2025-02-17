@@ -1,9 +1,12 @@
 import React from 'react';
 import Spin from 'antd/es/spin';
+import { Flex } from 'antd';
 
 function LoadingComponent() {
   return (
-    <Spin size="large" />
+    <Flex justify="center" align="center">
+      <Spin size="large" />
+    </Flex>
   );
 }
 

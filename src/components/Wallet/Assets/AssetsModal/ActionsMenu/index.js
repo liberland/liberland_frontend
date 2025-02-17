@@ -18,7 +18,7 @@ function ActionsMenu({
       {(isOwner || isAdmin) && (
         <CreateOrUpdateAssetModal defaultValues={defaultValues} />
       )}
-      {!isIssuer && (
+      {isIssuer && (
         <MintModal
           assetId={assetId}
           minimumBalance={defaultValues.balance}

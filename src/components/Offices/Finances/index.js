@@ -90,7 +90,9 @@ export default function Finances() {
     }
   }, [dispatch, pallets]);
 
-  if (!pallets || !balances) return 'Loading...';
+  if (!pallets || !balances) {
+    return <Spin />;
+  }
 
   const formatPercent = (value) => `${Math.round(10000 * value) / 100}%`;
 

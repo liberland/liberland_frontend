@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Title from 'antd/es/typography/Title';
+import Flex from 'antd/es/flex';
 import {
   onboardingSelectors,
   blockchainSelectors,
@@ -14,7 +17,6 @@ import {
   walletActions,
 } from '../../../redux/actions';
 import Button from '../../Button/Button';
-import styles from './styles.module.scss';
 import router from '../../../router';
 import UpdateProfile from '../../Profile/UpdateProfile';
 
@@ -54,11 +56,16 @@ function OnBoarding({ setIsSkippedOnBoardingGetLLD }) {
 
   if (!isFirstStepSkipped) {
     return (
-      <div className={styles.wrapper}>
-        <h3>Claim 2 gratis LLD for e-residency. This is needed to pay gas fees for onboarding</h3>
-        <div className={styles.buttons}>
+      <Flex vertical>
+        <Title level={2}>
+          Claim free LLD
+        </Title>
+        <Paragraph>Claim 2 gratis LLD for e-residency.</Paragraph>
+        <Paragraph>
+          This is needed to pay gas fees for onboarding
+        </Paragraph>
+        <Flex wrap gap="15px">
           <Button
-            medium
             primary
             disabled={isLoading}
             onClick={() => {
@@ -73,16 +80,21 @@ function OnBoarding({ setIsSkippedOnBoardingGetLLD }) {
           <Button onClick={() => setIsFirstStepSkipped(true)}>
             Skip
           </Button>
-        </div>
-      </div>
+        </Flex>
+      </Flex>
     );
   }
 
   return (
-    <div className={styles.wrapper}>
-      <h3>Update identity to claim tokens, e-residency and citizenship.</h3>
-      <h4>Once you do, it will take about a day for the Ministry of Interior to onboard you.</h4>
-      <div className={styles.buttons}>
+    <Flex vertical>
+      <Title level={2}>Update identity</Title>
+      <Paragraph>
+        Update identity to claim tokens, e-residency and citizenship.
+      </Paragraph>
+      <Paragraph>
+        Once you do, it will take about a day for the Ministry of Interior to onboard you.
+      </Paragraph>
+      <Flex wrap gap="15px">
         <UpdateProfile
           isGuidedUpdate
           blockNumber={blockNumber}
@@ -91,8 +103,6 @@ function OnBoarding({ setIsSkippedOnBoardingGetLLD }) {
           userName={userName}
         />
         <Button
-          medium
-          gray
           onClick={() => {
             setIsSkippedOnBoardingGetLLD('true');
             sessionStorage.setItem('SkippedOnBoardingGetLLD', true);
@@ -101,8 +111,8 @@ function OnBoarding({ setIsSkippedOnBoardingGetLLD }) {
         >
           Skip
         </Button>
-      </div>
-    </div>
+      </Flex>
+    </Flex>
   );
 }
 

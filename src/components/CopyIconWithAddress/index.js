@@ -9,7 +9,7 @@ import truncate from '../../utils/truncate';
 import styles from './styles.module.scss';
 
 function CopyIconWithAddress({
-  address, name, isTruncate, legal, showAddress,
+  address, name, isTruncate, legal, showAddress, truncateBy,
 }) {
   const [api, contextHolder] = notification.useNotification();
   const isBigScreen = useMediaQuery('(min-width: 1200px)');
@@ -17,6 +17,14 @@ function CopyIconWithAddress({
     navigator.clipboard.writeText(dataToCoppy);
     api.success({ message: 'Address was copied' });
   };
+
+  const truncateValues = {
+    bigScreen: 18,
+    smallScreen: 12,
+    ...truncateBy,
+  };
+
+  const truncateByScreen = isBigScreen ? truncateValues.bigScreen : truncateValues.smallScreen;
 
   return (
     <Flex gap="10px" className={styles.copyIconWithAdress}>
@@ -29,13 +37,13 @@ function CopyIconWithAddress({
         </span>
       ) : (
         <span>
-          {isTruncate ? truncate(address || '', isBigScreen ? 18 : 12) : address}
+          {isTruncate ? truncate(address || '', truncateByScreen) : address}
         </span>
       )}
       {showAddress && (name || legal) && (
         <span>
           (
-            {isTruncate ? truncate(address || '', isBigScreen ? 18 : 12) : address}
+            {isTruncate ? truncate(address || '', truncateByScreen) : address}
           )
         </span>
       )}
@@ -64,6 +72,7 @@ CopyIconWithAddress.propTypes = {
   isTruncate: PropTypes.bool,
   legal: PropTypes.string,
   showAddress: PropTypes.bool,
+  truncateBy: PropTypes.shape({ bigScreen: PropTypes.number.isRequired, smallScreen: PropTypes.number.isRequired }),
 };
 
 export default CopyIconWithAddress;

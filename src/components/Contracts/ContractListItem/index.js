@@ -6,27 +6,22 @@ import cx from 'classnames';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useHistory } from 'react-router-dom';
 import Markdown from 'markdown-to-jsx';
-import { useDispatch } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
 import { deriveAndHideContractTitle } from '../utils';
 import { useContractItem } from '../hooks';
 import Button from '../../Button/Button';
-import { contractsActions } from '../../../redux/actions';
 import styles from './styles.module.scss';
 
-function ContractItem({
+function ContractListItem({
   contractId,
   creator,
   data,
   parties,
   judgesSignaturesList,
   partiesSignaturesList,
-  isMyContracts,
 }) {
-  const dispatch = useDispatch();
   const history = useHistory();
   const {
-    isMeSigned,
     routerLink,
     setTitle,
     title,
@@ -39,14 +34,6 @@ function ContractItem({
   });
   const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
   const buttons = [
-    <Button
-      primary
-      disabled={isMeSigned}
-      key="party"
-      onClick={() => dispatch(contractsActions.signContract.call({ contractId, isMyContracts }))}
-    >
-      Sign as a party
-    </Button>,
     <Button
       href={routerLink}
       onClick={() => {
@@ -101,12 +88,7 @@ function ContractItem({
   );
 }
 
-ContractItem.defaultProps = {
-  isMyContracts: false,
-};
-
-ContractItem.propTypes = {
-  isMyContracts: PropTypes.bool,
+ContractListItem.propTypes = {
   contractId: PropTypes.string.isRequired,
   creator: PropTypes.string.isRequired,
   data: PropTypes.string.isRequired,
@@ -115,4 +97,4 @@ ContractItem.propTypes = {
   partiesSignaturesList: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
-export default ContractItem;
+export default ContractListItem;
