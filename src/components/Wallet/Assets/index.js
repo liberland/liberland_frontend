@@ -110,6 +110,9 @@ function Assets() {
           </Descriptions.Item>
         </>
       );
+      const isAdmin = assetDetails?.[index]?.admin === userWalletAddress;
+      const isOwner = assetDetails?.[index]?.owner === userWalletAddress;
+      const isIssuer = assetDetails?.[index]?.issuer === userWalletAddress;
       return (
         {
           ...asset,
@@ -138,11 +141,11 @@ function Assets() {
               {details}
             </Descriptions>
           ),
-          actions: (
+          actions: isAdmin || isOwner || isIssuer ? (
             <AssetsMenuModal
-              isAdmin={assetDetails?.[index]?.admin === userWalletAddress}
-              isOwner={assetDetails?.[index]?.owner === userWalletAddress}
-              isIssuer={assetDetails?.[index]?.issuer === userWalletAddress}
+              isAdmin={isAdmin}
+              isOwner={isOwner}
+              isIssuer={isIssuer}
               assetId={asset.index}
               defaultValues={{
                 admin: assetDetails?.[index]?.admin,
@@ -155,7 +158,7 @@ function Assets() {
                 symbol: asset.metadata.symbol,
               }}
             />
-          ),
+          ) : isBiggerThanLargeScreen && <div className="description">None</div>,
         }
       );
     }).filter(({ isStock: assetIsStock }) => assetIsStock === isStock) || [],
