@@ -2,8 +2,8 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { newCompanyDataObject } from '../../../../utils/defaultData';
-import { BuildRegistryForm } from '../../../../utils/registryFormBuilder';
 import { registriesActions } from '../../../../redux/actions';
+import CompaniesForm from '../../CompaniesForm';
 
 export default function CreateCompany() {
   const dispatch = useDispatch();
@@ -20,7 +20,7 @@ export default function CreateCompany() {
   });
 
   return (
-    <BuildRegistryForm
+    <CompaniesForm
       formObject={newCompanyDataObject}
       buttonMessage="Submit Company Application"
       companyId={null}

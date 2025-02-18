@@ -23,8 +23,8 @@ export const useCompanyDataFromUrl = () => {
   const company = allRegistries.officialRegistryEntries?.find((item) => item.id === companyId);
   const request = registries?.officialUserRegistryEntries?.companies?.requested?.find((item) => item.id === companyId);
 
-  if (company) {
-    return { mainDataObject: company, request: false };
+  if (request) {
+    return { mainDataObject: request, request: true };
   }
-  return { mainDataObject: request, request: true };
+  return { mainDataObject: company, request: false };
 };

@@ -8,6 +8,14 @@ import Fuse from 'fuse.js';
 import PropTypes from 'prop-types';
 import AutoCompleteInternal from 'antd/es/auto-complete';
 
+const concatNameWithPrefix = (name, prefix) => {
+  if (!prefix) {
+    return name;
+  }
+  const normalizedName = Array.isArray(name) ? name : [name];
+  return [prefix, ...normalizedName];
+};
+
 export default function AutoComplete({
   form,
   options,
@@ -19,8 +27,9 @@ export default function AutoComplete({
   empty,
   placeholder,
   keys,
+  prefix,
 }) {
-  const currentValue = Form.useWatch(name, form);
+  const currentValue = Form.useWatch(concatNameWithPrefix(name, prefix), form);
   const [extra, setExtra] = useState(<div className="description">None</div>);
   const [shownOptions, setShownOptions] = useState(options);
   const updateExtra = (nextValue, currentOptions) => {
@@ -71,7 +80,7 @@ AutoComplete.propTypes = {
   form: PropTypes.shape({ setFieldValue: PropTypes.func.isRequired }).isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   options: PropTypes.array,
-  name: PropTypes.string.isRequired,
+  name: PropTypes.oneOfType([PropTypes.array, PropTypes.string.isRequired]).isRequired,
   initialValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   renderSelected: PropTypes.func.isRequired,
   renderOption: PropTypes.func.isRequired,
@@ -79,4 +88,5 @@ AutoComplete.propTypes = {
   empty: PropTypes.string.isRequired,
   placeholder: PropTypes.string.isRequired,
   keys: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+  prefix: PropTypes.string,
 };
