@@ -33,9 +33,9 @@ function App() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    urlParams.get('mobileLogin');
-    if (urlParams.get('mobileLogin') === 'true') {
-      urlParams.delete('mobileLogin');
+
+    if (urlParams.get('login') === 'true') {
+      urlParams.delete('login');
       const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
       window.history.replaceState({}, '', newUrl);
       login();
@@ -62,13 +62,10 @@ function App() {
     <Router>
       <ModalProvider>
         <Loader>
-          {user ? (
-            <CheckExtensionWalletProvider>
-              <GuidedSetup>{appRouter}</GuidedSetup>
-            </CheckExtensionWalletProvider>
-          ) : (
-            <CheckExtensionWalletProvider>{appRouter}</CheckExtensionWalletProvider>
-          )}
+          <CheckExtensionWalletProvider>
+            {user ? <GuidedSetup>{appRouter}</GuidedSetup>
+              : appRouter}
+          </CheckExtensionWalletProvider>
         </Loader>
       </ModalProvider>
     </Router>
