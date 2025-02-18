@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 export default function ScrollTo({ deps, children }) {
   const scrollToRef = useRef();
-  useEffect(() => {
+  useLayoutEffect(() => {
     scrollToRef.current?.scrollIntoView({ behavior: 'smooth' });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
