@@ -1,6 +1,6 @@
 import React from 'react';
 import Spin from 'antd/es/spin';
-import { Flex } from 'antd';
+import Flex from 'antd/es/flex';
 
 function LoadingComponent() {
   return (
