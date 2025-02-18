@@ -209,7 +209,15 @@ function CreateOrUpdateAssetForm({
           logoURL,
         }) => ({
           value: id,
-          label: <CompanyDetail id={id} size={40} logo={logoURL} name={name} />,
+          label: (
+            <CompanyDetail
+              id={id}
+              size={40}
+              logo={logoURL}
+              name={name}
+              asset={defaultValues?.id || 0}
+            />
+          ),
         })}
         initialValue={defaultValues?.companyId}
         options={allRegistries}

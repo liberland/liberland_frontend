@@ -43,8 +43,12 @@ function Assets() {
     dispatch(registriesActions.getOfficialRegistryEntries.call());
   }, [dispatch]);
 
+  const registries = useSelector(registriesSelectors.registries)?.officialUserRegistryEntries?.companies?.registered;
   const allRegistries = useSelector(registriesSelectors.allRegistries)?.officialRegistryEntries;
-  const mappedRegistries = useMemo(() => (allRegistries ? groupBy(allRegistries, 'id') : {}), [allRegistries]);
+
+  const mappedRegistries = useMemo(() => (
+    groupBy([...(registries || []), ...(allRegistries || [])], 'id')
+  ), [registries, allRegistries]);
 
   const ids = useMemo(
     () => additionalAssets?.map((asset) => asset.index),
@@ -56,6 +60,13 @@ function Assets() {
       dispatch(walletActions.getAssetsDetails.call(ids));
     }
   }, [dispatch, ids]);
+  useEffect(() => {
+    if (userWalletAddress) {
+      dispatch(
+        registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress),
+      );
+    }
+  }, [dispatch, userWalletAddress]);
 
   useEffect(() => {
     dispatch(identityActions.getIdentityMotions.call(
@@ -133,6 +144,7 @@ function Assets() {
                 size={isBiggerThanLargeScreen ? 32 : 20}
                 logo={logoURL}
                 name={companyName}
+                asset={asset.index}
               />
             ) : 'None'}
           </Descriptions.Item>
