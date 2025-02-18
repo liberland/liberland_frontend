@@ -21,12 +21,12 @@ import Divider from 'antd/es/divider';
 import { useHistory } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useMediaQuery } from 'usehooks-ts';
-import Button from '../components/Button/Button';
+import Button from '../../Button/Button';
 import './utils.scss';
-import { newCompanyDataObject } from './defaultData';
-import { useHideTitle } from '../components/Layout/HideTitle';
-import FormSection from '../components/FormSection';
-import router from '../router';
+import { newCompanyDataObject } from '../../../utils/defaultData';
+import { useHideTitle } from '../../Layout/HideTitle';
+import FormSection from '../../FormSection';
+import router from '../../../router';
 
 const buildFieldName = (index, dynamicField, suffix) => (dynamicField.encryptable
   ? [index, dynamicField.key, suffix]

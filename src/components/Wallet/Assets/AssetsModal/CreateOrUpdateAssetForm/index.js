@@ -1,21 +1,16 @@
 import React, {
-  useCallback,
   useEffect,
-  useMemo,
   useState,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Fuse from 'fuse.js';
 import Form from 'antd/es/form';
 import Input from 'antd/es/input';
 import Flex from 'antd/es/flex';
 import Spin from 'antd/es/spin';
-import AutoComplete from 'antd/es/auto-complete';
 import Paragraph from 'antd/es/typography/Paragraph';
 import InputNumber from 'antd/es/input-number';
 import Title from 'antd/es/typography/Title';
 import PropTypes from 'prop-types';
-import groupBy from 'lodash/groupBy';
 import {
   walletSelectors,
   blockchainSelectors,
@@ -28,6 +23,7 @@ import CompanyDetail from '../../CompanyDisplay';
 import CompanyImage from '../../CompanyImage';
 import truncate from '../../../../../utils/truncate';
 import styles from './styles.module.scss';
+import AutoComplete from '../../../../AutoComplete';
 
 function CreateOrUpdateAssetForm({
   onClose,
@@ -52,41 +48,6 @@ function CreateOrUpdateAssetForm({
   }, [dispatch]);
 
   const allRegistries = useSelector(registriesSelectors.allRegistries)?.officialRegistryEntries;
-  const [shownOptions, setShownOptions] = useState(allRegistries);
-  const [extra, setExtra] = useState(<div className="description">None</div>);
-  const mappedRegistries = useMemo(() => (allRegistries ? groupBy(allRegistries, 'id') : {}), [allRegistries]);
-  const search = useMemo(
-    () => new Fuse(allRegistries, {
-      keys: ['id', 'name'],
-      distance: 3,
-    }),
-    [allRegistries],
-  );
-  const companyIdValue = Form.useWatch('companyId', form);
-  const updateExtra = useCallback((companyId) => {
-    const { name: companyName, logoURL: companyLogo } = mappedRegistries[companyId]?.[0] || {};
-    if (companyId) {
-      setExtra(
-        <Flex wrap gap="15px" align="center" className={styles.extra}>
-          <div className="description">
-            {truncate(companyName || 'Unknown', 15)}
-          </div>
-          <CompanyImage
-            id={companyId}
-            size={32}
-            logo={companyLogo}
-            name={companyName || 'Unknown'}
-          />
-        </Flex>,
-      );
-    } else {
-      setExtra(<div className="description">None</div>);
-    }
-  }, [mappedRegistries]);
-
-  useEffect(() => {
-    updateExtra(defaultValues.companyId);
-  }, [updateExtra, defaultValues.companyId]);
 
   const onSubmit = async ({
     name,
@@ -213,36 +174,50 @@ function CreateOrUpdateAssetForm({
       >
         <InputSearch />
       </Form.Item>
-      <Form.Item
+      <AutoComplete
+        empty="No companies found"
+        form={form}
+        label="Select related company"
         name="companyId"
-        label="Related company"
-        extra={extra}
-      >
-        <Flex vertical gap="20px">
-          <AutoComplete
-            disabled={!allRegistries?.length}
-            placeholder={!allRegistries?.length ? 'No companies found' : 'Select related company'}
-            onSelect={(_, { value }) => {
-              form.setFieldValue('companyId', value);
-              updateExtra(value);
-            }}
-            onFocus={() => setShownOptions(allRegistries)}
-            onSearch={(value) => setShownOptions(search.search(value).map(({ item }) => item))}
-            options={shownOptions?.map(({
-              id,
-              name,
-              logoURL,
-            }) => ({
-              value: id,
-              label: <CompanyDetail id={id} size={40} logo={logoURL} name={name} />,
-            })) || []}
-            onBlur={() => updateExtra(companyIdValue)}
-          />
-        </Flex>
-      </Form.Item>
+        placeholder="Select related company"
+        renderSelected={(companyId, options) => {
+          if (companyId) {
+            const {
+              name: companyName,
+              logoURL: companyLogo,
+            } = options?.find(({ id }) => companyId.toString() === id) || {};
+
+            return (
+              <Flex wrap gap="15px" align="center" className={styles.extra}>
+                <div className="description">
+                  {truncate(companyName || 'Unknown', 15)}
+                </div>
+                <CompanyImage
+                  id={companyId}
+                  size={32}
+                  logo={companyLogo}
+                  name={companyName || 'Unknown'}
+                />
+              </Flex>
+            );
+          }
+          return <div className="description">None</div>;
+        }}
+        renderOption={({
+          id,
+          name,
+          logoURL,
+        }) => ({
+          value: id,
+          label: <CompanyDetail id={id} size={40} logo={logoURL} name={name} />,
+        })}
+        initialValue={defaultValues?.companyId}
+        options={allRegistries}
+        keys={['id', 'name']}
+      />
       <Paragraph>May ask you to sign up to 5 transactions</Paragraph>
       <Flex wrap gap="15px">
-        <Button disabled={loading} medium onClick={onClose}>
+        <Button disabled={loading} onClick={onClose}>
           Close
         </Button>
         <Button primary medium type="submit" disabled={loading}>

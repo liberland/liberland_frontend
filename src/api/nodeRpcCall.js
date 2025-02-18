@@ -6,7 +6,7 @@ import {
 } from '@polkadot/util';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
-import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
+import { blockchainDataToFormObject } from '../components/Companies/CompaniesForm';
 import * as centralizedBackend from './backend';
 // eslint-disable-next-line import/no-cycle
 import { convertAssetData } from '../utils/dexFormatter';
