@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Collapse from 'antd/es/collapse';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
@@ -10,6 +10,8 @@ import Space from 'antd/es/space';
 import Title from 'antd/es/typography/Title';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
+import { useMediaQuery } from 'usehooks-ts';
+import { useDispatch, useSelector } from 'react-redux';
 import ArrowLeft from '../../../assets/icons/arrow-left.svg';
 import styles from './styles.module.scss';
 import { useHideTitle } from '../../Layout/HideTitle';
@@ -22,13 +24,44 @@ import { tryFormatDollars, tryFormatNumber } from '../../../utils/walletHelpers'
 import CompanyPersonas from '../CompanyPersonas';
 import { simplifyCompanyObject } from '../utils';
 import ColorAvatar from '../../ColorAvatar';
+import { walletActions } from '../../../redux/actions';
+import { walletSelectors } from '../../../redux/selectors';
+import CompanyAsset from '../CompanyAsset';
 
 function CompanyDetail() {
   const { mainDataObject: complexDataObject, request } = useCompanyDataFromUrl();
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   const mainDataObject = useMemo(() => simplifyCompanyObject(complexDataObject || {}), [complexDataObject]);
-
-  useHideTitle();
+  const dispatch = useDispatch();
   const history = useHistory();
+  const additionalAssets = useSelector(
+    walletSelectors.selectorAdditionalAssets,
+  );
+  const [connectedAssets, relevantAssets] = useMemo(() => {
+    if (additionalAssets && complexDataObject?.relevantAssets) {
+      return additionalAssets.reduce(([connected, relevant], asset) => {
+        const { companyId, index } = asset;
+        if (companyId?.toString() !== complexDataObject.id?.toString()) {
+          return [connected, relevant];
+        }
+        const isConnected = complexDataObject.relevantAssets.some(({ assetId }) => (
+          assetId?.value?.toString() === index?.toString()
+        ));
+        if (isConnected) {
+          connected.push(asset);
+        } else {
+          relevant.push(asset);
+        }
+        return [connected, relevant];
+      }, [[], []]);
+    }
+    return [[], []];
+  }, [additionalAssets, complexDataObject]);
+
+  useEffect(() => {
+    dispatch(walletActions.getAdditionalAssets.call());
+  }, [dispatch]);
+  useHideTitle();
 
   if (!mainDataObject) {
     return <Result status="error" title="Company data invalid" />;
@@ -91,6 +124,7 @@ function CompanyDetail() {
           'UBOs',
           'contracts',
           'assets',
+          'connected',
         ]}
         items={[
           {
@@ -266,6 +300,13 @@ function CompanyDetail() {
                 size="small"
                 renderItem={({ contractId }) => {
                   const url = router.contracts.item.replace(':id', contractId);
+                  const contractButton = (
+                    <Button
+                      onClick={() => history.push(url)}
+                    >
+                      View contract
+                    </Button>
+                  );
                   return (
                     <List.Item>
                       <Card
@@ -274,15 +315,11 @@ function CompanyDetail() {
                           header: classNames(styles.header, styles.view),
                           body: styles.noLine,
                         }}
-                        extra={(
-                          <Button
-                            href={url}
-                            onClick={() => history.push(url)}
-                          >
-                            View contract
-                          </Button>
-                        )}
+                        extra={isBiggerThanSmallScreen ? contractButton : undefined}
                         title={`Contract ID: ${contractId}`}
+                        actions={isBiggerThanSmallScreen ? undefined : [
+                          <Flex wrap justify="center" gap="15px">{contractButton}</Flex>,
+                        ]}
                       />
                     </List.Item>
                   );
@@ -290,7 +327,28 @@ function CompanyDetail() {
               />
             ),
           },
-          {
+          connectedAssets.length > 0 && {
+            key: 'connected',
+            label: 'Connected on-chain asset(s)',
+            children: (
+              <List
+                itemLayout="horizontal"
+                grid={{ gutter: 16, column: 3 }}
+                className="threeColumnList"
+                dataSource={connectedAssets}
+                size="small"
+                renderItem={({ index, metadata }) => {
+                  const { name, symbol } = metadata;
+                  return (
+                    <List.Item>
+                      <CompanyAsset index={index} name={name} symbol={symbol} isConnected />
+                    </List.Item>
+                  );
+                }}
+              />
+            ),
+          },
+          relevantAssets.length > 0 && {
             key: 'assets',
             label: 'Relevant on-chain asset(s)',
             children: (
@@ -298,24 +356,20 @@ function CompanyDetail() {
                 itemLayout="horizontal"
                 grid={{ gutter: 16, column: 3 }}
                 className="threeColumnList"
-                dataSource={mainDataObject.relevantAssets}
+                dataSource={relevantAssets}
                 size="small"
-                renderItem={({ assetId }) => (
-                  <List.Item>
-                    <Card
-                      size="small"
-                      classNames={{
-                        header: classNames(styles.header, styles.view),
-                        body: styles.noLine,
-                      }}
-                      title={`Asset ID: ${assetId}`}
-                    />
-                  </List.Item>
-                )}
+                renderItem={({ index, metadata }) => {
+                  const { name, symbol } = metadata;
+                  return (
+                    <List.Item>
+                      <CompanyAsset index={index} name={name} symbol={symbol} />
+                    </List.Item>
+                  );
+                }}
               />
             ),
           },
-        ]}
+        ].filter(Boolean)}
       />
     </>
   );

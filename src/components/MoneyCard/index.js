@@ -16,12 +16,14 @@ function MoneyCard({
   amount,
   description,
   className,
+  noBorder,
 }) {
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
 
   return (
     <Card
       size="small"
+      variant={noBorder ? 'borderless' : undefined}
       className={classNames(styles.card, className)}
       actions={isBiggerThanDesktop && actions ? [
         <Flex wrap gap="15px" align="start">
@@ -68,6 +70,7 @@ MoneyCard.propTypes = {
   amount: PropTypes.string,
   description: PropTypes.node,
   className: PropTypes.string,
+  noBorder: PropTypes.bool,
 };
 
 export default MoneyCard;
