@@ -7,6 +7,7 @@ import Avatar from 'antd/es/avatar';
 import Flex from 'antd/es/flex';
 import Divider from 'antd/es/divider';
 import Space from 'antd/es/space';
+import Alert from 'antd/es/alert';
 import Title from 'antd/es/typography/Title';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
@@ -113,6 +114,13 @@ function CompanyDetail() {
           <CompanyActions registeredCompany={mainDataObject} type={request ? 'detail-request' : 'detail'} />
         </Flex>
       </Flex>
+      {request && (
+        <>
+          <Divider />
+          <Alert type="warning" message="Company changes requested, pending approval" />
+          <Divider />
+        </>
+      )}
       <Collapse
         collapsible="icon"
         defaultActiveKey={[

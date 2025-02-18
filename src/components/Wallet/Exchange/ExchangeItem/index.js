@@ -59,20 +59,20 @@ function ExchangeItem({ poolData, assetsPoolData }) {
   const isReservedDataEmpty = reserved ? (reserved?.asset2?.isEmpty || reserved?.asset1?.isEmpty) : true;
 
   const liqPoolDescription = (
-    <div className={styles.liquidityPool}>
+    <Flex vertical gap="3px" className={styles.liquidityPool}>
       <span className="description">
         Liquidity pool
       </span>
-      &nbsp;
       <span className="values">
         {formatAssets(reserved?.asset1 || '0', decimals1, { symbol: asset1ToShow, optionalAll: true })}
         {' / '}
         {formatAssets(reserved?.asset2 || '0', decimals2, { symbol: asset2ToShow, optionalAll: true })}
       </span>
-    </div>
+    </Flex>
   );
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 1200px)');
   const name1 = (
     <Flex wrap gap="5px" align="center">
       {asset1ToShow}
@@ -115,9 +115,10 @@ function ExchangeItem({ poolData, assetsPoolData }) {
       extra={isBiggerThanDesktop ? liqPoolDescription : undefined}
     >
       {!isBiggerThanDesktop && liqPoolDescription}
-      <Flex wrap gap="15px">
-        <Flex wrap gap="15px" flex={0.8} justify="space-between">
+      <Flex wrap gap="15px" vertical={!isBiggerThanDesktop} align={isBiggerThanDesktop ? 'center' : undefined}>
+        <Flex wrap gap="15px" flex={1} vertical={!isBiggerThanSmallScreen} justify="space-between">
           <Flex wrap gap="15px" align="center" flex={0.5}>
+            <CurrencyIcon size={40} symbol={asset1ToShow} />
             <div>
               <div className="description">
                 {'1 '}
@@ -131,6 +132,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             </div>
           </Flex>
           <Flex wrap gap="15px" align="center" flex={0.5}>
+            <CurrencyIcon size={40} symbol={asset2ToShow} />
             <div>
               <div className="description">
                 {'1 '}
@@ -144,28 +146,26 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             </div>
           </Flex>
         </Flex>
-        <div className={styles.liquidityWrapper}>
-          <Flex gap="15px" wrap>
-            <TradeTokensModalWrapper
+        <Flex gap="15px" wrap justify={isBiggerThanDesktop ? 'end' : undefined}>
+          <TradeTokensModalWrapper
+            assets={assets}
+            asset1ToShow={asset1ToShow}
+            asset2ToShow={asset2ToShow}
+            isOpenOnRender={areDexQuerySamePair}
+          />
+          <AddLiquidityModal
+            assets={assets}
+            isReservedDataEmpty={isReservedDataEmpty}
+          />
+          {reserved && (
+            <RemoveLiquidityModalWrapper
               assets={assets}
-              asset1ToShow={asset1ToShow}
-              asset2ToShow={asset2ToShow}
-              isOpenOnRender={areDexQuerySamePair}
+              reserved={reserved}
+              lpTokensBalance={lpTokensBalance}
+              liquidity={liquidity}
             />
-            <AddLiquidityModal
-              assets={assets}
-              isReservedDataEmpty={isReservedDataEmpty}
-            />
-            {reserved && (
-              <RemoveLiquidityModalWrapper
-                assets={assets}
-                reserved={reserved}
-                lpTokensBalance={lpTokensBalance}
-                liquidity={liquidity}
-              />
-            )}
-          </Flex>
-        </div>
+          )}
+        </Flex>
       </Flex>
     </Card>
   );

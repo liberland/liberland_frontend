@@ -2,11 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
 import Link from 'antd/es/typography/Link';
-import { useSelector } from 'react-redux';
 import truncate from '../../../../utils/truncate';
 import CompanyImage from '../CompanyImage';
-import { registriesSelectors } from '../../../../redux/selectors';
 import router from '../../../../router';
+import { useIsConnected } from '../../hooks';
 
 export default function CompanyDetail({
   id,
@@ -15,13 +14,10 @@ export default function CompanyDetail({
   size,
   asset,
 }) {
-  const registries = useSelector(registriesSelectors.registries);
-  const allRegistries = useSelector(registriesSelectors.allRegistries);
-  const company = allRegistries.officialRegistryEntries?.find((item) => item.id === id);
-  const request = registries?.officialUserRegistryEntries?.companies?.requested?.find((item) => item.id === id);
-  const isConnected = company?.relevantAssets?.find(({ assetId }) => assetId?.value?.toString() === asset?.toString())
-    || request?.relevantAssets?.find(({ assetId }) => assetId?.value?.toString() === asset?.toString());
-
+  const isConnected = useIsConnected({
+    asset,
+    companyId: id,
+  });
   return (
     <Flex wrap gap="7px" align="center">
       <CompanyImage

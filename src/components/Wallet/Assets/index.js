@@ -7,14 +7,12 @@ import List from 'antd/es/list';
 import Spin from 'antd/es/spin';
 import Descriptions from 'antd/es/descriptions';
 import { useSelector, useDispatch } from 'react-redux';
-import groupBy from 'lodash/groupBy';
 import {
   walletSelectors,
   blockchainSelectors,
   identitySelectors,
-  registriesSelectors,
 } from '../../../redux/selectors';
-import { identityActions, registriesActions, walletActions } from '../../../redux/actions';
+import { identityActions, walletActions } from '../../../redux/actions';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import Button from '../../Button/Button';
 import Table from '../../Table';
@@ -27,6 +25,7 @@ import CurrencyIcon from '../../CurrencyIcon';
 import truncate from '../../../utils/truncate';
 import CompanyDetail from './CompanyDisplay';
 import ColorAvatar from '../../ColorAvatar';
+import { useCompanyMap } from '../hooks';
 
 function Assets() {
   const userWalletAddress = useSelector(
@@ -40,15 +39,7 @@ function Assets() {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(walletActions.getAdditionalAssets.call());
-    dispatch(registriesActions.getOfficialRegistryEntries.call());
   }, [dispatch]);
-
-  const registries = useSelector(registriesSelectors.registries)?.officialUserRegistryEntries?.companies?.registered;
-  const allRegistries = useSelector(registriesSelectors.allRegistries)?.officialRegistryEntries;
-
-  const mappedRegistries = useMemo(() => (
-    groupBy([...(registries || []), ...(allRegistries || [])], 'id')
-  ), [registries, allRegistries]);
 
   const ids = useMemo(
     () => additionalAssets?.map((asset) => asset.index),
@@ -60,13 +51,6 @@ function Assets() {
       dispatch(walletActions.getAssetsDetails.call(ids));
     }
   }, [dispatch, ids]);
-  useEffect(() => {
-    if (userWalletAddress) {
-      dispatch(
-        registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress),
-      );
-    }
-  }, [dispatch, userWalletAddress]);
 
   useEffect(() => {
     dispatch(identityActions.getIdentityMotions.call(
@@ -83,7 +67,7 @@ function Assets() {
       ].filter(Boolean)),
     ));
   }, [dispatch, assetDetails]);
-
+  const mappedRegistries = useCompanyMap();
   const isBiggerThanLargeScreen = useMediaQuery('(min-width: 1200px)');
   const { isStock } = useStockContext();
   const formatted = useMemo(
