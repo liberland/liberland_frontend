@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Flex from 'antd/es/flex';
 import Spin from 'antd/es/spin';
 import Collapse from 'antd/es/collapse';
+import List from 'antd/es/list';
+import { useMediaQuery } from 'usehooks-ts';
 import { officesActions, financesActions } from '../../../redux/actions';
 import { officesSelectors, financesSelectors } from '../../../redux/selectors';
 import Table from '../../Table';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import { palletIdToAddress } from '../../../utils/pallet';
 import CurrencyIcon from '../../CurrencyIcon';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
+import MoneyCard from '../../MoneyCard';
+import truncate from '../../../utils/truncate';
+import styles from './styles.module.scss';
 
 const DEFAULT_ACCOUNTS = [
   {
@@ -57,6 +63,7 @@ export default function Finances() {
   const finances = useSelector(financesSelectors.selectorFinances);
   const financesLoading = useSelector(financesSelectors.selectorIsLoading);
   const [accountsAddresses, setAccountsAddresses] = useState([]);
+  const isBigScreen = useMediaQuery('(min-width: 1500px)');
 
   useEffect(() => {
     dispatch(officesActions.getPalletIds.call());
@@ -90,6 +97,27 @@ export default function Finances() {
     }
   }, [dispatch, pallets]);
 
+  const walletDataDisplay = useMemo(() => accountsAddresses.map((a) => ({
+    ...a,
+    address: (
+      <div className="description">
+        <CopyIconWithAddress address={a.address} />
+      </div>
+    ),
+    llm: (
+      <Flex wrap gap="10px" align="center">
+        {formatMerits(balances.LLM[a.address] ?? 0)}
+        <CurrencyIcon size={20} symbol="LLM" />
+      </Flex>
+    ),
+    lld: (
+      <Flex wrap gap="10px" align="center">
+        {formatDollars(balances.LLD[a.address] ?? 0)}
+        <CurrencyIcon size={20} symbol="LLD" />
+      </Flex>
+    ),
+  })), [accountsAddresses, balances.LLD, balances.LLM]);
+
   if (!pallets || !balances) {
     return <Spin />;
   }
@@ -99,11 +127,12 @@ export default function Finances() {
   return (
     <Collapse
       defaultActiveKey={['wallet', 'finance']}
+      collapsible="icon"
       items={[
         {
           label: 'Wallet addresses',
           key: 'wallet',
-          children: (
+          children: isBigScreen ? (
             <Table
               columns={[
                 {
@@ -123,23 +152,34 @@ export default function Finances() {
                   accessor: 'lld',
                 },
               ]}
-              data={accountsAddresses.map((a) => ({
-                ...a,
-                address: a.address,
-                llm: (
-                  <Flex wrap gap="10px" align="center">
-                    {formatMerits(balances.LLM[a.address] ?? 0)}
-                    <CurrencyIcon size={20} symbol="LLM" />
-                  </Flex>
-                ),
-                lld: (
-                  <Flex wrap gap="10px" align="center">
-                    {formatDollars(balances.LLD[a.address] ?? 0)}
-                    <CurrencyIcon size={20} symbol="LLD" />
-                  </Flex>
-                ),
-              }))}
+              data={walletDataDisplay}
               noPagination
+            />
+          ) : (
+            <List
+              dataSource={walletDataDisplay}
+              itemLayout="horizontal"
+              size="small"
+              renderItem={({
+                name,
+                address,
+                llm,
+                lld,
+              }) => (
+                <List.Item>
+                  <MoneyCard
+                    amount={truncate(name, 15)}
+                    title={(
+                      <Flex vertical gap="5px">
+                        {llm}
+                        {lld}
+                      </Flex>
+                    )}
+                    actions={address}
+                    className={styles.card}
+                  />
+                </List.Item>
+              )}
             />
           ),
         },
