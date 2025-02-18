@@ -25,7 +25,6 @@ import CurrencyIcon from '../../CurrencyIcon';
 import truncate from '../../../utils/truncate';
 import CompanyDetail from './CompanyDisplay';
 import ColorAvatar from '../../ColorAvatar';
-import { useCompanyMap } from '../hooks';
 
 function Assets() {
   const userWalletAddress = useSelector(

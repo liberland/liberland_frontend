@@ -4,6 +4,7 @@ import {
   BN_ZERO,
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
+import groupBy from 'lodash/groupBy';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import * as centralizedBackend from './backend';
@@ -428,6 +429,49 @@ const getAssetDetails = async (ids) => {
   }
 };
 
+const convertCompanyValue = (api, entityId, companyValue) => {
+  let companyData;
+  try {
+    if (companyValue.isNone) companyData = { unregister: true };
+    else {
+      const compressed = companyValue?.isSome
+        ? companyValue.unwrap().data : companyValue.data;
+      companyData = api.createType('CompanyData', pako.inflate(compressed));
+    }
+
+    const formObject = blockchainDataToFormObject(companyData);
+
+    const dataObject = { ...formObject, id: entityId[1] };
+    return dataObject;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log(err);
+    return null;
+  }
+};
+
+const getOfficialRegistryEntries = async () => {
+  const api = await getApi();
+  const allEntites = await api.query.companyRegistry.registries.entries(0);
+  const registeredCompanies = [];
+  allEntites.forEach((companyRegistry) => {
+    const [key, companyValue] = companyRegistry;
+    const entityId = key.toHuman();
+    const converted = convertCompanyValue(api, entityId, companyValue);
+    if (converted) {
+      registeredCompanies.push(converted);
+    }
+  });
+  return registeredCompanies;
+};
+
+const getCompaniesByIds = async (ids) => {
+  const api = await getApi();
+  const queries = ids.map((id) => [api.query.companyRegistry.requests, [0, id]]);
+  const resolved = await api.queryMulti(queries);
+  return resolved.map((r, i) => convertCompanyValue(api, ids[i], r)).filter(Boolean);
+};
+
 const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = false) => {
   try {
     const api = await getApi();
@@ -454,9 +498,16 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
 
     if (relatedCompanyQueries.length !== 0) {
       const relatedCompanyResults = await api.queryMulti(relatedCompanyQueries);
-
+      const companies = await getCompaniesByIds(relatedCompanyResults.map((r) => r.toJSON()));
+      const mapped = groupBy(companies, 'id');
       relatedCompanyResults.forEach((relatedCompanyId, index) => {
-        assets[index].companyId = relatedCompanyId.toJSON();
+        const company = mapped[relatedCompanyId.toJSON()]?.[0];
+        if (company) {
+          assets[index].company = company;
+          assets[index].company.isConnected = company
+            .relatedAssets
+            ?.some(({ assetId }) => assetId?.value?.toString() === assets[index].index?.toString());
+        }
       });
     }
 
@@ -1234,34 +1285,6 @@ const getLegislation = async (tier) => {
   });
 
   return legislationById;
-};
-
-const getOfficialRegistryEntries = async () => {
-  const api = await getApi();
-  const allEntites = await api.query.companyRegistry.registries.entries(0);
-  const registeredCompanies = [];
-  allEntites.forEach((companyRegistry) => {
-    const [key, companyValue] = companyRegistry;
-    const entityId = key.toHuman();
-    let companyData;
-    try {
-      if (companyValue.isNone) companyData = { unregister: true };
-      else {
-        const compressed = companyValue?.isSome
-          ? companyValue.unwrap().data : companyValue.data;
-        companyData = api.createType('CompanyData', pako.inflate(compressed));
-      }
-
-      const formObject = blockchainDataToFormObject(companyData);
-
-      const dataObject = { ...formObject, id: entityId[1] };
-      registeredCompanies.push(dataObject);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.log(err);
-    }
-  });
-  return registeredCompanies;
 };
 
 const getOfficialUserRegistryEntries = async (walletAddress) => {
