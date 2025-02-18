@@ -28,6 +28,7 @@ import ColorAvatar from '../../ColorAvatar';
 import { walletActions } from '../../../redux/actions';
 import { walletSelectors } from '../../../redux/selectors';
 import CompanyAsset from '../CompanyAsset';
+import { isCompanyConnected } from '../../../utils/asset';
 
 function CompanyDetail() {
   const { mainDataObject: complexDataObject, request } = useCompanyDataFromUrl();
@@ -39,16 +40,13 @@ function CompanyDetail() {
     walletSelectors.selectorAdditionalAssets,
   );
   const [connectedAssets, relevantAssets] = useMemo(() => {
-    if (additionalAssets && complexDataObject?.relevantAssets) {
+    if (additionalAssets && complexDataObject) {
       return additionalAssets.reduce(([connected, relevant], asset) => {
-        const { companyId, index } = asset;
-        if (companyId?.toString() !== complexDataObject.id?.toString()) {
+        const { company } = asset;
+        if (!company || company.id?.toString() !== complexDataObject.id?.toString()) {
           return [connected, relevant];
         }
-        const isConnected = complexDataObject.relevantAssets.some(({ assetId }) => (
-          assetId?.value?.toString() === index?.toString()
-        ));
-        if (isConnected) {
+        if (isCompanyConnected(asset)) {
           connected.push(asset);
         } else {
           relevant.push(asset);
@@ -349,7 +347,13 @@ function CompanyDetail() {
                   const { name, symbol } = metadata;
                   return (
                     <List.Item>
-                      <CompanyAsset index={index} name={name} symbol={symbol} isConnected />
+                      <CompanyAsset
+                        index={index}
+                        name={name}
+                        symbol={symbol}
+                        logoURL={complexDataObject.logoURL}
+                        isConnected
+                      />
                     </List.Item>
                   );
                 }}

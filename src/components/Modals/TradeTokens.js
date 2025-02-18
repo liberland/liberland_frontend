@@ -39,7 +39,7 @@ function TradeTokensForm({
   const [input1Error, setInput1Error] = useState(null);
   const [input2Error, setInput2Error] = useState(null);
   const [isAsset1State, setIsAsset1State] = useState(false);
-
+  console.log(initialAssets);
   const {
     asset1,
     asset2,

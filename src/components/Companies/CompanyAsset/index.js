@@ -11,6 +11,7 @@ export default function CompanyAsset({
   index,
   name,
   symbol,
+  logoURL,
   isConnected,
 }) {
   return (
@@ -35,7 +36,7 @@ export default function CompanyAsset({
       <Card.Meta
         description={(
           <Flex wrap gap="10px" align="center">
-            <CurrencyIcon size={32} symbol={symbol} />
+            <CurrencyIcon size={32} symbol={symbol} logo={logoURL} />
             <div className="description">
               {truncate(name, 20)}
             </div>
@@ -50,5 +51,6 @@ CompanyAsset.propTypes = {
   index: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   symbol: PropTypes.string.isRequired,
+  logoURL: PropTypes.string,
   isConnected: PropTypes.bool,
 };

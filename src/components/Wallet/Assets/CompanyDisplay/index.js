@@ -2,22 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Flex from 'antd/es/flex';
 import Link from 'antd/es/typography/Link';
+import classNames from 'classnames';
 import truncate from '../../../../utils/truncate';
 import CompanyImage from '../CompanyImage';
 import router from '../../../../router';
-import { useIsConnected } from '../../hooks';
+import styles from './styles.module.scss';
 
 export default function CompanyDetail({
   id,
   name,
   logo,
   size,
-  asset,
+  showNotConnected,
+  hasLink,
 }) {
-  const isConnected = useIsConnected({
-    asset,
-    companyId: id,
-  });
   return (
     <Flex wrap gap="7px" align="center">
       <CompanyImage
@@ -26,16 +24,22 @@ export default function CompanyDetail({
         logo={logo}
         name={name}
       />
-      <Flex vertical gap="7px">
-        <Link href={router.companies.view.replace(':companyId', id)}>
-          {truncate(name || id || 'Unknown', 15)}
-        </Link>
-        {!isConnected && (
-          <div className="description">
+      <Flex vertical gap="3px">
+        {hasLink ? (
+          <Link href={router.companies.view.replace(':companyId', id)}>
+            {truncate(name || id || 'Unknown', 15)}
+          </Link>
+        ) : (
+          <strong className={styles.value}>
+            {truncate(name || id || 'Unknown', 15)}
+          </strong>
+        )}
+        {showNotConnected && (
+          <div className={classNames(styles.description, 'description')}>
             Not connected
           </div>
         )}
-        <div className="description">
+        <div className={classNames(styles.description, 'description')}>
           ID:
           {' '}
           {id || 'Unknown'}
@@ -50,5 +54,6 @@ CompanyDetail.propTypes = {
   name: PropTypes.string,
   logo: PropTypes.string,
   size: PropTypes.number.isRequired,
-  asset: PropTypes.number.isRequired,
+  showNotConnected: PropTypes.bool,
+  hasLink: PropTypes.bool,
 };

@@ -8,6 +8,7 @@ import { useHistory } from 'react-router-dom';
 import Button from '../../../Button/Button';
 import { officesActions } from '../../../../redux/actions';
 import router from '../../../../router';
+import styles from './styles.module.scss';
 
 function CompanyRegistration({ registration }) {
   const dispatch = useDispatch();
@@ -40,7 +41,7 @@ function CompanyRegistration({ registration }) {
       title="Company data"
       cover={(
         <Flex justify="center" align="center">
-          <code>
+          <code className={styles.container}>
             <pre>
               {JSON.stringify(
                 registration.registration.data.toJSON(),

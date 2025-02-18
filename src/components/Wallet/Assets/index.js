@@ -25,6 +25,7 @@ import CurrencyIcon from '../../CurrencyIcon';
 import truncate from '../../../utils/truncate';
 import CompanyDetail from './CompanyDisplay';
 import ColorAvatar from '../../ColorAvatar';
+import { isCompanyConnected } from '../../../utils/asset';
 
 function Assets() {
   const userWalletAddress = useSelector(
@@ -66,7 +67,6 @@ function Assets() {
       ].filter(Boolean)),
     ));
   }, [dispatch, assetDetails]);
-  const mappedRegistries = useCompanyMap();
   const isBiggerThanLargeScreen = useMediaQuery('(min-width: 1200px)');
   const { isStock } = useStockContext();
   const formatted = useMemo(
@@ -95,7 +95,6 @@ function Assets() {
         </Flex>
       );
 
-      const { id: companyId, name: companyName, logoURL } = mappedRegistries[asset.companyId]?.[0] || {};
       const spanSize = isBiggerThanLargeScreen ? 12 : 24;
       const details = (
         <>
@@ -121,13 +120,15 @@ function Assets() {
             </Flex>
           </Descriptions.Item>
           <Descriptions.Item span={spanSize} label="Related company">
-            {asset.companyId ? (
+            {asset.company ? (
               <CompanyDetail
-                id={companyId}
+                id={asset.company.id}
                 size={isBiggerThanLargeScreen ? 32 : 20}
-                logo={logoURL}
-                name={companyName}
+                logo={asset.company.logoURL}
+                name={asset.company.name}
                 asset={asset.index}
+                hasLink
+                showNotConnected={!isCompanyConnected(asset)}
               />
             ) : 'None'}
           </Descriptions.Item>
@@ -178,7 +179,7 @@ function Assets() {
               defaultValues={{
                 admin: assetDetails?.[index]?.admin,
                 balance: assetDetails?.[index]?.minBalance,
-                companyId: asset.companyId,
+                companyId: asset.company?.id,
                 decimals: parseInt(asset.metadata.decimals) || 0,
                 freezer: assetDetails?.[index]?.freezer,
                 id: asset.index,
@@ -191,7 +192,7 @@ function Assets() {
         }
       );
     }).filter(({ isStock: assetIsStock }) => assetIsStock === isStock) || [],
-    [additionalAssets, mappedRegistries, assetDetails, isBiggerThanLargeScreen, userWalletAddress, identities, isStock],
+    [additionalAssets, assetDetails, isBiggerThanLargeScreen, userWalletAddress, identities, isStock],
   );
 
   if (!assetDetails || !additionalAssets) {

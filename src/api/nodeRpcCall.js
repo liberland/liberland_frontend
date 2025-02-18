@@ -429,7 +429,7 @@ const getAssetDetails = async (ids) => {
   }
 };
 
-const convertCompanyValue = (api, entityId, companyValue) => {
+const convertCompanyValue = (api, id, companyValue) => {
   let companyData;
   try {
     if (companyValue.isNone) companyData = { unregister: true };
@@ -441,7 +441,7 @@ const convertCompanyValue = (api, entityId, companyValue) => {
 
     const formObject = blockchainDataToFormObject(companyData);
 
-    const dataObject = { ...formObject, id: entityId[1] };
+    const dataObject = { ...formObject, id };
     return dataObject;
   } catch (err) {
     // eslint-disable-next-line no-console
@@ -457,9 +457,9 @@ const getOfficialRegistryEntries = async () => {
   allEntites.forEach((companyRegistry) => {
     const [key, companyValue] = companyRegistry;
     const entityId = key.toHuman();
-    const converted = convertCompanyValue(api, entityId, companyValue);
-    if (converted) {
-      registeredCompanies.push(converted);
+    const companyData = convertCompanyValue(api, entityId[1], companyValue);
+    if (companyData) {
+      registeredCompanies.push(companyData);
     }
   });
   return registeredCompanies;
@@ -467,7 +467,7 @@ const getOfficialRegistryEntries = async () => {
 
 const getCompaniesByIds = async (ids) => {
   const api = await getApi();
-  const queries = ids.map((id) => [api.query.companyRegistry.requests, [0, id]]);
+  const queries = ids.map((id) => [api.query.companyRegistry.registries, [0, id]]);
   const resolved = await api.queryMulti(queries);
   return resolved.map((r, i) => convertCompanyValue(api, ids[i], r)).filter(Boolean);
 };
@@ -504,9 +504,6 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
         const company = mapped[relatedCompanyId.toJSON()]?.[0];
         if (company) {
           assets[index].company = company;
-          assets[index].company.isConnected = company
-            .relatedAssets
-            ?.some(({ assetId }) => assetId?.value?.toString() === assets[index].index?.toString());
         }
       });
     }

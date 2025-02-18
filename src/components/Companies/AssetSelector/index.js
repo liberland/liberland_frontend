@@ -1,12 +1,14 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import Flex from 'antd/es/flex';
 import Form from 'antd/es/form';
+import classNames from 'classnames';
 import AutoComplete from '../../AutoComplete';
 import { walletSelectors } from '../../../redux/selectors';
 import ColorAvatar from '../../ColorAvatar';
 import truncate from '../../../utils/truncate';
+import styles from './styles.module.scss';
 
 export default function AssetSelector({
   form,
@@ -23,7 +25,10 @@ export default function AssetSelector({
     name: metadata.name,
   })), [additionalAssets]);
   const value = Form.useWatch([prefix, ...name], form);
-  const initialValue = useRef(value);
+  const [initial, setInitial] = useState(value);
+  useEffect(() => {
+    setInitial((prev) => (prev || value));
+  }, [value]);
 
   return (
     <AutoComplete
@@ -38,9 +43,11 @@ export default function AssetSelector({
         label: (
           <Flex wrap gap="7px" align="center">
             <ColorAvatar size={24} name={symbol || name || 'U'} />
+            <div className={styles.value}>
+              {truncate(symbol || 'No symbol', 12)}
+            </div>
             <div className="description">
-              {truncate(symbol || 'No symbol', 5)}
-              {', ID: '}
+              {'ID: '}
               {id || 'No ID'}
             </div>
           </Flex>
@@ -51,22 +58,22 @@ export default function AssetSelector({
         // eslint-disable-next-line no-shadow
         const { symbol, name } = options.find(({ id }) => id === assetId) || {};
         return (
-          <Flex wrap gap="7px" align="center">
-            <ColorAvatar size={40} name={symbol || name || 'U'} />
-            <Flex vertical gap="7px">
-              <div className="description">
-                {truncate(symbol || 'No symbol', 5)}
+          <Flex wrap gap="7px" align="center" className={styles.selected}>
+            <ColorAvatar size={36} name={symbol || name || 'U'} />
+            <Flex vertical gap="2px">
+              <strong className={styles.value}>
+                {truncate(name || 'Unknown', 15)}
+              </strong>
+              <div className={classNames('description', styles.description)}>
+                {truncate(symbol || 'No symbol', 12)}
                 {', ID: '}
                 {assetId || 'No ID'}
               </div>
-              <strong>
-                {truncate(name || 'Unknown', 15)}
-              </strong>
             </Flex>
           </Flex>
         );
       }}
-      initialValue={initialValue.current}
+      initialValue={initial}
       options={mapped}
       prefix={prefix}
     />
