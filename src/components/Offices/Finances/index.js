@@ -6,7 +6,7 @@ import Title from 'antd/es/typography/Title';
 import { officesActions, financesActions } from '../../../redux/actions';
 import { officesSelectors, financesSelectors } from '../../../redux/selectors';
 import Table from '../../Table';
-import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
+import { formatCustom, formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import { palletIdToAddress } from '../../../utils/pallet';
 import CurrencyIcon from '../../CurrencyIcon';
 
@@ -176,6 +176,15 @@ export default function Finances() {
           {
             metric: 'Staker APY',
             value: formatPercent(finances.stakerApyWeeklyPayouts),
+          },
+          {
+            metric: 'Total LLD',
+            value: (
+              <Flex wrap gap="10px" align="center">
+                {formatCustom(finances.totalLld, 0)}
+                <CurrencyIcon size={20} symbol="LLD" />
+              </Flex>
+            ),
           },
         ]}
         noPagination
