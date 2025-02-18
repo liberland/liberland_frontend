@@ -7,6 +7,7 @@ import List from 'antd/es/list';
 import Spin from 'antd/es/spin';
 import Descriptions from 'antd/es/descriptions';
 import { useSelector, useDispatch } from 'react-redux';
+import groupBy from 'lodash/groupBy';
 import {
   walletSelectors,
   blockchainSelectors,
@@ -25,6 +26,7 @@ import CreateOrUpdateAssetModal from './AssetsModal/CreateOrUpdateAsset';
 import CurrencyIcon from '../../CurrencyIcon';
 import truncate from '../../../utils/truncate';
 import CompanyDetail from './CompanyDisplay';
+import ColorAvatar from '../../ColorAvatar';
 
 function Assets() {
   const userWalletAddress = useSelector(
@@ -42,12 +44,7 @@ function Assets() {
   }, [dispatch]);
 
   const allRegistries = useSelector(registriesSelectors.allRegistries)?.officialRegistryEntries;
-  const mappedRegistries = useMemo(() => allRegistries?.reduce(
-    (mapped, registry) => {
-      mapped[registry.id] = registry;
-      return mapped;
-    },
-  ) || {}, [allRegistries]);
+  const mappedRegistries = useMemo(() => (allRegistries ? groupBy(allRegistries, 'id') : {}), [allRegistries]);
 
   const ids = useMemo(
     () => additionalAssets?.map((asset) => asset.index),
@@ -91,32 +88,36 @@ function Assets() {
           || identities?.[wallet]?.identity.name
       );
       const getIdentity = (address) => (
-        <Flex vertical gap="7px">
-          <strong>
-            {truncate(getName(address) || 'Unknown', isBiggerThanLargeScreen ? 20 : 15)}
-          </strong>
-          <div className="description">
-            <CopyIconWithAddress address={address} truncateBy={{ bigScreen: 12, smallScreen: 7 }} />
-          </div>
+        <Flex wrap gap="7px" align="center">
+          <ColorAvatar name={getName(address) || 'U'} size={40} />
+          <Flex vertical gap="7px">
+            <strong>
+              {truncate(getName(address) || 'Unknown', isBiggerThanLargeScreen ? 20 : 15)}
+            </strong>
+            <div className="description">
+              <CopyIconWithAddress address={address} truncateBy={{ bigScreen: 12, smallScreen: 7 }} />
+            </div>
+          </Flex>
         </Flex>
       );
-      console.log(asset.companyId);
-      const { id: companyId, name: companyName, logoURL } = mappedRegistries[asset.companyId] || {};
+
+      const { id: companyId, name: companyName, logoURL } = mappedRegistries[asset.companyId]?.[0] || {};
+      const spanSize = isBiggerThanLargeScreen ? 12 : 24;
       const details = (
         <>
-          <Descriptions.Item label="Admin">
+          <Descriptions.Item span={spanSize} label="Admin">
             {assetDetails?.[index]?.admin && getIdentity(assetDetails?.[index]?.admin)}
           </Descriptions.Item>
-          <Descriptions.Item label="Owner">
+          <Descriptions.Item span={spanSize} label="Owner">
             {assetDetails?.[index]?.owner && getIdentity(assetDetails?.[index]?.owner)}
           </Descriptions.Item>
-          <Descriptions.Item label="Issuer">
+          <Descriptions.Item span={spanSize} label="Issuer">
             {assetDetails?.[index]?.issuer && getIdentity(assetDetails?.[index]?.issuer)}
           </Descriptions.Item>
-          <Descriptions.Item label="Freezer">
+          <Descriptions.Item span={spanSize} label="Freezer">
             {assetDetails?.[index]?.freezer && getIdentity(assetDetails?.[index]?.freezer)}
           </Descriptions.Item>
-          <Descriptions.Item label="Supply">
+          <Descriptions.Item span={spanSize} label="Supply">
             <Flex wrap gap="7px" align="center">
               {formatCustom(
                 assetDetails?.[index]?.supply ?? '0',
@@ -125,7 +126,7 @@ function Assets() {
               {symbol}
             </Flex>
           </Descriptions.Item>
-          <Descriptions.Item label="Related company">
+          <Descriptions.Item span={spanSize} label="Related company">
             {asset.companyId ? (
               <CompanyDetail
                 id={companyId}
@@ -149,11 +150,15 @@ function Assets() {
           details: isBiggerThanLargeScreen ? (
             <Popover
               content={(
-                <Descriptions className={styles.details} layout="vertical" size="small">
+                <Descriptions column={24} className={styles.details} layout="vertical" size="small" bordered>
                   {details}
                 </Descriptions>
               )}
-              title="Details"
+              title={(
+                <div className={styles.desktopDetails}>
+                  Details
+                </div>
+              )}
               trigger="click"
             >
               <Button>
@@ -161,8 +166,8 @@ function Assets() {
               </Button>
             </Popover>
           ) : (
-            <Descriptions layout="vertical" size="small" bordered>
-              <Descriptions.Item label="Name">
+            <Descriptions column={24} layout="vertical" size="small" bordered>
+              <Descriptions.Item span={spanSize} label="Name">
                 {asset.metadata.name}
               </Descriptions.Item>
               {details}
@@ -174,6 +179,7 @@ function Assets() {
               isOwner={isOwner}
               isIssuer={isIssuer}
               assetId={asset.index}
+              isStock={isStock}
               defaultValues={{
                 admin: assetDetails?.[index]?.admin,
                 balance: assetDetails?.[index]?.minBalance,
@@ -262,7 +268,7 @@ function Assets() {
         />
       )}
       <Flex wrap gap="15px">
-        <CreateOrUpdateAssetModal isCreate />
+        <CreateOrUpdateAssetModal isCreate isStock={isStock} />
       </Flex>
     </Flex>
   );

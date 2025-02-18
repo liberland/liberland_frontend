@@ -294,6 +294,10 @@ const createOrUpdateAsset = async ({
       const create = await api.tx.assets.create(id, admin, minBalance);
       await submitExtrinsic(create, owner, api);
     }
+    if (isStock && isCreate) {
+      const params = await api.tx.assets.setParameters(id, { eresidencyRequired: true });
+      await submitExtrinsic(params, owner, api);
+    }
     if (defaultValues?.name !== name || defaultValues?.symbol !== symbol || defaultValues?.decimals !== decimals) {
       const setMetadata = await api.tx.assets.setMetadata(id, name, symbol, decimals);
       await submitExtrinsic(setMetadata, owner, api);
@@ -305,10 +309,6 @@ const createOrUpdateAsset = async ({
     if (defaultValues?.companyId !== companyId) {
       const setCompanyId = await api.tx.assets.setRelatedCompany(id, companyId);
       await submitExtrinsic(setCompanyId, owner, api);
-    }
-    if (isStock && isCreate) {
-      const params = await api.tx.assets.setParameters(id, { eresidencyRequired: true });
-      await submitExtrinsic(params, owner, api);
     }
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -457,7 +457,7 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
       const relatedCompanyResults = await api.queryMulti(relatedCompanyQueries);
 
       relatedCompanyResults.forEach((relatedCompanyId, index) => {
-        assets[index].companyId = relatedCompanyId;
+        assets[index].companyId = relatedCompanyId.toJSON();
       });
     }
 
