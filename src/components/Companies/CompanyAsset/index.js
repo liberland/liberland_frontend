@@ -4,7 +4,6 @@ import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
 import CurrencyIcon from '../../CurrencyIcon';
 import truncate from '../../../utils/truncate';
-import Button from '../../Button/Button';
 import styles from './styles.module.scss';
 
 export default function CompanyAsset({
@@ -12,7 +11,7 @@ export default function CompanyAsset({
   name,
   symbol,
   logoURL,
-  isConnected,
+  actions,
 }) {
   return (
     <Card
@@ -25,11 +24,9 @@ export default function CompanyAsset({
           {index}
         </div>
       )}
-      actions={isConnected ? [
+      actions={actions ? [
         <Flex wrap gap="15px" className={styles.pools}>
-          <Button>
-            TBD
-          </Button>
+          {actions}
         </Flex>,
       ] : undefined}
     >
@@ -52,5 +49,5 @@ CompanyAsset.propTypes = {
   name: PropTypes.string.isRequired,
   symbol: PropTypes.string.isRequired,
   logoURL: PropTypes.string,
-  isConnected: PropTypes.bool,
+  actions: PropTypes.arrayOf(PropTypes.node.isRequired),
 };

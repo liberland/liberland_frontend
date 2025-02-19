@@ -12,6 +12,7 @@ import styles from './styles.module.scss';
 import { ExchangeItemPropTypes } from '../proptypes';
 import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
 import CurrencyIcon from '../../../CurrencyIcon';
+import { isCompanyConnected } from '../../../../utils/asset';
 
 function ExchangeItem({ poolData, assetsPoolData }) {
   const location = useLocation();
@@ -73,16 +74,18 @@ function ExchangeItem({ poolData, assetsPoolData }) {
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 1200px)');
+  const logo1 = isCompanyConnected({ index: asset1, ...assetData1 }) && assetData1.company.logoURL;
+  const logo2 = isCompanyConnected({ index: asset2, ...assetData2 }) && assetData2.company.logoURL;
   const name1 = (
     <Flex wrap gap="5px" align="center">
       {asset1ToShow}
-      <CurrencyIcon size={20} symbol={asset1ToShow} />
+      <CurrencyIcon size={20} symbol={asset1ToShow} logo={logo1} />
     </Flex>
   );
   const name2 = (
     <Flex wrap gap="5px" align="center">
       {asset2ToShow}
-      <CurrencyIcon size={20} symbol={asset2ToShow} />
+      <CurrencyIcon size={20} symbol={asset2ToShow} logo={logo2} />
     </Flex>
   );
 
@@ -118,7 +121,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
       <Flex wrap gap="15px" vertical={!isBiggerThanDesktop} align={isBiggerThanDesktop ? 'center' : undefined}>
         <Flex wrap gap="15px" flex={1} vertical={!isBiggerThanSmallScreen} justify="space-between">
           <Flex wrap gap="15px" align="center" flex={0.5}>
-            <CurrencyIcon size={40} symbol={asset1ToShow} />
+            <CurrencyIcon size={40} symbol={asset1ToShow} logo={logo1} />
             <div>
               <div className="description">
                 {'1 '}
@@ -132,7 +135,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             </div>
           </Flex>
           <Flex wrap gap="15px" align="center" flex={0.5}>
-            <CurrencyIcon size={40} symbol={asset2ToShow} />
+            <CurrencyIcon size={40} symbol={asset2ToShow} logo={logo2} />
             <div>
               <div className="description">
                 {'1 '}

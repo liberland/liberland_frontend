@@ -21,12 +21,12 @@ import { useCompanyDataFromUrl } from '../hooks';
 import CompanyActions from '../CompanyActions';
 import Button from '../../Button/Button';
 import router from '../../../router';
-import { tryFormatDollars, tryFormatNumber } from '../../../utils/walletHelpers';
+import { tryFormatDollars, tryFormatNumber, valueToBN } from '../../../utils/walletHelpers';
 import CompanyPersonas from '../CompanyPersonas';
 import { simplifyCompanyObject } from '../utils';
 import ColorAvatar from '../../ColorAvatar';
-import { walletActions } from '../../../redux/actions';
-import { walletSelectors } from '../../../redux/selectors';
+import { dexActions, walletActions } from '../../../redux/actions';
+import { dexSelectors, walletSelectors } from '../../../redux/selectors';
 import CompanyAsset from '../CompanyAsset';
 import { isCompanyConnected } from '../../../utils/asset';
 
@@ -39,6 +39,7 @@ function CompanyDetail() {
   const additionalAssets = useSelector(
     walletSelectors.selectorAdditionalAssets,
   );
+  const dexs = useSelector(dexSelectors.selectorDex);
   const [connectedAssets, relevantAssets] = useMemo(() => {
     if (additionalAssets && complexDataObject) {
       return additionalAssets.reduce(([connected, relevant], asset) => {
@@ -59,6 +60,9 @@ function CompanyDetail() {
 
   useEffect(() => {
     dispatch(walletActions.getAdditionalAssets.call());
+  }, [dispatch]);
+  useEffect(() => {
+    dispatch(dexActions.getPools.call());
   }, [dispatch]);
   useHideTitle();
 
@@ -345,6 +349,14 @@ function CompanyDetail() {
                 size="small"
                 renderItem={({ index, metadata }) => {
                   const { name, symbol } = metadata;
+                  const { poolsData, assetsPoolsData } = dexs || {};
+                  const relevantPools = poolsData?.filter(
+                    ({ asset1, asset2 }) => asset1 === index?.toString() || asset2 === index?.toString(),
+                  ).sort(({ lpToken: aToken }, { lpToken: bToken }) => {
+                    const aLiq = valueToBN(assetsPoolsData[aToken]?.supply || '0');
+                    const bLiq = valueToBN(assetsPoolsData[bToken]?.supply || '0');
+                    return bLiq.gt(aLiq) ? 1 : -1;
+                  });
                   return (
                     <List.Item>
                       <CompanyAsset
@@ -352,7 +364,32 @@ function CompanyDetail() {
                         name={name}
                         symbol={symbol}
                         logoURL={complexDataObject.logoURL}
-                        isConnected
+                        actions={relevantPools?.map(({
+                          asset1,
+                          asset2,
+                          assetData1,
+                          assetData2,
+                        }) => {
+                          const asset1Name = asset1 === 'Native' ? 'LLD' : assetData1.symbol;
+                          const asset2Name = asset2 === 'Native' ? 'LLD' : assetData2.symbol;
+                          const isStock = assetData1.isStock || assetData2.isStock;
+                          const modalLink = window.btoa(JSON.stringify({ asset1, asset2 }));
+                          return (
+                            <Button
+                              primary
+                              key={modalLink}
+                              onClick={() => history.push(
+                                `${isStock ? router.wallet.stockExchange : router.wallet.exchange}#${modalLink}`,
+                              )}
+                            >
+                              Trade
+                              {' '}
+                              {asset1Name}
+                              {' for '}
+                              {asset2Name}
+                            </Button>
+                          );
+                        })}
                       />
                     </List.Item>
                   );
