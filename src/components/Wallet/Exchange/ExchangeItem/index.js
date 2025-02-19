@@ -74,8 +74,8 @@ function ExchangeItem({ poolData, assetsPoolData }) {
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 1200px)');
-  const logo1 = isCompanyConnected({ index: asset1, ...assetData1 }) && assetData1.company.logoURL;
-  const logo2 = isCompanyConnected({ index: asset2, ...assetData2 }) && assetData2.company.logoURL;
+  const logo1 = isCompanyConnected({ index: asset1, ...assetData1 }) ? assetData1.company.logoURL : undefined;
+  const logo2 = isCompanyConnected({ index: asset2, ...assetData2 }) ? assetData2.company.logoURL : undefined;
   const name1 = (
     <Flex wrap gap="5px" align="center">
       {asset1ToShow}

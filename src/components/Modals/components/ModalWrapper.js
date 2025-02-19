@@ -3,34 +3,34 @@ import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import { useModal } from '../../../context/modalContext';
 
-const modalWrapper = (ModalContent, ModalButton, propsWrapper, urlAutoOpen) => {
+const modalWrapper = (ModalContent, ModalButton, { propsWrapper, matchHash, createHash } = {}) => {
   function WrappedComponent(props) {
     const { showModal, closeLastNModals } = useModal();
     const { isOpenOnRender } = props;
     const { hash } = useLocation();
-
-    const openModal = useCallback(() => {
+    const openModal = useCallback((hashPart) => {
       showModal(
         <ModalContent {...props} onClose={() => closeLastNModals(1)} />,
         { ...propsWrapper },
+        hashPart,
       );
     }, [closeLastNModals, props, showModal]);
 
     useEffect(() => {
-      if (isOpenOnRender) {
+      if (!ModalButton || isOpenOnRender) {
         openModal();
       }
     }, [openModal, isOpenOnRender]);
 
     useEffect(() => {
-      if (urlAutoOpen) {
+      if (matchHash) {
         const hashPart = hash.split('#')[1];
         if (hashPart) {
           const decoded = window.atob(hashPart);
           try {
             const object = JSON.parse(decoded);
-            if (urlAutoOpen(props, object)) {
-              openModal();
+            if (matchHash(props, object)) {
+              openModal(hashPart);
             }
           } catch (e) {
             // eslint-disable-next-line no-console
@@ -47,6 +47,10 @@ const modalWrapper = (ModalContent, ModalButton, propsWrapper, urlAutoOpen) => {
   WrappedComponent.propTypes = {
     isOpenOnRender: PropTypes.bool,
   };
+
+  if (createHash) {
+    WrappedComponent.createHash = (params) => window.btoa(JSON.stringify(createHash(params)));
+  }
 
   return WrappedComponent;
 };

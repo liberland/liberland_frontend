@@ -18,12 +18,23 @@ export const useModal = () => {
 export function ModalProvider({ children }) {
   const [modals, setModals] = useState([]);
 
-  const showModal = useCallback((content, props = {}) => {
+  const showModal = useCallback((content, props = {}, hash = undefined) => {
     const id = uniqueId('modal_');
-    setModals((prevModals) => [
-      ...prevModals,
-      { id, content, props },
-    ]);
+    setModals((prevModals) => {
+      const ignoreHash = hash && prevModals.some((modal) => modal.hash === hash);
+      if (ignoreHash) {
+        return prevModals;
+      }
+      return [
+        ...prevModals,
+        {
+          id,
+          content,
+          props,
+          hash,
+        },
+      ];
+    });
     return id;
   }, []);
 

@@ -470,11 +470,19 @@ function ButtonModal(props) {
 const TradeTokensModal = modalWrapper(
   TradeTokensForm,
   ButtonModal,
-  undefined,
-  (props, object) => {
-    const { assets } = props;
-    const { asset1, asset2 } = object || {};
-    return assets.asset1 === asset1 && assets.asset2 === asset2;
+  {
+    matchHash: (props, object) => {
+      const { assets } = props;
+      const { asset1, asset2, component } = object || {};
+      return component === 'TradeTokensModal'
+        && assets.asset1 === asset1
+        && assets.asset2 === asset2;
+    },
+    createHash: ({ asset1, asset2 }) => ({
+      component: 'TradeTokensModal',
+      asset1,
+      asset2,
+    }),
   },
 );
 

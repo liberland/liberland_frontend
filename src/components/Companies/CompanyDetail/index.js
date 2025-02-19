@@ -29,6 +29,7 @@ import { dexActions, walletActions } from '../../../redux/actions';
 import { dexSelectors, walletSelectors } from '../../../redux/selectors';
 import CompanyAsset from '../CompanyAsset';
 import { isCompanyConnected } from '../../../utils/asset';
+import TradeTokensModal from '../../Modals/TradeTokens';
 
 function CompanyDetail() {
   const { mainDataObject: complexDataObject, request } = useCompanyDataFromUrl();
@@ -373,7 +374,7 @@ function CompanyDetail() {
                           const asset1Name = asset1 === 'Native' ? 'LLD' : assetData1.symbol;
                           const asset2Name = asset2 === 'Native' ? 'LLD' : assetData2.symbol;
                           const isStock = assetData1.isStock || assetData2.isStock;
-                          const modalLink = window.btoa(JSON.stringify({ asset1, asset2 }));
+                          const modalLink = TradeTokensModal.createHash({ asset1, asset2 });
                           return (
                             <Button
                               primary
