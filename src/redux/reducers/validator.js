@@ -40,6 +40,7 @@ const validatorReducer = handleActions({
     validatorActions.getBondingDuration.call,
     validatorActions.unbond.call,
     validatorActions.withdrawUnbonded.call,
+    validatorActions.updateCommission.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -69,6 +70,8 @@ const validatorReducer = handleActions({
     validatorActions.getBondingDuration.failure,
     validatorActions.unbond.failure,
     validatorActions.withdrawUnbonded.failure,
+    validatorActions.updateCommission.success,
+    validatorActions.updateCommission.failure,
   )]: (state) => ({
     ...state,
     loading: false,

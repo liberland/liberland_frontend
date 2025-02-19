@@ -1,7 +1,6 @@
 import {
   put, takeLatest, call, select,
 } from 'redux-saga/effects';
-
 import { BN_ZERO } from '@polkadot/util';
 import {
   batchPayoutStakers, getIdentities, bondAndValidate, getNextSessionValidators, getNominators,
@@ -14,13 +13,21 @@ import {
   stakingUnbond,
   stakingWithdrawUnbonded,
   getStakingData,
+  getValidator,
+  updateValidate,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
-
 import { validatorActions, walletActions } from '../actions';
 import { blockchainSelectors } from '../selectors';
 
 // WORKERS
+
+function* updateCommissionWorker({ payload: { commission, blocked } }) {
+  const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  yield call(updateValidate, commission, blocked, walletAddress);
+  yield put(validatorActions.updateCommission.success());
+  yield put(validatorActions.getInfo.call());
+}
 
 function* payoutWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
@@ -71,6 +78,7 @@ function* getInfoWorker() {
   const nominatorsRaw = yield call(getNominators);
   const nominators = nominatorsRaw.map(([{ args: [nominator] }]) => nominator.toString());
   const ledgerRaw = yield call(getStakingLedger, walletAddress);
+  const validatorData = yield call(getValidator, walletAddress);
 
   if (ledgerRaw.isNone) {
     yield put(validatorActions.getInfo.success({
@@ -91,6 +99,7 @@ function* getInfoWorker() {
       isStakingValidator: stakingValidators.includes(stash),
       isNominator: nominators.includes(stash),
       unlocking: ledger.unlocking,
+      validator: validatorData.toJSON(),
     }));
   }
 }
@@ -271,6 +280,10 @@ function* setSessionKeysWatcher() {
   yield* blockchainWatcher(validatorActions.setSessionKeys, setSessionKeysWorker);
 }
 
+function* updateCommissionWatcher() {
+  yield* blockchainWatcher(validatorActions.updateCommission, updateCommissionWorker);
+}
+
 function* setPayeeWatcher() {
   yield* blockchainWatcher(validatorActions.setPayee, setPayeeWorker);
 }
@@ -353,4 +366,5 @@ export {
   unbondWatcher,
   withdrawUnbondedWatcher,
   getStakingDataWatcher,
+  updateCommissionWatcher,
 };

@@ -98,6 +98,7 @@ function CreateValidatorForm({
       <Form.Item
         name="allow_nominations"
         valuePropName="checked"
+        layout="horizontal"
         label="Allow new nominations"
       >
         <Checkbox />
