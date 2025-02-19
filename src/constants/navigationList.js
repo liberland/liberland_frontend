@@ -10,11 +10,11 @@ import { ReactComponent as StakingIcon } from '../assets/icons/staking.svg';
 import { ReactComponent as ProfileIcon } from '../assets/icons/profile.svg';
 import { ReactComponent as CongressIcon } from '../assets/icons/congress.svg';
 import { ReactComponent as SenateIcon } from '../assets/icons/senate.svg';
-import LinkedIn from '../assets/icons/linkedin.svg';
-import Meta from '../assets/icons/meta.svg';
-import X from '../assets/icons/x.svg';
-import YouTube from '../assets/icons/youtube.svg';
-import Telegram from '../assets/icons/telegram.svg';
+import { ReactComponent as LinkedIn } from '../assets/icons/linkedin.svg';
+import { ReactComponent as Meta } from '../assets/icons/meta.svg';
+import { ReactComponent as X } from '../assets/icons/x.svg';
+import { ReactComponent as YouTube } from '../assets/icons/youtube.svg';
+import { ReactComponent as Telegram } from '../assets/icons/telegram.svg';
 import router from '../router';
 
 export const navigationList = [

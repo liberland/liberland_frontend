@@ -1,8 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import theme from 'antd/es/theme';
 import ConfigProvider from 'antd/es/config-provider';
@@ -10,22 +6,18 @@ import { useMediaQuery } from 'usehooks-ts';
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
-const AntdProviderContext = createContext();
-
-export const useAntdProviderContext = () => useContext(AntdProviderContext);
-
 export default function AntdProvider({ children }) {
-  const systemPrefersDark = useMediaQuery(
-    {
-      query: '(prefers-color-scheme: dark)',
-    },
-    undefined,
-    (prefersDark) => {
-      // eslint-disable-next-line no-use-before-define
-      setDarkMode(prefersDark);
-    },
-  );
-  const [isDarkMode, setDarkMode] = useState(systemPrefersDark);
+  const isDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
+  const colorText = isDarkMode ? 'white' : '#243F5F';
+  const activeBackground = isDarkMode ? '#1E202A' : 'white';
+  const mildShadow = isDarkMode ? '#7095A7' : '#F2F2F2';
+  const shadow = isDarkMode ? '#7095A7' : '#EAEEF0';
+  const mildBlue = isDarkMode ? '#7095A7' : '#ACBDC5';
+  const activeBorder = isDarkMode ? '#7095A7' : '#CCD6DB';
+  const primaryColor = isDarkMode ? '#7095A7' : '#122C4B';
+  const primaryBorder = isDarkMode ? '#7095A7' : '#F6CA31';
+  const contentBg = isDarkMode ? '#1E202A' : 'white';
 
   return (
     <ConfigProvider
@@ -37,7 +29,7 @@ export default function AntdProvider({ children }) {
       theme={{
         algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
         token: {
-          colorText: '#243F5F',
+          colorText,
           fontSize: 18,
           fontSizeHeading5: 25,
           fontSizeHeading4: 29,
@@ -48,95 +40,101 @@ export default function AntdProvider({ children }) {
         },
         components: {
           Layout: {
-            bodyBg: 'white',
-            footerBg: 'white',
-            headerBg: 'white',
-            headerColor: '#243F5F',
+            bodyBg: activeBackground,
+            footerBg: activeBackground,
+            headerBg: activeBackground,
+            headerColor: colorText,
             headerHeight: '47px',
             headerPadding: '12.73px 10',
-            lightTriggerColor: '#243F5F',
-            siderBg: 'white',
-            triggerBg: 'white',
-            triggerColor: '#243F5F',
+            lightTriggerColor: colorText,
+            siderBg: activeBackground,
+            triggerBg: activeBackground,
+            triggerColor: colorText,
           },
           Menu: {
-            subMenuItemBg: 'white',
+            subMenuItemBg: activeBackground,
             itemPaddingInline: '20px',
             itemMarginInline: '0',
-            itemSelectedColor: '#243F5F',
-            itemColor: '#243F5F',
+            itemSelectedColor: colorText,
+            itemColor: colorText,
             itemBorderRadius: '0',
-            itemActiveBg: '#F2F2F2',
-            itemActiveColor: '#243F5F',
-            subMenuItemSelectedColor: '#243F5F',
-            itemSelectedBg: '#EAEEF0',
-            groupTitleColor: '#ACBDC5',
+            itemActiveBg: mildShadow,
+            itemActiveColor: colorText,
+            subMenuItemSelectedColor: colorText,
+            itemSelectedBg: shadow,
+            groupTitleColor: mildBlue,
             subMenuItemBorderRadius: '0',
-            horizontalItemHoverColor: '#F2F2F2',
+            horizontalItemHoverColor: mildShadow,
             horizontalItemSelectedColor: 'transparent',
           },
           Button: {
-            defaultActiveBorderColor: '#CCD6DB',
-            defaultBg: 'white',
-            defaultBorderColor: '#CCD6DB',
-            defaultHoverBorderColor: '#CCD6DB',
-            defaultHoverColor: '#243F5F',
-            defaultHoverBg: '#EAEEF0',
+            defaultActiveBorderColor: activeBorder,
+            defaultBg: activeBackground,
+            defaultBorderColor: activeBorder,
+            defaultHoverBorderColor: activeBorder,
+            defaultHoverColor: colorText,
+            defaultHoverBg: shadow,
             defaultShadow: '0',
-            primaryColor: '#122C4B',
+            primaryColor,
             primaryShadow: '0',
-            colorPrimaryBorder: '#F6CA31',
+            colorPrimaryBorder: primaryBorder,
           },
           Typography: {
-            colorText: '#243F5F',
+            colorText,
             titleMarginBottom: '20px',
           },
           Tabs: {
-            inkBarColor: '#243F5F',
-            itemActiveColor: '#243F5F',
-            itemColor: '#ACBDC5',
-            itemHoverColor: '#243F5F',
+            inkBarColor: colorText,
+            itemActiveColor: colorText,
+            itemColor: mildBlue,
+            itemHoverColor: colorText,
           },
           Collapse: {
             contentPadding: '20px',
-            headerBg: 'white',
+            headerBg: activeBackground,
             headerPadding: '20px',
-            colorBorder: '#F2F2F2',
+            colorBorder: mildShadow,
+            contentBg,
             fontSize: 20,
-            colorText: '#243F5F',
+            colorText,
           },
           Card: {
-            extraColor: '#243F5F',
+            extraColor: colorText,
             actionsLiMargin: '12px 5px',
+            actionsBg: contentBg,
+            headerBg: contentBg,
           },
           InputNumber: {
             controlWidth: '100%',
-            activeBorderColor: '#243F5F',
-            hoverBorderColor: '#243F5F',
-            colorText: '#243F5F',
+            activeBorderColor: colorText,
+            hoverBorderColor: colorText,
+            colorText,
           },
           Input: {
-            activeBorderColor: '#243F5F',
-            hoverBorderColor: '#243F5F',
-            colorText: '#243F5F',
+            activeBorderColor: colorText,
+            hoverBorderColor: colorText,
+            colorText,
           },
           Message: {
             margin: 'auto 0',
           },
           Progress: {
-            defaultColor: '#243F5F',
+            defaultColor: colorText,
           },
           Table: {
-            headerBg: '#ffffff',
-            borderColor: '#F2F2F2',
-            headerColor: '#ACBDC5',
+            headerBg: activeBackground,
+            borderColor: mildShadow,
+            headerColor: mildBlue,
+            footerBg: activeBackground,
+            rowExpandedBg: contentBg,
+            rowHoverBg: activeBackground,
+            rowSelectedHoverBg: activeBackground,
+            rowSelectedBg: activeBackground,
           },
         },
       }}
     >
-      <AntdProviderContext.Provider value={setDarkMode}>
-        {children}
-      </AntdProviderContext.Provider>
+      {children}
     </ConfigProvider>
   );
 }

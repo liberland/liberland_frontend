@@ -33,3 +33,14 @@ $text4: #B0B7C3;
 $text5: #BFBFBF;
 $text6: #BCBCBC;
 $errorText: $primary4;
+
+:root {
+    --main-color: #243F5F;
+    --border-color: #ECEBF0;
+    --main-border: #ECEBF0;
+    @media screen and (prefers-color-scheme: dark) {
+        --border-color: #7095A7;
+        --main-color: white;
+        --main-border: rgba(253,253,253,0.12);
+    }
+}

@@ -4,13 +4,16 @@
 
 .contentWrapper {
   background-color: #FAFAFA;
+  @media screen and (prefers-color-scheme: dark) {
+    background-color: #10131b!important;
+  }
 }
 .header {
   display: flex;
   align-items: center;
   height: 50px;
   border-top: solid 3px #F3CB28;
-  border-bottom: 1px solid #ECEBF0;
+  border-bottom: 1px solid var(--main-border);
   position: sticky;
   z-index: 999;
   cursor: pointer;
@@ -53,7 +56,7 @@
   border-bottom: none;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')) {
-    border-right: 1px solid #ECEBF0;
+    border-bottom: 1px solid var(--main-border);
     max-width: initial;
     width: unset;
     max-width: unset;
@@ -96,7 +99,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  border-top: 1px solid #ECEBF0;
+  border-top: 1px solid var(--main-border);
   margin-top: 50px;
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')) {
@@ -125,11 +128,14 @@
 }
 
 .icon {
-  color: #243F5F;
+  color: var(--main-color);
+  transform: scale(calc(20 / 17));
+}
+.navigationTitle {
+  padding-left: 10px;
 }
 
 .logo {
-  width: 136px;
   margin: 10px 20px 10px 10px;
 }
 
@@ -148,8 +154,10 @@
 }
 
 .social {
-  width: 15px;
-  height: 15px;
+  color: var(--main-color)!important;
+  &a:visited {
+    color: var(--main-color)!important;
+  }
 }
 
 .center {

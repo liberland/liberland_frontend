@@ -2,7 +2,7 @@ import React from 'react';
 import { Header as HeaderInternal } from 'antd/es/layout/layout';
 import Flex from 'antd/es/flex';
 import styles from '../styles.module.scss';
-import LiberlandLettermark from '../../../assets/icons/Liberland_Lettermark.svg';
+import { ReactComponent as LiberlandLettermark } from '../../../assets/icons/Liberland_Lettermark.svg';
 import ChangeWallet from '../../Home/ChangeWallet';
 import UserMenu from '../../UserMenu';
 
@@ -11,7 +11,7 @@ function DesktopHeader() {
     <HeaderInternal
       className={styles.header}
     >
-      <img alt="logo" src={LiberlandLettermark} className={styles.logo} />
+      <LiberlandLettermark alt="logo" className={styles.logo} />
       <div className={styles.version}>
         Blockchain
         <br />

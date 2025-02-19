@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Menu from 'antd/es/menu';
 import MenuIcon from '@ant-design/icons/MenuOutlined';
-import Icon from '@ant-design/icons/lib/components/Icon';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
@@ -14,6 +13,7 @@ import { blockchainSelectors, userSelectors } from '../../../redux/selectors';
 import { blockchainActions, validatorActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import ChangeWallet from '../../Home/ChangeWallet';
+import truncate from '../../../utils/truncate';
 
 function UrlMenu({
   onClose,
@@ -62,21 +62,21 @@ function UrlMenu({
   }, [matchedSubLink, pathname]);
   const createMenu = (navigation) => {
     const subs = Object.entries(navigation.subLinks).map(([name, link]) => ({
-      label: name,
+      label: <div className={styles.navigationTitle}>{truncate(name, 22)}</div>,
       key: link,
       onClick: () => navigate(link),
     }));
-    const icon = (
-      <Icon component={navigation.icon} className={styles.icon} />
+    const Icon = navigation.icon;
+    const icon = <Icon className={styles.icon} />;
+    const label = (
+      <span className={classNames(styles.navigationTitle, { [styles.discouraged]: navigation.isDiscouraged })}>
+        {navigation.title}
+      </span>
     );
     if (isBiggerThanSmallScreen) {
       return {
         icon,
-        label: (
-          <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>
-            {navigation.title}
-          </span>
-        ),
+        label,
         key: navigation.route,
         onClick: subs.length ? undefined : () => navigate(navigation.route),
         onTitleClick: !subs.length ? undefined : () => navigate(navigation.route),
@@ -85,11 +85,7 @@ function UrlMenu({
     }
     return {
       icon,
-      label: (
-        <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>
-          {navigation.title}
-        </span>
-      ),
+      label,
       key: navigation.route,
       children: subs.length ? subs : undefined,
       onClick: subs.length ? undefined : () => navigate(navigation.route),
