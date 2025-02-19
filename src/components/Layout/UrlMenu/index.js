@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Menu from 'antd/es/menu';
 import MenuIcon from '@ant-design/icons/MenuOutlined';
+import Icon from '@ant-design/icons/lib/components/Icon';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
@@ -65,9 +66,12 @@ function UrlMenu({
       key: link,
       onClick: () => navigate(link),
     }));
+    const icon = (
+      <Icon component={navigation.icon} className={styles.icon} />
+    );
     if (isBiggerThanSmallScreen) {
       return {
-        icon: <img src={navigation.icon} alt="icon" className={styles.icon} />,
+        icon,
         label: (
           <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>
             {navigation.title}
@@ -80,7 +84,7 @@ function UrlMenu({
       };
     }
     return {
-      icon: <img src={navigation.icon} alt="icon" className={styles.icon} />,
+      icon,
       label: (
         <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>
           {navigation.title}

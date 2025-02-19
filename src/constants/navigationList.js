@@ -1,6 +1,15 @@
-import FeedIcon from '../assets/icons/feed.svg';
-import WalletIcon from '../assets/icons/wallet.svg';
-import DocumentsIcon from '../assets/icons/documents.svg';
+import { ReactComponent as FeedIcon } from '../assets/icons/feed.svg';
+import { ReactComponent as WalletIcon } from '../assets/icons/wallet.svg';
+import { ReactComponent as DocumentsIcon } from '../assets/icons/documents.svg';
+import { ReactComponent as PoliticsIcon } from '../assets/icons/politics.svg';
+import { ReactComponent as LegislationIcon } from '../assets/icons/legislation.svg';
+import { ReactComponent as CompaniesIcon } from '../assets/icons/companies.svg';
+import { ReactComponent as RegistriesIcon } from '../assets/icons/registries.svg';
+import { ReactComponent as OfficesIcon } from '../assets/icons/offices.svg';
+import { ReactComponent as StakingIcon } from '../assets/icons/staking.svg';
+import { ReactComponent as ProfileIcon } from '../assets/icons/profile.svg';
+import { ReactComponent as CongressIcon } from '../assets/icons/congress.svg';
+import { ReactComponent as SenateIcon } from '../assets/icons/senate.svg';
 import LinkedIn from '../assets/icons/linkedin.svg';
 import Meta from '../assets/icons/meta.svg';
 import X from '../assets/icons/x.svg';
@@ -45,7 +54,7 @@ export const navigationList = [
   {
     route: router.home.voting,
     title: 'Politics',
-    icon: DocumentsIcon,
+    icon: PoliticsIcon,
     isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED === 'true',
     subLinks: {
       'Congressional Assemble': router.voting.congressionalAssemble,
@@ -56,7 +65,7 @@ export const navigationList = [
   {
     route: router.home.contracts,
     title: 'Contracts',
-    icon: WalletIcon,
+    icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONTRACTS_DISCOURAGED === 'true',
     subLinks: {
       Overview: router.contracts.overview,
@@ -66,7 +75,7 @@ export const navigationList = [
   {
     route: router.home.legislation,
     title: 'Legislation',
-    icon: DocumentsIcon,
+    icon: LegislationIcon,
     isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED === 'true',
     subLinks: {
       Decisions: router.legislation.decisions,
@@ -81,7 +90,7 @@ export const navigationList = [
   {
     route: router.home.companies,
     title: 'Companies',
-    icon: WalletIcon,
+    icon: CompaniesIcon,
     isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED === 'true',
     subLinks: {
       'All companies': router.companies.allCompanies,
@@ -101,14 +110,14 @@ export const navigationList = [
   {
     route: router.home.profile,
     title: 'Profile',
-    icon: DocumentsIcon,
+    icon: ProfileIcon,
     isDiscouraged: process.env.REACT_APP_IS_PROFILE_DISCOURAGED === 'true',
     subLinks: {},
   },
   {
     route: router.home.staking,
     title: 'Staking',
-    icon: WalletIcon,
+    icon: StakingIcon,
     isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED === 'true',
     subLinks: {
       Overview: router.staking.overview,
@@ -119,7 +128,7 @@ export const navigationList = [
   {
     route: router.home.offices,
     title: 'Offices',
-    icon: DocumentsIcon,
+    icon: OfficesIcon,
     isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
@@ -134,7 +143,7 @@ export const navigationList = [
   {
     route: router.home.registries,
     title: 'Registries',
-    icon: WalletIcon,
+    icon: RegistriesIcon,
     isGovt: true,
     isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED === 'true',
     subLinks: {
@@ -148,7 +157,7 @@ export const navigationList = [
   {
     route: router.home.congress,
     title: 'Congress',
-    icon: DocumentsIcon,
+    icon: CongressIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
@@ -162,7 +171,7 @@ export const navigationList = [
   {
     route: router.home.senate,
     title: 'Senate',
-    icon: WalletIcon,
+    icon: SenateIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
