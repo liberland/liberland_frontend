@@ -467,6 +467,15 @@ function ButtonModal(props) {
   );
 }
 
-const TradeTokensModal = modalWrapper(TradeTokensForm, ButtonModal);
+const TradeTokensModal = modalWrapper(
+  TradeTokensForm,
+  ButtonModal,
+  undefined,
+  (props, object) => {
+    const { assets } = props;
+    const { asset1, asset2 } = object || {};
+    return assets.asset1 === asset1 && assets.asset2 === asset2;
+  },
+);
 
 export default TradeTokensModal;

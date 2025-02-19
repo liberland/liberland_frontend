@@ -102,6 +102,7 @@ function ExchangeList() {
             {
               key: 'lowliq',
               label: 'Low liquidity exchange pairs',
+              forceRender: true,
               extra: isBiggerThanDesktop && (
                 <ExchangeSort onSort={setLowLiquiditySort} sortBy={lowLiquiditySort} />
               ),
