@@ -121,7 +121,7 @@ export default function Motion({
         )}
       />
       <Flex vertical gap="15px">
-        <Proposal proposal={proposalOf} isTableRow={isTableRow} />
+        <Proposal proposal={proposalOf} isTableRow={isTableRow} isDetailsHidden />
         <Flex wrap gap="15px">
           <Card size="small" title="Voted aye">
             <Voters voting={voting.ayes} />

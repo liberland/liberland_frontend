@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Tooltip from 'antd/es/tooltip';
 import Flex from 'antd/es/flex';
+import Spin from 'antd/es/spin';
 import { ethSelectors } from '../../../../redux/selectors';
 import { ethActions } from '../../../../redux/actions';
 import { formatCustom } from '../../../../utils/walletHelpers';
@@ -82,7 +83,7 @@ function TokenStakeInfo({ selectedAccount }) {
   }, [tokenStakeInfo]);
 
   if (!tokenStakeInfo || tokenStakeInfoLoading) {
-    return <div>Loading...</div>;
+    return <Spin />;
   }
 
   if (tokenStakeInfo.error) {

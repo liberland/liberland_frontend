@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import { validatorSelectors } from '../../../../redux/selectors';
 import { validatorActions } from '../../../../redux/actions';
 import { formatDollars } from '../../../../utils/walletHelpers';
@@ -18,7 +18,7 @@ export default function Stats() {
   }, [dispatch]);
 
   if (!stakerRewards?.length) {
-    return <Alert type="info" message="No rewards found" />;
+    return <Result status={404} title="No rewards found" />;
   }
   const data = stakerRewards.map(({ era, validators }) => ({
     era: `Era ${era.toNumber()}`,

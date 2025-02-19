@@ -37,7 +37,7 @@ function BalanceOverview({
       currency: 'LLD',
       icon: LLD,
       actions: [
-        <Button primary onClick={() => history.push(router.staking.overview)}>
+        <Button primary onClick={() => history.push(router.staking.overview)} key="stake">
           Stake
         </Button>,
       ],
@@ -98,7 +98,7 @@ function BalanceOverview({
 BalanceOverview.defaultProps = {
   totalBalance: '0x0',
   balances: {},
-  liquidMerits: 0,
+  liquidMerits: '0',
   showStaked: true,
 };
 
@@ -109,10 +109,10 @@ BalanceOverview.propTypes = {
   balances: PropTypes.shape({
     liquidAmount: PropTypes.shape({
       // eslint-disable-next-line react/forbid-prop-types
-      amount: PropTypes.object,
+      amount: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     }),
     liberstake: PropTypes.shape({
-      amount: PropTypes.number,
+      amount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     }),
     polkastake: PropTypes.shape({
       amount: PropTypes.number,

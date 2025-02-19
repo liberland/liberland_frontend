@@ -7,9 +7,9 @@ import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import InputNumber from 'antd/es/input-number';
-import Checkbox from 'antd/es/checkbox/Checkbox';
+import Collapse from 'antd/es/collapse';
 import { BN } from '@polkadot/util';
-import { SwapOutlined } from '@ant-design/icons';
+import SwapOutlined from '@ant-design/icons/SwapOutlined';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
 import { dexActions, walletActions } from '../../redux/actions';
@@ -72,7 +72,6 @@ function TradeTokensForm({
   const [amount1Focused, setAmount1Focused] = useState();
   const [amount2Focused, setAmount2Focused] = useState();
   const [form] = Form.useForm();
-  const details = Form.useWatch('details', form);
   const { isStock } = useStockContext();
 
   const onSubmit = async ({
@@ -314,6 +313,9 @@ function TradeTokensForm({
       className={styles.getCitizenshipModal}
       onFinish={onSubmit}
       form={form}
+      initialValues={{
+        minAmountPercent: 10,
+      }}
       layout="vertical"
     >
       <Title level={3}>
@@ -421,32 +423,35 @@ function TradeTokensForm({
           onChange={() => setInput2Error(null)}
         />
       </Form.Item>
-      {details && (
-        <Form.Item
-          label="Max Slippage (in percent %)"
-          name="minAmountPercent"
-          rules={[
-            { required: true },
-            { type: 'number' },
+      <Flex vertical gap="20px">
+        <Collapse
+          items={[
+            {
+              key: 'details',
+              label: 'Additional settings',
+              children: (
+                <Form.Item
+                  label="Max Slippage (in percent %)"
+                  name="minAmountPercent"
+                  rules={[
+                    { required: true },
+                    { type: 'number' },
+                  ]}
+                >
+                  <InputNumber controls={false} />
+                </Form.Item>
+              ),
+            },
           ]}
-        >
-          <InputNumber controls={false} />
-        </Form.Item>
-      )}
-      <Form.Item
-        label="Additional Settings"
-        name="details"
-        valuePropName="checked"
-      >
-        <Checkbox />
-      </Form.Item>
-      <Flex gap="15px" wrap>
-        <Button medium onClick={onClose} disabled={loading}>
-          Cancel
-        </Button>
-        <Button primary medium type="submit" disabled={loading}>
-          {loading ? 'Loading...' : submitText}
-        </Button>
+        />
+        <Flex gap="15px" wrap>
+          <Button medium onClick={onClose} disabled={loading}>
+            Cancel
+          </Button>
+          <Button primary medium type="submit" disabled={loading}>
+            {loading ? 'Loading...' : submitText}
+          </Button>
+        </Flex>
       </Flex>
     </Form>
   );

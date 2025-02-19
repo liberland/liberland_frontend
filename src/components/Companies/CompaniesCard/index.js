@@ -7,7 +7,7 @@ import List from 'antd/es/list';
 import { isAddress } from '@polkadot/util-crypto';
 import { useHistory } from 'react-router-dom';
 import cx from 'classnames';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Markdown from 'markdown-to-jsx';
 import { useMediaQuery } from 'usehooks-ts';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
@@ -32,14 +32,15 @@ function CompaniesCard({
     [registries],
   );
   const dataSource = simplify?.filter((registered) => registered && !registered.invalid);
+  const hasFooter = type === 'mine' && dataSource?.length > 0;
   return (
     <List
       dataSource={dataSource}
-      className={cx(styles.companies, 'listWithFooter')}
+      className={cx({ listWithFooter: hasFooter })}
       size="small"
       pagination={dataSource?.length ? { pageSize: 10 } : false}
       itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
-      footer={type === 'mine' && dataSource?.length > 0 ? (
+      footer={hasFooter ? (
         <Button
           primary
           onClick={() => history.push(router.companies.create)}
@@ -48,7 +49,7 @@ function CompaniesCard({
         </Button>
       ) : undefined}
       locale={{
-        emptyText: <Alert type="info" message="No companies found" />,
+        emptyText: <Result status={404} title="No companies found" />,
       }}
       renderItem={(registeredCompany) => {
         const owner = !hideOwner && registeredCompany.principals?.[0]?.name;
@@ -72,7 +73,7 @@ function CompaniesCard({
             </Markdown>
           </Paragraph>
         );
-        const companyLogoSize = isLargerThanHdScreen ? 54 : 40;
+        const companyLogoSize = isLargerThanHdScreen ? 40 : 32;
         const companyLogo = isValidUrl(logo) ? (
           <Avatar size={companyLogoSize} src={logo} className={styles.avatar} />
         ) : (
@@ -107,7 +108,7 @@ function CompaniesCard({
               <Flex wrap gap="15px">
                 {owner && (
                   <Flex wrap gap="15px" className={styles.owner}>
-                    <ColorAvatar size={54} name={owner} />
+                    <ColorAvatar size={companyLogoSize} name={owner} />
                     <Flex vertical gap="5px" justify="center" className={styles.ownerName}>
                       {owner && (
                         <>
@@ -115,7 +116,9 @@ function CompaniesCard({
                             {truncate(owner, 20)}
                           </strong>
                           {isAddress(address) && (
-                            <CopyIconWithAddress address={address} isTruncate />
+                            <div className="description">
+                              <CopyIconWithAddress address={address} isTruncate />
+                            </div>
                           )}
                         </>
                       )}
@@ -147,13 +150,20 @@ function CompaniesCard({
               </div>
             </Flex>
             {owner && (
-              <Flex vertical gap="5px">
-                <div className="description">
+              <Flex vertical gap="7px">
+                <div className={cx('description', styles.mobileOwner)}>
                   Company owner
                 </div>
                 <Flex wrap gap="5px" align="center">
-                  <ColorAvatar size={19} name={owner} />
-                  <CopyIconWithAddress address={address} name={owner} isTruncate />
+                  <ColorAvatar size={24} fontSize={12} name={owner} />
+                  <strong>
+                    {truncate(owner, 20)}
+                  </strong>
+                  {isAddress(address) && (
+                    <div className="description">
+                      <CopyIconWithAddress address={address} isTruncate />
+                    </div>
+                  )}
                 </Flex>
               </Flex>
             )}

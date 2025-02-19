@@ -6,6 +6,7 @@ import Flex from 'antd/es/flex';
 import { identitySelectors } from '../../../redux/selectors';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import ColorAvatar from '../../ColorAvatar';
+import truncate from '../../../utils/truncate';
 
 function Voters({ voting }) {
   const names = useSelector(identitySelectors.selectorIdentityMotions);
@@ -23,7 +24,7 @@ function Voters({ voting }) {
               <ColorAvatar size={50} name={identity?.name || identity?.legal || id} />
               <Flex vertical gap="5px">
                 <div className="description">
-                  {identity?.legal || identity?.name || 'Unknown'}
+                  {truncate(identity?.legal || identity?.name || 'Unknown', 20)}
                 </div>
                 <CopyIconWithAddress
                   isTruncate

@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import {
   Redirect, Route, Switch,
 } from 'react-router-dom';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import router from '../../router';
 import { blockchainSelectors } from '../../redux/selectors';
 import { loader } from '../../utils/loader';
@@ -51,9 +51,10 @@ function Wallet() {
         />
       </Switch>
     ) : (
-      <Alert
-        type="error"
-        message={(
+      <Result
+        status="error"
+        title="Extension error"
+        subTitle={(
           <>
             No extension installed, or you did not accept the authorization, please visit
             {' '}

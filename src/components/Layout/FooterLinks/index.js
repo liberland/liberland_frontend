@@ -12,18 +12,18 @@ function FooterLinks() {
     <List
       grid={isBiggerThanSmallScreen ? { gutter: 16 } : undefined}
       dataSource={footerList}
+      bordered={false}
       renderItem={([title, links]) => {
         const list = Object.entries(links);
         return (
           <Collapse
             key={title}
+            bordered={false}
             expandIcon={isBiggerThanSmallScreen ? () => null : undefined}
             activeKey={isBiggerThanSmallScreen ? [title] : undefined}
             items={[{
               key: title,
-              label: (
-                <div className="description">{title}</div>
-              ),
+              label: title,
               children: (
                 <Menu
                   mode="inline"

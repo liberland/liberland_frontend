@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
+import Collapse from 'antd/es/collapse';
 import { registriesSelectors } from '../../../redux/selectors';
 import { registriesActions } from '../../../redux/actions';
 import CompaniesCard from '../CompaniesCard';
@@ -16,11 +17,21 @@ function AllCompanies() {
 
   if (!allRegistries.officialRegistryEntries?.length) {
     return (
-      <Alert type="info" message="No registries found" />
+      <Result status={404} title="No registries found" />
     );
   }
   return (
-    <CompaniesCard registries={allRegistries.officialRegistryEntries} type="all" />
+    <Collapse
+      collapsible="icon"
+      defaultActiveKey={['all']}
+      items={[{
+        key: 'all',
+        label: 'Companies',
+        children: (
+          <CompaniesCard registries={allRegistries.officialRegistryEntries} type="all" />
+        ),
+      }]}
+    />
   );
 }
 

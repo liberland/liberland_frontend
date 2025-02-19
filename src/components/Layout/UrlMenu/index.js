@@ -30,7 +30,7 @@ function UrlMenu({
     dispatch(blockchainActions.setUserWallet.success(walletAddress));
     dispatch(validatorActions.getInfo.call());
     localStorage.removeItem('BlockchainAdress');
-    if (isBiggerThanSmallScreen) {
+    if (!isBiggerThanSmallScreen) {
       onClose?.();
     }
   };

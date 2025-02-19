@@ -28,7 +28,7 @@ function Offices() {
         exact
         path={router.home.offices}
         render={() => (
-          <Redirect to={router.offices.identity} />
+          <Redirect to={router.offices.ministryOfFinance} />
         )}
       />
       <Route

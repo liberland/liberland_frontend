@@ -52,7 +52,7 @@ export function CheckExtensionWalletProvider({ children }) {
 
   if (isLoading) {
     return (
-      <GuidedSetupWrapper>
+      <GuidedSetupWrapper isLoading>
         <LoadingComponent />
       </GuidedSetupWrapper>
     );

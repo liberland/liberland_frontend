@@ -59,35 +59,35 @@ export function Proposal({
         batchId={proposal.toJSON().callIndex}
         id={proposal.toString()}
       >
-        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} isDetailsHidden={isDetailsHidden} />}
       </BatchAll>
     );
   }
   if (isExternalProposeMajority(proposal)) {
     return (
       <Referendum {...{ proposal }}>
-        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} isDetailsHidden={isDetailsHidden} />}
       </Referendum>
     );
   }
   if (isBlacklist(proposal)) {
     return (
       <Blacklist {...{ proposal }}>
-        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} isDetailsHidden={isDetailsHidden} />}
       </Blacklist>
     );
   }
   if (isCouncilSenateExecute(proposal)) {
     return (
       <CouncilSenateExecute {...{ proposal }}>
-        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} isDetailsHidden={isDetailsHidden} />}
       </CouncilSenateExecute>
     );
   }
   if (isScheduler(proposal)) {
     return (
       <Schedule {...{ proposal }}>
-        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} />}
+        {(prop) => <Proposal proposal={prop} isTableRow={isTableRow} isDetailsHidden={isDetailsHidden} />}
       </Schedule>
     );
   }

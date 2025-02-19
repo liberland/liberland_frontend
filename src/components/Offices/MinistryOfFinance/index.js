@@ -42,7 +42,7 @@ export default function Wallet() {
       <WalletCongresSenateWrapper
         userIsMember={userIsMember}
         totalBalance={totalBalance}
-        congresAccountAddress={ministryFinanceWallet}
+        congressAccountAddress={ministryFinanceWallet}
         liquidMerits={liquidMerits}
         additionalAssets={additionalAssets}
         balances={balances}

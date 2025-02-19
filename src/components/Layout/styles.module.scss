@@ -2,6 +2,9 @@
 @import '../../assets/base/fonts';
 @import '../../assets/main';
 
+.contentWrapper {
+  background-color: #FAFAFA;
+}
 .header {
   display: flex;
   align-items: center;
@@ -18,6 +21,9 @@
     position: initial;
     cursor: initial;
   }
+}
+.pageTitleWrapper {
+  margin-bottom: 15px;
 }
 .menu {
   flex: 1;
@@ -67,6 +73,7 @@
   width: 100%;
 }
 .content {
+  max-width: 2048px;
   min-height: 280px;
   margin: 0;
   padding: 10px 25px;
@@ -76,7 +83,6 @@
   }
 }
 .version {
-  font-family: Open Sans;
   font-size: 10px;
   font-weight: 600;
   line-height: 12px;
@@ -151,35 +157,24 @@
   align-content: center;
 }
 
-.pageTitle {
-  font-family: Playfair Display;
-  font-size: 30px !important;
-  font-weight: 600 !important;
-  line-height: 33px !important;
-  letter-spacing: -0.5px;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
-  color: #243F5F !important;
-}
-
 .slogan {
-  font-family: Open Sans;
-  font-size: 10px;
+  font-size: 12px;
   font-style: italic;
   font-weight: 600;
-  line-height: 13.62px;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
   margin-left: auto;
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')) {
-    line-height: 16.34px;
     text-align: right;
     margin-right: 20px;
     color: #ACBDC5;
     width: 100%;
+    font-size: 14px;
+  }
+}
+
+.copyright {
+  font-size: 12px;
+  @media screen and (min-width: map-get($breakpoints, 'desktop')) {
     font-size: 14px;
   }
 }
@@ -198,6 +193,10 @@
 
 .donate {
   margin-left: auto;
+  font-size: 10px;
+  @media screen and (min-width: map-get($breakpoints, 'desktop')) {
+    font-size: 12px;
+  }
 }
 
 .discouraged {

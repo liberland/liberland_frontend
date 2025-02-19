@@ -4,6 +4,12 @@
 .card {
     width: 100%;
 }
+.title {
+    margin-top: 7px;
+}
+.date {
+    margin-top: 15px;
+}
 .header {
     border-bottom: none!important;
 }
@@ -12,4 +18,8 @@
 }
 .title {
     min-width: 160px;
+}
+.date,
+.type {
+    font-size: 14px;
 }

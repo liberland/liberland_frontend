@@ -1,21 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Flex from 'antd/es/flex';
-import Card from 'antd/es/card/Card';
+import Modal from 'antd/es/modal';
 import styles from './styles.module.scss';
 
-export function GuidedSetupWrapper({ children }) {
+export function GuidedSetupWrapper({ children, isLoading }) {
   return (
-    <Flex justify="center" align="center" className={styles.wrapper}>
-      <Card>
-        {children}
-      </Card>
-    </Flex>
+    <Modal
+      open
+      closable={false}
+      maskClosable={false}
+      footer={null}
+      className={isLoading ? styles.loader : styles.wrapper}
+    >
+      {children}
+    </Modal>
   );
 }
 
 GuidedSetupWrapper.propTypes = {
   children: PropTypes.node.isRequired,
+  isLoading: PropTypes.bool,
 };
 
 export default GuidedSetupWrapper;

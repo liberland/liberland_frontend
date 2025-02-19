@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import Collapse from 'antd/es/collapse';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Avatar from 'antd/es/avatar';
 import Flex from 'antd/es/flex';
 import Divider from 'antd/es/divider';
@@ -10,7 +10,7 @@ import Space from 'antd/es/space';
 import Title from 'antd/es/typography/Title';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
-import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
+import ArrowLeft from '../../../assets/icons/arrow-left.svg';
 import styles from './styles.module.scss';
 import { useHideTitle } from '../../Layout/HideTitle';
 import CopyInput from '../../CopyInput';
@@ -31,16 +31,16 @@ function CompanyDetail() {
   const history = useHistory();
 
   if (!mainDataObject) {
-    return <Alert type="error" message="Company data invalid!" />;
+    return <Result status="error" title="Company data invalid" />;
   }
 
   const fullLink = `${window.location.protocol}//${window.location.host}${router.companies.allCompanies}`;
 
   return (
-    <div className={styles.container}>
+    <>
       <Flex className={styles.top} wrap gap="15px" justify="space-between">
         <Button onClick={() => history.goBack()}>
-          <ArrowLeftOutlined />
+          <Avatar src={ArrowLeft} size={12} shape="square" />
           <Space />
           Back
         </Button>
@@ -317,7 +317,7 @@ function CompanyDetail() {
           },
         ]}
       />
-    </div>
+    </>
   );
 }
 

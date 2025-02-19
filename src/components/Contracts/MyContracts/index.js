@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Collapse from 'antd/es/collapse';
 import Spin from 'antd/es/spin';
+import Divider from 'antd/es/divider';
+import Flex from 'antd/es/flex';
+import { useMediaQuery } from 'usehooks-ts';
 import {
   blockchainSelectors,
   contractsSelectors,
@@ -17,7 +20,7 @@ function MyContracts() {
   const walletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
-
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   useEffect(() => {
     dispatch(contractsActions.getMyContracts.call());
   }, [dispatch, walletAddress]);
@@ -34,13 +37,22 @@ function MyContracts() {
         {
           key: 'all',
           label: 'My contracts',
-          extra: <CreateContractModal isMyContracts />,
-          children:
-            myContracts.length < 1 ? (
-              <Alert type="info" message="No contracts found" />
-            ) : (
-              <ContractsList contracts={myContracts} isMyContracts />
-            ),
+          extra: isBiggerThanSmallScreen ? <CreateContractModal isMyContracts /> : undefined,
+          children: (
+            <Flex vertical>
+              {!isBiggerThanSmallScreen && (
+                <>
+                  <CreateContractModal isMyContracts />
+                  <Divider />
+                </>
+              )}
+              {myContracts.length < 1 ? (
+                <Result status={404} title="No contracts found" />
+              ) : (
+                <ContractsList contracts={myContracts} />
+              )}
+            </Flex>
+          ),
         },
       ]}
     />

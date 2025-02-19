@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Spin from 'antd/es/spin';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Collapse from 'antd/es/collapse';
 import ContractsList from '../ContractsList';
 import { blockchainSelectors, contractsSelectors } from '../../../redux/selectors';
@@ -21,7 +21,7 @@ function HomeContract() {
   }
 
   if (!contracts.length) {
-    return <Alert type="info" message="No contracts found" />;
+    return <Result status={404} title="No contracts found" />;
   }
 
   return (

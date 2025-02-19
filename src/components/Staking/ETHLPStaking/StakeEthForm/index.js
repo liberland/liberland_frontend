@@ -5,6 +5,7 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import Flex from 'antd/es/flex';
 import InputNumber from 'antd/es/input-number';
 import Slider from 'antd/es/slider';
+import Spin from 'antd/es/spin';
 import PropTypes from 'prop-types';
 import { ethSelectors } from '../../../../redux/selectors';
 import { ethActions } from '../../../../redux/actions';
@@ -134,7 +135,11 @@ function StakeEthForm({
   }, [tokens, exchangeRate, tokensFocused, stakeFocused, form]);
 
   if (exchangeRateLoading) {
-    return <div className={styles.form}>Loading...</div>;
+    return (
+      <div className={styles.form}>
+        <Spin />
+      </div>
+    );
   }
 
   return (

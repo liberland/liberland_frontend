@@ -67,8 +67,8 @@ export default function StakeManagement() {
       <Col span={isBiggerThanDesktop ? 6 : 24}>
         <MoneyCard
           actions={[
-            <StakeLLDModal label="Stake LLD" />,
-            <UnbondModal />,
+            <StakeLLDModal label="Stake LLD" key="stake" />,
+            <UnbondModal key="unbond" />,
           ]}
           amount={`${formatDollars(balances.polkastake.amount)} LLD`}
           currency="LLD"

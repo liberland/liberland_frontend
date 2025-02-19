@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import List from 'antd/es/list';
 import Spin from 'antd/es/spin';
-import Flex from 'antd/es/flex';
+import Collapse from 'antd/es/collapse';
 import { useMediaQuery } from 'usehooks-ts';
 import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
@@ -26,34 +26,40 @@ function NftsComponent() {
   }
 
   return (
-    <Flex vertical gap="20px">
-      <Flex justify="end">
-        <CreateEditNFTModalWrapper />
-      </Flex>
-      {nfts.length ? (
-        <List
-          dataSource={nfts}
-          grid={isBiggerThanMediumScreen ? {
-            gutter: 16,
-          } : undefined}
-          className="centeredList"
-          renderItem={({
-            collectionId,
-            nftId,
-            collectionMetadata,
-            itemMetadata,
-          }) => (
-            <ItemNft
-              key={collectionId + nftId}
-              itemMetadata={itemMetadata}
-              collectionId={collectionId}
-              nftId={nftId}
-              collectionMetadata={collectionMetadata}
-            />
-          )}
-        />
-      ) : <Alert type="info" message="No NFTs found" />}
-    </Flex>
+    <Collapse
+      collapsible="icon"
+      defaultActiveKey={['overview']}
+      items={[{
+        key: 'overview',
+        label: 'Overview',
+        children: nfts.length ? (
+          <List
+            dataSource={nfts}
+            grid={isBiggerThanMediumScreen ? {
+              gutter: 16,
+            } : undefined}
+            className="centeredList"
+            renderItem={({
+              collectionId,
+              nftId,
+              collectionMetadata,
+              itemMetadata,
+            }) => (
+              <ItemNft
+                key={collectionId + nftId}
+                itemMetadata={itemMetadata}
+                collectionId={collectionId}
+                nftId={nftId}
+                collectionMetadata={collectionMetadata}
+              />
+            )}
+          />
+        ) : <Result status={404} title="No NFTs found" />,
+        extra: (
+          <CreateEditNFTModalWrapper />
+        ),
+      }]}
+    />
   );
 }
 

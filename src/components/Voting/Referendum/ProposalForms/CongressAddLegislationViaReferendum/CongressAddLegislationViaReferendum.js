@@ -8,6 +8,7 @@ import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
+import Card from 'antd/es/card';
 import dayjs from 'dayjs';
 import Button from '../../../../Button/Button';
 import router from '../../../../../router';
@@ -16,6 +17,7 @@ import { AddLegislationFields } from '../AddLegislationFields/AddLegislationFiel
 import { congressActions } from '../../../../../redux/actions';
 import FastTrackForm, { FastTrackDefaults } from '../../../../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../ProposalDiscussionFields';
+import styles from '../../../styles.module.scss';
 
 function CongressAddLegislationViaReferendum() {
   const dispatch = useDispatch();
@@ -69,52 +71,57 @@ function CongressAddLegislationViaReferendum() {
       form={form}
       layout="vertical"
     >
-      <Title level={3}>Propose a new Congress Motion</Title>
-      <Paragraph>Propose a new Congress Motion to propose a Referendum</Paragraph>
-      <Form.Item
-        name="tier"
-        label="Legislation tier"
-        rules={[{ required: true }]}
+      <Card
+        title={(
+          <Title className={styles.formTitle} level={3}>Propose a new Congress Motion</Title>
+        )}
       >
-        <Select
-          options={[
-            { value: 'InternationalTreaty', display: 'International Treaty' },
-            { value: 'Law', display: 'Law' },
-            { value: 'Tier3', display: 'Tier 3' },
-            { value: 'Tier4', display: 'Tier 4' },
-            { value: 'Tier5', display: 'Tier 5' },
-            { value: 'Decision', display: 'Decision' },
-          ]}
-        />
-      </Form.Item>
-      <Form.Item
-        name="year"
-        label="Legislation year"
-        rules={[{ required: true }]}
-        getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
-      >
-        <DatePicker picker="year" />
-      </Form.Item>
-      <Form.Item
-        name="index"
-        label="Legislation index"
-        rules={[{ required: true }]}
-      >
-        <InputNumber controls={false} />
-      </Form.Item>
-
-      <ProposalDiscussionFields />
-      <AddLegislationFields form={form} />
-      <FastTrackForm form={form} />
-
-      <Flex wrap gap="15px">
-        <Button
-          primary
-          type="submit"
+        <Paragraph>Propose a new Congress Motion to propose a Referendum</Paragraph>
+        <Form.Item
+          name="tier"
+          label="Legislation tier"
+          rules={[{ required: true }]}
         >
-          Submit
-        </Button>
-      </Flex>
+          <Select
+            options={[
+              { value: 'InternationalTreaty', display: 'International Treaty' },
+              { value: 'Law', display: 'Law' },
+              { value: 'Tier3', display: 'Tier 3' },
+              { value: 'Tier4', display: 'Tier 4' },
+              { value: 'Tier5', display: 'Tier 5' },
+              { value: 'Decision', display: 'Decision' },
+            ]}
+          />
+        </Form.Item>
+        <Form.Item
+          name="year"
+          label="Legislation year"
+          rules={[{ required: true }]}
+          getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
+        >
+          <DatePicker picker="year" />
+        </Form.Item>
+        <Form.Item
+          name="index"
+          label="Legislation index"
+          rules={[{ required: true }]}
+        >
+          <InputNumber controls={false} />
+        </Form.Item>
+
+        <ProposalDiscussionFields />
+        <AddLegislationFields form={form} />
+        <FastTrackForm form={form} />
+
+        <Flex wrap gap="15px">
+          <Button
+            primary
+            type="submit"
+          >
+            Submit
+          </Button>
+        </Flex>
+      </Card>
     </Form>
   );
 }

@@ -3,9 +3,9 @@ import { useHistory } from 'react-router-dom';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import { useNavigationList } from '../hooks';
-import styles from '../styles.module.scss';
 import { useHasHiddenTitle } from '../HideTitle';
 import Button from '../../Button/Button';
+import styles from '../styles.module.scss';
 
 function PageTitle() {
   const { matchedRoute, matchedSubLink, pathname } = useNavigationList();
@@ -24,9 +24,9 @@ function PageTitle() {
     ([path]) => path === pathname,
   );
   return (
-    <Flex wrap justify="space-between" align="center">
+    <Flex wrap justify="space-between" align="center" className={styles.pageTitleWrapper}>
       {pageTitle && !hidden ? (
-        <Title level={1} className={styles.pageTitle}>{pageTitle}</Title>
+        <Title level={1}>{pageTitle}</Title>
       ) : null}
       {extra && (
         <Button primary onClick={() => history.push(extra[1].link)}>

@@ -4,7 +4,7 @@ import formatDate from '../../../utils/formatDate';
 import paymentIcon from '../../../assets/icons/RedArrowCicrle.svg';
 import reciveIcon from '../../../assets/icons/GreenArrowCircle.svg';
 
-export const transactionHistoryProcessorFactory = (walletAddress) => (transactionHistoryInfo, index) => {
+export const transactionHistoryProcessorFactory = (walletAddress, compressed) => (transactionHistoryInfo, index) => {
   const value = transactionHistoryInfo.fromId === walletAddress
     ? `-${transactionHistoryInfo.value}`
     : transactionHistoryInfo.value;
@@ -15,7 +15,7 @@ export const transactionHistoryProcessorFactory = (walletAddress) => (transactio
   const imgAlt = isAmountPositive ? 'reviceIcon' : 'paymentIcon';
   const dateTransactionHistory = formatDate(
     new Date(transactionHistoryInfo.block.timestamp),
-    true,
+    !compressed,
   );
 
   const fromToId = isAmountPositive
@@ -31,7 +31,8 @@ export const transactionHistoryProcessorFactory = (walletAddress) => (transactio
     : typeTextFromToId;
   const iconType = isAmountPositive ? reciveIcon : paymentIcon;
   const configFormat = {
-    isSymbolFirst: true,
+    isSymbolFirst: false,
+    precision: compressed ? 2 : undefined,
   };
   const assetLldLLm = transactionHistoryInfo.asset === 'LLM'
     ? formatMeritTransaction(value, configFormat)
