@@ -66,6 +66,7 @@ export const transactionHistoryProcessorFactory = (walletAddress, compressed) =>
     userId,
     typeText: typeTextExpanded,
     currency: transactionHistoryInfo.asset,
+    logo: transactionHistoryInfo.logo,
     iconType,
     asset,
     status: true, // TODO: Add failed transactions?

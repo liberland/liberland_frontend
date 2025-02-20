@@ -26,6 +26,7 @@ function WalletTransactionHistoryMobile({ failure, transactionHistory, filterTra
         currency,
         iconType,
         imgAlt,
+        logo,
       }) => (
         <List.Item>
           <Card
@@ -52,7 +53,7 @@ function WalletTransactionHistoryMobile({ failure, transactionHistory, filterTra
             <Flex vertical gap="30px">
               <Card.Meta
                 description={(
-                  <WalletHistoryAmount currency={currency} value={asset} isTitle />
+                  <WalletHistoryAmount currency={currency} value={asset} logo={logo} isTitle />
                 )}
               />
               <Flex wrap className={styles.actions} gap="15px" justify="space-between" align="center">
