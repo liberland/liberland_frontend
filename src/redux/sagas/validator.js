@@ -88,6 +88,7 @@ function* getInfoWorker() {
       isStakingValidator: null,
       isNominator: null,
       unlocking: null,
+      validator: validatorData?.toJSON(),
     }));
   } else {
     const ledger = ledgerRaw.unwrap();
@@ -99,7 +100,7 @@ function* getInfoWorker() {
       isStakingValidator: stakingValidators.includes(stash),
       isNominator: nominators.includes(stash),
       unlocking: ledger.unlocking,
-      validator: validatorData.toJSON(),
+      validator: validatorData?.toJSON(),
     }));
   }
 }
