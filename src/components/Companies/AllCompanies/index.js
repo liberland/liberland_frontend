@@ -5,6 +5,7 @@ import Collapse from 'antd/es/collapse';
 import { registriesSelectors } from '../../../redux/selectors';
 import { registriesActions } from '../../../redux/actions';
 import CompaniesCard from '../CompaniesCard';
+import { useCompanyAssets, useTradePools } from '../hooks';
 
 function AllCompanies() {
   const dispatch = useDispatch();
@@ -14,12 +15,15 @@ function AllCompanies() {
   }, [dispatch]);
 
   const allRegistries = useSelector(registriesSelectors.allRegistries);
+  const getRelevantAssets = useCompanyAssets();
+  const getRelevantPools = useTradePools();
 
   if (!allRegistries.officialRegistryEntries?.length) {
     return (
       <Result status={404} title="No registries found" />
     );
   }
+
   return (
     <Collapse
       collapsible="icon"
@@ -28,7 +32,12 @@ function AllCompanies() {
         key: 'all',
         label: 'Companies',
         children: (
-          <CompaniesCard registries={allRegistries.officialRegistryEntries} type="all" />
+          <CompaniesCard
+            registries={allRegistries.officialRegistryEntries}
+            type="all"
+            getRelevantAssets={getRelevantAssets}
+            getRelevantPools={getRelevantPools}
+          />
         ),
       }]}
     />

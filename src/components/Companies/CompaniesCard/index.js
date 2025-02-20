@@ -24,6 +24,8 @@ function CompaniesCard({
   registries,
   type,
   hideOwner,
+  getRelevantAssets,
+  getRelevantPools,
 }) {
   const history = useHistory();
   const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
@@ -59,6 +61,8 @@ function CompaniesCard({
           <CompanyActions
             registeredCompany={registeredCompany}
             type={type}
+            getRelevantAssets={getRelevantAssets}
+            getRelevantPools={getRelevantPools}
           />
         );
         const purpose = (
@@ -179,6 +183,8 @@ CompaniesCard.propTypes = {
   registries: PropTypes.array.isRequired,
   type: PropTypes.oneOf(['requested', 'mine', 'all']),
   hideOwner: PropTypes.bool,
+  getRelevantAssets: PropTypes.func,
+  getRelevantPools: PropTypes.func,
 };
 
 export default CompaniesCard;

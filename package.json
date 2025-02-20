@@ -32,6 +32,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "ethers": "^5",
     "file-loader": "^6.2.0",
+    "fuse.js": "^7.1.0",
     "graphql": "^16.6.0",
     "interpolate-html-plugin": "^4.0.0",
     "lodash": "^4.17.15",

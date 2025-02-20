@@ -84,7 +84,7 @@ function MintAssetForm({
       </Form.Item>
       <Form.Item
         name="beneficiary"
-        label="Beneficiary amount"
+        label="Beneficiary"
         rules={[{ required: true }]}
       >
         <InputSearch />

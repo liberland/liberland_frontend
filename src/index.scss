@@ -320,3 +320,13 @@ textarea.ant-input {
 .ant-collapse-header {
   align-items: center!important;
 }
+
+.ant-modal {
+  top: 50px;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
+    top: 100px;
+  }
+}
+.ant-select-selection-search-input {
+  font-size: 18px!important;
+}

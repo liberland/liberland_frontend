@@ -4,14 +4,14 @@ import {
   BN_ZERO,
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
+import groupBy from 'lodash/groupBy';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
-import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
 // eslint-disable-next-line import/no-cycle
 import { convertAssetData } from '../utils/dexFormatter';
 import { parseDollars, parseMerits } from '../utils/walletHelpers';
-import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
+import { blockchainDataToFormObject, getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
@@ -283,6 +283,7 @@ const createOrUpdateAsset = async ({
   issuer,
   freezer,
   owner,
+  companyId,
   isCreate,
   isStock,
   defaultValues,
@@ -293,6 +294,10 @@ const createOrUpdateAsset = async ({
       const create = await api.tx.assets.create(id, admin, minBalance);
       await submitExtrinsic(create, owner, api);
     }
+    if (isStock && isCreate) {
+      const params = await api.tx.assets.setParameters(id, { eresidencyRequired: true });
+      await submitExtrinsic(params, owner, api);
+    }
     if (defaultValues?.name !== name || defaultValues?.symbol !== symbol || defaultValues?.decimals !== decimals) {
       const setMetadata = await api.tx.assets.setMetadata(id, name, symbol, decimals);
       await submitExtrinsic(setMetadata, owner, api);
@@ -301,9 +306,9 @@ const createOrUpdateAsset = async ({
       const setTeam = await api.tx.assets.setTeam(id, issuer, admin, freezer);
       await submitExtrinsic(setTeam, owner, api);
     }
-    if (isStock && isCreate) {
-      const params = await api.tx.assets.setParameters(id, { eresidencyRequired: true });
-      await submitExtrinsic(params, owner, api);
+    if (defaultValues?.companyId !== companyId) {
+      const setCompanyId = await api.tx.assets.setRelatedCompany(id, companyId);
+      await submitExtrinsic(setCompanyId, owner, api);
     }
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -424,6 +429,49 @@ const getAssetDetails = async (ids) => {
   }
 };
 
+const convertCompanyValue = (api, id, companyValue) => {
+  let companyData;
+  try {
+    if (companyValue.isNone) companyData = { unregister: true };
+    else {
+      const compressed = companyValue?.isSome
+        ? companyValue.unwrap().data : companyValue.data;
+      companyData = api.createType('CompanyData', pako.inflate(compressed));
+    }
+
+    const formObject = blockchainDataToFormObject(companyData);
+
+    const dataObject = { ...formObject, id };
+    return dataObject;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log(err);
+    return null;
+  }
+};
+
+const getOfficialRegistryEntries = async () => {
+  const api = await getApi();
+  const allEntites = await api.query.companyRegistry.registries.entries(0);
+  const registeredCompanies = [];
+  allEntites.forEach((companyRegistry) => {
+    const [key, companyValue] = companyRegistry;
+    const entityId = key.toHuman();
+    const companyData = convertCompanyValue(api, entityId[1], companyValue);
+    if (companyData) {
+      registeredCompanies.push(companyData);
+    }
+  });
+  return registeredCompanies;
+};
+
+const getCompaniesByIds = async (ids) => {
+  const api = await getApi();
+  const queries = ids.map((id) => [api.query.companyRegistry.registries, [0, id]]);
+  const resolved = await api.queryMulti(queries);
+  return resolved.map((r, i) => convertCompanyValue(api, ids[i], r)).filter(Boolean);
+};
+
 const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = false) => {
   try {
     const api = await getApi();
@@ -436,15 +484,29 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
     const assets = [];
     const assetQueries = [];
     const parametersQueries = [];
+    const relatedCompanyQueries = [];
     processedMetadatas.forEach((asset) => {
       // Disregard LLM, asset of ID 1 because it has special treatment already
-      const isLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
-      if (isLLM) {
+      const isNotLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
+      if (isNotLLM) {
+        relatedCompanyQueries.push([api.query.assets.relatedCompany, [asset.index]]);
         assetQueries.push([api.query.assets.account, [asset.index, address]]);
         parametersQueries.push([api.query.assets.parameters, [asset.index]]);
         assets.push(asset);
       }
     });
+
+    if (relatedCompanyQueries.length !== 0) {
+      const relatedCompanyResults = await api.queryMulti(relatedCompanyQueries);
+      const companies = await getCompaniesByIds(relatedCompanyResults.map((r) => r.toJSON()));
+      const mapped = groupBy(companies, 'id');
+      relatedCompanyResults.forEach((relatedCompanyId, index) => {
+        const company = mapped[relatedCompanyId.toJSON()]?.[0];
+        if (company) {
+          assets[index].company = company;
+        }
+      });
+    }
 
     if (assetQueries.length !== 0) {
       const assetResults = await api.queryMulti(assetQueries);
@@ -1220,34 +1282,6 @@ const getLegislation = async (tier) => {
   });
 
   return legislationById;
-};
-
-const getOfficialRegistryEntries = async () => {
-  const api = await getApi();
-  const allEntites = await api.query.companyRegistry.registries.entries(0);
-  const registeredCompanies = [];
-  allEntites.forEach((companyRegistry) => {
-    const [key, companyValue] = companyRegistry;
-    const entityId = key.toHuman();
-    let companyData;
-    try {
-      if (companyValue.isNone) companyData = { unregister: true };
-      else {
-        const compressed = companyValue?.isSome
-          ? companyValue.unwrap().data : companyValue.data;
-        companyData = api.createType('CompanyData', pako.inflate(compressed));
-      }
-
-      const formObject = blockchainDataToFormObject(companyData);
-
-      const dataObject = { ...formObject, id: entityId[1] };
-      registeredCompanies.push(dataObject);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.log(err);
-    }
-  });
-  return registeredCompanies;
 };
 
 const getOfficialUserRegistryEntries = async (walletAddress) => {
