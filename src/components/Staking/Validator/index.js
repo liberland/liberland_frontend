@@ -57,35 +57,33 @@ export default function Overview() {
           />
         </Col>
       </Row>
-      {nominators?.length ? (
-        <Collapse
-          defaultActiveKey={['by', 'staking']}
-          collapsible="icon"
-          items={[
-            {
-              key: 'by',
-              label: 'Nominated by',
-              children: (
-                <NominatedByList />
-              ),
-            },
-            {
-              key: 'staking',
-              label: 'Staking rewards',
-              children: (
-                <Stats />
-              ),
-            },
-            (appliedSlashes?.length || unappliedSlashes?.length) && {
-              key: 'slash',
-              label: 'Slashes',
-              children: (
-                <Slashes />
-              ),
-            },
-          ].filter(Boolean)}
-        />
-      ) : null}
+      <Collapse
+        defaultActiveKey={['by', 'staking']}
+        collapsible="icon"
+        items={[
+          {
+            key: 'by',
+            label: 'Nominated by',
+            children: (
+              <NominatedByList />
+            ),
+          },
+          {
+            key: 'staking',
+            label: 'Staking rewards',
+            children: (
+              <Stats />
+            ),
+          },
+          (appliedSlashes?.length || unappliedSlashes?.length) && {
+            key: 'slash',
+            label: 'Slashes',
+            children: (
+              <Slashes />
+            ),
+          },
+        ].filter(Boolean)}
+      />
     </Flex>
   );
 }
