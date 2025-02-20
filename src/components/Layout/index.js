@@ -15,6 +15,7 @@ import Copyright from './Copyright';
 import PageTitle from './PageTitle';
 import Tabs from './Tabs';
 import { HideTitleProvider } from './HideTitle';
+import ScrollContainer from './ScrollContainer';
 
 function Layout({ children }) {
   const dispatch = useDispatch();
@@ -23,30 +24,32 @@ function Layout({ children }) {
   }, [dispatch]);
 
   return (
-    <LayoutInternal>
-      <Header />
+    <ScrollContainer>
       <LayoutInternal>
-        <Sider />
-        <LayoutInternal className={styles.contentWrapper}>
-          <Content className={styles.content}>
-            <HideTitleProvider>
-              <PageTitle />
-              <Tabs />
-              {children}
-            </HideTitleProvider>
-          </Content>
-          <Footer className={styles.footer}>
-            <div className={styles.footerItem}>
-              <Socials />
-            </div>
-            <FooterLinks />
-          </Footer>
-          <Footer>
-            <Copyright />
-          </Footer>
+        <Header />
+        <LayoutInternal>
+          <Sider />
+          <LayoutInternal className={styles.contentWrapper}>
+            <Content className={styles.content}>
+              <HideTitleProvider>
+                <PageTitle />
+                <Tabs />
+                {children}
+              </HideTitleProvider>
+            </Content>
+            <Footer className={styles.footer}>
+              <div className={styles.footerItem}>
+                <Socials />
+              </div>
+              <FooterLinks />
+            </Footer>
+            <Footer>
+              <Copyright />
+            </Footer>
+          </LayoutInternal>
         </LayoutInternal>
       </LayoutInternal>
-    </LayoutInternal>
+    </ScrollContainer>
   );
 }
 

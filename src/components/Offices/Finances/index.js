@@ -4,6 +4,8 @@ import Flex from 'antd/es/flex';
 import Spin from 'antd/es/spin';
 import Collapse from 'antd/es/collapse';
 import List from 'antd/es/list';
+import Card from 'antd/es/card';
+import Descriptions from 'antd/es/descriptions';
 import { useMediaQuery } from 'usehooks-ts';
 import { officesActions, financesActions } from '../../../redux/actions';
 import { officesSelectors, financesSelectors } from '../../../redux/selectors';
@@ -12,8 +14,6 @@ import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import { palletIdToAddress } from '../../../utils/pallet';
 import CurrencyIcon from '../../CurrencyIcon';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
-import MoneyCard from '../../MoneyCard';
-import truncate from '../../../utils/truncate';
 import styles from './styles.module.scss';
 
 const DEFAULT_ACCOUNTS = [
@@ -167,17 +167,26 @@ export default function Finances() {
                 lld,
               }) => (
                 <List.Item>
-                  <MoneyCard
-                    amount={truncate(name, 15)}
-                    title={(
-                      <Flex vertical gap="5px">
-                        {llm}
+                  <Card title={name} className={styles.card}>
+                    <Descriptions
+                      layout="vertical"
+                      column={24}
+                      size="small"
+                      bordered
+                    >
+                      <Descriptions.Item label="Address" span={24}>
+                        <strong>
+                          {address}
+                        </strong>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="LLD" span={24}>
                         {lld}
-                      </Flex>
-                    )}
-                    actions={address}
-                    className={styles.card}
-                  />
+                      </Descriptions.Item>
+                      <Descriptions.Item label="LLM" span={24}>
+                        {llm}
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </Card>
                 </List.Item>
               )}
             />

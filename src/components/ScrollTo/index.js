@@ -3,11 +3,7 @@ import PropTypes from 'prop-types';
 
 export default function ScrollTo({ deps, children }) {
   useLayoutEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'smooth',
-    });
+    window.scrollTo(0, 0);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 
