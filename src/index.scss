@@ -15,6 +15,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--main-color);
+  background-color: var(--body-background);
   font-weight: 500;
 
   [class*=ant-] {
@@ -24,45 +25,26 @@ body {
   h1,h2,h3,h4,h5,strong {
     font-weight: 600!important;
   }
-
-  @media screen and (prefers-color-scheme: dark) {
-    background-color: #1E202A;
-  }
 }
 
 // ANTD overrides
 
 .ant-table-tbody,
 .ant-table-title {
-  @media screen and (prefers-color-scheme: dark) {
-    background-color: #1E202A;
-  }
-  @media screen and (prefers-color-scheme: light) {
-    background-color: white;
-  }
+  background-color: var(--table-bg);
 }
 
 .ant-layout-footer {
-  @media screen and (prefers-color-scheme: dark) {
-    background-color: #10131b!important;
-  }
+  background-color: var(--footer-bg)!important;
   .ant-collapse,
   .ant-menu {
-    @media screen and (prefers-color-scheme: dark) {
-      background-color: #10131b!important;
-    }
+    background-color: var(--footer-bg)!important;
   }
 }
 
 .ant-table-wrapper {
-  @media screen and (prefers-color-scheme: dark) {
-    background-color: #1E202A;
-    border: solid 1px #7095A7;
-  }
-  @media screen and (prefers-color-scheme: light) {
-    background-color: white;
-    border: solid 1px #F2F2F2;
-  }
+  background-color: var(--table-bg);
+  border: solid 1px var(--table-border);
   border-radius: 6px;
   padding: 0 18px;
 
@@ -82,12 +64,10 @@ body {
 .ant-btn-primary {
   background: #F6CA31;
   transition: all 0.3s;
+  color: #122C4B!important;
 
   &:focus,&:active,&:hover {
     background: #E3B517!important;
-  }
-  @media screen and (prefers-color-scheme: dark) {
-    color: #122C4B!important;
   }
 }
 
@@ -96,14 +76,8 @@ body {
   color: white!important;
 
   &:focus,&:active,&:hover {
-    @media screen and (prefers-color-scheme: dark) {
-      background: #702122!important;
-      color: white!important;
-    }
-    @media screen and (prefers-color-scheme: light) {
-      background: white!important;
-      color: black!important;
-    }
+    background: var(--dangerous-bg)!important;
+    color: var(--dangerous-color)!important;
     filter: brightness(120%);
   }
 }
@@ -119,12 +93,7 @@ body {
 
 .description {
   font-weight: 600;
-  @media screen and (prefers-color-scheme: light) {
-    color: #ACBDC5;
-  }
-  @media screen and (prefers-color-scheme: dark) {
-    color: #7095A7;
-  }
+  color: var(--description-color);
 }
 
 .values {
@@ -133,14 +102,8 @@ body {
 }
 
 .ant-card {
-  @media screen and (prefers-color-scheme: light) {
-    border-color: #ECEBF0!important;
-    background-color: white;
-  }
-  @media screen and (prefers-color-scheme: dark) {
-    border-color: #7095A7;
-    background-color: #1E202A;
-  }
+  border-color: var(--card-border)!important;
+  background-color: var(--card-background);
 }
 
 .ant-card-actions {
@@ -317,7 +280,5 @@ textarea.ant-input {
 }
 
 .ant-layout-sider-children .ant-menu {
-  @media screen and (prefers-color-scheme: dark) {
-    background-color: #1E202A;
-  }
+  background-color: var(--nav-bg);
 }

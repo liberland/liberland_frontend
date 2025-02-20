@@ -3,10 +3,7 @@
 @import '../../assets/main';
 
 .contentWrapper {
-  background-color: #FAFAFA;
-  @media screen and (prefers-color-scheme: dark) {
-    background-color: #10131b!important;
-  }
+  background-color: var(--content-bg);
 }
 .header {
   display: flex;
@@ -48,6 +45,7 @@
   border-radius: 0!important;
   height: 100vh;
   overflow: auto;
+  background-color: var(--mobile-menu-open)!important;
 }
 .sider {
   height: 100%;

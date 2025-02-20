@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Menu from 'antd/es/menu';
+import Flex from 'antd/es/flex';
 import MenuIcon from '@ant-design/icons/MenuOutlined';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,6 +15,7 @@ import { blockchainActions, validatorActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import ChangeWallet from '../../Home/ChangeWallet';
 import truncate from '../../../utils/truncate';
+import ModeSwitch from '../../ModeSwitch';
 
 function UrlMenu({
   onClose,
@@ -114,7 +116,7 @@ function UrlMenu({
     },
   ];
 
-  return (
+  const menu = (
     <Menu
       mode="inline"
       className={styles.sider}
@@ -139,6 +141,19 @@ function UrlMenu({
         ] : navigationList.map(createMenu),
       ]}
     />
+  );
+
+  if (isBiggerThanSmallScreen) {
+    return menu;
+  }
+
+  return (
+    <Flex vertical gap="20px">
+      <div onClick={(e) => e.stopPropagation()} className={styles.modeSwitch}>
+        <ModeSwitch />
+      </div>
+      {menu}
+    </Flex>
   );
 }
 

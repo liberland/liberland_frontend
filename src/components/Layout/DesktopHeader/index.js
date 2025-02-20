@@ -5,6 +5,7 @@ import styles from '../styles.module.scss';
 import { ReactComponent as LiberlandLettermark } from '../../../assets/icons/Liberland_Lettermark.svg';
 import ChangeWallet from '../../Home/ChangeWallet';
 import UserMenu from '../../UserMenu';
+import ModeSwitch from '../../ModeSwitch';
 
 function DesktopHeader() {
   return (
@@ -21,6 +22,7 @@ function DesktopHeader() {
         <Flex gap="20px" align="center" justify="center">
           <ChangeWallet />
           <UserMenu />
+          <ModeSwitch />
         </Flex>
       </div>
     </HeaderInternal>

@@ -1,4 +1,10 @@
-import React from 'react';
+import React, {
+  createContext,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react';
 import PropTypes from 'prop-types';
 import theme from 'antd/es/theme';
 import ConfigProvider from 'antd/es/config-provider';
@@ -6,8 +12,18 @@ import { useMediaQuery } from 'usehooks-ts';
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
+const ModeContext = createContext();
+
+export const useModeContext = () => useContext(ModeContext);
+
 export default function AntdProvider({ children }) {
-  const isDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [isDarkMode, setIsDarkMode] = useState(prefersDarkMode);
+  const context = useMemo(() => ({ isDarkMode, setIsDarkMode }), [isDarkMode]);
+
+  useLayoutEffect(() => {
+    document.getElementsByTagName('html')[0].setAttribute('dark-mode', isDarkMode ? 'yes' : 'no');
+  }, [isDarkMode]);
 
   const colorText = isDarkMode ? 'white' : '#243F5F';
   const activeBackground = isDarkMode ? '#1E202A' : 'white';
@@ -134,7 +150,9 @@ export default function AntdProvider({ children }) {
         },
       }}
     >
-      {children}
+      <ModeContext.Provider value={context}>
+        {children}
+      </ModeContext.Provider>
     </ConfigProvider>
   );
 }
