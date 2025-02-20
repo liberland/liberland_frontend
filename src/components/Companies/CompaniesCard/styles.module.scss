@@ -7,7 +7,8 @@
     font-size: 14px;
 }
 .listItem {
-    border: solid 1px #ECEBF0;
+    border: solid 1px var(--border-color);
+    border-block-end: solid 1px var(--border-color)!important;
     border-radius: 6px;
     margin-bottom: 10px;
     justify-content: start!important;

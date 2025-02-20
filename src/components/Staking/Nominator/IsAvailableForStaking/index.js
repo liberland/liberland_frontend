@@ -1,17 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Tag from 'antd/es/tag';
-import styles from './styles.module.scss';
 
 function IsAvailableForStaking({
   blocked,
 }) {
   return blocked ? (
-    <Tag className={styles.error} color="white">
+    <Tag color="error">
       Blocked
     </Tag>
   ) : (
-    <Tag className={styles.success} color="white">
+    <Tag color="success">
       Available
     </Tag>
   );

@@ -5,7 +5,6 @@ import Flex from 'antd/es/flex';
 import Tag from 'antd/es/tag';
 import Avatar from 'antd/es/avatar';
 import HistoryCopyIconWithAddress from '../HistoryCopyIconWithAddress';
-import styles from './styles.module.scss';
 import WalletHistoryAmount from '../WalletHistoryAmount';
 
 function WalletTransactionHistory({ failure, transactionHistory, filterTransactionsBy }) {
@@ -53,7 +52,7 @@ function WalletTransactionHistory({ failure, transactionHistory, filterTransacti
           title: 'Status',
           dataIndex: 'status',
           render: () => (
-            <Tag className={styles.success} color="white">
+            <Tag color="success">
               Successful
             </Tag>
           ),

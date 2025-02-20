@@ -3,14 +3,14 @@
 @import '../../assets/main';
 
 .contentWrapper {
-  background-color: #FAFAFA;
+  background-color: var(--content-bg);
 }
 .header {
   display: flex;
   align-items: center;
   height: 50px;
   border-top: solid 3px #F3CB28;
-  border-bottom: 1px solid #ECEBF0;
+  border-bottom: 1px solid var(--main-border);
   position: sticky;
   z-index: 999;
   cursor: pointer;
@@ -45,6 +45,7 @@
   border-radius: 0!important;
   height: 100vh;
   overflow: auto;
+  background-color: var(--mobile-menu-open)!important;
 }
 .sider {
   height: 100%;
@@ -53,7 +54,7 @@
   border-bottom: none;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')) {
-    border-right: 1px solid #ECEBF0;
+    border-bottom: 1px solid var(--main-border);
     max-width: initial;
     width: unset;
     max-width: unset;
@@ -96,7 +97,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  border-top: 1px solid #ECEBF0;
+  border-top: 1px solid var(--main-border);
   margin-top: 50px;
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')) {
@@ -125,12 +126,14 @@
 }
 
 .icon {
-  width: 25px;
-  height: 25px;
+  color: var(--main-color);
+  transform: scale(calc(20 / 17));
+}
+.navigationTitle {
+  padding-left: 10px;
 }
 
 .logo {
-  width: 136px;
   margin: 10px 20px 10px 10px;
 }
 
@@ -149,8 +152,10 @@
 }
 
 .social {
-  width: 15px;
-  height: 15px;
+  color: var(--main-color)!important;
+  &a:visited {
+    color: var(--main-color)!important;
+  }
 }
 
 .center {
