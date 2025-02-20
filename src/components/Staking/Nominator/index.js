@@ -111,7 +111,7 @@ function Nominator() {
     ));
   }, [validators, dispatch]);
 
-  const isBiggerThanDesktop = useMediaQuery('(min-width: 1600px)');
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1920px)');
 
   return (
     <Flex vertical gap="20px">

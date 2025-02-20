@@ -3,19 +3,20 @@ import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Checkbox from 'antd/es/checkbox';
 import Flex from 'antd/es/flex';
-import Input from 'antd/es/input';
 import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
-import { BN, isHex } from '@polkadot/util';
+import { BN } from '@polkadot/util';
 import Divider from 'antd/es/divider';
 import Button from '../Button/Button';
 import { validatorActions } from '../../redux/actions';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
+import { valueToBN } from '../../utils/walletHelpers';
 
-function StartValidatorForm({
+function UpdateCommissionForm({
   onClose,
+  defaultValues,
 }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -23,7 +24,7 @@ function StartValidatorForm({
   const onSubmit = (values) => {
     const commission = (new BN(values.commission)).mul(new BN(10000000));
     const blocked = !values.allow_nominations;
-    dispatch(validatorActions.validate.call({ commission, blocked, keys: values.keys }));
+    dispatch(validatorActions.updateCommission.call({ commission, blocked }));
     onClose();
   };
 
@@ -32,12 +33,16 @@ function StartValidatorForm({
       form={form}
       layout="vertical"
       initialValues={{
-        commission: 20,
-        allow_nominations: true,
+        commission: defaultValues.commission
+          ? valueToBN(defaultValues.commission).div(new BN(10000000)).toNumber()
+          : 20,
+        allow_nominations: !defaultValues?.blocked,
       }}
       onFinish={onSubmit}
     >
-      <Title level={3}>Start validator</Title>
+      <Title level={3}>
+        Update commission
+      </Title>
 
       <Form.Item
         label="Reward commission percentage"
@@ -55,25 +60,6 @@ function StartValidatorForm({
       >
         <Checkbox />
       </Form.Item>
-      <Form.Item
-        label="Session keys"
-        name="keys"
-        rules={[
-          { required: true },
-          {
-            validator: (_, v) => {
-              if (!isHex(v)) {
-                return Promise.reject('Must be a hex string starting with 0x');
-              }
-              return v.length === 258
-                ? Promise.resolve()
-                : Promise.reject('Invalid length');
-            },
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
       <Divider />
       <Flex wrap gap="15px">
         <Button
@@ -87,28 +73,27 @@ function StartValidatorForm({
           medium
           type="submit"
         >
-          Start validator
+          Update commission
         </Button>
       </Flex>
     </Form>
   );
 }
 
-StartValidatorForm.propTypes = {
+UpdateCommissionForm.propTypes = {
   onClose: PropTypes.func.isRequired,
+  defaultValues: PropTypes.shape({
+    commission: PropTypes.number,
+    blocked: PropTypes.bool,
+  }),
 };
 
 function ButtonModal(props) {
-  const { label } = props;
   return (
-    <OpenModalButton primary text={label} {...props} />
+    <OpenModalButton primary text="Update commission" {...props} />
   );
 }
 
-ButtonModal.propTypes = {
-  label: PropTypes.string.isRequired,
-};
+const UpdateCommissionModal = modalWrapper(UpdateCommissionForm, ButtonModal);
 
-const StartValidatorModal = modalWrapper(StartValidatorForm, ButtonModal);
-
-export default StartValidatorModal;
+export default UpdateCommissionModal;

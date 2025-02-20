@@ -101,7 +101,9 @@ function ValidatorListMobile({
                   <div className="description">
                     Allowed
                   </div>
-                  {allowed}
+                  <div>
+                    {allowed}
+                  </div>
                 </Flex>
               </Col>
               <Col span={11}>

@@ -18,6 +18,7 @@ export const {
   unbond,
   withdrawUnbonded,
   getStakingData,
+  updateCommission,
 } = createActions({
   PAYOUT: {
     call: undefined,
@@ -40,6 +41,11 @@ export const {
     failure: undefined,
   },
   SET_SESSION_KEYS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  UPDATE_COMMISSION: {
     call: undefined,
     success: undefined,
     failure: undefined,
