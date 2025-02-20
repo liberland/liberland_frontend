@@ -34,11 +34,7 @@ function Loader({ children }) {
   const { showModal, closeIdModal } = useModal();
   const [modalId, setModalsId] = useState();
 
-  const isTokenStakeLoading = useSelector(ethSelectors.selectorTokenStakeContractInfoLoading);
-  const isEthWalletOptionsLoading = useSelector(ethSelectors.selectorWalletOptionsLoading);
-  const isWethLoading = useSelector(ethSelectors.selectorWethLpExchangeRateLoading);
-  const isEthConnecting = useSelector(ethSelectors.selectorConnecting);
-  const isProcessingClaims = useSelector(ethSelectors.selectorClaimsProcessing);
+  const isEthLoading = useSelector(ethSelectors.selectorEthLoading);
   const isGettingWalletInfo = useSelector(walletSelectors.selectorGettingWalletInfo);
   const isGettingDemocracyInfo = useSelector(democracySelectors.selectorGettingDemocracyInfo);
   const isLoadingOffices = useSelector(officesSelectors.selectorIsLoading);
@@ -54,11 +50,7 @@ function Loader({ children }) {
   const isLoadingMinistryFinance = useSelector(ministryFinanceSelector.isLoading);
 
   const isLoading = [
-    isTokenStakeLoading,
-    isEthWalletOptionsLoading,
-    isWethLoading,
-    isEthConnecting,
-    isProcessingClaims,
+    isEthLoading,
     isLoadingContracts,
     isGettingWalletInfo,
     isGettingDemocracyInfo,
