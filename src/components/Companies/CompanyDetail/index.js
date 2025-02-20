@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import Collapse from 'antd/es/collapse';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
@@ -8,66 +8,39 @@ import Flex from 'antd/es/flex';
 import Divider from 'antd/es/divider';
 import Space from 'antd/es/space';
 import Alert from 'antd/es/alert';
+import Tooltip from 'antd/es/tooltip';
 import Title from 'antd/es/typography/Title';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import { useMediaQuery } from 'usehooks-ts';
-import { useDispatch, useSelector } from 'react-redux';
 import ArrowLeft from '../../../assets/icons/arrow-left.svg';
 import styles from './styles.module.scss';
 import { useHideTitle } from '../../Layout/HideTitle';
 import CopyInput from '../../CopyInput';
-import { useCompanyDataFromUrl } from '../hooks';
+import { useCompanyAssets, useCompanyDataFromUrl, useTradePools } from '../hooks';
 import CompanyActions from '../CompanyActions';
 import Button from '../../Button/Button';
 import router from '../../../router';
-import { tryFormatDollars, tryFormatNumber, valueToBN } from '../../../utils/walletHelpers';
+import { tryFormatDollars, tryFormatNumber } from '../../../utils/walletHelpers';
 import CompanyPersonas from '../CompanyPersonas';
 import { simplifyCompanyObject } from '../utils';
 import ColorAvatar from '../../ColorAvatar';
-import { dexActions, walletActions } from '../../../redux/actions';
-import { dexSelectors, walletSelectors } from '../../../redux/selectors';
 import CompanyAsset from '../CompanyAsset';
-import { isCompanyConnected } from '../../../utils/asset';
-import TradeTokensModal from '../../Modals/TradeTokens';
+import { isValidUrl } from '../../../utils/url';
+import TradeButton from '../TradeButton';
 
 function CompanyDetail() {
-  const { mainDataObject: complexDataObject, request } = useCompanyDataFromUrl();
+  const { mainDataObject, request } = useCompanyDataFromUrl();
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
-  const mainDataObject = useMemo(() => simplifyCompanyObject(complexDataObject || {}), [complexDataObject]);
-  const dispatch = useDispatch();
+  const simplifiedDataObject = useMemo(() => simplifyCompanyObject(mainDataObject || {}), [mainDataObject]);
   const history = useHistory();
-  const additionalAssets = useSelector(
-    walletSelectors.selectorAdditionalAssets,
-  );
-  const dexs = useSelector(dexSelectors.selectorDex);
-  const [connectedAssets, relevantAssets] = useMemo(() => {
-    if (additionalAssets && complexDataObject) {
-      return additionalAssets.reduce(([connected, relevant], asset) => {
-        const { company } = asset;
-        if (!company || company.id?.toString() !== complexDataObject.id?.toString()) {
-          return [connected, relevant];
-        }
-        if (isCompanyConnected(asset)) {
-          connected.push(asset);
-        } else {
-          relevant.push(asset);
-        }
-        return [connected, relevant];
-      }, [[], []]);
-    }
-    return [[], []];
-  }, [additionalAssets, complexDataObject]);
+  const getRelevantAssets = useCompanyAssets();
+  const getRelevantPools = useTradePools();
+  const [connectedAssets, relevantAssets] = getRelevantAssets(simplifiedDataObject);
 
-  useEffect(() => {
-    dispatch(walletActions.getAdditionalAssets.call());
-  }, [dispatch]);
-  useEffect(() => {
-    dispatch(dexActions.getPools.call());
-  }, [dispatch]);
   useHideTitle();
 
-  if (!mainDataObject) {
+  if (!simplifiedDataObject) {
     return <Result status="error" title="Company data invalid" />;
   }
 
@@ -86,11 +59,11 @@ function CompanyDetail() {
       <Divider className={styles.divider} />
       <Flex wrap gap="15px" justify="space-between" align="center" className={styles.divider}>
         <Flex wrap gap="15px" align="center">
-          {mainDataObject.logoURL ? (
-            <Avatar size={70} src={mainDataObject.logoURL} />
+          {simplifiedDataObject.logoURL ? (
+            <Avatar size={70} src={simplifiedDataObject.logoURL} />
           ) : (
             <ColorAvatar
-              name={mainDataObject.name || mainDataObject.id || 'C'}
+              name={simplifiedDataObject.name || simplifiedDataObject.id || 'C'}
               size={70}
             />
           )}
@@ -100,21 +73,26 @@ function CompanyDetail() {
               <div className="description">
                 Company ID:
                 {' '}
-                {mainDataObject.id || 'Unknown'}
+                {simplifiedDataObject.id || 'Unknown'}
               </div>
               <div className="description">
                 Type:
                 {' '}
-                {mainDataObject.type || 'Liberland'}
+                {simplifiedDataObject.type || 'Liberland'}
               </div>
             </Flex>
             <Title level={1} className={styles.title}>
-              {mainDataObject.name}
+              {simplifiedDataObject.name}
             </Title>
           </Flex>
         </Flex>
         <Flex wrap gap="15px">
-          <CompanyActions registeredCompany={mainDataObject} type={request ? 'detail-request' : 'detail'} />
+          <CompanyActions
+            registeredCompany={simplifiedDataObject}
+            getRelevantAssets={getRelevantAssets}
+            getRelevantPools={getRelevantPools}
+            type={request ? 'detail-request' : 'detail'}
+          />
         </Flex>
       </Flex>
       {request && (
@@ -146,40 +124,58 @@ function CompanyDetail() {
                 <Card
                   className={styles.purpose}
                   title="Company description"
-                  actions={[
-                    <Flex className={styles.online} wrap gap="15px" justify="start">
-                      {mainDataObject.onlineAddresses?.map(
-                        ({ description, url }, index) => (
-                          <Button
-                            primary={index === 0}
-                            key={url}
-                            onClick={() => {
-                              window.location.href = url;
-                            }}
-                          >
-                            {description}
-                          </Button>
-                        ),
-                      )}
-                    </Flex>,
-                  ]}
+                  classNames={{ body: styles.description }}
                 >
-                  <div className={styles.purposeText}>
-                    {mainDataObject.purpose || 'Unknown'}
-                  </div>
+                  <Flex vertical gap="15px" justify="space-between" className={styles.description}>
+                    <div className={styles.purposeText}>
+                      {simplifiedDataObject.purpose || 'Unknown'}
+                    </div>
+                    <Flex className={styles.online} wrap gap="15px" justify="start">
+                      {simplifiedDataObject
+                        .onlineAddresses
+                        ?.map(({ url, ...rest }) => ({
+                          url: url.includes('@') ? `mailto:${url}` : url,
+                          tooltip: url,
+                          ...rest,
+                        }))
+                        .map(({ url, ...rest }) => ({
+                          url: /^[+\s0-9]+$/gu.test(url) ? `tel:${url}` : url,
+                          ...rest,
+                        }))
+                        ?.filter(({ url }) => url.startsWith('mailto:') || url.startsWith('tel:') || isValidUrl(url))
+                        .map(({ description, url, tooltip }, index) => (
+                          <Tooltip
+                            placement="top"
+                            showArrow={false}
+                            trigger={['hover', 'click']}
+                            overlay={<span>{tooltip}</span>}
+                          >
+                            <div>
+                              <Button
+                                primary={index === 0}
+                                key={url}
+                                href={url}
+                              >
+                                {description}
+                              </Button>
+                            </div>
+                          </Tooltip>
+                        ))}
+                    </Flex>
+                  </Flex>
                 </Card>
                 <Flex vertical gap="15px">
                   <Card title="Total capital amount">
-                    {tryFormatDollars(mainDataObject.totalCapitalAmount)}
+                    {tryFormatDollars(simplifiedDataObject.totalCapitalAmount)}
                     {' '}
-                    {mainDataObject.totalCapitalCurrency}
+                    {simplifiedDataObject.totalCapitalCurrency}
                   </Card>
                   <Card title="Total number of shares">
-                    {tryFormatNumber(mainDataObject.numberOfShares)}
+                    {tryFormatNumber(simplifiedDataObject.numberOfShares)}
                     <div className="description">
                       Distributed amongst
                       {' '}
-                      {mainDataObject.shareholders?.length || 0}
+                      {simplifiedDataObject.shareholders?.length || 0}
                       {' '}
                       shareholder(s)
                     </div>
@@ -196,7 +192,7 @@ function CompanyDetail() {
                 itemLayout="horizontal"
                 grid={{ gutter: 16, column: 3 }}
                 className="threeColumnList"
-                dataSource={mainDataObject.contact}
+                dataSource={simplifiedDataObject.contact}
                 size="small"
                 renderItem={({ contact }, index) => (
                   <List.Item>
@@ -230,7 +226,7 @@ function CompanyDetail() {
                 itemLayout="horizontal"
                 grid={{ gutter: 16, column: 3 }}
                 className="threeColumnList"
-                dataSource={mainDataObject.physicalAddresses}
+                dataSource={simplifiedDataObject.physicalAddresses}
                 size="small"
                 renderItem={({
                   description,
@@ -282,21 +278,21 @@ function CompanyDetail() {
             key: 'owners',
             label: 'Company shareholder(s)',
             children: (
-              <CompanyPersonas data={mainDataObject.principals} />
+              <CompanyPersonas data={simplifiedDataObject.principals} />
             ),
           },
           {
             key: 'shareholders',
             label: 'Company shareholder(s)',
             children: (
-              <CompanyPersonas data={mainDataObject.shareholders} />
+              <CompanyPersonas data={simplifiedDataObject.shareholders} />
             ),
           },
           {
             key: 'UBOs',
             label: 'Ultimate beneficiary(es)',
             children: (
-              <CompanyPersonas data={mainDataObject.UBOs} />
+              <CompanyPersonas data={simplifiedDataObject.UBOs} />
             ),
           },
           {
@@ -307,7 +303,7 @@ function CompanyDetail() {
                 itemLayout="horizontal"
                 grid={{ gutter: 16, column: 3 }}
                 className="threeColumnList"
-                dataSource={mainDataObject.relevantContracts}
+                dataSource={simplifiedDataObject.relevantContracts}
                 size="small"
                 renderItem={({ contractId }) => {
                   const url = router.contracts.item.replace(':id', contractId);
@@ -350,22 +346,14 @@ function CompanyDetail() {
                 size="small"
                 renderItem={({ index, metadata }) => {
                   const { name, symbol } = metadata;
-                  const { poolsData, assetsPoolsData } = dexs || {};
-                  const relevantPools = poolsData?.filter(
-                    ({ asset1, asset2 }) => asset1 === index?.toString() || asset2 === index?.toString(),
-                  ).sort(({ lpToken: aToken }, { lpToken: bToken }) => {
-                    const aLiq = valueToBN(assetsPoolsData[aToken]?.supply || '0');
-                    const bLiq = valueToBN(assetsPoolsData[bToken]?.supply || '0');
-                    return bLiq.gt(aLiq) ? 1 : -1;
-                  });
                   return (
                     <List.Item>
                       <CompanyAsset
                         index={index}
                         name={name}
                         symbol={symbol}
-                        logoURL={complexDataObject.logoURL}
-                        actions={relevantPools?.map(({
+                        logoURL={mainDataObject.logoURL}
+                        actions={getRelevantPools(index)?.map(({
                           asset1,
                           asset2,
                           assetData1,
@@ -374,21 +362,14 @@ function CompanyDetail() {
                           const asset1Name = asset1 === 'Native' ? 'LLD' : assetData1.symbol;
                           const asset2Name = asset2 === 'Native' ? 'LLD' : assetData2.symbol;
                           const isStock = assetData1.isStock || assetData2.isStock;
-                          const modalLink = TradeTokensModal.createHash({ asset1, asset2 });
                           return (
-                            <Button
-                              primary
-                              key={modalLink}
-                              onClick={() => history.push(
-                                `${isStock ? router.wallet.stockExchange : router.wallet.exchange}#${modalLink}`,
-                              )}
-                            >
+                            <TradeButton key={asset1 + asset2} asset1={asset1} asset2={asset2} isStock={isStock}>
                               Trade
                               {' '}
                               {asset1Name}
                               {' for '}
                               {asset2Name}
-                            </Button>
+                            </TradeButton>
                           );
                         })}
                       />

@@ -19,7 +19,7 @@ import {
 import { registriesActions, walletActions } from '../../../../../redux/actions';
 import Button from '../../../../Button/Button';
 import InputSearch from '../../../../InputComponents/InputSearchAddressName';
-import CompanyDetail from '../../CompanyDisplay';
+import CompanyDisplay from '../../CompanyDisplay';
 import CompanyImage from '../../CompanyImage';
 import truncate from '../../../../../utils/truncate';
 import styles from './styles.module.scss';
@@ -210,7 +210,7 @@ function CreateOrUpdateAssetForm({
         }) => ({
           value: id,
           label: (
-            <CompanyDetail
+            <CompanyDisplay
               id={id}
               size={40}
               logo={logoURL}

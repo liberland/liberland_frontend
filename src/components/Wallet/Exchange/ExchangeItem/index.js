@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
 import { useMediaQuery } from 'usehooks-ts';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { getDecimalsForAsset, getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormatter';
 import { formatAssets } from '../../../../utils/walletHelpers';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
@@ -13,6 +13,7 @@ import { ExchangeItemPropTypes } from '../proptypes';
 import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
 import CurrencyIcon from '../../../CurrencyIcon';
 import { isCompanyConnected } from '../../../../utils/asset';
+import router from '../../../../router';
 
 function ExchangeItem({ poolData, assetsPoolData }) {
   const location = useLocation();
@@ -74,8 +75,15 @@ function ExchangeItem({ poolData, assetsPoolData }) {
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 1200px)');
-  const logo1 = isCompanyConnected({ index: asset1, ...assetData1 }) ? assetData1.company.logoURL : undefined;
-  const logo2 = isCompanyConnected({ index: asset2, ...assetData2 }) ? assetData2.company.logoURL : undefined;
+  const isConnected1 = isCompanyConnected({ index: asset1, ...assetData1 });
+  const isConnected2 = isCompanyConnected({ index: asset2, ...assetData2 });
+  const logo1 = isConnected1 ? assetData1.company.logoURL : undefined;
+  const logo2 = isConnected2 ? assetData2.company.logoURL : undefined;
+  const companyLink1 = isConnected1 ? router.companies.view.replace(':companyId', assetData1.company.id) : undefined;
+  const companyLink2 = isConnected2 ? router.companies.view.replace(':companyId', assetData2.company.id) : undefined;
+  const menuAssetName1 = companyLink1 ? <Link to={companyLink1}>{asset1Name}</Link> : asset1Name;
+  const menuAssetName2 = companyLink2 ? <Link to={companyLink2}>{asset2Name}</Link> : asset2Name;
+
   const name1 = (
     <Flex wrap gap="5px" align="center">
       {asset1ToShow}
@@ -125,12 +133,12 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             <div>
               <div className="description">
                 {'1 '}
-                {asset1Name}
+                {menuAssetName1}
               </div>
               <div className="values">
                 {asset2AmountForAsset1}
                 {' '}
-                {asset2Name}
+                {menuAssetName2}
               </div>
             </div>
           </Flex>
@@ -139,12 +147,12 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             <div>
               <div className="description">
                 {'1 '}
-                {asset2Name}
+                {menuAssetName2}
               </div>
               <div className="values">
                 {asset1AmountForAsset2}
                 {' '}
-                {asset1Name}
+                {menuAssetName1}
               </div>
             </div>
           </Flex>

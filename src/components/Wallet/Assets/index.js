@@ -23,7 +23,7 @@ import AssetsMenuModal from './AssetsModal/AssetsMenu';
 import CreateOrUpdateAssetModal from './AssetsModal/CreateOrUpdateAsset';
 import CurrencyIcon from '../../CurrencyIcon';
 import truncate from '../../../utils/truncate';
-import CompanyDetail from './CompanyDisplay';
+import CompanyDisplay from './CompanyDisplay';
 import ColorAvatar from '../../ColorAvatar';
 import { isCompanyConnected } from '../../../utils/asset';
 
@@ -74,7 +74,11 @@ function Assets() {
       const symbol = (
         <Flex wrap gap="7px" align="center">
           {asset.metadata.symbol}
-          <CurrencyIcon size={20} symbol={asset.metadata.symbol} />
+          <CurrencyIcon
+            size={20}
+            symbol={asset.metadata.symbol}
+            logo={isCompanyConnected(asset) ? asset.company?.logoURL : undefined}
+          />
         </Flex>
       );
       const getName = (wallet) => (
@@ -121,7 +125,7 @@ function Assets() {
           </Descriptions.Item>
           <Descriptions.Item span={spanSize} label="Related company">
             {asset.company ? (
-              <CompanyDetail
+              <CompanyDisplay
                 id={asset.company.id}
                 size={isBiggerThanLargeScreen ? 32 : 20}
                 logo={asset.company.logoURL}

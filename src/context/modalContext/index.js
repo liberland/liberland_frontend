@@ -1,9 +1,11 @@
 import React, {
   createContext, useContext, useState, useCallback, useMemo,
+  useEffect,
 } from 'react';
 import PropTypes from 'prop-types';
 import Modal from 'antd/es/modal';
 import uniqueId from 'lodash/uniqueId';
+import { useLocation } from 'react-router-dom';
 
 const ModalContext = createContext();
 
@@ -17,6 +19,7 @@ export const useModal = () => {
 
 export function ModalProvider({ children }) {
   const [modals, setModals] = useState([]);
+  const { pathname } = useLocation();
 
   const showModal = useCallback((content, props = {}, hash = undefined) => {
     const id = uniqueId('modal_');
@@ -46,11 +49,25 @@ export function ModalProvider({ children }) {
     setModals((prevModals) => prevModals.slice(0, -n));
   }, []);
 
+  const closeAllModals = useCallback(() => {
+    setModals([]);
+  }, []);
+
+  useEffect(() => {
+    closeAllModals();
+  }, [closeAllModals, pathname]);
+
   const contextValue = useMemo(() => ({
     showModal,
     closeLastNModals,
     closeIdModal,
-  }), [showModal, closeLastNModals, closeIdModal]);
+    closeAllModals,
+  }), [
+    showModal,
+    closeLastNModals,
+    closeIdModal,
+    closeAllModals,
+  ]);
   return (
     <ModalContext.Provider value={contextValue}>
       {children}

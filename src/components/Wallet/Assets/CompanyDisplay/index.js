@@ -8,7 +8,7 @@ import CompanyImage from '../CompanyImage';
 import router from '../../../../router';
 import styles from './styles.module.scss';
 
-export default function CompanyDetail({
+export default function CompanyDisplay({
   id,
   name,
   logo,
@@ -49,8 +49,11 @@ export default function CompanyDetail({
   );
 }
 
-CompanyDetail.propTypes = {
-  id: PropTypes.string.isRequired,
+CompanyDisplay.propTypes = {
+  id: PropTypes.oneOfType([
+    PropTypes.number.isRequired,
+    PropTypes.string.isRequired,
+  ]).isRequired,
   name: PropTypes.string,
   logo: PropTypes.string,
   size: PropTypes.number.isRequired,

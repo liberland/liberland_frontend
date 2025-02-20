@@ -63,7 +63,6 @@ const staticFieldSpan = {
 
 function getFieldComponent({
   field,
-  index,
   form,
   name,
   label,
@@ -112,7 +111,7 @@ function getFieldComponent({
   }
   if (field.type === 'number') {
     return {
-      fieldComponent: <InputNumber controls={false} placeholder={field.display} />,
+      fieldComponent: <InputNumber controls={false} />,
     };
   }
   if (field.type === 'password') {
@@ -142,7 +141,6 @@ function getFieldComponent({
     fieldComponent: (
       <Input
         type={field.type}
-        placeholder={typeof index === 'number' ? `${field.display} ${index}` : field.display}
       />
     ),
   };
@@ -166,12 +164,12 @@ export const getDefaultValuesFromDataObject = (formObject, editMode = false) => 
         if (editMode) {
           defaultValuesForField[index][field.key] = {
             value: fieldDateTypes[field.type] ? dayjs(field.display) : field.display,
-            isEncrypted: field.isEncrypted,
+            isEncrypted: field.isEncrypted || false,
           };
         } else {
           defaultValuesForField[index][field.key] = encryptable
             ? {
-              isEncrypted: field.isEncrypted,
+              isEncrypted: field.isEncrypted || false,
             }
             : null;
         }
@@ -282,6 +280,9 @@ export default function CompaniesForm({
                           layout={layout}
                           getValueProps={getValueProps}
                           valuePropName={valuePropName}
+                          extra={staticField.description && (
+                            <div className={styles.extra}>{staticField.description}</div>
+                          )}
                         >
                           {fieldComponent}
                         </Form.Item>
@@ -309,6 +310,7 @@ export default function CompaniesForm({
                     <List
                       dataSource={fields}
                       locale={{ emptyText: 'No data found' }}
+                      header={dynamicField.display}
                       renderItem={(field, index) => (
                         <Card
                           title={`${dynamicField.name} ${index + 1}`}
@@ -329,11 +331,7 @@ export default function CompaniesForm({
                           <Row gutter={16}>
                             {dynamicField.fields.map((singleField) => {
                               const fieldName = buildFieldName(index, singleField, 'value');
-                              const label = (
-                                `${singleField.display.length > 20
-                                  ? `${singleField.display.slice(0, 20)}...`
-                                  : singleField.display} ${index + 1}`
-                              );
+                              const label = singleField.name;
                               const {
                                 fieldComponent,
                                 layout,
@@ -343,7 +341,6 @@ export default function CompaniesForm({
                               } = getFieldComponent({
                                 field: singleField,
                                 form,
-                                index,
                                 label,
                                 name: fieldName,
                                 prefix: dynamicField.key,
@@ -357,9 +354,9 @@ export default function CompaniesForm({
                                     <Form.Item
                                       name={fieldName}
                                       label={label}
-                                      extra={singleField.display.length > 20 ? (
-                                        singleField.display
-                                      ) : undefined}
+                                      extra={singleField.display && (
+                                        <div className={styles.extra}>{singleField.display}</div>
+                                      )}
                                       layout={layout}
                                       getValueProps={getValueProps}
                                       valuePropName={valuePropName}

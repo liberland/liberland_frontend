@@ -40,9 +40,9 @@ function CompanyRegistration({ registration }) {
     <Card
       title="Company data"
       cover={(
-        <Flex justify="center" align="center">
-          <code className={styles.container}>
-            <pre>
+        <Flex justify="center" align="center" className={styles.container}>
+          <code>
+            <pre className={styles.code}>
               {JSON.stringify(
                 registration.registration.data.toJSON(),
                 null,

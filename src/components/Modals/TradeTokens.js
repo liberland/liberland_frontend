@@ -26,6 +26,7 @@ import { useStockContext } from '../Wallet/StockContext';
 import CurrencyIcon from '../CurrencyIcon';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
+import { isCompanyConnected } from '../../utils/asset';
 
 function TradeTokensForm({
   onClose, assets: initialAssets,
@@ -212,12 +213,19 @@ function TradeTokensForm({
 
   const submitText = isStock ? 'Trade stock' : 'Exchange tokens';
 
-  const symbolHelper = (symbol, size) => (
-    <Flex wrap gap="5px" align="center">
-      {symbol}
-      <CurrencyIcon size={size} symbol={symbol} />
-    </Flex>
-  );
+  const symbolHelper = (asset, assetData, symbol, size) => {
+    const isConnected = isCompanyConnected({ index: asset, ...assetData });
+    return (
+      <Flex wrap gap="5px" align="center">
+        {symbol}
+        <CurrencyIcon
+          size={size}
+          symbol={symbol}
+          logo={isConnected ? assetData?.company?.logoURL : undefined}
+        />
+      </Flex>
+    );
+  };
 
   const handleSwap = () => {
     setIsBuy((prev) => !prev);
@@ -331,7 +339,7 @@ function TradeTokensForm({
             <div>
               Sell
             </div>
-            {symbolHelper(asset1ToShow, 20)}
+            {symbolHelper(asset1, assetData1, asset1ToShow, 20)}
           </Flex>
         )}
         extra={(
@@ -383,7 +391,7 @@ function TradeTokensForm({
             <div>
               Buy
             </div>
-            {symbolHelper(asset2ToShow, 20)}
+            {symbolHelper(asset2, assetData2, asset2ToShow, 20)}
           </Flex>
         )}
         extra={(

@@ -48,7 +48,8 @@ export function blockchainDataToFormObject(blockchainDataRaw) {
             if (dynamicFieldDataArray[key].isEncrypted !== undefined) {
               pushObject.display = dynamicFieldDataArray[key].value;
               pushObject.isEncrypted = dynamicFieldDataArray[key].isEncrypted;
-            } else {
+            } else if (dynamicFieldDataArray[key] !== '[object Object]') {
+              // passport number of shareholders is serialzied incorrectly, skipping
               pushObject.display = dynamicFieldDataArray[key];
               pushObject.isEncrypted = false;
             }
