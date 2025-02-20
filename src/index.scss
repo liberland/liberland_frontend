@@ -14,7 +14,8 @@ body {
   font-family: $openSans;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #243F5F;
+  color: var(--main-color);
+  background-color: var(--body-background);
   font-weight: 500;
 
   [class*=ant-] {
@@ -26,65 +27,25 @@ body {
   }
 }
 
-p {
-  margin: 0;
-}
-
-
-#modal-root,
-.modal-root {
-  position: fixed;
-  left: 0;
-  top: 0;
-  overflow-y: scroll;
-  opacity: 0;
-  display: flex;
-  align-items: safe center;
-  justify-content: safe center;
-  flex: none;
-  
-
-  &.active {
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 100;
-    opacity: 1;
-  }
-
-  & > .modal-wrapper {
-    width: 100%;
-    height: fit-content;
-    padding-top: 50px;
-  @media (min-width: 768px) {
-    padding-top: 0;
-  }
-
-    & > div {
-      background: #fff;
-      border-radius: 20px;
-      margin: 24px;
-    }
-  }
-
-  @media (min-width: 640px) {
-    & > .modal-wrapper {
-      width: auto;
-    }
-  }
-
-  & > .modal-text-wrapper {
-    top: 5%;
-    transform: translate(-50%, 0%);
-  }
-}
-
 // ANTD overrides
 
+.ant-table-tbody,
+.ant-table-title {
+  background-color: var(--table-bg);
+}
+
+.ant-layout-footer {
+  background-color: var(--footer-bg)!important;
+  .ant-collapse,
+  .ant-menu {
+    background-color: var(--footer-bg)!important;
+  }
+}
+
 .ant-table-wrapper {
-  background-color: white;
+  background-color: var(--table-bg);
+  border: solid 1px var(--table-border);
   border-radius: 6px;
-  border: solid 1px #F2F2F2;
   padding: 0 18px;
 
   tbody {
@@ -103,6 +64,7 @@ p {
 .ant-btn-primary {
   background: #F6CA31;
   transition: all 0.3s;
+  color: #122C4B!important;
 
   &:focus,&:active,&:hover {
     background: #E3B517!important;
@@ -114,8 +76,8 @@ p {
   color: white!important;
 
   &:focus,&:active,&:hover {
-    background: white!important;
-    color: black!important;
+    background: var(--dangerous-bg)!important;
+    color: var(--dangerous-color)!important;
     filter: brightness(120%);
   }
 }
@@ -126,12 +88,12 @@ p {
   text-decoration-skip-ink: none;
 }
 .ant-tabs-tab-btn[aria-selected="true"] {
-  color: #243F5F !important;
+  color: var(--main-color)!important;
 }
 
 .description {
   font-weight: 600;
-  color: #ACBDC5;
+  color: var(--description-color);
 }
 
 .values {
@@ -140,7 +102,8 @@ p {
 }
 
 .ant-card {
-  border-color: #ECEBF0!important;
+  border-color: var(--card-border)!important;
+  background-color: var(--card-background);
 }
 
 .ant-card-actions {
@@ -159,11 +122,6 @@ p {
 
 th.ant-table-cell {
   word-break: keep-all;
-}
-
-.ant-splitter {
-  min-height: 300;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .ant-typography.ant-typography-ellipsis {
@@ -264,8 +222,8 @@ textarea.ant-input {
   zoom: 1.5;
 
   .ant-checkbox-inner {
-    border: solid 1.2px #243F5F;
-    box-shadow: 0 0 2px #243F5F;
+    border: solid 1.2px var(--main-color);
+    box-shadow: 0 0 2px var(--main-color);
   }
 }
 .big-checkbox-item {
@@ -319,4 +277,8 @@ textarea.ant-input {
 
 .ant-collapse-header {
   align-items: center!important;
+}
+
+.ant-layout-sider-children .ant-menu {
+  background-color: var(--nav-bg);
 }

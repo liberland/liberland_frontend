@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import Title from 'antd/es/typography/Title';
 import Space from 'antd/es/space';
-import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
+import LeftOutlined from '@ant-design/icons/LeftOutlined';
 import Button from '../../../../Button/Button';
 import truncate from '../../../../../utils/truncate';
 import Discussions from '../Discussions';
@@ -59,7 +59,7 @@ function ProposalPage() {
       <Flex className={styles.nav} wrap gap="15px" align="center">
         <Flex flex={1}>
           <Button onClick={() => history.goBack()}>
-            <ArrowLeftOutlined />
+            <LeftOutlined />
             <Space />
             Back
           </Button>

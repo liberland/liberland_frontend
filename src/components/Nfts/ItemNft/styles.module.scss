@@ -33,12 +33,19 @@
 }
 
 .imageWrapper {
-  width: 300px;
-  height: 300px;
-  min-height: 300px;
-  min-width: 300px;
+  width: 265px;
+  height: 265px;
+  min-height: 265px;
+  min-width: 265px;
   position: relative;
   overflow: hidden;
+
+  @media screen and (min-width: map-get($breakpoints, 'phone')) {
+    width: 300px;
+    height: 300px;
+    min-height: 300px;
+    min-width: 300px;
+  }
 
   .openNewTab {
     top: 0;

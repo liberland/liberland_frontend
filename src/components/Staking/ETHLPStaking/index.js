@@ -11,7 +11,7 @@ import Button from '../../Button/Button';
 
 export default function ETHLPStaking() {
   // eslint-disable-next-line max-len
-  const instructions = 'https://docs.liberland.org/blockchain/for-validators-nominators-and-stakers/liquidity-staking';
+  const instructions = 'https://docs.liberland.org/blockchain/for-validators-nominators-and-stakers/eth-liquidity-staking';
   const lldOnEth = 'https://app.uniswap.org/explore/tokens/ethereum/0x054c9d4c6f4ea4e14391addd1812106c97d05690';
 
   const [form] = Form.useForm();
