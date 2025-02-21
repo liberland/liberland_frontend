@@ -11,6 +11,7 @@ const initialState = {
 const registriesReducer = handleActions({
   [combineActions(
     registriesActions.getOfficialUserRegistryEntries.call,
+    registriesActions.getOfficialRegistryEntries.call,
     registriesActions.requestCompanyRegistrationAction.call,
     registriesActions.requestEditCompanyRegistrationAction.call,
     registriesActions.requestCompanyEditAction.call,
@@ -30,6 +31,7 @@ const registriesReducer = handleActions({
   }),
   [combineActions(
     registriesActions.getOfficialUserRegistryEntries.call,
+    registriesActions.getOfficialRegistryEntries.call,
   )]: (state) => ({
     ...state,
     unobtrusive: true,

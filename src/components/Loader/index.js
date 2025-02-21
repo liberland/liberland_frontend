@@ -21,11 +21,15 @@ import {
 import ErrorModal from '../ErrorModal';
 import NextBlockCountdown from './NextBlockCountdown';
 import { useModal } from '../../context/modalContext';
+import Blocking from './Blocking';
+import Unobtrusive from './Unobtrusive';
 
 function LoadingModal() {
   return (
     <Flex justify="center" align="center">
-      <NextBlockCountdown />
+      <NextBlockCountdown>
+        {(progressBarRatio) => <Blocking progressBarRatio={progressBarRatio} />}
+      </NextBlockCountdown>
     </Flex>
   );
 }
@@ -99,6 +103,13 @@ function Loader({ children }) {
 
   return (
     <>
+      {!shouldShowUnobtrusive ? (
+        <Unobtrusive progressBarRatio={100} inactive />
+      ) : (
+        <NextBlockCountdown>
+          {(progressBarRatio) => <Unobtrusive progressBarRatio={progressBarRatio} />}
+        </NextBlockCountdown>
+      )}
       {children}
       <ErrorModal />
     </>
