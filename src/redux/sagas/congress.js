@@ -89,8 +89,8 @@ function* applyForCongressWorker() {
   yield put(congressActions.applyForCongress.success());
 }
 
-function* spendingWorker() {
-  const spending = yield call(fetchCongressSpending);
+function* spendingWorker({ payload: { skip, take } }) {
+  const spending = yield call(fetchCongressSpending, skip, take);
   yield put(congressActions.congressSpending.success(spending));
 }
 

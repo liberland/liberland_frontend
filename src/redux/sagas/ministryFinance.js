@@ -30,8 +30,8 @@ function* getWalletWorker() {
   yield put(ministryFinanceActions.ministryFinanceGetWallet.success({ balances, walletAddress, clerksIds }));
 }
 
-function* spendingWorker() {
-  const spending = yield call(fetchMinistryOfFinanceSpending);
+function* spendingWorker({ payload: { skip, take } }) {
+  const spending = yield call(fetchMinistryOfFinanceSpending, skip, take);
   yield put(ministryFinanceActions.ministryFinanceSpending.success(spending));
 }
 
