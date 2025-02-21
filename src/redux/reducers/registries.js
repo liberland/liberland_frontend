@@ -4,8 +4,8 @@ import { registriesActions } from '../actions';
 const initialState = {
   officialUserRegistryEntries: [],
   isGetRegistries: false,
+  unobtrusive: false,
   officialRegistryEntries: [],
-  isGetAllRegistries: false,
 };
 
 const registriesReducer = handleActions({
@@ -29,6 +29,12 @@ const registriesReducer = handleActions({
     isGetRegistries: true,
   }),
   [combineActions(
+    registriesActions.getOfficialUserRegistryEntries.call,
+  )]: (state) => ({
+    ...state,
+    unobtrusive: true,
+  }),
+  [combineActions(
     registriesActions.getOfficialUserRegistryEntries.success,
     registriesActions.getOfficialUserRegistryEntries.failure,
     registriesActions.requestCompanyRegistrationAction.failure,
@@ -47,6 +53,7 @@ const registriesReducer = handleActions({
   )]: (state) => ({
     ...state,
     isGetRegistries: false,
+    unobtrusive: false,
   }),
   [registriesActions.getOfficialUserRegistryEntries.call]: (state) => ({
     ...state,

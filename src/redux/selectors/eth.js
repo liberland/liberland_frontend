@@ -42,6 +42,11 @@ const selectorEthLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+const selectorEthUnobtrusive = createSelector(
+  ethReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 const selectorERC20Balance = createSelector(
   ethReducer,
   (reducer) => Object.entries(reducer.erc20Balance).reduce((accumulator, [key, value]) => {
@@ -64,4 +69,5 @@ export {
   selectorWethLpExchangeRate,
   selectorBalance,
   selectorEthLoading,
+  selectorEthUnobtrusive,
 };
