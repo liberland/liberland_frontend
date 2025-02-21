@@ -15,6 +15,7 @@ import PolitipoolLLMModalWrapper from '../../Modals/PolitipoolModal';
 import MoneyCard from '../../MoneyCard';
 import Button from '../../Button/Button';
 import router from '../../../router';
+import GetLLDWrapper from '../../GetLLDWrapper';
 
 function BalanceOverview({
   balances, liquidMerits, showStaked, isCongress,
@@ -27,7 +28,9 @@ function BalanceOverview({
       currency: 'LLD',
       icon: LLD,
       actions: [
-        <SendLLDModal key="send" />,
+        <GetLLDWrapper>
+          <SendLLDModal key="send" />
+        </GetLLDWrapper>,
         <RequestLLDModal key="request" />,
       ],
     },
