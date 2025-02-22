@@ -66,6 +66,7 @@ function StakeEthForm({
       tokenAmountMin: getAmountWithTolerance(realTokens),
       provider: connected.provider,
     }));
+    onClose();
   };
 
   const stake = Form.useWatch('stake', form) || '';
@@ -81,10 +82,10 @@ function StakeEthForm({
   useEffect(() => {
     dispatch(ethActions.getWethLpExchangeRate.call());
     dispatch(ethActions.getBalance.call({ provider: connected.provider, address: account }));
-    dispatch(ethActions.getErc20Balance.call(
-      process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+    dispatch(ethActions.getErc20Balance.call({
+      erc20Address: process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
       account,
-    ));
+    }));
   }, [account, dispatch, connected]);
 
   const lldBalance = useMemo(
@@ -95,7 +96,11 @@ function StakeEthForm({
   const formattedBalance = formatCustom(balance || '0');
 
   const liquidityPoolReward = useMemo(() => {
-    if (stake && tokens && exchangeRate && !form.getFieldError('stake') && !form.getFieldError('token')) {
+    if (stake
+      && tokens
+      && exchangeRate
+      && !form.getFieldError('stake')?.length
+      && !form.getFieldError('token')?.length) {
       try {
         const lpTokens = exchangeRate.rewardRate({
           eth: window.BigInt(parseAssets(stake)),

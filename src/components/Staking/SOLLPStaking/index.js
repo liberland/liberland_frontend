@@ -1,6 +1,9 @@
 import React from 'react';
 import Title from 'antd/es/typography/Title';
 import Card from 'antd/es/card';
+import Link from 'antd/es/typography/Link';
+import Divider from 'antd/es/divider';
+import Flex from 'antd/es/flex';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
@@ -13,25 +16,22 @@ const instructions = 'https://docs.liberland.org/blockchain/for-validators-nomin
 export default function SOLLPStaking() {
   return (
     <>
-      <Card
-        title="Information"
-        actions={[
-          (
-            <Button link href={instructions}>
-              Read the instructions for more details.
-            </Button>
-          ),
-        ]}
-      >
-        <Paragraph>
-          You can earn
-          {' '}
-          <strong>LLD rewards </strong>
-          on SOLana by providing SOL/LLD liquidity on Raydium.
-          Being a liquidity provider allows people to trade against your pool, making LLD more stable
-          and earning you trading fees alongside staking rewards.
-        </Paragraph>
+      <Card title="Information">
+        <Flex vertical gap="20px" justify="space-between" align="center">
+          <Paragraph>
+            You can earn
+            {' '}
+            <strong>LLD rewards </strong>
+            on SOLana by providing SOL/LLD liquidity on Raydium.
+            Being a liquidity provider allows people to trade against your pool, making LLD more stable
+            and earning you trading fees alongside staking rewards.
+          </Paragraph>
+          <Link href={instructions}>
+            Learn more
+          </Link>
+        </Flex>
       </Card>
+      <Divider />
       <Card
         title={(
           <Title className={styles.sol} level={2}>
