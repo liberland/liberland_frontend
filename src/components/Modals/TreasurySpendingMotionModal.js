@@ -1,28 +1,22 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
 import PropTypes from 'prop-types';
-
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Flex from 'antd/es/flex';
+import InputNumber from 'antd/es/input-number';
 import { useDispatch } from 'react-redux';
 import { BN_ZERO, BN } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
-import { TextInput } from '../InputComponents';
 import { congressActions } from '../../redux/actions';
+import { parseDollars } from '../../utils/walletHelpers';
+import InputSearch from '../InputComponents/InputSearchAddressName';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-import { parseDollars, isValidSubstrateAddress } from '../../utils/walletHelpers';
-
-import styles from './styles.module.scss';
-
-function TreasurySpendingMotionModal({ closeModal, budget }) {
+function TreasurySpendingMotionForm({ onClose, budget }) {
   const dispatch = useDispatch();
-
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm({
-    mode: 'all',
-  });
+  const [form] = Form.useForm();
 
   const onSubmit = ({ transferToAddress, transferAmount }) => {
     dispatch(
@@ -31,73 +25,76 @@ function TreasurySpendingMotionModal({ closeModal, budget }) {
         transferAmount: parseDollars(transferAmount),
       }),
     );
-    closeModal();
+    onClose();
   };
 
-  const validateUnbondValue = (textUnbondValue) => {
+  const validateUnbondValue = (_, textUnbondValue) => {
     try {
       const unbondValue = parseDollars(textUnbondValue);
-      if (unbondValue.gt(budget) || unbondValue.lte(BN_ZERO)) return 'Invalid amount';
-      return true;
+      if (unbondValue.gt(budget) || unbondValue.lte(BN_ZERO)) {
+        return Promise.reject('Invalid amount');
+      }
+      return Promise.resolve();
     } catch (e) {
-      return 'Invalid amount';
+      return Promise.reject('Invalid amount');
     }
   };
 
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmit)}
+    <Form
+      form={form}
+      onFinish={onSubmit}
+      layout="vertical"
     >
-      <h3 className={styles.h3}>Create new spending</h3>
-      <span className={styles.description}>
+      <Title level={3}>Create new spending</Title>
+      <Paragraph>
         Here you can create a new motion for LLD spending.
-      </span>
-
-      <div className={styles.title}>Recipient Address</div>
-      <TextInput
-        register={register}
+      </Paragraph>
+      <Form.Item
         name="transferToAddress"
-        required
-        errorTitle="Address not valid"
-        validate={(v) => isValidSubstrateAddress(v) || 'Invalid length'}
-      />
-      {errors?.transferToAddress?.message && (
-        <div className={styles.error}>{errors.transferToAddress.message}</div>
-      )}
-      <span className={styles.title}>Amount</span>
-      <TextInput
-        register={register}
+        label="Recipient address"
+        rules={[{ required: true }]}
+      >
+        <InputSearch />
+      </Form.Item>
+      <Form.Item
+        label="Amount"
         name="transferAmount"
-        required
-        errorTitle="Amount not valid"
-        validate={validateUnbondValue}
-      />
-      {errors?.transferAmount?.message && (
-        <div className={styles.error}>{errors.transferAmount.message}</div>
-      )}
-
-      <div className={styles.buttonWrapper}>
-        <Button medium onClick={closeModal}>
+        rules={[
+          { required: true },
+          { validator: validateUnbondValue },
+        ]}
+      >
+        <InputNumber stringMode controls={false} />
+      </Form.Item>
+      <Flex wrap gap="15px">
+        <Button medium onClick={onClose}>
           Cancel
         </Button>
         <Button primary medium type="submit">
           Create
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
-TreasurySpendingMotionModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+TreasurySpendingMotionForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   budget: PropTypes.instanceOf(BN).isRequired,
 };
 
-export default function TreasurySpendingMotionModalWrapper(props) {
+function ButtonModal(props) {
   return (
-    <ModalRoot>
-      <TreasurySpendingMotionModal {...props} />
-    </ModalRoot>
+    <OpenModalButton primary text="Propose spend" {...props} />
   );
 }
+
+ButtonModal.propTypes = {
+  label: PropTypes.string.isRequired,
+  icon: PropTypes.node.isRequired,
+};
+
+const TreasurySpendingMotionModal = modalWrapper(TreasurySpendingMotionForm, ButtonModal);
+
+export default TreasurySpendingMotionModal;

@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import Spin from 'antd/es/spin';
+import Result from 'antd/es/result';
+import Collapse from 'antd/es/collapse';
 import ContractsList from '../ContractsList';
 import { blockchainSelectors, contractsSelectors } from '../../../redux/selectors';
 import { contractsActions } from '../../../redux/actions';
@@ -13,13 +16,28 @@ function HomeContract() {
     dispatch(contractsActions.getContracts.call());
   }, [dispatch, walletAddress]);
 
-  if (!contracts) return <div>Loading...</div>;
-
-  if (contracts.length < 1) {
-    return <div>No data...</div>;
+  if (!contracts) {
+    return <Spin />;
   }
+
+  if (!contracts.length) {
+    return <Result status={404} title="No contracts found" />;
+  }
+
   return (
-    <ContractsList contracts={contracts} />
+    <Collapse
+      collapsible="icon"
+      defaultActiveKey={['all']}
+      items={[
+        {
+          key: 'all',
+          label: 'All contracts',
+          children: (
+            <ContractsList contracts={contracts} />
+          ),
+        },
+      ]}
+    />
   );
 }
 

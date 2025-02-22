@@ -4,6 +4,7 @@ import {
   calculateAmountMax,
   calculateAmountMin,
   formatAssets,
+  formatCustom,
   parseAssets,
   sanitizeValue,
 } from './walletHelpers';
@@ -75,40 +76,39 @@ export const convertTransferData = async (
 
   let amount = null;
   let amountData = null;
-
-  const getSwapPrice = isAsset1 ? getSwapPriceExactTokensForTokens : getSwapPriceTokensForExactTokens;
   const isAmountMax = !isAsset1;
   const amountIn = isAsset1 ? amount1Desired : amount2Desired;
-
+  const decimals = isAsset1 ? asset1Decimals : asset2Decimals;
   if (isBuy) {
-    const decimals = isAsset1 ? asset2Decimals : asset1Decimals;
     amount = parseAssets(amountIn, decimals);
-    amountData = await getSwapPrice(enum2, enum1, amount);
+    amountData = await getSwapPriceTokensForExactTokens(enum1, enum2, amount);
   } else {
-    const decimals = isAsset1 ? asset1Decimals : asset2Decimals;
     amount = parseAssets(amountIn, decimals);
-    amountData = await getSwapPrice(enum1, enum2, amount);
+    amountData = await getSwapPriceExactTokensForTokens(enum1, enum2, amount);
   }
-
   const calculateFunc = isAmountMax ? calculateAmountMax : calculateAmountMin;
   const amountMin = calculateFunc(new BN(amountData), amountOut);
   return { amount, amountMin };
 };
 
 export const convertAssetData = (assetsData, asset1, asset2) => {
-  const asset1Metadata = assetsData[Number(asset1)]?.metadata;
+  const asset1Values = assetsData[Number(asset1)];
+  const asset1Metadata = asset1Values?.metadata;
   const assetData1 = {
     decimals: asset1Metadata?.decimals ? Number(asset1Metadata?.decimals) : undefined,
     deposit: asset1Metadata?.deposit,
     name: asset1Metadata?.name,
     symbol: asset1Metadata?.symbol,
+    isStock: asset1Values?.isStock,
   };
-  const asset2Metadata = assetsData[Number(asset2)]?.metadata;
+  const asset2Values = assetsData[Number(asset2)];
+  const asset2Metadata = asset2Values?.metadata;
   const assetData2 = {
     decimals: asset2Metadata?.decimals ? Number(asset2Metadata?.decimals) : undefined,
     deposit: asset2Metadata?.deposit,
     name: asset2Metadata?.name,
     symbol: asset2Metadata?.symbol,
+    isStock: asset2Values?.isStock,
   };
   return { assetData1, assetData2 };
 };
@@ -163,7 +163,13 @@ export const getExchangeRate = (reserved1, reserved2, decimals1, decimals2) => {
     resultString = integerNumber.toString();
   }
 
-  return removeTrailingZerosFromString(resultString);
+  const finalValue = removeTrailingZerosFromString(resultString);
+  const roundingIndex = decimal?.length;
+  if (!roundingIndex) {
+    return finalValue;
+  }
+  const parsed = parseAssets(finalValue, roundingIndex);
+  return formatCustom(parsed, roundingIndex, false, 4);
 };
 
 export const calculatePooled = (

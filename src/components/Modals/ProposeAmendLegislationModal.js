@@ -1,47 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import TextArea from 'antd/es/input/TextArea';
+import Flex from 'antd/es/flex';
+import Popconfirm from 'antd/es/popconfirm';
+import dayjs from 'dayjs';
 import { useDispatch, useSelector } from 'react-redux';
-import ModalRoot from './ModalRoot';
-import { TextInput, SelectInput } from '../InputComponents';
 import Button from '../Button/Button';
-import styles from './styles.module.scss';
 import { democracyActions } from '../../redux/actions';
 import { legislationSelectors } from '../../redux/selectors';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import AgreeDisagreeModal from './AgreeDisagreeModal';
-import useAgreeDisagreeModal from '../../hooks/useAgreeDisagreeModal';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
+import LegislationHeading from '../Congress/LegislationHeading';
 
-function ProposeAmendLegislationModal({
-  closeModal, tier, id, section,
+function ProposeAmendLegislationForm({
+  onClose, tier, id, section,
 }) {
   const dispatch = useDispatch();
   const allLegislation = useSelector(legislationSelectors.legislation);
   const legislation = allLegislation[tier][id.year][id.index];
-  const sectionContent = legislation.sections[section]?.content.toHuman() ?? '';
-  const {
-    handleSubmit,
-    register,
-    trigger,
-    formState: { errors, isValid },
-  } = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      tier,
-      year: id.year,
-      index: id.index,
-      section,
-      content: sectionContent,
-    },
-  });
+  const sectionContent = legislation?.sections?.[section]?.content.toHuman() ?? '';
+  const [form] = Form.useForm();
 
   const onSubmit = ({
     discussionName,
     discussionDescription,
     discussionLink,
     content,
+    // eslint-disable-next-line no-shadow
+    tier,
+    index,
+    year,
+    // eslint-disable-next-line no-shadow
+    section,
   }) => {
     dispatch(
       democracyActions.proposeAmendLegislation.call({
@@ -49,121 +42,91 @@ function ProposeAmendLegislationModal({
         discussionDescription,
         discussionLink,
         tier,
-        id,
+        id: {
+          year: year.year(),
+          index,
+        },
         section,
         content,
       }),
     );
-    closeModal();
+    onClose();
   };
 
-  const { dialogStep, handleClick } = useAgreeDisagreeModal(isValid, trigger);
-
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmit)}
+    <Form
+      form={form}
+      layout="vertical"
+      initialValues={{
+        tier,
+        year: dayjs(new Date(id.year, 0, 1)),
+        index: parseInt(id.index) || 1,
+        section,
+        content: sectionContent,
+      }}
+      onFinish={onSubmit}
     >
-      {dialogStep === 'form' ? (
-        <>
-          <div className={styles.h3}>
-            Propose a Referendum -
-            {legislation.sections[section]
-              ? 'amend legislation'
-              : 'add legislation section'}
-          </div>
+      <Title level={3}>
+        Propose a Referendum -
+        {legislation?.sections?.[section]
+          ? 'amend legislation'
+          : 'add legislation section'}
+      </Title>
 
-          <div className={styles.title}>Legislation Tier</div>
-          <SelectInput
-            register={register}
-            name="tier"
-            disabled
-            options={[
-              { value: 'Constitution', display: 'Constitution' },
-              { value: 'InternationalTreaty', display: 'International Treaty' },
-              { value: 'Law', display: 'Law' },
-              { value: 'Tier3', display: 'Tier3' }, // FIXME proper names
-              { value: 'Tier4', display: 'Tier4' },
-              { value: 'Tier5', display: 'Tier5' },
-              { value: 'Decision', display: 'Decision' },
-            ]}
-          />
-
-          <div className={styles.title}>Legislation Year</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Year"
-            register={register}
-            name="year"
-            disabled
-          />
-
-          <div className={styles.title}>Legislation Index</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Index"
-            register={register}
-            name="index"
-            disabled
-          />
-
-          <div className={styles.title}>Legislation Section</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Section"
-            register={register}
-            name="section"
-            disabled
-          />
-
-          <div className={styles.title}>Legislation Content</div>
-          <TextInput
-            required
-            errorTitle="Content"
-            register={register}
-            name="content"
-          />
-          {errors?.content?.message && (
-            <div className={styles.error}>{errors.content.message}</div>
-          )}
-
-          <ProposalDiscussionFields {...{ register, errors }} />
-
-          <div className={styles.buttonWrapper}>
-            <Button medium onClick={closeModal}>
-              Cancel
-            </Button>
-            <Button primary medium onClick={handleClick}>
-              Submit
-            </Button>
-          </div>
-        </>
-      ) : (
-        <AgreeDisagreeModal onDisagree={closeModal} agreeButtonType="submit" />
-      )}
-    </form>
+      <LegislationHeading section={section} />
+      <Form.Item
+        name="content"
+        label="Legislation Content"
+      >
+        <TextArea />
+      </Form.Item>
+      <ProposalDiscussionFields />
+      <Flex wrap gap="15px">
+        <Button onClick={onClose}>
+          Cancel
+        </Button>
+        <Popconfirm
+          title="Confirm form submission"
+          description="This operation costs 100 LLD."
+          onConfirm={() => form.submit()}
+        >
+          <Button primary>
+            Submit
+          </Button>
+        </Popconfirm>
+      </Flex>
+    </Form>
   );
 }
 
-ProposeAmendLegislationModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+ProposeAmendLegislationForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
-    year: PropTypes.number.isRequired,
-    index: PropTypes.number.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    year: PropTypes.object.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    index: PropTypes.object.isRequired,
   }).isRequired,
-  section: PropTypes.string.isRequired,
+  section: PropTypes.number,
 };
 
-function ProposeAmendLegislationModalWrapper(props) {
+ProposeAmendLegislationForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
+};
+
+function ButtonModal(props) {
+  const { add } = props;
+  const text = add ? 'Add section' : 'Amend';
   return (
-    <ModalRoot>
-      <ProposeAmendLegislationModal {...props} />
-    </ModalRoot>
+    <OpenModalButton text={text} {...props} />
   );
 }
 
-export default ProposeAmendLegislationModalWrapper;
+ButtonModal.propTypes = {
+  add: PropTypes.bool,
+};
+
+const ProposeAmendLegislationModal = modalWrapper(ProposeAmendLegislationForm, ButtonModal);
+
+export default ProposeAmendLegislationModal;

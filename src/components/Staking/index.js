@@ -1,38 +1,30 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import cx from 'classnames';
-import { blockchainSelectors, validatorSelectors } from '../../redux/selectors';
-import { validatorActions } from '../../redux/actions';
-import StakeManagement from './StakeManagement';
-import Validator from './Validator';
-import Nominator from './Nominator';
-import styles from '../../utils/pagesBase.module.scss';
-import stylesStacking from './styles.module.scss';
+import React from 'react';
+import { Redirect, Route, Switch } from 'react-router-dom';
+import router from '../../router';
+import { loader } from '../../utils/loader';
 
 export default function Staking() {
-  const dispatch = useDispatch();
-  const info = useSelector(validatorSelectors.info);
-  const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-
-  useEffect(() => {
-    dispatch(validatorActions.getInfo.call());
-  }, [dispatch, walletAddress]);
-
-  if (!info) return null; // loading
-
-  let render = null;
-  if (info.isStakingValidator) {
-    render = <Validator />;
-  } else if (info.stash) {
-    render = <Nominator />;
-  }
-
   return (
-    <div className={styles.sectionWrapper}>
-      <div className={cx(styles.contentWrapper, stylesStacking.contentWrapper)}>
-        <StakeManagement />
-        {render}
-      </div>
-    </div>
+    <Switch>
+      <Route
+        path={router.staking.overview}
+        component={loader(() => import('./Overview'))}
+      />
+      <Route
+        path={router.staking.ethlpstaking}
+        component={loader(() => import('./ETHLPStaking'))}
+      />
+      <Route
+        path={router.staking.sollpstaking}
+        component={loader(() => import('./SOLLPStaking'))}
+      />
+      <Route
+        exact
+        path={router.home.staking}
+        render={() => (
+          <Redirect to={router.staking.overview} />
+        )}
+      />
+    </Switch>
   );
 }

@@ -13,6 +13,10 @@ import { convertAssetData } from '../utils/dexFormatter';
 import { parseDollars, parseMerits } from '../utils/walletHelpers';
 import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
+import identityJudgementEnums from '../constants/identityJudgementEnums';
+import { IndexHelper } from '../utils/council/councilEnum';
+import { decodeAndFilter } from '../utils/identityParser';
+import { OfficeType } from '../utils/officeTypeEnum';
 
 const { ApiPromise, WsProvider } = require('@polkadot/api');
 
@@ -45,6 +49,9 @@ const getApi = async () => {
         },
         BrandName: {
           name: 'Encryptable',
+        },
+        Contact: {
+          contact: 'Encryptable',
         },
         OnlineAddress: {
           description: 'Encryptable',
@@ -116,6 +123,22 @@ const getApi = async () => {
           UBOs: 'Vec<UBO>',
           relevantAssets: 'Vec<RelevantAsset>',
           relevantContracts: 'Vec<RelevantContract>',
+          companyType: 'Text',
+          contact: 'Vec<Contact>',
+        },
+        RemarkInfo: {
+          category: 'Text',
+          project: 'Text',
+          supplier: 'Text',
+          description: 'Text',
+          finalDestination: 'Text',
+          amountInUSDAtDateOfPayment: 'u64',
+          date: 'u64',
+          currency: 'Text',
+        },
+        RemarkInfoUser: {
+          id: 'u64',
+          description: 'Text',
         },
       },
       runtime: {
@@ -250,6 +273,62 @@ const getIdentity = async (address) => {
   }
 };
 
+const createOrUpdateAsset = async ({
+  id,
+  name,
+  symbol,
+  decimals,
+  minBalance,
+  admin,
+  issuer,
+  freezer,
+  owner,
+  isCreate,
+  isStock,
+  defaultValues,
+}) => {
+  try {
+    const api = await getApi();
+    if (isCreate) {
+      const create = await api.tx.assets.create(id, admin, minBalance);
+      await submitExtrinsic(create, owner, api);
+    }
+    if (defaultValues?.name !== name || defaultValues?.symbol !== symbol || defaultValues?.decimals !== decimals) {
+      const setMetadata = await api.tx.assets.setMetadata(id, name, symbol, decimals);
+      await submitExtrinsic(setMetadata, owner, api);
+    }
+    if (defaultValues?.issuer !== issuer || defaultValues?.admin !== admin || defaultValues?.freezer !== freezer) {
+      const setTeam = await api.tx.assets.setTeam(id, issuer, admin, freezer);
+      await submitExtrinsic(setTeam, owner, api);
+    }
+    if (isStock && isCreate) {
+      const params = await api.tx.assets.setParameters(id, { eresidencyRequired: true });
+      await submitExtrinsic(params, owner, api);
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
+const mintAsset = async ({
+  id,
+  beneficiary,
+  amount,
+  owner,
+}) => {
+  try {
+    const api = await getApi();
+    const mint = await api.tx.assets.mint(id, beneficiary, amount);
+    await submitExtrinsic(mint, owner, api);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
 const getLlmBalances = async (addresses) => {
   try {
     const api = await getApi();
@@ -293,6 +372,58 @@ const getAssetData = async (asset, address) => {
   }
 };
 
+const getAssetDetails = async (ids) => {
+  try {
+    const api = await getApi();
+    const details = (await api.query.assets.asset.multi(ids)).map((asset) => asset.toJSON());
+    const assetQueries = details.reduce((queries, detail) => {
+      queries.push([api.query.identity.identityOf, detail.admin]);
+      queries.push([api.query.identity.identityOf, detail.freezer]);
+      queries.push([api.query.identity.identityOf, detail.issuer]);
+      queries.push([api.query.identity.identityOf, detail.owner]);
+      return queries;
+    }, []);
+    const assetResults = await api.queryMulti(assetQueries);
+    const resolvedIdentity = assetResults.map((result) => {
+      const json = result.toJSON();
+      const raw = json?.info?.display?.raw?.slice(2);
+      if (!raw) {
+        return '';
+      }
+      return Buffer.from(raw, 'hex').toString('utf-8');
+    }).reduce((accumulator, item) => {
+      const lastItem = accumulator[accumulator.length - 1];
+      if (!lastItem) {
+        accumulator.push([item]);
+      } else if (lastItem.length < 4) {
+        lastItem.push(item);
+      } else {
+        accumulator.push([item]);
+      }
+      return accumulator;
+    }, []);
+
+    const resolvedDetails = details.map((detail, index) => ({
+      ...detail,
+      supply: detail.supply.toString().startsWith('0x')
+        ? window.BigInt(detail.supply).toString()
+        : detail.supply,
+      identity: {
+        admin: resolvedIdentity[index][0] || detail.admin,
+        freezer: resolvedIdentity[index][1] || detail.freezer,
+        issuer: resolvedIdentity[index][2] || detail.issuer,
+        owner: resolvedIdentity[index][3] || detail.owner,
+      },
+    }));
+
+    return resolvedDetails;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw e;
+  }
+};
+
 const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = false) => {
   try {
     const api = await getApi();
@@ -302,33 +433,42 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
       index: parseInt(rawEntry[0].toHuman()[0].replace(/,/g, '')),
       metadata: rawEntry[1].toHuman(),
     }));
-    const indexedFilteredAssets = [];
+    const assets = [];
     const assetQueries = [];
+    const parametersQueries = [];
     processedMetadatas.forEach((asset) => {
       // Disregard LLM, asset of ID 1 because it has special treatment already
       const isLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
       if (isLLM) {
         assetQueries.push([api.query.assets.account, [asset.index, address]]);
-        if (isIndexNeed) {
-          indexedFilteredAssets[asset.index] = asset;
-        } else {
-          indexedFilteredAssets.push(asset);
-        }
+        parametersQueries.push([api.query.assets.parameters, [asset.index]]);
+        assets.push(asset);
       }
     });
-    if (isIndexNeed) {
-      return indexedFilteredAssets;
-    }
 
     if (assetQueries.length !== 0) {
-      const assetResults = await api.queryMulti([...assetQueries]);
+      const assetResults = await api.queryMulti(assetQueries);
 
       assetResults.forEach((assetResult, index) => {
-        indexedFilteredAssets[index].balance = assetResult.toJSON();
+        assets[index].balance = assetResult.toJSON() || '0';
       });
-      return indexedFilteredAssets;
     }
-    return [];
+
+    if (parametersQueries.length !== 0) {
+      const parametersResults = await api.queryMulti(parametersQueries);
+      parametersResults.forEach(({ eresidencyRequired }, index) => {
+        assets[index].isStock = eresidencyRequired?.valueOf() || false;
+      });
+    }
+
+    if (isIndexNeed) {
+      return assets.reduce((acc, asset) => {
+        acc[asset.index] = asset;
+        return acc;
+      }, {});
+    }
+
+    return assets;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
@@ -336,15 +476,40 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
   }
 };
 
+const makeTransferExtrinsic = (api, trasferData) => {
+  const { index, balance, recipient } = trasferData;
+  let transferExtrinsic;
+  if (index === IndexHelper.LLD) {
+    transferExtrinsic = api.tx.balances.transfer(recipient, balance);
+  } else if (index === IndexHelper.POLITIPOOL_LLM) {
+    transferExtrinsic = api.tx.llm.sendLlmToPolitipool(recipient, balance);
+  } else {
+    transferExtrinsic = api.tx.assets.transfer(parseInt(index), recipient, balance);
+  }
+  return transferExtrinsic;
+};
+
+const makeRemarkExtrinsic = (api, remarkInfo) => api.tx.llm.remark(remarkInfo);
+
+const transferWithRemark = async (remarkInfo, transfer, walletAddress) => {
+  const api = await getApi();
+  const remark = makeRemarkExtrinsic(api, remarkInfo);
+  const transferExtrinsic = makeTransferExtrinsic(api, transfer);
+
+  const call = [transferExtrinsic, remark];
+  const extrinsic = api.tx.utility.batch(call);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
 const provideJudgementAndAssets = async ({
-  address, hash, walletAddress, merits, dollars,
+  address, hash, walletAddress, merits, dollars, judgementType = identityJudgementEnums.KNOWNGOOD,
 }) => {
   const parsedMerits = parseMerits(merits);
   const parsedDollars = parseDollars(dollars);
   const api = await getApi();
   const calls = [];
 
-  const judgement = api.createType('IdentityJudgement', 'KnownGood');
+  const judgement = api.createType('IdentityJudgement', judgementType);
   const judgementCall = api.tx.identity.provideJudgement(0, address, judgement, hash);
   const officeJudgementCall = api.tx.identityOffice.execute(judgementCall);
   calls.push(officeJudgementCall);
@@ -364,12 +529,12 @@ const provideJudgementAndAssets = async ({
   return submitExtrinsic(finalCall, walletAddress, api);
 };
 
-const getLegalAdditionals = (legal) => {
+const getAdditionals = (itemData, key) => {
   const chunks = [];
-  for (let i = 0; i < legal.length; i += 32) {
+  for (let i = 0; i < itemData.length; i += 32) {
     chunks.push([
-      { Raw: 'legal' },
-      { Raw: legal.substr(i, 32) },
+      { Raw: key },
+      { Raw: itemData.substr(i, 32) },
     ]);
   }
   return chunks;
@@ -398,6 +563,10 @@ const getEResidentAdditionals = () => [
   [{ Raw: 'eresident' }, { Raw: '1' }],
 ];
 
+const getCompanyAdditionals = () => [
+  [{ Raw: 'company' }, { Raw: '1' }],
+];
+
 const buildAdditionals = (values, blockNumber) => {
   const additionals = [];
 
@@ -410,27 +579,38 @@ const buildAdditionals = (values, blockNumber) => {
     additionals.push(
       ...getEResidentAdditionals(),
     );
-  }
-
-  if (values.legal) {
+  } else if (values.onChainIdentity === 'company') {
     additionals.push(
-      ...getLegalAdditionals(values.legal),
+      ...getCompanyAdditionals(),
     );
   }
+
+  const additionalItems = ['legal', 'web', 'display', 'email'];
+
+  additionalItems.map((item) => {
+    const itemData = values[item];
+    if (itemData && itemData.length > 32) {
+      additionals.push(
+        ...getAdditionals(itemData, item),
+      );
+    }
+    return null;
+  });
 
   return additionals;
 };
 
 const setIdentity = async (values, walletAddress) => {
   const asData = (v) => (v ? { Raw: v } : null);
+  const truncate = (v) => (v?.length > 32 ? v.substring(0, 32) : v);
   const api = await getApi();
   const blockNumber = await api.derive.chain.bestNumber();
   const info = {
     additional: buildAdditionals(values, blockNumber.toNumber()),
-    display: asData(values.display),
-    legal: asData(null),
-    web: asData(values.web),
-    email: asData(values.email),
+    display: asData(truncate(values.display)),
+    legal: asData(truncate(values.legal)),
+    web: asData(truncate(values.web)),
+    email: asData(truncate(values.email)),
     riot: asData(null),
     image: asData(null),
     twitter: asData(null),
@@ -608,6 +788,11 @@ function accountsToString(accounts) {
   return accounts.map((account) => account.toString());
 }
 
+const getValidator = async (address) => {
+  const api = await getApi();
+  return api.query.staking.validators(address);
+};
+
 const getValidators = async () => {
   const api = await getApi();
   const validators = [];
@@ -640,13 +825,15 @@ const getValidators = async () => {
 
   validatorsData.forEach((validatorData, index) => {
     const validatorHumanData = validatorData.toHuman();
+    const data = validatorData.isSome ? validatorData.unwrap() : null;
+    const decodedData = decodeAndFilter(data?.info, ['display']);
     const validatorWithBaseInfo = validatorsWithBaseInfo.validators[index];
     if (!validatorWithBaseInfo) return;
     const dataToAdd = {
       ...((validatorHumanData?.commission !== undefined) && { commission: validatorHumanData.commission }),
       ...((validatorHumanData?.blocked !== undefined) && { blocked: validatorHumanData.blocked }),
       // eslint-disable-next-line max-len
-      ...((validatorHumanData?.info?.display?.Raw !== undefined) && { displayName: validatorHumanData?.info?.display?.Raw }),
+      ...((decodedData?.display !== undefined) && { displayName: decodedData.display }),
       ...validatorWithBaseInfo,
       isWaiting: accountsToString(baseInfo.waitingIds).includes(validatorWithBaseInfo.key),
     };
@@ -655,6 +842,7 @@ const getValidators = async () => {
       ...dataToAdd,
     };
   });
+
   validators.sort((a, b) => {
     if (a.isWaiting && !b.isWaiting) return -1;
     if (!a.isWaiting && b.isWaiting) return 1;
@@ -727,7 +915,6 @@ const getDemocracyReferendums = async (address) => {
 
     const motions = (await api.query.council.proposals())
       .map((propose) => propose.toString());
-
     const centralizedReferendumsData = await centralizedBackend.getReferenda();
     const crossReferencedReferendumsData = crossReference(
       api,
@@ -823,108 +1010,92 @@ const submitProposal = async (
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+async function getIdentityDataProper(addressesIdentityData) {
+  const api = await getApi();
+  if (addressesIdentityData.length === 0) return [];
+  const identityQueries = addressesIdentityData.map((address) => [api.query.identity.identityOf, address]);
+  const identities = await api.queryMulti(identityQueries);
+  return addressesIdentityData.map((address, index) => {
+    const identity = identities[index];
+
+    const isIdentity = identity.isSome;
+
+    const addressString = address.toString();
+    let nameData;
+    let legalData;
+    let websiteData;
+    if (isIdentity) {
+      const identityData = identity.unwrap();
+      const { info } = identityData;
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal']);
+      nameData = decodedData?.display;
+      legalData = decodedData?.legal;
+      websiteData = decodedData?.web;
+    }
+    return {
+      name: nameData,
+      legal: legalData,
+      website: websiteData,
+      identityData: identity.isSome ? identity.unwrap().toJSON() : null,
+      rawIdentity: addressString,
+    };
+  });
+}
+
 const getCongressMembersWithIdentity = async (walletAddress) => {
   const api = await getApi();
-  let [
+  const [
     councilMembers,
     candidates,
-    // eslint-disable-next-line prefer-const
     currentCandidateVotesByUserQuery,
+    runnersUp,
   ] = await api.queryMulti([
     api.query.council.members,
     api.query.elections.candidates,
     [api.query.elections.voting, walletAddress],
-  ]);
-  councilMembers = councilMembers.toHuman();
-  const councilMembersIdentityQueries = [];
-  councilMembers.forEach((councilMember) => {
-    councilMembersIdentityQueries.push([api.query.identity.identityOf, councilMember]);
-  });
-
-  // eslint-disable-next-line eqeqeq
-  const councilMemberIdentities = councilMembersIdentityQueries.length == 0 ? []
-    : await api.queryMulti([
-      ...councilMembersIdentityQueries,
-    ]);
-
-  const crossReferencedCouncilMemberIdentities = [];
-
-  councilMemberIdentities.forEach((councilMemberIdentity) => {
-    const toHumanIdentity = councilMemberIdentity.toHuman();
-    // address use councilmembers.shift as its same ordering as councilmemberidentities
-    let rawIdentity = councilMembers.shift();
-    rawIdentity = typeof rawIdentity === 'string' ? rawIdentity : rawIdentity[0];
-    crossReferencedCouncilMemberIdentities.push({
-      name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
-      identityData: toHumanIdentity,
-      rawIdentity,
-    });
-  });
-
-  candidates = candidates.toHuman();
-  // TODO isolate in function ?
-  const candidatesIdentityQueries = [];
-  candidates.forEach((candidate) => {
-    candidatesIdentityQueries.push([api.query.identity.identityOf, candidate[0]]);
-  });
-
-  // eslint-disable-next-line eqeqeq
-  const candidateIdentities = candidatesIdentityQueries.length == 0 ? [] : await api.queryMulti([
-    ...candidatesIdentityQueries,
+    api.query.elections.runnersUp,
   ]);
 
-  const crossReferencedCandidateIdentities = [];
-  candidateIdentities.forEach((candidateIdentity) => {
-    const toHumanIdentity = candidateIdentity.toHuman();
-    // address use councilmembers.shift as its same ordering as councilmemberidentities
-    let rawIdentity = candidates.shift();
-    rawIdentity = typeof rawIdentity === 'string' ? rawIdentity : rawIdentity[0];
-    crossReferencedCandidateIdentities.push({
-      name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
-      identityData: toHumanIdentity,
-      rawIdentity,
-    });
-  });
+  const councilMembersList = councilMembers.map((member) => member.toString());
+  const candidatesList = candidates.map((candidate) => candidate[0].toString());
+  const currentCandidateVotesByUser = !currentCandidateVotesByUserQuery.isEmpty
+    ? currentCandidateVotesByUserQuery.votes.map((vote) => vote.toString())
+    : [];
+  const runnersUpList = runnersUp.map(([who]) => who[1].toString());
 
-  const currentCandidateVotesByUser = currentCandidateVotesByUserQuery.toHuman().votes;
+  const [
+    crossReferencedCouncilMemberIdentities,
+    crossReferencedCandidateIdentities,
+    crossReferencedCurrentCandidateVotesByUser,
+    runnersUpListIdentities,
+  ] = await Promise.all([
+    getIdentityDataProper(councilMembersList),
+    getIdentityDataProper(candidatesList),
+    getIdentityDataProper(currentCandidateVotesByUser),
+    getIdentityDataProper(runnersUpList),
+  ]);
 
-  const currentCandidateVotesByUserIdentityQueries = [];
-  currentCandidateVotesByUser.forEach((currentCandidateVote) => {
-    currentCandidateVotesByUserIdentityQueries.push([api.query.identity.identityOf, currentCandidateVote]);
-  });
-
-  // eslint-disable-next-line max-len, eqeqeq
-  const currentCandidateVotesByUserIdentities = currentCandidateVotesByUserIdentityQueries.length == 0 ? [] : await api.queryMulti(
-    [
-      ...currentCandidateVotesByUserIdentityQueries,
-    ],
-  );
-
-  const crossReferencedCurrentCandidateVotesByUser = [];
-  currentCandidateVotesByUserIdentities.forEach((currentCandidateVoteIdentity) => {
-    const toHumanIdentity = currentCandidateVoteIdentity.toHuman();
-    // address use councilmembers.shift as its same ordering as councilmemberidentities
-    let rawIdentity = currentCandidateVotesByUser.shift();
-    rawIdentity = typeof rawIdentity === 'string' ? rawIdentity : rawIdentity[0];
-    crossReferencedCurrentCandidateVotesByUser.push({
-      name: toHumanIdentity?.info?.display?.Raw ? toHumanIdentity.info.display.Raw : rawIdentity,
-      identityData: toHumanIdentity,
-      rawIdentity,
-    });
-  });
-  // TODO add runnersup
+  const electionsInfo = await api.derive.elections.info();
 
   /*
-   const electionsInfo = useCall<DeriveElectionsInfo>(api.derive.elections.info);
-   const allVotes = useCall<Record<string, AccountId[]>>(api.derive.council.votes, undefined, transformVotes);
-   */
+    const allVotes = useCall(api.derive.council.votes, undefined, transformVotes);
+  */
 
-  // eslint-disable-next-line max-len
-  return { currentCongressMembers: crossReferencedCouncilMemberIdentities, candidates: crossReferencedCandidateIdentities, currentCandidateVotesByUser: crossReferencedCurrentCandidateVotesByUser };
+  return {
+    electionsInfo,
+    runnersUp: runnersUpListIdentities,
+    currentCongressMembers: crossReferencedCouncilMemberIdentities,
+    candidates: crossReferencedCandidateIdentities,
+    currentCandidateVotesByUser: crossReferencedCurrentCandidateVotesByUser,
+  };
 };
 
 const voteForCongress = async (listofVotes, walletAddress) => {
   const api = await getApi();
+  if (listofVotes.length < 1) {
+    const voteExtrinsic = api.tx.elections.removeVoter();
+    return submitExtrinsic(voteExtrinsic, walletAddress, api);
+  }
   const votes = listofVotes.map((vote) => vote.rawIdentity);
 
   const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
@@ -1120,8 +1291,11 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
       if (optCompanyRegistryEntity.isNone) companyData = { unregister: true };
       else {
         // eslint-disable-next-line max-len
-        const compressed = optCompanyRegistryEntity?.isSome ? optCompanyRegistryEntity.unwrap().data : optCompanyRegistryEntity.data;
+        const optCompanyRegistryEntityUnwrap = optCompanyRegistryEntity?.isSome ? optCompanyRegistryEntity.unwrap() : optCompanyRegistryEntity;
+        const compressed = optCompanyRegistryEntityUnwrap.data;
         companyData = api.createType('CompanyData', pako.inflate(compressed));
+
+        companyData.set('registryAllowedToEdit', optCompanyRegistryEntityUnwrap.editableByRegistrar);
       }
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -1214,18 +1388,22 @@ const requestCompanyRegistration = async (companyData, registryAllowedToEdit, wa
 
   const data = api.createType('CompanyData', companyData);
   const compressed = pako.deflate(data.toU8a());
-
   const extrinsic = api.tx.companyRegistry.requestEntity(0, u8aToHex(compressed), !!registryAllowedToEdit);
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
-const requestEditCompanyRegistration = async (companyData, companyId, walletAddress) => {
+const requestEditCompanyRegistration = async (companyData, companyId, walletAddress, registryAllowedToEdit) => {
   const api = await getApi();
 
   const data = api.createType('CompanyData', companyData);
   const compressed = pako.deflate(data.toU8a());
 
-  const extrinsic = api.tx.companyRegistry.requestRegistration(0, companyId, u8aToHex(compressed), true);
+  const extrinsic = api.tx.companyRegistry.requestRegistration(
+    0,
+    companyId,
+    u8aToHex(compressed),
+    !!registryAllowedToEdit,
+  );
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
@@ -1309,20 +1487,33 @@ const getBlockEvents = async (blockHash) => {
   }
 };
 
+const getVotesList = (voting) => {
+  const votingUnwrapped = voting.isSome ? voting.unwrap() : null;
+  if (!votingUnwrapped) return null;
+  const ayes = votingUnwrapped.ayes.map((item) => item.toString());
+  const nays = votingUnwrapped.nays.map((item) => item.toString());
+  return ayes.concat(nays);
+};
+
 const getMotions = async () => {
   const api = await getApi();
   const proposals = await api.query.council.proposals();
 
   return Promise.all(
     proposals.map(async (proposal) => {
-      const [proposalOf, voting] = await api.queryMulti([
+      const [proposalOf, voting, members] = await api.queryMulti([
         [api.query.council.proposalOf, proposal],
         [api.query.council.voting, proposal],
+        [api.query.council.members],
       ]);
+
+      const votes = getVotesList(voting);
       return {
         proposal,
         proposalOf,
         voting,
+        votes,
+        membersCount: members.length,
       };
     }),
   );
@@ -1389,12 +1580,177 @@ const createProposalAndVote = async (threshold, proposalContent, vote) => {
   return [proposal, voteAye];
 };
 
-const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmount }) => {
+const handleCreateProposalAndVote = async (threshold, proposalData, walletAddress) => {
+  const api = await getApi();
+  const [proposal, voteAye] = await createProposalAndVote(threshold, proposalData, true);
+
+  if (threshold === 1) {
+    return submitExtrinsic(proposal, walletAddress, api);
+  }
+
+  const extrinsic = api.tx.utility.batchAll([proposal, voteAye]);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const congressProposeSpend = async ({
+  walletAddress, spendProposal, remarkInfo, executionBlock,
+}) => {
   const api = await getApi();
 
   const threshold = await congressMajorityThreshold();
+  const remark = api.tx.llm.remark(remarkInfo);
+  const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
 
-  const executeProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
+  const executeProposal = api.tx.scheduler.schedule(executionBlock, null, 0, transferAndRemark);
+  const proposal = api.tx.councilAccount.execute(executeProposal);
+
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
+};
+
+const createSenateProposalAndVote = async (threshold, proposalContent, vote) => {
+  const api = await getApi();
+  const proposal = api.tx.senate.propose(threshold, proposalContent, proposalContent.length);
+  const nextProposalIndex = await api.query.senate.proposalCount();
+  const voteAye = api.tx.senate.vote(proposalContent.method.hash, nextProposalIndex, vote);
+
+  return [proposal, voteAye];
+};
+
+const senateMajorityThreshold = async () => {
+  const api = await getApi();
+  const senateMember = await api.query.senate.members();
+  return Math.trunc(senateMember.length / 2) + 1;
+};
+
+const senateProposeSpend = async ({
+  walletAddress, spendProposal, remarkInfo,
+}) => {
+  const api = await getApi();
+
+  const remark = api.tx.llm.remark(remarkInfo);
+  const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
+  const proposalData = api.tx.senateAccount.execute(transferAndRemark);
+  const threshold = await senateMajorityThreshold();
+  const [proposal, voteAye] = await createSenateProposalAndVote(threshold, proposalData, true);
+
+  if (threshold === 1) {
+    return submitExtrinsic(proposal, walletAddress, api);
+  }
+
+  const extrinsic = api.tx.utility.batchAll([proposal, voteAye]);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getClerksMinistryFinance = async () => {
+  const api = await getApi();
+  const keys = await api.query.ministryOfFinanceOffice.clerks.keys();
+  if (keys.length < 1) {
+    return null;
+  }
+  return keys.map((item) => item.args.toString());
+};
+
+const ministryFinanceSpend = async ({
+  walletAddress, spendProposal, remarkInfo,
+}) => {
+  const api = await getApi();
+
+  const remark = api.tx.llm.remark(remarkInfo);
+  const transferAndRemark = api.tx.utility.batchAll([spendProposal, remark]);
+  const extrinsic = api.tx.ministryOfFinanceOffice.execute(transferAndRemark);
+
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getProperProposal = async (officeType) => {
+  if (officeType === OfficeType.CONGRESS) {
+    return congressProposeSpend;
+  } if (officeType === OfficeType.SENATE) {
+    return senateProposeSpend;
+  } if (officeType === OfficeType.MINISTRY_FINANCE) {
+    return ministryFinanceSpend;
+  }
+  return null;
+};
+
+const congressSenateSendLlm = async ({
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
+}) => {
+  const api = await getApi();
+  const spendProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
+  const proposeSend = await getProperProposal(officeType);
+
+  return proposeSend({
+    walletAddress, spendProposal, remarkInfo, executionBlock,
+  });
+};
+
+const congressSenateSendLld = async ({
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
+}) => {
+  const api = await getApi();
+  const spendProposal = api.tx.balances.transfer(transferToAddress, transferAmount);
+  const proposeSend = await getProperProposal(officeType);
+
+  return proposeSend({
+    walletAddress, spendProposal, remarkInfo, executionBlock,
+  });
+};
+
+const congressSenateSendLlmToPolitipool = async ({
+  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
+}) => {
+  const api = await getApi();
+  const spendProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
+  const proposeSend = await getProperProposal(officeType);
+
+  return proposeSend({
+    walletAddress, spendProposal, remarkInfo, executionBlock,
+  });
+};
+
+const congressSenateSendAssets = async ({
+  walletAddress,
+  transferToAddress,
+  transferAmount,
+  assetData,
+  remarkInfo,
+  executionBlock,
+  officeType,
+}) => {
+  const api = await getApi();
+  const spendProposal = api.tx.assets.transfer(parseInt(assetData.index), transferToAddress, transferAmount);
+  const proposeSend = await getProperProposal(officeType);
+
+  return proposeSend({
+    walletAddress, spendProposal, remarkInfo, executionBlock,
+  });
+};
+const congressProposeBudget = async ({
+  walletAddress, itemsCouncilPropose, executionBlock,
+}) => {
+  const api = await getApi();
+  const proposeBudget = itemsCouncilPropose.map((itemCouncilPropose) => {
+    const { transfer, remark: remarkInfo } = itemCouncilPropose;
+    const { index, balance, recipient } = transfer;
+
+    const remark = api.tx.llm.remark(remarkInfo);
+    let transferProposal;
+
+    if (index === IndexHelper.LLD) {
+      transferProposal = api.tx.balances.transfer(recipient, balance);
+    } else if (index === IndexHelper.POLITIPOOL_LLM) {
+      transferProposal = api.tx.llm.sendLlmToPolitipool(recipient, balance);
+    } else {
+      transferProposal = api.tx.assets.transfer(parseInt(index), recipient, balance);
+    }
+
+    return { transferProposal, remark };
+  });
+  const threshold = await congressMajorityThreshold();
+  const transferAndRemark = api.tx.utility
+    .batchAll(proposeBudget.flatMap((item) => [item.transferProposal, item.remark]));
+  const executeProposal = api.tx.scheduler.schedule(executionBlock, null, 0, transferAndRemark);
   const proposal = api.tx.councilAccount.execute(executeProposal);
 
   const extrinsics = await createProposalAndVote(threshold, proposal, true);
@@ -1402,15 +1758,9 @@ const congressSendLlm = async ({ walletAddress, transferToAddress, transferAmoun
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
-const congressSendLlmToPolitipool = async ({ walletAddress, transferToAddress, transferAmount }) => {
+const senateVoteAtMotions = async (walletAddress, proposal, index, vote) => {
   const api = await getApi();
-
-  const threshold = await congressMajorityThreshold();
-
-  const executeProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
-  const proposal = api.tx.councilAccount.execute(executeProposal);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
+  const extrinsic = api.tx.senate.vote(proposal, index, vote);
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
@@ -1545,9 +1895,16 @@ const getIdentitiesNames = async (addresses) => {
   raw.map((identity, idx) => {
     identities[addresses[idx]] = {};
     const unwrapIdentity = identity.isSome ? identity.unwrap().info : null;
-    const nameHashed = unwrapIdentity?.display?.asRaw;
-    const name = nameHashed?.isEmpty ? null : new TextDecoder().decode(nameHashed);
-    identities[addresses[idx]].identity = name;
+
+    let nameData;
+    let legalData;
+
+    if (unwrapIdentity) {
+      const decodedData = decodeAndFilter(unwrapIdentity, ['display', 'legal']);
+      nameData = decodedData?.display;
+      legalData = decodedData?.legal;
+    }
+    identities[addresses[idx]].identity = { name: nameData, legal: legalData };
 
     return null;
   });
@@ -1567,6 +1924,12 @@ const stakingValidate = async (commission, blocked, keys, walletAddress) => {
   const validate = api.tx.staking.validate({ commission, blocked });
   const extrinsic = api.tx.utility.batchAll([setKeys, validate]);
   return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const updateValidate = async (commission, blocked, walletAddress) => {
+  const api = await getApi();
+  const validate = api.tx.staking.validate({ commission, blocked });
+  return submitExtrinsic(validate, walletAddress, api);
 };
 
 const bondAndValidate = async (bondValue, payee, commission, blocked, keys, walletAddress) => {
@@ -1628,9 +1991,7 @@ const congressProposeLegislation = async (tier, id, sections, walletAddress) => 
   const api = await getApi();
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.liberlandLegislation.addLegislation(tier, id, sections);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const congressRepealLegislation = async (tier, id, section, walletAddress) => {
@@ -1642,10 +2003,7 @@ const congressRepealLegislation = async (tier, id, section, walletAddress) => {
   const proposal = section !== null
     ? api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness)
     : api.tx.liberlandLegislation.repealLegislation(tier, id, witness);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const getTreasurySpendProposals = async () => {
@@ -1669,18 +2027,14 @@ const congressApproveTreasurySpend = async (proposalId, walletAddress) => {
   const api = await getApi();
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.treasury.approveProposal(proposalId);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const congressUnapproveTreasurySpend = async (proposalId, walletAddress) => {
   const api = await getApi();
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.treasury.removeApproval(proposalId);
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const closeCongressMotion = async (proposalHash, index, walletAddress) => {
@@ -1718,7 +2072,7 @@ const congressProposeReferendum = async (
       len: referendumProposal.encodedLength,
     },
   };
-  const proposal = fastTrack
+  const proposalData = fastTrack
     ? api.tx.utility.batchAll([
       api.tx.democracy.externalPropose(lookup),
       api.tx.democracy.fastTrack(
@@ -1731,7 +2085,9 @@ const congressProposeReferendum = async (
 
   const threshold = await congressMajorityThreshold();
 
-  const proposeAndVote = await createProposalAndVote(threshold, proposal, true);
+  const [proposal, voteAye] = await createProposalAndVote(threshold, proposalData, true);
+
+  const proposeAndVote = threshold === 1 ? [proposal] : [proposal, voteAye];
   // eslint-disable-next-line max-len
   const existingPreimage = await api.query.preimage.preimageFor([referendumProposal.hash, referendumProposal.encodedLength]);
   const extrinsic = api.tx.utility.batchAll(
@@ -1850,10 +2206,7 @@ const congressSendTreasuryLld = async (transferToAddress, transferAmount, wallet
 
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.treasury.spend(transferAmount, transferToAddress);
-
-  const extrinsics = await createProposalAndVote(threshold, proposal, true);
-  const extrinsic = api.tx.utility.batchAll(extrinsics);
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const getPalletIds = async () => {
@@ -1868,9 +2221,7 @@ const congressDemocracyBlacklist = async (proposalHash, referendumIndex, walletA
 
   const threshold = await congressMajorityThreshold();
   const proposal = api.tx.democracy.blacklist(proposalHash, referendumIndex ?? null);
-
-  const extrinsic = api.tx.utility.batchAll(await createProposalAndVote(threshold, proposal, true));
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const proposeAmendLegislation = async (
@@ -1921,8 +2272,7 @@ const congressAmendLegislation = async (tier, id, section, content, walletAddres
   const threshold = await congressMajorityThreshold();
   const witness = await api.query.liberlandLegislation.legislationVersion(tier, id, section);
   const proposal = api.tx.liberlandLegislation.amendLegislation(tier, id, section, content, witness);
-  const extrinsic = api.tx.utility.batchAll(await createProposalAndVote(threshold, proposal, true));
-  return submitExtrinsic(extrinsic, walletAddress, api);
+  return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
 const congressAmendLegislationViaReferendum = async (
@@ -1978,6 +2328,23 @@ const decodeCall = async (bytes) => {
   return api.createType('Call', bytes);
 };
 
+const getPreImage = async (preimageId, len) => {
+  const api = await getApi();
+  const preimageRaw = await api.query.preimage.preimageFor([preimageId, len]);
+  const preimage = preimageRaw.isSome ? await api.createType('Call', preimageRaw.unwrap()) : null;
+  return preimage;
+};
+
+const getSectionType = (origin) => {
+  if (origin?.isSystem && origin.asSystem.isSigned) {
+    return 'congress';
+  }
+  if ((origin?.isSystem && origin.asSystem.isRoot) || (origin?.isDemocracy && origin.asDemocracy.isReferendum)) {
+    return 'democracy';
+  }
+  return null;
+};
+
 const getScheduledCalls = async () => {
   const api = await getApi();
   const agendaEntries = await api.query.scheduler.agenda.entries();
@@ -1989,31 +2356,50 @@ const getScheduledCalls = async () => {
         call,
       }))
       .filter((item) => item.call.isSome)
-      .map((item) => ({
-        ...item,
-        call: item.call.unwrap(),
-      })))
-    .filter((item) => item.call.call.isLookup // our FE only does lookups now
-      && item.call.maybePeriodic.isNone); // we're interested only in referendum results, so nonperiodic
+      .map((item) => {
+        const call = item.call.unwrap();
+        const sectionType = getSectionType(call.origin);
 
+        return {
+          ...item,
+          call,
+          sectionType,
+        };
+      }));
+
+  const lookupItems = agendaItems.filter((item) => item.call.call.isLookup
+      && item.call.maybePeriodic.isNone);
+  // we're interested only in referendum results, so nonperiodic
   // we only want do download small preimages. fetching multi-megabyte setCode could be painful.
-  const bigAgendaItems = agendaItems.filter((item) => item.call.call.asLookup.len > 10240);
-  const smallAgendaItems = agendaItems.filter((item) => item.call.call.asLookup.len <= 10240);
+  const bigAgendaItems = lookupItems.filter((item) => item.call.call.asLookup.len > 10240);
+  const smallAgendaItems = lookupItems.filter((item) => item.call.call.asLookup.len <= 10240);
 
   const preimageIds = smallAgendaItems.map((item) => ([item.call.call.asLookup.hash_, item.call.call.asLookup.len]));
   const preimagesRaw = await api.query.preimage.preimageFor.multi(preimageIds);
   const preimages = preimagesRaw.map((raw) => (raw.isSome ? api.createType('Call', raw.unwrap()) : null));
 
-  return [
+  const lookupItemsData = [
     ...bigAgendaItems.map((item) => ({
       ...item,
       preimage: null,
+      needCallPreImage: true,
     })),
     ...smallAgendaItems.map((item, idx) => ({
       ...item,
       preimage: preimages[idx],
     })),
   ];
+
+  const inlineItems = agendaItems
+    .filter((item) => item.call.call.isInline && item.call.maybePeriodic.isNone)
+    .map((item) => {
+      const { call } = item;
+      return {
+        ...item,
+        proposal: api.createType('Call', call.call.asInline),
+      };
+    });
+  return [...lookupItemsData, ...inlineItems];
 };
 
 const requestUnregisterCompanyRegistration = async (companyId, walletAddress) => {
@@ -2116,7 +2502,7 @@ const getLpTokensOwnedByAddress = async (lpTokenId, address) => {
     return null;
   }
   const tokens = maybeTokens.unwrapOrDefault();
-  const balance = tokens.balance.toString();
+  const { balance } = tokens;
   return { balance };
 };
 
@@ -2145,8 +2531,9 @@ const getDexPools = async (walletAddress) => {
         assetData1,
         assetData2,
         lpToken: lpTokenTransform,
-        lpTokensBalance: lpTokensValue?.balance || 0,
+        lpTokensBalance: lpTokensValue?.balance || BN_ZERO,
         reserved,
+        isStock: assetData1?.isStock || assetData2?.isStock || false,
       };
     }));
     return { poolsData, assetsPoolData };
@@ -2177,6 +2564,12 @@ const swapExactTokensForTokens = async (path, amountIn, amountOutMin, sendTo, wa
     sendTo,
     true,
   );
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const createNewPool = async (aAsset, bAsset, walletAddress) => {
+  const api = await getApi();
+  const extrinsic = api.tx.assetConversion.createPool(aAsset, bAsset);
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
@@ -2378,6 +2771,324 @@ const getStakingData = async (walletAddress) => {
   return { stakingInfo, sessionProgress };
 };
 
+const getSenateMotions = async () => {
+  const api = await getApi();
+  const proposals = await api.query.senate.proposals();
+
+  return Promise.all(
+    proposals.map(async (proposal) => {
+      const [proposalOf, voting, members] = await api.queryMulti([
+        [api.query.senate.proposalOf, proposal],
+        [api.query.senate.voting, proposal],
+        [api.query.senate.members],
+      ]);
+      const votes = getVotesList(voting);
+
+      const senateProposalHash = proposalOf.hash.toHex();
+      return {
+        proposal,
+        proposalOf,
+        voting,
+        votes,
+        hash: senateProposalHash,
+        membersCount: members.length,
+      };
+    }),
+  ).then((motions) => motions.filter(Boolean));
+};
+
+const matchScheduledWithSenateMotions = async () => {
+  const [senateMotions, sheduledMotions] = await Promise.all([getSenateMotions(), getScheduledCalls()]);
+
+  const motions = senateMotions.map((motion) => {
+    const { proposalOf } = motion;
+
+    const unwrappedProposalOf = proposalOf.unwrap();
+    if (unwrappedProposalOf.method === 'cancel' && unwrappedProposalOf.section === 'scheduler') {
+      const blockNumber = proposalOf.value.args[0].toString();
+      const matchingScheduledCall = sheduledMotions.find(
+        (scheduled) => scheduled.blockNumber.toString() === blockNumber,
+      );
+      if (!matchingScheduledCall) {
+        return { ...motion, proposalOf: unwrappedProposalOf };
+      }
+      const proposalData = { method: unwrappedProposalOf.method, section: unwrappedProposalOf.section };
+      const proposalWithDetails = {
+        ...proposalData, args: matchingScheduledCall?.preimage || matchingScheduledCall?.proposal,
+      };
+      return { ...motion, proposalOf: proposalWithDetails };
+    }
+    return { ...motion, proposalOf: unwrappedProposalOf };
+  });
+  return motions;
+};
+
+const getSenateMembers = async () => {
+  const api = await getApi();
+  return api.query.senate.members();
+};
+
+const senateProposeCancel = async (walletAddress, idx, executionBlock) => {
+  const api = await getApi();
+  const threshold = await senateMajorityThreshold();
+  const executeProposal = api.tx.scheduler.cancel(executionBlock, idx);
+  const [proposal, voteAye] = await createSenateProposalAndVote(threshold, executeProposal, true);
+
+  if (threshold === 1) {
+    return submitExtrinsic(proposal, walletAddress, api);
+  }
+
+  const extrinsic = api.tx.utility.batchAll([proposal, voteAye]);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const closeSenateMotion = async (proposalHash, index, walletAddress) => {
+  const api = await getApi();
+  const proposal = await api.query.senate.proposalOf(proposalHash);
+  const { weight: weightBound } = await api.tx(proposal.unwrap()).paymentInfo(walletAddress);
+  const lengthBound = proposal.unwrap().toU8a().length;
+  return submitExtrinsic(api.tx.senate.close(proposalHash, index, weightBound, lengthBound), walletAddress, api);
+};
+
+const encodeRemarkUser = async (dataToEncode) => {
+  const api = await getApi();
+  const data = api.createType('RemarkInfoUser', dataToEncode);
+  return u8aToHex(pako.deflate(data.toU8a()));
+};
+
+const encodeRemark = async (dataToEncode) => {
+  const api = await getApi();
+  const data = api.createType('RemarkInfo', dataToEncode);
+  return u8aToHex(pako.deflate(data.toU8a()));
+};
+
+const decodeRemark = async (dataToEncode) => {
+  const api = await getApi();
+  const encodedData = dataToEncode.toHex();
+  const compressedData = hexToU8a(encodedData);
+  const decompressed = pako.inflate(compressedData);
+  const remarkInfo = api.createType('RemarkInfo', decompressed);
+
+  return remarkInfo;
+};
+
+const decoder = new TextDecoder();
+
+function processData(data) {
+  const decodedData = decoder.decode(data);
+  try {
+    return JSON.parse(decodedData);
+  } catch (e) {
+    return { name: decodedData };
+  }
+}
+const getIpfsHash = (ipfsUrl) => {
+  if (ipfsUrl.startsWith('ipfs://')) {
+    return ipfsUrl.split('/').pop();
+  }
+  return null;
+};
+
+const getMetadataWithoutPinata = (ipfsUrl) => {
+  const decoded = JSON.parse(ipfsUrl);
+  return decoded;
+};
+
+async function processUrlData(ipfsUrl, json = true) {
+  try {
+    const ipfsHash = getIpfsHash(ipfsUrl);
+    if (!ipfsHash) {
+      return getMetadataWithoutPinata(ipfsUrl);
+    }
+    const url = `https://${process.env.REACT_APP_PINATA_GATEWAY}/ipfs/${ipfsHash}`;
+    const response = await fetch(url, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch IPFS data: ${response.status} ${response.statusText}`);
+    }
+    return json ? await response.json() : response;
+  } catch (error) {
+    return null;
+  }
+}
+
+async function checkUserCollection(userAddress) {
+  const api = await getApi();
+  const collectionKeys = await api.query.nfts.account.entries(userAddress);
+  const collectionIds = [];
+  const nftIds = [];
+
+  collectionKeys.forEach(([key]) => {
+    const [collectionId, nftId] = key.args.slice(1);
+    collectionIds.push(collectionId.toString());
+    nftIds.push(nftId.toString());
+  });
+  return [collectionIds, nftIds];
+}
+
+const getAllNfts = async (walletAddress, onlyForSale) => {
+  const api = await getApi();
+  const nftEntries = await api.query.nfts.item.entries();
+
+  const collectionIds = nftEntries.map(([key]) => key.args[0].toString());
+  const nftIds = nftEntries.map(([key]) => key.args[1].toString());
+
+  const [userCollectionIds, userNftIds] = await checkUserCollection(walletAddress);
+
+  const [collectionMetadata, itemMetadata] = await Promise.all([
+    api.query.nfts.collectionMetadataOf.multi(collectionIds),
+    api.query.nfts.itemMetadataOf.multi(collectionIds.map((id, index) => [id, nftIds[index]])),
+  ]);
+
+  const nftDetails = await Promise.all(
+    nftEntries.map(async ([key], index) => {
+      const [collectionId, nftId] = key.args;
+
+      const collectionDataOpt = collectionMetadata[index];
+      const collectionMetadataUnwrapped = collectionDataOpt.isNone ? null : collectionDataOpt.unwrap();
+
+      const itemDataOpt = itemMetadata[index];
+      const itemMetadataUnwrapped = itemDataOpt.isNone ? null : itemDataOpt.unwrap();
+      const processedItemData = itemMetadataUnwrapped
+        ? await processUrlData(decoder.decode(itemMetadataUnwrapped.data))
+        : null;
+
+      const itemPriceOpt = await api.query.nfts.itemPriceOf(collectionId, nftId);
+      const itemPrice = itemPriceOpt.isNone ? null : itemPriceOpt.unwrap()[0].toString();
+      const imageUrl = processedItemData?.image || processedItemData?.imageUrl;
+      const image = imageUrl ? await processUrlData(imageUrl, false) : null;
+
+      if (onlyForSale && !itemPrice) {
+        return null;
+      }
+
+      const isUserNft = userCollectionIds.includes(collectionId.toString())
+                        && userNftIds.includes(nftId.toString());
+
+      return {
+        collectionId: collectionId.toString(),
+        nftId: nftId.toString(),
+        isUserNft,
+        collectionMetadata: {
+          name: collectionMetadataUnwrapped?.name?.toString(),
+        },
+        itemMetadata: {
+          ...processedItemData,
+          image: image?.url || imageUrl,
+          itemPrice,
+        },
+      };
+    }),
+  );
+
+  return nftDetails.filter((detail) => detail !== null);
+};
+
+const getUserNfts = async (walletAddress) => {
+  const api = await getApi();
+
+  const [collectionIds, nftIds] = await checkUserCollection(walletAddress);
+
+  const [collectionMetadata, itemMetadata] = await Promise.all([
+    api.query.nfts.collectionMetadataOf.multi(collectionIds),
+    api.query.nfts.itemMetadataOf.multi(collectionIds.map((id, index) => [id, nftIds[index]])),
+  ]);
+
+  const nftDetails = await Promise.all(
+    collectionIds.map(async (collectionId, index) => {
+      const collectionDataOpt = collectionMetadata[index];
+      const itemDataOpt = itemMetadata[index];
+      const collectionData = collectionDataOpt.isNone ? null : collectionDataOpt.unwrap();
+      const itemData = itemDataOpt.isNone ? null : itemDataOpt.unwrap();
+      const processedCollectionData = collectionData ? processData(collectionData.data) : null;
+      const processedItemData = itemData ? await processUrlData(decoder.decode(itemData.data)) : null;
+      const imageUrl = processedItemData?.image || processedItemData?.imageUrl;
+      const image = imageUrl ? await processUrlData(imageUrl, false) : null;
+
+      const itemPriceOpt = await api.query.nfts.itemPriceOf(collectionId, nftIds[index]);
+      const itemPrice = itemPriceOpt.isNone ? null : itemPriceOpt.unwrap()[0].toString();
+      return {
+        collectionId,
+        nftId: nftIds[index],
+        collectionMetadata: {
+          name: processedCollectionData?.name,
+        },
+        itemMetadata: {
+          ...processedItemData,
+          image: image?.url || imageUrl,
+          itemPrice,
+        },
+      };
+    }),
+  );
+
+  return nftDetails;
+};
+
+async function getUserCollection(walletAddress) {
+  const api = await getApi();
+
+  const collectionKeys = await api.query.nfts.collectionAccount.keys(walletAddress);
+
+  const collections = collectionKeys.map(({ args: [address, collectionId] }) => ({
+    address: address.toString(),
+    collectionId: collectionId.toNumber(),
+  }));
+
+  return collections;
+}
+
+async function createCollectionNfts(admin, config, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.create(admin, config);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function mintNFT(collectionId, itemId, mintTo, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.mint(collectionId, itemId, mintTo, null);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function destroyNFT(collectionId, itemId, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.burn(collectionId, itemId);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function setMetadataNFT(collectionId, itemId, metadataCID, walletAddress) {
+  const api = await getApi();
+  const metadata = `ipfs://${metadataCID}`;
+  const extrinsic = api.tx.nfts.setMetadata(collectionId, itemId, metadata);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function setAttributes(collectionId, itemId, namespace, key, value, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.setAttribute(collectionId, itemId, namespace, key, value);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function sellNFT(collectionId, itemId, price, walletAddress) {
+  const api = await getApi();
+  const buyer = api.createType('Option<MultiAddress>', null);
+  const extrinsic = api.tx.nfts.setPrice(collectionId, itemId, price, buyer);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function bidNFT(collectionId, itemId, bidPrice, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.buyItem(collectionId, itemId, bidPrice);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
+async function transferNFT(collectionId, itemId, newOwner, walletAddress) {
+  const api = await getApi();
+  const extrinsic = api.tx.nfts.transfer(collectionId, itemId, newOwner);
+  return submitExtrinsic(extrinsic, walletAddress, api);
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -2438,8 +3149,6 @@ export {
   stakingBondExtra,
   getMotions,
   voteAtMotions,
-  congressSendLlm,
-  congressSendLlmToPolitipool,
   stakingUnbond,
   stakingWithdrawUnbonded,
   subscribeActiveEra,
@@ -2498,4 +3207,38 @@ export {
   createContract,
   getSignaturesForContracts,
   getStakingData,
+  congressSenateSendLlm,
+  congressSenateSendLld,
+  congressSenateSendLlmToPolitipool,
+  congressSenateSendAssets,
+  getSenateMotions,
+  getSenateMembers,
+  senateVoteAtMotions,
+  closeSenateMotion,
+  senateProposeCancel,
+  getPreImage,
+  congressProposeBudget,
+  encodeRemark,
+  decodeRemark,
+  getUserNfts,
+  createCollectionNfts,
+  mintNFT,
+  destroyNFT,
+  setMetadataNFT,
+  setAttributes,
+  sellNFT,
+  bidNFT,
+  transferNFT,
+  getAllNfts,
+  getUserCollection,
+  matchScheduledWithSenateMotions,
+  createNewPool,
+  getAssetDetails,
+  createOrUpdateAsset,
+  mintAsset,
+  transferWithRemark,
+  encodeRemarkUser,
+  getClerksMinistryFinance,
+  updateValidate,
+  getValidator,
 };

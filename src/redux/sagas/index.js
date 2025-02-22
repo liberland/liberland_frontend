@@ -12,6 +12,11 @@ import * as congressSagas from './congress';
 import * as onboardingSagas from './onboarding';
 import * as dexSagas from './dex';
 import * as contractsSagas from './contracts';
+import * as senateSagas from './senate';
+import * as nftsSagas from './nfts';
+import * as ethSagas from './eth';
+import * as financesSagas from './finances';
+import * as ministryFinanceSagas from './ministryFinance';
 
 export default function* rootSaga() {
   yield all([
@@ -40,6 +45,10 @@ export default function* rootSaga() {
     walletSagas.getTransfersTxWatcher(),
     walletSagas.getAdditionalAssetsWatcher(),
     walletSagas.getAssetsBalanceWatcher(),
+    walletSagas.getAssetDetailsWatcher(),
+    walletSagas.sendTransferWithRemarkWatcher(),
+    walletSagas.createOrUpdateAssetWatcher(),
+    walletSagas.mintAssetWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),
@@ -60,6 +69,7 @@ export default function* rootSaga() {
     // IDENTITY
     identitySagas.setIdentityWatcher(),
     identitySagas.getIdentityWatcher(),
+    identitySagas.getIdentityMotionsWatcher(),
 
     // OFFICES
     officesSagas.getIdentityWatcher(),
@@ -71,6 +81,7 @@ export default function* rootSaga() {
     officesSagas.getPalletIdsWatcher(),
     officesSagas.unregisterCompanyWatcher(),
     officesSagas.setRegisteredCompanyDataWatcher(),
+    officesSagas.getPendingAdditionalMeritsWatcher(),
 
     // REGISTRIES
     registriesSagas.getOfficialRegistryEntriesWatcher(),
@@ -98,6 +109,7 @@ export default function* rootSaga() {
     validatorSagas.unbondWatcher(),
     validatorSagas.withdrawUnbondedWatcher(),
     validatorSagas.getStakingDataWatcher(),
+    validatorSagas.updateCommissionWatcher(),
 
     // CONGRESS
     congressSagas.applyForCongressWatcher(),
@@ -112,6 +124,8 @@ export default function* rootSaga() {
     congressSagas.congressRepealLegislationWatcher(),
     congressSagas.congressSendLlmToPolitipoolWatcher(),
     congressSagas.congressSendLlmWatcher(),
+    congressSagas.congressSendLldWatcher(),
+    congressSagas.congressSendAssetsTransferWatcher(),
     congressSagas.congressSendTreasuryLldWatcher(),
     congressSagas.getCandidatesWatcher(),
     congressSagas.getMembersWatcher(),
@@ -121,6 +135,10 @@ export default function* rootSaga() {
     congressSagas.renounceCandidacyWatcher(),
     congressSagas.unapproveTreasurySpendWatcher(),
     congressSagas.voteAtMotionsWatcher(),
+    congressSagas.getWalletWatcher(),
+    congressSagas.getAllBalanceForCongressWatcher(),
+    congressSagas.congressBudgetProposeWatcher(),
+    congressSagas.congressSpendingWatcher(),
 
     // ONBOARDING
     onboardingSagas.claimComplimentaryLLDWatcher(),
@@ -144,5 +162,59 @@ export default function* rootSaga() {
     contractsSagas.getSingleContractWatcher(),
     contractsSagas.createContractWatcher(),
     contractsSagas.getSignaturesForContractsWatcher(),
+
+    // SENATE
+    senateSagas.getSenateMotionsWatcher(),
+    senateSagas.getWalletWatcher(),
+    senateSagas.getAdditionalAssetsWatcher(),
+    senateSagas.senateSendLldWatcher(),
+    senateSagas.senateSendLlmToPolitipoolWatcher(),
+    senateSagas.senateSendLlmWatcher(),
+    senateSagas.senateSendAssetsTransferWatcher(),
+    senateSagas.closeMotionWatcher(),
+    senateSagas.voteAtMotionsWatcher(),
+    senateSagas.getScheduledCongressSpendingWatcher(),
+    senateSagas.proposeCloseMotionWatcher(),
+    senateSagas.getSenateMembersWatcher(),
+
+    // NFTS
+    nftsSagas.getUserNftsWatcher(),
+
+    // ETH
+    ethSagas.getWalletOptionsWatcher(),
+    ethSagas.getWalletConnectingWatcher(),
+    ethSagas.tokenStakeContractInfoWatcher(),
+    ethSagas.tokenStakeAddressInfoWatcher(),
+    ethSagas.erc20InfoWatcher(),
+    ethSagas.erc20BalanceWatcher(),
+    ethSagas.getWethExchangeRateWatcher(),
+    ethSagas.getBalanceWatcher(),
+    ethSagas.withdrawTokensWatcher(),
+    ethSagas.stakeLpWithEthWatcher(),
+    ethSagas.stakeTokensWatcher(),
+    ethSagas.claimRewardsWatcher(),
+
+    // FINANCES
+    financesSagas.getFinancesWatcher(),
+    nftsSagas.createCollectionWatcher(),
+    nftsSagas.mintNftWatcher(),
+    nftsSagas.destroyNftWatcher(),
+    nftsSagas.setMetadataWatcher(),
+    nftsSagas.setAttributesWatcher(),
+    nftsSagas.sellNftWatcher(),
+    nftsSagas.bidNftWatcher(),
+    nftsSagas.transferNftWatcher(),
+    nftsSagas.getUserCollectionstWatcher(),
+    nftsSagas.getNftsWatcher(),
+    nftsSagas.getNftsOnSaleWatcher(),
+
+    // MINISTRY FINANCE
+    ministryFinanceSagas.getWalletWatcher(),
+    ministryFinanceSagas.getAdditionalAssetsWatcher(),
+    ministryFinanceSagas.sendAssetsTransferWatcher(),
+    ministryFinanceSagas.sendLldWatcher(),
+    ministryFinanceSagas.sendLlmToPolitipoolWatcher(),
+    ministryFinanceSagas.sendLlmWatcher(),
+    ministryFinanceSagas.ministryOfFinanceSpendingWatcher(),
   ]);
 }

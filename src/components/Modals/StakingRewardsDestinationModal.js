@@ -1,78 +1,78 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
+import Flex from 'antd/es/flex';
+import Select from 'antd/es/select';
+import Title from 'antd/es/typography/Title';
 import PropTypes from 'prop-types';
-
 import { useDispatch, useSelector } from 'react-redux';
-import ModalRoot from './ModalRoot';
-import { SelectInput } from '../InputComponents';
 import Button from '../Button/Button';
-
-import styles from './styles.module.scss';
 import { validatorActions } from '../../redux/actions';
 import { validatorSelectors } from '../../redux/selectors';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function StakingRewardsDestinationModal({
-  closeModal,
+function StakingRewardsDestinationForm({
+  onClose,
 }) {
   const dispatch = useDispatch();
   const payee = useSelector(validatorSelectors.payee);
 
-  const {
-    handleSubmit,
-    register,
-  } = useForm({
-    defaultValues: {
-      payee: payee.toString(),
-    },
-  });
+  const [form] = Form.useForm();
 
   const onSubmit = (values) => {
     dispatch(validatorActions.setPayee.call(values));
-    closeModal();
+    onClose();
   };
 
   return (
-    <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
-      <div className={styles.h3}>Change staking rewards destination</div>
-
-      <div className={styles.title}>New destination</div>
-      <SelectInput
-        register={register}
+    <Form
+      onFinish={onSubmit}
+      form={form}
+      layout="vertical"
+      initialValues={{
+        payee: payee.toString(),
+      }}
+    >
+      <Title level={3}>Change staking rewards destination</Title>
+      <Form.Item
+        label="New destination"
         name="payee"
-        options={[
-          { value: 'Staked', display: 'Increase stake' },
-          { value: 'Stash', display: 'Deposit in the account (without staking)' },
-          { value: 'Controller', display: 'Controller (deprecated)' },
-        ]}
-      />
-
-      <div className={styles.buttonWrapper}>
+      >
+        <Select
+          options={[
+            { value: 'Staked', label: 'Increase stake' },
+            { value: 'Stash', label: 'Deposit in the account (without staking)' },
+            { value: 'Controller', label: 'Controller (deprecated)' },
+          ]}
+        />
+      </Form.Item>
+      <Flex wrap gap="15px">
         <Button
-          medium
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
         <Button
           primary
-          medium
           type="submit"
         >
           Change destination
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
-StakingRewardsDestinationModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+StakingRewardsDestinationForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-export default function StakingRewardsDestinationModalWrapper(props) {
+function ButtonModal(props) {
   return (
-    <ModalRoot>
-      <StakingRewardsDestinationModal {...props} />
-    </ModalRoot>
+    <OpenModalButton text="Change destination" {...props} />
   );
 }
+
+const StakingRewardsDestinationModal = modalWrapper(StakingRewardsDestinationForm, ButtonModal);
+
+export default StakingRewardsDestinationModal;

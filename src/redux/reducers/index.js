@@ -15,6 +15,11 @@ import congressReducer from './congress';
 import onboardingReducer from './onboarding';
 import dexReducer from './dex';
 import contractsReducer from './contracts';
+import senateReducer from './senate';
+import nftsReducer from './nfts';
+import ethReducer from './eth';
+import financesReducer from './finances';
+import ministryFinanceReducer from './ministryFinance';
 
 const rootReducer = combineReducers({
   user: userReducer,
@@ -33,6 +38,11 @@ const rootReducer = combineReducers({
   onboarding: onboardingReducer,
   dex: dexReducer,
   contracts: contractsReducer,
+  senate: senateReducer,
+  nfts: nftsReducer,
+  eth: ethReducer,
+  finances: financesReducer,
+  ministryFinance: ministryFinanceReducer,
 });
 
 export default rootReducer;

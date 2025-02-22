@@ -1,15 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cx from 'classnames';
-
+import ButtonInternal from 'antd/es/button';
 import styles from './styles.module.scss';
 
 function Button({
   children,
   type = 'button',
   primary,
-  onClick = () => { },
-  medium,
+  onClick,
   large,
   little,
   small,
@@ -20,58 +19,76 @@ function Button({
   grey,
   red,
   whiteRed,
+  flex,
   disabled,
+  multiline,
+  href,
+  link,
+  newTab,
 }) {
-  return (
-    <button
-      disabled={disabled}
-      onClick={onClick}
-      type={type}
-      className={
-      cx(styles.button, className, {
-        [styles.primary]: primary,
-        [styles.secondary]: secondary,
-        [styles.medium]: medium,
-        [styles.large]: large,
-        [styles.little]: little,
-        [styles.small]: small,
-        [styles.nano]: nano,
-        [styles.green]: green,
-        [styles.grey]: grey,
-        [styles.red]: red,
-        [styles.whiteRed]: whiteRed,
-      })
+  const getSize = () => {
+    if (large) {
+      return 'large';
     }
+    if (small) {
+      return 'small';
+    }
+    return undefined;
+  };
+
+  const getType = () => {
+    if (primary) {
+      return 'primary';
+    }
+    if (link) {
+      return 'link';
+    }
+    return undefined;
+  };
+
+  const getOnClick = () => {
+    if (href && onClick) {
+      return (e) => {
+        e.preventDefault();
+        onClick(e);
+      };
+    }
+    return onClick;
+  };
+
+  return (
+    <ButtonInternal
+      disabled={disabled}
+      onClick={getOnClick()}
+      htmlType={type}
+      type={getType()}
+      target={newTab ? '_blank' : undefined}
+      href={href}
+      danger={red}
+      size={getSize()}
+      className={
+        cx(styles.button, className, {
+          [styles.secondary]: secondary,
+          [styles.little]: little,
+          [styles.nano]: nano,
+          [styles.green]: green,
+          [styles.grey]: grey,
+          [styles.whiteRed]: whiteRed,
+          [styles.flex]: flex,
+          [styles.multiline]: multiline,
+        })
+      }
     >
       {children}
-    </button>
+    </ButtonInternal>
   );
 }
-
-Button.defaultProps = {
-  type: 'button',
-  primary: false,
-  onClick: () => {},
-  medium: false,
-  large: false,
-  little: false,
-  small: false,
-  nano: false,
-  className: '',
-  secondary: false,
-  green: false,
-  grey: false,
-  red: false,
-  whiteRed: false,
-  disabled: false,
-};
 
 Button.propTypes = {
   children: PropTypes.node.isRequired,
   type: PropTypes.string,
   primary: PropTypes.bool,
   onClick: PropTypes.func,
-  medium: PropTypes.bool,
   large: PropTypes.bool,
   little: PropTypes.bool,
   small: PropTypes.bool,
@@ -83,6 +100,11 @@ Button.propTypes = {
   red: PropTypes.bool,
   whiteRed: PropTypes.bool,
   disabled: PropTypes.bool,
+  flex: PropTypes.bool,
+  href: PropTypes.string,
+  multiline: PropTypes.bool,
+  link: PropTypes.bool,
+  newTab: PropTypes.bool,
 };
 
 export default Button;

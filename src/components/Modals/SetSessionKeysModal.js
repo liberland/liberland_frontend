@@ -1,63 +1,74 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Flex from 'antd/es/flex';
+import Input from 'antd/es/input';
+import PropTypes from 'prop-types';
 import { isHex } from '@polkadot/util';
-import ModalRoot from './ModalRoot';
-import { TextInput } from '../InputComponents';
 import Button from '../Button/Button';
+import modalWrapper from './components/ModalWrapper';
+import OpenModalButton from './components/OpenModalButton';
 
-import styles from './styles.module.scss';
-
-function SetSessionKeysModal({
-  // eslint-disable-next-line react/prop-types
-  onSubmit, closeModal,
+function SetSessionKeysForm({
+  onSubmit, onClose,
 }) {
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm({ mode: 'all' });
+  const [form] = Form.useForm();
 
   return (
-    <form className={styles.getCitizenshipModal} onSubmit={handleSubmit(onSubmit)}>
-      <div className={styles.h3}>Change session keys</div>
-
-      <div className={styles.title}>Session keys</div>
-      <TextInput
-        register={register}
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={(values) => {
+        onSubmit(values);
+        onClose();
+      }}
+    >
+      <Title level={3}>Change session keys</Title>
+      <Form.Item
+        label="Session keys"
         name="keys"
-        errorTitle="keys"
-        validate={(v) => {
-          if (!isHex(v)) return 'Must be a hex string starting with 0x';
-          return v.length === 258 || 'Invalid length';
-        }}
-        required
-      />
-      { errors?.keys?.message
-        && <div className={styles.error}>{errors.keys.message}</div>}
-
-      <div className={styles.buttonWrapper}>
+        rules={[
+          { required: true },
+          {
+            validator: (_, v) => {
+              if (!isHex(v)) {
+                return Promise.reject('Must be a hex string starting with 0x');
+              }
+              return v.length === 258 ? Promise.resolve() : Promise.reject('Invalid length');
+            },
+          },
+        ]}
+      >
+        <Input />
+      </Form.Item>
+      <Flex wrap gap="15px">
         <Button
-          medium
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
         <Button
           primary
-          medium
           type="submit"
         >
           Change session keys
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
-export default function SetSessionKeysModalWrapper(props) {
+SetSessionKeysForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+};
+
+function ButtonModal(props) {
   return (
-    <ModalRoot>
-      <SetSessionKeysModal {...props} />
-    </ModalRoot>
+    <OpenModalButton primary text="Change session keys" {...props} />
   );
 }
+
+const ProposeBudgetModal = modalWrapper(SetSessionKeysForm, ButtonModal);
+
+export default ProposeBudgetModal;

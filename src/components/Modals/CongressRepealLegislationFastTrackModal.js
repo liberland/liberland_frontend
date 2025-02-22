@@ -1,42 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Flex from 'antd/es/flex';
+import Popconfirm from 'antd/es/popconfirm';
 import { useDispatch } from 'react-redux';
-import ModalRoot from './ModalRoot';
-import { TextInput, SelectInput } from '../InputComponents';
+import dayjs from 'dayjs';
 import Button from '../Button/Button';
-import styles from './styles.module.scss';
 import { congressActions } from '../../redux/actions';
 import FastTrackForm, { FastTrackDefaults } from '../Congress/FastTrackForm';
 import { ProposalDiscussionFields } from '../Voting/Referendum/ProposalForms/ProposalDiscussionFields';
-import AgreeDisagreeModal from './AgreeDisagreeModal';
-import useAgreeDisagreeModal from '../../hooks/useAgreeDisagreeModal';
+import LegislationHeading from '../Congress/LegislationHeading';
 
-function CongressRepealLegislationFastTrackModal({
-  closeModal,
+function CongressRepealLegislationFastTrackForm({
+  onClose,
   tier,
   id,
   section,
 }) {
   const dispatch = useDispatch();
-  const {
-    handleSubmit,
-    formState: { errors, isValid },
-    register,
-    watch,
-    trigger,
-  } = useForm({
-    mode: 'onChange',
-    defaultValues: {
-      tier,
-      year: id.year,
-      index: id.index,
-      section,
-      ...FastTrackDefaults,
-    },
-  });
+  const [form] = Form.useForm();
 
   const onSubmitRepeal = ({
     discussionName,
@@ -45,6 +28,12 @@ function CongressRepealLegislationFastTrackModal({
     fastTrack,
     fastTrackVotingPeriod,
     fastTrackEnactmentPeriod,
+    index,
+    year,
+    // eslint-disable-next-line no-shadow
+    tier,
+    // eslint-disable-next-line no-shadow
+    section,
   }) => {
     dispatch(
       congressActions.congressProposeRepealLegislation.call({
@@ -52,114 +41,69 @@ function CongressRepealLegislationFastTrackModal({
         discussionDescription,
         discussionLink,
         tier,
-        id,
-        section,
+        id: {
+          index,
+          year: year.year(),
+        },
+        section: section || null,
         fastTrack,
         fastTrackVotingPeriod,
         fastTrackEnactmentPeriod,
       }),
     );
-    closeModal();
+    onClose();
   };
 
-  const { dialogStep, handleClick } = useAgreeDisagreeModal(isValid, trigger);
-
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmitRepeal)}
+    <Form
+      form={form}
+      layout="vertical"
+      initialValues={{
+        tier,
+        year: dayjs(new Date(id.year, 0, 1)),
+        index: parseInt(id.index) || 1,
+        section,
+        ...FastTrackDefaults,
+      }}
+      onFinish={onSubmitRepeal}
     >
-      {dialogStep === 'form' ? (
-        <>
-          <div className={styles.h3}>
-            Propose a Congress Motion - propose referendum for legislation
-            repeal
-          </div>
+      <Title level={3}>
+        Propose a Congress Motion - propose referendum for legislation
+        repeal
+      </Title>
 
-          <div className={styles.title}>Legislation Tier</div>
-          <SelectInput
-            register={register}
-            name="tier"
-            disabled
-            options={[
-              { value: 'InternationalTreaty', display: 'International Treaty' },
-              { value: 'Law', display: 'Law' },
-              { value: 'Tier3', display: 'Tier 3' },
-              { value: 'Tier4', display: 'Tier 4' },
-              { value: 'Tier5', display: 'Tier 5' },
-              { value: 'Decision', display: 'Decision' },
-            ]}
-          />
+      <LegislationHeading section={section} />
+      <ProposalDiscussionFields />
+      <FastTrackForm form={form} />
 
-          <div className={styles.title}>Legislation Year</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Year"
-            register={register}
-            name="year"
-            disabled
-          />
-
-          <div className={styles.title}>Legislation Index</div>
-          <TextInput
-            required
-            validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-            errorTitle="Index"
-            register={register}
-            name="index"
-            disabled
-          />
-
-          {section !== null && (
-            <>
-              <div className={styles.title}>Legislation Section</div>
-              <TextInput
-                required
-                validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-                errorTitle="Section"
-                register={register}
-                name="section"
-                disabled
-              />
-            </>
-          )}
-
-          <ProposalDiscussionFields {...{ register, errors }} />
-          <FastTrackForm {...{ register, errors, watch }} />
-
-          <div className={styles.buttonWrapper}>
-            <Button medium onClick={closeModal}>
-              Cancel
-            </Button>
-            <Button primary medium onClick={handleClick}>
-              Submit
-            </Button>
-          </div>
-        </>
-      ) : (
-        <AgreeDisagreeModal onDisagree={closeModal} agreeButtonType="submit" />
-      )}
-    </form>
+      <Flex wrap gap="15px">
+        <Button medium onClick={onClose}>
+          Cancel
+        </Button>
+        <Popconfirm
+          title="Confirm form submission"
+          description="This operation costs 100 LLD."
+          onConfirm={() => form.submit()}
+        >
+          <Button primary>
+            Submit
+          </Button>
+        </Popconfirm>
+      </Flex>
+    </Form>
   );
 }
 
-CongressRepealLegislationFastTrackModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+CongressRepealLegislationFastTrackForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
-    year: PropTypes.number.isRequired,
-    index: PropTypes.number.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    year: PropTypes.object.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    index: PropTypes.object.isRequired,
   }).isRequired,
-  section: PropTypes.string.isRequired,
+  section: PropTypes.number,
 };
 
-function CongressRepealLegislationFastTrackModalWrapper(props) {
-  return (
-    <ModalRoot>
-      <CongressRepealLegislationFastTrackModal {...props} />
-    </ModalRoot>
-  );
-}
-
-export default CongressRepealLegislationFastTrackModalWrapper;
+export default CongressRepealLegislationFastTrackForm;

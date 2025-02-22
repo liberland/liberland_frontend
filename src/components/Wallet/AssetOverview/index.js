@@ -1,72 +1,102 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import Card from '../../Card';
-
-import styles from './styles.module.scss';
+import Row from 'antd/es/row';
+import Col from 'antd/es/col';
+import Result from 'antd/es/result';
+import { useMediaQuery } from 'usehooks-ts';
 import { formatAssets } from '../../../utils/walletHelpers';
 import SendAssetModal from '../../Modals/SendAssetModal';
-import Button from '../../Button/Button';
+import styles from './styles.module.scss';
+import MoneyCard from '../../MoneyCard';
+import CurrencyIcon from '../../CurrencyIcon';
 
 function AssetOverview({
   additionalAssets,
+  isRemarkNeeded,
+  officeType,
+  userIsMember,
+  isCongress,
 }) {
-  const [whichModalOpen, setWhichModalOpen] = useState(null);
-  const handleModalOpenAssets = (symbol) => setWhichModalOpen(symbol);
-  const handleModalCloseAssets = () => setWhichModalOpen(null);
-  if (additionalAssets.length === 0) { return <div />; }
-  // Show only assets that the user owns
-  let filteredAssets = additionalAssets.filter(asset => asset?.balance?.balance > 0)
+  const filteredAssets = useMemo(
+    () => additionalAssets?.filter((asset) => asset?.balance?.balance > 0) || [],
+    [additionalAssets],
+  );
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
+  const renderItem = (assetData) => (
+    <MoneyCard
+      actions={!isCongress || userIsMember ? [
+        <SendAssetModal
+          isRemarkNeeded={isRemarkNeeded}
+          assetData={assetData}
+          officeType={officeType}
+          key="send"
+        />,
+      ] : undefined}
+      amount={(
+        <>
+          {formatAssets(
+            assetData.balance?.balance || '0',
+            assetData.metadata.decimals,
+            true,
+          )}
+          {' '}
+          {assetData.metadata.symbol}
+        </>
+      )}
+      title={(
+        <span className={styles.name}>
+          {assetData.metadata.name}
+        </span>
+      )}
+      alt={assetData.metadata.symbol}
+      icon={(
+        <CurrencyIcon size={22} symbol={assetData.metadata.symbol} />
+      )}
+    />
+  );
+
+  if (!filteredAssets.length) {
+    return (
+      <Result
+        status={404}
+        title="No additional assets found"
+      />
+    );
+  }
+
   return (
-    <Card className={styles.assetOverviewWrapper} title="Additional assets">
-      <div className={styles.assetOverViewCard}>
-        {
-          filteredAssets.map((assetInfo) => (
-            <div
-              className={styles.assetCardInfo}
-              key={assetInfo.metadata.symbol}
-            >
-              <p className={styles.assetCardInfoAmount}>
-                {assetInfo?.balance ? formatAssets(assetInfo.balance.balance, assetInfo.metadata.decimals) : 0}
-              </p>
-              <p className={styles.assetCardInfoTitle}>
-                {assetInfo.metadata.name}
-                {' '}
-                <span>
-                  (
-                  {assetInfo.metadata.symbol}
-                  )
-                </span>
-
-              </p>
-              <Button
-                className={styles.button}
-                small
-                primary
-                onClick={() => handleModalOpenAssets(assetInfo.metadata.symbol)}
-              >
-                <>
-                  SEND
-                  <span>
-                    {assetInfo.metadata.symbol}
-                  </span>
-                </>
-              </Button>
-              {whichModalOpen === assetInfo.metadata.symbol
-              && <SendAssetModal assetData={assetInfo} closeModal={handleModalCloseAssets} />}
-            </div>
-          ))
-        }
-      </div>
-
-    </Card>
+    <Row gutter={[16, 16]} wrap>
+      {filteredAssets.map((assetData) => (
+        <Col
+          span={isBiggerThanDesktop ? 6 : 24}
+          key={assetData.metadata.name}
+        >
+          {renderItem(assetData)}
+        </Col>
+      ))}
+    </Row>
   );
 }
+
 AssetOverview.defaultProps = {
   additionalAssets: [],
+  isRemarkNeeded: false,
+  userIsMember: false,
 };
 
 AssetOverview.propTypes = {
-  additionalAssets: PropTypes.array,
+  userIsMember: PropTypes.bool,
+  isCongress: PropTypes.bool,
+  officeType: PropTypes.string,
+  isRemarkNeeded: PropTypes.bool,
+  additionalAssets: PropTypes.arrayOf(PropTypes.shape({
+    metadata: PropTypes.shape({
+      symbol: PropTypes.string,
+      name: PropTypes.string,
+      decimals: PropTypes.string,
+    }),
+    balance: PropTypes.string,
+  })),
 };
 
 export default AssetOverview;

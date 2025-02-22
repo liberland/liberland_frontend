@@ -1,0 +1,34 @@
+@import '../../../../assets/base/variables';
+@import '../../../../assets/main';
+
+.error {
+  font-size: 16px;
+  color: $errorText;
+  font-weight: 500;
+}
+
+.detailContainer {
+  max-width: 800px;
+  @media screen and (min-width: map-get($breakpoints, 'desktop')){
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
+.tableContainer {
+  max-width: 600px;
+  flex-grow: 1;
+}
+
+.buttonContainer {
+  justify-self: end;
+  padding-top: 50px
+}
+
+.stakingContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+}

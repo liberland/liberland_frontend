@@ -1,44 +1,55 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
+import Flex from 'antd/es/flex';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Link from 'antd/es/typography/Link';
+import Collapse from 'antd/es/collapse';
 import WalletListComponent from '../WalletListComponent';
-import styles from '../styles.module.scss';
 import { userSelectors } from '../../../redux/selectors';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
 
 function MissingWalletComponent() {
   const registeredAddress = useSelector(userSelectors.selectWalletAddress);
-  const [showWallets, setShowWallets] = useState(false);
+
   return (
-    <div>
-      <h2>Missing wallet</h2>
-      <p>You already registered a wallet address but it is not available on this device</p>
-      <br />
-      <p>The address you registered is: </p>
-      <br />
-      <p className={styles.blockchainAddressContainer}>{registeredAddress}</p>
-      <br />
-      <p>Please log in with a browser or app that has this address available.</p>
-      <p>
-        Alternatively, you can register another address on
-        {' '}
-        <a href={process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}>liberland.org</a>
-        {' '}
-        or contact support.
-      </p>
-      <br />
-      <p>
-        If you are absolutely sure you want to change your wallet address to one available on this device
-        {' '}
-        <button onClick={() => setShowWallets(true)}>
-          <b>click here</b>
-        </button>
-      </p>
-      <br />
-      {showWallets && (
-      <div style={{ width: '100%' }}>
-        <WalletListComponent />
-      </div>
-      )}
-    </div>
+    <Flex vertical gap="20px">
+      <Flex vertical>
+        <Title level={2}>Missing wallet</Title>
+        <Paragraph>
+          You already registered a wallet address but it is not available on this device
+        </Paragraph>
+        <Paragraph>
+          The address you registered is:
+          <div className="description">
+            <CopyIconWithAddress address={registeredAddress} isTruncate />
+          </div>
+        </Paragraph>
+        <Paragraph>
+          Please log in with a browser or app that has this address available.
+        </Paragraph>
+        <Paragraph>
+          Alternatively, you can register another address on
+          {' '}
+          <Link href={process.env.REACT_APP_MAIN_LIBERLAND_WEBSITE}>liberland.org</Link>
+          {' '}
+          or contact support.
+        </Paragraph>
+        <Paragraph>
+          If you are absolutely sure you want to change your wallet address to one available on this device,
+          select wallet address from below
+        </Paragraph>
+      </Flex>
+      <Collapse
+        items={[{
+          key: 'wallets',
+          label: 'Wallets',
+          children: (
+            <WalletListComponent />
+          ),
+        }]}
+      />
+    </Flex>
   );
 }
 

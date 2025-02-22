@@ -12,6 +12,12 @@ import * as congressSelectors from './congress';
 import * as onboardingSelectors from './onboarding';
 import * as dexSelectors from './dex';
 import * as contractsSelectors from './contracts';
+import * as senateSelectors from './senate';
+import * as nftsSelectors from './nfts';
+import * as ethSelectors from './eth';
+import * as financesSelectors from './finances';
+import * as routeSelectors from './route';
+import * as ministryFinanceSelector from './ministryFinince';
 
 export {
   errorsSelectors,
@@ -28,4 +34,10 @@ export {
   onboardingSelectors,
   dexSelectors,
   contractsSelectors,
+  senateSelectors,
+  nftsSelectors,
+  ethSelectors,
+  financesSelectors,
+  routeSelectors,
+  ministryFinanceSelector,
 };

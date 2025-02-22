@@ -3,8 +3,35 @@ import { BN_ZERO } from '@polkadot/util';
 import { congressActions } from '../actions';
 
 const initialState = {
+  codeName: 'councilAccount',
+  walletInfo: {
+    balances: {
+      liberstake: {
+        amount: BN_ZERO,
+      },
+      polkastake: {
+        amount: 0,
+      },
+      liquidMerits: {
+        amount: 0,
+      },
+      totalAmount: {
+        amount: BN_ZERO,
+      },
+      liquidAmount: {
+        amount: BN_ZERO,
+      },
+      meritsTotalAmount: {
+        amount: 0,
+      },
+      electionLock: 0,
+    },
+  },
+  additionalAssets: [],
+  allBalance: [],
   candidates: [],
   loading: false,
+  unobtrusive: false,
   members: [],
   motions: [],
   runnersUp: [],
@@ -13,6 +40,7 @@ const initialState = {
     budget: BN_ZERO,
     period: BN_ZERO,
   },
+  congressSpending: null,
 };
 
 const congressReducer = handleActions(
@@ -36,9 +64,24 @@ const congressReducer = handleActions(
       congressActions.unapproveTreasurySpend.call,
       congressActions.congressDemocracyBlacklist.call,
       congressActions.renounceCandidacy.call,
+      congressActions.getAllBalanceForCongress.call,
+      congressActions.congressBudgetPropose.call,
+      congressActions.congressSpending.call,
     )]: (state) => ({
       ...state,
       loading: true,
+    }),
+    [combineActions(
+      congressActions.getCandidates.call,
+      congressActions.getMembers.call,
+      congressActions.getMotions.call,
+      congressActions.getRunnersUp.call,
+      congressActions.getTreasuryInfo.call,
+      congressActions.getAllBalanceForCongress.call,
+      congressActions.congressSpending.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
     }),
     [combineActions(
       congressActions.applyForCongress.failure,
@@ -66,9 +109,20 @@ const congressReducer = handleActions(
       congressActions.congressDemocracyBlacklist.success,
       congressActions.renounceCandidacy.failure,
       congressActions.renounceCandidacy.success,
+      congressActions.getAllBalanceForCongress.failure,
+      congressActions.getAllBalanceForCongress.success,
+      congressActions.congressBudgetPropose.failure,
+      congressActions.congressBudgetPropose.success,
+      congressActions.congressSpending.success,
+      congressActions.congressSpending.failure,
     )]: (state) => ({
       ...state,
       loading: false,
+      unobtrusive: false,
+    }),
+    [congressActions.getAllBalanceForCongress.success]: (state, action) => ({
+      ...state,
+      allBalance: action.payload,
     }),
     [congressActions.getCandidates.success]: (state, action) => ({
       ...state,
@@ -89,6 +143,18 @@ const congressReducer = handleActions(
     [congressActions.getTreasuryInfo.success]: (state, action) => ({
       ...state,
       treasury: action.payload,
+    }),
+    [congressActions.congressGetWallet.success]: (state, action) => ({
+      ...state,
+      walletInfo: action.payload,
+    }),
+    [congressActions.congressGetAdditionalAssets.success]: (state, action) => ({
+      ...state,
+      additionalAssets: action.payload,
+    }),
+    [congressActions.congressSpending.success]: (state, action) => ({
+      ...state,
+      congressSpending: action.payload,
     }),
   },
   initialState,

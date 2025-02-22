@@ -1,5 +1,5 @@
 import {
-  put, call, takeLatest, take,
+  put, call, takeLatest, take, race, delay,
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
@@ -60,21 +60,34 @@ export function* fetchPreimageWatcher() {
 }
 
 export function* subscribeWalletsSaga() {
+  let checkTimeout = true;
   const channel = eventChannel((emitter) => {
     const updateWallets = async () => {
       const extensions = await web3Enable('Liberland dApp');
       const wallets = await web3Accounts();
       emitter({ extensions, wallets });
     };
-    updateWallets();
+    setTimeout(updateWallets, 500);
     const interval = setInterval(updateWallets, 5000);
-    setTimeout(() => clearInterval(interval), 120000);
+    setTimeout(() => {
+      clearInterval(interval);
+      checkTimeout = false;
+    }, 120000);
     return () => clearInterval(interval);
   });
-
   while (true) {
-    const { extensions, wallets } = yield take(channel);
-    yield put(blockchainActions.setExtensions.value(extensions));
-    yield put(blockchainActions.setWallets.value(wallets));
+    const { data, timeout } = yield race({
+      data: take(channel),
+      timeout: delay(20000),
+    });
+    if (timeout && checkTimeout) {
+      yield put(blockchainActions.setExtensions.value([]));
+      yield put(blockchainActions.setWallets.value([]));
+    }
+    if (data) {
+      const { extensions, wallets } = data;
+      yield put(blockchainActions.setExtensions.value(extensions));
+      yield put(blockchainActions.setWallets.value(wallets));
+    }
   }
 }

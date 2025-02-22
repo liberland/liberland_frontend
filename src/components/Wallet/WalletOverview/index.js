@@ -1,104 +1,148 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-
-import { ReactComponent as ArrowYellowUpIcon } from '../../../assets/icons/arrow-yellow-up.svg';
-import { ReactComponent as ArrowYellowDownIcon } from '../../../assets/icons/arrow-yellow-down.svg';
-import { ReactComponent as ArrowRedDownIcon } from '../../../assets/icons/arrow-red-down.svg';
-import { ReactComponent as ArrowRedUpIcon } from '../../../assets/icons/arrow-red-up.svg';
-import { ReactComponent as ArrowBlueDownIcon } from '../../../assets/icons/arrow-blue-down.svg';
-import { ReactComponent as ArrowBlueUpIcon } from '../../../assets/icons/arrow-blue-up.svg';
-import Card from '../../Card';
-
+import React, { useEffect, useMemo, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import Collapse from 'antd/es/collapse';
+import Dropdown from 'antd/es/dropdown';
+import Flex from 'antd/es/flex';
+import Space from 'antd/es/space';
+import uniqBy from 'lodash/uniqBy';
+import { useMediaQuery } from 'usehooks-ts';
+import DownOutlined from '@ant-design/icons/DownOutlined';
+import uniq from 'lodash/uniq';
+import { isAddress } from '@polkadot/util-crypto';
+import BalanceOverview from '../BalanceOverview';
+import WalletTransactionHistory from '../WalletTransactionHistory';
+import AssetOverview from '../AssetOverview';
+import { identityActions, walletActions } from '../../../redux/actions';
+import { walletSelectors, blockchainSelectors, congressSelectors } from '../../../redux/selectors';
+import Button from '../../Button/Button';
+import { transactionHistoryProcessorFactory } from '../WalletTransactionHistory/utils';
+import RemarkTransferModal from '../RemarkTransferWrapper';
 import styles from './styles.module.scss';
-import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
+import WalletTransactionHistoryMobile from '../WalletTransactionHistoryMobile';
 
-function WalletOverview({
-  balances, liquidMerits,
-}) {
-  const overviewInfo = [
-    {
-      amount: formatMerits(balances.liberstake.amount),
-      title: 'PolitiPooled',
-      diff: 2.4,
-      // eslint-disable-next-line no-constant-condition
-      getIcon: () => (2.4 > 0 ? <ArrowYellowUpIcon /> : <ArrowYellowDownIcon />),
-      currency: 'LLM',
-    },
-    {
-      amount: formatDollars(balances.polkastake.amount),
-      title: 'Validator Staked',
-      diff: 2.4,
-      // eslint-disable-next-line no-constant-condition
-      getIcon: () => (2.4 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
-      currency: 'LLD',
-    },
-    {
-      amount: formatMerits(liquidMerits),
-      title: 'Liquid',
-      diff: -0.4,
-      // eslint-disable-next-line no-constant-condition
-      getIcon: () => (-0.4 > 0 ? <ArrowBlueUpIcon /> : <ArrowBlueDownIcon />),
-      currency: 'LLM',
-    },
-    {
-      amount: formatDollars(balances.liquidAmount.amount),
-      title: 'Liquid',
-      diff: -0.6,
-      // eslint-disable-next-line no-constant-condition
-      getIcon: () => (-0.6 > 0 ? <ArrowRedUpIcon /> : <ArrowRedDownIcon />),
-      currency: 'LLD',
-    },
-  ];
+function WalletOverview() {
+  const [filterTransactionsBy, setFilterTransactionsBy] = useState();
+
+  const balances = useSelector(walletSelectors.selectorBalances);
+  const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
+  const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
+  const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
+  const historyFetchFailed = useSelector(walletSelectors.selectorTxHistoryFailed);
+  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
+  const userIsMember = useSelector(congressSelectors.userIsMember);
+  const isDesktop = useMediaQuery('(min-width: 1200px)');
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+
+  const dispatch = useDispatch();
+
+  const transactionHistoryTranslated = useMemo(
+    () => transactionHistory?.map(transactionHistoryProcessorFactory(userWalletAddress, !isDesktop)) || [],
+    [transactionHistory, isDesktop, userWalletAddress],
+  );
+
+  useEffect(() => {
+    dispatch(walletActions.getWallet.call());
+    dispatch(walletActions.getAdditionalAssets.call());
+    dispatch(walletActions.getTxTransfers.call());
+  }, [dispatch, userWalletAddress]);
+
+  const selector = (
+    <Flex align="center" gap="15px" wrap>
+      <span className={styles.description}>
+        Show
+      </span>
+      <Dropdown
+        trigger={['click']}
+        arrow={false}
+        menu={{
+          items: [{ key: '', label: 'All transaction types' }]
+            .concat(uniqBy(transactionHistoryTranslated, ({ typeText }) => typeText).map(({ typeText }) => ({
+              key: typeText,
+              label: typeText,
+            }))),
+          onClick: ({ key }) => {
+            setFilterTransactionsBy(key);
+          },
+        }}
+      >
+        <Button>
+          <Space>
+            {filterTransactionsBy || 'All transaction types'}
+            <DownOutlined />
+          </Space>
+        </Button>
+      </Dropdown>
+    </Flex>
+  );
+
+  useEffect(() => {
+    const addresses = uniq(
+      transactionHistoryTranslated?.map(({ userId }) => userId),
+    ).filter((address) => isAddress(address));
+    if (addresses?.length) {
+      dispatch(identityActions.getIdentityMotions.call(
+        addresses,
+      ));
+    }
+  }, [dispatch, transactionHistoryTranslated]);
 
   return (
-    <Card className={styles.overviewWrapper} title="Overview">
-      <div className={styles.overViewCard}>
+    <Collapse
+      defaultActiveKey={['Remarks', 'BalanceOverview', 'AssetOverview', 'WalletTransactionHistory']}
+      collapsible="icon"
+      items={[
         {
-          overviewInfo.map((cardInfo, index) => (
-            <div
-              className={styles.cardInfo}
-              // eslint-disable-next-line react/no-array-index-key
-              key={cardInfo + index}
-            >
-              <p className={styles.cardInfoAmount}>
-                {cardInfo.amount}
-              </p>
-              <p className={styles.cardInfoTitle}>
-                {cardInfo.title}
-                {' '}
-                {cardInfo.currency}
-              </p>
-            </div>
-          ))
-        }
-      </div>
-    </Card>
+          key: 'BalanceOverview',
+          label: 'Balance overview',
+          children: (
+            <BalanceOverview
+              totalBalance={totalBalance}
+              balances={balances}
+              liquidMerits={liquidMerits}
+            />
+          ),
+        },
+        {
+          key: 'AssetOverview',
+          label: 'Additional assets',
+          children: (
+            <AssetOverview
+              additionalAssets={additionalAssets}
+              userIsMember={userIsMember}
+            />
+          ),
+        },
+        {
+          label: 'Remarks',
+          key: 'Remarks',
+          children: (
+            <RemarkTransferModal />
+          ),
+        },
+        {
+          key: 'WalletTransactionHistory',
+          label: 'Transaction history',
+          extra: isDesktop ? selector : undefined,
+          children: isDesktop ? (
+            <WalletTransactionHistory
+              failure={historyFetchFailed}
+              transactionHistory={transactionHistoryTranslated}
+              filterTransactionsBy={filterTransactionsBy}
+            />
+          ) : (
+            <Flex vertical gap="15px">
+              {selector}
+              <WalletTransactionHistoryMobile
+                failure={historyFetchFailed}
+                transactionHistory={transactionHistoryTranslated}
+                filterTransactionsBy={filterTransactionsBy}
+              />
+            </Flex>
+          ),
+        },
+      ]}
+    />
   );
 }
-WalletOverview.defaultProps = {
-  totalBalance: '0x0',
-  balances: {},
-  liquidMerits: 0,
-};
-
-WalletOverview.propTypes = {
-  // eslint-disable-next-line
-  totalBalance: PropTypes.string,
-  balances: PropTypes.shape({
-    free: PropTypes.shape({
-      amount: PropTypes.string,
-    }),
-    liberstake: PropTypes.shape({
-      amount: PropTypes.string,
-    }),
-    polkastake: PropTypes.shape({
-      amount: PropTypes.number,
-    }),
-    liquidMerits: PropTypes.shape({
-      amount: PropTypes.number,
-    }),
-  }),
-  liquidMerits: PropTypes.number,
-};
 
 export default WalletOverview;

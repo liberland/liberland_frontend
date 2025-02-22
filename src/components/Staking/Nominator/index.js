@@ -1,17 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import cx from 'classnames';
-import { useHistory } from 'react-router-dom/cjs/react-router-dom';
-import styles from './styles.module.scss';
+import { useMediaQuery } from 'usehooks-ts';
+import { useHistory } from 'react-router-dom';
+import Alert from 'antd/es/alert';
+import Flex from 'antd/es/flex';
+import Modal from 'antd/es/modal';
+import WarningTwoTone from '@ant-design/icons/WarningTwoTone';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
-import ValidatorList from './ValidatorList/ValidatorList';
-import Button from '../../Button/Button';
-import { walletActions } from '../../../redux/actions';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import Card from '../../Card';
-import AgreeDisagreeModal from '../../Modals/AgreeDisagreeModal';
-import ModalRoot from '../../Modals/ModalRoot';
-import stylesModal from '../../Modals/styles.module.scss';
+import ValidatorList from './ValidatorList';
+import ValidatorListMobile from './ValidatorListMobile';
+import { identityActions, walletActions } from '../../../redux/actions';
 import { areArraysSame } from '../../../utils/staking';
 
 function Nominator() {
@@ -24,19 +22,17 @@ function Nominator() {
 
   const [selectedValidatorsAsTargets, setSelectedValidatorsAsTargets] = useState(nominatorTargets);
   const [isListSelectedValidatorsChanged, setIsListSelectedValidatorsChanged] = useState(false);
-  const [isSideBlocked, setIsSideBlocked] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [navigationToLeave, setNavigationToLeave] = useState(null);
+  const [navigationAction, setNavigationAction] = useState();
 
   const isMaxNumValidatorsSelected = (selectedValidators) => selectedValidators.length > 15;
   const toggleSelectedValidator = (validatorAddress) => {
-    if (isMaxNumValidatorsSelected(selectedValidatorsAsTargets)) return;
-
     let currentlySelectedValidators = selectedValidatorsAsTargets;
     const selectedValidatorsIncludesAddress = currentlySelectedValidators.includes(validatorAddress);
 
     if (selectedValidatorsIncludesAddress) {
       currentlySelectedValidators = currentlySelectedValidators.filter((e) => e !== validatorAddress);
+    } else if (isMaxNumValidatorsSelected(selectedValidatorsAsTargets)) {
+      return;
     } else {
       currentlySelectedValidators.push(validatorAddress);
     }
@@ -46,7 +42,7 @@ function Nominator() {
 
   const updateNominations = (newNominatorTargets) => {
     dispatch(walletActions.setNominatorTargets.call({ newNominatorTargets, walletAddress }));
-    setIsModalOpen(false);
+    setNavigationAction(undefined);
   };
 
   const goToAdvancedPage = () => {
@@ -54,15 +50,10 @@ function Nominator() {
     const stakingLink = `https://polkadotjs.blockchain.liberland.org/?rpc=${process.env.REACT_APP_NODE_ADDRESS}#/staking`;
     window.open(stakingLink);
   };
-  /*
-  * TODO mynominations#/maxnominations
-  * TODO validator oversubscribed or not
-  *
-  * */
 
   const handleDiscardChanges = () => {
-    setIsModalOpen(false);
-    history.push(navigationToLeave);
+    navigationAction?.();
+    setNavigationAction(undefined);
   };
 
   useEffect(() => {
@@ -84,23 +75,20 @@ function Nominator() {
   }, [isListSelectedValidatorsChanged]);
 
   useEffect(() => {
-    let unblock;
-
-    if (isSideBlocked && isListSelectedValidatorsChanged) {
-      unblock = history.block((location) => {
-        setNavigationToLeave(location.pathname);
-        setIsModalOpen(true);
-        setIsSideBlocked(false);
-        return false;
-      });
-    }
-
-    return () => {
-      if (unblock) {
+    const unblock = history.block(({ pathname }) => {
+      const action = () => {
         unblock();
+        history.push(pathname);
+      };
+      if (!isListSelectedValidatorsChanged) {
+        action();
+        return true;
       }
-    };
-  }, [history, isListSelectedValidatorsChanged, isSideBlocked]);
+      setNavigationAction(() => action);
+      return false;
+    });
+    return unblock;
+  }, [history, isListSelectedValidatorsChanged]);
 
   useEffect(() => {
     setSelectedValidatorsAsTargets([...nominatorTargets]);
@@ -117,61 +105,59 @@ function Nominator() {
     dispatch(walletActions.getNominatorTargets.call());
   }, [dispatch]);
 
-  return (
-    <>
-      {isModalOpen
-      && (
-      <ModalRoot>
-        <AgreeDisagreeModal
-          text="You have unsaved changes. What would you like to do with them?"
-          buttonLeft="Discard"
-          buttonRight="Update"
-          style={stylesModal.getCitizenshipModal}
-          onDisagree={handleDiscardChanges}
-          onAgree={() => updateNominations(selectedValidatorsAsTargets)}
-        >
-          <span />
-        </AgreeDisagreeModal>
-      </ModalRoot>
-      )}
+  useEffect(() => {
+    dispatch(identityActions.getIdentityMotions.call(
+      validators.map(({ accountId }) => accountId.toString()),
+    ));
+  }, [validators, dispatch]);
 
-      <Card title="Validators" className={cx(stylesPage.overviewWrapper, styles.nominatorWrapper)}>
-        <div className={styles.nominatorsList}>
-          {/* <SearchBar
-          setSearchTerm={setSearchTerm}
-        /> */}
-          <div className={styles.updateNominationsContainer}>
-            <Button
-              className={styles.button}
-              small
-              primary
-              onClick={() => updateNominations(selectedValidatorsAsTargets)}
-            >
-              UPDATE NOMINATIONS
-            </Button>
-          </div>
-          <ValidatorList
-            validators={validators}
-            selectedValidatorsAsTargets={selectedValidatorsAsTargets}
-            selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
-            toggleSelectedValidator={toggleSelectedValidator}
-          />
-        </div>
-        <div className={styles.updateNominationsContainer}>
-          <Button small primary onClick={() => goToAdvancedPage()}>
-            ADVANCED
-          </Button>
-          <Button
-            className={styles.button}
-            small
-            primary
-            onClick={() => updateNominations(selectedValidatorsAsTargets)}
-          >
-            UPDATE NOMINATIONS
-          </Button>
-        </div>
-      </Card>
-    </>
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1920px)');
+
+  return (
+    <Flex vertical gap="20px">
+      <Modal
+        open={Boolean(navigationAction)}
+        title="Are you certain you want to leave?"
+        onOk={() => updateNominations(selectedValidatorsAsTargets)}
+        onCancel={handleDiscardChanges}
+        okText="Update nominations"
+        cancelText="Cancel and leave"
+      >
+        Your nominations haven&#96;t been saved, would you like to save them?
+      </Modal>
+      {!selectedValidatorsAsTargets?.length && (
+        <Alert
+          icon={<WarningTwoTone twoToneColor={['#243F5F', 'transparent']} />}
+          showIcon
+          type="warning"
+          message={(
+            <>
+              In order to receive staking rewards you need to nominate at least one validator.
+              See the list of active validators below.
+            </>
+          )}
+        />
+      )}
+      {isBiggerThanDesktop ? (
+        <ValidatorList
+          validators={validators}
+          selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+          selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+          toggleSelectedValidator={toggleSelectedValidator}
+          goToAdvancedPage={goToAdvancedPage}
+          updateNominations={updateNominations}
+        />
+      ) : (
+        <ValidatorListMobile
+          validators={validators}
+          selectedValidatorsAsTargets={selectedValidatorsAsTargets}
+          selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+          toggleSelectedValidator={toggleSelectedValidator}
+          goToAdvancedPage={goToAdvancedPage}
+          updateNominations={updateNominations}
+        />
+      )}
+    </Flex>
   );
 }
 

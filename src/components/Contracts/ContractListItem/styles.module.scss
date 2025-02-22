@@ -1,0 +1,23 @@
+.noHeading {
+    h1,h2,h3,h4,h5 {
+        font-size: 18px!important;
+        color: #ACBDC5;
+        font-weight: 600!important;
+    }
+}
+.action {
+    margin-bottom: 15px;
+}
+.title {
+    margin-bottom: 0!important;
+    margin-top: 0!important;
+}
+.preview {
+    margin-bottom: 0!important;
+}
+.listItem {
+    border: solid 1px var(--border-color);
+    border-block-end: solid 1px var(--border-color)!important;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}

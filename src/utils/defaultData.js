@@ -1,72 +1,65 @@
 export const newCompanyDataObject = {
   staticFields: [
     {
-      key: "name",
+      key: 'name',
       name: 'Company name',
-      display: "Your company name",
+      display: 'Your company name',
       type: 'text',
-      encryptable: false
+      encryptable: false,
     },
     {
-      key: "purpose",
-      name: 'Purpose',
+      key: 'purpose',
+      name: 'Description',
       display: 'Truthful scope of business',
       type: 'text',
-      encryptable: false
+      encryptable: false,
     },
     {
-      key: "logoURL",
-      name: 'Logo URL',
+      key: 'logoURL',
+      name: 'Logo URL (optional)',
       display: 'URL to logo',
       type: 'text',
-      encryptable: false
+      encryptable: false,
     },
     {
-      key: "charterURL",
-      name: 'Charter URL',
+      key: 'charterURL',
+      name: 'Charter URL (optional)',
       display: 'Charter URL',
       type: 'text',
-      encryptable: false
+      encryptable: false,
     },
     {
-      key: "totalCapitalAmount",
-      name: 'Total Capital Amount',
+      key: 'totalCapitalAmount',
+      name: 'Total Capital Amount (optional)',
       display: 'Total capital amount',
       type: 'text',
-      encryptable: false
+      encryptable: false,
     },
     {
-      key: "totalCapitalCurrency",
-      name: 'Total Capital Currency',
+      key: 'totalCapitalCurrency',
+      name: 'Total Capital Currency (optional)',
       display: 'Total capital currency',
       type: 'text',
-      encryptable: false
+      encryptable: false,
     },
     {
-      key: "numberOfShares",
-      name: 'Number of Shares',
+      key: 'numberOfShares',
+      name: 'Number of Shares (optional)',
       display: 'Total number of shares',
       type: 'text',
-      encryptable: false
+      encryptable: false,
     },
     {
-      key: "valuePerShare",
-      name: 'Value per share',
-      display: 'Value per share',
-      type: 'text',
-      encryptable: false
+      key: 'companyType',
+      name: 'Company Type',
+      display: 'Company Type',
+      type: 'radio',
+      encryptable: false,
     },
-    {
-      key: "registryAllowedToEdit",
-      name: 'Registry allowed to edit',
-      display: 'Allow registry to edit details on-chain. Required for registration',
-      type: 'checkbox',
-      encryptable: false
-    }
   ],
   dynamicFields: [
     {
-      key: "brandNames",
+      key: 'brandNames',
       display: 'List of brand names the company is doing business as',
       name: 'Brand Name',
       fields: [
@@ -74,19 +67,19 @@ export const newCompanyDataObject = {
           key: 'name',
           display: 'Brand Name',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
       ],
       data: [
         [{
           key: 'name',
           display: 'Brand Name',
-          isEncrypted: false
-        }]
-      ]
+          isEncrypted: false,
+        }],
+      ],
     },
     {
-      key: "onlineAddresses",
+      key: 'onlineAddresses',
       display: 'List of all online addresses',
       name: 'Online Address',
       fields: [
@@ -94,30 +87,50 @@ export const newCompanyDataObject = {
           key: 'description',
           display: 'Description of online address',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'url',
           display: 'URL of online address',
           type: 'text',
-          encryptable: true
-        }
+          encryptable: true,
+        },
       ],
       data: [
         [{
           key: 'description',
           display: 'Description of online address',
-          isEncrypted: false
+          isEncrypted: false,
         },
         {
           key: 'url',
           display: 'URL of online address',
-          isEncrypted: false
-        }]
-      ]
+          isEncrypted: false,
+        }],
+      ],
     },
     {
-      key: "physicalAddresses",
+      key: 'contact',
+      display: 'List of contacts',
+      name: 'Contact info (optional)',
+      fields: [
+        {
+          key: 'contact',
+          display: 'Contact info (optional)',
+          type: 'text',
+          encryptable: true,
+        },
+      ],
+      data: [
+        [{
+          key: 'contact',
+          display: 'Contact info (optional)',
+          isEncrypted: false,
+        }],
+      ],
+    },
+    {
+      key: 'physicalAddresses',
       display: 'List of all physical addresses',
       name: 'Physical Address',
       fields: [
@@ -125,200 +138,107 @@ export const newCompanyDataObject = {
           key: 'description',
           display: 'Description of physical address',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'street',
           display: 'Street',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'city',
           display: 'city',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'subdivision',
           display: 'Subdivision - state/province/emirate/oblast/etc',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'postalCode',
           display: 'Postal Code',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'country',
           display: 'Country',
           type: 'text',
-          encryptable: true
-        }
-      ],
-      data: [
-        [{
-          key: 'description',
-          display: 'Description of physical address',
-          isEncrypted: false
-        },
-        {
-          key: 'street',
-          display: 'Street',
-          isEncrypted: false
-        },
-        {
-          key: 'city',
-          display: 'city',
-          isEncrypted: false
-        },
-        {
-          key: 'subdivision',
-          display: 'Subdivision - state/province/emirate/oblast/etc',
-          isEncrypted: false
-        },
-        {
-          key: 'postalCode',
-          display: 'Postal Code',
-          isEncrypted: false
-        },
-        {
-          key: 'country',
-          display: 'Country id - make me a list',
-          isEncrypted: false
-        }]
-      ]
-    },
-    {
-      key: "relevantContracts",
-      display: 'List of relevant on-chain contract ids',
-      name: 'Relevant Contracts',
-      fields: [
-        {
-          key: 'contractId',
-          display: 'Contract id or link',
-          type: 'text',
-          encryptable: true
+          encryptable: true,
         },
       ],
-      data: [
-        [{
-          key: 'contractId',
-          display: 'Contract id or link',
-          isEncrypted: false
-        }]
-      ]
+      data: [],
     },
     {
-      key: "relevantAssets",
-      display: 'List of relevant on-chain asset ids',
-      name: 'Relevant Assets',
-      fields: [
-        {
-          key: 'assetId',
-          display: 'Asset id',
-          type: 'text',
-          encryptable: true
-        },
-      ],
-      data: [
-        [{
-          key: 'assetId',
-          display: 'Asset id',
-          isEncrypted: false
-        }]
-      ]
-    },
-    {
-      key: "principals",
-      display: 'List of principals',
-      name: 'Principal',
+      key: 'principals',
+      display: 'List of owners (principals)',
+      name: 'Owner (Principal)',
       fields: [
         {
           key: 'walletAddress',
           display: 'Liberland wallet address',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'name',
-          display: 'Name of principal',
+          display: 'Name of owner (principal)',
           type: 'text',
-          encryptable: true
-        },
-        {
-          key: 'dob',
-          display: 'Date of Birth of principal',
-          type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'passportNumber',
-          display: 'Passport number of principal',
+          display: 'Passport number of owner (principal)',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'shares',
-          display: 'Number of shares of principal',
+          display: 'Number of shares of owner (principal)',
           type: 'text',
-          encryptable: true
-        },
-        {
-          key: 'signingAbility',
-          display: 'Can be full or other',
-          type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'signingAbilityConditions',
-          display: 'Any conditions on principal signing ability. Must be in agreement',
+          display: 'Conditions or notes',
           type: 'text',
-          encryptable: true
-        }
+          encryptable: true,
+        },
       ],
       data: [
         [{
           key: 'walletAddress',
           display: 'Liberland wallet address',
-          isEncrypted: false
+          isEncrypted: false,
         },
         {
           key: 'name',
           display: 'Name of principal',
-          isEncrypted: false
-        },
-        {
-          key: 'dob',
-          display: 'Date of Birth of principal',
-          isEncrypted: false
+          isEncrypted: false,
         },
         {
           key: 'passportNumber',
           display: 'Passport number of principal',
-          isEncrypted: false
+          isEncrypted: false,
         },
         {
           key: 'shares',
           display: 'Number of shares of principal',
-          isEncrypted: false
-        },
-        {
-          key: 'signingAbility',
-          display: 'Can be full or other',
-          isEncrypted: false
+          isEncrypted: false,
         },
         {
           key: 'signingAbilityConditions',
-          display: 'Any conditions on principal signing ability. Must be in agreement',
-          isEncrypted: false
-        }]
-      ]
+          display: 'Conditions or notes',
+          isEncrypted: false,
+        }],
+      ],
     },
     {
-      key: "shareholders",
+      key: 'shareholders',
       display: 'List of all shareholders',
       name: 'Shareholder',
       fields: [
@@ -326,63 +246,31 @@ export const newCompanyDataObject = {
           key: 'walletAddress',
           display: 'Liberland wallet address',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'name',
           display: 'Name of shareholder',
           type: 'text',
-          encryptable: true
-        },
-        {
-          key: 'dob',
-          display: 'Date of Birth of shareholder',
-          type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'passportNumber',
           display: 'Passport number of shareholder',
           type: 'text',
-          encryptable: false
+          encryptable: true,
         },
         {
           key: 'shares',
           display: 'Number of shares of shareholder',
           type: 'text',
-          encryptable: true
-        }
+          encryptable: true,
+        },
       ],
-      data: [
-        [{
-          key: 'walletAddress',
-          display: 'Liberland wallet address',
-          isEncrypted: false
-        },
-        {
-          key: 'name',
-          display: 'Name of shareholder',
-          isEncrypted: false
-        },
-        {
-          key: 'dob',
-          display: 'Date of Birth of shareholder',
-          isEncrypted: false
-        },
-        {
-          key: 'passportNumber',
-          display: 'Passport number of shareholder',
-          isEncrypted: false
-        },
-        {
-          key: 'shares',
-          display: 'Number of shares of shareholder',
-          isEncrypted: false
-        }]
-      ]
+      data: [],
     },
     {
-      key: "UBOs",
+      key: 'UBOs',
       display: 'List of all Ultimate Beneficiaries',
       name: 'Ultimate Beneficiary',
       fields: [
@@ -390,71 +278,62 @@ export const newCompanyDataObject = {
           key: 'walletAddress',
           display: 'Liberland wallet address',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'name',
           display: 'Name of UBO',
           type: 'text',
-          encryptable: true
-        },
-        {
-          key: 'dob',
-          display: 'Date of Birth of UBO',
-          type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'passportNumber',
           display: 'Passport number of UBO',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'signingAbility',
           display: 'Can be full or other',
           type: 'text',
-          encryptable: true
+          encryptable: true,
         },
         {
           key: 'signingAbilityConditions',
           display: 'Any conditions on UBO signing ability. Must be in agreement',
           type: 'text',
-          encryptable: true
-        }
+          encryptable: true,
+        },
       ],
-      data: [
-        [{
-          key: 'walletAddress',
-          display: 'Liberland wallet address',
-          isEncrypted: false
-        },
+      data: [],
+    },
+    {
+      key: 'relevantContracts',
+      display: 'List of relevant on-chain contract ids',
+      name: 'Relevant on-chain Contracts',
+      fields: [
         {
-          key: 'name',
-          display: 'Name of UBO',
-          isEncrypted: false
+          key: 'contractId',
+          display: 'Contract id or link',
+          type: 'text',
+          encryptable: true,
         },
+      ],
+      data: [],
+    },
+    {
+      key: 'relevantAssets',
+      display: 'List of relevant on-chain asset ids)',
+      name: 'Relevant on-chain Assets',
+      fields: [
         {
-          key: 'dob',
-          display: 'Date of Birth of UBO',
-          isEncrypted: false
+          key: 'assetId',
+          display: 'Asset id',
+          type: 'text',
+          encryptable: true,
         },
-        {
-          key: 'passportNumber',
-          display: 'Passport number of UBO',
-          isEncrypted: false
-        },
-        {
-          key: 'signingAbility',
-          display: 'Can be full or other',
-          isEncrypted: false
-        },
-        {
-          key: 'signingAbilityConditions',
-          display: 'Any conditions on UBO signing ability. Must be in agreement',
-          isEncrypted: false
-        }]
-      ]
-    }
-  ]
-}
+      ],
+      data: [],
+    },
+  ],
+};

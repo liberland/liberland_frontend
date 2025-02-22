@@ -1,4 +1,5 @@
 import { handleActions, combineActions } from 'redux-actions';
+import { BN_ZERO } from '@polkadot/util';
 import { officesActions } from '../actions';
 
 const initialState = {
@@ -13,11 +14,36 @@ const initialState = {
   companyRegistration: null,
   isGetCompanyRegistration: null,
   loading: false,
+  unobtrusive: false,
   balances: {
     LLD: {},
     LLM: {},
   },
   backendAddressLLMBalance: null,
+  pendingAdditionalMerits: [],
+  senateWalletInfo: {
+    balances: {
+      liberstake: {
+        amount: BN_ZERO,
+      },
+      polkastake: {
+        amount: '0',
+      },
+      liquidMerits: {
+        amount: '0',
+      },
+      totalAmount: {
+        amount: BN_ZERO,
+      },
+      liquidAmount: {
+        amount: BN_ZERO,
+      },
+      meritsTotalAmount: {
+        amount: '0',
+      },
+      electionLock: 0,
+    },
+  },
 };
 
 const officesReducer = handleActions({
@@ -31,9 +57,17 @@ const officesReducer = handleActions({
     officesActions.getPalletIds.call,
     officesActions.unregisterCompany.call,
     officesActions.setRegisteredCompanyData.call,
+    officesActions.getPendingAdditionalMerits.call,
   )]: (state) => ({
     ...state,
     loading: true,
+  }),
+  [combineActions(
+    officesActions.getBalances.call,
+    officesActions.getPalletIds.call,
+  )]: (state) => ({
+    ...state,
+    unobtrusive: true,
   }),
   [combineActions(
     officesActions.officeGetIdentity.success,
@@ -51,9 +85,13 @@ const officesReducer = handleActions({
     officesActions.getPalletIds.failure,
     officesActions.unregisterCompany.failure,
     officesActions.setRegisteredCompanyData.failure,
+    officesActions.getPalletIds.success,
+    officesActions.getPendingAdditionalMerits.failure,
+    officesActions.getPendingAdditionalMerits.success,
   )]: (state) => ({
     ...state,
     loading: false,
+    unobtrusive: false,
   }),
   [officesActions.officeGetIdentity.call]: (state, action) => ({
     ...state,
@@ -85,6 +123,7 @@ const officesReducer = handleActions({
       request: null,
     },
     isGetCompanyRequest: true,
+    pendingAdditionalMerits: initialState.pendingAdditionalMerits,
   }),
   [officesActions.getCompanyRequest.success]: (state, action) => ({
     ...state,
@@ -141,6 +180,10 @@ const officesReducer = handleActions({
   [officesActions.getPalletIds.success]: (state, action) => ({
     ...state,
     pallets: action.payload,
+  }),
+  [officesActions.getPendingAdditionalMerits.success]: (state, action) => ({
+    ...state,
+    pendingAdditionalMerits: action.payload,
   }),
 }, initialState);
 

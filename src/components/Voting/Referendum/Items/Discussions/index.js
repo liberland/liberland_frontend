@@ -1,88 +1,67 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import cx from 'classnames';
+import List from 'antd/es/list';
+import Card from 'antd/es/card';
+import Flex from 'antd/es/flex';
+import { useSelector } from 'react-redux';
+import classNames from 'classnames';
+import Paragraph from 'antd/es/typography/Paragraph';
 import sanitizeUrlHelper from '../../../../../utils/sanitizeUrlHelper';
-import styles from '../item.module.scss';
 import { centralizedDatasType } from '../types';
 import Button from '../../../../Button/Button';
 import CopyIconWithAddress from '../../../../CopyIconWithAddress';
-
-function DiscussionList({ centralizedDatas }) {
-  return (
-    <ol>
-      {centralizedDatas.map((centralizedData) => {
-        const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
-        return (
-          <li
-            className={styles.listItem}
-            key={centralizedData.id}
-          >
-            <a
-              href={sanitizeUrl}
-              target="_blank"
-              rel="noreferrer"
-              className={styles.blueText}
-            >
-              {centralizedData.name}
-            </a>
-            {' - '}
-            {centralizedData.description}
-            {' '}
-            (Discussion added by
-            {' '}
-            <span className={styles.centerItem}>
-              <CopyIconWithAddress
-                address={centralizedData.proposerAddress}
-              />
-            </span>
-            )
-          </li>
-        );
-      })}
-    </ol>
-  );
-}
-
-DiscussionList.propTypes = {
-  centralizedDatas: PropTypes.arrayOf(centralizedDatasType).isRequired,
-};
+import { identitySelectors } from '../../../../../redux/selectors';
+import ColorAvatar from '../../../../ColorAvatar';
+import styles from '../../../styles.module.scss';
+import truncate from '../../../../../utils/truncate';
 
 function Discussions({ centralizedDatas }) {
-  const [isDiscussionsHidden, setIsDiscussionsHidden] = useState(true);
+  const identities = useSelector(identitySelectors.selectorIdentityMotions);
+
   return (
-    <div className={styles.greyWrapper}>
-      <div className={cx(styles.smallHeader, styles.discussionWrapper)}>
-        <h4 className={styles.title}>Discussions</h4>
-        <div className={cx(!isDiscussionsHidden && styles.none)}>
-          <DiscussionList
-            centralizedDatas={[centralizedDatas[0]]}
-            isDiscussionsHidden={isDiscussionsHidden}
-          />
-        </div>
-        <div className={cx(isDiscussionsHidden && styles.hidden)}>
-          <DiscussionList
-            centralizedDatas={centralizedDatas}
-            isDiscussionsHidden={isDiscussionsHidden}
-          />
-        </div>
-      </div>
-      {
-        centralizedDatas.length > 1
-        && (
-        <Button
-          className={styles.button}
-          small
-          secondary={isDiscussionsHidden}
-          grey={!isDiscussionsHidden}
-          onClick={() => setIsDiscussionsHidden((prevState) => !prevState)}
-        >
-          {!isDiscussionsHidden ? 'HIDE' : 'SHOW'}
-          {' '}
-          DISCUSSIONS
-        </Button>
-        )
-      }
-    </div>
+    <Card title="Discussions">
+      <List
+        dataSource={centralizedDatas}
+        pagination={{ pageSize: 5 }}
+        renderItem={(centralizedData) => {
+          const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
+          const identity = identities?.[centralizedData.proposerAddress]?.identity?.legal
+            || identities?.[centralizedData.proposerAddress]?.identity?.name
+            || 'Unknown';
+
+          return (
+            <List.Item
+              actions={[
+                <Button
+                  href={sanitizeUrl}
+                  link
+                >
+                  {centralizedData.name}
+                </Button>,
+              ]}
+            >
+              <Flex wrap gap="15px" align="center" className={styles.discussionIdentity}>
+                <ColorAvatar name={identity} size={30} />
+                <Flex vertical gap="5px">
+                  <strong>
+                    {truncate(identity, 20)}
+                  </strong>
+                  <div className="description">
+                    <CopyIconWithAddress
+                      address={centralizedData.proposerAddress}
+                      isTruncate
+                    />
+                  </div>
+                </Flex>
+              </Flex>
+              <Paragraph className={classNames('description', styles.discussionDescription)}>
+                {centralizedData.description}
+              </Paragraph>
+            </List.Item>
+          );
+        }}
+      />
+    </Card>
   );
 }
 

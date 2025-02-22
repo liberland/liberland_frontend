@@ -1,53 +1,56 @@
 import React from 'react';
+import Form from 'antd/es/form';
+import Flex from 'antd/es/flex';
+import Title from 'antd/es/typography/Title';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
 import { registriesActions } from '../../redux/actions';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function DeleteCompanyModal({
-  closeModal, companyId,
+function DeleteCompanyForm({
+  onClose, companyId,
 }) {
   const dispatch = useDispatch();
+  const [form] = Form.useForm();
 
   return (
-    <div>
-      <h4>Are you sure you want to request the deletion of company from the registrar ?</h4>
-      <div style={{
-        flexDirection: 'row', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={() => {
+        dispatch(
+          registriesActions.requestUnregisterCompanyRegistrationAction.call({
+            companyId,
+          }),
+        );
+        onClose();
       }}
-      >
-        <Button
-          red
-          medium
-          onClick={() => {
-            dispatch(
-              registriesActions.requestUnregisterCompanyRegistrationAction.call({
-                companyId,
-              }),
-            );
-            closeModal();
-          }}
-        >
+    >
+      <Title level={4}>
+        Are you sure you want to request the deletion of company from the registrar?
+      </Title>
+      <Flex wrap gap="15px">
+        <Button red type="submit">
           Yes
         </Button>
-        <Button green medium onClick={closeModal}>No</Button>
-      </div>
-    </div>
+        <Button green onClick={onClose}>No</Button>
+      </Flex>
+    </Form>
   );
 }
 
-DeleteCompanyModal.propTypes = {
+DeleteCompanyForm.propTypes = {
   companyId: PropTypes.string.isRequired,
-  closeModal: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
-function DeleteCompanyModalWrapper(props) {
+function ButtonModal(props) {
   return (
-    <ModalRoot>
-      <DeleteCompanyModal {...props} />
-    </ModalRoot>
+    <OpenModalButton text="Request Deletion" {...props} />
   );
 }
+const DeleteCompanyModal = modalWrapper(DeleteCompanyForm, ButtonModal);
 
-export default DeleteCompanyModalWrapper;
+export default DeleteCompanyModal;

@@ -1,88 +1,61 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
-import { useDispatch } from 'react-redux';
-import ModalRoot from './ModalRoot';
-import { TextInput, SelectInput } from '../InputComponents';
+import Form from 'antd/es/form';
+import Flex from 'antd/es/flex';
+import Title from 'antd/es/typography/Title';
+import dayjs from 'dayjs';
+import { useDispatch, useSelector } from 'react-redux';
 import Button from '../Button/Button';
-import styles from './styles.module.scss';
 import { congressActions } from '../../redux/actions';
+import LegislationHeading from '../Congress/LegislationHeading';
+import { congressSelectors } from '../../redux/selectors';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function CongressRepealLegislationModal({
-  closeModal, tier, id, section,
+function CongressRepealLegislationForm({
+  onClose, tier, id, section,
 }) {
   const dispatch = useDispatch();
-  const { handleSubmit, register } = useForm({
-    defaultValues: {
-      tier,
-      year: id.year,
-      index: id.index,
-      section,
-    },
-  });
+  const [form] = Form.useForm();
 
-  const onSubmitRepeal = () => {
-    dispatch(congressActions.congressRepealLegislation.call({ tier, id, section }));
-    closeModal();
+  const onSubmitRepeal = ({
+    // eslint-disable-next-line no-shadow
+    tier,
+    year,
+    index,
+    // eslint-disable-next-line no-shadow
+    section,
+  }) => {
+    const idData = {
+      year: year.year(),
+      index,
+    };
+    dispatch(congressActions.congressRepealLegislation.call({ tier, id: idData, section }));
+    onClose();
   };
 
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={handleSubmit(onSubmitRepeal)}
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={onSubmitRepeal}
+      initialValues={{
+        tier,
+        year: dayjs(new Date(id.year, 0, 1)),
+        index: parseInt(id.index) || 1,
+        section,
+      }}
     >
-      <div className={styles.h3}>Propose a Congress Motion - repeal legislation</div>
+      <Title level={3}>
+        Propose a Congress Motion - repeal legislation
+      </Title>
 
-      <div className={styles.title}>Legislation Tier</div>
-      <SelectInput
-        register={register}
-        name="tier"
-        disabled
-        options={[
-          { value: 'InternationalTreaty', display: 'International Treaty' },
-        ]}
-      />
+      <LegislationHeading section={section} />
 
-      <div className={styles.title}>Legislation Year</div>
-      <TextInput
-        required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-        errorTitle="Year"
-        register={register}
-        name="year"
-        disabled
-      />
-
-      <div className={styles.title}>Legislation Index</div>
-      <TextInput
-        required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-        errorTitle="Index"
-        register={register}
-        name="index"
-        disabled
-      />
-
-      { section !== null && (
-      <>
-        <div className={styles.title}>Legislation Section</div>
-        <TextInput
-          required
-          validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-          errorTitle="Section"
-          register={register}
-          name="section"
-          disabled
-        />
-      </>
-      )}
-
-      <div className={styles.buttonWrapper}>
+      <Flex wrap gap="15px">
         <Button
           medium
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
@@ -93,27 +66,34 @@ function CongressRepealLegislationModal({
         >
           Submit
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
-CongressRepealLegislationModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+CongressRepealLegislationForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
-    year: PropTypes.number.isRequired,
-    index: PropTypes.number.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    year: PropTypes.object.isRequired,
+    // eslint-disable-next-line react/forbid-prop-types
+    index: PropTypes.object.isRequired,
   }).isRequired,
   section: PropTypes.string.isRequired,
 };
 
-function CongressRepealLegislationModalWrapper(props) {
+function ButtonModal(props) {
+  const userIsMember = useSelector(congressSelectors.userIsMember);
+  if (!userIsMember) {
+    return null;
+  }
+
   return (
-    <ModalRoot>
-      <CongressRepealLegislationModal {...props} />
-    </ModalRoot>
+    <OpenModalButton text="Propose congress motion to repeal" {...props} />
   );
 }
 
-export default CongressRepealLegislationModalWrapper;
+const CongressRepealLegislationModal = modalWrapper(CongressRepealLegislationForm, ButtonModal);
+
+export default CongressRepealLegislationModal;

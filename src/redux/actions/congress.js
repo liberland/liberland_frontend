@@ -22,7 +22,24 @@ export const {
   renounceCandidacy,
   unapproveTreasurySpend,
   voteAtMotions,
+  congressGetWallet,
+  congressGetAdditionalAssets,
+  congressSendLld,
+  congressSendAssets,
+  getAllBalanceForCongress,
+  congressBudgetPropose,
+  congressSpending,
 } = createActions({
+  CONGRESS_BUDGET_PROPOSE: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_ALL_BALANCE_FOR_CONGRESS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
   APPLY_FOR_CONGRESS: {
     call: undefined,
     success: undefined,
@@ -124,6 +141,31 @@ export const {
     failure: undefined,
   },
   VOTE_AT_MOTIONS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_GET_WALLET: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_GET_ADDITIONAL_ASSETS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_SEND_LLD: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_SEND_ASSETS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CONGRESS_SPENDING: {
     call: undefined,
     success: undefined,
     failure: undefined,

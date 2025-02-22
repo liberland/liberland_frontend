@@ -1,153 +1,60 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import PropTypes from 'prop-types';
-import Card from '../../Card';
-import styles from './styles.module.scss';
-import Button from '../../Button/Button';
-import truncate from '../../../utils/truncate';
+import List from 'antd/es/list';
+import Result from 'antd/es/result';
+import { congressActions, identityActions } from '../../../redux/actions';
+import { congressSelectors } from '../../../redux/selectors';
+import Motion from '../../WalletCongresSenate/Motion';
+import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
+import ProposalContainer from '../../Proposal/ProposalContainer';
 
-// REDUX
-import { congressActions } from '../../../redux/actions';
-import {
-  congressSelectors,
-  blockchainSelectors,
-} from '../../../redux/selectors';
-import { Proposal } from '../../Proposal';
-
-export default function Motions() {
+function Motions() {
   const dispatch = useDispatch();
   const motions = useSelector(congressSelectors.motions);
+  const userIsMember = useSelector(congressSelectors.userIsMember);
+  const { motionIds } = useMotionContext();
 
   useEffect(() => {
     dispatch(congressActions.getMotions.call());
   }, [dispatch]);
 
+  useEffect(() => {
+    dispatch(congressActions.getMembers.call());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const votes = motions.map((item) => item.votes);
+    dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds.concat(votes.flat())))));
+  }, [motions, motionIds, dispatch]);
+
+  if (!motions || motions.length < 1) {
+    return <Result status={404} title="There are no open motions" />;
+  }
+
   return (
-    <div>
-      {motions.map(({ proposal, proposalOf, voting }) => (
-        <Motion
-          key={proposal}
-          proposal={proposal.toString()}
-          proposalOf={proposalOf.unwrap()}
-          voting={voting.unwrap()}
-        />
-      ))}
-    </div>
+    <List
+      dataSource={motions}
+      renderItem={({
+        proposal, proposalOf, voting, membersCount,
+      }) => (
+        <List.Item>
+          <ProposalContainer noTable>
+            <Motion
+              userIsMember={userIsMember}
+              membersCount={membersCount}
+              key={proposal}
+              proposal={proposal.toString()}
+              proposalOf={proposalOf.unwrap()}
+              voting={voting.unwrap()}
+              voteMotion={(data) => congressActions.voteAtMotions.call(data)}
+              closeMotion={(data) => congressActions.closeMotion.call(data)}
+              isTableRow
+            />
+          </ProposalContainer>
+        </List.Item>
+      )}
+    />
   );
 }
 
-function Motion({ proposal, proposalOf, voting }) {
-  const dispatch = useDispatch();
-  const userAddress = useSelector(
-    blockchainSelectors.userWalletAddressSelector,
-  );
-
-  const threshold = voting.threshold.toNumber();
-
-  const isClosable = voting.ayes.length >= threshold;
-
-  return (
-    <Card
-      className={styles.cardProposalsSection}
-    >
-
-      <div>
-        <div className={styles.metaInfoLine}>
-
-          <p>
-            Proposal id:
-            <b>{truncate(proposal, 13)}</b>
-          </p>
-          <span>
-            <p>
-              Aye
-              {' '}
-              <b>
-                {voting.ayes.length}
-                /
-                {threshold}
-              </b>
-            </p>
-            <p>
-              Nay
-              {' '}
-              <b>
-                {voting.nays.length}
-                /
-                {threshold}
-              </b>
-            </p>
-          </span>
-        </div>
-
-        <div className={styles.buttonsContainer}>
-          {isClosable && (
-            <Button
-              medium
-              primary
-              onClick={() => dispatch(
-                congressActions.closeMotion.call({
-                  proposal,
-                  index: voting.index,
-                }),
-              )}
-            >
-              Close & Execute
-            </Button>
-          )}
-          {!voting.ayes.map((v) => v.toString()).includes(userAddress)
-            && !isClosable && (
-              <Button
-                small
-                primary
-                onClick={() => dispatch(
-                  congressActions.voteAtMotions.call({
-                    proposal,
-                    index: voting.index,
-                    vote: true,
-                  }),
-                )}
-              >
-                Vote aye
-              </Button>
-          )}
-          {!voting.nays.map((v) => v.toString()).includes(userAddress)
-            && !isClosable && (
-              <Button
-                small
-                secondary
-                onClick={() => dispatch(
-                  congressActions.voteAtMotions.call({
-                    proposal,
-                    index: voting.index,
-                    vote: false,
-                  }),
-                )}
-              >
-                Vote nay
-              </Button>
-          )}
-        </div>
-        <Proposal proposal={proposalOf} />
-      </div>
-    </Card>
-  );
-}
-
-/* eslint-disable react/forbid-prop-types */
-Motion.propTypes = {
-  proposal: PropTypes.string.isRequired,
-  proposalOf: PropTypes.shape({
-    args: PropTypes.array.isRequired,
-    method: PropTypes.string.isRequired,
-    section: PropTypes.string.isRequired,
-    toHuman: PropTypes.func.isRequired,
-  }).isRequired,
-  voting: PropTypes.shape({
-    index: PropTypes.object.isRequired,
-    threshold: PropTypes.object.isRequired,
-    ayes: PropTypes.arrayOf(PropTypes.object).isRequired,
-    nays: PropTypes.arrayOf(PropTypes.object).isRequired,
-    end: PropTypes.object.isRequired,
-  }).isRequired,
-};
+export default Motions;

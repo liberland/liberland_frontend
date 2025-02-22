@@ -1,59 +1,60 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import cx from 'classnames';
-import styles from './styles.module.scss';
-import liberlandEmblemImage from '../../../../assets/images/liberlandEmblem.svg';
-import libertarianTorch from '../../../../assets/images/libertariantorch.png';
-import NotificationPortal from '../../../NotificationPortal';
-import CopyIconWithAddress from '../../../CopyIconWithAddress';
+import ArrowDownOutlined from '@ant-design/icons/ArrowDownOutlined';
+import ArrowUpOutlined from '@ant-design/icons/ArrowUpOutlined';
+import PoliticanCard from '../PoliticianCard';
+import Button from '../../../Button/Button';
 
 function SelectedCandidateCard({
-  politician, unselectCandidate, moveSelectedCandidate,
+  politician,
+  unselectCandidate,
+  moveSelectedCandidate,
+  candidateIndex,
+  candidatesLength,
 }) {
-  const notificationRef = useRef();
   return (
-    <>
-      <NotificationPortal ref={notificationRef} />
-      <div className={styles.politicianCardContainer}>
-        <div className={styles.leftColumn}>
-          <button
-            className={cx(styles.unselectContainer, styles.unselectContainerRed)}
-            onClick={() => unselectCandidate(politician)}
-          >
-            <span className={styles.cross}>&#x2715;</span>
-          </button>
-          <div className={styles.politicianImageContainer}>
-            <img src={liberlandEmblemImage} style={{ height: '100%' }} alt="" />
-            <img src={libertarianTorch} style={{ height: '100%' }} alt="" />
-          </div>
-          <div className={cx(styles.politicianDisplayName)}>
-            <CopyIconWithAddress
-              address={politician.name}
-            />
-          </div>
-        </div>
-        <div className={styles.rightColumn}>
-          <button onClick={() => moveSelectedCandidate(politician, 'up')} className={styles.orderButtonImageContainer}>
-            <span className={styles.icon}>&#x2303;</span>
-          </button>
-          <button
-            onClick={() => moveSelectedCandidate(politician, 'down')}
-            className={cx(styles.orderButtonImageContainer, styles.orderButtonImageContainerRed)}
-          >
-            <span className={cx(styles.icon, styles.arrowDown)}>&#x2304;</span>
-          </button>
-        </div>
-      </div>
-    </>
+    <PoliticanCard
+      politician={politician}
+      preActions={[
+        candidateIndex !== 0 && candidatesLength !== 1 && (
+          <Button link onClick={() => moveSelectedCandidate(politician, 'up')}>
+            <ArrowUpOutlined aria-label="Move up" />
+          </Button>
+        ),
+        candidateIndex !== candidatesLength - 1 && candidatesLength !== 1 && (
+          <Button link onClick={() => moveSelectedCandidate(politician, 'down')}>
+            <ArrowDownOutlined aria-label="Move down" />
+          </Button>
+        ),
+      ].filter(Boolean)}
+      actions={[
+        <Button red onClick={() => unselectCandidate(politician)}>
+          Remove
+        </Button>,
+      ]}
+    />
   );
 }
 
 SelectedCandidateCard.propTypes = {
   politician: PropTypes.shape({
-    name: PropTypes.string.isRequired,
+    name: PropTypes.string,
+    legal: PropTypes.string,
+    website: PropTypes.string,
+    rawIdentity: PropTypes.string.isRequired,
+    identityData: PropTypes.shape({
+      info: PropTypes.shape({
+        web: PropTypes.shape({
+          raw: PropTypes.string,
+          none: PropTypes.string,
+        }),
+      }),
+    }).isRequired,
   }).isRequired,
   unselectCandidate: PropTypes.func.isRequired,
   moveSelectedCandidate: PropTypes.func.isRequired,
+  candidateIndex: PropTypes.number.isRequired,
+  candidatesLength: PropTypes.number.isRequired,
 };
 
 export default SelectedCandidateCard;

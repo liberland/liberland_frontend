@@ -1,46 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import cx from 'classnames';
-import PoliticanCard from '../PoliticianCard/Index';
-import Card from '../../../Card';
-import stylesPage from '../../../../utils/pagesBase.module.scss';
-import styles from './styles.module.scss';
+import List from 'antd/es/list';
+import { useSelector } from 'react-redux';
+import PoliticanCard from '../PoliticianCard';
+import { blockchainSelectors, democracySelectors } from '../../../../redux/selectors';
+import DelegateModalWrapper from '../../../Modals/DelegateModal';
 
 function CurrentAssemble({
   currentCongressMembers,
 }) {
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
+  const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
   return (
-    <Card className={stylesPage.overviewWrapper} title="Acting Congressional Assembly">
-
-      <div className={stylesPage.transactionHistoryCard}>
-        <div className={cx(
-          stylesPage.transactionHistoryCardHeaderDesktop,
-          stylesPage.transactionHistoryCardHeader,
-          styles.gridList,
-        )}
-        >
-          <span>NAME</span>
-          <span>DELEGATE MY VOTE</span>
-          <span>VOTING POWER</span>
-        </div>
-        <div className={cx(stylesPage.transactionHistoryCardHeaderMobile, stylesPage.transactionHistoryCardHeader)}>
-          <span>NAME / VOTING POWER</span>
-          <span>DELEGATE MY VOTE</span>
-        </div>
-
-        {
-            currentCongressMembers?.map((currentCongressMember) => (
-              <div className={cx(stylesPage.transactionHistoryCardMain, styles.gridList)}>
-                <PoliticanCard
-                  politician={currentCongressMember}
-                  key={`current-congress-member${currentCongressMember.name}`}
+    <List
+      dataSource={currentCongressMembers}
+      locale={{ emptyText: 'No current assemble' }}
+      renderItem={(politician) => (
+        <List.Item>
+          <PoliticanCard
+            politician={politician}
+            actions={[
+              politician.rawIdentity === userWalletAddress || delegatingTo === politician.rawIdentity ? (
+                <div />
+              ) : (
+                <DelegateModalWrapper
+                  delegateAddress={politician.rawIdentity}
+                  currentlyDelegatingTo={delegatingTo}
                 />
-              </div>
-            ))
-          }
-
-      </div>
-    </Card>
+              ),
+            ]}
+            isElected
+          />
+        </List.Item>
+      )}
+    />
   );
 }
 
@@ -49,4 +43,5 @@ CurrentAssemble.propTypes = {
     name: PropTypes.string.isRequired,
   })).isRequired,
 };
+
 export default CurrentAssemble;

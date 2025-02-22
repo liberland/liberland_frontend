@@ -6,15 +6,24 @@
     word-break: break-word;
 }
 
-.blue{
+.blue {
     color: $lightBlue;
 }
 
-.text{
+.text {
   font-size: 14px;
   font-weight: 500;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){
     font-size: 17px;
   }
+}
+
+.batchItem {
+  margin-bottom: 5px;
+}
+
+.section {
+  max-width: 100%!important;
+  width: 100%;
 }

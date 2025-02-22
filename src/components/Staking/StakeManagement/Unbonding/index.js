@@ -2,82 +2,71 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import { BN_ZERO } from '@polkadot/util';
+import Card from 'antd/es/card';
+import List from 'antd/es/list';
 import { formatDollars } from '../../../../utils/walletHelpers';
 import { blockchainSelectors, validatorSelectors } from '../../../../redux/selectors';
 import { blockTimeFormatted, stakingInfoToProgress } from '../../../../utils/staking';
 import { validatorActions } from '../../../../redux/actions';
+import styles from './styles.module.scss';
+import OpenModalButton from '../../../Modals/components/OpenModalButton';
+import modalWrapper from '../../../Modals/components/ModalWrapper';
 
-function UnbondingRow({ unlock, blocks }) {
-  return (
-    <li>
-      {formatDollars(unlock.value)}
-      {' '}
-      LLD
-      {' '}
-      {
-       `will unlock in ${blockTimeFormatted(blocks)}`
-      }
-    </li>
-  );
-}
-
-UnbondingRow.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  unlock: PropTypes.object.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  blocks: PropTypes.object.isRequired,
-};
-
-function UnbondingRowReady({ value }) {
-  if (!value || value.lte(BN_ZERO)) return null;
-
-  return (
-    <li>
-      {formatDollars(value)}
-      {' '}
-      LLD
-      {' '}
-      ready to withdraw
-    </li>
-  );
-}
-
-UnbondingRowReady.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  value: PropTypes.object.isRequired,
-};
-
-export default function Unbonding({ info }) {
+function Unbonding({ info }) {
   const dispatch = useDispatch();
   const { stakingInfo, sessionProgress } = useSelector(validatorSelectors.stakingData);
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const stakingData = stakingInfoToProgress(stakingInfo, sessionProgress) ?? [];
 
   useEffect(() => {
-    if (info.unlocking.length === 0) return;
-    dispatch(validatorActions.getStakingData.call());
+    if (info?.unlocking?.length) {
+      dispatch(validatorActions.getStakingData.call());
+    }
   }, [dispatch, blockNumber, info]);
 
-  if (stakingData.length === 0 && (!stakingInfo?.redeemable || stakingInfo?.redeemable.lte(BN_ZERO))) return null;
+  if (stakingData.length === 0) {
+    return null;
+  }
+
   return (
-    <>
-      Currently unstaking:
-      <ul>
-        <UnbondingRowReady value={stakingInfo?.redeemable} />
-        {stakingData.map(({
+    <Card
+      title="Current unstaking"
+      size="small"
+      className={styles.unstaking}
+    >
+      <Card.Meta
+        description={stakingInfo?.redeemable?.gt(BN_ZERO)
+          ? `${formatDollars(stakingInfo.redeemable)} LLD ready to withdraw`
+          : undefined}
+      />
+      <List
+        size="small"
+        dataSource={stakingData || []}
+        locale={{ emptyText: 'No pending unlock' }}
+        renderItem={({
           unlock,
-          eras,
           blocks,
         }) => (
-          <UnbondingRow
-            key={eras.toString()}
-            {...{ unlock, eras, blocks }}
-          />
-        ))}
-      </ul>
-    </>
+          <List.Item>
+            <List.Item.Meta
+              title={`${formatDollars(unlock.value)} will unlock in ${blockTimeFormatted(blocks)}`}
+            />
+          </List.Item>
+        )}
+      />
+    </Card>
   );
 }
+
+function ButtonModal(props) {
+  return (
+    <OpenModalButton text="Show unbonding details" primary {...props} />
+  );
+}
+
+const UnbondingModal = modalWrapper(Unbonding, ButtonModal);
+
+export default UnbondingModal;
 
 Unbonding.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types

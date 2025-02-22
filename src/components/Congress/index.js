@@ -1,43 +1,56 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Switch, Route, Redirect } from 'react-router-dom';
-import CongressHeader from './CongressHeader';
-import styles from './styles.module.scss';
-import Overview from './Overview';
-import Motions from './Motions';
+import { useDispatch } from 'react-redux';
 import router from '../../router';
-import Treasury from './Treasury';
-// eslint-disable-next-line max-len
-import { CongressAddLegislation } from '../Voting/Referendum/ProposalForms/CongressAddLegislation/CongressAddLegislation';
-// eslint-disable-next-line max-len
-import { CongressAddLegislationViaReferendum } from '../Voting/Referendum/ProposalForms/CongressAddLegislationViaReferendum/CongressAddLegislationViaReferendum';
+import { congressActions } from '../../redux/actions';
+import { MotionProvider } from '../WalletCongresSenate/ContextMotions';
+import { loader } from '../../utils/loader';
+
+function MotionsWrapper() {
+  const Motions = loader(() => import('./Motions'));
+  return (
+    <MotionProvider>
+      <Motions />
+    </MotionProvider>
+  );
+}
 
 function Congress() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(congressActions.congressGetWallet.call());
+  }, [dispatch]);
+
   return (
-    <div className={styles.congressWrapper}>
-      <div className={styles.navWrapper}>
-        <CongressHeader />
-      </div>
-      <div>
-        <Switch>
-          <Route exact path={router.congress.overview} component={Overview} />
-          <Route exact path={router.congress.motions} component={Motions} />
-          <Route exact path={router.congress.treasury} component={Treasury} />
-          <Route exact path={router.congress.addLegislation} component={CongressAddLegislation} />
-          <Route
-            exact
-            path={router.congress.addLegislationViaReferendum}
-            component={CongressAddLegislationViaReferendum}
-          />
-          <Route
-            exact
-            path={router.home.congress}
-            render={() => (
-              <Redirect to={router.congress.overview} />
-            )}
-          />
-        </Switch>
-      </div>
-    </div>
+    <Switch>
+      <Route exact path={router.congress.overview} component={loader(() => import('./Overview'))} />
+      <Route exact path={router.congress.motions} component={MotionsWrapper} />
+      <Route exact path={router.congress.wallet} component={loader(() => import('./Wallet'))} />
+      <Route
+        exact
+        path={router.congress.addLegislation}
+        component={loader(
+          () => import('../Voting/Referendum/ProposalForms/CongressAddLegislation/CongressAddLegislation'),
+        )}
+      />
+      <Route
+        exact
+        path={router.congress.addLegislationViaReferendum}
+        component={loader(
+          () => import(
+            '../Voting/Referendum/ProposalForms/CongressAddLegislationViaReferendum/CongressAddLegislationViaReferendum'
+          ),
+        )}
+      />
+      <Route
+        exact
+        path={router.home.congress}
+        render={() => (
+          <Redirect to={router.congress.overview} />
+        )}
+      />
+    </Switch>
   );
 }
 

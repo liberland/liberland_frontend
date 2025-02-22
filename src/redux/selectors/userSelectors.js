@@ -7,14 +7,6 @@ const selectUser = createSelector(
   (reducer) => reducer.user,
 );
 
-const selectUserRole = createSelector(
-  selectUser,
-  (user) => {
-    if (!user) return null;
-    return user.role;
-  },
-);
-
 const selectUserEmail = createSelector(
   selectUser,
   (user) => {
@@ -63,7 +55,6 @@ const selectWalletAddress = createSelector(
 export {
   selectUser,
   selectIsSessionReady,
-  selectUserRole,
   selectUserEmail,
   selectUserId,
   selectUserGivenName,

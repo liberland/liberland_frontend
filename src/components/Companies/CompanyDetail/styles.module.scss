@@ -1,0 +1,31 @@
+.header {
+    border-bottom: none!important;
+}
+.top {
+    margin-top: 30px;
+}
+.divider {
+    margin-bottom: 30px;
+}
+.purpose {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+.purposeText {
+    min-height: 120px;
+}
+.title {
+    margin-top: 0!important;
+    margin-bottom: 0!important;
+}
+.online {
+    padding-left: 15px;
+}
+.view {
+    margin-top: 9px;
+}
+.noLine {
+    margin-bottom: 9px!important;
+    padding: 0!important;
+}

@@ -13,6 +13,11 @@ import * as congressActions from './congress';
 import * as onBoardingActions from './onboarding';
 import * as dexActions from './dex';
 import * as contractsActions from './contracts';
+import * as senateActions from './senate';
+import * as nftsActions from './nfts';
+import * as ethActions from './eth';
+import * as financesActions from './finances';
+import * as ministryFinanceActions from './ministryFinance';
 
 export {
   authActions,
@@ -30,4 +35,9 @@ export {
   onBoardingActions,
   dexActions,
   contractsActions,
+  senateActions,
+  nftsActions,
+  ethActions,
+  financesActions,
+  ministryFinanceActions,
 };

@@ -2,6 +2,7 @@ import {
   put, takeLatest, call, select,
 } from 'redux-saga/effects';
 
+import { BN_ZERO } from '@polkadot/util';
 import {
   getIdentity,
   provideJudgementAndAssets,
@@ -15,14 +16,12 @@ import {
   setRegisteredCompanyData,
 } from '../../api/nodeRpcCall';
 
-import { officesActions } from '../actions';
+import { blockchainActions, officesActions } from '../actions';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors } from '../selectors';
 import router from '../../router';
-import * as backend from '../../api/backend'
-import {addDollarsTransaction} from "../../api/backend";
-import {parseDollars, parseMerits} from "../../utils/walletHelpers";
-import {BN_ZERO} from "@polkadot/util";
+import * as backend from '../../api/backend';
+import { parseDollars, parseMerits } from '../../utils/walletHelpers';
 // WORKERS
 
 function* getIdentityWorker(action) {
@@ -43,7 +42,6 @@ function* getIdentityWorker(action) {
 }
 
 function* provideJudgementAndAssetsWorker(action) {
-
   if ((parseMerits(action.payload.merits)?.gt(BN_ZERO) || parseDollars(action.payload.dollars)?.gt(BN_ZERO))
     && !action.payload.id) {
     throw new Error('Tried to transfer LLD or LLM but we have no user id!');
@@ -143,7 +141,16 @@ function* setRegisteredCompanyDataWorker(action) {
   history.push(router.offices.companyRegistry.home);
 }
 
+function* getPendingAdditionalMeritsWorker() {
+  const pendingAdditionalMertis = yield call(backend.fetchPendingAdditionalMerits);
+  yield put(officesActions.getPendingAdditionalMerits.success(pendingAdditionalMertis));
+}
+
 // WATCHERS
+
+function* getPendingAdditionalMeritsWatcher() {
+  yield* blockchainWatcher(officesActions.getPendingAdditionalMerits, getPendingAdditionalMeritsWorker);
+}
 
 function* getIdentityWatcher() {
   try {
@@ -211,4 +218,5 @@ export {
   getPalletIdsWatcher,
   unregisterCompanyWatcher,
   setRegisteredCompanyDataWatcher,
+  getPendingAdditionalMeritsWatcher,
 };

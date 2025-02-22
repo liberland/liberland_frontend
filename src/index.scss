@@ -1,63 +1,305 @@
 @import url('https://fonts.googleapis.com/css?family=Open+Sans|Playfair+Display&display=swap');
+@import '../node_modules/rc-tooltip/assets/bootstrap';
+@import './assets/main.scss';
 
 $openSans: 'Open Sans', sans-serif;
 $playfairDisplay: 'Playfair Display', serif;
+
+h1.ant-typography {
+  font-family: $playfairDisplay;
+}
 
 body {
   margin: 0;
   font-family: $openSans;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: var(--main-color);
+  background-color: var(--body-background);
+  font-weight: 500;
+
+  [class*=ant-] {
+    font-weight: 500;
+  }
+
+  h1,h2,h3,h4,h5,strong {
+    font-weight: 600!important;
+  }
 }
 
-p {
-  margin: 0;
+// ANTD overrides
+
+.ant-table-tbody,
+.ant-table-title {
+  background-color: var(--table-bg);
 }
 
+.ant-layout-footer {
+  background-color: var(--footer-bg)!important;
+  .ant-collapse,
+  .ant-menu {
+    background-color: var(--footer-bg)!important;
+  }
+}
 
-#modal-root {
-  position: fixed;
-  left: 0;
-  top: 0;
-  overflow-y: scroll;
-  opacity: 0;
-  display: flex;
-  align-items: safe center;
-  justify-content: safe center;
-  flex: none;
-  
+.unobtrusive {
+  &.ant-progress,
+  .ant-progress-outer,
+  .ant-progress-inner {
+    top: 0;
+    left: 0;
+    position: fixed;
+    height: 5px;
+    z-index: 999;
+    transition: all 0.3s;
+  }
 
-  &.active {
-    width: 100%;
+  &--inactive {
+    &.ant-progress,
+    .ant-progress-outer,
+    .ant-progress-inner {
+      height: 3px;
+    } 
+  }
+}
+
+.ant-table-wrapper {
+  background-color: var(--table-bg);
+  border: solid 1px var(--table-border);
+  border-radius: 6px;
+  padding: 0 18px;
+
+  tbody {
+    .ant-table-row:last-child {
+      .ant-table-cell {
+        border-bottom: none!important;
+      }
+    }
+  }
+}
+
+.ant-btn {
+  padding: 18px!important;
+}
+
+.ant-btn-primary {
+  background: #F6CA31;
+  transition: all 0.3s;
+  color: #122C4B!important;
+
+  &:focus,&:active,&:hover {
+    background: #E3B517!important;
+  }
+}
+
+.ant-btn-dangerous {
+  background: #ff4d4f!important;
+  color: white!important;
+
+  &:focus,&:active,&:hover {
+    background: var(--dangerous-bg)!important;
+    color: var(--dangerous-color)!important;
+    filter: brightness(120%);
+  }
+}
+
+.ant-collapse-header-text {
+  text-align: left;
+  text-underline-position: from-font;
+  text-decoration-skip-ink: none;
+}
+.ant-tabs-tab-btn[aria-selected="true"] {
+  color: var(--main-color)!important;
+}
+
+.description {
+  font-weight: 600;
+  color: var(--description-color);
+}
+
+.values {
+  text-align: left;
+  font-weight: 600;
+}
+
+.ant-card {
+  border-color: var(--card-border)!important;
+  background-color: var(--card-background);
+}
+
+.ant-card-actions {
+  border-top: none!important;
+}
+
+.ant-col {
+  .ant-card {
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 100;
-    opacity: 1;
   }
+}
 
-  & > .modal-wrapper {
+.ant-table-wrapper {
+  overflow-x: auto;
+}
+
+th.ant-table-cell {
+  word-break: keep-all;
+}
+
+.ant-typography.ant-typography-ellipsis {
+  max-width: 500px;
+}
+
+.ant-card-head-title {
+  white-space: unset!important;
+}
+
+.ant-list-grid .ant-card.ant-card-bordered {
+  max-width: 600px;
+}
+
+.ant-list-grid {
+  .ant-row > * {
+    display: flex;
+    height: auto;
+  }
+}
+
+.ant-list .ant-row {
+  gap: 15px;
+}
+
+.threeColumnList {
+  .ant-row > div {
+    width: 100%!important;
+    max-width: 100%!important;
+  
+    @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
+      width: calc(33.33% - 15px)!important;
+      max-width: calc(33.33% - 15px)!important;
+    }
+  }
+}
+
+.oneColumnList {
+  .ant-row > div {
+    width: 100%!important;
+    max-width: 100%!important;
+  }
+  .ant-card {
+    max-width: 100%!important;
+  }
+  .ant-card-body {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .ant-card-meta {
+    padding-bottom: 20px;
+    padding-right: 20px;
+    @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
+      min-width: 400px;
+      padding-bottom: 0;
+    }
+  }
+}
+
+.hidden {
+  display: none!important;
+}
+
+.ant-list-item-meta-title {
+  text-align: left;
+}
+
+.ant-dropdown-menu-title-content {
+  .ant-btn {
     width: 100%;
-    height: fit-content;
-    padding-top: 50px;
-  @media (min-width: 768px) {
-    padding-top: 0;
+    border: none;
   }
+}
 
-    & > div {
-      background: #fff;
-      border-radius: 20px;
-      margin: 24px;
+.ant-collapse-header-text {
+  font-weight: bolder;
+}
+
+textarea.ant-input {
+  min-height: 400px;
+}
+
+.listWithFooter {
+  @media screen and (min-width: map-get($breakpoints, 'xs-phone')) {
+    .ant-list-footer {
+      display: inline-flex;
+      width: 50%;
+    }
+    .ant-list-pagination {
+        display: inline-flex;
+        width: 50%;
+        justify-content: end;
     }
   }
+}
 
-  @media (min-width: 640px) {
-    & > .modal-wrapper {
-      width: auto;
+.big-checkbox {
+  zoom: 1.5;
+
+  .ant-checkbox-inner {
+    border: solid 1.2px var(--main-color);
+    box-shadow: 0 0 2px var(--main-color);
+  }
+}
+.big-checkbox-item {
+  .ant-form-item-label {
+    align-content: center;
+  }
+}
+
+// Screen reader only class utility
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+.ant-tabs-card {
+  .ant-tabs-nav-list {
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 10px;
+  }
+  .ant-tabs-tab {
+    background: none!important;
+    border-radius: 8px!important;
+    border: none!important;
+  }
+}
+
+.centeredList {
+  .ant-row {
+    justify-content: center;
+
+    & > * {
+      flex: 1;
+    }
+
+    @media screen and (min-width: map-get($breakpoints, 'widescreen')) {
+      justify-content: start;
+
+      & > * {
+        flex: unset;
+      }
     }
   }
+}
 
-  & > .modal-text-wrapper {
-    top: 5%;
-    transform: translate(-50%, 0%);
-  }
+.ant-collapse-header {
+  align-items: center!important;
+}
+
+.ant-layout-sider-children .ant-menu {
+  background-color: var(--nav-bg);
 }

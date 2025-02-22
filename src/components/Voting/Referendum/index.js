@@ -1,156 +1,147 @@
-import React, { useEffect, useState } from 'react';
+import React, {
+  useContext,
+  useEffect,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
-import cx from 'classnames';
-import { blockchainSelectors, democracySelectors, congressSelectors } from '../../../redux/selectors';
-import ProposalItem from './Items/ProposalItem';
-import Card from '../../Card';
-import styles from './styles.module.scss';
-import ReferendumItem from './Items/ReferendumItem';
-import DispatchItem from './Items/DispatchItem';
+import Result from 'antd/es/result';
+import Collapse from 'antd/es/collapse';
+import Flex from 'antd/es/flex';
+import List from 'antd/es/list';
+import { useMediaQuery } from 'usehooks-ts';
+import { useHistory } from 'react-router-dom';
+import { AuthContext } from 'react-oauth2-code-pkce';
 import {
-  VoteOnReferendumModal, UndelegateModal,
-} from '../../Modals';
-import { democracyActions, congressActions } from '../../../redux/actions';
+  blockchainSelectors,
+  democracySelectors,
+  userSelectors,
+} from '../../../redux/selectors';
+import ProposalItem from './Items/ProposalItem';
+import DispatchItem from './Items/DispatchItem';
+import { UndelegateModal } from '../../Modals';
+import { democracyActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
-import stylesPage from '../../../utils/pagesBase.module.scss';
+import router from '../../../router';
+import ReferendumItem from './Items/ReferendumItem';
 
 function Referendum() {
-  const [isModalOpenVote, setIsModalOpenVote] = useState(false);
-  const [isModalOpenUndelegate, setIsModalOpenUndelegate] = useState(false);
-  const [selectedReferendumInfo, setSelectedReferendumInfo] = useState({ name: 'Referendum' });
-  const [selectedVoteType, setSelectedVoteType] = useState('Nay');
-  const { handleSubmit, register } = useForm();
+  const history = useHistory();
   const dispatch = useDispatch();
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const userIsMember = useSelector(congressSelectors.userIsMember);
+  const { login } = useContext(AuthContext);
+  const user = useSelector(userSelectors.selectUser);
+  const isBiggerThanMediumScreen = useMediaQuery('(min-width: 1200px)');
 
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call(userWalletAddress));
   }, [dispatch, userWalletAddress]);
 
-  useEffect(() => {
-    dispatch(congressActions.getMembers.call());
-  }, [dispatch]);
-
-  const handleModalOpenVote = (voteType, referendumInfo) => {
-    setIsModalOpenVote(!isModalOpenVote);
-    setSelectedReferendumInfo(referendumInfo);
-    setSelectedVoteType(voteType);
-  };
-  const handleModalOpenUndelegate = () => {
-    setIsModalOpenUndelegate(!isModalOpenUndelegate);
-  };
-  const handleSubmitVoteForm = (values) => {
-    dispatch(democracyActions.voteOnReferendum.call({ ...values, voteType: selectedVoteType }));
-    handleModalOpenVote();
-  };
   const handleSubmitUndelegate = () => {
     dispatch(democracyActions.undelegate.call({ userWalletAddress }));
-    handleModalOpenUndelegate();
   };
   const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
-  const alreadyVoted = (referendum) => {
-    if (referendum.allAye.map((v) => v.accountId.toString()).includes(userWalletAddress)) return 'Aye';
-    if (referendum.allNay.map((v) => v.accountId.toString()).includes(userWalletAddress)) return 'Nay';
-    return false;
-  };
+
+  const controls = (
+    <Flex wrap gap="15px" justify="center">
+      {delegatingTo && (
+        <Flex vertical gap="20px">
+          <div className="description">
+            Delegating to:
+            {' '}
+            {delegatingTo}
+          </div>
+          <UndelegateModal
+            delegatee={delegatingTo}
+            onSubmitUndelegate={handleSubmitUndelegate}
+          />
+        </Flex>
+      )}
+      {user ? (
+        <Button primary onClick={() => history.push(router.voting.addLegislation)}>
+          Propose
+        </Button>
+      ) : (
+        <Button
+          onClick={() => login()}
+          primary
+        >
+          Log in to propose referenda
+        </Button>
+      )}
+    </Flex>
+  );
 
   return (
-    <div className={cx(stylesPage.contentWrapper, styles.wrapper)}>
-      <div>
-        <h3 className={styles.title}>Referendums</h3>
+    <Collapse
+      defaultActiveKey={['referendums', 'proposals', 'dispatches']}
+      collapsible="icon"
+      items={[
         {
-            delegatingTo
-              ? (
-                <div className={styles.proposeReferendumLine}>
-                  (
-                  Delegating to:
-                  {' '}
-                  {delegatingTo}
-                  <Button small primary onClick={handleModalOpenUndelegate}>Undelegate</Button>
-                  )
-                </div>
-              )
-              : null
-        }
-        <div className={styles.overViewCard}>
-          {
-              democracy.democracy?.crossReferencedReferendumsData.map((referendum) => (
-                <Card className={stylesPage.overviewWrapper} key={referendum.index}>
+          key: 'referendums',
+          label: 'Referendums',
+          extra: isBiggerThanMediumScreen ? controls : undefined,
+          children: democracy.democracy?.crossReferencedReferendumsData?.length ? (
+            <List
+              dataSource={democracy.democracy.crossReferencedReferendumsData}
+              footer={!isBiggerThanMediumScreen ? controls : undefined}
+              renderItem={(referendum) => (
+                <List.Item>
                   <ReferendumItem
-                    centralizedDatas={referendum.centralizedDatas}
                     voted={{
                       yayVotes: referendum.votedAye,
                       nayVotes: referendum.votedNay,
                       votedTotal: referendum.votedTotal,
                     }}
                     hash={referendum.imageHash}
-                    delegating={delegatingTo !== undefined}
-                    alreadyVoted={alreadyVoted(referendum)}
                     proposal={referendum.image.proposal}
-                    buttonVoteCallback={handleModalOpenVote}
-                    referendumIndex={parseInt(referendum.index)}
-                    blacklistMotion={referendum.blacklistMotion}
-                    userIsMember={userIsMember}
                   />
-                </Card>
-              ))
-            }
-        </div>
-      </div>
-      <div>
-        <h3 className={styles.title}>Proposals</h3>
-        <div className={styles.overViewCard}>
-          {
-              democracy.democracy?.crossReferencedProposalsData.map((proposal) => (
-                <Card className={stylesPage.overviewWrapper} key={proposal.index}>
+                </List.Item>
+              )}
+            />
+          ) : (
+            <Result
+              status={404}
+              title="There are no active Referendums"
+              extra={!isBiggerThanMediumScreen ? controls : undefined}
+            />
+          ),
+        },
+        {
+          key: 'proposals',
+          label: 'Proposals',
+          children: democracy.democracy?.crossReferencedProposalsData?.length ? (
+            <List
+              dataSource={democracy.democracy.crossReferencedProposalsData}
+              renderItem={(proposal) => (
+                <List.Item>
                   <ProposalItem
-                    centralizedDatas={proposal.centralizedDatas}
                     boundedCall={proposal.boundedCall}
-                    blacklistMotion={proposal.blacklistMotion}
-                    userIsMember={userIsMember}
+                    id={proposal.index}
                   />
-                </Card>
-              ))
-            }
-        </div>
-      </div>
-      <div>
-        <h3 className={styles.title}>Dispatches</h3>
-        <div className={styles.overViewCard}>
-          {democracy.democracy?.scheduledCalls.map((item) => (
-            <Card
-              className={cx(stylesPage.overviewWrapper, styles.itemWrapper)}
-              key={`${item.blockNumber.toString()}-${item.idx}`}
-            >
-              <DispatchItem
-                item={item}
-              />
-            </Card>
-          ))}
-        </div>
-      </div>
-      {isModalOpenVote && (
-        <VoteOnReferendumModal
-          closeModal={handleModalOpenVote}
-          handleSubmit={handleSubmit}
-          register={register}
-          referendumInfo={selectedReferendumInfo}
-          voteType={selectedVoteType}
-          onSubmitVote={handleSubmitVoteForm}
-        />
-      )}
-      {isModalOpenUndelegate && (
-        <UndelegateModal
-          closeModal={handleModalOpenUndelegate}
-          handleSubmit={handleSubmit}
-          delegatee={delegatingTo}
-          onSubmitUndelegate={handleSubmitUndelegate}
-        />
-      )}
-    </div>
+                </List.Item>
+              )}
+            />
+          ) : <Result status={404} title="There are no active Proposals" />,
+        },
+        {
+          key: 'dispatches',
+          label: 'Dispatches',
+          children: democracy.democracy?.scheduledCalls?.length ? (
+            <List
+              dataSource={democracy.democracy.scheduledCalls}
+              renderItem={(item) => (
+                <List.Item>
+                  <DispatchItem
+                    item={item}
+                  />
+                </List.Item>
+              )}
+            />
+          ) : <Result status={404} title="There are no active Dispatches" />,
+        },
+      ]}
+    />
   );
 }
+
 export default Referendum;

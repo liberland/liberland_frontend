@@ -9,13 +9,11 @@ export default function CreateCompany() {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const onSubmit = ((allCompanyData) => {
-    const { registryAllowedToEdit, ...companyData } = allCompanyData;
-
+  const onSubmit = ((companyData) => {
     dispatch(
       registriesActions.requestCompanyRegistrationAction.call({
         companyData,
-        registryAllowedToEdit,
+        registryAllowedToEdit: true,
         history,
       }),
     );

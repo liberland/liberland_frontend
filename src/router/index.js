@@ -1,6 +1,6 @@
 export default {
-  signIn: '/signin',
   signUp: '/signup',
+  signIn: '/liberland-login',
   home: {
     index: '/home',
     feed: '/home/feed',
@@ -15,6 +15,14 @@ export default {
     congress: '/home/congress',
     contracts: '/home/contracts',
     companies: '/home/companies',
+    senate: '/home/senate',
+    nfts: '/home/nfts',
+  },
+  nfts: {
+    overview: '/home/nfts/overview',
+    ownedNfts: '/home/nfts/owned-nfts',
+    collections: '/home/nfts/collections',
+    shop: '/home/nfts/on-sale',
   },
   guidedSetup: '/guided-setup',
   offices: {
@@ -25,6 +33,8 @@ export default {
     },
     landRegistry: '/home/offices/land_registry',
     finances: '/home/offices/finances',
+    scheduledCongressSpending: '/home/offices/scheduled-congress-spending',
+    ministryOfFinance: '/home/offices/ministry-of-finance',
   },
   documents: {
     myAccount: '/home/documents/my-account',
@@ -35,15 +45,30 @@ export default {
   voting: {
     congressionalAssemble: '/home/voting/congressional-assemble',
     referendum: '/home/voting/referendum',
+    proposalItem: '/home/voting/proposal/:id',
+    referendumItem: '/home/voting/referendum/:referendumHash',
+    dispatchItem: '/home/voting/dispatch/:dispatchId',
     addLegislation: '/home/voting/add-legislation',
   },
   legislation: {
     view: '/home/legislation/:tier',
+    constitution: '/home/legislation/Constitution',
+    internationalTreaty: '/home/legislation/InternationalTreaty',
+    law: '/home/legislation/Law',
+    tier3: '/home/legislation/Tier3',
+    tier4: '/home/legislation/Tier4',
+    tier5: '/home/legislation/Tier5',
+    decisions: '/home/legislation/Decision',
   },
   wallet: {
     exchange: '/home/wallet/exchange',
-    allTransactions: '/home/wallet/all-transactions',
+    stockExchange: '/home/wallet/stock-exchange',
+    assets: '/home/wallet/assets',
+    stocks: '/home/wallet/stocks',
     overView: '/home/wallet/overview',
+    bridge: '/home/wallet/bridge',
+    nfts: '/home/wallet/nfts',
+    payMe: '/home/wallet/pay-me',
   },
   registries: {
     overview: '/home/registries/overview',
@@ -54,14 +79,22 @@ export default {
   },
   staking: {
     overview: '/home/staking/overview',
+    ethlpstaking: '/home/staking/ethlpstaking',
+    sollpstaking: '/home/staking/sollpstaking',
   },
   congress: {
     overview: '/home/congress/overview',
     motions: '/home/congress/motions',
-    treasury: '/home/congress/treasury',
     addLegislation: '/home/congress/add-legislation',
     addLegislationViaReferendum:
       '/home/congress/add-legislation-via-referendum',
+    wallet: '/home/congress/wallet',
+  },
+  senate: {
+    motions: '/home/senate/motions',
+    scheduledCongressSpending: '/home/senate/scheduled-congress-spending',
+    wallet: '/home/senate/wallet',
+    overview: '/home/senate/overview',
   },
   contracts: {
     overview: '/home/contracts/overview',
@@ -72,6 +105,7 @@ export default {
     home: '/home/companies',
     create: '/home/companies/create',
     edit: '/home/companies/edit/:companyId',
+    view: '/home/companies/view/:companyId',
     allCompanies: '/home/companies/allCompanies',
   },
 };

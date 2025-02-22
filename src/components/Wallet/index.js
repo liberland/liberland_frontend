@@ -1,107 +1,69 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import {
-  Redirect, Route, Switch, useHistory,
+  Redirect, Route, Switch,
 } from 'react-router-dom';
+import Result from 'antd/es/result';
 import router from '../../router';
-
-import { walletSelectors, blockchainSelectors } from '../../redux/selectors';
-import { walletActions } from '../../redux/actions';
-
-import WalletAddressesLine from './WalletAddressesLine';
-import styles from './styles.module.scss';
-import stylesPage from '../../utils/pagesBase.module.scss';
-import WalletOverview from './WalletOverview';
-import WalletTransactionHistory from './WalletTransactionHistory';
-
-import Card from '../Card';
-import RoleHOC from '../../hocs/RoleHOC';
-import AssetOverview from './AssetOverview';
-import Exchange from './Exchange';
+import { blockchainSelectors } from '../../redux/selectors';
+import { loader } from '../../utils/loader';
+import { stockWrapper } from './StockContext';
 
 function Wallet() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
-  const balances = useSelector(walletSelectors.selectorBalances);
-  const totalBalance = useSelector(walletSelectors.selectorTotalBalance);
-  const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
-  const transactionHistory = useSelector(walletSelectors.selectorAllHistoryTx);
-  const historyFetchFailed = useSelector(walletSelectors.selectorTxHistoryFailed);
-  const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
-  const dispatch = useDispatch();
-  const history = useHistory();
-  const redirectToViewAllTx = () => {
-    history.push(router.wallet.allTransactions);
-  };
-
-  useEffect(() => {
-    dispatch(walletActions.getWallet.call());
-    dispatch(walletActions.getAdditionalAssets.call());
-    dispatch(walletActions.getTxTransfers.call());
-  }, [dispatch, userWalletAddress]);
-
-  const overView = () => (
-    <div className={stylesPage.contentWrapper}>
-
-      <WalletOverview
-        totalBalance={totalBalance}
-        balances={balances}
-        liquidMerits={liquidMerits}
-      />
-
-      <AssetOverview
-        additionalAssets={additionalAssets}
-      />
-
-      <WalletTransactionHistory
-        failure={historyFetchFailed}
-        transactionHistory={transactionHistory}
-        textForBtn="View All Transactions"
-        bottomButtonOnclick={redirectToViewAllTx}
-      />
-    </div>
-  );
-
   return (
     (userWalletAddress !== undefined) ? (
-      <div className={stylesPage.sectionWrapper}>
-        <div className={stylesPage.menuAddressWrapper}>
-          <WalletAddressesLine walletAddress={userWalletAddress} />
-        </div>
-
-        <div>
-          <Switch>
-            <Route
-              path={router.wallet.overView}
-              component={overView}
-            />
-            <Route
-              path={router.wallet.exchange}
-              component={Exchange}
-            />
-            <Route
-              exact
-              path={router.home.wallet}
-              render={() => (
-                <RoleHOC>
-                  <Redirect to={router.wallet.overView} />
-                </RoleHOC>
-              )}
-            />
-          </Switch>
-        </div>
-      </div>
+      <Switch>
+        <Route
+          path={router.wallet.overView}
+          component={loader(() => import('./WalletOverview'))}
+        />
+        <Route
+          path={router.wallet.exchange}
+          component={stockWrapper(loader(() => import('./Exchange')), false)}
+        />
+        <Route
+          path={router.wallet.stockExchange}
+          component={stockWrapper(loader(() => import('./Exchange')), true)}
+        />
+        <Route
+          path={router.wallet.assets}
+          component={stockWrapper(loader(() => import('./Assets')), false)}
+        />
+        <Route
+          path={router.wallet.stocks}
+          component={stockWrapper(loader(() => import('./Assets')), true)}
+        />
+        <Route
+          path={router.wallet.bridge}
+          component={loader(() => import('./Bridge'))}
+        />
+        <Route
+          path={router.wallet.payMe}
+          component={loader(() => import('./PayMe'))}
+        />
+        <Route
+          exact
+          path={router.home.wallet}
+          render={() => (
+            <Redirect to={router.wallet.overView} />
+          )}
+        />
+      </Switch>
     ) : (
-      <Card>
-        <div className={styles.haveNotExtension}>
-          <span>
+      <Result
+        status="error"
+        title="Extension error"
+        subTitle={(
+          <>
             No extension installed, or you did not accept the authorization, please visit
             {' '}
             <a target="_blank" href="https://polkadot.js.org/extension/" rel="noopener noreferrer">polkadot.js.org</a>
             {' '}
             for more details.
-          </span>
-        </div>
-      </Card>
+          </>
+        )}
+      />
     )
   );
 }

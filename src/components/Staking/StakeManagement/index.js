@@ -1,79 +1,117 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import cx from 'classnames';
-import { validatorSelectors, walletSelectors } from '../../../redux/selectors';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Spin from 'antd/es/spin';
+import Row from 'antd/es/row';
+import Col from 'antd/es/col';
+import { useMediaQuery } from 'usehooks-ts';
+import { blockchainSelectors, validatorSelectors, walletSelectors } from '../../../redux/selectors';
 import { formatDollars } from '../../../utils/walletHelpers';
-import Button from '../../Button/Button';
-import { StakeLLDModal, UnbondModal } from '../../Modals';
-import StakingMode from './StakingMode';
-import RewardsConfig from './RewardsConfig';
-import styles from './styles.module.scss';
-import PendingRewardsData from './PendingRewardsData';
-import RewardsConfigButton from './RewardsConfig/RewardsConfigButton';
+import LLD from '../../../assets/icons/lld.svg';
+import {
+  StakeLLDModal,
+  StakingRewardsDestinationModal,
+  UnbondModal,
+} from '../../Modals';
 import WithdrawUnbondedButton from './WithdrawUnbondedButton';
 import PayoutRewards from './PayoutRewards';
 import Unbonding from './Unbonding';
-import stylesPage from '../../../utils/pagesBase.module.scss';
-import Card from '../../Card';
-
-function CurrentlyStaked() {
-  const balances = useSelector(walletSelectors.selectorBalances);
-
-  return (
-    <div className={cx(styles.rowWrapper, styles.currentlyStaked)}>
-      <span>Currently staked: </span>
-      <span>
-        {formatDollars(balances.polkastake.amount)}
-        {' '}
-        LLD
-      </span>
-    </div>
-  );
-}
+import { validatorActions } from '../../../redux/actions';
+import styles from './styles.module.scss';
+import MoneyCard from '../../MoneyCard';
+import { blockTimeFormatted, stakingInfoToProgress } from '../../../utils/staking';
 
 export default function StakeManagement() {
   const balances = useSelector(walletSelectors.selectorBalances);
+  const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const info = useSelector(validatorSelectors.info);
-  const [isStakeModalOpen, setIsStakeModalOpen] = useState(false);
-  const [isUnbondModalOpen, setIsUnbondModalOpen] = useState(false);
+  const pendingRewards = useSelector(validatorSelectors.pendingRewards);
+  const payee = useSelector(validatorSelectors.payee);
+  const { stakingInfo, sessionProgress } = useSelector(validatorSelectors.stakingData);
+  const dispatch = useDispatch();
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
+  const stakingData = stakingInfoToProgress(stakingInfo, sessionProgress) ?? [];
+  const { unlock, blocks } = stakingData?.[0] || {};
 
-  if (!balances) return null;
+  useEffect(() => {
+    if (info?.unlocking?.length) {
+      dispatch(validatorActions.getStakingData.call());
+    }
+  }, [dispatch, blockNumber, info]);
+  useEffect(() => {
+    if (info?.unlocking?.length) {
+      dispatch(validatorActions.getStakingData.call());
+    }
+  }, [dispatch, info]);
 
-  const handleStakeModalOpen = () => setIsStakeModalOpen(!isStakeModalOpen);
-  const handleUnbondModalOpen = () => setIsUnbondModalOpen(!isUnbondModalOpen);
+  useEffect(() => {
+    dispatch(validatorActions.getPayee.call());
+  }, [dispatch]);
+
+  if (!balances) {
+    return <Spin />;
+  }
+
+  const rewardsDescription = (() => {
+    switch (payee?.toString()) {
+      case 'Staked':
+        return 'Rewards will be automatically staked';
+      case 'Stash':
+        return 'Rewards will be deposited in your account';
+      default:
+        return '';
+    }
+  })();
 
   return (
-    <div className={styles.stakingWrapper}>
-      <Card className={cx(stylesPage.overviewWrapper, styles.customCard)} title="LLD staking">
-        <div>
-          <CurrentlyStaked />
-          {info?.stash && (
-          <>
-            <PendingRewardsData />
-            <RewardsConfig />
-            <Unbonding {...{ info }} />
-            <div className={styles.stakingActionButtonsWrapper}>
-              <Button small primary onClick={handleStakeModalOpen}>
-                ADD STAKE
-              </Button>
-              <WithdrawUnbondedButton />
-              <Button small secondary onClick={handleUnbondModalOpen}>
-                UNSTAKE
-              </Button>
-              <RewardsConfigButton />
-              <PayoutRewards />
-            </div>
-          </>
+    <Row gutter={16} className={!isBiggerThanDesktop && styles.row}>
+      <Col span={isBiggerThanDesktop ? 6 : 24}>
+        <MoneyCard
+          actions={[
+            <StakeLLDModal label="Stake LLD" key="stake" />,
+            <UnbondModal key="unbond" />,
+          ]}
+          amount={`${formatDollars(balances.polkastake.amount)} LLD`}
+          currency="LLD"
+          icon={LLD}
+          title="Currently staked"
+        />
+      </Col>
+      <Col span={isBiggerThanDesktop ? 6 : 24}>
+        <MoneyCard
+          actions={[
+            <PayoutRewards />,
+          ]}
+          title="Rewards pending"
+          amount={`${formatDollars(pendingRewards ?? 0)} LLD`}
+          currency="LLD"
+          icon={LLD}
+        />
+      </Col>
+      <Col span={isBiggerThanDesktop ? 6 : 24}>
+        <MoneyCard
+          amount={payee?.toString() || 'None'}
+          title="Rewards destination"
+          description={rewardsDescription}
+          actions={[
+            <StakingRewardsDestinationModal />,
+          ]}
+        />
+      </Col>
+      <Col span={isBiggerThanDesktop ? 6 : 24}>
+        <MoneyCard
+          amount={`${formatDollars(stakingInfo?.redeemable || '0')} LLD to withdraw`}
+          currency="LLD"
+          icon={LLD}
+          title="Unstaking"
+          description={(
+            unlock?.value && blocks && `${formatDollars(unlock?.value)} will unlock in ${blockTimeFormatted(blocks)}`
           )}
-        </div>
-      </Card>
-      <Card className={cx(stylesPage.overviewWrapper, styles.customCard, styles.stakingCard)} title="Staking mode">
-        <div className={styles.internalWrapper}>
-          <StakingMode />
-        </div>
-      </Card>
-      {isStakeModalOpen && <StakeLLDModal closeModal={handleStakeModalOpen} />}
-      {isUnbondModalOpen && <UnbondModal closeModal={handleUnbondModalOpen} />}
-    </div>
+          actions={[
+            stakingData?.length > 1 && <Unbonding info={info} />,
+            <WithdrawUnbondedButton />,
+          ].filter(Boolean)}
+        />
+      </Col>
+    </Row>
   );
 }

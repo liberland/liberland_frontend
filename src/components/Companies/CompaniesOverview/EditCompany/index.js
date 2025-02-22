@@ -4,9 +4,9 @@ import { useParams, useHistory } from 'react-router-dom';
 import { BuildRegistryForm } from '../../../../utils/registryFormBuilder';
 import { registriesActions } from '../../../../redux/actions';
 import {
-  registriesSelectors,
   blockchainSelectors,
 } from '../../../../redux/selectors';
+import { useCompanyDataFromUrl } from '../../hooks';
 
 export default function EditCompany() {
   const { companyId } = useParams();
@@ -20,12 +20,9 @@ export default function EditCompany() {
       registriesActions.getOfficialUserRegistryEntries.call(userWalletAddress),
     );
   }, [dispatch, userWalletAddress]);
-  const registries = useSelector(registriesSelectors.registries);
-  const requestType = window.location.hash.substring(1);
-  const companies = registries?.officialUserRegistryEntries?.companies?.[requestType];
-  const registeredCompanyData = companies?.find((item) => item.id === companyId);
+  const { mainDataObject } = useCompanyDataFromUrl();
 
-  if (!registeredCompanyData) {
+  if (!mainDataObject) {
     return (
       <div>
         There is no company with this id
@@ -33,19 +30,21 @@ export default function EditCompany() {
     );
   }
 
-  const onSubmit = (companyData) => {
+  const onSubmit = (allCompanyData) => {
+    const { registryAllowedToEdit, ...companyData } = allCompanyData;
     dispatch(
       registriesActions.requestEditCompanyRegistrationAction.call({
         companyData,
         companyId,
         history,
+        registryAllowedToEdit,
       }),
     );
   };
 
   return (
     <BuildRegistryForm
-      formObject={registeredCompanyData}
+      formObject={mainDataObject}
       buttonMessage="Submit Company Application"
       companyId={companyId}
       callback={onSubmit}

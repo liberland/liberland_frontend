@@ -1,22 +1,62 @@
-@import '../../assets/base/variables';
-@import '../../assets/base/fonts';
-@import '../../assets/main.scss';
+@import "../../assets/base/variables";
+@import "../../assets/main.scss";
 
-.votingHeaderWrapper {
-  display: flex;
-  justify-content: space-between;
-
-  & > a{
-    text-decoration: none;
+.nav {
+  margin-top: 25px;
+}
+.icon {
+  max-height: 20px;
+  margin-right: 10px;
+}
+.torch {
+  width: 15px!important;
+  margin: 20px auto;
+}
+.cardTitle {
+  @media screen and (min-width: map-get($breakpoints, 'widescreen')) {
+    max-width: 350px;
+    min-width: 350px;
   }
 }
-
-.linkButton{
-  display: none;
-
-  @media screen and (min-width: map-get($breakpoints, 'tablet')){
-    display: block;
-  }
+.countdown {
+    width: 100%;
+    max-width: 100%!important;
 }
-
-
+.candidate,
+.referendum {
+    width: 100%;
+    max-width: 100%!important;
+}
+.splash {
+    width: 100%;
+    max-width: 100%!important;
+}
+.proposal {
+  width: 100%;
+  max-width: 100%!important;
+}
+.discussionDescription {
+  margin-bottom: 0!important;
+}
+.discussionIdentity {
+  width: 300px;
+}
+.intro {
+  h1,h2,h3,h4,h5 {
+    font-size: 18px!important;
+    color: #ACBDC5;
+    font-weight: 600!important;
+    margin-bottom: 0!important;
+    margin-top: 0!important;
+  }
+  margin-bottom: 0!important;
+}
+.for {
+  color: #7DC035;
+}
+.against {
+  color: #FF0000;
+}
+.formTitle {
+  margin-top: 15px;
+}

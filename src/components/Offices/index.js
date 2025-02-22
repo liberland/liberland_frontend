@@ -3,60 +3,55 @@ import {
   Switch, Route, Redirect,
 } from 'react-router-dom';
 
-import OfficesHeader from './OfficesHeader';
-import Identity from './Identity';
-import CompanyRegistry from './CompanyRegistry';
-import CompanyRegistryEdit from './CompanyRegistry/EditCompany';
-import LandRegistry from "./LandRegistry";
-import Finances from "./Finances";
 import router from '../../router';
-
-import styles from './styles.module.scss';
+import { loader } from '../../utils/loader';
 
 function Offices() {
   return (
-    <div className={styles.officesWrapper}>
-      <div className={styles.navWrapper}>
-        <OfficesHeader />
-      </div>
-
-      <div>
-        <Switch>
-          <Route
-            exact
-            path={router.offices.identity}
-            component={Identity}
-          />
-          <Route
-            exact
-            path={router.offices.companyRegistry.home}
-            component={CompanyRegistry}
-          />
-          <Route
-            exact
-            path={router.offices.companyRegistry.edit}
-            component={CompanyRegistryEdit}
-          />
-          <Route
-            exact
-            path={router.home.offices}
-            render={() => (
-              <Redirect to={router.offices.identity} />
-            )}
-          />
-          <Route
-            exact
-            path={router.offices.landRegistry}
-            component={LandRegistry}
-          />
-          <Route
-            exact
-            path={router.offices.finances}
-            component={Finances}
-          />
-        </Switch>
-      </div>
-    </div>
+    <Switch>
+      <Route
+        exact
+        path={router.offices.identity}
+        component={loader(() => import('./Identity'))}
+      />
+      <Route
+        exact
+        path={router.offices.companyRegistry.home}
+        component={loader(() => import('./CompanyRegistry'))}
+      />
+      <Route
+        exact
+        path={router.offices.companyRegistry.edit}
+        component={loader(() => import('./CompanyRegistry/EditCompany'))}
+      />
+      <Route
+        exact
+        path={router.home.offices}
+        render={() => (
+          <Redirect to={router.offices.ministryOfFinance} />
+        )}
+      />
+      <Route
+        exact
+        path={router.offices.landRegistry}
+        component={loader(() => import('./LandRegistry'))}
+      />
+      <Route
+        exact
+        path={router.offices.finances}
+        component={loader(() => import('./Finances'))}
+      />
+      <Route
+        exact
+        path={router.offices.scheduledCongressSpending}
+        component={loader(() => import('./ScheduledCongressSpendingWrapper'))}
+      />
+      <Route
+        exact
+        path={router.offices.ministryOfFinance}
+        component={loader(() => import('./MinistryOfFinance'))}
+      />
+    </Switch>
   );
 }
 

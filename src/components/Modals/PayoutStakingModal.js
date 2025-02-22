@@ -1,64 +1,64 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Flex from 'antd/es/flex';
 import { useDispatch } from 'react-redux';
-import ModalRoot from './ModalRoot';
 import Button from '../Button/Button';
-import styles from './styles.module.scss';
 import { validatorActions } from '../../redux/actions';
+import OpenModalButton from './components/OpenModalButton';
+import modalWrapper from './components/ModalWrapper';
 
-function PayoutStakingModal({
-  closeModal,
+function PayoutStakingForm({
+  onClose,
 }) {
   const dispatch = useDispatch();
-
+  const [form] = Form.useForm();
   const payout = () => {
     dispatch(validatorActions.payout.call());
-    closeModal();
+    onClose();
   };
 
   return (
-    <form
-      className={styles.getCitizenshipModal}
-      onSubmit={payout}
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={payout}
     >
-      <div className={styles.h3}>Payout staking rewards</div>
-      <div className={styles.title}>
+      <Title level={3}>Payout staking rewards</Title>
+      <Paragraph>
         Staking rewards are paid per staking era and validator. These payouts will
         be batched 10 at a time, but it&apos;s still possible that your wallet will ask
         you to sign multiple transactions.
-      </div>
+      </Paragraph>
 
-      <div className={styles.buttonWrapper}>
+      <Flex wrap gap="15px">
         <Button
-          medium
-          onClick={closeModal}
+          onClick={onClose}
         >
           Cancel
         </Button>
         <Button
           primary
-          medium
           type="submit"
         >
           Payout
         </Button>
-      </div>
-    </form>
+      </Flex>
+    </Form>
   );
 }
 
-PayoutStakingModal.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+PayoutStakingForm.propTypes = {
+  onClose: PropTypes.func.isRequired,
 };
 
-function PayoutStakingModalWrapper(props) {
+function ButtonModal(props) {
   return (
-    <ModalRoot>
-      <PayoutStakingModal {...props} />
-    </ModalRoot>
+    <OpenModalButton text="Payout rewards" {...props} />
   );
 }
+const PayoutStakingModal = modalWrapper(PayoutStakingForm, ButtonModal);
 
-export default PayoutStakingModalWrapper;
+export default PayoutStakingModal;

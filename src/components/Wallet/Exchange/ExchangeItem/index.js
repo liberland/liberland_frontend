@@ -1,26 +1,20 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
+import Card from 'antd/es/card';
+import Flex from 'antd/es/flex';
+import { useMediaQuery } from 'usehooks-ts';
+import { useLocation } from 'react-router-dom';
 import { getDecimalsForAsset, getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormatter';
+import { formatAssets } from '../../../../utils/walletHelpers';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
-import AddLiquidityModalWrapper from '../../../Modals/AddLiquidityModal';
-import styles from '../styles.module.scss';
-import Button from '../../../Button/Button';
-import ExchangeShowMore from '../ExchangeShowMore';
+import AddLiquidityModal from '../../../Modals/AddLiquidityModal';
+import styles from './styles.module.scss';
 import { ExchangeItemPropTypes } from '../proptypes';
 import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
+import CurrencyIcon from '../../../CurrencyIcon';
 
 function ExchangeItem({ poolData, assetsPoolData }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isBuyTrade, setIsBuyTrade] = useState(false);
-  const [isShowMoreOpen, setIsShowMoreOpen] = useState(false);
-  const [isOpenLiquidityModal, setIsOpenLiquidityModal] = useState(false);
-  const [isModalRemoveLiquidityOpen, setIsModalRemoveLiquidityOpen] = useState(false);
-  const handleModalLiquidity = () => setIsOpenLiquidityModal(
-    (prevValue) => !prevValue,
-  );
-
-  const handleModal = () => setIsModalOpen((prevValue) => !prevValue);
-  const handleModalLiquidityRemove = () => setIsModalRemoveLiquidityOpen((prevValue) => !prevValue);
+  const location = useLocation();
   const {
     asset1,
     asset2,
@@ -32,6 +26,8 @@ function ExchangeItem({ poolData, assetsPoolData }) {
   } = poolData;
   const asset1ToShow = useMemo(() => makeAssetToShow(asset1, assetData1?.symbol), [assetData1, asset1]);
   const asset2ToShow = useMemo(() => makeAssetToShow(asset2, assetData2?.symbol), [assetData2, asset2]);
+  const asset1Name = asset1 === 'Native' ? 'Liberland dollar' : assetData1.name;
+  const asset2Name = asset2 === 'Native' ? 'Liberland dollar' : assetData2.name;
   const assets = {
     asset1,
     asset2,
@@ -45,13 +41,13 @@ function ExchangeItem({ poolData, assetsPoolData }) {
   const decimals1 = getDecimalsForAsset(asset1, assetData1?.decimals);
   const decimals2 = getDecimalsForAsset(asset2, assetData2?.decimals);
 
-  const swapPriceTokensForExactTokens = getExchangeRate(
+  const asset1AmountForAsset2 = getExchangeRate(
     reserved?.asset1,
     reserved?.asset2,
     decimals1,
     decimals2,
   );
-  const swapPriceExactTokensForTokens = getExchangeRate(
+  const asset2AmountForAsset1 = getExchangeRate(
     reserved?.asset2,
     reserved?.asset1,
     decimals2,
@@ -62,122 +58,121 @@ function ExchangeItem({ poolData, assetsPoolData }) {
 
   const isReservedDataEmpty = reserved ? (reserved?.asset2?.isEmpty || reserved?.asset1?.isEmpty) : true;
 
+  const liqPoolDescription = (
+    <div className={styles.liquidityPool}>
+      <span className="description">
+        Liquidity pool
+      </span>
+      &nbsp;
+      <span className="values">
+        {formatAssets(reserved?.asset1 || '0', decimals1, { symbol: asset1ToShow, optionalAll: true })}
+        {' / '}
+        {formatAssets(reserved?.asset2 || '0', decimals2, { symbol: asset2ToShow, optionalAll: true })}
+      </span>
+    </div>
+  );
+
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
+  const name1 = (
+    <Flex wrap gap="5px" align="center">
+      {asset1ToShow}
+      <CurrencyIcon size={20} symbol={asset1ToShow} />
+    </Flex>
+  );
+  const name2 = (
+    <Flex wrap gap="5px" align="center">
+      {asset2ToShow}
+      <CurrencyIcon size={20} symbol={asset2ToShow} />
+    </Flex>
+  );
+
+  const areDexQuerySamePair = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    const dexQuery = params.get('dex');
+
+    if (!dexQuery) return false;
+
+    const pair = dexQuery.split('/').map((item) => item.toLowerCase());
+
+    const asset1Text = asset1ToShow.toLowerCase();
+    const asset2Text = asset2ToShow.toLowerCase();
+
+    return (
+      (pair[0] === asset1Text && pair[1] === asset2Text)
+      || (pair[0] === asset2Text && pair[1] === asset1Text)
+    );
+  }, [asset1ToShow, asset2ToShow, location.search]);
+
   return (
-    <>
-      {isModalOpen && (
-        <TradeTokensModalWrapper
-          handleModal={handleModal}
-          assets={assets}
-          isBuy={isBuyTrade}
-        />
+    <Card
+      title={(
+        <Flex wrap gap="15px">
+          {name1}
+          <span>/</span>
+          {name2}
+        </Flex>
       )}
-      {isOpenLiquidityModal && (
-        <AddLiquidityModalWrapper
-          handleModal={handleModalLiquidity}
-          assets={assets}
-          isReservedDataEmpty={isReservedDataEmpty}
-        />
-      )}
-      {isModalRemoveLiquidityOpen && (
-        <RemoveLiquidityModalWrapper
-          handleModal={handleModalLiquidityRemove}
-          assets={assets}
-          reserved={reserved}
-          lpTokensBalance={lpTokensBalance}
-          liquidity={liquidity}
-        />
-      )}
-      <div className={styles.item}>
-        <div className={styles.buttons}>
-          <div className={styles.buttonsWithRate}>
-            <div className={styles.transactionButtons}>
-              <Button
-                disabled={!reserved}
-                small
-                primary
-                onClick={() => {
-                  handleModal();
-                  setIsBuyTrade(false);
-                }}
-              >
-                SELL
-                {' '}
-                {asset1ToShow}
-                {' '}
-                FOR
-                {' '}
-                {asset2ToShow}
-              </Button>
-              <Button
-                disabled={!reserved}
-                small
-                primary
-                onClick={() => {
-                  handleModal();
-                  setIsBuyTrade(true);
-                }}
-              >
-                BUY
-                {' '}
-                {asset1ToShow}
-                {' '}
-                FOR
-                {' '}
-                {asset2ToShow}
-              </Button>
-            </div>
-            {swapPriceTokensForExactTokens
-            && swapPriceExactTokensForTokens
-              && (
-              <div className={styles.exchangeRate}>
-                <span>
-                  <span className={styles.bold}>{asset1ToShow}</span>
-                  {` = ${swapPriceExactTokensForTokens} `}
-                  <span className={styles.bold}>{asset2ToShow}</span>
-                </span>
-
-                <span>
-                  <span className={styles.bold}>{asset2ToShow}</span>
-                  {` = ${swapPriceTokensForExactTokens} `}
-                  <span className={styles.bold}>{asset1ToShow}</span>
-                </span>
-
+      extra={isBiggerThanDesktop ? liqPoolDescription : undefined}
+    >
+      {!isBiggerThanDesktop && liqPoolDescription}
+      <Flex wrap gap="15px">
+        <Flex wrap gap="15px" flex={0.8} justify="space-between">
+          <Flex wrap gap="15px" align="center" flex={0.5}>
+            <div>
+              <div className="description">
+                {'1 '}
+                {asset1Name}
               </div>
-              )}
-          </div>
-          <div>
-            <Button
-              small
-              green
-              onClick={() => setIsShowMoreOpen((prevState) => !prevState)}
-            >
-              {isShowMoreOpen ? 'Show less' : 'Show more'}
-            </Button>
-          </div>
+              <div className="values">
+                {asset2AmountForAsset1}
+                {' '}
+                {asset2Name}
+              </div>
+            </div>
+          </Flex>
+          <Flex wrap gap="15px" align="center" flex={0.5}>
+            <div>
+              <div className="description">
+                {'1 '}
+                {asset2Name}
+              </div>
+              <div className="values">
+                {asset1AmountForAsset2}
+                {' '}
+                {asset1Name}
+              </div>
+            </div>
+          </Flex>
+        </Flex>
+        <div className={styles.liquidityWrapper}>
+          <Flex gap="15px" wrap>
+            <TradeTokensModalWrapper
+              assets={assets}
+              asset1ToShow={asset1ToShow}
+              asset2ToShow={asset2ToShow}
+              isOpenOnRender={areDexQuerySamePair}
+            />
+            <AddLiquidityModal
+              assets={assets}
+              isReservedDataEmpty={isReservedDataEmpty}
+            />
+            {reserved && (
+              <RemoveLiquidityModalWrapper
+                assets={assets}
+                reserved={reserved}
+                lpTokensBalance={lpTokensBalance}
+                liquidity={liquidity}
+              />
+            )}
+          </Flex>
         </div>
-        {isShowMoreOpen && (
-        <ExchangeShowMore
-          handleModalLiquidityRemove={handleModalLiquidityRemove}
-          handleModalLiquidity={handleModalLiquidity}
-          asset1={asset1}
-          asset2={asset2}
-          asset1ToShow={asset1ToShow}
-          asset2ToShow={asset2ToShow}
-          liquidity={liquidity}
-          reserved={reserved}
-          lpTokensBalance={lpTokensBalance}
-          asset1Decimals={assetData1?.decimals}
-          asset2Decimals={assetData2?.decimals}
-          isReservedDataEmpty={isReservedDataEmpty}
-        />
-        )}
-      </div>
-    </>
+      </Flex>
+    </Card>
   );
 }
 
 ExchangeItem.propTypes = {
-  poolData: ExchangeItemPropTypes.isRequired,
+  poolData: PropTypes.shape(ExchangeItemPropTypes).isRequired,
   assetsPoolData: PropTypes.shape({
     supply: PropTypes.string,
   }).isRequired,

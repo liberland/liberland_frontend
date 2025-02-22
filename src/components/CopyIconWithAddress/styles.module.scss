@@ -1,8 +1,9 @@
-.copyIconWithAdress{
+.copyIconWithAdress {
   display: inline-flex;
   align-items: center;
 
-  .copyIcon{
+  .copyIcon {
     cursor: pointer;
+    margin-top: 3px;
   }
 }

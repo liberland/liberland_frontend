@@ -1,71 +1,104 @@
-import React from 'react';
-import { useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import routesNotSameWallet from '../../../router/routesNotSameWallet';
-import router from '../../../router';
-import { blockchainActions, validatorActions, walletActions } from '../../../redux/actions';
+import Flex from 'antd/es/flex';
+import { useDispatch, useSelector } from 'react-redux';
+import { useMediaQuery } from 'usehooks-ts';
+import Dropdown from 'antd/es/dropdown/dropdown';
+import Avatar from 'antd/es/avatar';
+import DownOutlined from '@ant-design/icons/DownOutlined';
+import {
+  blockchainActions, democracyActions, validatorActions, walletActions,
+} from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
 import truncate from '../../../utils/truncate';
+import Polkadot from '../../../assets/icons/polkadot.svg';
 import styles from './styles.module.scss';
+import Button from '../../Button/Button';
 
-function ChangeWallet({ setIsMenuOpen }) {
+function ChangeWallet({
+  onSelect,
+}) {
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
   const wallets = useSelector(blockchainSelectors.allWalletsSelector);
   const walletAdressSelector = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
 
-  const history = useHistory();
   const dispatch = useDispatch();
-  const onWalletAdresssChange = (address) => {
-    if (!address) return;
-    dispatch(blockchainActions.setUserWallet.success(address));
-    dispatch(validatorActions.getInfo.call());
-    dispatch(walletActions.getWallet.call());
-    if (
-      !routesNotSameWallet.some((path) => path === history.location.pathname)
-    ) {
-      history.push(router.home.profile);
+  const onWalletAdresssChange = useCallback((address) => {
+    if (address) {
+      dispatch(blockchainActions.setUserWallet.success(address));
+      dispatch(validatorActions.getInfo.call());
+      dispatch(walletActions.getWallet.call());
+      dispatch(democracyActions.getDemocracy.call());
+      localStorage.setItem('BlockchainAdress', address);
+      onSelect?.(address);
     }
-    localStorage.setItem('BlockchainAdress', address);
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const onChangeSelect = (e) => {
-    onWalletAdresssChange(e.target.value);
-    if (setIsMenuOpen) {
-      setIsMenuOpen((prevValue) => !prevValue);
+  useEffect(() => {
+    if (wallets?.length === 1 && !walletAdressSelector) {
+      onWalletAdresssChange(wallets[0].address);
     }
-  };
+  }, [walletAdressSelector, wallets, onWalletAdresssChange]);
 
-  if (!wallets || wallets.length < 2) return null;
+  const displaySelected = useMemo(() => {
+    const found = wallets.find(({ address }) => walletAdressSelector === address);
+    if (found) {
+      const { meta, address } = found;
+      return meta?.name
+        ? (
+          <>
+            {meta?.name}
+            {' '}
+            (
+            {truncate(address, 10)}
+            )
+          </>
+        )
+        : (
+          <>
+            {truncate(address, 24)}
+          </>
+        );
+    }
+    return 'No address selected';
+  }, [walletAdressSelector, wallets]);
+
   return (
-    <div className={styles.selectWrapper}>
-      <select
-        value={walletAdressSelector}
-        className={styles.select}
-        onChange={onChangeSelect}
+    <Dropdown
+      trigger={['click']}
+      menu={{
+        items: wallets.map(({ meta, address }) => ({
+          key: address,
+          label: meta?.name ? `${meta?.name} (${truncate(address, 10)})` : truncate(address, 24),
+        })),
+        selectedKeys: [walletAdressSelector],
+        onClick: ({ key }) => onWalletAdresssChange(key),
+      }}
+      className={styles.dropdown}
+    >
+      <Button
+        link={isBiggerThanSmallScreen}
+        primary={!isBiggerThanSmallScreen}
+        nano={!isBiggerThanSmallScreen}
+        className={styles.button}
       >
-        {wallets.map((wallet) => {
-          const metaName = wallet?.meta?.name;
-          const { address } = wallet;
-          const addressToShow = metaName ? `${metaName} (${truncate(address, 10)})` : truncate(address, 24);
-          return (
-            <option key={wallet.address} value={wallet.address}>
-              {addressToShow}
-            </option>
-          );
-        })}
-      </select>
-    </div>
+        <Flex gap="5px" align="center">
+          {isBiggerThanSmallScreen && (
+            <Avatar size={20} src={Polkadot} alt="Polkadot icon" />
+          )}
+          {displaySelected}
+          <DownOutlined />
+        </Flex>
+      </Button>
+    </Dropdown>
   );
 }
 
-ChangeWallet.defaultProps = {
-  setIsMenuOpen: null,
-};
-
 ChangeWallet.propTypes = {
-  setIsMenuOpen: PropTypes.func,
+  onSelect: PropTypes.func,
 };
 
 export default ChangeWallet;

@@ -12,6 +12,10 @@ import {
   setNominatorTargets,
   unpool, getAdditionalAssets, sendAssetTransfer,
   getAssetData,
+  getAssetDetails,
+  transferWithRemark,
+  mintAsset,
+  createOrUpdateAsset,
 } from '../../api/nodeRpcCall';
 import { getHistoryTransfers } from '../../api/explorer';
 
@@ -23,27 +27,39 @@ import { blockchainWatcher } from './base';
 
 function* getWalletWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
+  if (!walletAddress) {
+    yield put(walletActions.getWallet.failure());
+    return;
+  }
   const balances = yield call(getBalanceByAddress, walletAddress);
-  yield put(walletActions.getWallet.success({ ...walletAddress, balances }));
+  yield put(walletActions.getWallet.success({ balances }));
 }
 
-function* getAdditionalAssetsWorker() {
+function* getAdditionalAssetsWorker(action) {
+  const isLlmNeeded = action.payload || false;
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  const additionalAssets = yield call(getAdditionalAssets, walletAddress);
+  const additionalAssets = yield call(getAdditionalAssets, walletAddress, false, isLlmNeeded);
   yield put(walletActions.getAdditionalAssets.success(additionalAssets));
+}
+
+function* getAssetDetailsWorker(action) {
+  const details = yield call(getAssetDetails, action.payload);
+  yield put(walletActions.getAssetsDetails.success(details));
 }
 
 function* getAssetsBalanceWorker(action) {
   const assets = action.payload;
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
-  const assetsBalance = yield Promise.all(assets.map(async (asset) => {
-    if (asset === 'Native') {
-      const { liquidAmount } = await getBalanceByAddress(walletAddress);
-      return liquidAmount?.amount || 0;
-    }
-    const assetData = await getAssetData(asset, walletAddress);
-    return assetData || 0;
-  }));
+  const assetsBalance = yield Promise.all(
+    assets.map(async (asset) => {
+      if (asset === 'Native') {
+        const { liquidAmount } = await getBalanceByAddress(walletAddress);
+        return { [asset]: liquidAmount?.amount || 0 };
+      }
+      const assetData = await getAssetData(asset, walletAddress);
+      return { [asset]: assetData || 0 };
+    }),
+  ).then((balancesArray) => balancesArray.reduce((acc, curr) => ({ ...acc, ...curr }), {}));
   yield put(walletActions.getAssetsBalance.success(assetsBalance));
 }
 
@@ -126,7 +142,40 @@ function* getTransfersTxWorker() {
   }
 }
 
+function* sendTransferRemarkWorker(action) {
+  const { transferData, remarkInfo } = action.payload;
+  const walletAddress = yield select(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+  yield call(transferWithRemark, remarkInfo, transferData, walletAddress);
+  yield put(walletActions.sendTransferRemark.success());
+}
+
+function* mintAssetWorker(action) {
+  yield call(mintAsset, action.payload);
+  yield put(walletActions.mintAsset.success());
+  yield put(walletActions.getAdditionalAssets.call());
+}
+
+function* createOrUpdateAssetWorker(action) {
+  yield call(createOrUpdateAsset, action.payload);
+  yield put(walletActions.createOrUpdateAsset.success());
+  yield put(walletActions.getAdditionalAssets.call());
+}
+
 // WATCHERS
+
+function* sendTransferWithRemarkWatcher() {
+  yield* blockchainWatcher(walletActions.sendTransferRemark, sendTransferRemarkWorker);
+}
+
+function* mintAssetWatcher() {
+  yield* blockchainWatcher(walletActions.mintAsset, mintAssetWorker);
+}
+
+function* createOrUpdateAssetWatcher() {
+  yield* blockchainWatcher(walletActions.createOrUpdateAsset, createOrUpdateAssetWorker);
+}
 
 function* getWalletWatcher() {
   yield* blockchainWatcher(walletActions.getWallet, getWalletWorker);
@@ -134,6 +183,10 @@ function* getWalletWatcher() {
 
 function* getAdditionalAssetsWatcher() {
   yield* blockchainWatcher(walletActions.getAdditionalAssets, getAdditionalAssetsWorker);
+}
+
+function* getAssetDetailsWatcher() {
+  yield* blockchainWatcher(walletActions.getAssetsDetails, getAssetDetailsWorker);
 }
 
 function* getAssetsBalanceWatcher() {
@@ -193,4 +246,8 @@ export {
   setNominatorTargetsWatcher,
   unpoolWatcher,
   getAssetsBalanceWatcher,
+  getAssetDetailsWatcher,
+  sendTransferWithRemarkWatcher,
+  mintAssetWatcher,
+  createOrUpdateAssetWatcher,
 };

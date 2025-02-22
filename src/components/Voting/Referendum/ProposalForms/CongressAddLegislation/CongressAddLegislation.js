@@ -1,36 +1,30 @@
 import React, { useState } from 'react';
 import { Redirect } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-
-// COMPONENTS
+import Form from 'antd/es/form';
+import Title from 'antd/es/typography/Title';
+import DatePicker from 'antd/es/date-picker';
+import Flex from 'antd/es/flex';
+import dayjs from 'dayjs';
+import InputNumber from 'antd/es/input-number';
+import Select from 'antd/es/select';
+import Card from 'antd/es/card';
 import { useDispatch, useSelector } from 'react-redux';
-import { TextInput, SelectInput } from '../../../../InputComponents';
 import Button from '../../../../Button/Button';
-import styles from './styles.module.scss';
 import router from '../../../../../router';
 import { congressSelectors } from '../../../../../redux/selectors';
 import { AddLegislationFields } from '../AddLegislationFields/AddLegislationFields';
 import { congressActions } from '../../../../../redux/actions';
+import styles from '../../../styles.module.scss';
 
-export function CongressAddLegislation() {
+function CongressAddLegislation() {
   const dispatch = useDispatch();
   const isLoading = useSelector(congressSelectors.isLoading);
   const [shouldRedirect, setShouldRedirect] = useState(false);
 
-  const {
-    handleSubmit, formState: { errors }, register, control, watch,
-  } = useForm({
-    mode: 'all',
-    defaultValues: {
-      tier: 'InternationalTreaty',
-      year: new Date().getFullYear(),
-      sections: [
-        { value: 'Paste markdown to autosplit sections' },
-      ],
-    },
-  });
-
-  if (!isLoading && shouldRedirect) return <Redirect to={router.congress.motions} />;
+  const [form] = Form.useForm();
+  if (!isLoading && shouldRedirect) {
+    return <Redirect to={router.congress.motions} />;
+  }
 
   const propose = ({
     tier, year, index, sections: sectionsRaw,
@@ -38,62 +32,70 @@ export function CongressAddLegislation() {
     const sections = sectionsRaw.map((v) => v.value);
     dispatch(congressActions.congressProposeLegislation.call({
       tier,
-      id: { year, index },
+      id: { year: year.year(), index },
       sections,
     }));
     setShouldRedirect(true);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(propose)}
-    >
-      <div className={styles.h3}>Propose a new Referendum</div>
-
-      <div className={styles.title}>Legislation Tier</div>
-      <SelectInput
-        register={register}
-        name="tier"
-        disabled
-        options={[
-          { value: 'InternationalTreaty', display: 'International Treaty' },
-        ]}
-      />
-
-      <div className={styles.title}>Legislation Year</div>
-      <TextInput
-        required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-        errorTitle="Year"
-        register={register}
-        name="year"
-      />
-      { errors?.year?.message && <div className={styles.error}>{errors.year.message}</div> }
-
-      <div className={styles.title}>Legislation Index</div>
-      <TextInput
-        required
-        validate={(v) => !Number.isNaN(parseInt(v)) || 'Not a valid number'}
-        errorTitle="Index"
-        register={register}
-        name="index"
-      />
-      { errors?.index?.message && <div className={styles.error}>{errors.index.message}</div> }
-
-      <AddLegislationFields {...{
-        register, control, errors, watch,
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={propose}
+      initialValues={{
+        tier: 'InternationalTreaty',
+        year: dayjs(new Date()),
+        index: 1,
+        sections: [
+          { value: 'Paste markdown to autosplit sections' },
+        ],
       }}
-      />
-
-      <div className={styles.buttonWrapper}>
-        <Button
-          primary
-          medium
-          type="submit"
+    >
+      <Card
+        title={(
+          <Title className={styles.formTitle} level={3}>Propose a new International Treaty</Title>
+        )}
+      >
+        <Form.Item
+          name="tier"
+          label="Legislation tier"
+          rules={[{ required: true }]}
         >
-          Submit
-        </Button>
-      </div>
-    </form>
+          <Select
+            options={[
+              { value: 'InternationalTreaty', label: 'International Treaty' },
+            ]}
+          />
+        </Form.Item>
+        <Form.Item
+          name="index"
+          label="Legislation index"
+          rules={[{ required: true }]}
+        >
+          <InputNumber controls={false} />
+        </Form.Item>
+        <Form.Item
+          name="year"
+          label="Legislation year"
+          rules={[{ required: true }]}
+          getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
+        >
+          <DatePicker picker="year" />
+        </Form.Item>
+        <AddLegislationFields form={form} />
+        <Flex wrap gap="15px">
+          <Button
+            primary
+            medium
+            type="submit"
+          >
+            Submit
+          </Button>
+        </Flex>
+      </Card>
+    </Form>
   );
 }
+
+export default CongressAddLegislation;

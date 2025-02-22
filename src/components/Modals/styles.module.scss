@@ -1,204 +1,75 @@
 @import "../../assets/base/variables";
 @import "../../assets/base/fonts";
-@import '../../assets/main.scss';
-@import '../../index.scss';
+@import "../../assets/main.scss";
+@import "../../index.scss";
 
-.getCitizenshipModal {
-  padding: 15px;
+.requestIcon {
+  width: 18px;
+  height: 18px;
+  margin: 0 7px 5px 1px;
+}
 
-  @media screen and (min-width: map-get($breakpoints, 'tablet')){
-    padding: 33px 35px 40px 35px;
-  }
+.copyIcon {
+  cursor: pointer;
+}
 
-  & .h3 {
-    color: $black;
-    font-weight: 600;
-    font-size: 24px;
-    margin-bottom: 20px;
-    font-family: $playfairDisplay;
+.icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+}
 
-    @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      font-size: 35px;
-    }
-  }
+.backIcon {
+  width: 10px;
+  height: 10px;
+  margin-left: 5px;
+}
 
-  & .h4 {
-    color: $text2;
-    font-weight: 600;
-    font-size: 16px;
-    margin-bottom: 20px;
-  }
+.primaryIcon {
+  width: 15px;
+  height: 15px;
+  margin-left: 5px;
+  margin-bottom: 4.9px;
+}
 
-  & .description {
-    font-size: 14px;
-    color: $text5;
-    font-weight: 500;
+.arrowIcon {
+  width: 7px;
+  height: 7px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
 
-    @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      font-size: 17px;
-    }
-  }
+.whiten {
+  filter: brightness(100);
+}
 
-  & .modalDescription{
-    margin-bottom: 10px;
-  }
+.swapButton {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
 
-  & .error {
-    font-size: 16px;
-    color: $errorText;
-    font-weight: 500;
-  }
-
-  & .title {
-    font-size: 14px;
-    font-weight: 600;
-    color: $text4;
-    margin: 20px 0 5px 0;
-    line-height: 29px;
-    word-break: break-word;
-
-    @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      font-size: 17px;
-    }
-  }
-
-  & .titleFlex{
-    display: flex;
-    justify-content: space-between;
-    gap: 20px; 
-    flex-wrap: wrap;
-  }
-
-  & .buttonWrapper {
+  .circle{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: $grey;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 50px;
-    flex-wrap: wrap;
-    gap: 8px;
-    width: 100%;
-
-    @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      gap: 15px;
+  
+    &:hover {
+      background-color: $primary;
+      transform: scale(1.1);
     }
 
-    .button{
-      flex: 1;
-      color: $clearBlack;
-    }
-  }
-
-  & .lawText {
-    border: 1px solid red;
-  }
-}
-
-@media (min-width: 640px) {
-  .getCitizenshipModal {
-    max-width: 765px;
-  }
-}
-
-.ChoseStakeModal {
-  @extend .getCitizenshipModal;
-  width: 730px;
-}
-
-.dragAndDrop {
-  overflow: scroll;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 15px;
-  background-color: $bg3;
-  border: 1.5px dashed $bg2;
-  margin: 20px 0;
-  padding: 17px;
-  position: relative;
-
-  .dropZone {
-    top: 0;
-    bottom: 0;
-    position: absolute;
-    left: 0;
-    right: 0;
-  }
-
-  svg {
-    margin-bottom: 15px;
-  }
-
-  span {
-    
-    font-size: 16px;
-    color: $text4;
-    margin-bottom: 8px;
-  }
-}
-
-.infoSection {
-  margin-top: 50px;
-}
-
-.infoItem {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 18px;
-  color: $text4;
-
-  svg {
-    margin-right: 17px;
-  }
-}
-.valueOfItem {
-  margin-left: 3px;
-  font-weight: 600;
-  color: $text1;
-
-  &.yellow {
-    color: $primary;
-  }
-}
-
-.draftTypes {
-  border-radius: 15px;
-  background: white;
-  width: calc(100% - 22px);
-  height: 56px;
-  border: 1px solid #d4d4d4;
-  font-size: 16px;
-  padding-left: 20px;
-  position: relative;
-  font-weight: 500;
-  color: #4e5d78;
-}
-
-.agreeDisagree{
-  .buttons{
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-  }
-}
-
-.onChainIdentity{
-  .margin{
-    margin-top: 30px;
-
-    @media screen and (min-width: map-get($breakpoints, 'tablet')){
-      margin-top: 50px;
+    .swapIcon {
+      font-size: 20px;
+      color: #333;
     }
   }
 }
 
-.displayNone{
-  display: none;
-}
-
-.checkbox{
-  padding-top: 10px;
-  display: flex;
-  justify-content: flex-end;
-}

@@ -1,106 +1,84 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { blake2AsHex } from '@polkadot/util-crypto';
-import { hexToU8a } from '@polkadot/util';
-import styles from './styles.module.scss';
+import { hexToString } from '@polkadot/util';
+import Flex from 'antd/es/flex';
+import Card from 'antd/es/card';
+import { useMediaQuery } from 'usehooks-ts';
+import classNames from 'classnames';
+import Paragraph from 'antd/es/typography/Paragraph';
+import { useHistory } from 'react-router-dom';
+import Markdown from 'markdown-to-jsx';
 import Button from '../../../../Button/Button';
+import CopyIconWithAddress from '../../../../CopyIconWithAddress';
+import router from '../../../../../router';
+import styles from '../../../styles.module.scss';
+import Preimage from '../../../../Proposal/Preimage';
+import { getHashAndLength } from '../ProposalPage/utils';
+import { useTitleFromMarkdown } from '../hooks';
 import truncate from '../../../../../utils/truncate';
-import NotificationPortal from '../../../../NotificationPortal';
-import Header from '../Header';
-import Discussions from '../Discussions';
-import stylesItem from '../item.module.scss';
-
-// REDUX
-import { congressActions } from '../../../../../redux/actions';
-import {
-  congressSelectors,
-} from '../../../../../redux/selectors';
-import Details from '../Details';
-
-function BlacklistButton({ hash }) {
-  const dispatch = useDispatch();
-  const userIsMember = useSelector(congressSelectors.userIsMember);
-
-  useEffect(() => {
-    dispatch(congressActions.getMembers.call());
-  }, [dispatch]);
-
-  if (!userIsMember) return null;
-
-  const blacklistMotion = () => {
-    dispatch(congressActions.congressDemocracyBlacklist.call({ hash }));
-  };
-
-  return (
-    <Button small secondary onClick={blacklistMotion}>
-      Cancel
-    </Button>
-  );
-}
-
-BlacklistButton.propTypes = { hash: PropTypes.string.isRequired };
 
 function ProposalItem({
-  centralizedDatas,
   boundedCall,
-  blacklistMotion,
-  userIsMember,
+  id,
 }) {
-  let hash;
-  let len;
-  if ('lookup' in boundedCall) {
-    hash = boundedCall.lookup.hash;
-    len = boundedCall.lookup.len;
-  } else if ('legacy' in boundedCall) {
-    hash = boundedCall.legacy.hash;
-  } else {
-    // this sux but we have no other way until we refactor it to NOT use toJSON/toHuman
-    hash = blake2AsHex(hexToU8a(boundedCall.inline));
-  }
-
-  const [isProposalHidden, setIsProposalHidden] = useState(true);
-  const notificationRef = useRef();
+  const [hash, len] = useMemo(() => getHashAndLength(boundedCall), [boundedCall]);
+  const history = useHistory();
+  const { title, setTitleFromRef } = useTitleFromMarkdown(true, 'Proposal');
+  const linkTo = router.voting.proposalItem.replace(':id', id);
+  const isBigScreen = useMediaQuery('(min-width: 1200px)');
 
   return (
-    <>
-      <NotificationPortal ref={notificationRef} />
-      <div className={stylesItem.itemWrapper}>
-        <Header
-          hash={hash}
-          setIsHidden={setIsProposalHidden}
-          isHidden={isProposalHidden}
-          textButton="PROPOSAL"
-        >
-          {blacklistMotion && (
-            <div className={styles.rowEnd}>
-              <small>
-                Blacklist motion:
-                <a href={`/home/congress/motions#${blacklistMotion}`}>
-                  {truncate(blacklistMotion, 13)}
-                </a>
-              </small>
-            </div>
+    <Card
+      size="small"
+      className={styles.proposal}
+    >
+      <Flex vertical={!isBigScreen} wrap gap="20px" align={isBigScreen ? 'center' : undefined}>
+        <Card.Meta
+          className={styles.cardTitle}
+          title={(
+            <Flex vertical gap="5px">
+              {hash && (
+                <div className="description">
+                  <CopyIconWithAddress address={hash} />
+                </div>
+              )}
+              <strong>
+                {truncate(title, 30)}
+              </strong>
+            </Flex>
           )}
-          {!blacklistMotion && userIsMember
-            && (
-              <div className={styles.rowEnd}>
-                <BlacklistButton hash={
-                boundedCall?.lookup?.hash
-                ?? boundedCall?.legacy?.hash
-              }
-                />
-              </div>
-            )}
-        </Header>
-        {!isProposalHidden && hash && len
-            && (
-            <Details proposal={{ hash, len }} isProposal />
-            )}
-        {!isProposalHidden && centralizedDatas?.length > 0
-          && <Discussions centralizedDatas={centralizedDatas} />}
-      </div>
-    </>
+        />
+        <Flex flex={1}>
+          <Paragraph ellipsis={{ rows: 2 }} className={classNames('description', styles.intro)}>
+            {hash && len ? (
+              <Preimage hash={hash} len={len}>
+                {(proposal) => {
+                  const { args } = proposal.toJSON() || {};
+                  const { sections } = args || {};
+                  const [firstSection] = sections || [];
+                  try {
+                    return (
+                      <span ref={setTitleFromRef}>
+                        <Markdown>
+                          {hexToString(firstSection) || ''}
+                        </Markdown>
+                      </span>
+                    );
+                  } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error(e);
+                  }
+                  return null;
+                }}
+              </Preimage>
+            ) : null}
+          </Paragraph>
+        </Flex>
+        <Button href={linkTo} onClick={() => history.push(linkTo)}>
+          Show more
+        </Button>
+      </Flex>
+    </Card>
   );
 }
 
@@ -123,17 +101,8 @@ const call = PropTypes.oneOfType([
 ]);
 
 ProposalItem.propTypes = {
-  centralizedDatas: PropTypes.arrayOf(PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    link: PropTypes.string.isRequired,
-    proposerAddress: PropTypes.string.isRequired,
-    created: PropTypes.string.isRequired,
-    id: PropTypes.number.isRequired,
-  })).isRequired,
   boundedCall: call.isRequired,
-  blacklistMotion: PropTypes.string.isRequired,
-  userIsMember: PropTypes.string.isRequired,
+  id: PropTypes.number.isRequired,
 };
 
 export default ProposalItem;

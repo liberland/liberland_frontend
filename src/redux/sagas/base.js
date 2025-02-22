@@ -1,17 +1,21 @@
 import {
-  put, takeEvery, takeLatest,
+  put, select, takeEvery, takeLatest,
 } from 'redux-saga/effects';
 import { blockchainActions } from '../actions';
+import { blockchainSelectors } from '../selectors';
 
 function errorHandler(onFailure, worker) {
   function* errorHandledWorker(action) {
+    const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
     try {
       yield* worker(action);
     } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
       yield put(onFailure(e));
-      yield put(blockchainActions.setError.success(e?.errorData || { details: e.message }));
+      yield put(blockchainActions.setError.success(
+        !walletAddress
+          ? { details: 'No wallet detected, you need to login.', type: 'LOGIN_ERROR' }
+          : e?.errorData || { details: e.message },
+      ));
       yield put(blockchainActions.setErrorExistsAndUnacknowledgedByUser.success(true));
     }
   }

@@ -1,42 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import Button from '../../Button/Button';
-import CongressRepealLegislationFastTrackModal from '../../Modals/CongressRepealLegislationFastTrackModal';
 import {
   congressSelectors,
 } from '../../../redux/selectors';
+import OpenModalButton from '../../Modals/components/OpenModalButton';
+import modalWrapper from '../../Modals/components/ModalWrapper';
+import CongressRepealLegislationFastTrackForm from '../../Modals/CongressRepealLegislationFastTrackModal';
 
-export default function ProposeRepealLegislationButton({ tier, id, section }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleModalOpen = () => setIsModalOpen(!isModalOpen);
-
-  // requires parent to dispatch getMembers action
+function ButtonModal(props) {
   const userIsMember = useSelector(congressSelectors.userIsMember);
-  if (!userIsMember) return null;
-
+  if (!userIsMember) {
+    return null;
+  }
   return (
-    <>
-      <Button small primary onClick={handleModalOpen}>
-        PROPOSE REFERENDUM TO REPEAL
-      </Button>
-      {isModalOpen && (
-        <CongressRepealLegislationFastTrackModal
-          closeModal={handleModalOpen}
-          tier={tier}
-          id={id}
-          section={section}
-        />
-      )}
-    </>
+    <OpenModalButton text="Propose referendum to repeal" {...props} />
   );
 }
 
-ProposeRepealLegislationButton.propTypes = {
-  tier: PropTypes.string.isRequired,
-  id: PropTypes.shape({
-    year: PropTypes.number.isRequired,
-    index: PropTypes.number.isRequired,
-  }).isRequired,
-  section: PropTypes.string.isRequired,
+ButtonModal.propTypes = {
+  add: PropTypes.bool,
 };
+
+const ProposeRepealLegislationButton = modalWrapper(CongressRepealLegislationFastTrackForm, ButtonModal);
+
+export default ProposeRepealLegislationButton;

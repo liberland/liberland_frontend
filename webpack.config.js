@@ -1,6 +1,7 @@
+/* eslint-disable */
 const HtmlWebPackPlugin = require('html-webpack-plugin');
-const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const Dotenv = require('dotenv-webpack');
+const CopyPlugin = require("copy-webpack-plugin");
 
 const webpack = require('webpack');
 
@@ -10,8 +11,6 @@ const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
 const postcssNormalize = require('postcss-normalize');
-// const postcssNormalize = require('postcss-flexbugs-fixes');
-// const postcssNormalize = require('postcss-preset-env');
 
 const getStyleLoaders = (cssOptions) => {
   const loaders = [
@@ -56,24 +55,24 @@ module.exports = (env, argv) => {
     },
     optimization: {
       moduleIds: 'deterministic',
-      runtimeChunk: 'single',
       splitChunks: {
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-          },
-        },
+        maxSize: 51200,
+        maxAsyncSize: 51200,
       },
     },
     module: {
       rules: [
         {
+          test: /\.m?js$/,
+          resolve: {
+            fullySpecified: false
+          },
+        },
+        {
           test: /\.js$/,
           exclude: /node_modules/,
           resolve: {
-            fullySpecified: false,
+            fallback: { 'process/browser': require.resolve('process/browser'), }
           },
           use: {
             loader: 'babel-loader',
@@ -136,12 +135,28 @@ module.exports = (env, argv) => {
         },
       ],
     },
-    devtool: argv.mode === 'development' ? 'eval-source-map' : undefined,
+    devtool: argv.mode === 'development' ? 'eval-cheap-module-source-map' : undefined,
+    cache: argv.mode === 'development' ? {
+      type: 'filesystem',
+      compression: 'gzip',
+      allowCollectingMemory: true,
+    } : undefined,
     plugins: [
       new HtmlWebPackPlugin({
         template: path.resolve(__dirname, 'public/index.html'),
         filename: 'index.html',
       }),
+      argv.mode === 'production' && (
+        new CopyPlugin({
+          patterns: [
+            "./public/favicon.ico",
+            "./public/logo192.png",
+            "./public/logo512.png",
+            "./public/manifest.json",
+            "./public/robots.txt",
+          ],
+        })
+      ),
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
       }),
@@ -150,7 +165,7 @@ module.exports = (env, argv) => {
       }),
       new Dotenv(),
       // new InterpolateHtmlPlugin({PUBLIC_URL: 'static' }),
-    ],
+    ].filter(Boolean),
     resolve: {
       extensions: ['.ts', '.js'],
       fallback: {
@@ -161,6 +176,7 @@ module.exports = (env, argv) => {
       alias: {
         buffer: 'buffer',
         stream: 'stream-browserify',
+        '../fonts/PlayfairDisplay-Regular.ttf': path.resolve(__dirname, './src/assets/fonts/PlayfairDisplay-Regular.ttf'),
       },
     },
   };

@@ -1,72 +1,51 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { useTable } from 'react-table';
+import TableInternal from 'antd/es/table';
 
-import styles from './styles.module.scss';
-
-function Table({ columns, data, rowProps }) {
-  const tableInstance = useTable({ columns, data });
-
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-  } = tableInstance;
-
+function Table({
+  columns,
+  data,
+  noPagination,
+  pageSize,
+  showHeader,
+  footer,
+  title,
+}) {
+  const identityData = useMemo(() => data?.map((d, index) => ({
+    ...d,
+    hash: d.hash || (index + Object.values(d).map((val) => val.toString()).join('|')),
+  })) || [], [data]);
   return (
-    <table {...getTableProps()} className={styles.table}>
-      <thead className={styles.thead}>
-        {
-          headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {
-                headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps()}>
-                    {column.render('Header')}
-                  </th>
-                ))
-              }
-            </tr>
-          ))
-        }
-      </thead>
-
-      <tbody {...getTableBodyProps()} className={styles.tbody}>
-        {
-          rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps(rowProps(row))}>
-                {
-                  row.cells.map((cell) => (
-                    <td {...cell.getCellProps()}>
-                      {
-                        cell.render('Cell')
-                      }
-                    </td>
-                  ))
-                }
-              </tr>
-            );
-          })
-        }
-      </tbody>
-    </table>
+    <TableInternal
+      dataSource={identityData}
+      rowKey="hash"
+      title={title ? () => title : undefined}
+      footer={footer ? () => footer : undefined}
+      onRow={() => ({ tabIndex: '0' })}
+      showHeader={showHeader}
+      pagination={noPagination ? false : { pageSize: pageSize || 10 }}
+      columns={columns.filter(Boolean).map(({ Header, accessor }) => ({
+        dataIndex: accessor,
+        key: accessor,
+        title: Header,
+      }))}
+    />
   );
 }
 
 Table.defaultProps = {
   columns: [],
   data: [],
-  rowProps: () => {},
 };
 
 Table.propTypes = {
   columns: PropTypes.arrayOf(PropTypes.shape({})),
   data: PropTypes.arrayOf(PropTypes.shape({})),
-  rowProps: PropTypes.func,
+  noPagination: PropTypes.bool,
+  pageSize: PropTypes.number,
+  showHeader: PropTypes.bool,
+  footer: PropTypes.node,
+  title: PropTypes.node,
 };
 
 export default Table;

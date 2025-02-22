@@ -1,104 +1,62 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import _ from 'lodash';
-import cx from 'classnames';
+import Autocomplete from 'antd/es/auto-complete';
+import Spin from 'antd/es/spin';
+import Flex from 'antd/es/flex';
+import CheckCircleFilled from '@ant-design/icons/CheckCircleFilled';
+import CloseCircleFilled from '@ant-design/icons/CloseCircleFilled';
 import { getUsersIdentityData } from '../../api/explorer';
-import TextInput from './TextInput';
 import styles from './styles.module.scss';
 
-function InputSearch({
-  errorTitle,
-  register,
-  name,
-  placeholder,
-  validate,
-  setValue,
-  isRequired,
-}) {
-  const inputProps = {
-    errorTitle,
-    register,
-    name,
-    placeholder,
-    isRequired,
-    validate,
-  };
-  const [inputValue, setInputValue] = useState('');
+function InputSearch(props) {
+  const [loading, setLoading] = useState();
+  const [error, setError] = useState();
   const [suggestions, setSuggestions] = useState([]);
-  const [isSuggestedListShown, setIsSuggestedListShown] = useState(true);
-
-  const debouncedSearch = _.debounce(async (searchTerm) => {
-    const apiData = await getUsersIdentityData(searchTerm);
-    setSuggestions(apiData);
-  }, 300);
-
-  const handleSearchChange = (e) => {
-    const searchTerm = e.target.value;
-    setValue(name, searchTerm);
-    setInputValue(searchTerm);
-    if (searchTerm.length >= 3) {
-      debouncedSearch(searchTerm);
-      if (!isSuggestedListShown) {
-        setIsSuggestedListShown(true);
-      }
-    } else {
-      setSuggestions([]);
+  const debouncedSearch = async (searchTerm) => {
+    setError(false);
+    setLoading(true);
+    try {
+      const apiData = await getUsersIdentityData(searchTerm);
+      setSuggestions(apiData.map(({ name, id, isConfirmed }) => ({
+        value: id,
+        label: (
+          <Flex gap="15px">
+            {isConfirmed
+              ? <CheckCircleFilled className={styles.green} />
+              : <CloseCircleFilled className={styles.red} />}
+            <strong>{name}</strong>
+            <span>
+              {id}
+            </span>
+          </Flex>
+        ),
+      })));
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e);
+      setError(true);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSuggestionClick = (suggestion) => {
-    setValue(name, suggestion);
-    setInputValue(suggestion);
-    setSuggestions([]);
-  };
+  const loader = [
+    {
+      label: 'Loading...',
+      disabled: true,
+      value: '',
+      children: <Spin />,
+    },
+  ];
 
   return (
-    <div className={styles.inputSearch}>
-      <div className={styles.inputSearchWrapper}>
-        <TextInput
-          onChange={handleSearchChange}
-          value={inputValue}
-          {...inputProps}
-        />
-        {isSuggestedListShown && suggestions.length > 0 && (
-          <div className={styles.suggestionWrapper}>
-            <button className={styles.close} onClick={() => setIsSuggestedListShown(false)}>&#10005;</button>
-            <ul className={styles.suggestionList}>
-              {suggestions.map((result) => {
-                const { name: nameUser, id, isConfirmed } = result;
-                return (
-                  <li key={id}>
-                    <button onClick={() => handleSuggestionClick(id)}>
-                      <span>
-                        <b>{nameUser}</b>
-                      &nbsp;
-                        {id}
-                      &nbsp;
-                        {isConfirmed
-                          ? <span className={styles.icon}>&#10003;</span>
-                          : <span className={cx(styles.icon, styles.iconRed)}>&#10005;</span>}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-        )}
-      </div>
-    </div>
+    <Autocomplete
+      onSearch={debouncedSearch}
+      options={loading ? loader : suggestions}
+      placeholder="Start typing to see users"
+      status={error ? 'error' : undefined}
+      {...props}
+    />
   );
 }
-
-InputSearch.propTypes = {
-  errorTitle: PropTypes.string.isRequired,
-  register: PropTypes.func.isRequired,
-  name: PropTypes.string.isRequired,
-  placeholder: PropTypes.string.isRequired,
-  validate: PropTypes.func.isRequired,
-  setValue: PropTypes.func.isRequired,
-  isRequired: PropTypes.bool.isRequired,
-};
 
 export default InputSearch;

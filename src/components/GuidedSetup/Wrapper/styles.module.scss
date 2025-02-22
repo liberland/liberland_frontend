@@ -1,0 +1,13 @@
+@import '../../../assets/main.scss';
+
+.wrapper {
+  top: 0;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
+    top: 100px;
+  }
+}
+.loader {
+  top: calc(50% - 70px);
+  width: 70px!important;
+  height: 70px!important;
+}

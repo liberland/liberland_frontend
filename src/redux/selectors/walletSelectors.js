@@ -13,6 +13,11 @@ const selectorGettingWalletInfo = createSelector(
   (reducer) => reducer.gettingWalletInfo,
 );
 
+const selectorGettingWalletInfoUnobtrusive = createSelector(
+  walletReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 // FIXME delete or make functional
 const selectorWalletAddress = createSelector(
   selectorWalletInfo,
@@ -31,7 +36,7 @@ const selectorLiquidMeritsBalance = createSelector(
 
 const selectorLiquidDollarsBalance = createSelector(
   selectorBalances,
-  (reducer) => (reducer.liquidAmount.amount),
+  (reducer) => (reducer.liquidAmount?.amount),
 );
 
 const selectorTotalBalance = createSelector(
@@ -90,6 +95,11 @@ const selectorAdditionalAssets = createSelector(
   (reducer) => reducer.additionalAssets,
 );
 
+const selectorAssetsDetails = createSelector(
+  walletReducer,
+  (reducer) => reducer.assetDetails,
+);
+
 const selectorAssetBalance = createSelector(
   walletReducer,
   (reducer) => reducer.assetBalance,
@@ -98,6 +108,11 @@ const selectorAssetBalance = createSelector(
 const selectorAssetsBalance = createSelector(
   walletReducer,
   (reducer) => reducer.assetsBalance,
+);
+
+const selectorTransferState = createSelector(
+  walletReducer,
+  (reducer) => reducer.transferState,
 );
 
 export {
@@ -119,4 +134,7 @@ export {
   selectorAdditionalAssets,
   selectorAssetBalance,
   selectorAssetsBalance,
+  selectorAssetsDetails,
+  selectorTransferState,
+  selectorGettingWalletInfoUnobtrusive,
 };

@@ -1,15 +1,130 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { TextInput } from '../components/InputComponents';
+import Checkbox from 'antd/es/checkbox';
+import Result from 'antd/es/result';
+import ColorPicker from 'antd/es/color-picker';
+import DatePicker from 'antd/es/date-picker';
+import Flex from 'antd/es/flex';
+import Form from 'antd/es/form';
+import InputNumber from 'antd/es/input-number';
+import Radio from 'antd/es/radio';
+import Password from 'antd/es/input/Password';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Title from 'antd/es/typography/Title';
+import Input from 'antd/es/input';
+import List from 'antd/es/list';
+import Card from 'antd/es/card';
+import Row from 'antd/es/row';
+import Col from 'antd/es/col';
+import TextArea from 'antd/es/input/TextArea';
+import Divider from 'antd/es/divider';
+import { useHistory } from 'react-router-dom';
+import dayjs from 'dayjs';
+import { useMediaQuery } from 'usehooks-ts';
 import Button from '../components/Button/Button';
-import Card from '../components/Card';
 import './utils.scss';
 import { newCompanyDataObject } from './defaultData';
+import { useHideTitle } from '../components/Layout/HideTitle';
+import FormSection from '../components/FormSection';
+import router from '../router';
 
-const buildFieldName = (formKey, index, dynamicField, suffix) => (dynamicField.encryptable
-  ? `${formKey}.${index}.${dynamicField.key}.${suffix}`
-  : `${formKey}.${index}.${dynamicField.key}`);
+const buildFieldName = (index, dynamicField, suffix) => (dynamicField.encryptable
+  ? [index, dynamicField.key, suffix]
+  : [index, dynamicField.key]);
+
+const fieldDateTypes = {
+  date: true,
+  month: true,
+  week: true,
+  time: true,
+};
+
+const staticFieldOrder = {
+  name: 0,
+  logoURL: 1,
+  charterURL: 2,
+  purpose: 3,
+  totalCapitalCurrency: 4,
+  totalCapitalAmount: 5,
+  numberOfShares: 6,
+};
+
+const staticFieldSpan = {
+  name: 8,
+  logoURL: 8,
+  charterURL: 8,
+  purpose: 24,
+  totalCapitalCurrency: 8,
+  totalCapitalAmount: 8,
+  numberOfShares: 8,
+};
+
+function getFieldComponent(field, index) {
+  if (field.key === 'companyType') {
+    return {
+      fieldComponent: null,
+    };
+  }
+  if (field.type === 'checkbox') {
+    return {
+      fieldComponent: <Checkbox />,
+      layout: 'horizontal',
+      valuePropName: 'checked',
+    };
+  }
+  if (field.type === 'date') {
+    return {
+      fieldComponent: <DatePicker />,
+      getValueProps: (value) => ({ value: value ? dayjs(value) : '' }),
+    };
+  }
+  if (field.type === 'color') {
+    return {
+      fieldComponent: <ColorPicker />,
+    };
+  }
+  if (field.type === 'month') {
+    return {
+      fieldComponent: <DatePicker picker="month" />,
+      getValueProps: (value) => ({ value: value ? dayjs(value) : '' }),
+    };
+  }
+  if (field.type === 'week') {
+    return {
+      fieldComponent: <DatePicker picker="week" />,
+      getValueProps: (value) => ({ value: value ? dayjs(value) : '' }),
+    };
+  }
+  if (field.type === 'time') {
+    return {
+      fieldComponent: <DatePicker picker="time" />,
+      getValueProps: (value) => ({ value: value ? dayjs(value) : '' }),
+    };
+  }
+  if (field.type === 'number') {
+    return {
+      fieldComponent: <InputNumber controls={false} placeholder={field.display} />,
+    };
+  }
+  if (field.type === 'password') {
+    return {
+      fieldComponent: <Password />,
+    };
+  }
+  if (field.key === 'purpose') {
+    return {
+      fieldComponent: <TextArea className="slimTextArea" />,
+    };
+  }
+  return {
+    fieldComponent: (
+      <Input
+        type={field.type}
+        placeholder={typeof index === 'number' ? `${field.display} ${index}` : field.display}
+      />
+    ),
+  };
+}
 
 export function blockchainDataToFormObject(blockchainDataRaw) {
   const blockchainData = blockchainDataRaw.toJSON ? blockchainDataRaw.toJSON() : blockchainDataRaw;
@@ -18,7 +133,7 @@ export function blockchainDataToFormObject(blockchainDataRaw) {
   const dynamicFields = [];
 
   supportedObject.staticFields.forEach((staticField) => {
-    if (staticField.key in blockchainData) {
+    if (staticField.key in blockchainData || staticField.type === 'checkbox') {
       const fieldObject = staticField;
       fieldObject.display = blockchainData[staticField.key];
       staticFields.push(fieldObject);
@@ -31,7 +146,7 @@ export function blockchainDataToFormObject(blockchainDataRaw) {
       const fieldObjectData = [];
       blockchainData[dynamicField.key].forEach((dynamicFieldDataArray) => {
         // Format using fields data
-        const crossReferencedFieldDataArray = [];
+        const crossReferencedFieldDataArray = [{}];
         for (const key in dynamicFieldDataArray) {
           if (Object.prototype.hasOwnProperty.call(dynamicFieldDataArray, key)) {
             const pushObject = {};
@@ -59,101 +174,100 @@ export function blockchainDataToFormObject(blockchainDataRaw) {
 }
 
 export function GetFieldsForm({
-  formKey, displayName, register, control, dynamicFieldData, errors,
+  formKey, displayName, dynamicFieldData,
 }) {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: formKey,
-  });
+  const isLargerThanWideScreen = useMediaQuery('(min-width: 1200px)');
   return (
-    <div id={`programmatic${formKey}`} style={{ marginBottom: '1rem' }}>
-      <Card>
-        {fields.map((_, index) => (
-          <Card className="dynamicFieldsEntityCard">
-            <div style={{ width: '100%', marginBottom: '0.25rem' }}>
-              <div>
-                <h4>
-                  {displayName}
-                  {' '}
-                  {index + 1}
-                </h4>
-              </div>
-
-              {dynamicFieldData.fields.map((dynamicField) => {
-                const fieldName = buildFieldName(formKey, index, dynamicField, 'value');
-
-                return (
-                  <div key={dynamicField.key} style={{ margin: '16px 0' }}>
-                    <div>
-                      {dynamicField.display}
-                      :
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                      <div style={{ flex: '1', margin: '0 16px' }}>
-                        {dynamicField.type === 'text'
-                          ? (
-                            <>
-                              <TextInput
-                                name={fieldName}
-                                register={register}
-                                placeholder={dynamicField.display}
-                                validate={(v) => v !== '' || `${dynamicField.name} cannot be empty`}
-                              />
-                              <div className="error">
-                                {dynamicField.encryptable
-                                  ? errors?.[formKey]?.[index]?.[dynamicField.key]?.value?.message
-                                  : errors?.[formKey]?.[index]?.[dynamicField.key]?.message}
-                              </div>
-                            </>
-                          )
-                          : (
-                            <input
-                              type={dynamicField.type}
-                              {...register(fieldName)}
-                              placeholder={dynamicField.display}
-                            />
+    <Form.List name={formKey}>
+      {(fields, { add, remove }) => (
+        <FormSection
+          title={displayName}
+          extra={(
+            <Button className="add" type="button" onClick={add} green>
+              Add
+              {' '}
+              {displayName}
+            </Button>
+          )}
+        >
+          <List
+            dataSource={fields}
+            locale={{ emptyText: 'No data found' }}
+            renderItem={(field, index) => (
+              <Card
+                title={`${displayName} ${index + 1}`}
+                key={field.key}
+                className="dynamicFieldsEntityCard"
+                actions={[
+                  <Flex wrap gap="15px" justify="start" className="delete">
+                    <Button red type="button" onClick={() => remove(field.name)}>
+                      Delete
+                      {' '}
+                      {displayName}
+                      {' '}
+                      {index + 1}
+                    </Button>
+                  </Flex>,
+                ]}
+              >
+                <Row gutter={16}>
+                  {dynamicFieldData.fields.map((dynamicField) => {
+                    const fieldName = buildFieldName(index, dynamicField, 'value');
+                    const {
+                      fieldComponent,
+                      layout,
+                      getValueProps,
+                      valuePropName,
+                    } = getFieldComponent(dynamicField, index);
+                    if (!fieldComponent) {
+                      return null;
+                    }
+                    const span = Math.max(6, Math.floor(24 / dynamicFieldData.fields.length));
+                    return (
+                      <Col key={fieldName} span={isLargerThanWideScreen ? span : 24}>
+                        <Form.Item
+                          name={fieldName}
+                          label={(
+                            `${dynamicField.display.length > 40
+                              ? `${dynamicField.display.slice(0, 40)}...`
+                              : dynamicField.display} ${index + 1}`
                           )}
-                      </div>
-
-                    </div>
-                  </div>
-                );
-              })}
-              <div style={{ display: 'flex', margin: '16px', justifyContent: 'flex-end' }}>
-                <Button small red type="button" onClick={() => remove(index)}>Delete</Button>
-              </div>
-            </div>
-          </Card>
-        ))}
-        <div style={{ display: 'flex', margin: '16px', justifyContent: 'flex-end' }}>
-          <Button type="button" onClick={() => append({})} small green>
-            Add
-            {' '}
-            {displayName}
-          </Button>
-        </div>
-      </Card>
-    </div>
+                          extra={dynamicField.display.length > 40 ? (
+                            dynamicField.display
+                          ) : undefined}
+                          layout={layout}
+                          getValueProps={getValueProps}
+                          valuePropName={valuePropName}
+                        >
+                          {fieldComponent}
+                        </Form.Item>
+                      </Col>
+                    );
+                  })}
+                </Row>
+              </Card>
+            )}
+          />
+        </FormSection>
+      )}
+    </Form.List>
   );
 }
 
 GetFieldsForm.propTypes = {
   formKey: PropTypes.string.isRequired,
-  register: PropTypes.func.isRequired,
   displayName: PropTypes.string.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   dynamicFieldData: PropTypes.any.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  control: PropTypes.any.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  errors: PropTypes.any.isRequired,
 };
 
 export const getDefaultValuesFromDataObject = (formObject, editMode = false) => {
   const defaultValues = {};
   if (editMode) {
     formObject?.staticFields?.forEach((staticField) => {
-      defaultValues[staticField.key] = staticField.display;
+      defaultValues[staticField.key] = fieldDateTypes[staticField.type]
+        ? dayjs(staticField.display)
+        : staticField.display;
     });
   }
   formObject?.dynamicFields?.forEach((dynamicField) => {
@@ -163,12 +277,10 @@ export const getDefaultValuesFromDataObject = (formObject, editMode = false) => 
       fieldValues?.forEach((field) => {
         const encryptable = dynamicField.fields.find((v) => v.key === field.key)?.encryptable;
         if (editMode) {
-          defaultValuesForField[index][field.key] = encryptable
-            ? {
-              value: field.display,
-              isEncrypted: field.isEncrypted,
-            }
-            : field.display;
+          defaultValuesForField[index][field.key] = {
+            value: fieldDateTypes[field.type] ? dayjs(field.display) : field.display,
+            isEncrypted: field.isEncrypted,
+          };
         } else {
           defaultValuesForField[index][field.key] = encryptable
             ? {
@@ -182,82 +294,216 @@ export const getDefaultValuesFromDataObject = (formObject, editMode = false) => 
   });
   return defaultValues;
 };
+
 export function BuildRegistryForm({
   formObject, buttonMessage, companyId, callback,
 }) {
+  const [form] = Form.useForm();
   const defaultValues = getDefaultValuesFromDataObject(formObject, !!companyId);
-  const {
-    handleSubmit, register, control, formState: { errors },
-  } = useForm({
-    defaultValues,
-  });
+  const companyType = Form.useWatch('companyType', form);
+  const isLargerThanWideScreen = useMediaQuery('(min-width: 1200px)');
+  const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
+  const history = useHistory();
+
+  useHideTitle();
 
   if (formObject.invalid) {
-    return <div>This company&apos;s registry data is corrupted. Please contact administration.</div>;
+    return (
+      <Result
+        title="Corrupted data"
+        status="error"
+        subTitle={(
+          <>
+            This company&apos;s registry data is corrupted. Please contact administration.
+          </>
+        )}
+      />
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit((result) => {
-      callback(result);
-    })}
+    <Form
+      form={form}
+      initialValues={{
+        ...defaultValues,
+        registryAllowedToEdit: !!defaultValues.registryAllowedToEdit,
+      }}
+      onFinish={callback}
+      layout="vertical"
     >
-      <div id="static">
-        <Card>
-          {formObject.staticFields.map((staticField) => {
-            const staticFieldName = staticField.encryptable ? `${staticField.key}.value` : staticField.key;
-            const staticFieldEncryptedName = `${staticField.key}.isEncrypted`;
-            return (
-              <div style={{ marginBottom: '0.5rem' }}>
-                <label style={{ fontWeight: 'bold', fontSize: '1.05rem' }}>{staticField.name}</label>
-                <br />
-                {staticField.type === 'text'
-                  ? (
-                    <>
-                      <TextInput
-                        name={staticField.key}
-                        register={register}
-                        style={{ width: '50%' }}
-                        placeholder={staticField.name}
-                        validate={(v) => v !== '' || `${staticField.name} cannot be empty`}
-                      />
-                      <div className="error">{errors?.[staticField.key]?.message}</div>
-                    </>
-                  )
-                  : (
-                    <input
-                      type={staticField.type}
-                      name={staticField.key}
-                      {...register(staticFieldName)}
-                      placeholder={staticField.display}
-                    />
-                  )}
-
-                {staticField.encryptable ? <input {...register(staticFieldEncryptedName)} type="checkbox" /> : null }
-              </div>
-            );
-          })}
-        </Card>
-      </div>
-      {formObject.dynamicFields.map((dynamicField) => (
-        <GetFieldsForm
-          formKey={dynamicField.key}
-          displayName={dynamicField.name}
-          register={register}
-          control={control}
-          dynamicFieldData={dynamicField}
-          errors={errors}
+      <Card
+        className="registryCard"
+        title={(
+          <Title className="registryTitle" level={1}>
+            {companyId
+              ? defaultValues.name
+              : 'Register a new Liberland company'}
+          </Title>
+        )}
+      >
+        <Card.Meta
+          description={(
+            <Paragraph className="description">
+              For full instructions, check out the
+              {' '}
+              <a
+                href="https://docs.liberland.org/blockchain/for-citizens/how-to-run-liberland-company"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Company registration guide
+              </a>
+            </Paragraph>
+          )}
         />
-      ))}
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <Button
-          primary
-          small
-          type="submit"
+        <Flex vertical gap="40px">
+          <FormSection title="Basic information">
+            <Row gutter={16} wrap>
+              {[
+                ...formObject.staticFields,
+              ].sort((aField, bField) => staticFieldOrder[aField.key] - staticFieldOrder[bField.key])
+                .map((staticField) => {
+                  const staticFieldName = staticField.encryptable ? `${staticField.key}.value` : staticField.key;
+                  const {
+                    fieldComponent,
+                    layout,
+                    getValueProps,
+                    valuePropName,
+                  } = getFieldComponent(staticField);
+                  if (!fieldComponent) {
+                    return null;
+                  }
+                  return (
+                    <Col
+                      span={isLargerThanWideScreen ? staticFieldSpan[staticField.key] : 24}
+                      key={staticFieldName}
+                    >
+                      <Form.Item
+                        name={staticFieldName}
+                        label={staticField.name}
+                        layout={layout}
+                        getValueProps={getValueProps}
+                        valuePropName={valuePropName}
+                      >
+                        {fieldComponent}
+                      </Form.Item>
+                    </Col>
+                  );
+                })}
+            </Row>
+          </FormSection>
+          {formObject.dynamicFields.map((dynamicField) => (
+            <React.Fragment key={dynamicField.key}>
+              <Divider />
+              <GetFieldsForm
+                formKey={dynamicField.key}
+                displayName={dynamicField.name}
+                dynamicFieldData={dynamicField}
+              />
+            </React.Fragment>
+          ))}
+        </Flex>
+        <Divider />
+        <Form.Item
+          name="companyType"
+          label="Choose company type"
+          rules={[{ required: true }]}
         >
-          {buttonMessage}
-        </Button>
-      </div>
-    </form>
+          <Radio.Group>
+            <Row gutter={16}>
+              <Col span={isLargerThanHdScreen ? 8 : 23}>
+                <Card
+                  title={(
+                    <Radio value="Dormant">
+                      Dormant company
+                    </Radio>
+                  )}
+                >
+                  <Flex vertical gap="5px" align="stretch">
+                    <Paragraph className="signature">
+                      If you are registering a dormant company for reserving brand name,
+                      establishing presence in Liberland,
+                      using this company to drive Liberland traffic to some other business,
+                      or any other reason for which you do not intend to do any transactions or hold
+                      assets with this company until further notice (can change this at any time)
+                    </Paragraph>
+                    <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/12">
+                      Sign contract
+                    </Button>
+                  </Flex>
+                </Card>
+              </Col>
+              {!isLargerThanHdScreen ? <Divider /> : null}
+              <Col span={isLargerThanHdScreen ? 8 : 23}>
+                <Card
+                  title={(
+                    <Radio value="Liberland">
+                      Pure Liberland company
+                    </Radio>
+                  )}
+                >
+                  <Flex vertical gap="5px" align="stretch">
+                    <Paragraph className="signature">
+                      If you are registering a pure Liberland company,
+                      only operating under the jurisdiction of Liberland,
+                      such as the territory of Liberland, Liberland ecosystem, Liberland blockchain, or doing business
+                      only with Liberland citizens and e-residents
+                    </Paragraph>
+                    <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/14">
+                      Sign contract
+                    </Button>
+                  </Flex>
+                </Card>
+              </Col>
+              {!isLargerThanHdScreen ? <Divider /> : null}
+              <Col span={isLargerThanHdScreen ? 8 : 23}>
+                <Card
+                  title={(
+                    <Radio value="International">
+                      Internationally operating company
+                    </Radio>
+                  )}
+                >
+                  <Flex vertical gap="5px" align="stretch">
+                    <Paragraph className="signature">
+                      If you are registering a Liberland company intended to do business internationally,
+                      within jurisdictions other than Liberland,
+                      you will need to comply with additional requirements and sign the
+                      &quot;GoodBoi&quot; contract
+                    </Paragraph>
+                    <Button flex primary href="https://blockchain.liberland.org/home/contracts/overview/browser/13">
+                      Sign contract
+                    </Button>
+                  </Flex>
+                </Card>
+              </Col>
+            </Row>
+          </Radio.Group>
+        </Form.Item>
+        <Divider />
+        <Form.Item
+          label="Signed company contract"
+          name="signedContract"
+          rules={[{ required: true }]}
+          layout="horizontal"
+          valuePropName="checked"
+          className="big-checkbox-item"
+        >
+          <Checkbox disabled={!companyType} className="big-checkbox" />
+        </Form.Item>
+        <Flex wrap gap="15px">
+          <Button onClick={() => history.push(router.companies.allCompanies)}>
+            Cancel
+          </Button>
+          <Button
+            primary
+            type="submit"
+          >
+            {buttonMessage}
+          </Button>
+        </Flex>
+      </Card>
+    </Form>
   );
 }
 
@@ -267,55 +513,4 @@ BuildRegistryForm.propTypes = {
   buttonMessage: PropTypes.string.isRequired,
   companyId: PropTypes.string.isRequired,
   callback: PropTypes.func.isRequired,
-};
-
-export function RenderRegistryItemDetails({ mainDataObject, showAll = false }) {
-  return (
-    <div>
-      <ul>
-        {mainDataObject?.staticFields.map((staticField) => (
-          <li>
-            {staticField?.name}
-            :
-            {' '}
-            {staticField?.display}
-          </li>
-        ))}
-        {showAll
-          ? mainDataObject?.dynamicFields.map((dynamicField) => (
-            <div>
-              <b>{dynamicField?.name}</b>
-              <ul>
-                {dynamicField?.data?.map((formObjects, index) => (
-                  <div>
-                    <li>
-                      {dynamicField?.name}
-                      {' '}
-                      {index + 1}
-                    </li>
-                    <ul>
-                      {formObjects.map((formObject) => (
-                        <li>
-                          {formObject?.display}
-                          {' '}
-                          {formObject?.isEncrypted ? '(Encrypted)' : ''}
-                        </li>
-
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </ul>
-            </div>
-          ))
-          : <div />}
-      </ul>
-    </div>
-  );
-}
-
-RenderRegistryItemDetails.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  mainDataObject: PropTypes.any.isRequired,
-  showAll: PropTypes.bool.isRequired,
 };
