@@ -26,6 +26,7 @@ import { useStockContext } from '../Wallet/StockContext';
 import CurrencyIcon from '../CurrencyIcon';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
+import GetLLDWrapper from '../GetLLDWrapper';
 
 function TradeTokensForm({
   onClose, assets: initialAssets,
@@ -448,6 +449,9 @@ function TradeTokensForm({
           <Button medium onClick={onClose} disabled={loading}>
             Cancel
           </Button>
+          {(asset1 === 'Native' || asset2 === 'Native') && (
+            <GetLLDWrapper />
+          )}
           <Button primary medium type="submit" disabled={loading}>
             {loading ? 'Loading...' : submitText}
           </Button>
