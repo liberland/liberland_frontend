@@ -140,3 +140,8 @@ export const spendingSelector = createSelector(
   congressReducer,
   (reducer) => reducer.congressSpending,
 );
+
+export const spendingCountSelector = createSelector(
+  congressReducer,
+  (reducer) => reducer.spendingCount,
+);

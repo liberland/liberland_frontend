@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Flex from 'antd/es/flex';
 import { ministryFinanceActions, officesActions } from '../../../redux/actions';
@@ -6,6 +6,9 @@ import { blockchainSelectors, ministryFinanceSelector, officesSelectors } from '
 import WalletCongresSenateWrapper from '../../WalletCongresSenate/Wrapper';
 import { OfficeType } from '../../../utils/officeTypeEnum';
 import SpendingTable from '../../SpendingTable';
+import { paginator } from '../../../utils/pagination';
+
+const pageSize = 10;
 
 export default function Wallet() {
   const dispatch = useDispatch();
@@ -18,12 +21,19 @@ export default function Wallet() {
   const balances = useSelector(ministryFinanceSelector.balances);
   const clerksIds = useSelector(ministryFinanceSelector.clerksMinistryFinance);
   const spending = useSelector(ministryFinanceSelector.spendingSelector);
+  const spendingCount = useSelector(ministryFinanceSelector.spendingCountSelector);
   const userIsMember = clerksIds?.includes(walletAddress) || false;
 
+  const loadMore = useCallback(({ skip }) => (
+    dispatch(ministryFinanceActions.ministryFinanceSpending.call({ skip, take: pageSize }))
+  ), [dispatch]);
+
   useEffect(() => {
-    dispatch(ministryFinanceActions.ministryFinanceSpending.call());
+    dispatch(ministryFinanceActions.ministryFinanceSpendingCount.call());
+    loadMore({ skip: 0 });
+    dispatch(ministryFinanceActions.ministryFinanceSpendingCount.call());
     dispatch(officesActions.getPalletIds.call());
-  }, [dispatch]);
+  }, [loadMore, dispatch]);
 
   useEffect(() => {
     dispatch(ministryFinanceActions.ministryFinanceGetWallet.call());
@@ -53,8 +63,16 @@ export default function Wallet() {
           LLMPolitipool: (data) => ministryFinanceActions.ministryFinanceSendLlmToPolitipool.call(data),
         }}
       />
-      {spending && (
-        <SpendingTable spending={spending} />
+      {spending && spendingCount && (
+        <SpendingTable
+          spending={spending}
+          onNext={paginator(
+            pageSize,
+            spending.length,
+            spendingCount,
+            loadMore,
+          )}
+        />
       )}
     </Flex>
   );

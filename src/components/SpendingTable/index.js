@@ -20,7 +20,7 @@ import ColorAvatar from '../ColorAvatar';
 import styles from './styles.module.scss';
 import truncate from '../../utils/truncate';
 
-export default function SpendingTable({ spending }) {
+export default function SpendingTable({ spending, onNext }) {
   const names = useSelector(identitySelectors.selectorIdentityMotions);
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const isBigScreen = useMediaQuery('(min-width: 1600px)');
@@ -160,12 +160,14 @@ export default function SpendingTable({ spending }) {
                 },
               ]}
               data={displayData}
+              onPageChange={onNext}
             />
           ) : (
             <List
               dataSource={displayData}
               itemLayout="horizontal"
               size="small"
+              pagination={{ pageSize: 10, onChange: onNext }}
               renderItem={({
                 timestamp,
                 recipient,
@@ -225,6 +227,7 @@ export default function SpendingTable({ spending }) {
 }
 
 SpendingTable.propTypes = {
+  onNext: PropTypes.func.isRequired,
   spending: PropTypes.arrayOf(PropTypes.shape({
     timestamp: PropTypes.instanceOf(Date).isRequired,
     recipient: PropTypes.string.isRequired,

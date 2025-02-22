@@ -11,7 +11,7 @@ import { palletIdToAddress } from '../../utils/pallet';
 import { ministryFinanceActions } from '../actions';
 import { blockchainSelectors, ministryFinanceSelector, officesSelectors } from '../selectors';
 import { OfficeType } from '../../utils/officeTypeEnum';
-import { fetchMinistryOfFinanceSpending } from '../../api/middleware';
+import { fetchMinistryOfFinanceSpending, fetchMinistryOfFinanceSpendingCount } from '../../api/middleware';
 
 const officeType = OfficeType.MINISTRY_FINANCE;
 
@@ -33,6 +33,11 @@ function* getWalletWorker() {
 function* spendingWorker({ payload: { skip, take } }) {
   const spending = yield call(fetchMinistryOfFinanceSpending, skip, take);
   yield put(ministryFinanceActions.ministryFinanceSpending.success(spending));
+}
+
+function* spendingCountWorker() {
+  const spending = yield call(fetchMinistryOfFinanceSpendingCount);
+  yield put(ministryFinanceActions.ministryFinanceSpendingCount.success(spending));
 }
 
 export function* getWalletWatcher() {
@@ -172,5 +177,12 @@ export function* ministryOfFinanceSpendingWatcher() {
   yield* blockchainWatcher(
     ministryFinanceActions.ministryFinanceSpending,
     spendingWorker,
+  );
+}
+
+export function* ministryOfFinanceSpendingCountWatcher() {
+  yield* blockchainWatcher(
+    ministryFinanceActions.ministryFinanceSpendingCount,
+    spendingCountWorker,
   );
 }
