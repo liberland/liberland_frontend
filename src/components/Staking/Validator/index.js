@@ -13,6 +13,8 @@ import styles from './styles.module.scss';
 import { validatorActions } from '../../../redux/actions';
 import MoneyCard from '../../MoneyCard';
 import { validatorSelectors } from '../../../redux/selectors';
+import { valueToBN } from '../../../utils/walletHelpers';
+import UpdateCommissionModal from '../../Modals/UpdateCommissionModal';
 
 export default function Overview() {
   const dispatch = useDispatch();
@@ -30,49 +32,58 @@ export default function Overview() {
   return (
     <Flex vertical gap="20px">
       <Row gutter={16} className={styles.row}>
-        <Col span={isLargerThanHdScreen ? 12 : 24}>
+        <Col span={isLargerThanHdScreen ? 8 : 24}>
           <MoneyCard
             title="My validator status"
             amount={<Status />}
             description={info.isNextSessionValidator && 'Scheduled for next session'}
           />
         </Col>
-        <Col span={isLargerThanHdScreen ? 12 : 24}>
+        <Col span={isLargerThanHdScreen ? 8 : 24}>
           <MoneyCard
             title="Nominated by"
             amount={`${nominators?.length || 0} nominators`}
             description={nominators?.length ? 'See list of nominators below' : undefined}
           />
         </Col>
+        <Col span={isLargerThanHdScreen ? 8 : 24}>
+          <MoneyCard
+            title="Commission"
+            amount={`${valueToBN(info?.validator?.commission || 0).div(valueToBN(10000000))}%`}
+            description={info?.validator?.blocked ? 'New nominations blocked' : 'Allows new nominations'}
+            actions={[
+              <UpdateCommissionModal defaultValues={info?.validator} />,
+            ]}
+          />
+        </Col>
       </Row>
-      {nominators?.length ? (
-        <Collapse
-          defaultActiveKey={['by', 'staking']}
-          items={[
-            {
-              key: 'by',
-              label: 'Nominated by',
-              children: (
-                <NominatedByList />
-              ),
-            },
-            {
-              key: 'staking',
-              label: 'Staking rewards',
-              children: (
-                <Stats />
-              ),
-            },
-            (appliedSlashes?.length || unappliedSlashes?.length) && {
-              key: 'slash',
-              label: 'Slashes',
-              children: (
-                <Slashes />
-              ),
-            },
-          ].filter(Boolean)}
-        />
-      ) : null}
+      <Collapse
+        defaultActiveKey={['by', 'staking']}
+        collapsible="icon"
+        items={[
+          {
+            key: 'by',
+            label: 'Nominated by',
+            children: (
+              <NominatedByList />
+            ),
+          },
+          {
+            key: 'staking',
+            label: 'Staking rewards',
+            children: (
+              <Stats />
+            ),
+          },
+          (appliedSlashes?.length || unappliedSlashes?.length) && {
+            key: 'slash',
+            label: 'Slashes',
+            children: (
+              <Slashes />
+            ),
+          },
+        ].filter(Boolean)}
+      />
     </Flex>
   );
 }

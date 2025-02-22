@@ -12,6 +12,11 @@ export const isLoading = createSelector(
   (reducer) => reducer.isLoading,
 );
 
+export const isUnobtrusive = createSelector(
+  nftsReducer,
+  (reducer) => reducer.isLoading,
+);
+
 export const userCollections = createSelector(
   nftsReducer,
   (reducer) => reducer.userCollections,

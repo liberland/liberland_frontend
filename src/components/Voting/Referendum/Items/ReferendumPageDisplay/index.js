@@ -7,7 +7,7 @@ import List from 'antd/es/list';
 import Space from 'antd/es/space';
 import Title from 'antd/es/typography/Title';
 import { useSelector } from 'react-redux';
-import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
+import LeftOutlined from '@ant-design/icons/LeftOutlined';
 import { useHistory } from 'react-router-dom';
 import Details from '../Details';
 import { centralizedDatasType } from '../types';
@@ -49,7 +49,7 @@ function ReferendumPageDisplay({
       <Flex className={styles.nav} wrap gap="15px" align="center">
         <Flex flex={1}>
           <Button onClick={() => history.goBack()}>
-            <ArrowLeftOutlined />
+            <LeftOutlined />
             <Space />
             Back
           </Button>

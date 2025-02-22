@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import Avatar from 'antd/es/avatar';
-import Globe from '../../../assets/icons/globe.svg';
+import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
 import Button from '../../Button/Button';
 import { registriesActions } from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
@@ -56,7 +55,7 @@ export default function CompanyActions({
     <Button
       href={website}
     >
-      <Avatar size={18} src={Globe} />
+      <GlobalOutlined />
       <span className="hidden">
         Website
       </span>

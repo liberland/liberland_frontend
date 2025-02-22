@@ -49,7 +49,7 @@ export const getValidatorDisplay = ({
       ),
       commission,
       allowed: <IsAvailableForStaking blocked={blocked} />,
-      profit: `${stakedReturnCmp || 0}%`,
+      profit: `${(Math.round(100 * stakedReturnCmp) / 100) || 0}%`,
       nominated: (
         <Nominated
           address={address}

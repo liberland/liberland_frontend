@@ -21,11 +21,15 @@ import {
 import ErrorModal from '../ErrorModal';
 import NextBlockCountdown from './NextBlockCountdown';
 import { useModal } from '../../context/modalContext';
+import Blocking from './Blocking';
+import Unobtrusive from './Unobtrusive';
 
 function LoadingModal() {
   return (
     <Flex justify="center" align="center">
-      <NextBlockCountdown />
+      <NextBlockCountdown>
+        {(progressBarRatio) => <Blocking progressBarRatio={progressBarRatio} />}
+      </NextBlockCountdown>
     </Flex>
   );
 }
@@ -34,11 +38,7 @@ function Loader({ children }) {
   const { showModal, closeIdModal } = useModal();
   const [modalId, setModalsId] = useState();
 
-  const isTokenStakeLoading = useSelector(ethSelectors.selectorTokenStakeContractInfoLoading);
-  const isEthWalletOptionsLoading = useSelector(ethSelectors.selectorWalletOptionsLoading);
-  const isWethLoading = useSelector(ethSelectors.selectorWethLpExchangeRateLoading);
-  const isEthConnecting = useSelector(ethSelectors.selectorConnecting);
-  const isProcessingClaims = useSelector(ethSelectors.selectorClaimsProcessing);
+  const isEthLoading = useSelector(ethSelectors.selectorEthLoading);
   const isGettingWalletInfo = useSelector(walletSelectors.selectorGettingWalletInfo);
   const isGettingDemocracyInfo = useSelector(democracySelectors.selectorGettingDemocracyInfo);
   const isLoadingOffices = useSelector(officesSelectors.selectorIsLoading);
@@ -53,42 +53,63 @@ function Loader({ children }) {
   const isLoadingNfts = useSelector(nftsSelectors.isLoading);
   const isLoadingMinistryFinance = useSelector(ministryFinanceSelector.isLoading);
 
-  const isLoading = [
-    isTokenStakeLoading,
-    isEthWalletOptionsLoading,
-    isWethLoading,
-    isEthConnecting,
-    isProcessingClaims,
-    isLoadingContracts,
-    isGettingWalletInfo,
-    isGettingDemocracyInfo,
-    isLoadingOffices,
-    isLoadingIdentity,
-    isLoadingLegislation,
-    isLoadingValidator,
-    isLoadingCongress,
-    isGetRegistries,
-    isLoadingDex,
-    isLoadingSenate,
-    isLoadingNfts,
-    isLoadingMinistryFinance,
-  ].some((isFetching) => isFetching);
+  const isEthUnobtrusive = useSelector(ethSelectors.selectorEthUnobtrusive);
+  const isGettingWalletInfoUnobtrusive = useSelector(walletSelectors.selectorGettingWalletInfoUnobtrusive);
+  const isGettingDemocracyInfoUnobtrusive = useSelector(democracySelectors.selectorGettingDemocracyInfoUnobtrusive);
+  const isUnobtrusiveOffices = useSelector(officesSelectors.selectorIsUnobtrusive);
+  const isUnobtrusiveIdentity = useSelector(identitySelectors.selectorIsUnobtrusive);
+  const isUnobtrusiveLegislation = useSelector(legislationSelectors.gettingLegislationUnobtrusive);
+  const isUnobtrusiveValidator = useSelector(validatorSelectors.isUnobtrusive);
+  const isUnobtrusiveCongress = useSelector(congressSelectors.isUnobtrusive);
+  const isGetRegistriesUnobtrusive = useSelector(registriesSelectors.isGetRegistriesUnobtrusive);
+  const isUnobtrusiveDex = useSelector(dexSelectors.selectorIsUnobtrusive);
+  const isUnobtrusiveContracts = useSelector(contractsSelectors.selectorIsContractsUnobtrusive);
+  const isUnobtrusiveSenate = useSelector(senateSelectors.isUnobtrusive);
+  const isUnobtrusiveNfts = useSelector(nftsSelectors.isUnobtrusive);
+  const isUnobtrusiveMinistryFinance = useSelector(ministryFinanceSelector.isUnobtrusive);
+
+  const loadingStructure = [
+    [isEthLoading, isEthUnobtrusive],
+    [isGettingWalletInfo, isGettingWalletInfoUnobtrusive],
+    [isGettingDemocracyInfo, isGettingDemocracyInfoUnobtrusive],
+    [isLoadingOffices, isUnobtrusiveOffices],
+    [isLoadingIdentity, isUnobtrusiveIdentity],
+    [isLoadingLegislation, isUnobtrusiveLegislation],
+    [isLoadingValidator, isUnobtrusiveValidator],
+    [isLoadingCongress, isUnobtrusiveCongress],
+    [isGetRegistries, isGetRegistriesUnobtrusive],
+    [isLoadingDex, isUnobtrusiveDex],
+    [isLoadingContracts, isUnobtrusiveContracts],
+    [isLoadingSenate, isUnobtrusiveSenate],
+    [isLoadingNfts, isUnobtrusiveNfts],
+    [isLoadingMinistryFinance, isUnobtrusiveMinistryFinance],
+  ];
+
+  const shouldShowModal = loadingStructure.some(([loading, unobtrusive]) => loading && !unobtrusive);
+  const shouldShowUnobtrusive = loadingStructure.some(([loading, unobtrusive]) => loading && unobtrusive);
 
   useEffect(() => {
-    if (isLoading) {
+    if (shouldShowModal) {
       const id = showModal(<LoadingModal />, { maskClosable: false });
       setModalsId(id);
     }
-  }, [isLoading, showModal]);
+  }, [shouldShowModal, showModal]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!shouldShowModal) {
       closeIdModal(modalId);
     }
-  }, [closeIdModal, isLoading, modalId]);
+  }, [closeIdModal, shouldShowModal, modalId]);
 
   return (
     <>
+      {!shouldShowUnobtrusive ? (
+        <Unobtrusive progressBarRatio={100} inactive />
+      ) : (
+        <NextBlockCountdown>
+          {(progressBarRatio) => <Unobtrusive progressBarRatio={progressBarRatio} />}
+        </NextBlockCountdown>
+      )}
       {children}
       <ErrorModal />
     </>

@@ -850,6 +850,11 @@ function accountsToString(accounts) {
   return accounts.map((account) => account.toString());
 }
 
+const getValidator = async (address) => {
+  const api = await getApi();
+  return api.query.staking.validators(address);
+};
+
 const getValidators = async () => {
   const api = await getApi();
   const validators = [];
@@ -1953,6 +1958,12 @@ const stakingValidate = async (commission, blocked, keys, walletAddress) => {
   const validate = api.tx.staking.validate({ commission, blocked });
   const extrinsic = api.tx.utility.batchAll([setKeys, validate]);
   return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const updateValidate = async (commission, blocked, walletAddress) => {
+  const api = await getApi();
+  const validate = api.tx.staking.validate({ commission, blocked });
+  return submitExtrinsic(validate, walletAddress, api);
 };
 
 const bondAndValidate = async (bondValue, payee, commission, blocked, keys, walletAddress) => {
@@ -3262,4 +3273,6 @@ export {
   transferWithRemark,
   encodeRemarkUser,
   getClerksMinistryFinance,
+  updateValidate,
+  getValidator,
 };

@@ -12,6 +12,11 @@ export const isLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+export const isUnobtrusive = createSelector(
+  ministryFinanceReducer,
+  (reducer) => reducer.loading,
+);
+
 const walletInfo = createSelector(
   ministryFinanceReducer,
   (reducer) => reducer.walletInfo,

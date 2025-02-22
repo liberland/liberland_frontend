@@ -4,7 +4,7 @@ import MenuOutlined from '@ant-design/icons/MenuOutlined';
 import Modal from 'antd/es/modal';
 import styles from '../styles.module.scss';
 import UrlMenu from '../UrlMenu';
-import LiberlandLettermarkMobile from '../../../assets/icons/Liberland_Lettermark_Mobile.svg';
+import { ReactComponent as LiberlandLettermarkMobile } from '../../../assets/icons/Liberland_Lettermark_Mobile.svg';
 import UserMenu from '../../UserMenu';
 
 function MobileHeader() {
@@ -20,7 +20,7 @@ function MobileHeader() {
           onClick={() => setOpen(true)}
           aria-label="Open pagination menu"
         />
-        <img alt="logo" src={LiberlandLettermarkMobile} className={styles.mobileLogo} />
+        <LiberlandLettermarkMobile alt="logo" className={styles.mobileLogo} />
         <div className={styles.mobileUser} onClick={(e) => e.stopPropagation()}>
           <UserMenu />
         </div>

@@ -28,6 +28,7 @@ const initialState = {
   additionalAssets: [],
   assetDetails: [],
   gettingWalletInfo: false,
+  unobtrusive: false,
   transfersTxHistory: {
     transfersTxHistory: [],
     transfersTxHistoryFailed: false,
@@ -68,6 +69,18 @@ const walletReducer = handleActions(
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
+    }),
+    [combineActions(
+      walletActions.getWallet.call,
+      walletActions.getAssetsDetails.call,
+      walletActions.getAdditionalAssets.call,
+      walletActions.getValidators.call,
+      walletActions.getNominatorTargets.call,
+      walletActions.getTxTransfers.call,
+      walletActions.getAssetsBalance.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
     }),
     [walletActions.getTxTransfers.call]: (state) => ({
       ...state,
@@ -155,6 +168,7 @@ const walletReducer = handleActions(
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,
+      unobtrusive: initialState.unobtrusive,
     }),
     [walletActions.sendTransfer.success]: (state) => ({
       ...state,

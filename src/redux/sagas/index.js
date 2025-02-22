@@ -109,6 +109,7 @@ export default function* rootSaga() {
     validatorSagas.unbondWatcher(),
     validatorSagas.withdrawUnbondedWatcher(),
     validatorSagas.getStakingDataWatcher(),
+    validatorSagas.updateCommissionWatcher(),
 
     // CONGRESS
     congressSagas.applyForCongressWatcher(),

@@ -51,7 +51,7 @@ function StartValidatorForm({
         name="allow_nominations"
         label="Allow new nominations"
         valuePropName="checked"
-        layout="vertical"
+        layout="horizontal"
       >
         <Checkbox />
       </Form.Item>

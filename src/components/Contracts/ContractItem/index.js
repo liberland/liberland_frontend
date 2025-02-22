@@ -7,11 +7,10 @@ import Divider from 'antd/es/divider';
 import Space from 'antd/es/space';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
-import Avatar from 'antd/es/avatar';
+import LeftOutlined from '@ant-design/icons/LeftOutlined';
 import Markdown from 'markdown-to-jsx';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import ArrowLeft from '../../../assets/icons/arrow-left.svg';
 import { deriveAndHideContractTitle } from '../utils';
 import { useContractItem } from '../hooks';
 import Button from '../../Button/Button';
@@ -79,7 +78,7 @@ function ContractItem({
           history.goBack();
         }}
       >
-        <Avatar src={ArrowLeft} size={12} shape="square" />
+        <LeftOutlined />
         <Space />
         Back
       </Button>

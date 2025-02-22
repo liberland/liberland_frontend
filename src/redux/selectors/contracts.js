@@ -17,6 +17,11 @@ const selectorIsContractsLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+const selectorIsContractsUnobtrusive = createSelector(
+  contractsReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 const selectorIdentityContracts = createSelector(
   contractsReducer,
   (reducer) => reducer.names,
@@ -45,4 +50,5 @@ export {
   selectorMyContracts,
   selectorSingleContract,
   selectorSignatures,
+  selectorIsContractsUnobtrusive,
 };

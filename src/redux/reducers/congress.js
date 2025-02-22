@@ -31,6 +31,7 @@ const initialState = {
   allBalance: [],
   candidates: [],
   loading: false,
+  unobtrusive: false,
   members: [],
   motions: [],
   runnersUp: [],
@@ -71,6 +72,18 @@ const congressReducer = handleActions(
       loading: true,
     }),
     [combineActions(
+      congressActions.getCandidates.call,
+      congressActions.getMembers.call,
+      congressActions.getMotions.call,
+      congressActions.getRunnersUp.call,
+      congressActions.getTreasuryInfo.call,
+      congressActions.getAllBalanceForCongress.call,
+      congressActions.congressSpending.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
+    }),
+    [combineActions(
       congressActions.applyForCongress.failure,
       congressActions.approveTreasurySpend.failure,
       congressActions.closeMotion.failure,
@@ -105,6 +118,7 @@ const congressReducer = handleActions(
     )]: (state) => ({
       ...state,
       loading: false,
+      unobtrusive: false,
     }),
     [congressActions.getAllBalanceForCongress.success]: (state, action) => ({
       ...state,
