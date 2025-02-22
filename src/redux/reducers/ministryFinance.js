@@ -100,7 +100,7 @@ const ministryFinanceReducer = handleActions(
     }),
     [ministryFinanceActions.ministryFinanceSpendingCount.success]: (state, action) => ({
       ...state,
-      count: action.payload.spendingCount,
+      spendingCount: action.payload.count,
     }),
   },
   initialState,

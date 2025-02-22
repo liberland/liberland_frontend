@@ -36,8 +36,8 @@ function* spendingWorker({ payload: { skip, take } }) {
 }
 
 function* spendingCountWorker() {
-  const spending = yield call(fetchMinistryOfFinanceSpendingCount);
-  yield put(ministryFinanceActions.ministryFinanceSpendingCount.success(spending));
+  const count = yield call(fetchMinistryOfFinanceSpendingCount);
+  yield put(ministryFinanceActions.ministryFinanceSpendingCount.success({ count }));
 }
 
 export function* getWalletWatcher() {

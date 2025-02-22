@@ -46,7 +46,7 @@ const fetchSpending = async (wallet, skip, take) => {
         params: { skip, take },
       },
     );
-    return spendings.map((spending) => ({
+    return spendings.slice(1).map((spending) => ({
       timestamp: new Date(spending[0]),
       recipient: spending[1],
       asset: spending[2],
@@ -66,7 +66,7 @@ const fetchSpending = async (wallet, skip, take) => {
 };
 
 const fetchSpendingCount = async (wallet) => {
-  const { count } = await getMiddlewareApi().get(
+  const { data: { count } } = await getMiddlewareApi().get(
     `/v1/government-spendings/${wallet}/count`,
   );
   return count;

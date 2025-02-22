@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Flex from 'antd/es/flex';
 import { congressActions } from '../../../redux/actions';
@@ -20,20 +20,19 @@ export default function Wallet() {
   const spending = useSelector(congressSelectors.spendingSelector);
   const spendingCount = useSelector(congressSelectors.spendingCountSelector);
   const dispatch = useDispatch();
+  const [skip, setSkip] = useState(0);
 
-  const loadMore = useCallback(({ skip }) => (
-    dispatch(congressActions.congressSpending.call({ skip, take: pageSize }))
-  ), [dispatch]);
+  const loadMore = useCallback(() => {
+    dispatch(congressActions.congressSpending.call({ skip, take: pageSize }));
+    setSkip((prev) => prev + pageSize);
+  }, [dispatch, skip]);
 
   useEffect(() => {
     dispatch(congressActions.congressSpendingCount.call());
-    loadMore({ skip: 0 });
+    loadMore();
     dispatch(congressActions.getMembers.call());
-  }, [loadMore, dispatch]);
-
-  if (!congressAccountAddress || !balances) {
-    return null;
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount
 
   return (
     <Flex vertical gap="20px">
@@ -53,17 +52,17 @@ export default function Wallet() {
           }}
         />
       )}
-      {spending && spendingCount && (
+      {spending && spendingCount ? (
         <SpendingTable
           spending={spending}
-          onNext={paginator(
+          onNext={paginator({
+            action: loadMore,
+            count: spendingCount,
+            loaded: spending.length,
             pageSize,
-            spending.length,
-            spendingCount,
-            loadMore,
-          )}
+          })}
         />
-      )}
+      ) : null}
     </Flex>
   );
 }

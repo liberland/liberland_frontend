@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Flex from 'antd/es/flex';
 import { ministryFinanceActions, officesActions } from '../../../redux/actions';
@@ -23,17 +23,20 @@ export default function Wallet() {
   const spending = useSelector(ministryFinanceSelector.spendingSelector);
   const spendingCount = useSelector(ministryFinanceSelector.spendingCountSelector);
   const userIsMember = clerksIds?.includes(walletAddress) || false;
+  const [skip, setSkip] = useState(0);
 
-  const loadMore = useCallback(({ skip }) => (
-    dispatch(ministryFinanceActions.ministryFinanceSpending.call({ skip, take: pageSize }))
-  ), [dispatch]);
+  const loadMore = useCallback(() => {
+    dispatch(ministryFinanceActions.ministryFinanceSpending.call({ skip, take: pageSize }));
+    setSkip((prev) => prev + pageSize);
+  }, [dispatch, skip]);
 
   useEffect(() => {
     dispatch(ministryFinanceActions.ministryFinanceSpendingCount.call());
-    loadMore({ skip: 0 });
+    loadMore();
     dispatch(ministryFinanceActions.ministryFinanceSpendingCount.call());
     dispatch(officesActions.getPalletIds.call());
-  }, [loadMore, dispatch]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Should only run on mount
 
   useEffect(() => {
     dispatch(ministryFinanceActions.ministryFinanceGetWallet.call());
@@ -63,17 +66,17 @@ export default function Wallet() {
           LLMPolitipool: (data) => ministryFinanceActions.ministryFinanceSendLlmToPolitipool.call(data),
         }}
       />
-      {spending && spendingCount && (
+      {spending && spendingCount ? (
         <SpendingTable
           spending={spending}
-          onNext={paginator(
+          onNext={paginator({
+            action: loadMore,
+            count: spendingCount,
+            loaded: spending.length,
             pageSize,
-            spending.length,
-            spendingCount,
-            loadMore,
-          )}
+          })}
         />
-      )}
+      ) : null}
     </Flex>
   );
 }

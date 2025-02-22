@@ -238,6 +238,6 @@ SpendingTable.propTypes = {
     supplier: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     finalDestination: PropTypes.string.isRequired,
-    amountInUsd: PropTypes.string.isRequired,
+    amountInUsd: PropTypes.number.isRequired,
   }).isRequired).isRequired,
 };
