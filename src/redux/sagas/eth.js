@@ -21,27 +21,41 @@ import { blockchainWatcher } from './base';
 // WORKERS
 
 function* stakeLpWithEthWorker(action) {
-  yield call(stakeLPWithEth, action.payload);
-  yield put(ethActions.getWethLpExchangeRate.call());
-  yield put(ethActions.getBalance.call({ provider: action.payload.provider, address: action.payload.account }));
-  yield put(ethActions.getErc20Balance.call(
-    process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
-    action.payload.account,
-  ));
+  try {
+    const userEthAddress = yield call(() => action.payload.account.getAddress());
+    yield call(stakeLPWithEth, action.payload);
+    yield put(ethActions.getWethLpExchangeRate.call());
+    yield put(ethActions.getBalance.call({ provider: action.payload.provider, address: userEthAddress }));
+    yield put(ethActions.getErc20Balance.call({
+      erc20Address: process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+      account: userEthAddress,
+    }));
+    yield put(ethActions.getTokenStakeAddressInfo.call({ userEthAddress }));
+  } catch (e) {
+    console.error(e);
+    throw e;
+  }
 }
 
 function* stakeTokensWorker(action) {
+  const userEthAddress = yield call(() => action.payload.account.getAddress());
   yield call(stakeTokens, action.payload);
+  yield put(ethActions.stakeTokens.success());
+  yield put(ethActions.getTokenStakeAddressInfo.call({ userEthAddress }));
 }
 
 function* withdrawTokensWorker(action) {
+  const userEthAddress = yield call(() => action.payload.account.getAddress());
   yield call(withdrawTokens, action.payload);
   yield put(ethActions.withdrawTokens.success());
+  yield put(ethActions.getTokenStakeAddressInfo.call({ userEthAddress }));
 }
 
 function* claimRewardsWorker(action) {
+  const userEthAddress = yield call(() => action.payload.account.getAddress());
   yield call(claimRewards, action.payload);
   yield put(ethActions.claimReward.success());
+  yield put(ethActions.getTokenStakeAddressInfo.call({ userEthAddress }));
 }
 
 function* getWethExchangeRateWorker(action) {
