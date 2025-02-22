@@ -3,6 +3,7 @@ import { dexActions } from '../actions';
 
 const initialState = {
   loading: false,
+  unobtrusive: false,
   pools: null,
   reserves: null,
   withdrawalFee: null,
@@ -24,6 +25,15 @@ const dexReducer = handleActions(
     }),
 
     [combineActions(
+      dexActions.getPools.call,
+      dexActions.getDexReserves.call,
+      dexActions.getWithdrawalFee.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
+    }),
+
+    [combineActions(
       dexActions.swapExactTokensForTokens.success,
       dexActions.swapExactTokensForTokens.failure,
       dexActions.swapTokensForExactTokens.success,
@@ -42,6 +52,7 @@ const dexReducer = handleActions(
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
+      unobtrusive: initialState.unobtrusive,
     }),
 
     [dexActions.getPools.call]: (state) => ({

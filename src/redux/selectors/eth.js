@@ -12,39 +12,9 @@ const selectorWethLpExchangeRate = createSelector(
   (reducer) => reducer.wethLpExchangeRate,
 );
 
-const selectorWethLpExchangeRateLoading = createSelector(
-  ethReducer,
-  (reducer) => reducer.wethLpExchangeRateLoading,
-);
-
-const selectorWethLpExchangeRateError = createSelector(
-  ethReducer,
-  (reducer) => reducer.wethLpExchangeRateError,
-);
-
-const selectorWalletOptionsLoading = createSelector(
-  ethReducer,
-  (reducer) => reducer.loading,
-);
-
 const selectorConnected = createSelector(
   ethReducer,
   (reducer) => reducer.wallet,
-);
-
-const selectorConnecting = createSelector(
-  ethReducer,
-  (reducer) => reducer.connecting,
-);
-
-const selectorConnectError = createSelector(
-  ethReducer,
-  (reducer) => reducer.walletError,
-);
-
-const selectorTokenStakeContractInfoLoading = createSelector(
-  ethReducer,
-  (reducer) => reducer.tokenStakeContractInfoLoading,
 );
 
 const selectorTokenStakeContractInfo = createSelector(
@@ -67,9 +37,14 @@ const selectorBalance = createSelector(
   (reducer) => reducer.balance,
 );
 
-const selectorClaimsProcessing = createSelector(
+const selectorEthLoading = createSelector(
   ethReducer,
-  (reducer) => reducer.claimsProcessing,
+  (reducer) => reducer.loading,
+);
+
+const selectorEthUnobtrusive = createSelector(
+  ethReducer,
+  (reducer) => reducer.unobtrusive,
 );
 
 const selectorERC20Balance = createSelector(
@@ -86,18 +61,13 @@ const selectorERC20Balance = createSelector(
 
 export {
   selectorWalletOptions,
-  selectorWalletOptionsLoading,
   selectorConnected,
-  selectorConnecting,
-  selectorConnectError,
-  selectorTokenStakeContractInfoLoading,
   selectorTokenStakeContractInfo,
   selectorTokenStakeAddressInfo,
   selectorERC20Info,
   selectorERC20Balance,
   selectorWethLpExchangeRate,
-  selectorWethLpExchangeRateLoading,
-  selectorWethLpExchangeRateError,
   selectorBalance,
-  selectorClaimsProcessing,
+  selectorEthLoading,
+  selectorEthUnobtrusive,
 };

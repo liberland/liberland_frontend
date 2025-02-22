@@ -31,8 +31,8 @@ function OwnedNfts() {
   useEffect(() => {
     dispatch(nftsActions.getUserCollections.call(userWalletAddress));
   }, [dispatch, userWalletAddress]);
-  const nftIds = nfts.map((nft) => Number(nft.nftId));
-  const nftsId = nftIds.length > 0 ? Math.max(...nftIds) : 0;
+  const nftIds = nfts?.map((nft) => Number(nft.nftId));
+  const nftsId = nftIds?.length > 0 ? Math.max(...nftIds) : 0;
 
   if (!nfts) {
     return <Spin />;

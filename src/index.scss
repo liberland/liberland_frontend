@@ -42,6 +42,27 @@ body {
   }
 }
 
+.unobtrusive {
+  &.ant-progress,
+  .ant-progress-outer,
+  .ant-progress-inner {
+    top: 0;
+    left: 0;
+    position: fixed;
+    height: 5px;
+    z-index: 999;
+    transition: all 0.3s;
+  }
+
+  &--inactive {
+    &.ant-progress,
+    .ant-progress-outer,
+    .ant-progress-inner {
+      height: 3px;
+    } 
+  }
+}
+
 .ant-table-wrapper {
   background-color: var(--table-bg);
   border: solid 1px var(--table-border);

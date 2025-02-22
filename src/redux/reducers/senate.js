@@ -4,6 +4,7 @@ import { senateActions } from '../actions';
 
 const initialState = {
   loading: false,
+  unobtrusive: false,
   members: [],
   motions: [],
   codeName: 'senateAccount',
@@ -51,6 +52,16 @@ const senateReducer = handleActions(
       loading: true,
     }),
     [combineActions(
+      senateActions.senateGetMotions.call,
+      senateActions.senateGetWallet.call,
+      senateActions.senateGetAdditionalAssets.call,
+      senateActions.senateGetCongressSpending.call,
+      senateActions.senateGetMembers.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
+    }),
+    [combineActions(
       senateActions.senateCloseMotion.failure,
       senateActions.senateCloseMotion.success,
       senateActions.senateVoteAtMotions.failure,
@@ -71,6 +82,7 @@ const senateReducer = handleActions(
     )]: (state) => ({
       ...state,
       loading: false,
+      unobtrusive: false,
     }),
     [senateActions.senateGetMotions.success]: (state, action) => ({
       ...state,

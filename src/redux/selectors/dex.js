@@ -12,6 +12,11 @@ const selectorIsLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+const selectorIsUnobtrusive = createSelector(
+  dexReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 const selectorReserves = createSelector(
   dexReducer,
   (reducer) => reducer.reserves,
@@ -23,5 +28,9 @@ const selectorWithdrawalFee = createSelector(
 );
 
 export {
-  selectorDex, selectorIsLoading, selectorReserves, selectorWithdrawalFee,
+  selectorDex,
+  selectorIsLoading,
+  selectorReserves,
+  selectorWithdrawalFee,
+  selectorIsUnobtrusive,
 };

@@ -16,3 +16,8 @@ export const isGetRegistries = createSelector(
   registriesReducer,
   (reducer) => reducer.isGetRegistries,
 );
+
+export const isGetRegistriesUnobtrusive = createSelector(
+  registriesReducer,
+  (reducer) => reducer.unobtrusive,
+);

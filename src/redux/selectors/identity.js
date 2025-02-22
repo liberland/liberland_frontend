@@ -12,6 +12,11 @@ const selectorIsLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+const selectorIsUnobtrusive = createSelector(
+  identityReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 const selectorIdentityMotions = createSelector(
   identityReducer,
   (reducer) => reducer.identityMotions,
@@ -21,4 +26,5 @@ export {
   selectorIdentity,
   selectorIsLoading,
   selectorIdentityMotions,
+  selectorIsUnobtrusive,
 };

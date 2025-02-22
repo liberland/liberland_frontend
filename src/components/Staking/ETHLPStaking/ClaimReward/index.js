@@ -10,7 +10,7 @@ function ClaimReward({
 }) {
   const dispatch = useDispatch();
   const connected = useSelector(ethSelectors.selectorConnected);
-  const processing = useSelector(ethSelectors.selectorClaimsProcessing);
+  const loading = useSelector(ethSelectors.selectorEthLoading);
 
   if (!connected) {
     return null;
@@ -19,7 +19,7 @@ function ClaimReward({
   return (
     <Button
       primary
-      disabled={processing}
+      disabled={loading}
       onClick={async () => {
         try {
           const signer = await connected.provider.getSigner(account);
@@ -30,7 +30,7 @@ function ClaimReward({
         }
       }}
     >
-      {processing ? 'Loading...' : 'Claim reward!'}
+      {loading ? 'Loading...' : 'Claim reward!'}
     </Button>
   );
 }

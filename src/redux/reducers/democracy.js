@@ -12,6 +12,7 @@ const initialState = {
     scheduledCalls: [],
   },
   gettingDemocracyInfo: false,
+  unobtrusive: false,
 };
 
 const democracyReducer = handleActions(
@@ -28,6 +29,12 @@ const democracyReducer = handleActions(
     )]: (state) => ({
       ...state,
       gettingDemocracyInfo: true,
+    }),
+    [combineActions(
+      democracyActions.getDemocracy.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
     }),
     [democracyActions.getDemocracy.success]: (state, action) => ({
       ...state,
@@ -54,6 +61,7 @@ const democracyReducer = handleActions(
     )]: (state) => ({
       ...state,
       gettingDemocracyInfo: initialState.gettingDemocracyInfo,
+      unobtrusive: initialState.unobtrusive,
     }),
   },
   initialState,

@@ -12,6 +12,11 @@ export const isLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+export const isUnobtrusive = createSelector(
+  ministryFinanceReducer,
+  (reducer) => reducer.loading,
+);
+
 const walletInfo = createSelector(
   ministryFinanceReducer,
   (reducer) => reducer.walletInfo,
@@ -57,4 +62,9 @@ export const totalBalance = createSelector(
 export const spendingSelector = createSelector(
   ministryFinanceReducer,
   (reducer) => reducer.ministryFinanceSpending,
+);
+
+export const spendingCountSelector = createSelector(
+  ministryFinanceReducer,
+  (reducer) => reducer.spendingCount,
 );

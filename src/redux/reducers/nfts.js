@@ -3,10 +3,11 @@ import { nftsActions } from '../actions';
 
 const initialState = {
   isLoading: false,
-  userNfts: [],
-  userCollections: [],
-  nfts: [],
-  nftsOnSale: [],
+  unobtrusive: false,
+  userNfts: null,
+  userCollections: null,
+  nfts: null,
+  nftsOnSale: null,
 };
 
 const nftsReducer = handleActions({
@@ -26,6 +27,15 @@ const nftsReducer = handleActions({
   )]: (state) => ({
     ...state,
     isLoading: true,
+  }),
+  [combineActions(
+    nftsActions.getNfts.call,
+    nftsActions.getUserCollections.call,
+    nftsActions.getAllNfts.call,
+    nftsActions.getNftsOnSale.call,
+  )]: (state) => ({
+    ...state,
+    unobtrusive: true,
   }),
   [nftsActions.getNfts.success]: (state, action) => ({
     ...state,
@@ -71,6 +81,7 @@ const nftsReducer = handleActions({
   )]: (state) => ({
     ...state,
     isLoading: initialState.isLoading,
+    unobtrusive: initialState.unobtrusive,
   }),
 }, initialState);
 

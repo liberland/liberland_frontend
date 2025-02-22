@@ -7,6 +7,11 @@ export const isLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+export const isUnobtrusive = createSelector(
+  validatorReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 export const pendingRewards = createSelector(
   validatorReducer,
   (reducer) => reducer.pendingRewards,

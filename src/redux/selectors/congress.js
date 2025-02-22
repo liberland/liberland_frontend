@@ -8,6 +8,11 @@ export const isLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+export const isUnobtrusive = createSelector(
+  congressReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 export const candidates = createSelector(
   congressReducer,
   (reducer) => reducer.candidates,
@@ -134,4 +139,9 @@ export const allBalance = createSelector(
 export const spendingSelector = createSelector(
   congressReducer,
   (reducer) => reducer.congressSpending,
+);
+
+export const spendingCountSelector = createSelector(
+  congressReducer,
+  (reducer) => reducer.spendingCount,
 );

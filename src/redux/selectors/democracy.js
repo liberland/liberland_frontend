@@ -12,7 +12,13 @@ const selectorGettingDemocracyInfo = createSelector(
   (reducer) => reducer.gettingDemocracyInfo,
 );
 
+const selectorGettingDemocracyInfoUnobtrusive = createSelector(
+  democracyReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 export {
   selectorDemocracyInfo,
   selectorGettingDemocracyInfo,
+  selectorGettingDemocracyInfoUnobtrusive,
 };

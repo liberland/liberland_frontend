@@ -65,7 +65,7 @@ MoneyCard.propTypes = {
   title: PropTypes.node,
   icon: PropTypes.node,
   alt: PropTypes.string,
-  amount: PropTypes.string,
+  amount: PropTypes.node,
   description: PropTypes.node,
   className: PropTypes.string,
 };

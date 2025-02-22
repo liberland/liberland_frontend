@@ -13,6 +13,11 @@ const selectorGettingWalletInfo = createSelector(
   (reducer) => reducer.gettingWalletInfo,
 );
 
+const selectorGettingWalletInfoUnobtrusive = createSelector(
+  walletReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 // FIXME delete or make functional
 const selectorWalletAddress = createSelector(
   selectorWalletInfo,
@@ -131,4 +136,5 @@ export {
   selectorAssetsBalance,
   selectorAssetsDetails,
   selectorTransferState,
+  selectorGettingWalletInfoUnobtrusive,
 };

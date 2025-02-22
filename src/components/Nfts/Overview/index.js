@@ -19,7 +19,7 @@ function NftsComponent() {
   useEffect(() => {
     dispatch(nftsActions.getAllNfts.call(walletAddress));
   }, [dispatch, walletAddress]);
-  const { nfts } = nftsAll;
+  const { nfts } = nftsAll || {};
 
   if (!nfts) {
     return <Spin />;
