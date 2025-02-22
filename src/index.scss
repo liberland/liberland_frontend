@@ -50,7 +50,7 @@ body {
     left: 0;
     position: fixed;
     height: 5px;
-    z-index: 999;
+    z-index: 1001;
     transition: all 0.3s;
   }
 
@@ -59,6 +59,7 @@ body {
     .ant-progress-outer,
     .ant-progress-inner {
       height: 3px;
+      z-index: 999;
     } 
   }
 }
@@ -298,6 +299,17 @@ textarea.ant-input {
 
 .ant-collapse-header {
   align-items: center!important;
+}
+
+.ant-modal {
+  top: 50px;
+  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
+    top: 100px;
+  }
+}
+
+.ant-select-selection-search-input {
+  font-size: 18px!important;
 }
 
 .ant-layout-sider-children .ant-menu {

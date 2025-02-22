@@ -9,6 +9,7 @@ function ActionsMenu({
   isOwner,
   isAdmin,
   isIssuer,
+  isStock,
   assetId,
   defaultValues,
   onClose,
@@ -16,7 +17,7 @@ function ActionsMenu({
   return (
     <Flex gap="15px" justify="center" align="center" vertical>
       {(isOwner || isAdmin) && (
-        <CreateOrUpdateAssetModal defaultValues={defaultValues} />
+        <CreateOrUpdateAssetModal defaultValues={defaultValues} isStock={isStock} />
       )}
       {isIssuer && (
         <MintModal
@@ -48,6 +49,7 @@ ActionsMenu.propTypes = {
   isIssuer: PropTypes.bool.isRequired,
   assetId: PropTypes.number.isRequired,
   onClose: PropTypes.func.isRequired,
+  isStock: PropTypes.bool,
   defaultValues,
 };
 

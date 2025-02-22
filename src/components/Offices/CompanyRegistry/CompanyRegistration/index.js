@@ -8,6 +8,7 @@ import { useHistory } from 'react-router-dom';
 import Button from '../../../Button/Button';
 import { officesActions } from '../../../../redux/actions';
 import router from '../../../../router';
+import styles from './styles.module.scss';
 
 function CompanyRegistration({ registration }) {
   const dispatch = useDispatch();
@@ -39,9 +40,9 @@ function CompanyRegistration({ registration }) {
     <Card
       title="Company data"
       cover={(
-        <Flex justify="center" align="center">
+        <Flex justify="center" align="center" className={styles.container}>
           <code>
-            <pre>
+            <pre className={styles.code}>
               {JSON.stringify(
                 registration.registration.data.toJSON(),
                 null,

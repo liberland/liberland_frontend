@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
 import { useMediaQuery } from 'usehooks-ts';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { getDecimalsForAsset, getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormatter';
 import { formatAssets } from '../../../../utils/walletHelpers';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
@@ -12,6 +12,8 @@ import styles from './styles.module.scss';
 import { ExchangeItemPropTypes } from '../proptypes';
 import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
 import CurrencyIcon from '../../../CurrencyIcon';
+import { isCompanyConnected } from '../../../../utils/asset';
+import router from '../../../../router';
 
 function ExchangeItem({ poolData, assetsPoolData }) {
   const location = useLocation();
@@ -59,30 +61,39 @@ function ExchangeItem({ poolData, assetsPoolData }) {
   const isReservedDataEmpty = reserved ? (reserved?.asset2?.isEmpty || reserved?.asset1?.isEmpty) : true;
 
   const liqPoolDescription = (
-    <div className={styles.liquidityPool}>
+    <Flex vertical gap="3px" className={styles.liquidityPool}>
       <span className="description">
         Liquidity pool
       </span>
-      &nbsp;
       <span className="values">
         {formatAssets(reserved?.asset1 || '0', decimals1, { symbol: asset1ToShow, optionalAll: true })}
         {' / '}
         {formatAssets(reserved?.asset2 || '0', decimals2, { symbol: asset2ToShow, optionalAll: true })}
       </span>
-    </div>
+    </Flex>
   );
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 1200px)');
+  const isConnected1 = isCompanyConnected({ index: asset1, ...assetData1 });
+  const isConnected2 = isCompanyConnected({ index: asset2, ...assetData2 });
+  const logo1 = isConnected1 ? assetData1.company.logoURL : undefined;
+  const logo2 = isConnected2 ? assetData2.company.logoURL : undefined;
+  const companyLink1 = isConnected1 ? router.companies.view.replace(':companyId', assetData1.company.id) : undefined;
+  const companyLink2 = isConnected2 ? router.companies.view.replace(':companyId', assetData2.company.id) : undefined;
+  const menuAssetName1 = companyLink1 ? <Link to={companyLink1}>{asset1Name}</Link> : asset1Name;
+  const menuAssetName2 = companyLink2 ? <Link to={companyLink2}>{asset2Name}</Link> : asset2Name;
+
   const name1 = (
     <Flex wrap gap="5px" align="center">
       {asset1ToShow}
-      <CurrencyIcon size={20} symbol={asset1ToShow} />
+      <CurrencyIcon size={20} symbol={asset1ToShow} logo={logo1} />
     </Flex>
   );
   const name2 = (
     <Flex wrap gap="5px" align="center">
       {asset2ToShow}
-      <CurrencyIcon size={20} symbol={asset2ToShow} />
+      <CurrencyIcon size={20} symbol={asset2ToShow} logo={logo2} />
     </Flex>
   );
 
@@ -115,57 +126,57 @@ function ExchangeItem({ poolData, assetsPoolData }) {
       extra={isBiggerThanDesktop ? liqPoolDescription : undefined}
     >
       {!isBiggerThanDesktop && liqPoolDescription}
-      <Flex wrap gap="15px">
-        <Flex wrap gap="15px" flex={0.8} justify="space-between">
+      <Flex wrap gap="15px" vertical={!isBiggerThanDesktop} align={isBiggerThanDesktop ? 'center' : undefined}>
+        <Flex wrap gap="15px" flex={1} vertical={!isBiggerThanSmallScreen} justify="space-between">
           <Flex wrap gap="15px" align="center" flex={0.5}>
+            <CurrencyIcon size={40} symbol={asset1ToShow} logo={logo1} />
             <div>
               <div className="description">
                 {'1 '}
-                {asset1Name}
+                {menuAssetName1}
               </div>
               <div className="values">
                 {asset2AmountForAsset1}
                 {' '}
-                {asset2Name}
+                {menuAssetName2}
               </div>
             </div>
           </Flex>
           <Flex wrap gap="15px" align="center" flex={0.5}>
+            <CurrencyIcon size={40} symbol={asset2ToShow} logo={logo2} />
             <div>
               <div className="description">
                 {'1 '}
-                {asset2Name}
+                {menuAssetName2}
               </div>
               <div className="values">
                 {asset1AmountForAsset2}
                 {' '}
-                {asset1Name}
+                {menuAssetName1}
               </div>
             </div>
           </Flex>
         </Flex>
-        <div className={styles.liquidityWrapper}>
-          <Flex gap="15px" wrap>
-            <TradeTokensModalWrapper
+        <Flex gap="15px" wrap justify={isBiggerThanDesktop ? 'end' : undefined}>
+          <TradeTokensModalWrapper
+            assets={assets}
+            asset1ToShow={asset1ToShow}
+            asset2ToShow={asset2ToShow}
+            isOpenOnRender={areDexQuerySamePair}
+          />
+          <AddLiquidityModal
+            assets={assets}
+            isReservedDataEmpty={isReservedDataEmpty}
+          />
+          {reserved && (
+            <RemoveLiquidityModalWrapper
               assets={assets}
-              asset1ToShow={asset1ToShow}
-              asset2ToShow={asset2ToShow}
-              isOpenOnRender={areDexQuerySamePair}
+              reserved={reserved}
+              lpTokensBalance={lpTokensBalance}
+              liquidity={liquidity}
             />
-            <AddLiquidityModal
-              assets={assets}
-              isReservedDataEmpty={isReservedDataEmpty}
-            />
-            {reserved && (
-              <RemoveLiquidityModalWrapper
-                assets={assets}
-                reserved={reserved}
-                lpTokensBalance={lpTokensBalance}
-                liquidity={liquidity}
-              />
-            )}
-          </Flex>
-        </div>
+          )}
+        </Flex>
       </Flex>
     </Card>
   );

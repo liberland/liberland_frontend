@@ -26,6 +26,7 @@ import { useStockContext } from '../Wallet/StockContext';
 import CurrencyIcon from '../CurrencyIcon';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
+import { isCompanyConnected } from '../../utils/asset';
 import GetLLDWrapper from '../GetLLDWrapper';
 
 function TradeTokensForm({
@@ -40,7 +41,6 @@ function TradeTokensForm({
   const [input1Error, setInput1Error] = useState(null);
   const [input2Error, setInput2Error] = useState(null);
   const [isAsset1State, setIsAsset1State] = useState(false);
-
   const {
     asset1,
     asset2,
@@ -214,12 +214,19 @@ function TradeTokensForm({
 
   const submitText = isStock ? 'Trade stock' : 'Exchange tokens';
 
-  const symbolHelper = (symbol, size) => (
-    <Flex wrap gap="5px" align="center">
-      {symbol}
-      <CurrencyIcon size={size} symbol={symbol} />
-    </Flex>
-  );
+  const symbolHelper = (asset, assetData, symbol, size) => {
+    const isConnected = isCompanyConnected({ index: asset, ...assetData });
+    return (
+      <Flex wrap gap="5px" align="center">
+        {symbol}
+        <CurrencyIcon
+          size={size}
+          symbol={symbol}
+          logo={isConnected ? assetData?.company?.logoURL : undefined}
+        />
+      </Flex>
+    );
+  };
 
   const handleSwap = () => {
     setIsBuy((prev) => !prev);
@@ -333,7 +340,7 @@ function TradeTokensForm({
             <div>
               Sell
             </div>
-            {symbolHelper(asset1ToShow, 20)}
+            {symbolHelper(asset1, assetData1, asset1ToShow, 20)}
           </Flex>
         )}
         extra={(
@@ -385,7 +392,7 @@ function TradeTokensForm({
             <div>
               Buy
             </div>
-            {symbolHelper(asset2ToShow, 20)}
+            {symbolHelper(asset2, assetData2, asset2ToShow, 20)}
           </Flex>
         )}
         extra={(
@@ -472,6 +479,23 @@ function ButtonModal(props) {
   );
 }
 
-const TradeTokensModal = modalWrapper(TradeTokensForm, ButtonModal);
+const TradeTokensModal = modalWrapper(
+  TradeTokensForm,
+  ButtonModal,
+  {
+    matchHash: (props, object) => {
+      const { assets } = props;
+      const { asset1, asset2, component } = object || {};
+      return component === 'TradeTokensModal'
+        && assets.asset1 === asset1
+        && assets.asset2 === asset2;
+    },
+    createHash: ({ asset1, asset2 }) => ({
+      component: 'TradeTokensModal',
+      asset1,
+      asset2,
+    }),
+  },
+);
 
 export default TradeTokensModal;

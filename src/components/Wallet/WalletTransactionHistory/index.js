@@ -44,8 +44,8 @@ function WalletTransactionHistory({ failure, transactionHistory, filterTransacti
           title: 'Amount',
           dataIndex: 'asset',
           key: 'asset',
-          render: (value, { currency }) => (
-            <WalletHistoryAmount currency={currency} value={value} />
+          render: (value, { currency, logo }) => (
+            <WalletHistoryAmount currency={currency} value={value} logo={logo} />
           ),
         },
         {
