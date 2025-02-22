@@ -11,11 +11,12 @@ import ValidatorList from './ValidatorList';
 import ValidatorListMobile from './ValidatorListMobile';
 import { identityActions, walletActions } from '../../../redux/actions';
 import { areArraysSame } from '../../../utils/staking';
+import { useModeContext } from '../../AntdProvider';
 
 function Nominator() {
   const dispatch = useDispatch();
   const history = useHistory();
-
+  const { isDarkMode } = useModeContext();
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const validators = useSelector(walletSelectors.selectorValidators);
   const nominatorTargets = useSelector(walletSelectors.selectorNominatorTargets);
@@ -127,7 +128,7 @@ function Nominator() {
       </Modal>
       {!selectedValidatorsAsTargets?.length && (
         <Alert
-          icon={<WarningTwoTone twoToneColor={['#243F5F', 'transparent']} />}
+          icon={<WarningTwoTone twoToneColor={[isDarkMode ? '#122C4B' : '#243F5F', 'transparent']} />}
           showIcon
           type="warning"
           message={(

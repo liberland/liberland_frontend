@@ -29,6 +29,17 @@ body {
 
 // ANTD overrides
 
+.anticon.anticon-down {
+  width: 12px;
+  margin-left: 5px;
+}
+
+.ant-alert-warning {
+  .ant-alert-message {
+    color: var(--alert-warning-color);
+  }
+}
+
 .ant-table-tbody,
 .ant-table-title {
   background-color: var(--table-bg);
