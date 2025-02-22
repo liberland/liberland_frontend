@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import Alert from 'antd/es/alert';
-import Spin from 'antd/es/spin';
 import Select from 'antd/es/select';
 import Form from 'antd/es/form';
 import { ethSelectors } from '../../../redux/selectors';
@@ -12,8 +10,6 @@ function EthereumSelectorAddress({ selectedWallet, form }) {
   const dispatch = useDispatch();
 
   const connected = useSelector(ethSelectors.selectorConnected);
-  const connecting = useSelector(ethSelectors.selectorConnecting);
-  const error = useSelector(ethSelectors.selectorConnectError);
 
   useEffect(() => {
     form.resetFields(['selectedAccount']);
@@ -34,10 +30,6 @@ function EthereumSelectorAddress({ selectedWallet, form }) {
     return null;
   }
 
-  if (connecting) {
-    return <Spin />;
-  }
-
   if (connected) {
     return (
       <Form.Item
@@ -52,12 +44,6 @@ function EthereumSelectorAddress({ selectedWallet, form }) {
           }))}
         />
       </Form.Item>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert type="error" message="Something went wrong, try reconnecting provider" />
     );
   }
 

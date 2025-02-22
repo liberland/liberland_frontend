@@ -12,6 +12,11 @@ const gettingLegislation = createSelector(
   (reducer) => reducer.isGetLegislation,
 );
 
+const gettingLegislationUnobtrusive = createSelector(
+  legislationReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 const citizenCount = createSelector(
   legislationReducer,
   (reducer) => reducer.citizenCount,
@@ -21,4 +26,5 @@ export {
   legislation,
   gettingLegislation,
   citizenCount,
+  gettingLegislationUnobtrusive,
 };

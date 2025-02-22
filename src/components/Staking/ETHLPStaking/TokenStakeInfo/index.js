@@ -12,14 +12,12 @@ import StakeForm from '../StakeForm';
 import StakeEthForm from '../StakeEthForm';
 import ClaimReward from '../ClaimReward';
 import WithdrawForm from '../WithdrawForm';
-import styles from './styles.module.scss';
 import CopyIconWithAddress from '../../../CopyIconWithAddress';
 
 function TokenStakeInfo({ selectedAccount }) {
   const dispatch = useDispatch();
   const tokenStakeInfo = useSelector(ethSelectors.selectorTokenStakeContractInfo);
   const tokenStakeAddressInfo = useSelector(ethSelectors.selectorTokenStakeAddressInfo);
-  const tokenStakeInfoLoading = useSelector(ethSelectors.selectorTokenStakeContractInfoLoading);
   const erc20Info = useSelector(ethSelectors.selectorERC20Info);
   const erc20Balance = useSelector(ethSelectors.selectorERC20Balance);
 
@@ -50,15 +48,15 @@ function TokenStakeInfo({ selectedAccount }) {
   };
 
   const erc20FromSelector = (erc20Address) => {
-    const mapped = erc20Info[erc20Address];
-    if (!mapped || mapped.loading || mapped.error) {
+    const mapped = erc20Info?.[erc20Address];
+    if (!mapped) {
       return undefined;
     }
     return mapped;
   };
   const erc20BalanceFromSelector = (erc20Address, account) => {
-    const mapped = account && erc20Balance[erc20Address]?.[account];
-    if (!mapped || mapped.loading || mapped.error) {
+    const mapped = account && erc20Balance?.[erc20Address]?.[account];
+    if (!mapped) {
       return undefined;
     }
     return mapped;
@@ -75,23 +73,15 @@ function TokenStakeInfo({ selectedAccount }) {
   }, [selectedAccount, tokenStakeInfo]);
 
   useEffect(() => {
-    if (tokenStakeInfo && !tokenStakeInfo.error) {
+    if (tokenStakeInfo) {
       getERC20Info(tokenStakeInfo.rewardToken);
       getERC20Info(tokenStakeInfo.stakingToken);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenStakeInfo]);
 
-  if (!tokenStakeInfo || tokenStakeInfoLoading) {
+  if (!tokenStakeInfo) {
     return <Spin />;
-  }
-
-  if (tokenStakeInfo.error) {
-    return (
-      <div className={styles.error}>
-        Something went wrong
-      </div>
-    );
   }
 
   const rewardTokenInfo = erc20FromSelector(tokenStakeInfo?.rewardToken);

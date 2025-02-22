@@ -5,7 +5,6 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import Flex from 'antd/es/flex';
 import InputNumber from 'antd/es/input-number';
 import Slider from 'antd/es/slider';
-import Spin from 'antd/es/spin';
 import PropTypes from 'prop-types';
 import { ethSelectors } from '../../../../redux/selectors';
 import { ethActions } from '../../../../redux/actions';
@@ -75,8 +74,6 @@ function StakeEthForm({
   const [tokensFocused, setTokensFocused] = useState(false);
   const tolerance = Form.useWatch('tolerance', form) || '90';
   const exchangeRate = useSelector(ethSelectors.selectorWethLpExchangeRate);
-  const exchangeRateLoading = useSelector(ethSelectors.selectorWethLpExchangeRateLoading);
-  const exchangeRateError = useSelector(ethSelectors.selectorWethLpExchangeRateError);
   const lldBalances = useSelector(ethSelectors.selectorERC20Balance)?.[process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS];
 
   useEffect(() => {
@@ -116,12 +113,6 @@ function StakeEthForm({
   }, [exchangeRate, stake, tokens, form]);
 
   useEffect(() => {
-    if (exchangeRateError) {
-      form.setFields([{ name: 'stake', errors: ['LP stake did not load correctly'] }]);
-    }
-  }, [form, exchangeRateError]);
-
-  useEffect(() => {
     if (stake && exchangeRate && stakeFocused && !tokensFocused) {
       form.setFieldValue(
         'tokens',
@@ -138,14 +129,6 @@ function StakeEthForm({
       );
     }
   }, [tokens, exchangeRate, tokensFocused, stakeFocused, form]);
-
-  if (exchangeRateLoading) {
-    return (
-      <div className={styles.form}>
-        <Spin />
-      </div>
-    );
-  }
 
   return (
     <Form

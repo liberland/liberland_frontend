@@ -22,6 +22,11 @@ const selectorIsLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+const selectorIsUnobtrusive = createSelector(
+  officesReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 const selectorBalances = createSelector(
   officesReducer,
   (reducer) => reducer.balances,
@@ -51,4 +56,5 @@ export {
   selectorBackendAddressLLMBalance,
   selectorPallets,
   selectorPendingAdditionalMerits,
+  selectorIsUnobtrusive,
 };
