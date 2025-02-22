@@ -4,6 +4,7 @@ import { ministryFinanceActions } from '../actions';
 
 const initialState = {
   loading: false,
+  unobtrusive: false,
   codeName: 'ministryOfFinanceOffice',
   additionalAssets: [],
   walletInfo: {
@@ -48,6 +49,14 @@ const ministryFinanceReducer = handleActions(
       ...state,
       loading: true,
     }),
+    [combineActions(
+      ministryFinanceActions.ministryFinanceGetAdditionalAssets.call,
+      ministryFinanceActions.ministryFinanceGetWallet.call,
+      ministryFinanceActions.ministryFinanceSpending.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
+    }),
 
     [combineActions(
       ministryFinanceActions.ministryFinanceGetAdditionalAssets.success,
@@ -67,6 +76,7 @@ const ministryFinanceReducer = handleActions(
     )]: (state) => ({
       ...state,
       loading: false,
+      unobtrusive: false,
     }),
 
     [ministryFinanceActions.ministryFinanceGetAdditionalAssets.success]: (state, action) => ({

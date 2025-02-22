@@ -5,6 +5,7 @@ const initialState = {
   legislation: {},
   citizenCount: undefined,
   isGetLegislation: false,
+  unobtrusive: false,
 };
 
 const legislationReducer = handleActions({
@@ -18,6 +19,13 @@ const legislationReducer = handleActions({
     isGetLegislation: true,
   }),
   [combineActions(
+    legislationActions.getLegislation.call,
+    legislationActions.getCitizenCount.call,
+  )]: (state) => ({
+    ...state,
+    unobtrusive: true,
+  }),
+  [combineActions(
     legislationActions.castVeto.failure,
     legislationActions.castVeto.success,
     legislationActions.getCitizenCount.failure,
@@ -29,6 +37,7 @@ const legislationReducer = handleActions({
   )]: (state) => ({
     ...state,
     isGetLegislation: false,
+    unobtrusive: false,
   }),
   [legislationActions.getCitizenCount.call]: (state) => ({
     ...state,

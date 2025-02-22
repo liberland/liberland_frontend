@@ -14,6 +14,7 @@ const initialState = {
   companyRegistration: null,
   isGetCompanyRegistration: null,
   loading: false,
+  unobtrusive: false,
   balances: {
     LLD: {},
     LLM: {},
@@ -62,6 +63,13 @@ const officesReducer = handleActions({
     loading: true,
   }),
   [combineActions(
+    officesActions.getBalances.call,
+    officesActions.getPalletIds.call,
+  )]: (state) => ({
+    ...state,
+    unobtrusive: true,
+  }),
+  [combineActions(
     officesActions.officeGetIdentity.success,
     officesActions.getCompanyRequest.success,
     officesActions.getCompanyRegistration.success,
@@ -83,6 +91,7 @@ const officesReducer = handleActions({
   )]: (state) => ({
     ...state,
     loading: false,
+    unobtrusive: false,
   }),
   [officesActions.officeGetIdentity.call]: (state, action) => ({
     ...state,

@@ -4,6 +4,7 @@ import { validatorActions } from '../actions';
 
 const initialState = {
   loading: false,
+  unobtrusive: false,
   pendingRewards: null,
   stakerRewards: null,
   info: {
@@ -46,6 +47,18 @@ const validatorReducer = handleActions({
     loading: true,
   }),
   [combineActions(
+    validatorActions.getPendingRewards.call,
+    validatorActions.getInfo.call,
+    validatorActions.getSlashes.call,
+    validatorActions.getPayee.call,
+    validatorActions.getNominators.call,
+    validatorActions.getStakerRewards.call,
+    validatorActions.getBondingDuration.call,
+  )]: (state) => ({
+    ...state,
+    unobtrusive: true,
+  }),
+  [combineActions(
     validatorActions.payout.failure,
     validatorActions.validate.failure,
     validatorActions.chill.failure,
@@ -75,6 +88,7 @@ const validatorReducer = handleActions({
   )]: (state) => ({
     ...state,
     loading: false,
+    unobtrusive: false,
   }),
   [validatorActions.getPendingRewards.call]: (state) => ({
     ...state,

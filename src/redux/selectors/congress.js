@@ -8,6 +8,11 @@ export const isLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+export const isUnobtrusive = createSelector(
+  congressReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 export const candidates = createSelector(
   congressReducer,
   (reducer) => reducer.candidates,
