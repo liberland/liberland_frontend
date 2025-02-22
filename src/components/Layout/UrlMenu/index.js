@@ -16,6 +16,7 @@ import Button from '../../Button/Button';
 import ChangeWallet from '../../Home/ChangeWallet';
 import truncate from '../../../utils/truncate';
 import ModeSwitch from '../../ModeSwitch';
+import GetLLDWrapper from '../../GetLLDWrapper';
 
 function UrlMenu({
   onClose,
@@ -24,6 +25,7 @@ function UrlMenu({
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
   const dispatch = useDispatch();
   const user = useSelector(userSelectors.selectUser);
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const isWalletAdressSame = useSelector(
     blockchainSelectors.isUserWalletAddressSameAsUserAdress,
   );
@@ -94,6 +96,12 @@ function UrlMenu({
     };
   };
 
+  const getLLD = userWalletAddress ? [] : [{
+    label: <GetLLDWrapper />,
+    key: 'getlld',
+    className: styles.switchContainer,
+  }];
+
   const switcher = hasSwitchWallet ? [{
     label: (
       <Button primary nano onClick={switchToRegisteredWallet} className={styles.switch}>
@@ -125,6 +133,7 @@ function UrlMenu({
       key={getMenuKey()}
       overflowedIndicator={isBiggerThanSmallScreen ? undefined : <MenuIcon />}
       items={[
+        ...getLLD,
         ...switcher,
         ...changeWallet,
         ...isBiggerThanSmallScreen ? [

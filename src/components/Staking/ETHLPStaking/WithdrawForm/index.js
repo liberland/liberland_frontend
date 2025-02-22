@@ -6,7 +6,7 @@ import InputNumber from 'antd/es/input-number';
 import PropTypes from 'prop-types';
 import { ethSelectors } from '../../../../redux/selectors';
 import Button from '../../../Button/Button';
-import { formatCustom } from '../../../../utils/walletHelpers';
+import { formatCustom, parseAssets } from '../../../../utils/walletHelpers';
 import { ethActions } from '../../../../redux/actions';
 import OpenModalButton from '../../../Modals/components/OpenModalButton';
 import modalWrapper from '../../../Modals/components/ModalWrapper';
@@ -21,7 +21,11 @@ function WithdrawForm({
   const connected = useSelector(ethSelectors.selectorConnected);
   const onSubmit = async ({ withdraw }) => {
     const signer = await connected.provider.getSigner(account);
-    dispatch(ethActions.withdrawTokens({ account: signer, amount: withdraw }));
+    dispatch(ethActions.withdrawTokens.call({
+      account: signer,
+      amount: parseAssets(withdraw, stakingToken.decimals),
+    }));
+    onClose();
   };
 
   return (
@@ -45,7 +49,7 @@ function WithdrawForm({
           secondary
           medium
           type="button"
-          onClick={() => form.setFieldValue('withdraw', stakingToken.balance)}
+          onClick={() => form.setFieldValue('withdraw', formatCustom(stakingToken.balance, stakingToken.decimals))}
         >
           Withdraw all
           {' '}

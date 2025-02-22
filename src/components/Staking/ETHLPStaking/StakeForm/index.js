@@ -27,6 +27,7 @@ function StakeForm({
       erc20Address: stakingToken.address,
       tokens: parseAssets(stake, stakingToken.decimals),
     }));
+    onClose();
   };
 
   return (
@@ -50,7 +51,7 @@ function StakeForm({
         <Button
           secondary
           type="button"
-          onClick={() => form.setFieldValue('stake', formatCustom(stakingToken.balance, stakingToken.balance))}
+          onClick={() => form.setFieldValue('stake', formatCustom(stakingToken.balance, stakingToken.decimals))}
         >
           Stake all
           {' '}

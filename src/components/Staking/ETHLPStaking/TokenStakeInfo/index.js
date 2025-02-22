@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import Tooltip from 'antd/es/tooltip';
 import Flex from 'antd/es/flex';
 import Spin from 'antd/es/spin';
 import { ethSelectors } from '../../../../redux/selectors';
@@ -13,6 +12,7 @@ import StakeForm from '../StakeForm';
 import StakeEthForm from '../StakeEthForm';
 import ClaimReward from '../ClaimReward';
 import WithdrawForm from '../WithdrawForm';
+import CopyIconWithAddress from '../../../CopyIconWithAddress';
 
 function TokenStakeInfo({ selectedAccount }) {
   const dispatch = useDispatch();
@@ -188,18 +188,14 @@ function TokenStakeInfo({ selectedAccount }) {
         {
           info: 'Reward token',
           value: (
-            <Tooltip
-              placement="top"
-              showArrow={false}
-              trigger={['hover', 'click']}
-              overlay={<span>{tokenStakeInfo.rewardToken}</span>}
-            >
-              <div>
-                {rewardTokenInfo
-                  ? rewardTokenInfo.name
-                  : `${tokenStakeInfo.rewardToken.slice(0, 7)}...`}
+            <Flex wrap gap="10px" align="center">
+              {rewardTokenInfo
+                ? rewardTokenInfo.name
+                : `${tokenStakeInfo.rewardToken.slice(0, 7)}...`}
+              <div className="description">
+                <CopyIconWithAddress address={tokenStakeInfo.rewardToken} />
               </div>
-            </Tooltip>
+            </Flex>
           ),
         },
         {
@@ -219,18 +215,14 @@ function TokenStakeInfo({ selectedAccount }) {
         {
           info: 'Staking token',
           value: (
-            <Tooltip
-              placement="top"
-              showArrow={false}
-              trigger={['hover', 'click']}
-              overlay={<span>{tokenStakeInfo.stakingToken}</span>}
-            >
-              <div>
-                {stakingTokenInfo
-                  ? stakingTokenInfo.name
-                  : `${tokenStakeInfo.stakingToken.slice(0, 7)}...`}
+            <Flex wrap gap="10px" align="center">
+              {stakingTokenInfo
+                ? stakingTokenInfo.name
+                : `${tokenStakeInfo.stakingToken.slice(0, 7)}...`}
+              <div className="description">
+                <CopyIconWithAddress address={tokenStakeInfo.stakingToken} />
               </div>
-            </Tooltip>
+            </Flex>
           ),
         },
         {
