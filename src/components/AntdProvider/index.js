@@ -35,10 +35,9 @@ export default function AntdProvider({ children }) {
   const primaryColor = isDarkMode ? '#7095A7' : '#122C4B';
   const primaryBorder = isDarkMode ? '#7095A7' : '#F6CA31';
   const contentBg = isDarkMode ? '#1E202A' : 'white';
-  const colorLink = isDarkMode ? '#F3CB28' : undefined;
-  const colorLinkActive = isDarkMode ? '#FBE9AC' : undefined;
-  const colorWarningBg = isDarkMode ? '#F6CA31' : undefined;
-  const colorWarning = isDarkMode ? '#122C4B' : undefined;
+  const colorLink = isDarkMode ? '#F3CB28' : '#1677ff';
+  const colorLinkActive = isDarkMode ? '#FBE9AC' : '#1677ff';
+  const colorWarningBg = isDarkMode ? '#F6CA31' : '#fffbe6';
 
   return (
     <ConfigProvider
@@ -61,7 +60,6 @@ export default function AntdProvider({ children }) {
           colorLink,
           colorLinkHover: colorLinkActive,
           colorLinkActive,
-          colorWarning,
           colorWarningBg,
         },
         components: {
