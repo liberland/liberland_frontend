@@ -52,6 +52,8 @@ const registriesReducer = handleActions({
     registriesActions.requestAssetDeleteAction.failure,
     registriesActions.registerAssetAction.failure,
     registriesActions.cancelCompanyRequest.failure,
+    registriesActions.getOfficialRegistryEntries.success,
+    registriesActions.getOfficialRegistryEntries.failure,
   )]: (state) => ({
     ...state,
     isGetRegistries: false,
