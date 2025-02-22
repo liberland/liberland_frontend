@@ -13,9 +13,11 @@ export default function GetLLDWrapper({ children }) {
     return children || null;
   }
   return (
-    <Button href={link} primary className={styles.lldWrapper}>
-      Get LLD
-    </Button>
+    <div>
+      <Button href={link} primary className={styles.lldWrapper}>
+        Get LLD
+      </Button>
+    </div>
   );
 }
 
