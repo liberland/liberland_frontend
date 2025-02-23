@@ -52,7 +52,7 @@ body {
     background-color: var(--serious-bg);
     border: 1px solid var(--serious-border);
     .ant-result-subtitle {
-      color: white!important;
+      color: var(--main-color)!important;
     }
   }
 }
