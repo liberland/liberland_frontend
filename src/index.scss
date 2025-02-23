@@ -29,6 +29,34 @@ body {
 
 // ANTD overrides
 
+.warning-result {
+  padding: 15px;
+  border-radius: 6px;
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+  .ant-result-title {
+    font-size: 18px;
+  }
+  .ant-result-subtitle {
+    @extend .description;
+    font-size: 15px;
+  }
+  .ant-result-icon {
+    margin-bottom: 0px;
+    .anticon.anticon-warning {
+      font-size: 30px;
+    }
+  }
+
+  &--serious {
+    background-color: var(--serious-bg);
+    border: 1px solid var(--serious-border);
+    .ant-result-subtitle {
+      color: white!important;
+    }
+  }
+}
+
 .anticon.anticon-down {
   width: 12px;
   margin-left: 5px;
