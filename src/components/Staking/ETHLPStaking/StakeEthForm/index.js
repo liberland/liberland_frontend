@@ -208,7 +208,7 @@ function ButtonModal(props) {
 
 ButtonModal.propTypes = {
   label: PropTypes.string.isRequired,
-  icon: PropTypes.node.isRequired,
+  icon: PropTypes.node,
 };
 
 const StakeEthFormModal = modalWrapper(StakeEthForm, ButtonModal);
