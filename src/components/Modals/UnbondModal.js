@@ -110,7 +110,7 @@ function ButtonModal(props) {
 
 ButtonModal.propTypes = {
   label: PropTypes.string.isRequired,
-  icon: PropTypes.node.isRequired,
+  icon: PropTypes.node,
 };
 
 const UnbondModal = modalWrapper(UnbondForm, ButtonModal);

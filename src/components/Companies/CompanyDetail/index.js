@@ -149,6 +149,7 @@ function CompanyDetail() {
                             showArrow={false}
                             trigger={['hover', 'click']}
                             overlay={<span>{tooltip}</span>}
+                            key={url}
                           >
                             <div>
                               <Button
