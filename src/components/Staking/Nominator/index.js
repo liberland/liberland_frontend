@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Flex from 'antd/es/flex';
 import Modal from 'antd/es/modal';
-import WarningTwoTone from '@ant-design/icons/WarningTwoTone';
 import { blockchainSelectors, walletSelectors } from '../../../redux/selectors';
 import ValidatorList from './ValidatorList';
 import ValidatorListMobile from './ValidatorListMobile';
@@ -15,7 +14,6 @@ import { areArraysSame } from '../../../utils/staking';
 function Nominator() {
   const dispatch = useDispatch();
   const history = useHistory();
-
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const validators = useSelector(walletSelectors.selectorValidators);
   const nominatorTargets = useSelector(walletSelectors.selectorNominatorTargets);
@@ -126,11 +124,11 @@ function Nominator() {
         Your nominations haven&#96;t been saved, would you like to save them?
       </Modal>
       {!selectedValidatorsAsTargets?.length && (
-        <Alert
-          icon={<WarningTwoTone twoToneColor={['#243F5F', 'transparent']} />}
-          showIcon
-          type="warning"
-          message={(
+        <Result
+          status="warning"
+          className="warning-result"
+          title="No validators selected"
+          subTitle={(
             <>
               In order to receive staking rewards you need to nominate at least one validator.
               See the list of active validators below.

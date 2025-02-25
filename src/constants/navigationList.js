@@ -7,7 +7,7 @@ import { ReactComponent as CompaniesIcon } from '../assets/icons/companies.svg';
 import { ReactComponent as RegistriesIcon } from '../assets/icons/registries.svg';
 import { ReactComponent as OfficesIcon } from '../assets/icons/offices.svg';
 import { ReactComponent as StakingIcon } from '../assets/icons/staking.svg';
-import { ReactComponent as ProfileIcon } from '../assets/icons/profile.svg';
+import { ReactComponent as ProfileIcon } from '../assets/icons/profile-menu.svg';
 import { ReactComponent as CongressIcon } from '../assets/icons/congress.svg';
 import { ReactComponent as SenateIcon } from '../assets/icons/senate.svg';
 import { ReactComponent as LinkedIn } from '../assets/icons/linkedin.svg';

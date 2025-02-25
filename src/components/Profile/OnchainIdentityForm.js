@@ -4,7 +4,7 @@ import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Input from 'antd/es/input';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Checkbox from 'antd/es/checkbox';
 import DatePicker from 'antd/es/date-picker';
 import Flex from 'antd/es/flex';
@@ -126,12 +126,13 @@ function OnchainIdentityForm({
       )}
       {defaultValues.hasUserWarn && !isUserWarnAccepted && (
         <Paragraph>
-          <Alert
-            type="warning"
-            message={(
+          <Result
+            className="warning-result warning-result--serious"
+            status="warning"
+            title="Your identity is currently confirmed by citizenship office as valid."
+            subTitle={(
               <>
-                Warning! Your identity is currently confirmed by citizenship office
-                as valid. Changing it will require reapproval - you&apos;ll
+                Changing it will require reapproval - you&apos;ll
                 temporarily lose citizenship or e-resident rights onchain.
                 Until its manually handled by ministry of interior which takes about two days.
               </>

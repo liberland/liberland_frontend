@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { intervalToDuration, formatDuration, format } from 'date-fns';
 import Card from 'antd/es/card';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Flex from 'antd/es/flex';
 import Progress from 'antd/es/progress';
 import {
@@ -49,9 +49,11 @@ function CongressionalCountdown({ termDuration }) {
         />
         <Progress type="line" trailColor="#ECEBF0" strokeColor="#EDC007" percent={100 - ratio} />
       </Card>
-      <Alert
-        type="warning"
-        message={(
+      <Result
+        status="warning"
+        className="warning-result"
+        title="Phragmen algorithm"
+        subTitle={(
           <>
             Liberland uses the Phragmen algorithm to tally votes.
             Your votes will be distributed among your preferred candidates in the order set below.
