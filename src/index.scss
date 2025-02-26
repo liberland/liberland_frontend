@@ -283,14 +283,19 @@ textarea.ant-input {
   }
 }
 
-.big-checkbox {
-  zoom: 1.5;
-
+.ant-checkbox {
+  margin-top: 2px;
+  
   .ant-checkbox-inner {
     border: solid 1.2px var(--main-color);
     box-shadow: 0 0 2px var(--main-color);
   }
 }
+
+.big-checkbox {
+  zoom: 1.5;
+}
+
 .big-checkbox-item {
   .ant-form-item-label {
     align-content: center;

@@ -59,13 +59,21 @@
     max-width: unset;
   }
 }
-.switchContainer {
+.switchContainer,
+.changeWallet {
   &:hover,
   &:focus,
   &:active {
     background-color: transparent!important;
   }
+  background-color: transparent!important;
+}
+
+.switchContainer {
   height: 50px!important;
+}
+.changeWallet {
+  height: 105px!important;
 }
 .switch {
   margin-top: 5px;

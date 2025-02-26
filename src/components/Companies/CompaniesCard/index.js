@@ -33,7 +33,35 @@ function CompaniesCard({
     () => registries?.map((registry) => simplifyCompanyObject(registry || {})),
     [registries],
   );
-  const dataSource = simplify?.filter((registered) => registered && !registered.invalid);
+  const dataSource = useMemo(() => {
+    const filtered = simplify?.filter((registered) => registered && !registered.invalid);
+    return type === 'all'
+      ? filtered.sort((aCompany, bCompany) => {
+        const [aAssets] = getRelevantAssets(aCompany);
+        const [bAssets] = getRelevantAssets(bCompany);
+        const aTradePool = aAssets?.length && getRelevantPools(aAssets[0]?.index)?.[0];
+        const bTradePool = bAssets?.length && getRelevantPools(bAssets[0]?.index)?.[0];
+        const aHasPool = aTradePool ? 1 : -1;
+        const bHasPool = bTradePool ? 1 : -1;
+        const aHasAssets = aAssets?.[0] ? 1 : -1;
+        const bHasAssets = bAssets?.[0] ? 1 : -1;
+        const aHasLogo = aCompany.logoURL ? 1 : -1;
+        const bHasLogo = bCompany.logoURL ? 1 : -1;
+        if (aHasPool !== bHasPool) {
+          return bHasPool - aHasPool;
+        }
+        if (aHasAssets !== bHasAssets) {
+          return bHasAssets - aHasAssets;
+        }
+        if (aHasLogo !== bHasLogo) {
+          return bHasLogo - aHasLogo;
+        }
+        const aName = aCompany.name || aCompany.id.toString();
+        const bName = bCompany.name || bCompany.id.toString();
+        return bName.localeCompare(aName);
+      })
+      : filtered;
+  }, [getRelevantAssets, getRelevantPools, simplify, type]);
   const hasFooter = type === 'mine' && dataSource?.length > 0;
   return (
     <List

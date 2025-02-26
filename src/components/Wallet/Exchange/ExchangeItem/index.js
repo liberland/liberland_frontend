@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
 import { useMediaQuery } from 'usehooks-ts';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { getDecimalsForAsset, getExchangeRate, makeAssetToShow } from '../../../../utils/dexFormatter';
 import { formatAssets } from '../../../../utils/walletHelpers';
 import TradeTokensModalWrapper from '../../../Modals/TradeTokens';
@@ -14,8 +14,10 @@ import RemoveLiquidityModalWrapper from '../../../Modals/RemoveLiquidity';
 import CurrencyIcon from '../../../CurrencyIcon';
 import { isCompanyConnected } from '../../../../utils/asset';
 import router from '../../../../router';
+import Button from '../../../Button/Button';
 
 function ExchangeItem({ poolData, assetsPoolData }) {
+  const history = useHistory();
   const location = useLocation();
   const {
     asset1,
@@ -81,8 +83,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
   const logo2 = isConnected2 ? assetData2.company.logoURL : undefined;
   const companyLink1 = isConnected1 ? router.companies.view.replace(':companyId', assetData1.company.id) : undefined;
   const companyLink2 = isConnected2 ? router.companies.view.replace(':companyId', assetData2.company.id) : undefined;
-  const menuAssetName1 = companyLink1 ? <Link to={companyLink1}>{asset1Name}</Link> : asset1Name;
-  const menuAssetName2 = companyLink2 ? <Link to={companyLink2}>{asset2Name}</Link> : asset2Name;
+  const showCompanyNames = isConnected1 && isConnected2;
 
   const name1 = (
     <Flex wrap gap="5px" align="center">
@@ -133,12 +134,12 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             <div>
               <div className="description">
                 {'1 '}
-                {menuAssetName1}
+                {asset1Name}
               </div>
               <div className="values">
                 {asset2AmountForAsset1}
                 {' '}
-                {menuAssetName2}
+                {asset2Name}
               </div>
             </div>
           </Flex>
@@ -147,35 +148,53 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             <div>
               <div className="description">
                 {'1 '}
-                {menuAssetName2}
+                {asset2Name}
               </div>
               <div className="values">
                 {asset1AmountForAsset2}
                 {' '}
-                {menuAssetName1}
+                {asset1Name}
               </div>
             </div>
           </Flex>
         </Flex>
-        <Flex gap="15px" wrap justify={isBiggerThanDesktop ? 'end' : undefined}>
-          <TradeTokensModalWrapper
-            assets={assets}
-            asset1ToShow={asset1ToShow}
-            asset2ToShow={asset2ToShow}
-            isOpenOnRender={areDexQuerySamePair}
-          />
-          <AddLiquidityModal
-            assets={assets}
-            isReservedDataEmpty={isReservedDataEmpty}
-          />
-          {reserved && (
-            <RemoveLiquidityModalWrapper
+        <Flex vertical gap="15px">
+          <Flex gap="15px" wrap justify={isBiggerThanDesktop ? 'end' : undefined}>
+            <TradeTokensModalWrapper
               assets={assets}
-              reserved={reserved}
-              lpTokensBalance={lpTokensBalance}
-              liquidity={liquidity}
+              asset1ToShow={asset1ToShow}
+              asset2ToShow={asset2ToShow}
+              isOpenOnRender={areDexQuerySamePair}
             />
+            <AddLiquidityModal
+              assets={assets}
+              isReservedDataEmpty={isReservedDataEmpty}
+            />
+          </Flex>
+          {reserved && (
+            <Flex wrap gap="15px">
+              <RemoveLiquidityModalWrapper
+                assets={assets}
+                reserved={reserved}
+                lpTokensBalance={lpTokensBalance}
+                liquidity={liquidity}
+              />
+            </Flex>
           )}
+          <Flex wrap gap="15px">
+            {isConnected1 && (
+              <Button primary href={companyLink1} onClick={() => history.push(companyLink1)}>
+                Show company
+                {showCompanyNames && ` ${asset1ToShow}`}
+              </Button>
+            )}
+            {isConnected2 && (
+              <Button primary href={companyLink2} onClick={() => history.push(companyLink2)}>
+                Show company
+                {showCompanyNames && ` ${asset2ToShow}`}
+              </Button>
+            )}
+          </Flex>
         </Flex>
       </Flex>
     </Card>

@@ -118,7 +118,7 @@ function UrlMenu({
         <ChangeWallet onSelect={() => onClose?.()} />
       ),
       key: 'wallets',
-      className: styles.switchContainer,
+      className: styles.changeWallet,
       onClick: ({ domEvent }) => domEvent.preventDefault(),
       onTitleClick: ({ domEvent }) => domEvent.preventDefault(),
     },

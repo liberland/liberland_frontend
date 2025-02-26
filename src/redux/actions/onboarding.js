@@ -8,6 +8,7 @@ export const {
     call: undefined,
     success: undefined,
     failure: undefined,
+    clear: undefined,
   },
   GET_ELIGIBLE_FOR_COMPLIMENTARY_LLD: {
     call: undefined,

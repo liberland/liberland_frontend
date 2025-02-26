@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import router from '../../router';
 import { loader } from '../../utils/loader';
 
@@ -8,7 +8,7 @@ function Companies() {
     <Switch>
       <Route
         exact
-        path={router.companies.home}
+        path={router.companies.myCompanies}
         component={loader(() => import('./CompaniesOverview'))}
       />
       <Route
@@ -29,6 +29,13 @@ function Companies() {
         exact
         path={router.companies.allCompanies}
         component={loader(() => import('./AllCompanies'))}
+      />
+      <Route
+        exact
+        path={router.home.companies}
+        render={() => (
+          <Redirect to={router.companies.allCompanies} />
+        )}
       />
     </Switch>
   );
