@@ -62,7 +62,7 @@ function ProposeBudgetForm({
       layout="vertical"
       onFinish={onSubmit}
       initialValues={{
-        votingDays: '7',
+        votingDays: 7,
         spendings: [defaultValueSpending],
       }}
     >
@@ -152,14 +152,7 @@ function ProposeBudgetForm({
         label="Congress voting time in days"
         extra="How long will it take for congress to close this motion?"
         name="votingDays"
-        rules={[
-          {
-            required: true,
-          },
-          {
-            min: 1,
-          },
-        ]}
+        rules={[{ required: true }, { type: 'number', min: 1 }]}
       >
         <InputNumber controls={false} />
       </Form.Item>

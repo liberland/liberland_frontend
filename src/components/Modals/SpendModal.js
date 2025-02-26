@@ -61,7 +61,7 @@ function SpendForm({
   return (
     <Form
       initialValues={{
-        votingDays: '7',
+        votingDays: 7,
       }}
       form={form}
       layout="vertical"
@@ -105,7 +105,7 @@ function SpendForm({
             name="votingDays"
             label="Congress voting time in days"
             extra="How long will it take for congress to close this motion?"
-            rules={[{ required: true }, { min: 1 }]}
+            rules={[{ required: true }, { type: 'number', min: 1 }]}
           >
             <InputNumber controls={false} />
           </Form.Item>

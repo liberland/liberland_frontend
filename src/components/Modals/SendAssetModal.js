@@ -75,7 +75,7 @@ function SendAssetForm({
       form={form}
       layout="vertical"
       initialValues={{
-        votingDays: '7',
+        votingDays: 7,
       }}
       onFinish={transfer}
     >
@@ -127,7 +127,7 @@ function SendAssetForm({
                 name="votingDays"
                 label="Congress voting time in days"
                 extra="How long will it take for congress to close the motion?"
-                rules={[{ required: true }, { min: 1 }]}
+                rules={[{ required: true }, { type: 'number', min: 1 }]}
               >
                 <InputNumber controls={false} placeholder="Voting days" />
               </Form.Item>
