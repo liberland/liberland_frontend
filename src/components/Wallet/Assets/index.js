@@ -26,6 +26,7 @@ import truncate from '../../../utils/truncate';
 import CompanyDisplay from './CompanyDisplay';
 import ColorAvatar from '../../ColorAvatar';
 import { isCompanyConnected } from '../../../utils/asset';
+import { getDefaultPageSizes } from '../../../utils/pageSize';
 
 function Assets() {
   const userWalletAddress = useSelector(
@@ -245,7 +246,7 @@ function Assets() {
           dataSource={formatted}
           className="centeredList"
           header={title}
-          pagination={formatted.length ? { pageSize: 10 } : undefined}
+          pagination={formatted.length ? getDefaultPageSizes(10) : undefined}
           renderItem={({
             symbol,
             details,

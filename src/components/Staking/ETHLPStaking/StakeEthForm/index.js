@@ -202,7 +202,7 @@ StakeEthForm.propTypes = {
 
 function ButtonModal(props) {
   return (
-    <OpenModalButton primary medium text="Stake ETH & LLD" {...props} />
+    <OpenModalButton primary text="Stake ETH & LLD" {...props} />
   );
 }
 

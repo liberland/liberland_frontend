@@ -19,6 +19,7 @@ import { simplifyCompanyObject } from '../utils';
 import Button from '../../Button/Button';
 import router from '../../../router';
 import ColorAvatar from '../../ColorAvatar';
+import { getDefaultPageSizes } from '../../../utils/pageSize';
 
 function CompaniesCard({
   registries,
@@ -68,7 +69,7 @@ function CompaniesCard({
       dataSource={dataSource}
       className={cx({ listWithFooter: hasFooter })}
       size="small"
-      pagination={dataSource?.length ? { pageSize: 10 } : false}
+      pagination={dataSource?.length ? getDefaultPageSizes(10) : false}
       itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
       footer={hasFooter ? (
         <Button

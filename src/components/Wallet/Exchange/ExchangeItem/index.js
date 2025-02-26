@@ -172,7 +172,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             />
           </Flex>
           {reserved && (
-            <Flex wrap gap="15px">
+            <Flex wrap gap="15px" justify="end">
               <RemoveLiquidityModalWrapper
                 assets={assets}
                 reserved={reserved}
@@ -181,7 +181,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
               />
             </Flex>
           )}
-          <Flex wrap gap="15px">
+          <Flex wrap gap="15px" justify="end">
             {isConnected1 && (
               <Button primary href={companyLink1} onClick={() => history.push(companyLink1)}>
                 Show company

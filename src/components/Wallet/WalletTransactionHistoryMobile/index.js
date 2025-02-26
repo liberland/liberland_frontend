@@ -9,11 +9,12 @@ import CheckCircleOutlined from '@ant-design/icons/CheckCircleOutlined';
 import HistoryCopyIconWithAddress from '../HistoryCopyIconWithAddress';
 import styles from './styles.module.scss';
 import WalletHistoryAmount from '../WalletHistoryAmount';
+import { getDefaultPageSizes } from '../../../utils/pageSize';
 
 function WalletTransactionHistoryMobile({ failure, transactionHistory, filterTransactionsBy }) {
   return (
     <List
-      pagination={{ pageSize: 5 }}
+      pagination={getDefaultPageSizes(5)}
       dataSource={failure
         ? []
         : transactionHistory
