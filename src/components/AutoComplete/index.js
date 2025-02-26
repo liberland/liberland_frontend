@@ -7,14 +7,7 @@ import Form from 'antd/es/form';
 import Fuse from 'fuse.js';
 import PropTypes from 'prop-types';
 import AutoCompleteInternal from 'antd/es/auto-complete';
-
-const concatNameWithPrefix = (name, prefix) => {
-  if (!prefix) {
-    return name;
-  }
-  const normalizedName = Array.isArray(name) ? name : [name];
-  return [prefix, ...normalizedName];
-};
+import { concatNameWithPrefix } from '../../utils/form';
 
 export default function AutoComplete({
   form,

@@ -16,7 +16,6 @@ import List from 'antd/es/list';
 import Card from 'antd/es/card';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
-import TextArea from 'antd/es/input/TextArea';
 import Divider from 'antd/es/divider';
 import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
@@ -29,6 +28,7 @@ import FormSection from '../../FormSection';
 import router from '../../../router';
 import { walletActions } from '../../../redux/actions';
 import AssetSelector from '../AssetSelector';
+import MarkdownEditor from '../../MarkdownEditor';
 
 const buildFieldName = (index, dynamicField, suffix) => (dynamicField.encryptable
   ? [index, dynamicField.key, suffix]
@@ -121,7 +121,13 @@ function getFieldComponent({
   }
   if (field.key === 'purpose') {
     return {
-      fieldComponent: <TextArea className={styles.slimTextArea} />,
+      noWrapper: true,
+      fieldComponent: (
+        <MarkdownEditor
+          label={label}
+          name={name}
+        />
+      ),
     };
   }
   if (field.key === 'assetId') {

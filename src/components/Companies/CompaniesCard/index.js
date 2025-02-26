@@ -99,9 +99,9 @@ function CompaniesCard({
             ellipsis={{
               rows: 2,
             }}
-            className={cx('description', styles.preview)}
+            className={cx('description', styles.preview, styles.noHeading)}
           >
-            <Markdown>
+            <Markdown options={{ disableParsingRawHTML: true }}>
               {registeredCompany.purpose}
             </Markdown>
           </Paragraph>

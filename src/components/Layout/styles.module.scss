@@ -178,7 +178,7 @@
   @media screen and (min-width: map-get($breakpoints, 'desktop')) {
     text-align: right;
     margin-right: 20px;
-    color: #ACBDC5;
+    color: var(--description-color);
     width: 100%;
     font-size: 14px;
   }

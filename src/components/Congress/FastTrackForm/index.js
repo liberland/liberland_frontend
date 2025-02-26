@@ -3,6 +3,7 @@ import Form from 'antd/es/form';
 import PropTypes from 'prop-types';
 import Checkbox from 'antd/es/checkbox';
 import Collapse from 'antd/es/collapse';
+import Divider from 'antd/es/divider';
 import InputNumber from 'antd/es/input-number';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
@@ -17,7 +18,12 @@ export default function FastTrackForm({ form }) {
   const fastTrack = Form.useWatch('fastTrack', form);
   return (
     <>
-      <Form.Item name="fastTrack" valuePropName="checked" label="Fast track proposal">
+      <Form.Item
+        name="fastTrack"
+        valuePropName="checked"
+        label="Fast track proposal"
+        layout="horizontal"
+      >
         <Checkbox />
       </Form.Item>
       <Collapse
@@ -60,6 +66,7 @@ export default function FastTrackForm({ form }) {
           },
         ]}
       />
+      <Divider />
     </>
   );
 }
