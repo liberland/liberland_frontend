@@ -84,6 +84,22 @@ function ExchangeItem({ poolData, assetsPoolData }) {
   const companyLink1 = isConnected1 ? router.companies.view.replace(':companyId', assetData1.company.id) : undefined;
   const companyLink2 = isConnected2 ? router.companies.view.replace(':companyId', assetData2.company.id) : undefined;
   const showCompanyNames = isConnected1 && isConnected2;
+  const showCompanyLink1 = isConnected1 ? (
+    <Button key="comp1" primary href={companyLink1} onClick={() => history.push(companyLink1)}>
+      Show company
+      {showCompanyNames && ` ${asset1ToShow}`}
+    </Button>
+  ) : undefined;
+  const showCompanyLink2 = isConnected2 ? (
+    <Button key="comp2" primary href={companyLink2} onClick={() => history.push(companyLink2)}>
+      Show company
+      {showCompanyNames && ` ${asset2ToShow}`}
+    </Button>
+  ) : undefined;
+  const companyLinks = [
+    showCompanyLink1,
+    showCompanyLink2,
+  ];
 
   const name1 = (
     <Flex wrap gap="5px" align="center">
@@ -165,6 +181,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
               asset1ToShow={asset1ToShow}
               asset2ToShow={asset2ToShow}
               isOpenOnRender={areDexQuerySamePair}
+              companyLinks={companyLinks}
             />
             <AddLiquidityModal
               assets={assets}
@@ -182,18 +199,7 @@ function ExchangeItem({ poolData, assetsPoolData }) {
             </Flex>
           )}
           <Flex wrap gap="15px" justify="end">
-            {isConnected1 && (
-              <Button primary href={companyLink1} onClick={() => history.push(companyLink1)}>
-                Show company
-                {showCompanyNames && ` ${asset1ToShow}`}
-              </Button>
-            )}
-            {isConnected2 && (
-              <Button primary href={companyLink2} onClick={() => history.push(companyLink2)}>
-                Show company
-                {showCompanyNames && ` ${asset2ToShow}`}
-              </Button>
-            )}
+            {companyLinks}
           </Flex>
         </Flex>
       </Flex>

@@ -30,7 +30,7 @@ import { isCompanyConnected } from '../../utils/asset';
 import GetLLDWrapper from '../GetLLDWrapper';
 
 function TradeTokensForm({
-  onClose, assets: initialAssets,
+  onClose, assets: initialAssets, companyLinks,
 }) {
   const [isBuy, setIsBuy] = useState(false);
   const dispatch = useDispatch();
@@ -462,6 +462,7 @@ function TradeTokensForm({
           <Button primary medium type="submit" disabled={loading}>
             {loading ? 'Loading...' : submitText}
           </Button>
+          {companyLinks}
         </Flex>
       </Flex>
     </Form>
@@ -471,6 +472,7 @@ function TradeTokensForm({
 TradeTokensForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   assets: AssetsPropTypes.isRequired,
+  companyLinks: PropTypes.arrayOf(PropTypes.node),
 };
 
 function ButtonModal(props) {
