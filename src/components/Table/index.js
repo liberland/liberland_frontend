@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import TableInternal from 'antd/es/table';
+import { getDefaultPageSizes } from '../../utils/pageSize';
 
 function Table({
   columns,
@@ -23,7 +24,7 @@ function Table({
       footer={footer ? () => footer : undefined}
       onRow={() => ({ tabIndex: '0' })}
       showHeader={showHeader}
-      pagination={noPagination ? false : { pageSize: pageSize || 10 }}
+      pagination={noPagination ? false : getDefaultPageSizes(pageSize || 10)}
       columns={columns.filter(Boolean).map(({ Header, accessor }) => ({
         dataIndex: accessor,
         key: accessor,

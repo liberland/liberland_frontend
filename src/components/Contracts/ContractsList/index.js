@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import List from 'antd/es/list';
 import { useMediaQuery } from 'usehooks-ts';
 import ContractListItem from '../ContractListItem';
+import { getDefaultPageSizes } from '../../../utils/pageSize';
 
 function ContractsList({ contracts }) {
   const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
@@ -10,7 +11,7 @@ function ContractsList({ contracts }) {
     <List
       dataSource={contracts}
       size="small"
-      pagination={{ pageSize: 10 }}
+      pagination={getDefaultPageSizes(10)}
       itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
       renderItem={(contract) => (
         <ContractListItem

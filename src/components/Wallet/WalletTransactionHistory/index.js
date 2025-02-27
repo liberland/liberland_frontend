@@ -6,11 +6,12 @@ import Tag from 'antd/es/tag';
 import Avatar from 'antd/es/avatar';
 import HistoryCopyIconWithAddress from '../HistoryCopyIconWithAddress';
 import WalletHistoryAmount from '../WalletHistoryAmount';
+import { getDefaultPageSizes } from '../../../utils/pageSize';
 
 function WalletTransactionHistory({ failure, transactionHistory, filterTransactionsBy }) {
   return (
     <Table
-      pagination={{ showSizeChanger: true }}
+      pagination={getDefaultPageSizes(20)}
       columns={[
         {
           title: 'Type',

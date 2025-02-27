@@ -12,6 +12,7 @@ import Tooltip from 'antd/es/tooltip';
 import Title from 'antd/es/typography/Title';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
+import Markdown from 'markdown-to-jsx';
 import { useMediaQuery } from 'usehooks-ts';
 import LeftOutlined from '@ant-design/icons/LeftOutlined';
 import styles from './styles.module.scss';
@@ -128,7 +129,9 @@ function CompanyDetail() {
                 >
                   <Flex vertical gap="15px" justify="space-between" className={styles.description}>
                     <div className={styles.purposeText}>
-                      {simplifiedDataObject.purpose || 'Unknown'}
+                      <Markdown options={{ disableParsingRawHTML: true }}>
+                        {simplifiedDataObject.purpose || 'Unknown'}
+                      </Markdown>
                     </div>
                     <Flex className={styles.online} wrap gap="15px" justify="start">
                       {simplifiedDataObject
@@ -204,7 +207,7 @@ function CompanyDetail() {
                       }}
                       title={(
                         <div className="description">
-                          {contact.includes('@') ? 'Email' : 'Telephone'}
+                          Contact
                           {' '}
                           {index + 1}
                         </div>

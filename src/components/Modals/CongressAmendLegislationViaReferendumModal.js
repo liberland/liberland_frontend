@@ -94,7 +94,6 @@ function CongressAmendLegislationViaReferendumForm({
 
       <ProposalDiscussionFields />
       <FastTrackForm form={form} />
-
       <Flex wrap gap="15px">
         <Button medium onClick={closeModal}>
           Cancel

@@ -116,6 +116,21 @@ function AddAssetForm({
     }
   };
 
+  const keySort = React.useCallback(([aKey], [bKey]) => {
+    const aIsNative = aKey === 'Native' ? 1 : -1;
+    const bIsNative = bKey === 'Native' ? 1 : -1;
+    if (aIsNative === bIsNative) {
+      return aKey.localeCompare(bKey);
+    }
+    return bIsNative - aIsNative;
+  }, []);
+
+  const firstAssets = useMemo(() => (
+    Object.entries(filtered)
+      .filter(([_, values]) => Object.keys(values).length > 0)
+      .sort(keySort)
+  ), [filtered, keySort]);
+
   const firstAsset = Form.useWatch('firstAsset', form);
 
   if (!filtered) {
@@ -135,21 +150,19 @@ function AddAssetForm({
         >
           <Select>
             <Select.Option value="" />
-            {Object.entries(filtered)
-              .filter(([_, values]) => Object.keys(values).length > 0)
-              .map(([key, value]) => {
-                const humanReadableName = key === 'Native'
-                  ? 'Liberland dollar'
-                  : Object.values(value)[0][0].metadata.symbol;
-                return (
-                  <Select.Option
-                    value={key}
-                    key={key}
-                  >
-                    {humanReadableName}
-                  </Select.Option>
-                );
-              })}
+            {firstAssets.map(([key, value]) => {
+              const humanReadableName = key === 'Native'
+                ? 'Liberland dollar'
+                : Object.values(value)[0][0].metadata.symbol;
+              return (
+                <Select.Option
+                  value={key}
+                  key={key}
+                >
+                  {humanReadableName}
+                </Select.Option>
+              );
+            })}
           </Select>
         </Form.Item>
         {firstAsset && (
@@ -163,6 +176,7 @@ function AddAssetForm({
             <Select>
               <Select.Option value="" />
               {Object.entries(filtered[firstAsset])
+                .sort(keySort)
                 .map(([key, value]) => {
                   const humanReadableName = key === 'Native'
                     ? 'Liberland dollar'

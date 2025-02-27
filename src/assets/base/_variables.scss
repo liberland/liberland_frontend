@@ -55,6 +55,8 @@ html {
     --alert-warning-color: #243F5F;
     --serious-bg: rgba(255, 0, 0, .02);
     --serious-border: rgba(255, 0, 0, .25);
+    --markd-bg: white;
+    --markd-border: #424242;
 
     &[dark-mode='yes'] {
         --border-color: #37383F;
@@ -72,6 +74,8 @@ html {
         --nav-bg: #1E202A;
         --content-bg: #10131b;
         --mobile-menu-open: #141414;
+        --markd-bg: #141414;
+        --markd-border: #424242;
         --button-gray-bg: rgba(255,255,255,0.20);
         --button-gray-color: rgba(255,255,255,0.75);
         --alert-warning-color: #122C4B;

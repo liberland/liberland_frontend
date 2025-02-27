@@ -283,17 +283,47 @@ textarea.ant-input {
   }
 }
 
-.big-checkbox {
-  zoom: 1.5;
-
+.ant-checkbox {
+  margin-top: 2px;
+  
   .ant-checkbox-inner {
     border: solid 1.2px var(--main-color);
     box-shadow: 0 0 2px var(--main-color);
   }
 }
+
+.big-checkbox {
+  zoom: 1.5;
+}
+
+.ant-input-md {
+  background-color: var(--markd-bg)!important;
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--markd-border)!important;
+  --color-neutral-muted: var(--main-color);
+
+  .cm-editor { 
+    background-color: var(--markd-bg)!important;
+  }
+  .cm-line {
+    font-family: $openSans!important;
+  }
+}
+
 .big-checkbox-item {
   .ant-form-item-label {
     align-content: center;
+  }
+  &.ant-form-item-has-error {
+    margin-bottom: 40px;
+    .ant-col.ant-form-item-control {
+      display: flex!important;
+      flex-wrap: wrap;
+      flex-direction: row!important;
+      align-items: center!important;
+      gap: 15px;
+    }
   }
 }
 

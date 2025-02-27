@@ -60,7 +60,7 @@ function ReferendumItem({
           <Paragraph ellipsis={{ rows: 2 }} className={classNames('description', styles.intro)}>
             <Alert.ErrorBoundary>
               <span ref={setTitleFromRef}>
-                <Markdown>
+                <Markdown options={{ disableParsingRawHTML: true }}>
                   {hexToString(firstSection) || ''}
                 </Markdown>
               </span>

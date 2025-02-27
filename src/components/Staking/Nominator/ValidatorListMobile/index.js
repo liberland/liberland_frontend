@@ -10,6 +10,7 @@ import { getValidatorDisplay } from '../ValidatorList/utils';
 import NominatorUpdateActions from '../NominatorUpdateActions';
 import styles from './styles.module.scss';
 import { identitySelectors } from '../../../../redux/selectors';
+import { getDefaultPageSizes } from '../../../../utils/pageSize';
 
 function ValidatorListMobile({
   validators,
@@ -39,7 +40,7 @@ function ValidatorListMobile({
           validators,
           identities,
         })}
-        pagination={{ pageSize: 20 }}
+        pagination={getDefaultPageSizes(20)}
         renderItem={({
           name,
           total,

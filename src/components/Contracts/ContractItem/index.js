@@ -158,7 +158,7 @@ function ContractItem({
               <Paragraph
                 ref={(p) => deriveAndHideContractTitle(p, title, setTitle)}
               >
-                <Markdown>{data}</Markdown>
+                <Markdown options={{ disableParsingRawHTML: true }}>{data}</Markdown>
               </Paragraph>
             ),
           },

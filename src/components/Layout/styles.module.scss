@@ -59,13 +59,21 @@
     max-width: unset;
   }
 }
-.switchContainer {
+.switchContainer,
+.changeWallet {
   &:hover,
   &:focus,
   &:active {
     background-color: transparent!important;
   }
+  background-color: transparent!important;
+}
+
+.switchContainer {
   height: 50px!important;
+}
+.changeWallet {
+  height: 105px!important;
 }
 .switch {
   margin-top: 5px;
@@ -170,7 +178,7 @@
   @media screen and (min-width: map-get($breakpoints, 'desktop')) {
     text-align: right;
     margin-right: 20px;
-    color: #ACBDC5;
+    color: var(--description-color);
     width: 100%;
     font-size: 14px;
   }

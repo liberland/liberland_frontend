@@ -59,7 +59,7 @@ function ProposalItem({
                   try {
                     return (
                       <span ref={setTitleFromRef}>
-                        <Markdown>
+                        <Markdown options={{ disableParsingRawHTML: true }}>
                           {hexToString(firstSection) || ''}
                         </Markdown>
                       </span>

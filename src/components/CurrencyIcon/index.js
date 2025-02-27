@@ -47,7 +47,7 @@ export default function CurrencyIcon({
     return <Avatar size={size} src={icon} alt={symbol} />;
   }
   return (
-    <ColorAvatar name={symbol} fontSize={12} size={size} />
+    <ColorAvatar name={symbol} fontSize={Math.round(size / 2)} size={size} />
   );
 }
 

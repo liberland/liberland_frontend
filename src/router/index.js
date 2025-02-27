@@ -107,5 +107,6 @@ export default {
     edit: '/home/companies/edit/:companyId',
     view: '/home/companies/view/:companyId',
     allCompanies: '/home/companies/allCompanies',
+    myCompanies: '/home/companies/my',
   },
 };
