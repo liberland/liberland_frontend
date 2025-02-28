@@ -21,6 +21,7 @@ const initialState = {
   },
   backendAddressLLMBalance: null,
   pendingAdditionalMerits: [],
+  taxPayers: {},
   senateWalletInfo: {
     balances: {
       liberstake: {
@@ -58,6 +59,7 @@ const officesReducer = handleActions({
     officesActions.unregisterCompany.call,
     officesActions.setRegisteredCompanyData.call,
     officesActions.getPendingAdditionalMerits.call,
+    officesActions.getTaxPayers.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -88,6 +90,8 @@ const officesReducer = handleActions({
     officesActions.getPalletIds.success,
     officesActions.getPendingAdditionalMerits.failure,
     officesActions.getPendingAdditionalMerits.success,
+    officesActions.getTaxPayers.failure,
+    officesActions.getTaxPayers.success,
   )]: (state) => ({
     ...state,
     loading: false,
@@ -184,6 +188,10 @@ const officesReducer = handleActions({
   [officesActions.getPendingAdditionalMerits.success]: (state, action) => ({
     ...state,
     pendingAdditionalMerits: action.payload,
+  }),
+  [officesActions.getTaxPayers.success]: (state, action) => ({
+    ...state,
+    taxPayers: action.payload,
   }),
 }, initialState);
 
