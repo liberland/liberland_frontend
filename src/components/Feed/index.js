@@ -28,6 +28,7 @@ function Feed() {
         <li><a href="https://blockchain.liberland.org/home/offices/ministry-of-finance">Transparently view government decisions and spending</a></li>
         <li><a href="https://blockchain.liberland.org/home/staking/overview">Stake your LLD for profit</a></li>
       </ul>
+      If you havent already, join the official <a href="https://t.me/liberlanders">Telegram channel</a>
       `,
       hashtags: ['#General'],
       type: 'liberland',
