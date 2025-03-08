@@ -51,6 +51,11 @@ function Offices() {
         path={router.offices.ministryOfFinance}
         component={loader(() => import('./MinistryOfFinance'))}
       />
+      <Route
+        exact
+        path={router.offices.taxPayers}
+        component={loader(() => import('./TaxPayers'))}
+      />
     </Switch>
   );
 }
