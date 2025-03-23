@@ -33,7 +33,7 @@ export const navigationList = [
     subLinks: {
       Finances: router.wallet.overView,
       Exchange: router.wallet.exchange,
-      'Stock exchange': router.wallet.stockExchange,
+      // 'Stock exchange': router.wallet.stockExchange,
       Assets: router.wallet.assets,
       Stocks: router.wallet.stocks,
       Bridge: router.wallet.bridge,
