@@ -65,11 +65,18 @@ function UrlMenu({
     };
   }, [matchedSubLink, pathname]);
   const createMenu = (navigation) => {
-    const subs = Object.entries(navigation.subLinks).map(([name, link]) => ({
-      label: <div className={styles.navigationTitle}>{truncate(name, 22)}</div>,
-      key: link,
-      onClick: () => navigate(link),
-    }));
+    const subs = Object.entries(navigation.subLinks).map(([name, link]) => {
+      const isDiscouraged = navigation.subDiscouraged?.includes(link);
+      return {
+        label: (
+          <div className={classNames(styles.navigationTitle, { [styles.discouraged]: isDiscouraged })}>
+            {truncate(name, 22)}
+          </div>
+        ),
+        key: link,
+        onClick: isDiscouraged ? undefined : () => navigate(link),
+      };
+    });
     const Icon = navigation.icon;
     const icon = <Icon className={styles.icon} />;
     const label = (

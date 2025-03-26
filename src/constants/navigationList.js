@@ -30,10 +30,13 @@ export const navigationList = [
     title: 'Finances',
     icon: WalletIcon,
     isDiscouraged: process.env.REACT_APP_IS_WALLET_DISCOURAGED === 'true',
+    subDiscouraged: [
+      router.wallet.stockExchange,
+    ],
     subLinks: {
       Finances: router.wallet.overView,
       Exchange: router.wallet.exchange,
-      // 'Stock exchange': router.wallet.stockExchange,
+      'Stock exchange': router.wallet.stockExchange,
       Assets: router.wallet.assets,
       Stocks: router.wallet.stocks,
       Bridge: router.wallet.bridge,
