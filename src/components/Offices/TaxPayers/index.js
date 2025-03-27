@@ -22,9 +22,9 @@ export default function TaxPayers() {
   const [timePeriodInMonth, setTimePeriodInMonth] = useState(12);
   const dispatch = useDispatch();
   const taxesPayers = useSelector(officesSelectors.selectorTaxesPayers);
-  const { sortedPollTotals, sortedUnpoolTotals, sortedTotalsByAddressPollTotal } = taxesPayers;
+  const { sortedPoolTotals, sortedUnpoolTotals, sortedTotalsByAddressPoolTotal } = taxesPayers;
 
-  const topPollTotals = sortedPollTotals?.slice(0, 10);
+  const topPoolTotals = sortedPoolTotals?.slice(0, 10);
   const topUnpoolTotals = sortedUnpoolTotals?.slice(0, 10);
 
   useEffect(() => {
@@ -32,18 +32,21 @@ export default function TaxPayers() {
   }, [dispatch, timePeriodInMonth]);
 
   useEffect(() => {
-    const pollList = sortedPollTotals
-      ? sortedPollTotals.map((item) => item.addressId)
+    const poolList = sortedPoolTotals
+      ? sortedPoolTotals.map((item) => item.addressId)
       : [];
-    const unPollList = sortedUnpoolTotals
+    const unPoolList = sortedUnpoolTotals
       ? sortedUnpoolTotals.map((item) => item.addressId)
+      : [];
+    const topTaxpayersList = sortedTotalsByAddressPoolTotal
+      ? sortedTotalsByAddressPoolTotal.map((item) => item.addressId)
       : [];
     dispatch(
       identityActions.getIdentityMotions.call(
-        Array.from(new Set(pollList.concat(unPollList.flat()))),
+        Array.from(new Set(poolList.concat(unPoolList.flat()).concat(topTaxpayersList.flat()))),
       ),
     );
-  }, [dispatch, sortedPollTotals, sortedUnpoolTotals]);
+  }, [dispatch, sortedPoolTotals, sortedUnpoolTotals, sortedTotalsByAddressPoolTotal]);
 
   const handleSelectChange = (value) => {
     setTimePeriodInMonth(value);
@@ -55,8 +58,8 @@ export default function TaxPayers() {
         Best ever taxpayers
       </Title>
       <Row gutter={[16, 16]}>
-        {sortedTotalsByAddressPollTotal && sortedTotalsByAddressPollTotal.length ? (
-          sortedTotalsByAddressPollTotal.map(({ addressId, totalValue }, index) => (
+        {sortedTotalsByAddressPoolTotal && sortedTotalsByAddressPoolTotal.length ? (
+          sortedTotalsByAddressPoolTotal.map(({ addressId, totalValue }, index) => (
             <Col xs={24} sm={12} xl={8} key={addressId}>
               <Card hoverable>
                 <Text type="secondary">
@@ -105,8 +108,8 @@ export default function TaxPayers() {
         {' '}
       </Title>
       <Row gutter={[16, 16]}>
-        {topPollTotals && topPollTotals.length ? (
-          topPollTotals.map(({ addressId, totalValue }, index) => (
+        {topPoolTotals && topPoolTotals.length ? (
+          topPoolTotals.map(({ addressId, totalValue }, index) => (
             <Col xs={24} sm={12} xl={8} key={addressId}>
               <Card hoverable>
                 <Text type="secondary">
@@ -126,7 +129,7 @@ export default function TaxPayers() {
             </Col>
           ))
         ) : (
-          <Text>No Poll Totals Available</Text>
+          <Text>No Pool Totals Available</Text>
         )}
       </Row>
 
