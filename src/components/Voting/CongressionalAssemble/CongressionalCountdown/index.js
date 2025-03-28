@@ -16,16 +16,18 @@ function CongressionalCountdown({ termDuration }) {
   const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
   const remaining = termDuration - (currentBlockNumber % termDuration);
   const blockDurationMilis = 6000;
+  const now = new Date(currentBlockTimestamp);
   const untilEnd = new Date(currentBlockTimestamp + (remaining * blockDurationMilis));
-
-  const ratio = Math.round(100 * (1 - (remaining / termDuration)));
 
   const duration = intervalToDuration(
     {
-      start: new Date(currentBlockTimestamp),
+      start: now,
       end: untilEnd,
     },
   );
+
+  const untilEndMillis = untilEnd.getTime() - now.getTime();
+  const ratio = Math.round(100 * (1 - (untilEndMillis / (termDuration * blockDurationMilis))));
 
   return (
     <Flex vertical gap="20px">
@@ -47,7 +49,7 @@ function CongressionalCountdown({ termDuration }) {
             </>
           )}
         />
-        <Progress type="line" trailColor="#ECEBF0" strokeColor="#EDC007" percent={100 - ratio} />
+        <Progress type="line" trailColor="#ECEBF0" strokeColor="#EDC007" percent={ratio} />
       </Card>
       <Result
         status="warning"

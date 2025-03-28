@@ -17,6 +17,7 @@ const ModeContext = createContext();
 export const useModeContext = () => useContext(ModeContext);
 
 export default function AntdProvider({ children }) {
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [isDarkMode, setIsDarkMode] = useState(prefersDarkMode);
   const context = useMemo(() => ({ isDarkMode, setIsDarkMode }), [isDarkMode]);
@@ -114,12 +115,12 @@ export default function AntdProvider({ children }) {
             itemHoverColor: colorText,
           },
           Collapse: {
-            contentPadding: '20px',
+            contentPadding: isBiggerThanSmallScreen ? '20px' : '7px 10px',
             headerBg: activeBackground,
-            headerPadding: '20px',
+            headerPadding: isBiggerThanSmallScreen ? '20px' : '7px 10px',
             colorBorder: mildShadow,
             contentBg,
-            fontSize: 20,
+            fontSize: isBiggerThanSmallScreen ? 20 : 18,
             colorText,
           },
           Card: {
@@ -127,6 +128,11 @@ export default function AntdProvider({ children }) {
             actionsLiMargin: '12px 5px',
             actionsBg: contentBg,
             headerBg: contentBg,
+            ...(isBiggerThanSmallScreen ? {} : {
+              bodyPadding: '7px 10px',
+              headerFontSize: 18,
+              headerPadding: 10,
+            }),
           },
           InputNumber: {
             controlWidth: '100%',
@@ -154,6 +160,12 @@ export default function AntdProvider({ children }) {
             rowHoverBg: activeBackground,
             rowSelectedHoverBg: activeBackground,
             rowSelectedBg: activeBackground,
+          },
+          Divider: {
+            marginLG: isBiggerThanSmallScreen ? '24px' : '8px',
+          },
+          List: {
+            itemPaddingSM: isBiggerThanSmallScreen ? '8px 16px' : '8px 10px',
           },
         },
       }}
