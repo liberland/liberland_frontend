@@ -84,7 +84,11 @@
   max-width: 2048px;
   min-height: 280px;
   margin: 0;
-  padding: 10px 25px;
+  padding: 5px 12px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
+    padding: 10px 25px;
+  }
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')) {
     padding: 10px 50px;

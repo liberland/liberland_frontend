@@ -170,7 +170,11 @@ body {
   border-color: var(--card-border)!important;
   background-color: var(--card-background);
 }
-
+.ant-card-head {
+  @media screen and (max-width: map-get($breakpoints, 'desktop')) {
+    min-height: 30px!important;
+  }
+}
 .ant-card-actions {
   border-top: none!important;
 }
