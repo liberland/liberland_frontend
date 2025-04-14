@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
 import Button from '../../Button/Button';
-import { registriesActions } from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
 import { generatePdf } from '../../../api/middleware';
 import ManageInfo from '../ManageInfo';
@@ -18,7 +17,6 @@ export default function CompanyActions({
   getRelevantAssets,
   getRelevantPools,
 }) {
-  const dispatch = useDispatch();
   const website = useMemo(() => {
     const url = registeredCompany?.onlineAddresses?.[0]?.url;
     if (!url) {
@@ -126,16 +124,6 @@ export default function CompanyActions({
         <>
           {tradeButton}
           {websiteButton}
-          <Button
-            red
-            onClick={() => dispatch(
-              registriesActions.cancelCompanyRequest.call({
-                companyId: registeredCompany.id,
-              }),
-            )}
-          >
-            Delete request
-          </Button>
         </>
       );
     default:

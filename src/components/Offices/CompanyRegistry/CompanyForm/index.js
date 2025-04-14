@@ -33,7 +33,7 @@ function CompanyForm() {
         <Title className={styles.title} level={3}>Verify company registration request</Title>
       )}
     >
-      <Form form={form} layout="vertical" onSubmit={onSubmit}>
+      <Form form={form} layout="vertical" onFinish={onSubmit}>
         <Form.Item
           name="entity_id"
           label="Company ID"
