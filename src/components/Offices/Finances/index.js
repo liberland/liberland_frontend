@@ -210,7 +210,7 @@ export default function Finances() {
               data={[
                 {
                   metric: 'Inflation',
-                  value: formatPercent(finances.inflation),
+                  value: formatPercent(finances.inflation ?? 0),
                 },
                 {
                   metric: 'Congress rewards from last week',
@@ -232,13 +232,13 @@ export default function Finances() {
                 },
                 {
                   metric: 'Staker APY',
-                  value: formatPercent(finances.stakerApyWeeklyPayouts),
+                  value: formatPercent(finances.stakerApyWeeklyPayouts ?? 0),
                 },
                 {
                   metric: 'Total LLD',
                   value: (
                     <Flex wrap gap="10px" align="center">
-                      {formatCustom(finances.totalLld, 0)}
+                      {formatCustom(finances.totalLld ?? 0, 0)}
                       <CurrencyIcon size={20} symbol="LLD" />
                     </Flex>
                   ),
