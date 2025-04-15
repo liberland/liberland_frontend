@@ -9,7 +9,13 @@ import truncate from '../../utils/truncate';
 import styles from './styles.module.scss';
 
 function CopyIconWithAddress({
-  address, name, isTruncate, legal, showAddress, truncateBy,
+  address,
+  name,
+  isTruncate,
+  legal,
+  showAddress,
+  truncateBy,
+  hideAddress,
 }) {
   const [api, contextHolder] = notification.useNotification();
   const isBigScreen = useMediaQuery('(min-width: 1200px)');
@@ -25,6 +31,7 @@ function CopyIconWithAddress({
   };
 
   const truncateByScreen = isBigScreen ? truncateValues.bigScreen : truncateValues.smallScreen;
+  const shouldTruncate = isTruncate ?? true;
 
   return (
     <Flex gap="10px" className={styles.copyIconWithAdress}>
@@ -35,15 +42,15 @@ function CopyIconWithAddress({
           {name && legal && ' - '}
           {legal && truncate(legal, 20)}
         </span>
-      ) : (
+      ) : !hideAddress && (
         <span>
-          {isTruncate ? truncate(address || '', truncateByScreen) : address}
+          {shouldTruncate ? truncate(address || '', truncateByScreen) : address}
         </span>
       )}
-      {showAddress && (name || legal) && (
+      {showAddress && !hideAddress && (name || legal) && (
         <span>
           (
-            {isTruncate ? truncate(address || '', truncateByScreen) : address}
+            {shouldTruncate ? truncate(address || '', truncateByScreen) : address}
           )
         </span>
       )}
@@ -52,19 +59,14 @@ function CopyIconWithAddress({
         shape="square"
         className={styles.copyIcon}
         src={CopyInputIcon}
-        onClick={() => handleCopyClick(address)}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleCopyClick(address);
+        }}
       />
     </Flex>
   );
 }
-
-CopyIconWithAddress.defaultProps = {
-  name: null,
-  address: null,
-  isTruncate: true,
-  legal: null,
-  showAddress: false,
-};
 
 CopyIconWithAddress.propTypes = {
   address: PropTypes.string,
@@ -72,6 +74,7 @@ CopyIconWithAddress.propTypes = {
   isTruncate: PropTypes.bool,
   legal: PropTypes.string,
   showAddress: PropTypes.bool,
+  hideAddress: PropTypes.bool, // TODO: These props are very poorly named and this component should be refactored
   truncateBy: PropTypes.shape({ bigScreen: PropTypes.number.isRequired, smallScreen: PropTypes.number.isRequired }),
 };
 

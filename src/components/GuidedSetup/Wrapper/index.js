@@ -10,7 +10,7 @@ export function GuidedSetupWrapper({ children, isLoading }) {
       closable={false}
       maskClosable={false}
       footer={null}
-      className={isLoading ? styles.loader : styles.wrapper}
+      className={isLoading ? styles.loader : undefined}
     >
       {children}
     </Modal>

@@ -1,7 +1,7 @@
 .noHeading {
     h1,h2,h3,h4,h5 {
         font-size: 18px!important;
-        color: #ACBDC5;
+        color: var(--description-color);
         font-weight: 600!important;
     }
 }

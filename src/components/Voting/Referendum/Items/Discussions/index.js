@@ -14,6 +14,7 @@ import { identitySelectors } from '../../../../../redux/selectors';
 import ColorAvatar from '../../../../ColorAvatar';
 import styles from '../../../styles.module.scss';
 import truncate from '../../../../../utils/truncate';
+import { getDefaultPageSizes } from '../../../../../utils/pageSize';
 
 function Discussions({ centralizedDatas }) {
   const identities = useSelector(identitySelectors.selectorIdentityMotions);
@@ -22,7 +23,7 @@ function Discussions({ centralizedDatas }) {
     <Card title="Discussions">
       <List
         dataSource={centralizedDatas}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: getDefaultPageSizes(5) }}
         renderItem={(centralizedData) => {
           const sanitizeUrl = sanitizeUrlHelper(centralizedData.link);
           const identity = identities?.[centralizedData.proposerAddress]?.identity?.legal

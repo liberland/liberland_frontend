@@ -9,11 +9,12 @@ import CheckCircleOutlined from '@ant-design/icons/CheckCircleOutlined';
 import HistoryCopyIconWithAddress from '../HistoryCopyIconWithAddress';
 import styles from './styles.module.scss';
 import WalletHistoryAmount from '../WalletHistoryAmount';
+import { getDefaultPageSizes } from '../../../utils/pageSize';
 
 function WalletTransactionHistoryMobile({ failure, transactionHistory, filterTransactionsBy }) {
   return (
     <List
-      pagination={{ pageSize: 5 }}
+      pagination={getDefaultPageSizes(5)}
       dataSource={failure
         ? []
         : transactionHistory
@@ -26,6 +27,7 @@ function WalletTransactionHistoryMobile({ failure, transactionHistory, filterTra
         currency,
         iconType,
         imgAlt,
+        logo,
       }) => (
         <List.Item>
           <Card
@@ -52,7 +54,7 @@ function WalletTransactionHistoryMobile({ failure, transactionHistory, filterTra
             <Flex vertical gap="30px">
               <Card.Meta
                 description={(
-                  <WalletHistoryAmount currency={currency} value={asset} isTitle />
+                  <WalletHistoryAmount currency={currency} value={asset} logo={logo} isTitle />
                 )}
               />
               <Flex wrap className={styles.actions} gap="15px" justify="space-between" align="center">

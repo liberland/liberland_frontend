@@ -7,7 +7,7 @@ import { ReactComponent as CompaniesIcon } from '../assets/icons/companies.svg';
 import { ReactComponent as RegistriesIcon } from '../assets/icons/registries.svg';
 import { ReactComponent as OfficesIcon } from '../assets/icons/offices.svg';
 import { ReactComponent as StakingIcon } from '../assets/icons/staking.svg';
-import { ReactComponent as ProfileIcon } from '../assets/icons/profile.svg';
+import { ReactComponent as ProfileIcon } from '../assets/icons/profile-menu.svg';
 import { ReactComponent as CongressIcon } from '../assets/icons/congress.svg';
 import { ReactComponent as SenateIcon } from '../assets/icons/senate.svg';
 import { ReactComponent as LinkedIn } from '../assets/icons/linkedin.svg';
@@ -33,7 +33,7 @@ export const navigationList = [
     subLinks: {
       Finances: router.wallet.overView,
       Exchange: router.wallet.exchange,
-      'Stock exchange': router.wallet.stockExchange,
+      // 'Stock exchange': router.wallet.stockExchange,
       Assets: router.wallet.assets,
       Stocks: router.wallet.stocks,
       Bridge: router.wallet.bridge,
@@ -94,10 +94,10 @@ export const navigationList = [
     isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED === 'true',
     subLinks: {
       'All companies': router.companies.allCompanies,
-      'My companies': router.companies.home,
+      'My companies': router.companies.myCompanies,
     },
     extra: {
-      [router.companies.home]: {
+      [router.companies.myCompanies]: {
         link: router.companies.create,
         title: 'Register a new company',
       },

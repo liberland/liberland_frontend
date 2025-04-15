@@ -4,6 +4,8 @@ import Collapse from 'antd/es/collapse';
 import Descriptions from 'antd/es/descriptions';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
+import Modal from 'antd/es/modal';
+import Result from 'antd/es/result';
 import { useMediaQuery } from 'usehooks-ts';
 import Button from '../Button/Button';
 import {
@@ -43,6 +45,7 @@ function Profile() {
   const balances = useSelector(walletSelectors.selectorBalances);
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
   const registeredAddress = useSelector(userSelectors.selectWalletAddress);
+  const hasClaimed = useSelector(onboardingSelectors.selectorIsClaimed);
   const liquidDollars = useSelector(
     walletSelectors.selectorLiquidDollarsBalance,
   );
@@ -241,6 +244,18 @@ function Profile() {
                     ? 'Claim complimentary LLD'
                     : ineligibleForComplimentaryLLDReason}
                 </Button>
+                <Modal
+                  closable
+                  maskClosable
+                  footer={null}
+                  onCancel={() => dispatch(onBoardingActions.claimComplimentaryLld.clear())}
+                  open={hasClaimed}
+                >
+                  <Result
+                    status="success"
+                    title="Complimentary LLDs claimed"
+                  />
+                </Modal>
               </Flex>
             </Flex>
           ),

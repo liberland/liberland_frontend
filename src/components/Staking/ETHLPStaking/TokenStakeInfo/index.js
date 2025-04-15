@@ -113,6 +113,9 @@ function TokenStakeInfo({ selectedAccount }) {
         <Flex wrap gap="15px" justify="end">
           {selectedAccount && stakingTokenInfo && stakingTokenBalance && (
             <>
+              <StakeEthForm
+                account={selectedAccount}
+              />
               <StakeForm
                 account={selectedAccount}
                 stakingToken={{
@@ -121,9 +124,6 @@ function TokenStakeInfo({ selectedAccount }) {
                   balance: stakingTokenBalance.balance.toString(),
                   decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
                 }}
-              />
-              <StakeEthForm
-                account={selectedAccount}
               />
             </>
           )}

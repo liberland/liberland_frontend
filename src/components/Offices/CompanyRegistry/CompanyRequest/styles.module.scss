@@ -4,9 +4,13 @@
 .red {
     color: red;
 }
-.code {
+.code,
+.container {
     max-width: min-content;
 }
-.enforceFlex {
-    display: flex!important;
+.code {
+    overflow: auto;
+}
+.wrapper {
+    padding: 20px;
 }

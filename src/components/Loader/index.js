@@ -17,6 +17,7 @@ import {
   nftsSelectors,
   ministryFinanceSelector,
   ethSelectors,
+  onboardingSelectors,
 } from '../../redux/selectors';
 import ErrorModal from '../ErrorModal';
 import NextBlockCountdown from './NextBlockCountdown';
@@ -38,6 +39,7 @@ function Loader({ children }) {
   const { showModal, closeIdModal } = useModal();
   const [modalId, setModalsId] = useState();
 
+  const isOnboardingLoading = useSelector(onboardingSelectors.selectorIsLoading);
   const isEthLoading = useSelector(ethSelectors.selectorEthLoading);
   const isGettingWalletInfo = useSelector(walletSelectors.selectorGettingWalletInfo);
   const isGettingDemocracyInfo = useSelector(democracySelectors.selectorGettingDemocracyInfo);
@@ -53,6 +55,7 @@ function Loader({ children }) {
   const isLoadingNfts = useSelector(nftsSelectors.isLoading);
   const isLoadingMinistryFinance = useSelector(ministryFinanceSelector.isLoading);
 
+  const isOnboardingUnobtrusive = useSelector(onboardingSelectors.selectorIsUnobtrusive);
   const isEthUnobtrusive = useSelector(ethSelectors.selectorEthUnobtrusive);
   const isGettingWalletInfoUnobtrusive = useSelector(walletSelectors.selectorGettingWalletInfoUnobtrusive);
   const isGettingDemocracyInfoUnobtrusive = useSelector(democracySelectors.selectorGettingDemocracyInfoUnobtrusive);
@@ -69,6 +72,7 @@ function Loader({ children }) {
   const isUnobtrusiveMinistryFinance = useSelector(ministryFinanceSelector.isUnobtrusive);
 
   const loadingStructure = [
+    [isOnboardingLoading, isOnboardingUnobtrusive],
     [isEthLoading, isEthUnobtrusive],
     [isGettingWalletInfo, isGettingWalletInfoUnobtrusive],
     [isGettingDemocracyInfo, isGettingDemocracyInfoUnobtrusive],

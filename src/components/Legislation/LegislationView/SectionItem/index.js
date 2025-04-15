@@ -62,7 +62,7 @@ function SectionItem({
       <Paragraph
         className={styles.paragraph}
       >
-        <Markdown>
+        <Markdown options={{ disableParsingRawHTML: true }}>
           {text}
         </Markdown>
       </Paragraph>

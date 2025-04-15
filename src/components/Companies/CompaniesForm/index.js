@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Checkbox from 'antd/es/checkbox';
 import Result from 'antd/es/result';
@@ -16,17 +16,19 @@ import List from 'antd/es/list';
 import Card from 'antd/es/card';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
-import TextArea from 'antd/es/input/TextArea';
 import Divider from 'antd/es/divider';
+import { useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { useMediaQuery } from 'usehooks-ts';
-import Button from '../components/Button/Button';
-import './utils.scss';
-import { newCompanyDataObject } from './defaultData';
-import { useHideTitle } from '../components/Layout/HideTitle';
-import FormSection from '../components/FormSection';
-import router from '../router';
+import Button from '../../Button/Button';
+import styles from './styles.module.scss';
+import { useHideTitle } from '../../Layout/HideTitle';
+import FormSection from '../../FormSection';
+import router from '../../../router';
+import { walletActions } from '../../../redux/actions';
+import AssetSelector from '../AssetSelector';
+import MarkdownEditor from '../../MarkdownEditor';
 
 const buildFieldName = (index, dynamicField, suffix) => (dynamicField.encryptable
   ? [index, dynamicField.key, suffix]
@@ -59,7 +61,13 @@ const staticFieldSpan = {
   numberOfShares: 8,
 };
 
-function getFieldComponent(field, index) {
+function getFieldComponent({
+  field,
+  form,
+  name,
+  label,
+  prefix,
+}) {
   if (field.key === 'companyType') {
     return {
       fieldComponent: null,
@@ -103,7 +111,7 @@ function getFieldComponent(field, index) {
   }
   if (field.type === 'number') {
     return {
-      fieldComponent: <InputNumber controls={false} placeholder={field.display} />,
+      fieldComponent: <InputNumber controls={false} />,
     };
   }
   if (field.type === 'password') {
@@ -113,153 +121,36 @@ function getFieldComponent(field, index) {
   }
   if (field.key === 'purpose') {
     return {
-      fieldComponent: <TextArea className="slimTextArea" />,
+      noWrapper: true,
+      fieldComponent: (
+        <MarkdownEditor
+          label={label}
+          name={name}
+        />
+      ),
+    };
+  }
+  if (field.key === 'assetId') {
+    return {
+      noWrapper: true,
+      fieldComponent: (
+        <AssetSelector
+          form={form}
+          label={label}
+          name={name}
+          prefix={prefix}
+        />
+      ),
     };
   }
   return {
     fieldComponent: (
       <Input
         type={field.type}
-        placeholder={typeof index === 'number' ? `${field.display} ${index}` : field.display}
       />
     ),
   };
 }
-
-export function blockchainDataToFormObject(blockchainDataRaw) {
-  const blockchainData = blockchainDataRaw.toJSON ? blockchainDataRaw.toJSON() : blockchainDataRaw;
-  const supportedObject = JSON.parse(JSON.stringify(newCompanyDataObject));
-  const staticFields = [];
-  const dynamicFields = [];
-
-  supportedObject.staticFields.forEach((staticField) => {
-    if (staticField.key in blockchainData || staticField.type === 'checkbox') {
-      const fieldObject = staticField;
-      fieldObject.display = blockchainData[staticField.key];
-      staticFields.push(fieldObject);
-    }
-  });
-
-  supportedObject.dynamicFields.forEach((dynamicField) => {
-    if (dynamicField.key in blockchainData) {
-      const fieldObject = dynamicField;
-      const fieldObjectData = [];
-      blockchainData[dynamicField.key].forEach((dynamicFieldDataArray) => {
-        // Format using fields data
-        const crossReferencedFieldDataArray = [{}];
-        for (const key in dynamicFieldDataArray) {
-          if (Object.prototype.hasOwnProperty.call(dynamicFieldDataArray, key)) {
-            const pushObject = {};
-            pushObject.key = key;
-            if (dynamicFieldDataArray[key].isEncrypted !== undefined) {
-              pushObject.display = dynamicFieldDataArray[key].value;
-              pushObject.isEncrypted = dynamicFieldDataArray[key].isEncrypted;
-            } else {
-              pushObject.display = dynamicFieldDataArray[key];
-              pushObject.isEncrypted = false;
-            }
-            crossReferencedFieldDataArray.push(JSON.parse(JSON.stringify(pushObject)));
-          }
-        }
-        fieldObjectData.push(crossReferencedFieldDataArray);
-      });
-
-      fieldObject.data = JSON.parse(JSON.stringify(fieldObjectData));
-      dynamicFields.push(fieldObject);
-    }
-  });
-  blockchainData.staticFields = JSON.parse(JSON.stringify(staticFields));
-  blockchainData.dynamicFields = JSON.parse(JSON.stringify(dynamicFields));
-  return blockchainData;
-}
-
-export function GetFieldsForm({
-  formKey, displayName, dynamicFieldData,
-}) {
-  const isLargerThanWideScreen = useMediaQuery('(min-width: 1200px)');
-  return (
-    <Form.List name={formKey}>
-      {(fields, { add, remove }) => (
-        <FormSection
-          title={displayName}
-          extra={(
-            <Button className="add" type="button" onClick={add} green>
-              Add
-              {' '}
-              {displayName}
-            </Button>
-          )}
-        >
-          <List
-            dataSource={fields}
-            locale={{ emptyText: 'No data found' }}
-            renderItem={(field, index) => (
-              <Card
-                title={`${displayName} ${index + 1}`}
-                key={field.key}
-                className="dynamicFieldsEntityCard"
-                actions={[
-                  <Flex wrap gap="15px" justify="start" className="delete">
-                    <Button red type="button" onClick={() => remove(field.name)}>
-                      Delete
-                      {' '}
-                      {displayName}
-                      {' '}
-                      {index + 1}
-                    </Button>
-                  </Flex>,
-                ]}
-              >
-                <Row gutter={16}>
-                  {dynamicFieldData.fields.map((dynamicField) => {
-                    const fieldName = buildFieldName(index, dynamicField, 'value');
-                    const {
-                      fieldComponent,
-                      layout,
-                      getValueProps,
-                      valuePropName,
-                    } = getFieldComponent(dynamicField, index);
-                    if (!fieldComponent) {
-                      return null;
-                    }
-                    const span = Math.max(6, Math.floor(24 / dynamicFieldData.fields.length));
-                    return (
-                      <Col key={fieldName} span={isLargerThanWideScreen ? span : 24}>
-                        <Form.Item
-                          name={fieldName}
-                          label={(
-                            `${dynamicField.display.length > 40
-                              ? `${dynamicField.display.slice(0, 40)}...`
-                              : dynamicField.display} ${index + 1}`
-                          )}
-                          extra={dynamicField.display.length > 40 ? (
-                            dynamicField.display
-                          ) : undefined}
-                          layout={layout}
-                          getValueProps={getValueProps}
-                          valuePropName={valuePropName}
-                        >
-                          {fieldComponent}
-                        </Form.Item>
-                      </Col>
-                    );
-                  })}
-                </Row>
-              </Card>
-            )}
-          />
-        </FormSection>
-      )}
-    </Form.List>
-  );
-}
-
-GetFieldsForm.propTypes = {
-  formKey: PropTypes.string.isRequired,
-  displayName: PropTypes.string.isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  dynamicFieldData: PropTypes.any.isRequired,
-};
 
 export const getDefaultValuesFromDataObject = (formObject, editMode = false) => {
   const defaultValues = {};
@@ -279,12 +170,12 @@ export const getDefaultValuesFromDataObject = (formObject, editMode = false) => 
         if (editMode) {
           defaultValuesForField[index][field.key] = {
             value: fieldDateTypes[field.type] ? dayjs(field.display) : field.display,
-            isEncrypted: field.isEncrypted,
+            isEncrypted: field.isEncrypted || false,
           };
         } else {
           defaultValuesForField[index][field.key] = encryptable
             ? {
-              isEncrypted: field.isEncrypted,
+              isEncrypted: field.isEncrypted || false,
             }
             : null;
         }
@@ -295,15 +186,19 @@ export const getDefaultValuesFromDataObject = (formObject, editMode = false) => 
   return defaultValues;
 };
 
-export function BuildRegistryForm({
+export default function CompaniesForm({
   formObject, buttonMessage, companyId, callback,
 }) {
   const [form] = Form.useForm();
   const defaultValues = getDefaultValuesFromDataObject(formObject, !!companyId);
   const companyType = Form.useWatch('companyType', form);
-  const isLargerThanWideScreen = useMediaQuery('(min-width: 1200px)');
+  const isLargerThanWideScreen = useMediaQuery('(min-width: 1500px)');
   const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
   const history = useHistory();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(walletActions.getAdditionalAssets.call());
+  }, [dispatch]);
 
   useHideTitle();
 
@@ -332,9 +227,9 @@ export function BuildRegistryForm({
       layout="vertical"
     >
       <Card
-        className="registryCard"
+        className={styles.registryCard}
         title={(
-          <Title className="registryTitle" level={1}>
+          <Title className={styles.registryTitle} level={1}>
             {companyId
               ? defaultValues.name
               : 'Register a new Liberland company'}
@@ -369,7 +264,13 @@ export function BuildRegistryForm({
                     layout,
                     getValueProps,
                     valuePropName,
-                  } = getFieldComponent(staticField);
+                    noWrapper,
+                  } = getFieldComponent({
+                    field: staticField,
+                    form,
+                    label: staticField.name,
+                    name: staticFieldName,
+                  });
                   if (!fieldComponent) {
                     return null;
                   }
@@ -378,15 +279,20 @@ export function BuildRegistryForm({
                       span={isLargerThanWideScreen ? staticFieldSpan[staticField.key] : 24}
                       key={staticFieldName}
                     >
-                      <Form.Item
-                        name={staticFieldName}
-                        label={staticField.name}
-                        layout={layout}
-                        getValueProps={getValueProps}
-                        valuePropName={valuePropName}
-                      >
-                        {fieldComponent}
-                      </Form.Item>
+                      {noWrapper ? fieldComponent : (
+                        <Form.Item
+                          name={staticFieldName}
+                          label={staticField.name}
+                          layout={layout}
+                          getValueProps={getValueProps}
+                          valuePropName={valuePropName}
+                          extra={staticField.description && (
+                            <div className={styles.extra}>{staticField.description}</div>
+                          )}
+                        >
+                          {fieldComponent}
+                        </Form.Item>
+                      )}
                     </Col>
                   );
                 })}
@@ -395,11 +301,85 @@ export function BuildRegistryForm({
           {formObject.dynamicFields.map((dynamicField) => (
             <React.Fragment key={dynamicField.key}>
               <Divider />
-              <GetFieldsForm
-                formKey={dynamicField.key}
-                displayName={dynamicField.name}
-                dynamicFieldData={dynamicField}
-              />
+              <Form.List name={dynamicField.key}>
+                {(fields, { add, remove }) => (
+                  <FormSection
+                    title={dynamicField.name}
+                    extra={(
+                      <Button className={styles.add} type="button" onClick={add} green>
+                        Add
+                        {' '}
+                        {dynamicField.name}
+                      </Button>
+                    )}
+                  >
+                    <List
+                      dataSource={fields}
+                      locale={{ emptyText: 'No data found' }}
+                      header={dynamicField.display}
+                      renderItem={(field, index) => (
+                        <Card
+                          title={`${dynamicField.name} ${index + 1}`}
+                          key={field.key}
+                          className={styles.dynamicFieldsEntityCard}
+                          actions={[
+                            <Flex wrap gap="15px" justify="start" className={styles.delete}>
+                              <Button red type="button" onClick={() => remove(field.name)}>
+                                Delete
+                                {' '}
+                                {dynamicField.name}
+                                {' '}
+                                {index + 1}
+                              </Button>
+                            </Flex>,
+                          ]}
+                        >
+                          <Row gutter={16}>
+                            {dynamicField.fields.map((singleField) => {
+                              const fieldName = buildFieldName(index, singleField, 'value');
+                              const label = singleField.name;
+                              const {
+                                fieldComponent,
+                                layout,
+                                getValueProps,
+                                valuePropName,
+                                noWrapper,
+                              } = getFieldComponent({
+                                field: singleField,
+                                form,
+                                label,
+                                name: fieldName,
+                                prefix: dynamicField.key,
+                              });
+                              if (!fieldComponent) {
+                                return null;
+                              }
+                              return (
+                                <Col key={fieldName} span={isLargerThanWideScreen ? 7 : 24}>
+                                  {noWrapper ? fieldComponent : (
+                                    <Form.Item
+                                      name={fieldName}
+                                      label={label}
+                                      extra={singleField.display && (
+                                        <div className={styles.extra}>{singleField.display}</div>
+                                      )}
+                                      layout={layout}
+                                      getValueProps={getValueProps}
+                                      valuePropName={valuePropName}
+                                    >
+                                      {fieldComponent}
+                                    </Form.Item>
+                                  )}
+                                </Col>
+                              );
+                            })}
+                          </Row>
+                        </Card>
+                      )}
+                    />
+                  </FormSection>
+                )}
+              </Form.List>
             </React.Fragment>
           ))}
         </Flex>
@@ -420,7 +400,7 @@ export function BuildRegistryForm({
                   )}
                 >
                   <Flex vertical gap="5px" align="stretch">
-                    <Paragraph className="signature">
+                    <Paragraph className={styles.signature}>
                       If you are registering a dormant company for reserving brand name,
                       establishing presence in Liberland,
                       using this company to drive Liberland traffic to some other business,
@@ -443,7 +423,7 @@ export function BuildRegistryForm({
                   )}
                 >
                   <Flex vertical gap="5px" align="stretch">
-                    <Paragraph className="signature">
+                    <Paragraph className={styles.signature}>
                       If you are registering a pure Liberland company,
                       only operating under the jurisdiction of Liberland,
                       such as the territory of Liberland, Liberland ecosystem, Liberland blockchain, or doing business
@@ -465,7 +445,7 @@ export function BuildRegistryForm({
                   )}
                 >
                   <Flex vertical gap="5px" align="stretch">
-                    <Paragraph className="signature">
+                    <Paragraph className={styles.signature}>
                       If you are registering a Liberland company intended to do business internationally,
                       within jurisdictions other than Liberland,
                       you will need to comply with additional requirements and sign the
@@ -507,7 +487,7 @@ export function BuildRegistryForm({
   );
 }
 
-BuildRegistryForm.propTypes = {
+CompaniesForm.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   formObject: PropTypes.any.isRequired,
   buttonMessage: PropTypes.string.isRequired,

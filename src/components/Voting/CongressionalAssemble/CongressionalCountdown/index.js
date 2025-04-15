@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { intervalToDuration, formatDuration, format } from 'date-fns';
 import Card from 'antd/es/card';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Flex from 'antd/es/flex';
 import Progress from 'antd/es/progress';
 import {
@@ -16,16 +16,18 @@ function CongressionalCountdown({ termDuration }) {
   const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
   const remaining = termDuration - (currentBlockNumber % termDuration);
   const blockDurationMilis = 6000;
+  const now = new Date(currentBlockTimestamp);
   const untilEnd = new Date(currentBlockTimestamp + (remaining * blockDurationMilis));
-
-  const ratio = Math.round(100 * (1 - (remaining / termDuration)));
 
   const duration = intervalToDuration(
     {
-      start: new Date(currentBlockTimestamp),
+      start: now,
       end: untilEnd,
     },
   );
+
+  const untilEndMillis = untilEnd.getTime() - now.getTime();
+  const ratio = Math.round(100 * (1 - (untilEndMillis / (termDuration * blockDurationMilis))));
 
   return (
     <Flex vertical gap="20px">
@@ -47,11 +49,13 @@ function CongressionalCountdown({ termDuration }) {
             </>
           )}
         />
-        <Progress type="line" trailColor="#ECEBF0" strokeColor="#EDC007" percent={100 - ratio} />
+        <Progress type="line" trailColor="#ECEBF0" strokeColor="#EDC007" percent={ratio} />
       </Card>
-      <Alert
-        type="warning"
-        message={(
+      <Result
+        status="warning"
+        className="warning-result"
+        title="Phragmen algorithm"
+        subTitle={(
           <>
             Liberland uses the Phragmen algorithm to tally votes.
             Your votes will be distributed among your preferred candidates in the order set below.

@@ -21,9 +21,7 @@ function ShowInfo({
 
 ShowInfo.propTypes = {
   registeredCompany: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    // eslint-disable-next-line react/forbid-prop-types
-    onlineAddresses: PropTypes.arrayOf(PropTypes.object),
+    id: PropTypes.string,
   }).isRequired,
 };
 

@@ -24,10 +24,28 @@ const selectorIsResident = createSelector(
   (reducer) => reducer.isResident,
 );
 
+const selectorIsLoading = createSelector(
+  onboardingReducer,
+  (reducer) => reducer.isLoading,
+);
+
+const selectorIsUnobtrusive = createSelector(
+  onboardingReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
+const selectorIsClaimed = createSelector(
+  onboardingReducer,
+  (reducer) => reducer.claimed,
+);
+
 export {
+  selectorIsLoading,
+  selectorIsUnobtrusive,
   selectorEligibleForComplimentaryLLD,
   selectorIneligibleForComplimentaryLLDReason,
   selectorIsSkipOnBoarding,
   selectorIneligibleForComplimentaryLLDIsLoading,
   selectorIsResident,
+  selectorIsClaimed,
 };

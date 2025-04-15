@@ -3,56 +3,54 @@ export const newCompanyDataObject = {
     {
       key: 'name',
       name: 'Company name',
-      display: 'Your company name',
+      description: 'Your company name',
       type: 'text',
       encryptable: false,
     },
     {
       key: 'purpose',
       name: 'Description',
-      display: 'Truthful scope of business',
+      description: 'Truthful scope of business',
       type: 'text',
       encryptable: false,
     },
     {
       key: 'logoURL',
-      name: 'Logo URL (optional)',
-      display: 'URL to logo',
+      name: 'Logo URL',
+      description: 'URL to logo',
       type: 'text',
       encryptable: false,
     },
     {
       key: 'charterURL',
-      name: 'Charter URL (optional)',
-      display: 'Charter URL',
+      name: 'Charter URL',
       type: 'text',
       encryptable: false,
     },
     {
       key: 'totalCapitalAmount',
-      name: 'Total Capital Amount (optional)',
-      display: 'Total capital amount',
+      name: 'Capital Amount',
+      description: 'Total capital amount',
       type: 'text',
       encryptable: false,
     },
     {
       key: 'totalCapitalCurrency',
-      name: 'Total Capital Currency (optional)',
-      display: 'Total capital currency',
+      name: 'Capital Currency',
+      description: 'Total capital currency',
       type: 'text',
       encryptable: false,
     },
     {
       key: 'numberOfShares',
-      name: 'Number of Shares (optional)',
-      display: 'Total number of shares',
+      name: 'Number of Shares',
+      description: 'Total number of shares',
       type: 'text',
       encryptable: false,
     },
     {
       key: 'companyType',
       name: 'Company Type',
-      display: 'Company Type',
       type: 'radio',
       encryptable: false,
     },
@@ -65,7 +63,7 @@ export const newCompanyDataObject = {
       fields: [
         {
           key: 'name',
-          display: 'Brand Name',
+          name: 'Brand name',
           type: 'text',
           encryptable: true,
         },
@@ -85,12 +83,14 @@ export const newCompanyDataObject = {
       fields: [
         {
           key: 'description',
+          name: 'Description',
           display: 'Description of online address',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'url',
+          name: 'URL',
           display: 'URL of online address',
           type: 'text',
           encryptable: true,
@@ -112,11 +112,11 @@ export const newCompanyDataObject = {
     {
       key: 'contact',
       display: 'List of contacts',
-      name: 'Contact info (optional)',
+      name: 'Contact info',
       fields: [
         {
           key: 'contact',
-          display: 'Contact info (optional)',
+          name: 'Contact',
           type: 'text',
           encryptable: true,
         },
@@ -136,37 +136,39 @@ export const newCompanyDataObject = {
       fields: [
         {
           key: 'description',
+          name: 'Description',
           display: 'Description of physical address',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'street',
-          display: 'Street',
+          name: 'Street',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'city',
-          display: 'city',
+          name: 'city',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'subdivision',
+          name: 'Subdivision',
           display: 'Subdivision - state/province/emirate/oblast/etc',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'postalCode',
-          display: 'Postal Code',
+          name: 'Postal Code',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'country',
-          display: 'Country',
+          name: 'Country',
           type: 'text',
           encryptable: true,
         },
@@ -176,34 +178,39 @@ export const newCompanyDataObject = {
     {
       key: 'principals',
       display: 'List of owners (principals)',
-      name: 'Owner (Principal)',
+      name: 'Owners',
       fields: [
         {
           key: 'walletAddress',
+          name: 'Wallet',
           display: 'Liberland wallet address',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'name',
+          name: 'Owner',
           display: 'Name of owner (principal)',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'passportNumber',
-          display: 'Passport number of owner (principal)',
+          name: 'Liberland ID',
+          display: 'Liberland ID or Liberland passport number of owner (principal)',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'shares',
+          name: 'Number of shares',
           display: 'Number of shares of owner (principal)',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'signingAbilityConditions',
+          name: 'Notes',
           display: 'Conditions or notes',
           type: 'text',
           encryptable: true,
@@ -240,28 +247,32 @@ export const newCompanyDataObject = {
     {
       key: 'shareholders',
       display: 'List of all shareholders',
-      name: 'Shareholder',
+      name: 'Shareholders',
       fields: [
         {
           key: 'walletAddress',
+          name: 'Wallet',
           display: 'Liberland wallet address',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'name',
+          name: 'Name',
           display: 'Name of shareholder',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'passportNumber',
-          display: 'Passport number of shareholder',
+          name: 'Liberland ID',
+          display: 'Liberland ID or Liberland passport number of shareholder',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'shares',
+          name: 'Number of shares',
           display: 'Number of shares of shareholder',
           type: 'text',
           encryptable: true,
@@ -272,34 +283,39 @@ export const newCompanyDataObject = {
     {
       key: 'UBOs',
       display: 'List of all Ultimate Beneficiaries',
-      name: 'Ultimate Beneficiary',
+      name: 'Beneficiaries',
       fields: [
         {
           key: 'walletAddress',
+          name: 'Wallet',
           display: 'Liberland wallet address',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'name',
-          display: 'Name of UBO',
+          name: 'Name',
+          display: 'Name of Ultimate Beneficiary',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'passportNumber',
-          display: 'Passport number of UBO',
+          name: 'Liberland ID',
+          display: 'Liberland ID or Liberland passport number of Ultimate Beneficiary',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'signingAbility',
+          name: 'Signing ability',
           display: 'Can be full or other',
           type: 'text',
           encryptable: true,
         },
         {
           key: 'signingAbilityConditions',
+          name: 'Conditions',
           display: 'Any conditions on UBO signing ability. Must be in agreement',
           type: 'text',
           encryptable: true,
@@ -314,7 +330,7 @@ export const newCompanyDataObject = {
       fields: [
         {
           key: 'contractId',
-          display: 'Contract id or link',
+          name: 'Contract ID',
           type: 'text',
           encryptable: true,
         },
@@ -328,7 +344,7 @@ export const newCompanyDataObject = {
       fields: [
         {
           key: 'assetId',
-          display: 'Asset id',
+          name: 'Asset ID',
           type: 'text',
           encryptable: true,
         },

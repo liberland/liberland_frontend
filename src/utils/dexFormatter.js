@@ -100,6 +100,7 @@ export const convertAssetData = (assetsData, asset1, asset2) => {
     name: asset1Metadata?.name,
     symbol: asset1Metadata?.symbol,
     isStock: asset1Values?.isStock,
+    company: asset1Values?.company,
   };
   const asset2Values = assetsData[Number(asset2)];
   const asset2Metadata = asset2Values?.metadata;
@@ -109,6 +110,7 @@ export const convertAssetData = (assetsData, asset1, asset2) => {
     name: asset2Metadata?.name,
     symbol: asset2Metadata?.symbol,
     isStock: asset2Values?.isStock,
+    company: asset2Values?.company,
   };
   return { assetData1, assetData2 };
 };

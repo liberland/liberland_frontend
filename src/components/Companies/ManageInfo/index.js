@@ -20,8 +20,7 @@ function ManageInfo({
 
 ManageInfo.propTypes = {
   registeredCompany: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    onlineAddresses: PropTypes.arrayOf(PropTypes.string),
+    id: PropTypes.string,
   }).isRequired,
 };
 
