@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Flex from 'antd/es/flex';
 import { congressActions } from '../../../redux/actions';
@@ -6,9 +6,6 @@ import { congressSelectors } from '../../../redux/selectors';
 import WalletCongresSenateWrapper from '../../WalletCongresSenate/Wrapper';
 import { OfficeType } from '../../../utils/officeTypeEnum';
 import SpendingTable from '../../SpendingTable';
-import { paginator } from '../../../utils/pagination';
-
-const pageSize = 10;
 
 export default function Wallet() {
   const totalBalance = useSelector(congressSelectors.totalBalance);
@@ -20,16 +17,18 @@ export default function Wallet() {
   const spending = useSelector(congressSelectors.spendingSelector);
   const spendingCount = useSelector(congressSelectors.spendingCountSelector);
   const dispatch = useDispatch();
-  const [skip, setSkip] = useState(0);
 
-  const loadMore = useCallback(() => {
-    dispatch(congressActions.congressSpending.call({ skip, take: pageSize }));
-    setSkip((prev) => prev + pageSize);
-  }, [dispatch, skip]);
+  const loadMore = (page, pageSize) => {
+    const from = spending ? spending.from : 0;
+    const skip = (page - 1) * pageSize;
+    if (from < (page * pageSize)) {
+      dispatch(congressActions.congressSpending.call({ skip, take: pageSize }));
+    }
+  };
 
   useEffect(() => {
     dispatch(congressActions.congressSpendingCount.call());
-    loadMore();
+    loadMore(1, 10);
     dispatch(congressActions.getMembers.call());
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only on mount
@@ -54,13 +53,9 @@ export default function Wallet() {
       )}
       {spending && spendingCount ? (
         <SpendingTable
-          spending={spending}
-          onNext={paginator({
-            action: loadMore,
-            count: spendingCount,
-            loaded: spending.length,
-            pageSize,
-          })}
+          spending={spending.data}
+          onNext={loadMore}
+          total={spendingCount}
         />
       ) : null}
     </Flex>

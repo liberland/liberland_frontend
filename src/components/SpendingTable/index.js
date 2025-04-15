@@ -20,7 +20,7 @@ import ColorAvatar from '../ColorAvatar';
 import styles from './styles.module.scss';
 import truncate from '../../utils/truncate';
 
-export default function SpendingTable({ spending, onNext }) {
+export default function SpendingTable({ spending, total, onNext }) {
   const names = useSelector(identitySelectors.selectorIdentityMotions);
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const isBigScreen = useMediaQuery('(min-width: 1600px)');
@@ -77,7 +77,7 @@ export default function SpendingTable({ spending, onNext }) {
     const { identity } = names?.[recipient] || {};
     const name = identity?.legal || identity?.name;
     return {
-      timestamp: formatDate(timestamp, ' '),
+      timestamp: timestamp !== '-' ? formatDate(timestamp, ' ') : '-',
       recipient: recipient !== '-' && (
         <Flex wrap gap="10px" align="center">
           <ColorAvatar size={32} name={name || 'U'} />
@@ -160,14 +160,23 @@ export default function SpendingTable({ spending, onNext }) {
                 },
               ]}
               data={displayData}
+              total={total}
+              simple
               onPageChange={onNext}
+              pageSize={10}
             />
           ) : (
             <List
               dataSource={displayData}
               itemLayout="horizontal"
               size="small"
-              pagination={{ pageSize: 10, onChange: onNext }}
+              pagination={{
+                pageSize: 10,
+                total,
+                onChange: onNext,
+                simple: { readOnly: true },
+                showSizeChanger: false,
+              }}
               renderItem={({
                 timestamp,
                 recipient,
@@ -228,6 +237,7 @@ export default function SpendingTable({ spending, onNext }) {
 
 SpendingTable.propTypes = {
   onNext: PropTypes.func.isRequired,
+  total: PropTypes.number.isRequired,
   spending: PropTypes.arrayOf(PropTypes.shape({
     timestamp: PropTypes.instanceOf(Date).isRequired,
     recipient: PropTypes.string.isRequired,

@@ -8,10 +8,12 @@ function Table({
   data,
   noPagination,
   onPageChange,
+  total,
   pageSize,
   showHeader,
   footer,
   title,
+  simple,
 }) {
   const identityData = useMemo(() => data?.map((d, index) => ({
     ...d,
@@ -27,6 +29,8 @@ function Table({
       showHeader={showHeader}
       pagination={noPagination ? false : {
         ...getDefaultPageSizes(pageSize || 10),
+        ...(total ? { total } : undefined), // Don't leave undefined key in config
+        ...(simple ? { simple: { readOnly: true }, showSizeChanger: false } : undefined),
         onChange: onPageChange,
       }}
       columns={columns.filter(Boolean).map(({ Header, accessor }) => ({
@@ -52,6 +56,8 @@ Table.propTypes = {
   showHeader: PropTypes.bool,
   footer: PropTypes.node,
   title: PropTypes.node,
+  total: PropTypes.number,
+  simple: PropTypes.bool,
 };
 
 export default Table;

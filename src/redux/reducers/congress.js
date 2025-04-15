@@ -1,6 +1,7 @@
 import { handleActions, combineActions } from 'redux-actions';
 import { BN_ZERO } from '@polkadot/util';
 import { congressActions } from '../actions';
+import { spendingTableMerge } from '../../utils/spendingTable';
 
 const initialState = {
   codeName: 'councilAccount',
@@ -159,7 +160,7 @@ const congressReducer = handleActions(
     }),
     [congressActions.congressSpending.success]: (state, action) => ({
       ...state,
-      congressSpending: [...state.congressSpending || [], ...action.payload],
+      congressSpending: spendingTableMerge(action.payload, state.congressSpending),
     }),
     [congressActions.congressSpendingCount.success]: (state, action) => ({
       ...state,

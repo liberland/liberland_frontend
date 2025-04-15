@@ -1,6 +1,7 @@
 import { handleActions, combineActions } from 'redux-actions';
 import { BN_ZERO } from '@polkadot/util';
 import { ministryFinanceActions } from '../actions';
+import { spendingTableMerge } from '../../utils/spendingTable';
 
 const initialState = {
   loading: false,
@@ -96,7 +97,7 @@ const ministryFinanceReducer = handleActions(
 
     [ministryFinanceActions.ministryFinanceSpending.success]: (state, action) => ({
       ...state,
-      ministryFinanceSpending: [...state.ministryFinanceSpending || [], ...action.payload],
+      ministryFinanceSpending: spendingTableMerge(action.payload, state.ministryFinanceSpending),
     }),
     [ministryFinanceActions.ministryFinanceSpendingCount.success]: (state, action) => ({
       ...state,
