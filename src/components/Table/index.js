@@ -7,6 +7,7 @@ function Table({
   columns,
   data,
   noPagination,
+  disablePagination,
   onPageChange,
   total,
   pageSize,
@@ -31,6 +32,7 @@ function Table({
         ...getDefaultPageSizes(pageSize || 10),
         ...(total ? { total } : undefined), // Don't leave undefined key in config
         ...(simple ? { simple: { readOnly: true }, showSizeChanger: false } : undefined),
+        ...(disablePagination ? { disabled: true } : undefined),
         onChange: onPageChange,
       }}
       columns={columns.filter(Boolean).map(({ Header, accessor }) => ({
@@ -58,6 +60,7 @@ Table.propTypes = {
   title: PropTypes.node,
   total: PropTypes.number,
   simple: PropTypes.bool,
+  disablePagination: PropTypes.bool,
 };
 
 export default Table;

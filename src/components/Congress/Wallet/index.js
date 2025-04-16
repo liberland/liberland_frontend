@@ -16,6 +16,7 @@ export default function Wallet() {
   const balances = useSelector(congressSelectors.balances);
   const spending = useSelector(congressSelectors.spendingSelector);
   const spendingCount = useSelector(congressSelectors.spendingCountSelector);
+  const isLoading = useSelector(congressSelectors.isLoading);
   const dispatch = useDispatch();
 
   const loadMore = (page, pageSize) => {
@@ -56,6 +57,7 @@ export default function Wallet() {
           spending={spending.data}
           onNext={loadMore}
           total={spendingCount}
+          isLoading={isLoading}
         />
       ) : null}
     </Flex>

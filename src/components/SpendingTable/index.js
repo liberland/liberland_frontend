@@ -20,7 +20,12 @@ import ColorAvatar from '../ColorAvatar';
 import styles from './styles.module.scss';
 import truncate from '../../utils/truncate';
 
-export default function SpendingTable({ spending, total, onNext }) {
+export default function SpendingTable({
+  spending,
+  isLoading,
+  total,
+  onNext,
+}) {
   const names = useSelector(identitySelectors.selectorIdentityMotions);
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const isBigScreen = useMediaQuery('(min-width: 1600px)');
@@ -163,6 +168,7 @@ export default function SpendingTable({ spending, total, onNext }) {
               total={total}
               simple
               onPageChange={onNext}
+              disablePagination={isLoading}
               pageSize={10}
             />
           ) : (
@@ -176,6 +182,7 @@ export default function SpendingTable({ spending, total, onNext }) {
                 onChange: onNext,
                 simple: { readOnly: true },
                 showSizeChanger: false,
+                disabled: isLoading,
               }}
               renderItem={({
                 timestamp,
@@ -238,6 +245,7 @@ export default function SpendingTable({ spending, total, onNext }) {
 SpendingTable.propTypes = {
   onNext: PropTypes.func.isRequired,
   total: PropTypes.number.isRequired,
+  isLoading: PropTypes.bool.isRequired,
   spending: PropTypes.arrayOf(PropTypes.shape({
     timestamp: PropTypes.instanceOf(Date).isRequired,
     recipient: PropTypes.string.isRequired,

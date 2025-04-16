@@ -19,6 +19,7 @@ export default function Wallet() {
   const clerksIds = useSelector(ministryFinanceSelector.clerksMinistryFinance);
   const spending = useSelector(ministryFinanceSelector.spendingSelector);
   const spendingCount = useSelector(ministryFinanceSelector.spendingCountSelector);
+  const isLoading = useSelector(ministryFinanceSelector.isLoading);
   const userIsMember = clerksIds?.includes(walletAddress) || false;
   const loadMore = (page, pageSize) => {
     const from = spending ? spending.from : 0;
@@ -68,6 +69,7 @@ export default function Wallet() {
           spending={spending.data}
           onNext={loadMore}
           total={spendingCount}
+          isLoading={isLoading}
         />
       ) : null}
     </Flex>
