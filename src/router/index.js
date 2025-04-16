@@ -35,6 +35,7 @@ export default {
     finances: '/home/offices/finances',
     scheduledCongressSpending: '/home/offices/scheduled-congress-spending',
     ministryOfFinance: '/home/offices/ministry-of-finance',
+    taxPayers: '/home/offices/tax-payers',
   },
   documents: {
     myAccount: '/home/documents/my-account',

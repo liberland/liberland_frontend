@@ -90,3 +90,18 @@ export const fetchCongressSpending = (skip, take) => (
 export const fetchMinistryOfFinanceSpending = (skip, take) => (
   fetchSpending('5EYCAe5iXF2YZpCZr7ALYUUYaNpMXde3NUXxYn1Sc1YRM4gV', skip, take)
 );
+
+export const getTaxPayers = async (timeInMonth, limit) => {
+  try {
+    const middlewareApi = getMiddlewareApi();
+    const response = await middlewareApi.get('/v1/tax-payers', {
+      params: {
+        limit: limit || 10,
+        months: timeInMonth || 12,
+      },
+    });
+    return response.data;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
