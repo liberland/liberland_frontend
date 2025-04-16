@@ -20,7 +20,12 @@ import ColorAvatar from '../ColorAvatar';
 import styles from './styles.module.scss';
 import truncate from '../../utils/truncate';
 
-export default function SpendingTable({ spending }) {
+export default function SpendingTable({
+  spending,
+  isLoading,
+  total,
+  onNext,
+}) {
   const names = useSelector(identitySelectors.selectorIdentityMotions);
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const isBigScreen = useMediaQuery('(min-width: 1600px)');
@@ -77,7 +82,7 @@ export default function SpendingTable({ spending }) {
     const { identity } = names?.[recipient] || {};
     const name = identity?.legal || identity?.name;
     return {
-      timestamp: formatDate(timestamp, ' '),
+      timestamp: timestamp !== '-' ? formatDate(timestamp, ' ') : '-',
       recipient: recipient !== '-' && (
         <Flex wrap gap="10px" align="center">
           <ColorAvatar size={32} name={name || 'U'} />
@@ -160,12 +165,25 @@ export default function SpendingTable({ spending }) {
                 },
               ]}
               data={displayData}
+              total={total}
+              simple
+              onPageChange={onNext}
+              disablePagination={isLoading}
+              pageSize={10}
             />
           ) : (
             <List
               dataSource={displayData}
               itemLayout="horizontal"
               size="small"
+              pagination={{
+                pageSize: 10,
+                total,
+                onChange: onNext,
+                simple: { readOnly: true },
+                showSizeChanger: false,
+                disabled: isLoading,
+              }}
               renderItem={({
                 timestamp,
                 recipient,
@@ -225,6 +243,9 @@ export default function SpendingTable({ spending }) {
 }
 
 SpendingTable.propTypes = {
+  onNext: PropTypes.func.isRequired,
+  total: PropTypes.number.isRequired,
+  isLoading: PropTypes.bool.isRequired,
   spending: PropTypes.arrayOf(PropTypes.shape({
     timestamp: PropTypes.instanceOf(Date).isRequired,
     recipient: PropTypes.string.isRequired,
@@ -235,6 +256,6 @@ SpendingTable.propTypes = {
     supplier: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     finalDestination: PropTypes.string.isRequired,
-    amountInUsd: PropTypes.string.isRequired,
+    amountInUsd: PropTypes.number.isRequired,
   }).isRequired).isRequired,
 };
