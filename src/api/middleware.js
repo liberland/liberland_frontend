@@ -65,3 +65,18 @@ const fetchSpending = async (wallet) => {
 
 export const fetchCongressSpending = () => fetchSpending('5EYCAe5g8CDuMsTief7QBxfvzDFEfws6ueXTUhsbx5V81nGH');
 export const fetchMinistryOfFinanceSpending = () => fetchSpending('5EYCAe5iXF2YZpCZr7ALYUUYaNpMXde3NUXxYn1Sc1YRM4gV');
+
+export const getTaxPayers = async (timeInMonth, limit) => {
+  try {
+    const middlewareApi = getMiddlewareApi();
+    const response = await middlewareApi.get('/v1/tax-payers', {
+      params: {
+        limit: limit || 10,
+        months: timeInMonth || 12,
+      },
+    });
+    return response.data;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
