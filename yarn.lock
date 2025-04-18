@@ -3137,6 +3137,29 @@
     rxjs "^7.8.1"
     tslib "^2.6.2"
 
+"@polkadot/extension-dapp@^0.47.6":
+  version "0.47.6"
+  resolved "https://registry.yarnpkg.com/@polkadot/extension-dapp/-/extension-dapp-0.47.6.tgz#0ab43d95cb6ad7b007510259e2a94186b49baff7"
+  integrity sha512-GpV0MQGL5c4y5lVcQXP+tf6Nnyqau/9ZHQnQdsWosnrjR0n9iak8UgWl1hQEGqBp/nYi9TdvdA4uFvcIjv1Jng==
+  dependencies:
+    "@polkadot/extension-inject" "0.47.6"
+    "@polkadot/util" "^12.6.2"
+    "@polkadot/util-crypto" "^12.6.2"
+    tslib "^2.6.2"
+
+"@polkadot/extension-inject@0.47.6":
+  version "0.47.6"
+  resolved "https://registry.yarnpkg.com/@polkadot/extension-inject/-/extension-inject-0.47.6.tgz#a729d00215dd90d8ba77f6103018563ca187e060"
+  integrity sha512-rDTHyjGBgNochLc5Us+H2YJXUb2HW4hJJ23+6B7Mv373mfBYtM1T1HDkIWzV/xNJmiboAQy4O41N71CmZq4j7g==
+  dependencies:
+    "@polkadot/api" "^11.3.1"
+    "@polkadot/rpc-provider" "^11.3.1"
+    "@polkadot/types" "^11.3.1"
+    "@polkadot/util" "^12.6.2"
+    "@polkadot/util-crypto" "^12.6.2"
+    "@polkadot/x-global" "^12.6.2"
+    tslib "^2.6.2"
+
 "@polkadot/keyring@^12.6.2":
   version "12.6.2"
   resolved "https://registry.yarnpkg.com/@polkadot/keyring/-/keyring-12.6.2.tgz#6067e6294fee23728b008ac116e7e9db05cecb9b"
@@ -3178,7 +3201,7 @@
     rxjs "^7.8.1"
     tslib "^2.6.2"
 
-"@polkadot/rpc-provider@11.3.1":
+"@polkadot/rpc-provider@11.3.1", "@polkadot/rpc-provider@^11.3.1":
   version "11.3.1"
   resolved "https://registry.yarnpkg.com/@polkadot/rpc-provider/-/rpc-provider-11.3.1.tgz#1d1289bf42d065b5f04f9baa46ef90d96940819e"
   integrity sha512-pqERChoHo45hd3WAgW8UuzarRF+G/o/eXEbl0PXLubiayw4X4qCmIzmtntUcKYgxGNcYGZaG87ZU8OjN97m6UA==
@@ -3246,7 +3269,7 @@
     "@polkadot/util" "^12.6.2"
     tslib "^2.6.2"
 
-"@polkadot/types@11.3.1":
+"@polkadot/types@11.3.1", "@polkadot/types@^11.3.1":
   version "11.3.1"
   resolved "https://registry.yarnpkg.com/@polkadot/types/-/types-11.3.1.tgz#bab61b701218158099e3f548d20efc27cbf1287f"
   integrity sha512-5c7uRFXQTT11Awi6T0yFIdAfD6xGDAOz06Kp7M5S9OGNZY28wSPk5x6BYfNphWPaIBmHHewYJB5qmnrdYQAWKQ==
