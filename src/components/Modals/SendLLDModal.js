@@ -4,7 +4,6 @@ import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Flex from 'antd/es/flex';
-import Checkbox from 'antd/es/checkbox';
 import Collapse from 'antd/es/collapse';
 import InputNumber from 'antd/es/input-number';
 import { useDispatch, useSelector } from 'react-redux';
@@ -98,26 +97,23 @@ function SendLLDForm({ onClose }) {
       </Form.Item>
       <Form.Item
         name="remark"
-        label="Include remark"
-        layout="horizontal"
-        valuePropName="checked"
       >
-        <Checkbox />
+        <Collapse
+          activeKey={remark ? ['remark'] : []}
+          onChange={() => form.setFieldValue('remark', !remark)}
+          destroyInactivePanel
+          items={[{
+            key: 'remark',
+            label: remark ? 'Remark' : 'Click to include remark',
+            children: (
+              <RemarkFormUser
+                form={form}
+                setIsLoading={setIsLoading}
+              />
+            ),
+          }]}
+        />
       </Form.Item>
-      <Collapse
-        className="formCollapse"
-        activeKey={remark ? ['remark'] : []}
-        destroyInactivePanel
-        items={[{
-          key: 'remark',
-          children: (
-            <RemarkFormUser
-              form={form}
-              setIsLoading={setIsLoading}
-            />
-          ),
-        }]}
-      />
       <Flex wrap gap="15px">
         <Button onClick={onClose}>Cancel</Button>
         <Button primary disabled={isLoading} type="submit">

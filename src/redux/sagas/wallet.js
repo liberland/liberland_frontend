@@ -149,6 +149,7 @@ function* sendTransferRemarkWorker(action) {
   );
   yield call(transferWithRemark, remarkInfo, transferData, walletAddress);
   yield put(walletActions.sendTransferRemark.success());
+  yield put(walletActions.getWallet.call());
 }
 
 function* mintAssetWorker(action) {
