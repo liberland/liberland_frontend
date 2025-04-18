@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { BN } from '@polkadot/util';
 import { getAdditionalAssets } from './nodeRpcCall';
+import { isCompanyConnected } from '../utils/asset';
 
 const historyTransferQuery = `
   query CombinedQuery(
@@ -273,6 +274,7 @@ export const getHistoryTransfers = async (substrateAddress) => {
   const assets = filteredTransferAssets.map((n) => ({
     ...n,
     asset: assetsData[n.asset].metadata.symbol,
+    logo: isCompanyConnected(assetsData[n.asset]) ? assetsData[n.asset].company.logoURL : undefined,
     decimals: assetsData[n.asset].metadata.decimals,
   }));
   const llm = transfersLLM.map((n) => ({ asset: 'LLM', ...n }));

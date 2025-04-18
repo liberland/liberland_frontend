@@ -35,6 +35,7 @@ export default {
     finances: '/home/offices/finances',
     scheduledCongressSpending: '/home/offices/scheduled-congress-spending',
     ministryOfFinance: '/home/offices/ministry-of-finance',
+    taxPayers: '/home/offices/tax-payers',
   },
   documents: {
     myAccount: '/home/documents/my-account',
@@ -45,6 +46,9 @@ export default {
   voting: {
     congressionalAssemble: '/home/voting/congressional-assemble',
     referendum: '/home/voting/referendum',
+    proposalItem: '/home/voting/proposal/:id',
+    referendumItem: '/home/voting/referendum/:referendumHash',
+    dispatchItem: '/home/voting/dispatch/:dispatchId',
     addLegislation: '/home/voting/add-legislation',
   },
   legislation: {
@@ -104,5 +108,6 @@ export default {
     edit: '/home/companies/edit/:companyId',
     view: '/home/companies/view/:companyId',
     allCompanies: '/home/companies/allCompanies',
+    myCompanies: '/home/companies/my',
   },
 };

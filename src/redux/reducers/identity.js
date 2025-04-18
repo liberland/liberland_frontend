@@ -3,6 +3,7 @@ import { identityActions } from '../actions';
 
 const initialState = {
   loading: false,
+  unobtrusive: false,
   identity: null,
 };
 
@@ -18,6 +19,14 @@ const identityReducer = handleActions(
     }),
 
     [combineActions(
+      identityActions.getIdentity.call,
+      identityActions.getIdentityMotions.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
+    }),
+
+    [combineActions(
       identityActions.getIdentity.success,
       identityActions.getIdentity.failure,
       identityActions.setIdentity.success,
@@ -27,6 +36,7 @@ const identityReducer = handleActions(
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
+      unobtrusive: initialState.unobtrusive,
     }),
 
     [identityActions.getIdentity.call]: (state) => ({

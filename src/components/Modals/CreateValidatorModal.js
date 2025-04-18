@@ -7,16 +7,13 @@ import Flex from 'antd/es/flex';
 import Input from 'antd/es/input';
 import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
-import Slider from 'antd/es/slider';
 import PropTypes from 'prop-types';
-
 import { useDispatch, useSelector } from 'react-redux';
 import { BN, BN_ZERO, isHex } from '@polkadot/util';
 import Button from '../Button/Button';
-
 import { validatorActions } from '../../redux/actions';
 import { validatorSelectors, walletSelectors } from '../../redux/selectors';
-import { formatDollars, parseDollars } from '../../utils/walletHelpers';
+import { formatDollars, parseDollars, valueToBN } from '../../utils/walletHelpers';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
 
@@ -28,7 +25,7 @@ function CreateValidatorForm({
   const payee = useSelector(validatorSelectors.payee);
   const maxBond = BN.max(
     new BN(0),
-    (new BN(balances?.liquidAmount?.amount ?? 0))
+    valueToBN(balances?.liquidAmount?.amount ?? 0)
       .sub(parseDollars('2')), // leave at least 2 liquid LLD...
   );
 
@@ -66,7 +63,7 @@ function CreateValidatorForm({
       layout="vertical"
       initialValues={{
         bondValue: formatDollars(maxBond).replaceAll(',', ''),
-        commission: '20',
+        commission: 20,
         allow_nominations: true,
         payee: payee ? payee.toString() : 'Staked',
       }}
@@ -91,19 +88,17 @@ function CreateValidatorForm({
         <InputNumber stringMode controls={false} />
       </Form.Item>
       <Form.Item
-        name="comission"
         label="Reward commission percentage"
-        rules={[{ required: true }]}
         extra="The commission is deducted from all rewards before the remainder is split with nominators."
+        rules={[{ required: true }, { type: 'number', min: 0, max: 100 }]}
+        name="commission"
       >
-        <Slider
-          min={0}
-          max={100}
-        />
+        <InputNumber controls={false} />
       </Form.Item>
       <Form.Item
         name="allow_nominations"
         valuePropName="checked"
+        layout="horizontal"
         label="Allow new nominations"
       >
         <Checkbox />
@@ -169,7 +164,7 @@ CreateValidatorForm.propTypes = {
 function ButtonModal(props) {
   const { label } = props;
   return (
-    <OpenModalButton small primary text={label || 'Start Validating'} {...props} />
+    <OpenModalButton primary text={label || 'Start Validating'} {...props} />
   );
 }
 

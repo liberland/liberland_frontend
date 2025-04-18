@@ -8,10 +8,10 @@ const initialState = {
         amount: '0x0',
       },
       polkastake: {
-        amount: 0,
+        amount: '0',
       },
       liquidMerits: {
-        amount: 0,
+        amount: '0',
       },
       totalAmount: {
         amount: '0x0',
@@ -20,7 +20,7 @@ const initialState = {
         amount: '0x0',
       },
       meritsTotalAmount: {
-        amount: 0,
+        amount: '0',
       },
       electionLock: 0,
     },
@@ -28,6 +28,7 @@ const initialState = {
   additionalAssets: [],
   assetDetails: [],
   gettingWalletInfo: false,
+  unobtrusive: false,
   transfersTxHistory: {
     transfersTxHistory: [],
     transfersTxHistoryFailed: false,
@@ -37,7 +38,7 @@ const initialState = {
   validators: [],
   nominatorTargets: [],
   assetBalance: null,
-  assetsBalance: [],
+  assetsBalance: {},
   transferState: null,
 };
 
@@ -68,6 +69,18 @@ const walletReducer = handleActions(
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
+    }),
+    [combineActions(
+      walletActions.getWallet.call,
+      walletActions.getAssetsDetails.call,
+      walletActions.getAdditionalAssets.call,
+      walletActions.getValidators.call,
+      walletActions.getNominatorTargets.call,
+      walletActions.getTxTransfers.call,
+      walletActions.getAssetsBalance.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
     }),
     [walletActions.getTxTransfers.call]: (state) => ({
       ...state,
@@ -155,6 +168,7 @@ const walletReducer = handleActions(
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,
+      unobtrusive: initialState.unobtrusive,
     }),
     [walletActions.sendTransfer.success]: (state) => ({
       ...state,

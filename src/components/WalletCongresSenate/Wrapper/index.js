@@ -1,19 +1,21 @@
 import React from 'react';
 import Flex from 'antd/es/flex';
 import Collapse from 'antd/es/collapse';
+import Divider from 'antd/es/divider';
 import { BN } from '@polkadot/util';
 import PropTypes from 'prop-types';
+import { useMediaQuery } from 'usehooks-ts';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
-import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
-import { ReactComponent as GraphIcon } from '../../../assets/icons/graph.svg';
 import AssetOverview from '../../Wallet/AssetOverview';
 import SpendModalWrapper from '../../Modals/SpendModal';
 import { valueToBN } from '../../../utils/walletHelpers';
 import BalanceOverview from '../../Wallet/BalanceOverview';
+import { OfficeType } from '../../../utils/officeTypeEnum';
+import ProposeBudgetModalWrapper from '../../Modals/ProposeBudgetModal';
 
 export default function WalletCongresSenateWrapper({
   totalBalance,
-  congresAccountAddress,
+  congressAccountAddress,
   liquidMerits,
   additionalAssets,
   onSendFunctions,
@@ -24,8 +26,20 @@ export default function WalletCongresSenateWrapper({
   const { LLD, LLM, LLMPolitipool } = onSendFunctions;
   const balanceLLD = new BN(balances?.liquidAmount?.amount ?? 0);
   const balanceLLM = valueToBN(balances?.liquidMerits?.amount ?? 0);
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 1200px)');
 
-  if (!congresAccountAddress) {
+  const walletAddress = (
+    <Flex wrap vertical={!isBiggerThanDesktop} gap="7px">
+      <strong>
+        Wallet address
+      </strong>
+      <div className="description">
+        <CopyIconWithAddress address={congressAccountAddress} />
+      </div>
+    </Flex>
+  );
+
+  if (!congressAccountAddress) {
     return null;
   }
 
@@ -39,6 +53,9 @@ export default function WalletCongresSenateWrapper({
           key: 'actions',
           children: (
             <Flex wrap gap="15px">
+              {officeType === OfficeType.CONGRESS && userIsMember && (
+                <ProposeBudgetModalWrapper />
+              )}
               <SpendModalWrapper
                 officeType={officeType}
                 spendData={{
@@ -51,7 +68,6 @@ export default function WalletCongresSenateWrapper({
                 onSend={LLMPolitipool}
                 balance={balanceLLM}
                 label="Spend LLM (Politipool)"
-                icon={<GraphIcon />}
               />
               <SpendModalWrapper
                 officeType={officeType}
@@ -61,7 +77,6 @@ export default function WalletCongresSenateWrapper({
                 }}
                 balance={balanceLLM}
                 label="Spend LLM"
-                icon={<GraphIcon />}
               />
               <SpendModalWrapper
                 officeType={officeType}
@@ -71,18 +86,16 @@ export default function WalletCongresSenateWrapper({
                 }}
                 balance={balanceLLD}
                 label="Spend LLD"
-                icon={<UploadIcon />}
               />
+              {!isBiggerThanDesktop && (
+                <>
+                  <Divider />
+                  {walletAddress}
+                </>
+              )}
             </Flex>
           ),
-          extra: (
-            <Flex wrap gap="15px">
-              <span>
-                Wallet address
-              </span>
-              <CopyIconWithAddress address={congresAccountAddress} />
-            </Flex>
-          ),
+          extra: isBiggerThanDesktop && walletAddress,
         },
         {
           label: 'Balance overview',
@@ -93,6 +106,7 @@ export default function WalletCongresSenateWrapper({
               balances={balances}
               liquidMerits={liquidMerits}
               showStaked={false}
+              isCongress
             />
           ),
         },
@@ -117,7 +131,7 @@ export default function WalletCongresSenateWrapper({
 WalletCongresSenateWrapper.propTypes = {
   officeType: PropTypes.string.isRequired,
   totalBalance: PropTypes.oneOfType([PropTypes.number.isRequired, PropTypes.string.isRequired]).isRequired,
-  congresAccountAddress: PropTypes.string.isRequired,
+  congressAccountAddress: PropTypes.string.isRequired,
   liquidMerits: PropTypes.string.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   additionalAssets: PropTypes.array.isRequired,

@@ -16,18 +16,11 @@ import CongressAmendLegislationViaReferendumModal from '../../../Modals/Congress
 import CastVeto from '../CastVeto';
 import ProposeButton from '../ProposeButton';
 import AmendButton from '../AmendButton';
-import ExistingMotionsAndReferendums from '../ExistingMotionsAndReferendums';
 import styles from '../styles.module.scss';
 
 function LegislationItem({
-  year, index, tier, id, sections, mainRepealProposalReferendum,
+  year, index, tier, id, sections,
 }) {
-  const {
-    mainRepealMotion,
-    mainRepealReferendum,
-    mainRepealProposal,
-  } = mainRepealProposalReferendum;
-
   return (
     <Collapse
       items={[{
@@ -45,11 +38,6 @@ function LegislationItem({
             title="Sections"
             actions={[
               <Flex className={styles.actions} justify="end" wrap gap="15px">
-                <ExistingMotionsAndReferendums
-                  motion={mainRepealMotion}
-                  proposal={mainRepealProposal}
-                  referendum={mainRepealReferendum}
-                />
                 <CastVeto
                   id={id}
                   tier={tier}
@@ -57,7 +45,6 @@ function LegislationItem({
                 <ProposeButton
                   id={id}
                   tier={tier}
-                  repealMotion={mainRepealMotion}
                 />
                 <AmendButton
                   id={id}
@@ -105,7 +92,7 @@ function LegislationItem({
             <List
               dataSource={sections}
               renderItem={({
-                content, repealMotion, repealReferendum, repealProposal,
+                content,
               }, section) => (
                 <List.Item>
                   <SectionItem
@@ -113,11 +100,6 @@ function LegislationItem({
                     content={content}
                     id={id}
                     section={section}
-                    repealProposalReferendum={{
-                      repealMotion,
-                      repealReferendum,
-                      repealProposal,
-                    }}
                   />
                 </List.Item>
               )}
@@ -137,8 +119,6 @@ LegislationItem.propTypes = {
   id: PropTypes.object.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   sections: PropTypes.arrayOf(PropTypes.object).isRequired,
-  // eslint-disable-next-line react/forbid-prop-types
-  mainRepealProposalReferendum: PropTypes.object.isRequired,
 };
 
 export default LegislationItem;

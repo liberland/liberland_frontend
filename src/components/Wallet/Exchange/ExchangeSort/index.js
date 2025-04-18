@@ -13,7 +13,7 @@ function ExchangeSort({
   sortBy,
 }) {
   return (
-    <Flex align="center" justify="center" gap="15px" onClick={(e) => e.stopPropagation()}>
+    <Flex wrap align="center" gap="15px" onClick={(e) => e.stopPropagation()}>
       <span className={styles.description}>
         Sort
       </span>

@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import List from 'antd/es/list';
 import Spin from 'antd/es/spin';
 import Flex from 'antd/es/flex';
+import Collapse from 'antd/es/collapse';
 import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
 import routes from '../../../router';
@@ -30,67 +31,75 @@ function OwnedNfts() {
   useEffect(() => {
     dispatch(nftsActions.getUserCollections.call(userWalletAddress));
   }, [dispatch, userWalletAddress]);
-  const nftIds = nfts.map((nft) => Number(nft.nftId));
-  const nftsId = nftIds.length > 0 ? Math.max(...nftIds) : 0;
+  const nftIds = nfts?.map((nft) => Number(nft.nftId));
+  const nftsId = nftIds?.length > 0 ? Math.max(...nftIds) : 0;
 
   if (!nfts) {
     return <Spin />;
   }
 
   return (
-    <Flex vertical gap="20px">
-      <Flex wrap gap="15px" justify="end">
-        <Button
-          primary
-          onClick={() => history.push(routes.nfts.overview)}
-        >
-          Buy and Browse
-        </Button>
-        <FillNumberModal
-          itemList={userCollections}
-          textData={{
-            title: 'NFT id',
-            description: '',
-            amount: nftsId + 1 || 0,
-            submitButtonText: 'Mint',
-          }}
-          higherThanZero={false}
-          onAccept={(collectionId, itemId) => {
-            dispatch(
-              nftsActions.mintNft.call({
-                collectionId,
-                itemId,
-                mintTo: userWalletAddress,
-              }),
-            );
-          }}
-        />
-      </Flex>
-      {nfts.length ? (
-        <List
-          className="centeredList"
-          dataSource={nfts}
-          grid={isBiggerThanMediumScreen ? {
-            gutter: 16,
-          } : undefined}
-          renderItem={({
-            collectionId,
-            nftId,
-            collectionMetadata,
-            itemMetadata,
-          }) => (
-            <ItemNft
-              key={collectionId + nftId}
-              itemMetadata={itemMetadata}
-              collectionId={collectionId}
-              nftId={nftId}
-              collectionMetadata={collectionMetadata}
-              isOwnItem
+    <Collapse
+      collapsible="icon"
+      defaultActiveKey={['owned']}
+      items={[{
+        key: 'owned',
+        label: 'Owned NFTs',
+        extra: (
+          <Flex wrap gap="15px">
+            <Button
+              primary
+              onClick={() => history.push(routes.nfts.overview)}
+            >
+              Buy and Browse
+            </Button>
+            <FillNumberModal
+              itemList={userCollections}
+              textData={{
+                title: 'NFT id',
+                description: '',
+                amount: nftsId + 1 || 0,
+                submitButtonText: 'Mint',
+              }}
+              higherThanZero={false}
+              onAccept={(collectionId, itemId) => {
+                dispatch(
+                  nftsActions.mintNft.call({
+                    collectionId,
+                    itemId,
+                    mintTo: userWalletAddress,
+                  }),
+                );
+              }}
             />
-          )}
-        />
-      ) : <Alert message="You have no NFTs" type="info" />}
-    </Flex>
+          </Flex>
+        ),
+        children: nfts.length ? (
+          <List
+            className="centeredList"
+            dataSource={nfts}
+            grid={isBiggerThanMediumScreen ? {
+              gutter: 16,
+            } : undefined}
+            renderItem={({
+              collectionId,
+              nftId,
+              collectionMetadata,
+              itemMetadata,
+            }) => (
+              <ItemNft
+                key={collectionId + nftId}
+                itemMetadata={itemMetadata}
+                collectionId={collectionId}
+                nftId={nftId}
+                collectionMetadata={collectionMetadata}
+                isOwnItem
+              />
+            )}
+          />
+        ) : <Result title="You have no NFTs" status={404} />,
+      }]}
+    />
   );
 }
 

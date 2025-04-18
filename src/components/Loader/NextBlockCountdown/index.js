@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import Progress from 'antd/es/progress';
 import { BN, BN_ZERO } from '@polkadot/util';
+import PropTypes from 'prop-types';
 import { blockchainSelectors } from '../../../redux/selectors';
 
-export default function NextBlockCountdown() {
+export default function NextBlockCountdown({ children }) {
   const currentBlockTimestamp = useSelector(blockchainSelectors.blockTimestamp);
   const blockDurationMilis = 6000;
   const [nextBlockCounter, setNextBlockCounter] = useState(
@@ -24,10 +24,10 @@ export default function NextBlockCountdown() {
     ? (100 - parseInt(progress.toString()))
     : 0;
 
-  return (
-    <Progress
-      type="circle"
-      percent={progressBarRatio}
-    />
-  );
+  return children(progressBarRatio);
 }
+
+NextBlockCountdown.propTypes = {
+  unobtrusive: PropTypes.bool,
+  children: PropTypes.func.isRequired,
+};

@@ -2,9 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Select from 'antd/es/select';
+import Spin from 'antd/es/spin';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
-import { useStockContext } from '../../StockContext';
+import Title from 'antd/es/typography/Title';
 import { createNewPool } from '../../../../api/nodeRpcCall';
 import Button from '../../../Button/Button';
 import { walletSelectors, blockchainSelectors } from '../../../../redux/selectors';
@@ -16,6 +17,7 @@ import modalWrapper from '../../../Modals/components/ModalWrapper';
 function AddAssetForm({
   poolsData,
   onClose,
+  isStock,
 }) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState();
@@ -29,7 +31,6 @@ function AddAssetForm({
     dispatch(walletActions.getAdditionalAssets.call());
   }, [dispatch]);
 
-  const { isStock } = useStockContext();
   const filtered = useMemo(() => {
     const allOptions = additionalAssets
       ?.reduce((pairings, aAsset, index) => {
@@ -115,14 +116,32 @@ function AddAssetForm({
     }
   };
 
+  const keySort = React.useCallback(([aKey], [bKey]) => {
+    const aIsNative = aKey === 'Native' ? 1 : -1;
+    const bIsNative = bKey === 'Native' ? 1 : -1;
+    if (aIsNative === bIsNative) {
+      return aKey.localeCompare(bKey);
+    }
+    return bIsNative - aIsNative;
+  }, []);
+
+  const firstAssets = useMemo(() => (
+    Object.entries(filtered)
+      .filter(([_, values]) => Object.keys(values).length > 0)
+      .sort(keySort)
+  ), [filtered, keySort]);
+
   const firstAsset = Form.useWatch('firstAsset', form);
 
   if (!filtered) {
-    return <div>Loading...</div>;
+    return <Spin />;
   }
 
   return (
     <Form layout="vertical" form={form} onFinish={onSubmit}>
+      <Title level={2}>
+        Create pool
+      </Title>
       <Flex gap="15px" wrap>
         <Form.Item
           label="Select first pool asset"
@@ -131,21 +150,19 @@ function AddAssetForm({
         >
           <Select>
             <Select.Option value="" />
-            {Object.entries(filtered)
-              .filter(([_, values]) => Object.keys(values).length > 0)
-              .map(([key, value]) => {
-                const humanReadableName = key === 'Native'
-                  ? 'Liberland dollar'
-                  : Object.values(value)[0][0].metadata.symbol;
-                return (
-                  <Select.Option
-                    value={key}
-                    key={key}
-                  >
-                    {humanReadableName}
-                  </Select.Option>
-                );
-              })}
+            {firstAssets.map(([key, value]) => {
+              const humanReadableName = key === 'Native'
+                ? 'Liberland dollar'
+                : Object.values(value)[0][0].metadata.symbol;
+              return (
+                <Select.Option
+                  value={key}
+                  key={key}
+                >
+                  {humanReadableName}
+                </Select.Option>
+              );
+            })}
           </Select>
         </Form.Item>
         {firstAsset && (
@@ -159,6 +176,7 @@ function AddAssetForm({
             <Select>
               <Select.Option value="" />
               {Object.entries(filtered[firstAsset])
+                .sort(keySort)
                 .map(([key, value]) => {
                   const humanReadableName = key === 'Native'
                     ? 'Liberland dollar'
@@ -193,6 +211,7 @@ AddAssetForm.propTypes = {
   poolsData: PropTypes.arrayOf(
     PropTypes.shape(ExchangeItemPropTypes).isRequired,
   ).isRequired,
+  isStock: PropTypes.bool,
 };
 
 function ButtonModal(props) {

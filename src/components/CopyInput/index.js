@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Space from 'antd/es/space';
 import Input from 'antd/es/input';
+import Avatar from 'antd/es/avatar';
 import notification from 'antd/es/notification';
-import CopyOutlined from '@ant-design/icons/CopyOutlined';
+import CopyInputIcon from '../../assets/icons/copy-input.svg';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
@@ -17,11 +18,14 @@ function CopyInput({
     navigator.clipboard.writeText(value);
     api.success({ message: 'Link copied!' });
   };
+  const icon = (
+    <Avatar size={20} shape="square" src={CopyInputIcon} className={styles.copyIcon} />
+  );
   const button = (
     <Button onClick={handleCopyClick}>
       {buttonLabel}
       <Space />
-      <CopyOutlined />
+      {icon}
     </Button>
   );
 
@@ -36,7 +40,7 @@ function CopyInput({
       <Button onClick={handleCopyClick}>
         {buttonLabel}
         <Space />
-        <CopyOutlined />
+        {icon}
       </Button>
     </Space.Compact>
   );

@@ -15,35 +15,38 @@ import PolitipoolLLMModalWrapper from '../../Modals/PolitipoolModal';
 import MoneyCard from '../../MoneyCard';
 import Button from '../../Button/Button';
 import router from '../../../router';
+import GetLLDWrapper from '../../GetLLDWrapper';
 
 function BalanceOverview({
-  balances, liquidMerits, showStaked,
+  balances, liquidMerits, showStaked, isCongress,
 }) {
   const history = useHistory();
   const overviewInfo = useMemo(() => [
     {
-      amount: formatDollars(balances.liquidAmount.amount),
+      amount: formatDollars(balances.liquidAmount.amount, false, 2),
       title: 'Liquid LLD',
       currency: 'LLD',
       icon: LLD,
       actions: [
-        <SendLLDModal key="send" />,
+        <GetLLDWrapper>
+          <SendLLDModal key="send" />
+        </GetLLDWrapper>,
         <RequestLLDModal key="request" />,
       ],
     },
     showStaked && {
-      amount: formatDollars(balances.polkastake.amount),
+      amount: formatDollars(balances.polkastake.amount, false, 2),
       title: 'Validator Staked LLD',
       currency: 'LLD',
       icon: LLD,
       actions: [
-        <Button primary onClick={() => history.push(router.staking.overview)}>
+        <Button primary onClick={() => history.push(router.staking.overview)} key="stake">
           Stake
         </Button>,
       ],
     },
     {
-      amount: formatMerits(liquidMerits),
+      amount: formatMerits(liquidMerits, false, 2),
       title: 'Liquid LLM',
       currency: 'LLM',
       icon: LLM,
@@ -53,7 +56,7 @@ function BalanceOverview({
       ],
     },
     showStaked && {
-      amount: formatMerits(balances.liberstake.amount),
+      amount: formatMerits(balances.liberstake.amount, false, 2),
       title: 'PolitiPooled LLM',
       currency: 'LLM',
       icon: LLM,
@@ -83,7 +86,7 @@ function BalanceOverview({
       }) => (
         <Col span={isBiggerThanDesktop ? 6 : 24} key={title}>
           <MoneyCard
-            actions={actions}
+            actions={isCongress ? undefined : actions}
             amount={amount}
             alt={currency}
             icon={icon}
@@ -98,7 +101,7 @@ function BalanceOverview({
 BalanceOverview.defaultProps = {
   totalBalance: '0x0',
   balances: {},
-  liquidMerits: 0,
+  liquidMerits: '0',
   showStaked: true,
 };
 
@@ -109,10 +112,10 @@ BalanceOverview.propTypes = {
   balances: PropTypes.shape({
     liquidAmount: PropTypes.shape({
       // eslint-disable-next-line react/forbid-prop-types
-      amount: PropTypes.object,
+      amount: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     }),
     liberstake: PropTypes.shape({
-      amount: PropTypes.number,
+      amount: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     }),
     polkastake: PropTypes.shape({
       amount: PropTypes.number,
@@ -122,6 +125,7 @@ BalanceOverview.propTypes = {
     }),
   }),
   liquidMerits: PropTypes.string,
+  isCongress: PropTypes.bool,
 };
 
 export default BalanceOverview;

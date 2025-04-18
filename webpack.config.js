@@ -1,6 +1,7 @@
 /* eslint-disable */
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
+const CopyPlugin = require("copy-webpack-plugin");
 
 const webpack = require('webpack');
 
@@ -145,6 +146,17 @@ module.exports = (env, argv) => {
         template: path.resolve(__dirname, 'public/index.html'),
         filename: 'index.html',
       }),
+      argv.mode === 'production' && (
+        new CopyPlugin({
+          patterns: [
+            "./public/favicon.ico",
+            "./public/logo192.png",
+            "./public/logo512.png",
+            "./public/manifest.json",
+            "./public/robots.txt",
+          ],
+        })
+      ),
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
       }),
@@ -153,7 +165,7 @@ module.exports = (env, argv) => {
       }),
       new Dotenv(),
       // new InterpolateHtmlPlugin({PUBLIC_URL: 'static' }),
-    ],
+    ].filter(Boolean),
     resolve: {
       extensions: ['.ts', '.js'],
       fallback: {
@@ -164,6 +176,7 @@ module.exports = (env, argv) => {
       alias: {
         buffer: 'buffer',
         stream: 'stream-browserify',
+        '../fonts/PlayfairDisplay-Regular.ttf': path.resolve(__dirname, './src/assets/fonts/PlayfairDisplay-Regular.ttf'),
       },
     },
   };

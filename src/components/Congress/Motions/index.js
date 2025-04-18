@@ -1,20 +1,17 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import List from 'antd/es/list';
-import Alert from 'antd/es/alert';
-import { congressActions, identityActions, senateActions } from '../../../redux/actions';
-import { congressSelectors, senateSelectors } from '../../../redux/selectors';
+import Result from 'antd/es/result';
+import { congressActions, identityActions } from '../../../redux/actions';
+import { congressSelectors } from '../../../redux/selectors';
 import Motion from '../../WalletCongresSenate/Motion';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 import ProposalContainer from '../../Proposal/ProposalContainer';
 
-function Motions({
-  isSenate,
-}) {
+function Motions() {
   const dispatch = useDispatch();
   const motions = useSelector(congressSelectors.motions);
-  const userIsMember = useSelector(isSenate ? congressSelectors.userIsMember : senateSelectors.userIsMember);
+  const userIsMember = useSelector(congressSelectors.userIsMember);
   const { motionIds } = useMotionContext();
 
   useEffect(() => {
@@ -22,12 +19,8 @@ function Motions({
   }, [dispatch]);
 
   useEffect(() => {
-    if (isSenate) {
-      dispatch(congressActions.getMembers.call());
-    } else {
-      dispatch(senateActions.senateGetMembers.call());
-    }
-  }, [dispatch, isSenate]);
+    dispatch(congressActions.getMembers.call());
+  }, [dispatch]);
 
   useEffect(() => {
     const votes = motions.map((item) => item.votes);
@@ -35,7 +28,7 @@ function Motions({
   }, [motions, motionIds, dispatch]);
 
   if (!motions || motions.length < 1) {
-    return <Alert type="info" message="There are no open motions" />;
+    return <Result status={404} title="There are no open motions" />;
   }
 
   return (
@@ -63,9 +56,5 @@ function Motions({
     />
   );
 }
-
-Motions.propTypes = {
-  isSenate: PropTypes.bool,
-};
 
 export default Motions;

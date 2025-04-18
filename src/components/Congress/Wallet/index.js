@@ -10,28 +10,37 @@ import SpendingTable from '../../SpendingTable';
 export default function Wallet() {
   const totalBalance = useSelector(congressSelectors.totalBalance);
   const liquidMerits = useSelector(congressSelectors.liquidMeritsBalance);
-  const congresAccountAddress = useSelector(congressSelectors.walletAddress);
+  const congressAccountAddress = useSelector(congressSelectors.walletAddress);
   const additionalAssets = useSelector(congressSelectors.additionalAssets);
   const userIsMember = useSelector(congressSelectors.userIsMember);
   const balances = useSelector(congressSelectors.balances);
   const spending = useSelector(congressSelectors.spendingSelector);
+  const spendingCount = useSelector(congressSelectors.spendingCountSelector);
+  const isLoading = useSelector(congressSelectors.isLoading);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(congressActions.congressSpending.call());
-  }, [dispatch]);
+  const loadMore = (page, pageSize) => {
+    const from = spending ? spending.from : 0;
+    const skip = (page - 1) * pageSize;
+    if (from < (page * pageSize)) {
+      dispatch(congressActions.congressSpending.call({ skip, take: pageSize }));
+    }
+  };
 
-  if (!congresAccountAddress || !balances) {
-    return null;
-  }
+  useEffect(() => {
+    dispatch(congressActions.congressSpendingCount.call());
+    loadMore(1, 10);
+    dispatch(congressActions.getMembers.call());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount
 
   return (
     <Flex vertical gap="20px">
-      {congresAccountAddress && balances && (
+      {congressAccountAddress && balances && (
         <WalletCongresSenateWrapper
           userIsMember={userIsMember}
           totalBalance={totalBalance}
-          congresAccountAddress={congresAccountAddress}
+          congressAccountAddress={congressAccountAddress}
           liquidMerits={liquidMerits}
           additionalAssets={additionalAssets}
           balances={balances}
@@ -43,9 +52,14 @@ export default function Wallet() {
           }}
         />
       )}
-      {spending && (
-        <SpendingTable spending={spending} />
-      )}
+      {spending && spendingCount ? (
+        <SpendingTable
+          spending={spending.data}
+          onNext={loadMore}
+          total={spendingCount}
+          isLoading={isLoading}
+        />
+      ) : null}
     </Flex>
   );
 }

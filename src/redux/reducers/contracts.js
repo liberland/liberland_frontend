@@ -3,6 +3,7 @@ import { contractsActions } from '../actions';
 
 const initialState = {
   loading: false,
+  unobtrusive: false,
   contracts: [],
   isUserJudge: false,
   names: null,
@@ -15,7 +16,6 @@ const contractReducer = handleActions(
   {
     [combineActions(
       contractsActions.getMyContracts.call,
-      contractsActions.getMyContracts.call,
       contractsActions.signContract.call,
       contractsActions.signContractJudge.call,
       contractsActions.getContracts.call,
@@ -25,6 +25,16 @@ const contractReducer = handleActions(
     )]: (state) => ({
       ...state,
       loading: true,
+    }),
+
+    [combineActions(
+      contractsActions.getMyContracts.call,
+      contractsActions.getContracts.call,
+      contractsActions.getSignaturesForContracts.call,
+      contractsActions.getSingleContract.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
     }),
 
     [combineActions(
@@ -47,6 +57,7 @@ const contractReducer = handleActions(
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
+      unobtrusive: initialState.unobtrusive,
     }),
 
     [contractsActions.getContracts.call]: (state) => ({

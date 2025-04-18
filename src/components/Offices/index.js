@@ -28,7 +28,7 @@ function Offices() {
         exact
         path={router.home.offices}
         render={() => (
-          <Redirect to={router.offices.identity} />
+          <Redirect to={router.offices.ministryOfFinance} />
         )}
       />
       <Route
@@ -50,6 +50,11 @@ function Offices() {
         exact
         path={router.offices.ministryOfFinance}
         component={loader(() => import('./MinistryOfFinance'))}
+      />
+      <Route
+        exact
+        path={router.offices.taxPayers}
+        component={loader(() => import('./TaxPayers'))}
       />
     </Switch>
   );

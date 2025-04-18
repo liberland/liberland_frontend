@@ -5,15 +5,12 @@ import Flex from 'antd/es/flex';
 import Collapse from 'antd/es/collapse';
 import Divider from 'antd/es/divider';
 import Space from 'antd/es/space';
-import Card from 'antd/es/card';
-import Tag from 'antd/es/tag';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
+import LeftOutlined from '@ant-design/icons/LeftOutlined';
 import Markdown from 'markdown-to-jsx';
-import ArrowLeftOutlined from '@ant-design/icons/ArrowLeftOutlined';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import CopyIconWithAddress from '../../CopyIconWithAddress';
 import { deriveAndHideContractTitle } from '../utils';
 import { useContractItem } from '../hooks';
 import Button from '../../Button/Button';
@@ -23,7 +20,7 @@ import { contractsActions, identityActions } from '../../../redux/actions';
 import { contractsSelectors, identitySelectors } from '../../../redux/selectors';
 import { useHideTitle } from '../../Layout/HideTitle';
 import styles from './styles.module.scss';
-import ColorAvatar from '../../ColorAvatar';
+import PersonBox from '../../PersonBox';
 
 function ContractItem({
   contractId,
@@ -78,12 +75,12 @@ function ContractItem({
       <Button
         href={router.contracts.overview}
         onClick={() => {
-          history.push(router.contracts.overview);
+          history.goBack();
         }}
       >
-        <ArrowLeftOutlined />
+        <LeftOutlined />
         <Space />
-        Back to Contracts
+        Back
       </Button>
       <CopyInput
         buttonLabel="Copy link to contract"
@@ -130,7 +127,7 @@ function ContractItem({
   );
 
   return (
-    <Flex vertical className={styles.wrapper}>
+    <Flex vertical className={styles.wrapper} gap="20px">
       {navigation}
       <Divider className={styles.divider} />
       <Flex wrap gap="15px" className="description">
@@ -144,7 +141,7 @@ function ContractItem({
         </div>
       </Flex>
       <Flex wrap gap="15px" justify="space-between">
-        <Title level={1}>
+        <Title level={1} className={styles.title}>
           {title}
         </Title>
         {actions}
@@ -161,7 +158,7 @@ function ContractItem({
               <Paragraph
                 ref={(p) => deriveAndHideContractTitle(p, title, setTitle)}
               >
-                <Markdown>{data}</Markdown>
+                <Markdown options={{ disableParsingRawHTML: true }}>{data}</Markdown>
               </Paragraph>
             ),
           },
@@ -193,29 +190,14 @@ function ContractItem({
                     || 'Unknown';
 
                   return (
-                    <Card
-                      size="small"
-                      className={styles.party}
-                    >
-                      <Card.Meta
-                        title={(
-                          <Flex wrap gap="15px" justify="space-between">
-                            {displayName}
-                            <Tag color={color} className={styles.tag}>
-                              {name}
-                            </Tag>
-                          </Flex>
-                        )}
-                        avatar={(
-                          <ColorAvatar name={displayName} />
-                        )}
-                        description={(
-                          <CopyIconWithAddress
-                            address={item}
-                          />
-                        )}
-                      />
-                    </Card>
+                    <PersonBox
+                      address={item}
+                      displayName={displayName}
+                      role={{
+                        color,
+                        name,
+                      }}
+                    />
                   );
                 }}
               />

@@ -7,12 +7,14 @@ import Flex from 'antd/es/flex';
 import dayjs from 'dayjs';
 import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
+import Card from 'antd/es/card';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../../../Button/Button';
 import router from '../../../../../router';
 import { congressSelectors } from '../../../../../redux/selectors';
 import { AddLegislationFields } from '../AddLegislationFields/AddLegislationFields';
 import { congressActions } from '../../../../../redux/actions';
+import styles from '../../../styles.module.scss';
 
 function CongressAddLegislation() {
   const dispatch = useDispatch();
@@ -50,44 +52,48 @@ function CongressAddLegislation() {
         ],
       }}
     >
-      <Title level={3}>Propose a new International Treaty</Title>
-
-      <Form.Item
-        name="tier"
-        label="Legislation tier"
-        rules={[{ required: true }]}
+      <Card
+        title={(
+          <Title className={styles.formTitle} level={3}>Propose a new International Treaty</Title>
+        )}
       >
-        <Select
-          options={[
-            { value: 'InternationalTreaty', label: 'International Treaty' },
-          ]}
-        />
-      </Form.Item>
-      <Form.Item
-        name="index"
-        label="Legislation index"
-        rules={[{ required: true }]}
-      >
-        <InputNumber controls={false} />
-      </Form.Item>
-      <Form.Item
-        name="year"
-        label="Legislation year"
-        rules={[{ required: true }]}
-        getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
-      >
-        <DatePicker picker="year" />
-      </Form.Item>
-      <AddLegislationFields form={form} />
-      <Flex wrap gap="15px">
-        <Button
-          primary
-          medium
-          type="submit"
+        <Form.Item
+          name="tier"
+          label="Legislation tier"
+          rules={[{ required: true }]}
         >
-          Submit
-        </Button>
-      </Flex>
+          <Select
+            options={[
+              { value: 'InternationalTreaty', label: 'International Treaty' },
+            ]}
+          />
+        </Form.Item>
+        <Form.Item
+          name="index"
+          label="Legislation index"
+          rules={[{ required: true }]}
+        >
+          <InputNumber controls={false} />
+        </Form.Item>
+        <Form.Item
+          name="year"
+          label="Legislation year"
+          rules={[{ required: true }]}
+          getValueProps={(value) => ({ value: value ? dayjs(value) : '' })}
+        >
+          <DatePicker picker="year" />
+        </Form.Item>
+        <AddLegislationFields form={form} />
+        <Flex wrap gap="15px">
+          <Button
+            primary
+            medium
+            type="submit"
+          >
+            Submit
+          </Button>
+        </Flex>
+      </Card>
     </Form>
   );
 }

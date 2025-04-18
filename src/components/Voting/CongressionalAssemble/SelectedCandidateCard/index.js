@@ -6,20 +6,30 @@ import PoliticanCard from '../PoliticianCard';
 import Button from '../../../Button/Button';
 
 function SelectedCandidateCard({
-  politician, unselectCandidate, moveSelectedCandidate,
+  politician,
+  unselectCandidate,
+  moveSelectedCandidate,
+  candidateIndex,
+  candidatesLength,
 }) {
   return (
     <PoliticanCard
       politician={politician}
+      preActions={[
+        candidateIndex !== 0 && candidatesLength !== 1 && (
+          <Button link onClick={() => moveSelectedCandidate(politician, 'up')}>
+            <ArrowUpOutlined aria-label="Move up" />
+          </Button>
+        ),
+        candidateIndex !== candidatesLength - 1 && candidatesLength !== 1 && (
+          <Button link onClick={() => moveSelectedCandidate(politician, 'down')}>
+            <ArrowDownOutlined aria-label="Move down" />
+          </Button>
+        ),
+      ].filter(Boolean)}
       actions={[
         <Button red onClick={() => unselectCandidate(politician)}>
           Remove
-        </Button>,
-        <Button link onClick={() => moveSelectedCandidate(politician, 'up')}>
-          <ArrowUpOutlined color="green" aria-label="Move up" />
-        </Button>,
-        <Button link onClick={() => moveSelectedCandidate(politician, 'down')}>
-          <ArrowDownOutlined color="red" aria-label="Move down" />
         </Button>,
       ]}
     />
@@ -43,6 +53,8 @@ SelectedCandidateCard.propTypes = {
   }).isRequired,
   unselectCandidate: PropTypes.func.isRequired,
   moveSelectedCandidate: PropTypes.func.isRequired,
+  candidateIndex: PropTypes.number.isRequired,
+  candidatesLength: PropTypes.number.isRequired,
 };
 
 export default SelectedCandidateCard;

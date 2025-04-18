@@ -2,12 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import Card from 'antd/es/card';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Flex from 'antd/es/flex';
 import { useHistory } from 'react-router-dom';
 import Button from '../../../Button/Button';
 import { officesActions } from '../../../../redux/actions';
 import router from '../../../../router';
+import styles from './styles.module.scss';
 
 function CompanyRegistration({ registration }) {
   const dispatch = useDispatch();
@@ -18,11 +19,14 @@ function CompanyRegistration({ registration }) {
   }
   if (registration.invalid) {
     return (
-      <Alert type="error" message="Failed to fetch registered data for this company. Maybe it contains invalid data?" />
+      <Result
+        status="error"
+        title="Failed to fetch registered data for this company. Maybe it contains invalid data?"
+      />
     );
   }
   if (!registration.registration) {
-    return <Alert type="error" message="Company not registered yet" />;
+    return <Result status="error" title="Company not registered yet" />;
   }
 
   const unregisterCompany = (entityId) => {
@@ -36,9 +40,9 @@ function CompanyRegistration({ registration }) {
     <Card
       title="Company data"
       cover={(
-        <Flex justify="center" align="center">
+        <Flex justify="center" align="center" className={styles.container}>
           <code>
-            <pre>
+            <pre className={styles.code}>
               {JSON.stringify(
                 registration.registration.data.toJSON(),
                 null,

@@ -5,7 +5,7 @@ import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import InputNumber from 'antd/es/input-number';
-import Checkbox from 'antd/es/checkbox';
+import Collapse from 'antd/es/collapse';
 import { BN } from '@polkadot/util';
 import styles from './styles.module.scss';
 import Button from '../Button/Button';
@@ -141,7 +141,6 @@ function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
 
   const amount1Desired = Form.useWatch('amount1Desired', form);
   const amount2Desired = Form.useWatch('amount2Desired', form);
-  const details = Form.useWatch('details', form);
 
   useEffect(() => {
     if (asset1Focused && amount1Desired) {
@@ -164,6 +163,9 @@ function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
       className={styles.getCitizenshipModal}
       onFinish={onSubmit}
       layout="vertical"
+      initialValues={{
+        minAmountPercent: 10,
+      }}
       form={form}
     >
       <Title level={3}>
@@ -177,13 +179,12 @@ function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
         name="amount1Desired"
         label={`Amount ${asset1ToShow} desired`}
         extra={
-          assetsBalance
-          && assetsBalance.length > 0 && (
+          assetsBalance?.[asset1] && (
             <span>
               Balance
               {' '}
-              {assetsBalance[0]
-                ? formatAssets(assetsBalance[0], decimals1, {
+              {assetsBalance?.[asset1]
+                ? formatAssets(assetsBalance[asset1], decimals1, {
                   symbol: asset1ToShow,
                   withAll: true,
                 })
@@ -198,7 +199,7 @@ function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
               if (v) {
                 const validated = validate(
                   v,
-                  assetsBalance[0],
+                  assetsBalance[asset1],
                   decimals1,
                   asset1,
                 );
@@ -222,13 +223,12 @@ function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
         name="amount2Desired"
         label={`Amount ${asset2ToShow} desired`}
         extra={
-          assetsBalance
-          && assetsBalance.length > 0 && (
+          assetsBalance?.[asset2] && (
             <span>
               Balance
               {' '}
-              {assetsBalance[1]
-                ? formatAssets(assetsBalance[1], decimals2, {
+              {assetsBalance[asset2]
+                ? formatAssets(assetsBalance[asset2], decimals2, {
                   symbol: asset2ToShow,
                   withAll: true,
                 })
@@ -243,7 +243,7 @@ function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
               if (v) {
                 const validated = validate(
                   v,
-                  assetsBalance[1],
+                  assetsBalance[asset2],
                   decimals2,
                   asset2,
                 );
@@ -263,29 +263,30 @@ function AddLiquidityForm({ onClose, assets, isReservedDataEmpty }) {
           onBlur={() => setAsset2Focused(false)}
         />
       </Form.Item>
-      {details && (
-        <Form.Item
-          label="Max Slippage (in percent %)"
-          name="minAmountPercent"
-          rules={[{ required: true }, { type: 'number' }]}
-        >
-          <InputNumber controls={false} />
-        </Form.Item>
-      )}
-      <Form.Item
-        label="Additional Settings"
-        name="details"
-        valuePropName="checked"
-      >
-        <Checkbox />
-      </Form.Item>
-      <Flex gap="15px" wrap>
-        <Button medium onClick={onClose}>
-          Cancel
-        </Button>
-        <Button primary medium type="submit">
-          Add Liquidity
-        </Button>
+      <Flex vertical gap="20px">
+        <Collapse
+          items={[{
+            label: 'Additional settings',
+            key: 'settings',
+            children: (
+              <Form.Item
+                label="Max Slippage (in percent %)"
+                name="minAmountPercent"
+                rules={[{ required: true }, { type: 'number', min: 0, max: 100 }]}
+              >
+                <InputNumber controls={false} />
+              </Form.Item>
+            ),
+          }]}
+        />
+        <Flex gap="15px" wrap>
+          <Button medium onClick={onClose}>
+            Cancel
+          </Button>
+          <Button primary medium type="submit">
+            Add Liquidity
+          </Button>
+        </Flex>
       </Flex>
     </Form>
   );

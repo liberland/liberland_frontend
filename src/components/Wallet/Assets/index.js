@@ -1,13 +1,17 @@
 import React, { useEffect, useMemo } from 'react';
 import { useMediaQuery } from 'usehooks-ts';
-import Paragraph from 'antd/es/typography/Paragraph';
 import Popover from 'antd/es/popover';
 import Flex from 'antd/es/flex';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
+import Spin from 'antd/es/spin';
 import Descriptions from 'antd/es/descriptions';
 import { useSelector, useDispatch } from 'react-redux';
-import { walletSelectors, blockchainSelectors, identitySelectors } from '../../../redux/selectors';
+import {
+  walletSelectors,
+  blockchainSelectors,
+  identitySelectors,
+} from '../../../redux/selectors';
 import { identityActions, walletActions } from '../../../redux/actions';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import Button from '../../Button/Button';
@@ -18,6 +22,11 @@ import styles from './styles.module.scss';
 import AssetsMenuModal from './AssetsModal/AssetsMenu';
 import CreateOrUpdateAssetModal from './AssetsModal/CreateOrUpdateAsset';
 import CurrencyIcon from '../../CurrencyIcon';
+import truncate from '../../../utils/truncate';
+import CompanyDisplay from './CompanyDisplay';
+import ColorAvatar from '../../ColorAvatar';
+import { isCompanyConnected } from '../../../utils/asset';
+import { getDefaultPageSizes } from '../../../utils/pageSize';
 
 function Assets() {
   const userWalletAddress = useSelector(
@@ -59,56 +68,54 @@ function Assets() {
       ].filter(Boolean)),
     ));
   }, [dispatch, assetDetails]);
-
-  const isBiggerThanLargeScreen = useMediaQuery('(min-width: 1025px)');
+  const isBiggerThanLargeScreen = useMediaQuery('(min-width: 1200px)');
   const { isStock } = useStockContext();
   const formatted = useMemo(
     () => additionalAssets?.map((asset, index) => {
       const symbol = (
         <Flex wrap gap="7px" align="center">
           {asset.metadata.symbol}
-          <CurrencyIcon size={20} symbol={asset.metadata.symbol} />
+          <CurrencyIcon
+            size={20}
+            symbol={asset.metadata.symbol}
+            logo={isCompanyConnected(asset) ? asset.company?.logoURL : undefined}
+          />
         </Flex>
       );
       const getName = (wallet) => (
         identities?.[wallet]?.identity.legal
           || identities?.[wallet]?.identity.name
       );
+      const getIdentity = (address) => (
+        <Flex wrap gap="7px" align="center">
+          <ColorAvatar name={getName(address) || 'U'} size={40} />
+          <Flex vertical gap="7px">
+            <strong>
+              {truncate(getName(address) || 'Unknown', isBiggerThanLargeScreen ? 20 : 15)}
+            </strong>
+            <div className="description">
+              <CopyIconWithAddress address={address} truncateBy={{ bigScreen: 12, smallScreen: 7 }} />
+            </div>
+          </Flex>
+        </Flex>
+      );
+
+      const spanSize = isBiggerThanLargeScreen ? 12 : 24;
       const details = (
         <>
-          <Descriptions.Item label="Admin">
-            {assetDetails?.[index]?.admin && (
-              <CopyIconWithAddress
-                address={assetDetails[index].admin}
-                name={getName(assetDetails[index].admin)}
-              />
-            )}
+          <Descriptions.Item span={spanSize} label="Admin">
+            {assetDetails?.[index]?.admin && getIdentity(assetDetails?.[index]?.admin)}
           </Descriptions.Item>
-          <Descriptions.Item label="Owner">
-            {assetDetails?.[index]?.owner && (
-              <CopyIconWithAddress
-                address={assetDetails?.[index]?.owner}
-                name={getName(assetDetails[index].owner)}
-              />
-            )}
+          <Descriptions.Item span={spanSize} label="Owner">
+            {assetDetails?.[index]?.owner && getIdentity(assetDetails?.[index]?.owner)}
           </Descriptions.Item>
-          <Descriptions.Item label="Issuer">
-            {assetDetails?.[index]?.issuer && (
-              <CopyIconWithAddress
-                address={assetDetails?.[index]?.issuer}
-                name={getName(assetDetails[index].issuer)}
-              />
-            )}
+          <Descriptions.Item span={spanSize} label="Issuer">
+            {assetDetails?.[index]?.issuer && getIdentity(assetDetails?.[index]?.issuer)}
           </Descriptions.Item>
-          <Descriptions.Item label="Freezer">
-            {assetDetails?.[index]?.freezer && (
-              <CopyIconWithAddress
-                address={assetDetails?.[index]?.freezer}
-                name={getName(assetDetails[index].freezer)}
-              />
-            )}
+          <Descriptions.Item span={spanSize} label="Freezer">
+            {assetDetails?.[index]?.freezer && getIdentity(assetDetails?.[index]?.freezer)}
           </Descriptions.Item>
-          <Descriptions.Item label="Supply">
+          <Descriptions.Item span={spanSize} label="Supply">
             <Flex wrap gap="7px" align="center">
               {formatCustom(
                 assetDetails?.[index]?.supply ?? '0',
@@ -117,8 +124,24 @@ function Assets() {
               {symbol}
             </Flex>
           </Descriptions.Item>
+          <Descriptions.Item span={spanSize} label="Related company">
+            {asset.company ? (
+              <CompanyDisplay
+                id={asset.company.id}
+                size={isBiggerThanLargeScreen ? 32 : 20}
+                logo={asset.company.logoURL}
+                name={asset.company.name}
+                asset={asset.index}
+                hasLink
+                showNotConnected={!isCompanyConnected(asset)}
+              />
+            ) : 'None'}
+          </Descriptions.Item>
         </>
       );
+      const isAdmin = assetDetails?.[index]?.admin === userWalletAddress;
+      const isOwner = assetDetails?.[index]?.owner === userWalletAddress;
+      const isIssuer = assetDetails?.[index]?.issuer === userWalletAddress;
       return (
         {
           ...asset,
@@ -128,11 +151,15 @@ function Assets() {
           details: isBiggerThanLargeScreen ? (
             <Popover
               content={(
-                <Descriptions className={styles.details} layout="vertical" size="small">
+                <Descriptions column={24} className={styles.details} layout="vertical" size="small" bordered>
                   {details}
                 </Descriptions>
               )}
-              title="Details"
+              title={(
+                <div className={styles.desktopDetails}>
+                  Details
+                </div>
+              )}
               trigger="click"
             >
               <Button>
@@ -140,22 +167,24 @@ function Assets() {
               </Button>
             </Popover>
           ) : (
-            <Descriptions layout="vertical" size="small" bordered>
-              <Descriptions.Item label="Name">
+            <Descriptions column={24} layout="vertical" size="small" bordered>
+              <Descriptions.Item span={spanSize} label="Name">
                 {asset.metadata.name}
               </Descriptions.Item>
               {details}
             </Descriptions>
           ),
-          actions: (
+          actions: isAdmin || isOwner || isIssuer ? (
             <AssetsMenuModal
-              isAdmin={assetDetails?.[index]?.admin === userWalletAddress}
-              isOwner={assetDetails?.[index]?.owner === userWalletAddress}
-              isIssuer={assetDetails?.[index]?.issuer === userWalletAddress}
+              isAdmin={isAdmin}
+              isOwner={isOwner}
+              isIssuer={isIssuer}
               assetId={asset.index}
+              isStock={isStock}
               defaultValues={{
                 admin: assetDetails?.[index]?.admin,
                 balance: assetDetails?.[index]?.minBalance,
+                companyId: asset.company?.id,
                 decimals: parseInt(asset.metadata.decimals) || 0,
                 freezer: assetDetails?.[index]?.freezer,
                 id: asset.index,
@@ -164,33 +193,35 @@ function Assets() {
                 symbol: asset.metadata.symbol,
               }}
             />
-          ),
+          ) : isBiggerThanLargeScreen && <div className="description">None</div>,
         }
       );
     }).filter(({ isStock: assetIsStock }) => assetIsStock === isStock) || [],
-    [isBiggerThanLargeScreen, identities, additionalAssets, assetDetails, userWalletAddress, isStock],
+    [additionalAssets, assetDetails, isBiggerThanLargeScreen, userWalletAddress, identities, isStock],
   );
 
-  if (!assetDetails || !additionalAssets || !userWalletAddress) {
-    return <div>Loading...</div>;
+  if (!assetDetails || !additionalAssets) {
+    return <Spin />;
   }
 
-  return (
+  const title = (
     <>
-      <Paragraph>
-        <p>
-          {isStock ? 'Stocks' : 'Assets'}
-          {' '}
-          on the Liberland blockchain.
-          {' '}
-          <a href="https://docs.liberland.org/blockchain/for-citizens/assets-and-stocks">
-            Learn more
-          </a>
-        </p>
-      </Paragraph>
+      {isStock ? 'Stocks' : 'Assets'}
+      {' '}
+      on the Liberland blockchain.
+      {' '}
+      <a href="https://docs.liberland.org/blockchain/for-citizens/assets-and-stocks">
+        Learn more
+      </a>
+    </>
+  );
+
+  return (
+    <Flex vertical gap="20px">
       {isBiggerThanLargeScreen ? (
         <Table
           data={formatted}
+          title={title}
           columns={[
             {
               Header: 'Name',
@@ -214,7 +245,8 @@ function Assets() {
         <List
           dataSource={formatted}
           className="centeredList"
-          pagination={formatted.length ? { pageSize: 10 } : undefined}
+          header={title}
+          pagination={formatted.length ? getDefaultPageSizes(10) : undefined}
           renderItem={({
             symbol,
             details,
@@ -236,8 +268,10 @@ function Assets() {
           )}
         />
       )}
-      <CreateOrUpdateAssetModal isCreate />
-    </>
+      <Flex wrap gap="15px">
+        <CreateOrUpdateAssetModal isCreate isStock={isStock} />
+      </Flex>
+    </Flex>
   );
 }
 

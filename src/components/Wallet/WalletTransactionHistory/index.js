@@ -5,13 +5,13 @@ import Flex from 'antd/es/flex';
 import Tag from 'antd/es/tag';
 import Avatar from 'antd/es/avatar';
 import HistoryCopyIconWithAddress from '../HistoryCopyIconWithAddress';
-import styles from './styles.module.scss';
 import WalletHistoryAmount from '../WalletHistoryAmount';
+import { getDefaultPageSizes } from '../../../utils/pageSize';
 
 function WalletTransactionHistory({ failure, transactionHistory, filterTransactionsBy }) {
   return (
     <Table
-      pagination={{ showSizeChanger: true }}
+      pagination={getDefaultPageSizes(20)}
       columns={[
         {
           title: 'Type',
@@ -45,15 +45,15 @@ function WalletTransactionHistory({ failure, transactionHistory, filterTransacti
           title: 'Amount',
           dataIndex: 'asset',
           key: 'asset',
-          render: (value, { currency }) => (
-            <WalletHistoryAmount currency={currency} value={value} />
+          render: (value, { currency, logo }) => (
+            <WalletHistoryAmount currency={currency} value={value} logo={logo} />
           ),
         },
         {
           title: 'Status',
           dataIndex: 'status',
           render: () => (
-            <Tag className={styles.success} color="white">
+            <Tag color="success">
               Successful
             </Tag>
           ),

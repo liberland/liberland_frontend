@@ -1,21 +1,25 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import Spin from 'antd/es/spin';
 import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
+import Link from 'antd/es/typography/Link';
 import { blockchainSelectors, validatorSelectors } from '../../../redux/selectors';
 import { validatorActions } from '../../../redux/actions';
 import StakeManagement from '../StakeManagement';
 import Validator from '../Validator';
 import Nominator from '../Nominator';
 import styles from './styles.module.scss';
-import Button from '../../Button/Button';
 import { CreateValidatorModal, StakeLLDModal } from '../../Modals';
+import router from '../../../router';
+import Button from '../../Button/Button';
 
 export default function StakingOverview() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const info = useSelector(validatorSelectors.info);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const infoLink = 'https://docs.liberland.org/blockchain/for-validators-nominators-and-stakers/staking';
@@ -48,17 +52,31 @@ export default function StakingOverview() {
             Validators receive rewards for staking (about 15% APY), take a commission,
             and distribute the remaining rewards to the nominators. Learn more
             {' '}
-            <Button
-              href={infoLink}
-              link
-            >
+            <Link href={infoLink}>
               here
-            </Button>
-            .
+            </Link>
+            . If you hold LLD on other chains,
+            you can also stake your LLD in a liquidity pool to earn trading and farming rewards.
           </Paragraph>
           <Flex wrap gap="15px" justify="center">
-            <StakeLLDModal label="Start staking as nominator" />
+            <StakeLLDModal label="Start staking as nominator" primary />
             <CreateValidatorModal label="Create validator server" />
+          </Flex>
+          <Flex wrap gap="15px" justify="center">
+            <Button
+              href={router.staking.ethlpstaking}
+              primary
+              onClick={() => history.push(router.staking.ethlpstaking)}
+            >
+              Stake LLD on ETH
+            </Button>
+            <Button
+              href={router.staking.sollpstaking}
+              primary
+              onClick={() => history.push(router.staking.sollpstaking)}
+            >
+              Stake LLD on SOL
+            </Button>
           </Flex>
         </Flex>
       </Flex>

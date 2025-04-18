@@ -27,9 +27,10 @@
       color: $clearBlack;
     }
   }
-  &.grey{
-    background: $grey;
-    color: $clearBlack;
+  &.grey,
+  &:disabled {
+    background: var(--button-gray-bg)!important;
+    color: var(--button-gray-color)!important;
   }
   &.whiteRed{
     border: 2px solid $red;

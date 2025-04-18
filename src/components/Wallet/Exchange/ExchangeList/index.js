@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Collapse from 'antd/es/collapse';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
 import Flex from 'antd/es/flex';
+import Spin from 'antd/es/spin';
+import { useMediaQuery } from 'usehooks-ts';
 import { blockchainSelectors, dexSelectors } from '../../../../redux/selectors';
 import { dexActions } from '../../../../redux/actions';
 import { useStockContext } from '../../StockContext';
@@ -21,6 +23,7 @@ function ExchangeList() {
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const [highLiquiditySort, setHighLiquiditySort] = useState(Object.keys(sortByMap)[0]);
   const [lowLiquiditySort, setLowLiquiditySort] = useState(Object.keys(sortByMap)[0]);
+  const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
   const { isStock } = useStockContext();
 
   useEffect(() => {
@@ -48,14 +51,14 @@ function ExchangeList() {
 
   if (!dexs) {
     return (
-      <div>Loading...</div>
+      <Spin />
     );
   }
 
   return (
     <Flex vertical gap="20px">
       {!highLiquidity.length && !lowLiquidity.length && (
-        <Alert type="error" className={styles.noneFound} message="No pools were found" />
+        <Result status="error" title="No pools were found" />
       )}
       {highLiquidity.length > 0 && (
         <Collapse
@@ -66,9 +69,18 @@ function ExchangeList() {
             {
               key: 'highliq',
               label: 'Exchange pairs',
-              extra: <ExchangeSort onSort={setHighLiquiditySort} sortBy={highLiquiditySort} />,
+              extra: isBiggerThanDesktop && (
+                <ExchangeSort onSort={setHighLiquiditySort} sortBy={highLiquiditySort} />
+              ),
               children: (
                 <Row gutter={[16, 16]}>
+                  {!isBiggerThanDesktop && (
+                    <Col span={24}>
+                      <Flex justify="start">
+                        <ExchangeSort onSort={setHighLiquiditySort} sortBy={highLiquiditySort} />
+                      </Flex>
+                    </Col>
+                  )}
                   {sortPool(highLiquidity, highLiquiditySort).map((pool) => (
                     <Col span={24} key={pool.asset1 + pool.asset2}>
                       <ExchangeItem
@@ -90,9 +102,19 @@ function ExchangeList() {
             {
               key: 'lowliq',
               label: 'Low liquidity exchange pairs',
-              extra: <ExchangeSort onSort={setLowLiquiditySort} sortBy={lowLiquiditySort} />,
+              forceRender: true,
+              extra: isBiggerThanDesktop && (
+                <ExchangeSort onSort={setLowLiquiditySort} sortBy={lowLiquiditySort} />
+              ),
               children: (
                 <Row gutter={[16, 16]}>
+                  {!isBiggerThanDesktop && (
+                    <Col span={24}>
+                      <Flex justify="start">
+                        <ExchangeSort onSort={setLowLiquiditySort} sortBy={lowLiquiditySort} />
+                      </Flex>
+                    </Col>
+                  )}
                   {sortPool(lowLiquidity, lowLiquiditySort).map((pool) => (
                     <Col span={24} key={pool.asset1 + pool.asset2}>
                       <ExchangeItem
@@ -108,7 +130,7 @@ function ExchangeList() {
         />
       )}
       <Flex wrap gap="15px">
-        <AddAssetForm poolsData={poolsData} />
+        <AddAssetForm poolsData={poolsData} isStock={isStock} />
       </Flex>
     </Flex>
   );

@@ -32,7 +32,7 @@ function StartValidatorForm({
       form={form}
       layout="vertical"
       initialValues={{
-        commission: '20',
+        commission: 20,
         allow_nominations: true,
       }}
       onFinish={onSubmit}
@@ -42,7 +42,7 @@ function StartValidatorForm({
       <Form.Item
         label="Reward commission percentage"
         extra="The commission is deducted from all rewards before the remainder is split with nominators."
-        rules={[{ required: true }, { min: 0 }, { max: 100 }]}
+        rules={[{ required: true }, { type: 'number', min: 0, max: 100 }]}
         name="commission"
       >
         <InputNumber controls={false} />
@@ -51,7 +51,7 @@ function StartValidatorForm({
         name="allow_nominations"
         label="Allow new nominations"
         valuePropName="checked"
-        layout="vertical"
+        layout="horizontal"
       >
         <Checkbox />
       </Form.Item>

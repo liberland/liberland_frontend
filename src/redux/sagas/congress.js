@@ -48,7 +48,7 @@ import { palletIdToAddress } from '../../utils/pallet';
 import { formatMerits } from '../../utils/walletHelpers';
 import { IndexHelper } from '../../utils/council/councilEnum';
 import { OfficeType } from '../../utils/officeTypeEnum';
-import { fetchCongressSpending } from '../../api/middleware';
+import { fetchCongressSpending, fetchCongressSpendingCount } from '../../api/middleware';
 
 const officeType = OfficeType.CONGRESS;
 
@@ -89,9 +89,14 @@ function* applyForCongressWorker() {
   yield put(congressActions.applyForCongress.success());
 }
 
-function* spendingWorker() {
-  const spending = yield call(fetchCongressSpending);
-  yield put(congressActions.congressSpending.success(spending));
+function* spendingWorker({ payload: { skip, take } }) {
+  const spending = yield call(fetchCongressSpending, skip, take);
+  yield put(congressActions.congressSpending.success({ data: spending, from: skip }));
+}
+
+function* spendingCountWorker() {
+  const count = yield call(fetchCongressSpendingCount);
+  yield put(congressActions.congressSpendingCount.success({ count }));
 }
 
 function* getCandidatesWorker() {
@@ -689,6 +694,13 @@ export function* congressSpendingWatcher() {
   yield* blockchainWatcher(
     congressActions.congressSpending,
     spendingWorker,
+  );
+}
+
+export function* congressSpendingCountWatcher() {
+  yield* blockchainWatcher(
+    congressActions.congressSpendingCount,
+    spendingCountWorker,
   );
 }
 

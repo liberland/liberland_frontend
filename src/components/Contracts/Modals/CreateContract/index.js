@@ -4,10 +4,11 @@ import TextArea from 'antd/es/input/TextArea';
 import Title from 'antd/es/typography/Title';
 import Divider from 'antd/es/divider';
 import Space from 'antd/es/space';
-import MinusCircleOutlined from '@ant-design/icons/MinusCircleOutlined';
-import PlusCircleOutlined from '@ant-design/icons/PlusCircleOutlined';
+import Avatar from 'antd/es/avatar';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
+import Plus from '../../../../assets/icons/plus.svg';
+import Cross from '../../../../assets/icons/cross.svg';
 import { contractsActions } from '../../../../redux/actions';
 import Button from '../../../Button/Button';
 import InputSearch from '../../../InputComponents/InputSearchAddressName';
@@ -52,15 +53,15 @@ export default function CreateContract({ isMyContracts, onClose }) {
                   <InputSearch />
                 </Form.Item>
                 <Button onClick={() => remove(field.name)} red>
-                  <MinusCircleOutlined />
+                  <Avatar size={12} shape="square" src={Cross} />
                   <Space />
                   Remove member
                 </Button>
                 <Divider />
               </div>
             ))}
-            <Button onClick={add} green medium>
-              <PlusCircleOutlined />
+            <Button onClick={add} green>
+              <Avatar size={12} src={Plus} />
               <Space />
               Add party member
             </Button>

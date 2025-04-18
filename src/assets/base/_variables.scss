@@ -33,3 +33,53 @@ $text4: #B0B7C3;
 $text5: #BFBFBF;
 $text6: #BCBCBC;
 $errorText: $primary4;
+
+html {
+    --main-color: #243F5F;
+    --border-color: #ECEBF0;
+    --main-border: #ECEBF0;
+    --body-background: white;
+    --table-bg: white;
+    --footer-bg: white;
+    --table-border: #F2F2F2;
+    --dangerous-color: black;
+    --dangerous-bg: white;
+    --description-color: #ACBDC5;
+    --card-border: #ECEBF0;
+    --card-background: white;
+    --nav-bg: white;
+    --content-bg: #FAFAFA;
+    --mobile-menu-open: white;
+    --button-gray-bg: rgba(0,0,0,0.04);
+    --button-gray-color: rgba(0,0,0,0.25);
+    --alert-warning-color: #243F5F;
+    --serious-bg: rgba(255, 0, 0, .02);
+    --serious-border: rgba(255, 0, 0, .25);
+    --markd-bg: white;
+    --markd-border: #424242;
+
+    &[dark-mode='yes'] {
+        --border-color: #37383F;
+        --main-color: white;
+        --main-border: #37383F;
+        --body-background: #1E202A;
+        --table-bg: #1E202A;
+        --footer-bg: #10131b;
+        --table-border: #37383F;
+        --dangerous-color: white;
+        --dangerous-bg: #702122;
+        --description-color: #7095A7;
+        --card-border: #37383F;
+        --card-background: #1E202A;
+        --nav-bg: #1E202A;
+        --content-bg: #10131b;
+        --mobile-menu-open: #141414;
+        --markd-bg: #141414;
+        --markd-border: #424242;
+        --button-gray-bg: rgba(255,255,255,0.20);
+        --button-gray-color: rgba(255,255,255,0.75);
+        --alert-warning-color: #122C4B;
+        --serious-bg: rgba(255, 0, 0, .25);
+        --serious-border: rgba(255, 0, 0, .75);
+    }
+}

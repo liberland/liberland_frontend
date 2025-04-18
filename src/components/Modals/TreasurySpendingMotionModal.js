@@ -92,7 +92,7 @@ function ButtonModal(props) {
 
 ButtonModal.propTypes = {
   label: PropTypes.string.isRequired,
-  icon: PropTypes.node.isRequired,
+  icon: PropTypes.node,
 };
 
 const TreasurySpendingMotionModal = modalWrapper(TreasurySpendingMotionForm, ButtonModal);

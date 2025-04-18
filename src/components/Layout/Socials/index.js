@@ -1,6 +1,5 @@
 import React from 'react';
 import Flex from 'antd/es/flex';
-import List from 'antd/es/list';
 import { useMediaQuery } from 'usehooks-ts';
 import Paragraph from 'antd/es/typography/Paragraph';
 import LiberlandSeal from '../../../assets/icons/seal.svg';
@@ -18,19 +17,20 @@ function Socials() {
           Free Republic of Liberland is a sovereign state & constitutional
           republic with elements of direct democracy.
         </Paragraph>
-        <List
-          grid={{ column: socials.length }}
-          dataSource={socials}
-          renderItem={({
+        <Flex wrap gap="20px">
+          {socials.map(({
             icon,
             label,
             href,
-          }) => (
-            <a href={href} aria-label={label}>
-              <img src={icon} alt="icon" className={styles.social} />
-            </a>
-          )}
-        />
+          }) => {
+            const Icon = icon;
+            return (
+              <a href={href} aria-label={label} key={href} className={styles.social}>
+                <Icon alt="icon" />
+              </a>
+            );
+          })}
+        </Flex>
       </div>
     </Flex>
   );

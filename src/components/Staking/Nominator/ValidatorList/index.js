@@ -28,6 +28,7 @@ function ValidatorList({
           />
         </Flex>
       )}
+      pageSize={20}
       data={getValidatorDisplay({
         selectedValidatorsAsTargets,
         selectingValidatorsDisabled,

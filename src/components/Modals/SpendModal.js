@@ -14,7 +14,6 @@ import useCongressExecutionBlock from '../../hooks/useCongressExecutionBlock';
 import RemarkForm from '../WalletCongresSenate/RemarkForm';
 import { encodeRemark } from '../../api/nodeRpcCall';
 import { OfficeType } from '../../utils/officeTypeEnum';
-import styles from './styles.module.scss';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
 
@@ -62,7 +61,7 @@ function SpendForm({
   return (
     <Form
       initialValues={{
-        votingDays: '7',
+        votingDays: 7,
       }}
       form={form}
       layout="vertical"
@@ -106,7 +105,7 @@ function SpendForm({
             name="votingDays"
             label="Congress voting time in days"
             extra="How long will it take for congress to close this motion?"
-            rules={[{ required: true }, { min: 1 }]}
+            rules={[{ required: true }, { type: 'number', min: 1 }]}
           >
             <InputNumber controls={false} />
           </Form.Item>
@@ -162,13 +161,10 @@ SpendForm.propTypes = {
 };
 
 function ButtonModal(props) {
-  const { icon, label } = props;
+  const { label } = props;
 
   return (
     <OpenModalButton primary {...props}>
-      <div className={styles.icon}>
-        {icon}
-      </div>
       {label}
     </OpenModalButton>
   );
@@ -176,7 +172,6 @@ function ButtonModal(props) {
 
 ButtonModal.propTypes = {
   label: PropTypes.string.isRequired,
-  icon: PropTypes.node.isRequired,
 };
 
 const ProposeBudgetModal = modalWrapper(SpendForm, ButtonModal);

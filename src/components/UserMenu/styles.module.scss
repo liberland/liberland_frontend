@@ -1,6 +1,8 @@
+@import '../../assets/main.scss';
+
 .dropdown,
 .dropdownLink {
-  color: #243f5f;
+  color: var(--main-color);
 }
 .avatar {
     margin: 0 5px;

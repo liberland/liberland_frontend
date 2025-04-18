@@ -2,12 +2,27 @@
 @import '../../assets/base/fonts';
 @import '../../assets/main';
 
+.contentWrapper {
+  background-color: var(--content-bg);
+}
 .header {
   display: flex;
   align-items: center;
   height: 50px;
-  border-top: solid 3px #F3CB28;
-  border-bottom: 1px solid #ECEBF0;
+  border-bottom: 1px solid var(--main-border);
+  position: sticky;
+  z-index: 998;
+  cursor: pointer;
+  top: 5px;
+  margin-bottom: 7px;
+  left: 0;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
+    cursor: initial;
+  }
+}
+.pageTitleWrapper {
+  margin-bottom: 15px;
 }
 .menu {
   flex: 1;
@@ -29,6 +44,7 @@
   border-radius: 0!important;
   height: 100vh;
   overflow: auto;
+  background-color: var(--mobile-menu-open)!important;
 }
 .sider {
   height: 100%;
@@ -37,19 +53,27 @@
   border-bottom: none;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')) {
-    border-right: 1px solid #ECEBF0;
+    border-bottom: 1px solid var(--main-border);
     max-width: initial;
     width: unset;
     max-width: unset;
   }
 }
-.switchContainer {
+.switchContainer,
+.changeWallet {
   &:hover,
   &:focus,
   &:active {
     background-color: transparent!important;
   }
+  background-color: transparent!important;
+}
+
+.switchContainer {
   height: 50px!important;
+}
+.changeWallet {
+  height: 105px!important;
 }
 .switch {
   margin-top: 5px;
@@ -57,16 +81,20 @@
   width: 100%;
 }
 .content {
+  max-width: 2048px;
   min-height: 280px;
   margin: 0;
-  padding: 10px 25px;
+  padding: 5px 12px;
+
+  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
+    padding: 10px 25px;
+  }
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')) {
     padding: 10px 50px;
   }
 }
 .version {
-  font-family: Open Sans;
   font-size: 10px;
   font-weight: 600;
   line-height: 12px;
@@ -80,7 +108,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  border-top: 1px solid #ECEBF0;
+  border-top: 1px solid var(--main-border);
   margin-top: 50px;
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')) {
@@ -109,12 +137,14 @@
 }
 
 .icon {
-  width: 25px;
-  height: 25px;
+  color: var(--main-color);
+  transform: scale(calc(20 / 17));
+}
+.navigationTitle {
+  padding-left: 10px;
 }
 
 .logo {
-  width: 136px;
   margin: 10px 20px 10px 10px;
 }
 
@@ -133,43 +163,34 @@
 }
 
 .social {
-  width: 15px;
-  height: 15px;
+  color: var(--main-color)!important;
+  &a:visited {
+    color: var(--main-color)!important;
+  }
 }
 
 .center {
   align-content: center;
 }
 
-.pageTitle {
-  font-family: Playfair Display;
-  font-size: 30px !important;
-  font-weight: 600 !important;
-  line-height: 33px !important;
-  letter-spacing: -0.5px;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
-  color: #243F5F !important;
-}
-
 .slogan {
-  font-family: Open Sans;
-  font-size: 10px;
+  font-size: 12px;
   font-style: italic;
   font-weight: 600;
-  line-height: 13.62px;
-  text-align: left;
-  text-underline-position: from-font;
-  text-decoration-skip-ink: none;
   margin-left: auto;
 
   @media screen and (min-width: map-get($breakpoints, 'desktop')) {
-    line-height: 16.34px;
     text-align: right;
     margin-right: 20px;
-    color: #ACBDC5;
+    color: var(--description-color);
     width: 100%;
+    font-size: 14px;
+  }
+}
+
+.copyright {
+  font-size: 12px;
+  @media screen and (min-width: map-get($breakpoints, 'desktop')) {
     font-size: 14px;
   }
 }
@@ -188,6 +209,10 @@
 
 .donate {
   margin-left: auto;
+  font-size: 10px;
+  @media screen and (min-width: map-get($breakpoints, 'desktop')) {
+    font-size: 12px;
+  }
 }
 
 .discouraged {

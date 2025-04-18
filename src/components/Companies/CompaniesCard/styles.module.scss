@@ -3,11 +3,21 @@
 @import '../../../assets/main.scss';
 @import '../../../index.scss';
 
-.companies {
-    max-width: 1600px;
+.noHeading {
+    h1,h2,h3,h4,h5 {
+        font-size: 18px!important;
+        color: var(--description-color);
+        font-weight: 500!important;
+        margin-bottom: 0!important;
+        margin-top:0!important;
+    }
+}
+.mobileOwner {
+    font-size: 14px;
 }
 .listItem {
-    border: solid 1px #ECEBF0;
+    border: solid 1px var(--border-color);
+    border-block-end: solid 1px var(--border-color)!important;
     border-radius: 6px;
     margin-bottom: 10px;
     justify-content: start!important;
@@ -35,7 +45,7 @@
 }
 .action {
     @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
-        min-width: 240px;
+        min-width: 300px;
     }
 }
 .owner {

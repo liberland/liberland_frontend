@@ -26,7 +26,7 @@ export const useContractItem = ({
     { itemsOrItem: judgesSignaturesList || [], name: 'Judges Signatures' },
   ], [creator, parties, partiesSignaturesList, judgesSignaturesList]);
 
-  const [title, setTitle] = useState(`Contract id: ${contractId}`);
+  const [title, setTitle] = useState('');
   const routerLinkBase = router.contracts.item.split(':')[0];
   const routerLink = `${routerLinkBase}${contractId}`;
 

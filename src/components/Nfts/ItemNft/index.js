@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import cx from 'classnames';
 import Card from 'antd/es/card';
 import Dropdown from 'antd/es/dropdown';
-import { useHistory, useLocation } from 'react-router-dom/cjs/react-router-dom.min';
+import { useHistory, useLocation } from 'react-router-dom';
 import { nftsActions } from '../../../redux/actions';
 import FillAddressWrapper from '../../Modals/FillAddress';
 import Button from '../../Button/Button';
@@ -190,8 +190,15 @@ function ItemNft({
 }
 
 ItemNft.defaultProps = {
-  itemMetadata: {},
-  collectionMetadata: {},
+  itemMetadata: PropTypes.shape({
+    image: PropTypes.string,
+    name: PropTypes.string,
+    description: PropTypes.string,
+    itemPrice: PropTypes.string,
+  }),
+  collectionMetadata: PropTypes.shape({
+    data: PropTypes.string,
+  }),
   isOnSaleItem: false,
   isOwnItem: false,
 };

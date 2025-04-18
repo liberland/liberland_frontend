@@ -4,13 +4,14 @@ import Collapse from 'antd/es/collapse';
 import List from 'antd/es/list';
 import Card from 'antd/es/card';
 import Markdown from 'markdown-to-jsx';
+import Paragraph from 'antd/es/typography/Paragraph';
 import PropTypes from 'prop-types';
 import router from '../../../router';
 import styles from '../styles.module.scss';
 
 function AddLegislation({ proposal, isDetailsHidden }) {
   const { args: [tier, { year, index }, sections] } = proposal;
-  const [show, setShow] = useState(isDetailsHidden);
+  const [show, setShow] = useState(!isDetailsHidden);
 
   useEffect(() => {
     setShow(!isDetailsHidden);
@@ -18,7 +19,7 @@ function AddLegislation({ proposal, isDetailsHidden }) {
 
   return (
     <div>
-      <p>
+      <Paragraph>
         Add new legislation
         {' '}
         <Link to={`${router.home.legislation}/${tier.toString()}`} className={styles.blue}>
@@ -30,10 +31,8 @@ function AddLegislation({ proposal, isDetailsHidden }) {
         {year.toNumber()}
         /
         {index.toNumber()}
-        {show ? '.' : '...'}
-      </p>
+      </Paragraph>
       <Collapse
-        collapsible="icon"
         onChange={() => setShow(!show)}
         activeKey={show ? ['details'] : []}
         items={[
@@ -43,11 +42,11 @@ function AddLegislation({ proposal, isDetailsHidden }) {
             children: (
               <List
                 dataSource={sections}
-                renderItem={(section, idx) => (
+                renderItem={(section) => (
                   <List.Item>
-                    <Card title={`Section #${idx}`}>
+                    <Card className={styles.section}>
                       <div className={styles.legislationContent}>
-                        <Markdown>
+                        <Markdown options={{ disableParsingRawHTML: true }}>
                           {new TextDecoder('utf-8').decode(section)}
                         </Markdown>
                       </div>

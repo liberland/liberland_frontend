@@ -4,6 +4,8 @@ import Collapse from 'antd/es/collapse';
 import Descriptions from 'antd/es/descriptions';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
+import Modal from 'antd/es/modal';
+import Result from 'antd/es/result';
 import { useMediaQuery } from 'usehooks-ts';
 import Button from '../Button/Button';
 import {
@@ -17,7 +19,7 @@ import { formatDollars, formatMerits } from '../../utils/walletHelpers';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../assets/images/liberlandEmblem.svg';
 import UpdateProfile from './UpdateProfile';
-import { identityActions, onBoardingActions } from '../../redux/actions';
+import { blockchainActions, identityActions, onBoardingActions } from '../../redux/actions';
 import {
   parseDOB,
   parseAdditionalFlag,
@@ -25,21 +27,25 @@ import {
   decodeAndFilter,
 } from '../../utils/identityParser';
 import CopyIconWithAddress from '../CopyIconWithAddress';
+import truncate from '../../utils/truncate';
+import { setCentralizedBackendAddress } from '../../utils/setCentralizedBackendAddress';
 
 function Profile() {
   const userName = useSelector(userSelectors.selectUserGivenName);
   const lastName = useSelector(userSelectors.selectUserFamilyName);
-  const isBiggerThanDesktop = useMediaQuery('(min-width: 992px)');
-  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
-  const spanSize = isBiggerThanDesktop ? 12 : 24;
+  const isBigScreen = useMediaQuery('(min-width: 1500px)');
+  const spanSize = isBigScreen ? 12 : 24;
   const walletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
+  const userId = useSelector(userSelectors.selectUserId);
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const identity = useSelector(identitySelectors.selectorIdentity);
   const walletInfo = useSelector(walletSelectors.selectorWalletInfo);
   const balances = useSelector(walletSelectors.selectorBalances);
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
+  const registeredAddress = useSelector(userSelectors.selectWalletAddress);
+  const hasClaimed = useSelector(onboardingSelectors.selectorIsClaimed);
   const liquidDollars = useSelector(
     walletSelectors.selectorLiquidDollarsBalance,
   );
@@ -118,6 +124,23 @@ function Profile() {
     dispatch(onBoardingActions.claimComplimentaryLld.call());
   };
 
+  const switchRegistered = userId && walletAddress && registeredAddress !== walletAddress && (
+    <Flex wrap gap="15px">
+      <Button
+        primary
+        onClick={() => {
+          dispatch(blockchainActions.setUserWallet.success(walletAddress));
+          setCentralizedBackendAddress(walletAddress, userId, { dispatch });
+        }}
+      >
+        Register
+        {' '}
+        {truncate(walletAddress, isBigScreen ? 18 : 12)}
+        {registeredAddress ? ' instead' : ''}
+      </Button>
+    </Flex>
+  );
+
   return (
     <Collapse
       defaultActiveKey={['profile', 'account', 'onchain']}
@@ -139,31 +162,42 @@ function Profile() {
             </Flex>
           ),
           children: (
-            <Descriptions
-              column={24}
-              layout={isBiggerThanSmallScreen ? 'horizontal' : 'vertical'}
-              title="Information"
-            >
-              <Descriptions.Item span={spanSize} label="LLM (liquid)">
-                {formatMerits(liquidMerits)}
-              </Descriptions.Item>
-              <Descriptions.Item span={spanSize} label="LLM (Politipooled)">
-                {formatMerits(
-                  balances.liberstake.amount,
-                )}
-              </Descriptions.Item>
-              <Descriptions.Item span={spanSize} label="LLD">
-                {formatDollars(balances.liquidAmount.amount)}
-              </Descriptions.Item>
-              <Descriptions.Item span={spanSize} label="Wallet">
-                <CopyIconWithAddress address={walletAddress} />
-              </Descriptions.Item>
-              <Descriptions.Item span={spanSize} label="Unpooling in effect">
-                {lockDays.toFixed(2)}
-                {' '}
-                days remaining.
-              </Descriptions.Item>
-            </Descriptions>
+            <Flex vertical gap="20px">
+              <Descriptions
+                column={24}
+                layout={isBigScreen ? 'horizontal' : 'vertical'}
+                title="Information"
+              >
+                <Descriptions.Item span={spanSize} label="LLM (liquid)">
+                  {formatMerits(liquidMerits)}
+                </Descriptions.Item>
+                <Descriptions.Item span={spanSize} label="LLM (Politipooled)">
+                  {formatMerits(
+                    balances.liberstake.amount,
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item span={spanSize} label="LLD">
+                  {formatDollars(balances.liquidAmount.amount)}
+                </Descriptions.Item>
+                <Descriptions.Item span={spanSize} label="Wallet">
+                  <CopyIconWithAddress address={walletAddress} />
+                </Descriptions.Item>
+                <Descriptions.Item span={spanSize} label="Registered wallet">
+                  <Flex vertical gap="10px">
+                    {registeredAddress ? (
+                      <CopyIconWithAddress address={registeredAddress} />
+                    ) : 'Unknown'}
+                    {!isBigScreen && switchRegistered}
+                  </Flex>
+                </Descriptions.Item>
+                <Descriptions.Item span={spanSize} label="Unpooling in effect">
+                  {lockDays.toFixed(2)}
+                  {' '}
+                  days remaining.
+                </Descriptions.Item>
+              </Descriptions>
+              {isBigScreen && switchRegistered}
+            </Flex>
           ),
         },
         {
@@ -210,6 +244,18 @@ function Profile() {
                     ? 'Claim complimentary LLD'
                     : ineligibleForComplimentaryLLDReason}
                 </Button>
+                <Modal
+                  closable
+                  maskClosable
+                  footer={null}
+                  onCancel={() => dispatch(onBoardingActions.claimComplimentaryLld.clear())}
+                  open={hasClaimed}
+                >
+                  <Result
+                    status="success"
+                    title="Complimentary LLDs claimed"
+                  />
+                </Modal>
               </Flex>
             </Flex>
           ),

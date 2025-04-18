@@ -14,22 +14,24 @@ const initialState = {
   companyRegistration: null,
   isGetCompanyRegistration: null,
   loading: false,
+  unobtrusive: false,
   balances: {
     LLD: {},
     LLM: {},
   },
   backendAddressLLMBalance: null,
   pendingAdditionalMerits: [],
+  taxPayers: {},
   senateWalletInfo: {
     balances: {
       liberstake: {
         amount: BN_ZERO,
       },
       polkastake: {
-        amount: 0,
+        amount: '0',
       },
       liquidMerits: {
-        amount: 0,
+        amount: '0',
       },
       totalAmount: {
         amount: BN_ZERO,
@@ -38,7 +40,7 @@ const initialState = {
         amount: BN_ZERO,
       },
       meritsTotalAmount: {
-        amount: 0,
+        amount: '0',
       },
       electionLock: 0,
     },
@@ -57,9 +59,17 @@ const officesReducer = handleActions({
     officesActions.unregisterCompany.call,
     officesActions.setRegisteredCompanyData.call,
     officesActions.getPendingAdditionalMerits.call,
+    officesActions.getTaxPayers.call,
   )]: (state) => ({
     ...state,
     loading: true,
+  }),
+  [combineActions(
+    officesActions.getBalances.call,
+    officesActions.getPalletIds.call,
+  )]: (state) => ({
+    ...state,
+    unobtrusive: true,
   }),
   [combineActions(
     officesActions.officeGetIdentity.success,
@@ -80,9 +90,12 @@ const officesReducer = handleActions({
     officesActions.getPalletIds.success,
     officesActions.getPendingAdditionalMerits.failure,
     officesActions.getPendingAdditionalMerits.success,
+    officesActions.getTaxPayers.failure,
+    officesActions.getTaxPayers.success,
   )]: (state) => ({
     ...state,
     loading: false,
+    unobtrusive: false,
   }),
   [officesActions.officeGetIdentity.call]: (state, action) => ({
     ...state,
@@ -175,6 +188,10 @@ const officesReducer = handleActions({
   [officesActions.getPendingAdditionalMerits.success]: (state, action) => ({
     ...state,
     pendingAdditionalMerits: action.payload,
+  }),
+  [officesActions.getTaxPayers.success]: (state, action) => ({
+    ...state,
+    taxPayers: action.payload,
   }),
 }, initialState);
 

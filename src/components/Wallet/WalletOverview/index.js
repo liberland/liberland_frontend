@@ -35,8 +35,8 @@ function WalletOverview() {
   const dispatch = useDispatch();
 
   const transactionHistoryTranslated = useMemo(
-    () => transactionHistory?.map(transactionHistoryProcessorFactory(userWalletAddress)) || [],
-    [transactionHistory, userWalletAddress],
+    () => transactionHistory?.map(transactionHistoryProcessorFactory(userWalletAddress, !isDesktop)) || [],
+    [transactionHistory, isDesktop, userWalletAddress],
   );
 
   useEffect(() => {
@@ -46,7 +46,7 @@ function WalletOverview() {
   }, [dispatch, userWalletAddress]);
 
   const selector = (
-    <Flex align="center" gap="15px">
+    <Flex align="center" gap="15px" wrap>
       <span className={styles.description}>
         Show
       </span>

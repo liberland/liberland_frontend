@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Menu from 'antd/es/menu';
+import Flex from 'antd/es/flex';
 import MenuIcon from '@ant-design/icons/MenuOutlined';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +14,9 @@ import { blockchainSelectors, userSelectors } from '../../../redux/selectors';
 import { blockchainActions, validatorActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import ChangeWallet from '../../Home/ChangeWallet';
+import truncate from '../../../utils/truncate';
+import ModeSwitch from '../../ModeSwitch';
+import GetLLDWrapper from '../../GetLLDWrapper';
 
 function UrlMenu({
   onClose,
@@ -21,6 +25,7 @@ function UrlMenu({
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 768px)');
   const dispatch = useDispatch();
   const user = useSelector(userSelectors.selectUser);
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const isWalletAdressSame = useSelector(
     blockchainSelectors.isUserWalletAddressSameAsUserAdress,
   );
@@ -30,6 +35,9 @@ function UrlMenu({
     dispatch(blockchainActions.setUserWallet.success(walletAddress));
     dispatch(validatorActions.getInfo.call());
     localStorage.removeItem('BlockchainAdress');
+    if (!isBiggerThanSmallScreen) {
+      onClose?.();
+    }
   };
 
   const { pathname } = useLocation();
@@ -58,18 +66,21 @@ function UrlMenu({
   }, [matchedSubLink, pathname]);
   const createMenu = (navigation) => {
     const subs = Object.entries(navigation.subLinks).map(([name, link]) => ({
-      label: name,
+      label: <div className={styles.navigationTitle}>{truncate(name, 22)}</div>,
       key: link,
       onClick: () => navigate(link),
     }));
+    const Icon = navigation.icon;
+    const icon = <Icon className={styles.icon} />;
+    const label = (
+      <span className={classNames(styles.navigationTitle, { [styles.discouraged]: navigation.isDiscouraged })}>
+        {navigation.title}
+      </span>
+    );
     if (isBiggerThanSmallScreen) {
       return {
-        icon: <img src={navigation.icon} alt="icon" className={styles.icon} />,
-        label: (
-          <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>
-            {navigation.title}
-          </span>
-        ),
+        icon,
+        label,
         key: navigation.route,
         onClick: subs.length ? undefined : () => navigate(navigation.route),
         onTitleClick: !subs.length ? undefined : () => navigate(navigation.route),
@@ -77,17 +88,19 @@ function UrlMenu({
       };
     }
     return {
-      icon: <img src={navigation.icon} alt="icon" className={styles.icon} />,
-      label: (
-        <span className={classNames({ [styles.discouraged]: navigation.isDiscouraged })}>
-          {navigation.title}
-        </span>
-      ),
+      icon,
+      label,
       key: navigation.route,
       children: subs.length ? subs : undefined,
       onClick: subs.length ? undefined : () => navigate(navigation.route),
     };
   };
+
+  const getLLD = userWalletAddress ? [] : [{
+    label: <GetLLDWrapper />,
+    key: 'getlld',
+    className: styles.switchContainer,
+  }];
 
   const switcher = hasSwitchWallet ? [{
     label: (
@@ -102,16 +115,16 @@ function UrlMenu({
   const changeWallet = isBiggerThanSmallScreen ? [] : [
     {
       label: (
-        <ChangeWallet />
+        <ChangeWallet onSelect={() => onClose?.()} />
       ),
       key: 'wallets',
-      className: styles.switchContainer,
-      onClick: (e) => e.preventDefault(),
-      onTitleClick: (e) => e.preventDefault(),
+      className: styles.changeWallet,
+      onClick: ({ domEvent }) => domEvent.preventDefault(),
+      onTitleClick: ({ domEvent }) => domEvent.preventDefault(),
     },
   ];
 
-  return (
+  const menu = (
     <Menu
       mode="inline"
       className={styles.sider}
@@ -120,6 +133,7 @@ function UrlMenu({
       key={getMenuKey()}
       overflowedIndicator={isBiggerThanSmallScreen ? undefined : <MenuIcon />}
       items={[
+        ...getLLD,
         ...switcher,
         ...changeWallet,
         ...isBiggerThanSmallScreen ? [
@@ -136,6 +150,19 @@ function UrlMenu({
         ] : navigationList.map(createMenu),
       ]}
     />
+  );
+
+  if (isBiggerThanSmallScreen) {
+    return menu;
+  }
+
+  return (
+    <Flex vertical gap="20px">
+      <div onClick={(e) => e.stopPropagation()} className={styles.modeSwitch}>
+        <ModeSwitch />
+      </div>
+      {menu}
+    </Flex>
   );
 }
 

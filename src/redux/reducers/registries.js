@@ -4,13 +4,14 @@ import { registriesActions } from '../actions';
 const initialState = {
   officialUserRegistryEntries: [],
   isGetRegistries: false,
+  unobtrusive: false,
   officialRegistryEntries: [],
-  isGetAllRegistries: false,
 };
 
 const registriesReducer = handleActions({
   [combineActions(
     registriesActions.getOfficialUserRegistryEntries.call,
+    registriesActions.getOfficialRegistryEntries.call,
     registriesActions.requestCompanyRegistrationAction.call,
     registriesActions.requestEditCompanyRegistrationAction.call,
     registriesActions.requestCompanyEditAction.call,
@@ -29,6 +30,13 @@ const registriesReducer = handleActions({
     isGetRegistries: true,
   }),
   [combineActions(
+    registriesActions.getOfficialUserRegistryEntries.call,
+    registriesActions.getOfficialRegistryEntries.call,
+  )]: (state) => ({
+    ...state,
+    unobtrusive: true,
+  }),
+  [combineActions(
     registriesActions.getOfficialUserRegistryEntries.success,
     registriesActions.getOfficialUserRegistryEntries.failure,
     registriesActions.requestCompanyRegistrationAction.failure,
@@ -44,9 +52,12 @@ const registriesReducer = handleActions({
     registriesActions.requestAssetDeleteAction.failure,
     registriesActions.registerAssetAction.failure,
     registriesActions.cancelCompanyRequest.failure,
+    registriesActions.getOfficialRegistryEntries.success,
+    registriesActions.getOfficialRegistryEntries.failure,
   )]: (state) => ({
     ...state,
     isGetRegistries: false,
+    unobtrusive: false,
   }),
   [registriesActions.getOfficialUserRegistryEntries.call]: (state) => ({
     ...state,

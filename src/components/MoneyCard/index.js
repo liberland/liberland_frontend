@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Card from 'antd/es/card';
 import Avatar from 'antd/es/avatar';
 import Flex from 'antd/es/flex';
+import classNames from 'classnames';
 import { useMediaQuery } from 'usehooks-ts';
 import Title from 'antd/es/typography/Title';
 import styles from './styles.module.scss';
@@ -14,13 +15,16 @@ function MoneyCard({
   alt,
   amount,
   description,
+  className,
+  noBorder,
 }) {
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
 
   return (
     <Card
       size="small"
-      className={styles.card}
+      variant={noBorder ? 'borderless' : undefined}
+      className={classNames(styles.card, className)}
       actions={isBiggerThanDesktop && actions ? [
         <Flex wrap gap="15px" align="start">
           {actions}
@@ -63,8 +67,10 @@ MoneyCard.propTypes = {
   title: PropTypes.node,
   icon: PropTypes.node,
   alt: PropTypes.string,
-  amount: PropTypes.string,
+  amount: PropTypes.node,
   description: PropTypes.node,
+  className: PropTypes.string,
+  noBorder: PropTypes.bool,
 };
 
 export default MoneyCard;

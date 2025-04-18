@@ -4,10 +4,12 @@ import Flex from 'antd/es/flex';
 import Input from 'antd/es/input';
 import List from 'antd/es/list';
 import Title from 'antd/es/typography/Title';
+import Card from 'antd/es/card';
 import { useDispatch } from 'react-redux';
 import { officesActions } from '../../../../redux/actions';
 import { fetchCompanyRequests } from '../../../../api/nodeRpcCall';
 import Button from '../../../Button/Button';
+import styles from './styles.module.scss';
 
 function CompanyForm() {
   const dispatch = useDispatch();
@@ -26,9 +28,12 @@ function CompanyForm() {
   };
 
   return (
-    <div>
+    <Card
+      title={(
+        <Title className={styles.title} level={3}>Verify company registration request</Title>
+      )}
+    >
       <Form form={form} layout="vertical" onSubmit={onSubmit}>
-        <Title level={3}>Verify company registration request</Title>
         <Form.Item
           name="entity_id"
           label="Company ID"
@@ -67,7 +72,7 @@ function CompanyForm() {
           </List.Item>
         )}
       />
-    </div>
+    </Card>
   );
 }
 

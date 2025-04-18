@@ -1,6 +1,7 @@
 import { handleActions, combineActions } from 'redux-actions';
 import { BN_ZERO } from '@polkadot/util';
 import { congressActions } from '../actions';
+import { spendingTableMerge } from '../../utils/spendingTable';
 
 const initialState = {
   codeName: 'councilAccount',
@@ -31,6 +32,7 @@ const initialState = {
   allBalance: [],
   candidates: [],
   loading: false,
+  unobtrusive: false,
   members: [],
   motions: [],
   runnersUp: [],
@@ -40,6 +42,7 @@ const initialState = {
     period: BN_ZERO,
   },
   congressSpending: null,
+  spendingCount: 0,
 };
 
 const congressReducer = handleActions(
@@ -66,9 +69,23 @@ const congressReducer = handleActions(
       congressActions.getAllBalanceForCongress.call,
       congressActions.congressBudgetPropose.call,
       congressActions.congressSpending.call,
+      congressActions.congressSpendingCount.call,
     )]: (state) => ({
       ...state,
       loading: true,
+    }),
+    [combineActions(
+      congressActions.getCandidates.call,
+      congressActions.getMembers.call,
+      congressActions.getMotions.call,
+      congressActions.getRunnersUp.call,
+      congressActions.getTreasuryInfo.call,
+      congressActions.getAllBalanceForCongress.call,
+      congressActions.congressSpending.call,
+      congressActions.congressSpendingCount.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
     }),
     [combineActions(
       congressActions.applyForCongress.failure,
@@ -102,9 +119,12 @@ const congressReducer = handleActions(
       congressActions.congressBudgetPropose.success,
       congressActions.congressSpending.success,
       congressActions.congressSpending.failure,
+      congressActions.congressSpendingCount.success,
+      congressActions.congressSpendingCount.failure,
     )]: (state) => ({
       ...state,
       loading: false,
+      unobtrusive: false,
     }),
     [congressActions.getAllBalanceForCongress.success]: (state, action) => ({
       ...state,
@@ -140,7 +160,11 @@ const congressReducer = handleActions(
     }),
     [congressActions.congressSpending.success]: (state, action) => ({
       ...state,
-      congressSpending: action.payload,
+      congressSpending: spendingTableMerge(action.payload, state.congressSpending),
+    }),
+    [congressActions.congressSpendingCount.success]: (state, action) => ({
+      ...state,
+      spendingCount: action.payload.count,
     }),
   },
   initialState,

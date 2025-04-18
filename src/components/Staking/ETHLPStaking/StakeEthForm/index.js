@@ -65,6 +65,7 @@ function StakeEthForm({
       tokenAmountMin: getAmountWithTolerance(realTokens),
       provider: connected.provider,
     }));
+    onClose();
   };
 
   const stake = Form.useWatch('stake', form) || '';
@@ -73,17 +74,15 @@ function StakeEthForm({
   const [tokensFocused, setTokensFocused] = useState(false);
   const tolerance = Form.useWatch('tolerance', form) || '90';
   const exchangeRate = useSelector(ethSelectors.selectorWethLpExchangeRate);
-  const exchangeRateLoading = useSelector(ethSelectors.selectorWethLpExchangeRateLoading);
-  const exchangeRateError = useSelector(ethSelectors.selectorWethLpExchangeRateError);
   const lldBalances = useSelector(ethSelectors.selectorERC20Balance)?.[process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS];
 
   useEffect(() => {
     dispatch(ethActions.getWethLpExchangeRate.call());
     dispatch(ethActions.getBalance.call({ provider: connected.provider, address: account }));
-    dispatch(ethActions.getErc20Balance.call(
-      process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+    dispatch(ethActions.getErc20Balance.call({
+      erc20Address: process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
       account,
-    ));
+    }));
   }, [account, dispatch, connected]);
 
   const lldBalance = useMemo(
@@ -94,7 +93,11 @@ function StakeEthForm({
   const formattedBalance = formatCustom(balance || '0');
 
   const liquidityPoolReward = useMemo(() => {
-    if (stake && tokens && exchangeRate && !form.getFieldError('stake') && !form.getFieldError('token')) {
+    if (stake
+      && tokens
+      && exchangeRate
+      && !form.getFieldError('stake')?.length
+      && !form.getFieldError('token')?.length) {
       try {
         const lpTokens = exchangeRate.rewardRate({
           eth: window.BigInt(parseAssets(stake)),
@@ -108,12 +111,6 @@ function StakeEthForm({
     }
     return 'No reward calculated';
   }, [exchangeRate, stake, tokens, form]);
-
-  useEffect(() => {
-    if (exchangeRateError) {
-      form.setFields([{ name: 'stake', errors: ['LP stake did not load correctly'] }]);
-    }
-  }, [form, exchangeRateError]);
 
   useEffect(() => {
     if (stake && exchangeRate && stakeFocused && !tokensFocused) {
@@ -132,10 +129,6 @@ function StakeEthForm({
       );
     }
   }, [tokens, exchangeRate, tokensFocused, stakeFocused, form]);
-
-  if (exchangeRateLoading) {
-    return <div className={styles.form}>Loading...</div>;
-  }
 
   return (
     <Form
@@ -209,13 +202,13 @@ StakeEthForm.propTypes = {
 
 function ButtonModal(props) {
   return (
-    <OpenModalButton primary medium text="Stake ETH & LLD" {...props} />
+    <OpenModalButton primary text="Stake ETH & LLD" {...props} />
   );
 }
 
 ButtonModal.propTypes = {
   label: PropTypes.string.isRequired,
-  icon: PropTypes.node.isRequired,
+  icon: PropTypes.node,
 };
 
 const StakeEthFormModal = modalWrapper(StakeEthForm, ButtonModal);

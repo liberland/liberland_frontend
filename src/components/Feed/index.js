@@ -12,18 +12,43 @@ import styles from './styles.module.scss';
 function Feed() {
   const news = [
     {
-      title: 'Claiming your tokens and residency',
-      date: 'Feb 12, 2024',
+      title: 'Welcome to Liberland blockchain',
+      date: 'Feb 12, 2025',
       author: 'Liberland',
-      text: `In order to claim your citizenship, e-residency, and any LLM and LLDs you might have gotten for the presale,
-      You need to connect your liberland account and your blockchain address, claim onboarding LLDs so that you can start using the chain
-      and pay gas feed right away, and <a href="https://blockchain.liberland.org/home/profile">update your identity here</a>. 
-      Note that while no fields are mandatory except the age check, setting the display name is a good idea as it is your on-chain username.
-      After setting your identity, the Ministry of Interior will verify it, and send you your tokens. This usually takes about a day.
-      Once this is done, congratulations and welcome to Liberland blockchain!
-      For detailed steps, follow the <a href="https://docs.liberland.org/blockchain/for-citizens/onboarding">Onboarding guide</a>
+      text: `Liberland is the young new country located on a 7km^2 island on the Danube river.
+      The country is founded on the principles of Libertarianism and blockchain governance. 
+      Welcome to the official dApp of Liberland. Here, you can:
+      <ul>
+        <li><a href="https://blockchain.liberland.org/home/wallet/overview">Handle finances and get deFi services</a></li>
+        <li><a href="https://blockchain.liberland.org/home/companies/allCompanies">Browse Liberland companies</a> and <a href="https://blockchain.liberland.org/home/wallet/stock-exchange">trade their stocks</a></li>
+        <li><a href="https://blockchain.liberland.org/home/companies/create">Open a company in Liberland</a></li>
+        <li><a href="https://blockchain.liberland.org/home/voting/congressional-assemble">Vote in Congress elections and referenda</a></li>
+        <li><a href="https://blockchain.liberland.org/home/contracts/overview">Sign legally binding on-chain contracts</a></li>
+        <li><a href="https://blockchain.liberland.org/home/legislation/Decision">Browse Liberland legislation</a>, kept on blockchain with legal force</li>
+        <li><a href="https://blockchain.liberland.org/home/offices/ministry-of-finance">Transparently view government decisions and spending</a></li>
+        <li><a href="https://blockchain.liberland.org/home/staking/overview">Stake your LLD for profit</a></li>
+      </ul>
+      If you havent already, join the official <a href="https://t.me/liberlanders">Telegram channel</a>
       `,
-      hashtags: ['#Onboarding'],
+      hashtags: ['#General'],
+      type: 'liberland',
+    },
+    {
+      title: 'How to get LLD?',
+      date: 'Jan 27, 2025',
+      author: 'Liberland',
+      text: `There are multiple ways to acquire LLD. 
+      If you already have LLD on other chains like Ethereum or Solana, check out the <a href="https://docs.liberland.org/blockchain/ecosystem/cross-chain-bridge">Bridging guide</a>.
+      The easiest way to get LLDs currently are to use one of the centralized exchanges where selling USDT for LLD is possible.
+      <ul>
+        <li><a href="https://www.mexc.com/exchange/LLD_USDT">MEXC</a> on Liberland blockchain</li>
+        <li><a href="https://www.coinstore.com/spot/LLDUSDT">Coinstore</a> on Liberland blockchain</li>
+        <li><a href="https://matcha.xyz/tokens/ethereum/0x054c9d4c6f4ea4e14391addd1812106c97d05690?sellChain=1&sellAddress=0xdac17f958d2ee523a2206206994597c13d831ec7">Matcha/Uniswap</a> on Ethereum</li>
+        <li><a href="https://emirex.com">Emirex</a> on Liberland blockchain</li>
+        <li><a href="https://raydium.io/swap/?inputMint=sol&outputMint=GwKKPsJdY5oWMJ8RReWLcvb82KzW6FKy2bKoYW7kHr16">Raydium</a> on Solana</li>
+      </ul>
+      LLD purchased on other chains like Ethereum, Solana or TRON can be <a href="https://docs.liberland.org/blockchain/ecosystem/cross-chain-bridge">bridged to Liberland Blockchain</a>.`,
+      hashtags: ['#Blockchain', 'LLD'],
       type: 'liberland',
     },
     {
@@ -38,19 +63,6 @@ function Feed() {
       If you are interested,
       <a href="https://docs.liberland.org/blockchain/for-validators-nominators-and-stakers/staking">Learn more here</a>`,
       hashtags: ['#Staking', '#LLD'],
-      type: 'liberland',
-    },
-    {
-      title: 'What can you do on Liberland blockchain?',
-      date: 'Jan 27, 2024',
-      author: 'Liberland',
-      text: `Trading LLD and LLM are available, or soon will be available at coinstore, emirex, uniswap and polkaswap.
-     LLD and LLM can be bridged to ethereum via the Liberland ETH bridge or polkaswap via the SORA bridge.
-     LLD can be staked for inflation and block rewards.
-     Any citizen can engage in the political process by voting for congressmen and referendums in the Voting tab.
-     Politics for now is just advisory, but the expected date of binding politics is the birthday of Liberland on 13.4.
-     Upcoming features include company registrations, Liberland stock market, the judiciary system and contracts enforcement.`,
-      hashtags: ['#Blockchain'],
       type: 'liberland',
     },
     {

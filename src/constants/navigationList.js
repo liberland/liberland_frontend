@@ -1,11 +1,20 @@
-import FeedIcon from '../assets/icons/feed.svg';
-import WalletIcon from '../assets/icons/wallet.svg';
-import DocumentsIcon from '../assets/icons/documents.svg';
-import LinkedIn from '../assets/icons/linkedin.svg';
-import Meta from '../assets/icons/meta.svg';
-import X from '../assets/icons/x.svg';
-import YouTube from '../assets/icons/youtube.svg';
-import Telegram from '../assets/icons/telegram.svg';
+import { ReactComponent as FeedIcon } from '../assets/icons/feed.svg';
+import { ReactComponent as WalletIcon } from '../assets/icons/wallet.svg';
+import { ReactComponent as DocumentsIcon } from '../assets/icons/documents.svg';
+import { ReactComponent as PoliticsIcon } from '../assets/icons/politics.svg';
+import { ReactComponent as LegislationIcon } from '../assets/icons/legislation.svg';
+import { ReactComponent as CompaniesIcon } from '../assets/icons/companies.svg';
+import { ReactComponent as RegistriesIcon } from '../assets/icons/registries.svg';
+import { ReactComponent as OfficesIcon } from '../assets/icons/offices.svg';
+import { ReactComponent as StakingIcon } from '../assets/icons/staking.svg';
+import { ReactComponent as ProfileIcon } from '../assets/icons/profile-menu.svg';
+import { ReactComponent as CongressIcon } from '../assets/icons/congress.svg';
+import { ReactComponent as SenateIcon } from '../assets/icons/senate.svg';
+import { ReactComponent as LinkedIn } from '../assets/icons/linkedin.svg';
+import { ReactComponent as Meta } from '../assets/icons/meta.svg';
+import { ReactComponent as X } from '../assets/icons/x.svg';
+import { ReactComponent as YouTube } from '../assets/icons/youtube.svg';
+import { ReactComponent as Telegram } from '../assets/icons/telegram.svg';
 import router from '../router';
 
 export const navigationList = [
@@ -24,7 +33,7 @@ export const navigationList = [
     subLinks: {
       Finances: router.wallet.overView,
       Exchange: router.wallet.exchange,
-      'Stock exchange': router.wallet.stockExchange,
+      // 'Stock exchange': router.wallet.stockExchange,
       Assets: router.wallet.assets,
       Stocks: router.wallet.stocks,
       Bridge: router.wallet.bridge,
@@ -45,7 +54,7 @@ export const navigationList = [
   {
     route: router.home.voting,
     title: 'Politics',
-    icon: DocumentsIcon,
+    icon: PoliticsIcon,
     isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED === 'true',
     subLinks: {
       'Congressional Assemble': router.voting.congressionalAssemble,
@@ -56,7 +65,7 @@ export const navigationList = [
   {
     route: router.home.contracts,
     title: 'Contracts',
-    icon: WalletIcon,
+    icon: DocumentsIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONTRACTS_DISCOURAGED === 'true',
     subLinks: {
       Overview: router.contracts.overview,
@@ -66,29 +75,29 @@ export const navigationList = [
   {
     route: router.home.legislation,
     title: 'Legislation',
-    icon: DocumentsIcon,
+    icon: LegislationIcon,
     isDiscouraged: process.env.REACT_APP_IS_LEGISLATION_DISCOURAGED === 'true',
     subLinks: {
-      Constitution: router.legislation.constitution,
+      Decisions: router.legislation.decisions,
       'International treaty': router.legislation.internationalTreaty,
       Law: router.legislation.law,
       'Tier 3': router.legislation.tier3,
       'Tier 4': router.legislation.tier4,
       'Tier 5': router.legislation.tier5,
-      Decisions: router.legislation.decisions,
+      Constitution: router.legislation.constitution,
     },
   },
   {
     route: router.home.companies,
     title: 'Companies',
-    icon: WalletIcon,
+    icon: CompaniesIcon,
     isDiscouraged: process.env.REACT_APP_IS_COMPANIES_DISCOURAGED === 'true',
     subLinks: {
       'All companies': router.companies.allCompanies,
-      'My companies': router.companies.home,
+      'My companies': router.companies.myCompanies,
     },
     extra: {
-      [router.companies.home]: {
+      [router.companies.myCompanies]: {
         link: router.companies.create,
         title: 'Register a new company',
       },
@@ -101,14 +110,14 @@ export const navigationList = [
   {
     route: router.home.profile,
     title: 'Profile',
-    icon: DocumentsIcon,
+    icon: ProfileIcon,
     isDiscouraged: process.env.REACT_APP_IS_PROFILE_DISCOURAGED === 'true',
     subLinks: {},
   },
   {
     route: router.home.staking,
     title: 'Staking',
-    icon: WalletIcon,
+    icon: StakingIcon,
     isDiscouraged: process.env.REACT_APP_IS_STAKING_DISCOURAGED === 'true',
     subLinks: {
       Overview: router.staking.overview,
@@ -119,22 +128,23 @@ export const navigationList = [
   {
     route: router.home.offices,
     title: 'Offices',
-    icon: DocumentsIcon,
+    icon: OfficesIcon,
     isDiscouraged: process.env.REACT_APP_IS_OFFICES_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
+      'Ministry Of Finance': router.offices.ministryOfFinance,
       Identity: router.offices.identity,
       'Company registry': router.offices.companyRegistry.home,
       'Land registry': router.offices.landRegistry,
       Finances: router.offices.finances,
       'Scheduled Congress Spending': router.offices.scheduledCongressSpending,
-      'Ministry Of Finance': router.offices.ministryOfFinance,
+      'Tax Payers': router.offices.taxPayers,
     },
   },
   {
     route: router.home.registries,
     title: 'Registries',
-    icon: WalletIcon,
+    icon: RegistriesIcon,
     isGovt: true,
     isDiscouraged: process.env.REACT_APP_IS_REGISTRIES_DISCOURAGED === 'true',
     subLinks: {
@@ -148,7 +158,7 @@ export const navigationList = [
   {
     route: router.home.congress,
     title: 'Congress',
-    icon: DocumentsIcon,
+    icon: CongressIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {
@@ -162,7 +172,7 @@ export const navigationList = [
   {
     route: router.home.senate,
     title: 'Senate',
-    icon: WalletIcon,
+    icon: SenateIcon,
     isDiscouraged: process.env.REACT_APP_IS_CONGRESS_DISCOURAGED === 'true',
     isGovt: true,
     subLinks: {

@@ -219,7 +219,7 @@ const stakeLPWithEth = async ({
   );
   const [pair, balance1] = await tryGetPairAndBalance(account);
   const liquidity = window.BigInt(balance1) - window.BigInt(balance);
-  await stakeTokens(account, pair, liquidity);
+  await stakeTokens({ account, erc20Address: pair, tokens: liquidity });
 
   return liquidity;
 };

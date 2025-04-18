@@ -22,6 +22,11 @@ const selectorIsLoading = createSelector(
   (reducer) => reducer.loading,
 );
 
+const selectorIsUnobtrusive = createSelector(
+  officesReducer,
+  (reducer) => reducer.unobtrusive,
+);
+
 const selectorBalances = createSelector(
   officesReducer,
   (reducer) => reducer.balances,
@@ -42,6 +47,11 @@ const selectorPendingAdditionalMerits = createSelector(
   (reducer) => reducer.pendingAdditionalMerits,
 );
 
+const selectorTaxesPayers = createSelector(
+  officesReducer,
+  (reducer) => reducer.taxPayers,
+);
+
 export {
   selectorIdentity,
   selectorCompanyRequest,
@@ -51,4 +61,6 @@ export {
   selectorBackendAddressLLMBalance,
   selectorPallets,
   selectorPendingAdditionalMerits,
+  selectorIsUnobtrusive,
+  selectorTaxesPayers,
 };

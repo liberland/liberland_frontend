@@ -1,9 +1,11 @@
 import { handleActions, combineActions } from 'redux-actions';
 import { BN_ZERO } from '@polkadot/util';
 import { ministryFinanceActions } from '../actions';
+import { spendingTableMerge } from '../../utils/spendingTable';
 
 const initialState = {
   loading: false,
+  unobtrusive: false,
   codeName: 'ministryOfFinanceOffice',
   additionalAssets: [],
   walletInfo: {
@@ -32,6 +34,7 @@ const initialState = {
   },
   scheduledCalls: [],
   ministryFinanceSpending: null,
+  spendingCount: 0,
 };
 
 const ministryFinanceReducer = handleActions(
@@ -44,9 +47,19 @@ const ministryFinanceReducer = handleActions(
       ministryFinanceActions.ministryFinanceSendAssets.call,
       ministryFinanceActions.ministryFinanceSendLlmToPolitipool.call,
       ministryFinanceActions.ministryFinanceSpending.call,
+      ministryFinanceActions.ministryFinanceSpendingCount.call,
     )]: (state) => ({
       ...state,
       loading: true,
+    }),
+    [combineActions(
+      ministryFinanceActions.ministryFinanceGetAdditionalAssets.call,
+      ministryFinanceActions.ministryFinanceGetWallet.call,
+      ministryFinanceActions.ministryFinanceSpending.call,
+      ministryFinanceActions.ministryFinanceSpendingCount.call,
+    )]: (state) => ({
+      ...state,
+      unobtrusive: true,
     }),
 
     [combineActions(
@@ -64,9 +77,12 @@ const ministryFinanceReducer = handleActions(
       ministryFinanceActions.ministryFinanceSendLlmToPolitipool.failure,
       ministryFinanceActions.ministryFinanceSpending.success,
       ministryFinanceActions.ministryFinanceSpending.failure,
+      ministryFinanceActions.ministryFinanceSpendingCount.success,
+      ministryFinanceActions.ministryFinanceSpendingCount.failure,
     )]: (state) => ({
       ...state,
       loading: false,
+      unobtrusive: false,
     }),
 
     [ministryFinanceActions.ministryFinanceGetAdditionalAssets.success]: (state, action) => ({
@@ -81,7 +97,11 @@ const ministryFinanceReducer = handleActions(
 
     [ministryFinanceActions.ministryFinanceSpending.success]: (state, action) => ({
       ...state,
-      ministryFinanceSpending: action.payload,
+      ministryFinanceSpending: spendingTableMerge(action.payload, state.ministryFinanceSpending),
+    }),
+    [ministryFinanceActions.ministryFinanceSpendingCount.success]: (state, action) => ({
+      ...state,
+      spendingCount: action.payload.count,
     }),
   },
   initialState,

@@ -4,9 +4,10 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import Avatar from 'antd/es/avatar';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
+import { isAddress } from '@polkadot/util-crypto';
 import { useHistory } from 'react-router-dom';
 import cx from 'classnames';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Markdown from 'markdown-to-jsx';
 import { useMediaQuery } from 'usehooks-ts';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
@@ -18,11 +19,14 @@ import { simplifyCompanyObject } from '../utils';
 import Button from '../../Button/Button';
 import router from '../../../router';
 import ColorAvatar from '../../ColorAvatar';
+import { getDefaultPageSizes } from '../../../utils/pageSize';
 
 function CompaniesCard({
   registries,
   type,
   hideOwner,
+  getRelevantAssets,
+  getRelevantPools,
 }) {
   const history = useHistory();
   const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
@@ -30,15 +34,44 @@ function CompaniesCard({
     () => registries?.map((registry) => simplifyCompanyObject(registry || {})),
     [registries],
   );
-  const dataSource = simplify?.filter((registered) => registered && !registered.invalid);
+  const dataSource = useMemo(() => {
+    const filtered = simplify?.filter((registered) => registered && !registered.invalid);
+    return type === 'all'
+      ? filtered.sort((aCompany, bCompany) => {
+        const [aAssets] = getRelevantAssets(aCompany);
+        const [bAssets] = getRelevantAssets(bCompany);
+        const aTradePool = aAssets?.length && getRelevantPools(aAssets[0]?.index)?.[0];
+        const bTradePool = bAssets?.length && getRelevantPools(bAssets[0]?.index)?.[0];
+        const aHasPool = aTradePool ? 1 : -1;
+        const bHasPool = bTradePool ? 1 : -1;
+        const aHasAssets = aAssets?.[0] ? 1 : -1;
+        const bHasAssets = bAssets?.[0] ? 1 : -1;
+        const aHasLogo = aCompany.logoURL ? 1 : -1;
+        const bHasLogo = bCompany.logoURL ? 1 : -1;
+        if (aHasPool !== bHasPool) {
+          return bHasPool - aHasPool;
+        }
+        if (aHasAssets !== bHasAssets) {
+          return bHasAssets - aHasAssets;
+        }
+        if (aHasLogo !== bHasLogo) {
+          return bHasLogo - aHasLogo;
+        }
+        const aName = aCompany.name || aCompany.id.toString();
+        const bName = bCompany.name || bCompany.id.toString();
+        return bName.localeCompare(aName);
+      })
+      : filtered;
+  }, [getRelevantAssets, getRelevantPools, simplify, type]);
+  const hasFooter = type === 'mine' && dataSource?.length > 0;
   return (
     <List
       dataSource={dataSource}
-      className={cx(styles.companies, 'listWithFooter')}
+      className={cx({ listWithFooter: hasFooter })}
       size="small"
-      pagination={dataSource?.length ? { pageSize: 10 } : false}
+      pagination={dataSource?.length ? getDefaultPageSizes(10) : false}
       itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
-      footer={type === 'mine' && dataSource?.length > 0 ? (
+      footer={hasFooter ? (
         <Button
           primary
           onClick={() => history.push(router.companies.create)}
@@ -47,7 +80,7 @@ function CompaniesCard({
         </Button>
       ) : undefined}
       locale={{
-        emptyText: <Alert type="info" message="No companies found" />,
+        emptyText: <Result status={404} title="No companies found" />,
       }}
       renderItem={(registeredCompany) => {
         const owner = !hideOwner && registeredCompany.principals?.[0]?.name;
@@ -57,6 +90,8 @@ function CompaniesCard({
           <CompanyActions
             registeredCompany={registeredCompany}
             type={type}
+            getRelevantAssets={getRelevantAssets}
+            getRelevantPools={getRelevantPools}
           />
         );
         const purpose = (
@@ -64,14 +99,14 @@ function CompaniesCard({
             ellipsis={{
               rows: 2,
             }}
-            className={cx('description', styles.preview)}
+            className={cx('description', styles.preview, styles.noHeading)}
           >
-            <Markdown>
+            <Markdown options={{ disableParsingRawHTML: true }}>
               {registeredCompany.purpose}
             </Markdown>
           </Paragraph>
         );
-        const companyLogoSize = isLargerThanHdScreen ? 54 : 40;
+        const companyLogoSize = isLargerThanHdScreen ? 40 : 32;
         const companyLogo = isValidUrl(logo) ? (
           <Avatar size={companyLogoSize} src={logo} className={styles.avatar} />
         ) : (
@@ -96,7 +131,7 @@ function CompaniesCard({
                 title={(
                   <Flex align="center" gap="15px">
                     {companyLogo}
-                    {registeredCompany.name}
+                    {truncate(registeredCompany.name, 20)}
                   </Flex>
                 )}
               />
@@ -106,14 +141,18 @@ function CompaniesCard({
               <Flex wrap gap="15px">
                 {owner && (
                   <Flex wrap gap="15px" className={styles.owner}>
-                    <ColorAvatar size={54} name={owner} />
-                    <Flex vertical gap="5px" className={styles.ownerName}>
+                    <ColorAvatar size={companyLogoSize} name={owner} />
+                    <Flex vertical gap="5px" justify="center" className={styles.ownerName}>
                       {owner && (
                         <>
                           <strong>
                             {truncate(owner, 20)}
                           </strong>
-                          <CopyIconWithAddress address={address} isTruncate />
+                          {isAddress(address) && (
+                            <div className="description">
+                              <CopyIconWithAddress address={address} isTruncate />
+                            </div>
+                          )}
                         </>
                       )}
                     </Flex>
@@ -144,13 +183,20 @@ function CompaniesCard({
               </div>
             </Flex>
             {owner && (
-              <Flex vertical gap="5px">
-                <div className="description">
+              <Flex vertical gap="7px">
+                <div className={cx('description', styles.mobileOwner)}>
                   Company owner
                 </div>
                 <Flex wrap gap="5px" align="center">
-                  <ColorAvatar size={19} name={owner} />
-                  <CopyIconWithAddress address={address} name={owner} isTruncate />
+                  <ColorAvatar size={24} fontSize={12} name={owner} />
+                  <strong>
+                    {truncate(owner, 20)}
+                  </strong>
+                  {isAddress(address) && (
+                    <div className="description">
+                      <CopyIconWithAddress address={address} isTruncate />
+                    </div>
+                  )}
                 </Flex>
               </Flex>
             )}
@@ -166,6 +212,8 @@ CompaniesCard.propTypes = {
   registries: PropTypes.array.isRequired,
   type: PropTypes.oneOf(['requested', 'mine', 'all']),
   hideOwner: PropTypes.bool,
+  getRelevantAssets: PropTypes.func,
+  getRelevantPools: PropTypes.func,
 };
 
 export default CompaniesCard;

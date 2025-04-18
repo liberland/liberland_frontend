@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import Spin from 'antd/es/spin';
 import { congressActions, legislationActions } from '../../../redux/actions';
 import {
@@ -25,9 +25,6 @@ function LegislationView() {
     Object.entries(legislations).map(([index, {
       id,
       sections,
-      mainRepealMotion,
-      mainRepealReferendum,
-      mainRepealProposal,
     }]) => (
       <LegislationItem
         year={year}
@@ -35,11 +32,6 @@ function LegislationView() {
         tier={tier}
         id={id}
         sections={sections}
-        mainRepealProposalReferendum={{
-          mainRepealMotion,
-          mainRepealReferendum,
-          mainRepealProposal,
-        }}
         key={`${year}-${index}`}
       />
     )))), [legislation, tier]);
@@ -49,7 +41,7 @@ function LegislationView() {
   }
 
   if (!items.length) {
-    return <Alert type="info" message="No legislation found" />;
+    return <Result status={404} title="No legislation found" />;
   }
 
   return (

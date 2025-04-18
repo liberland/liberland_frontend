@@ -82,6 +82,7 @@ export default function* rootSaga() {
     officesSagas.unregisterCompanyWatcher(),
     officesSagas.setRegisteredCompanyDataWatcher(),
     officesSagas.getPendingAdditionalMeritsWatcher(),
+    officesSagas.getTaxPayersWatcher(),
 
     // REGISTRIES
     registriesSagas.getOfficialRegistryEntriesWatcher(),
@@ -109,6 +110,7 @@ export default function* rootSaga() {
     validatorSagas.unbondWatcher(),
     validatorSagas.withdrawUnbondedWatcher(),
     validatorSagas.getStakingDataWatcher(),
+    validatorSagas.updateCommissionWatcher(),
 
     // CONGRESS
     congressSagas.applyForCongressWatcher(),
@@ -138,6 +140,7 @@ export default function* rootSaga() {
     congressSagas.getAllBalanceForCongressWatcher(),
     congressSagas.congressBudgetProposeWatcher(),
     congressSagas.congressSpendingWatcher(),
+    congressSagas.congressSpendingCountWatcher(),
 
     // ONBOARDING
     onboardingSagas.claimComplimentaryLLDWatcher(),
@@ -215,5 +218,6 @@ export default function* rootSaga() {
     ministryFinanceSagas.sendLlmToPolitipoolWatcher(),
     ministryFinanceSagas.sendLlmWatcher(),
     ministryFinanceSagas.ministryOfFinanceSpendingWatcher(),
+    ministryFinanceSagas.ministryOfFinanceSpendingCountWatcher(),
   ]);
 }

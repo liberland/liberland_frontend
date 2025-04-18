@@ -33,7 +33,7 @@ export default function NominatedByList() {
     dispatch(validatorActions.getNominators.call());
   }, [dispatch]);
 
-  const formatted = useMemo(() => nominators.map(({
+  const formatted = useMemo(() => nominators?.map(({
     address,
     identity,
   }) => ({
@@ -44,7 +44,7 @@ export default function NominatedByList() {
         displayName={getNominatorName(identity)}
       />
     ),
-  })), [isLargerThanHdScreen, nominators]);
+  })) || [], [isLargerThanHdScreen, nominators]);
 
   return isLargerThanHdScreen ? (
     <Table

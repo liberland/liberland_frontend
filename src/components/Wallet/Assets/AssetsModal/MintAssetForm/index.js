@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import InputNumber from 'antd/es/input-number';
 import Flex from 'antd/es/flex';
+import Spin from 'antd/es/spin';
 import PropTypes from 'prop-types';
 import { blockchainSelectors } from '../../../../../redux/selectors';
 import { walletActions } from '../../../../../redux/actions';
@@ -44,7 +45,7 @@ function MintAssetForm({
   };
 
   if (!userWalletAddress) {
-    return <div>Loading...</div>;
+    return <Spin />;
   }
 
   const submitText = isStock ? 'Issue stock' : 'Mint assets';
@@ -83,7 +84,7 @@ function MintAssetForm({
       </Form.Item>
       <Form.Item
         name="beneficiary"
-        label="Beneficiary amount"
+        label="Beneficiary"
         rules={[{ required: true }]}
       >
         <InputSearch />

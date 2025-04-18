@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import Tooltip from 'antd/es/tooltip';
 import Flex from 'antd/es/flex';
+import Spin from 'antd/es/spin';
 import { ethSelectors } from '../../../../redux/selectors';
 import { ethActions } from '../../../../redux/actions';
 import { formatCustom } from '../../../../utils/walletHelpers';
@@ -12,13 +12,12 @@ import StakeForm from '../StakeForm';
 import StakeEthForm from '../StakeEthForm';
 import ClaimReward from '../ClaimReward';
 import WithdrawForm from '../WithdrawForm';
-import styles from './styles.module.scss';
+import CopyIconWithAddress from '../../../CopyIconWithAddress';
 
 function TokenStakeInfo({ selectedAccount }) {
   const dispatch = useDispatch();
   const tokenStakeInfo = useSelector(ethSelectors.selectorTokenStakeContractInfo);
   const tokenStakeAddressInfo = useSelector(ethSelectors.selectorTokenStakeAddressInfo);
-  const tokenStakeInfoLoading = useSelector(ethSelectors.selectorTokenStakeContractInfoLoading);
   const erc20Info = useSelector(ethSelectors.selectorERC20Info);
   const erc20Balance = useSelector(ethSelectors.selectorERC20Balance);
 
@@ -49,15 +48,15 @@ function TokenStakeInfo({ selectedAccount }) {
   };
 
   const erc20FromSelector = (erc20Address) => {
-    const mapped = erc20Info[erc20Address];
-    if (!mapped || mapped.loading || mapped.error) {
+    const mapped = erc20Info?.[erc20Address];
+    if (!mapped) {
       return undefined;
     }
     return mapped;
   };
   const erc20BalanceFromSelector = (erc20Address, account) => {
-    const mapped = account && erc20Balance[erc20Address]?.[account];
-    if (!mapped || mapped.loading || mapped.error) {
+    const mapped = account && erc20Balance?.[erc20Address]?.[account];
+    if (!mapped) {
       return undefined;
     }
     return mapped;
@@ -74,23 +73,15 @@ function TokenStakeInfo({ selectedAccount }) {
   }, [selectedAccount, tokenStakeInfo]);
 
   useEffect(() => {
-    if (tokenStakeInfo && !tokenStakeInfo.error) {
+    if (tokenStakeInfo) {
       getERC20Info(tokenStakeInfo.rewardToken);
       getERC20Info(tokenStakeInfo.stakingToken);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tokenStakeInfo]);
 
-  if (!tokenStakeInfo || tokenStakeInfoLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (tokenStakeInfo.error) {
-    return (
-      <div className={styles.error}>
-        Something went wrong
-      </div>
-    );
+  if (!tokenStakeInfo) {
+    return <Spin />;
   }
 
   const rewardTokenInfo = erc20FromSelector(tokenStakeInfo?.rewardToken);
@@ -122,6 +113,9 @@ function TokenStakeInfo({ selectedAccount }) {
         <Flex wrap gap="15px" justify="end">
           {selectedAccount && stakingTokenInfo && stakingTokenBalance && (
             <>
+              <StakeEthForm
+                account={selectedAccount}
+              />
               <StakeForm
                 account={selectedAccount}
                 stakingToken={{
@@ -130,9 +124,6 @@ function TokenStakeInfo({ selectedAccount }) {
                   balance: stakingTokenBalance.balance.toString(),
                   decimals: parseInt(tokenStakeInfo.stakingTokenDecimals.toString()),
                 }}
-              />
-              <StakeEthForm
-                account={selectedAccount}
               />
             </>
           )}
@@ -197,18 +188,14 @@ function TokenStakeInfo({ selectedAccount }) {
         {
           info: 'Reward token',
           value: (
-            <Tooltip
-              placement="top"
-              showArrow={false}
-              trigger={['hover', 'click']}
-              overlay={<span>{tokenStakeInfo.rewardToken}</span>}
-            >
-              <div>
-                {rewardTokenInfo
-                  ? rewardTokenInfo.name
-                  : `${tokenStakeInfo.rewardToken.slice(0, 7)}...`}
+            <Flex wrap gap="10px" align="center">
+              {rewardTokenInfo
+                ? rewardTokenInfo.name
+                : `${tokenStakeInfo.rewardToken.slice(0, 7)}...`}
+              <div className="description">
+                <CopyIconWithAddress address={tokenStakeInfo.rewardToken} />
               </div>
-            </Tooltip>
+            </Flex>
           ),
         },
         {
@@ -228,18 +215,14 @@ function TokenStakeInfo({ selectedAccount }) {
         {
           info: 'Staking token',
           value: (
-            <Tooltip
-              placement="top"
-              showArrow={false}
-              trigger={['hover', 'click']}
-              overlay={<span>{tokenStakeInfo.stakingToken}</span>}
-            >
-              <div>
-                {stakingTokenInfo
-                  ? stakingTokenInfo.name
-                  : `${tokenStakeInfo.stakingToken.slice(0, 7)}...`}
+            <Flex wrap gap="10px" align="center">
+              {stakingTokenInfo
+                ? stakingTokenInfo.name
+                : `${tokenStakeInfo.stakingToken.slice(0, 7)}...`}
+              <div className="description">
+                <CopyIconWithAddress address={tokenStakeInfo.stakingToken} />
               </div>
-            </Tooltip>
+            </Flex>
           ),
         },
         {

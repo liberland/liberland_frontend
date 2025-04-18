@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import Alert from 'antd/es/alert';
+import Result from 'antd/es/result';
 import List from 'antd/es/list';
 import Card from 'antd/es/card';
 import { identityActions, senateActions } from '../../../redux/actions';
@@ -28,7 +28,7 @@ function ScheduledCongressSpending({ isVetoButton }) {
   }, [motionIds, dispatch, scheduledCalls]);
 
   if (!scheduledCalls || scheduledCalls.length < 1) {
-    return <Alert type="info" message="There are no open items" />;
+    return <Result status={404} title="There are no open items" />;
   }
 
   return (
