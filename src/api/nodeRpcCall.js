@@ -4,6 +4,7 @@ import {
   BN_ZERO,
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
+import { ApiPromise, WsProvider } from '@polkadot/api';
 import groupBy from 'lodash/groupBy';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
@@ -17,8 +18,6 @@ import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
 import { decodeAndFilter } from '../utils/identityParser';
 import { OfficeType } from '../utils/officeTypeEnum';
-
-const { ApiPromise, WsProvider } = require('@polkadot/api');
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 let __apiCache = null;
