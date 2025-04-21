@@ -131,7 +131,7 @@ function CompaniesCard({
                 title={(
                   <Flex align="center" gap="15px">
                     {companyLogo}
-                    {truncate(registeredCompany.name, 20)}
+                    {truncate(registeredCompany.name || '', 20)}
                   </Flex>
                 )}
               />

@@ -138,6 +138,7 @@ export const navigationList = [
       'Land registry': router.offices.landRegistry,
       Finances: router.offices.finances,
       'Scheduled Congress Spending': router.offices.scheduledCongressSpending,
+      'Tax Payers': router.offices.taxPayers,
     },
   },
   {

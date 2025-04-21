@@ -18,12 +18,23 @@ export default function Wallet() {
   const balances = useSelector(ministryFinanceSelector.balances);
   const clerksIds = useSelector(ministryFinanceSelector.clerksMinistryFinance);
   const spending = useSelector(ministryFinanceSelector.spendingSelector);
+  const spendingCount = useSelector(ministryFinanceSelector.spendingCountSelector);
+  const isLoading = useSelector(ministryFinanceSelector.isLoading);
   const userIsMember = clerksIds?.includes(walletAddress) || false;
+  const loadMore = (page, pageSize) => {
+    const from = spending ? spending.from : 0;
+    const skip = (page - 1) * pageSize;
+    if (from === 0 || from < skip) {
+      dispatch(ministryFinanceActions.ministryFinanceSpending.call({ skip, take: pageSize }));
+    }
+  };
 
   useEffect(() => {
-    dispatch(ministryFinanceActions.ministryFinanceSpending.call());
+    dispatch(ministryFinanceActions.ministryFinanceSpendingCount.call());
+    loadMore(1, 10);
     dispatch(officesActions.getPalletIds.call());
-  }, [dispatch]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Should only run on mount
 
   useEffect(() => {
     dispatch(ministryFinanceActions.ministryFinanceGetWallet.call());
@@ -53,9 +64,14 @@ export default function Wallet() {
           LLMPolitipool: (data) => ministryFinanceActions.ministryFinanceSendLlmToPolitipool.call(data),
         }}
       />
-      {spending && (
-        <SpendingTable spending={spending} />
-      )}
+      {spending && spendingCount ? (
+        <SpendingTable
+          spending={spending.data}
+          onNext={loadMore}
+          total={spendingCount}
+          isLoading={isLoading}
+        />
+      ) : null}
     </Flex>
   );
 }

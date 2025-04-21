@@ -100,7 +100,7 @@ AssetOverview.propTypes = {
       name: PropTypes.string,
       decimals: PropTypes.string,
     }),
-    balance: PropTypes.string,
+    balance: PropTypes.oneOf([PropTypes.string, PropTypes.string]),
   })),
 };
 

@@ -47,6 +47,11 @@ const selectorPendingAdditionalMerits = createSelector(
   (reducer) => reducer.pendingAdditionalMerits,
 );
 
+const selectorTaxesPayers = createSelector(
+  officesReducer,
+  (reducer) => reducer.taxPayers,
+);
+
 export {
   selectorIdentity,
   selectorCompanyRequest,
@@ -57,4 +62,5 @@ export {
   selectorPallets,
   selectorPendingAdditionalMerits,
   selectorIsUnobtrusive,
+  selectorTaxesPayers,
 };
