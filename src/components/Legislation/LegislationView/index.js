@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Result from 'antd/es/result';
 import Spin from 'antd/es/spin';
+import Flex from 'antd/es/flex';
 import { congressActions, legislationActions } from '../../../redux/actions';
 import {
   legislationSelectors,
@@ -43,11 +44,10 @@ function LegislationView() {
   if (!items.length) {
     return <Result status={404} title="No legislation found" />;
   }
-
   return (
-    <div>
+    <Flex vertical gap="20px">
       {items}
-    </div>
+    </Flex>
   );
 }
 

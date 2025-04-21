@@ -165,7 +165,7 @@ export const navigationList = [
       Overview: router.congress.overview,
       Motions: router.congress.motions,
       'Propose International treaty': router.congress.addLegislation,
-      'Propose legislaton': router.congress.addLegislationViaReferendum,
+      'Propose legislation': router.congress.addLegislationViaReferendum,
       Wallet: router.congress.wallet,
     },
   },

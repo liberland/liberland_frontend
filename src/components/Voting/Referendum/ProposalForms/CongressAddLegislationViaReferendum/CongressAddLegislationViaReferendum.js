@@ -84,12 +84,12 @@ function CongressAddLegislationViaReferendum() {
         >
           <Select
             options={[
-              { value: 'InternationalTreaty', display: 'International Treaty' },
-              { value: 'Law', display: 'Law' },
-              { value: 'Tier3', display: 'Tier 3' },
-              { value: 'Tier4', display: 'Tier 4' },
-              { value: 'Tier5', display: 'Tier 5' },
-              { value: 'Decision', display: 'Decision' },
+              { value: 'InternationalTreaty', label: 'International Treaty' },
+              { value: 'Law', label: 'Law' },
+              { value: 'Tier3', label: 'Tier 3' },
+              { value: 'Tier4', label: 'Tier 4' },
+              { value: 'Tier5', label: 'Tier 5' },
+              { value: 'Decision', label: 'Decision' },
             ]}
           />
         </Form.Item>
