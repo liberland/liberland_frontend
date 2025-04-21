@@ -123,15 +123,12 @@ function CreateValidatorForm({
           { required: true },
           {
             validator: (_, v) => {
-              if (v) {
-                if (!isHex(v)) {
-                  return Promise.reject('Must be a hex string starting with 0x');
-                }
-                if (v.length !== 256) {
-                  return Promise.reject('Invalid length');
-                }
+              if (!isHex(v)) {
+                return Promise.reject('Must be a hex string starting with 0x');
               }
-              return Promise.resolve();
+              return v.length === 258
+                ? Promise.resolve()
+                : Promise.reject('Invalid length');
             },
           },
         ]}
