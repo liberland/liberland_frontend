@@ -1185,15 +1185,29 @@ const getLegislation = async (tier) => {
     tier,
   );
   const legislationById = legislation.reduce(
-    (acc, [{ args: key }, content]) => {
+    (acc, part) => {
+      const [{ args: key }, content] = part;
       const { year, index } = key[1];
-      if (!acc[year]) acc[year] = {};
-      if (!acc[year][index]) { acc[year][index] = { id: { year, index }, vetos: [], sections: [] }; }
-      acc[year][index].sections.push({ vetos: [], content });
+      const sectionId = key[2].toNumber();
+      if (!acc[year]) {
+        acc[year] = {};
+      }
+      if (!acc[year][index]) {
+        acc[year][index] = { id: { year, index }, vetos: [], sections: [] };
+      }
+      acc[year][index].sections[sectionId] = { vetos: [], content };
       return acc;
     },
     {},
   );
+  Object.keys(legislationById).forEach((year) => {
+    Object.keys(legislationById[year] || {}).forEach((index) => {
+      const { sections } = legislationById[year][index] || {};
+      if (sections) {
+        legislationById[year][index].sections = sections.filter(Boolean); // Make sure no "undefined" sections exist
+      }
+    });
+  });
 
   const vetos = await api.query.liberlandLegislation.vetos.entries(tier);
   vetos
