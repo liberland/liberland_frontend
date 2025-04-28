@@ -34,6 +34,24 @@ body {
   border-radius: 6px;
   background-color: var(--card-background);
   border: 1px solid var(--border-color);
+
+  &--borderless {
+    border: none;
+  }
+
+  &--flat {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    .ant-result-title {
+      margin: 0;
+      line-height: 30px;
+    }
+  }
+
   .ant-result-title {
     font-size: 18px;
   }
