@@ -20,10 +20,28 @@ import {
 import { getHistoryTransfers } from '../../api/explorer';
 
 import { walletActions } from '../actions';
-import { blockchainSelectors } from '../selectors';
+import { blockchainSelectors, walletSelectors } from '../selectors';
 import { blockchainWatcher } from './base';
+import { checkPayment, createPayment } from '../../api/kalatori';
 
 // WORKERS
+
+function* createPaymentWorker(action) {
+  const response = yield call(createPayment, action.payload);
+  yield put(walletActions.createPayment.success(response));
+}
+
+function* checkPaymentWorker() {
+  const { payment_account } = yield select(walletSelectors.selectorPaymentCreated);
+  if (!payment_account) {
+    yield put(walletActions.checkPayment.failure());
+    return;
+  }
+  const { payment_status } = yield call(checkPayment, { paymentAddress: payment_account });
+  if (payment_status === 'paid') {
+    yield put(walletActions.checkPayment.success());
+  }
+}
 
 function* getWalletWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
@@ -166,6 +184,14 @@ function* createOrUpdateAssetWorker(action) {
 
 // WATCHERS
 
+function* createPaymentWatcher() {
+  yield* blockchainWatcher(walletActions.createPayment, createPaymentWorker);
+}
+
+function* checkPaymentWatcher() {
+  yield* blockchainWatcher(walletActions.checkPayment, checkPaymentWorker);
+}
+
 function* sendTransferWithRemarkWatcher() {
   yield* blockchainWatcher(walletActions.sendTransferRemark, sendTransferRemarkWorker);
 }
@@ -251,4 +277,6 @@ export {
   sendTransferWithRemarkWatcher,
   mintAssetWatcher,
   createOrUpdateAssetWatcher,
+  createPaymentWatcher,
+  checkPaymentWatcher,
 };

@@ -18,7 +18,7 @@ import OpenModalButton from './components/OpenModalButton';
 import RemarkFormUser from '../Wallet/RemarkFormUser';
 import { IndexHelper } from '../../utils/council/councilEnum';
 
-function SendLLDForm({ onClose }) {
+function SendLLDForm({ onClose, initialValues }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
   const [isLoading, setIsLoading] = useState();
@@ -73,7 +73,12 @@ function SendLLDForm({ onClose }) {
   const remark = Form.useWatch('remark', form);
 
   return (
-    <Form form={form} layout="vertical" onFinish={transfer}>
+    <Form
+      form={form}
+      initialValues={initialValues}
+      layout="vertical"
+      onFinish={transfer}
+    >
       <Title level={3}>Send LLD</Title>
       <Paragraph>You are going to send tokens from your wallet</Paragraph>
       <Form.Item
@@ -126,6 +131,13 @@ function SendLLDForm({ onClose }) {
 
 SendLLDForm.propTypes = {
   onClose: PropTypes.func.isRequired,
+  initialValues: PropTypes.shape({
+    recipient: PropTypes.string,
+    amount: PropTypes.string,
+    remark: PropTypes.bool,
+    id: PropTypes.string,
+    description: PropTypes.string,
+  }),
 };
 
 function ButtonModal(props) {
