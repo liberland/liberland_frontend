@@ -9,7 +9,7 @@ import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { hexToString } from '@polkadot/util';
-import Markdown from 'markdown-to-jsx';
+import Markdown from 'react-markdown';
 import Alert from 'antd/es/alert';
 import LLM from '../../../../../assets/icons/llm.svg';
 import CopyIconWithAddress from '../../../../CopyIconWithAddress';
@@ -60,7 +60,7 @@ function ReferendumItem({
           <Paragraph ellipsis={{ rows: 2 }} className={classNames('description', styles.intro)}>
             <Alert.ErrorBoundary>
               <span ref={setTitleFromRef}>
-                <Markdown options={{ disableParsingRawHTML: true }}>
+                <Markdown skipHtml>
                   {hexToString(firstSection) || ''}
                 </Markdown>
               </span>

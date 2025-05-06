@@ -8,7 +8,7 @@ import Space from 'antd/es/space';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import LeftOutlined from '@ant-design/icons/LeftOutlined';
-import Markdown from 'markdown-to-jsx';
+import Markdown from 'react-markdown';
 import { useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { deriveAndHideContractTitle } from '../utils';
@@ -158,7 +158,7 @@ function ContractItem({
               <Paragraph
                 ref={(p) => deriveAndHideContractTitle(p, title, setTitle)}
               >
-                <Markdown options={{ disableParsingRawHTML: true }}>{data}</Markdown>
+                <Markdown skipHtml>{data}</Markdown>
               </Paragraph>
             ),
           },

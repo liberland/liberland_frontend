@@ -65,7 +65,7 @@ function CongressAddLegislationViaReferendum() {
         index: 1,
         FastTrackDefaults,
         sections: [
-          { value: 'Paste markdown to autosplit sections' },
+          { value: '' },
         ],
       }}
       form={form}

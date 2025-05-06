@@ -48,7 +48,7 @@ function CongressAddLegislation() {
         year: dayjs(new Date()),
         index: 1,
         sections: [
-          { value: 'Paste markdown to autosplit sections' },
+          { value: '' },
         ],
       }}
     >

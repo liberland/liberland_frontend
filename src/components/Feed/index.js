@@ -5,7 +5,7 @@ import Flex from 'antd/es/flex';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
 import Paragraph from 'antd/es/typography/Paragraph';
-import Markdown from 'markdown-to-jsx';
+import Markdown from 'react-markdown';
 import Status from '../Status';
 import styles from './styles.module.scss';
 

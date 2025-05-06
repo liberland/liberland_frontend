@@ -8,7 +8,7 @@ import { isAddress } from '@polkadot/util-crypto';
 import { useHistory } from 'react-router-dom';
 import cx from 'classnames';
 import Result from 'antd/es/result';
-import Markdown from 'markdown-to-jsx';
+import Markdown from 'react-markdown';
 import { useMediaQuery } from 'usehooks-ts';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import CompanyActions from '../CompanyActions';
@@ -101,7 +101,7 @@ function CompaniesCard({
             }}
             className={cx('description', styles.preview, styles.noHeading)}
           >
-            <Markdown options={{ disableParsingRawHTML: true }}>
+            <Markdown skipHtml>
               {registeredCompany.purpose}
             </Markdown>
           </Paragraph>

@@ -14,13 +14,14 @@ export function AddLegislationFields({
   const sections = Form.useWatch('sections', form) || [];
 
   const handlePaste = (e) => {
+    e.preventDefault();
     const data = e.clipboardData.getData('text');
-    const newSections = markdown2sections(data);
-    if (sections.length === 1) {
-      form.setFieldValue('sections', [...newSections.map((value) => ({ value }))]);
-    } else if (newSections.length > 1) {
-      // Process the paste event only if there are no existing sections or if there's more than one new section
-      form.setFieldValue('sections', [...sections, ...newSections.map((value) => ({ value }))]);
+    const newSections = markdown2sections(data).map((value) => ({ value }));
+    const lastIndex = (sections || []).length - 1;
+    if (lastIndex === -1) {
+      form.setFieldValue('sections', newSections);
+    } else {
+      form.setFieldValue('sections', [...sections.slice(0, lastIndex), ...newSections]);
     }
   };
 
@@ -36,7 +37,7 @@ export function AddLegislationFields({
               <Button green onClick={add}>Add</Button>
             </Flex>
           </Flex>
-          {fields.map((field, index) => (
+          {fields.map((field, index, all) => (
             <div key={field.key}>
               <Form.Item
                 name={[index, 'value']}
@@ -45,7 +46,7 @@ export function AddLegislationFields({
               >
                 <TextArea onPaste={handlePaste} placeholder="Paste markdown to autosplit sections" />
               </Form.Item>
-              {index !== 0 && (
+              {all.length > 1 && (
                 <Button red onClick={() => remove(field.name)}>Delete</Button>
               )}
               <Divider />

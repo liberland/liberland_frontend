@@ -7,7 +7,7 @@ import { useMediaQuery } from 'usehooks-ts';
 import classNames from 'classnames';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useHistory } from 'react-router-dom';
-import Markdown from 'markdown-to-jsx';
+import Markdown from 'react-markdown';
 import Button from '../../../../Button/Button';
 import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 import router from '../../../../../router';
@@ -59,7 +59,7 @@ function ProposalItem({
                   try {
                     return (
                       <span ref={setTitleFromRef}>
-                        <Markdown options={{ disableParsingRawHTML: true }}>
+                        <Markdown skipHtml>
                           {hexToString(firstSection) || ''}
                         </Markdown>
                       </span>

@@ -5,7 +5,7 @@ import Flex from 'antd/es/flex';
 import cx from 'classnames';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useHistory } from 'react-router-dom';
-import Markdown from 'markdown-to-jsx';
+import Markdown from 'react-markdown';
 import { useMediaQuery } from 'usehooks-ts';
 import { deriveAndHideContractTitle } from '../utils';
 import { useContractItem } from '../hooks';
@@ -74,7 +74,7 @@ function ContractListItem({
           }}
           className={cx('description', styles.preview)}
         >
-          <Markdown options={{ disableParsingRawHTML: true }}>
+          <Markdown skipHtml>
             {data}
           </Markdown>
         </Paragraph>

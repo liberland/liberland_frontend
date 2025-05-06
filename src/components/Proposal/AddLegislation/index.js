@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Collapse from 'antd/es/collapse';
 import List from 'antd/es/list';
 import Card from 'antd/es/card';
-import Markdown from 'markdown-to-jsx';
+import Markdown from 'react-markdown';
 import Paragraph from 'antd/es/typography/Paragraph';
 import PropTypes from 'prop-types';
 import router from '../../../router';
@@ -46,7 +46,7 @@ function AddLegislation({ proposal, isDetailsHidden }) {
                   <List.Item>
                     <Card className={styles.section}>
                       <div className={styles.legislationContent}>
-                        <Markdown options={{ disableParsingRawHTML: true }}>
+                        <Markdown skipHtml>
                           {new TextDecoder('utf-8').decode(section)}
                         </Markdown>
                       </div>

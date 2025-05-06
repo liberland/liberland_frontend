@@ -12,7 +12,7 @@ import Tooltip from 'antd/es/tooltip';
 import Title from 'antd/es/typography/Title';
 import { useHistory } from 'react-router-dom';
 import classNames from 'classnames';
-import Markdown from 'markdown-to-jsx';
+import Markdown from 'react-markdown';
 import { useMediaQuery } from 'usehooks-ts';
 import LeftOutlined from '@ant-design/icons/LeftOutlined';
 import styles from './styles.module.scss';
@@ -129,7 +129,7 @@ function CompanyDetail() {
                 >
                   <Flex vertical gap="15px" justify="space-between" className={styles.description}>
                     <div className={styles.purposeText}>
-                      <Markdown options={{ disableParsingRawHTML: true }}>
+                      <Markdown skipHtml>
                         {simplifiedDataObject.purpose || 'Unknown'}
                       </Markdown>
                     </div>

@@ -4,7 +4,7 @@ import { hexToString, isHex } from '@polkadot/util';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
-import Markdown from 'markdown-to-jsx';
+import Markdown from 'react-markdown';
 import VetoStats from '../VetoStats';
 import ProposeButton from '../ProposeButton';
 import AmendButton from '../AmendButton';
@@ -62,7 +62,7 @@ function SectionItem({
       <Paragraph
         className={styles.paragraph}
       >
-        <Markdown options={{ disableParsingRawHTML: true }}>
+        <Markdown skipHtml>
           {text}
         </Markdown>
       </Paragraph>
