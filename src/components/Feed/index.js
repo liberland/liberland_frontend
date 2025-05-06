@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import React from 'react';
 import cx from 'classnames';
+import rehypeRaw from 'rehype-raw';
 import Flex from 'antd/es/flex';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
@@ -108,7 +109,7 @@ function Feed() {
           )}
         >
           <Paragraph>
-            <Markdown>
+            <Markdown rehypePlugins={[rehypeRaw]}>
               {newsItem.text}
             </Markdown>
           </Paragraph>
