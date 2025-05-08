@@ -18,7 +18,7 @@ import OpenModalButton from './components/OpenModalButton';
 import RemarkFormUser from '../Wallet/RemarkFormUser';
 import { IndexHelper } from '../../utils/council/councilEnum';
 
-function SendLLDForm({ onClose, initialValues }) {
+function SendLLDForm({ onClose, onSuccess, initialValues }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
   const [isLoading, setIsLoading] = useState();
@@ -54,6 +54,7 @@ function SendLLDForm({ onClose, initialValues }) {
       );
     }
     onClose();
+    onSuccess();
   };
 
   const validateUnbondValue = (_, textUnbondValue) => {
@@ -138,6 +139,7 @@ SendLLDForm.propTypes = {
     id: PropTypes.string,
     description: PropTypes.string,
   }),
+  onSuccess: PropTypes.func,
 };
 
 function ButtonModal(props) {
