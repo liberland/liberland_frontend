@@ -22,6 +22,7 @@ import { democracyActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import router from '../../../router';
 import ReferendumItem from './Items/ReferendumItem';
+import { Proposal } from '../../Proposal';
 
 function Referendum() {
   const history = useHistory();
@@ -73,7 +74,7 @@ function Referendum() {
 
   return (
     <Collapse
-      defaultActiveKey={['referendums', 'proposals', 'dispatches']}
+      defaultActiveKey={['referendums', 'proposals', 'dispatches', 'external']}
       collapsible="icon"
       items={[
         {
@@ -122,6 +123,13 @@ function Referendum() {
               )}
             />
           ) : <Result status={404} title="There are no active Proposals" />,
+        },
+        {
+          key: 'external',
+          label: 'External proposals',
+          children: democracy.democracy?.nextExternal?.image?.proposal ? (
+            <Proposal proposal={democracy.democracy.nextExternal?.image?.proposal} isDetailsHidden />
+          ) : <Result status={404} title="There are no active External proposals" />,
         },
         {
           key: 'dispatches',

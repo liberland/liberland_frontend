@@ -954,9 +954,11 @@ const getDemocracyReferendums = async (address) => {
     const [
       apideriveReferendums,
       apideriveReferendumsActive,
+      nextExternal,
     ] = await Promise.all([ // api.queryMulti doesnt work with api.derive :(
       api.derive.democracy.referendums(),
       api.derive.democracy.referendumsActive(),
+      api.derive.democracy.nextExternal(),
     ]);
 
     const proposalData = proposals.map((proposalItem) => ({
@@ -1000,6 +1002,7 @@ const getDemocracyReferendums = async (address) => {
       apideriveReferendumsActive,
       userVotes: userVotes.toHuman(),
       centralizedReferendumsData,
+      nextExternal,
     };
   } catch (e) {
     // eslint-disable-next-line no-console
