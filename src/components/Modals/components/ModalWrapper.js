@@ -6,21 +6,28 @@ import { useModal } from '../../../context/modalContext';
 const modalWrapper = (ModalContent, ModalButton, { propsWrapper, matchHash, createHash } = {}) => {
   function WrappedComponent(props) {
     const { showModal, closeLastNModals } = useModal();
-    const { isOpenOnRender } = props;
+    const { isOpenOnRender, onClose } = props;
     const { hash } = useLocation();
     const openModal = useCallback((hashPart) => {
       showModal(
-        <ModalContent {...props} onClose={() => closeLastNModals(1)} />,
-        { ...propsWrapper },
+        <ModalContent
+          {...props}
+          onClose={() => {
+            closeLastNModals(1);
+            onClose();
+          }}
+        />,
+        { ...propsWrapper, onClose },
         hashPart,
       );
-    }, [closeLastNModals, props, showModal]);
+    }, [closeLastNModals, props, showModal, onClose]);
 
     useEffect(() => {
       if (!ModalButton || isOpenOnRender) {
         openModal();
       }
-    }, [openModal, isOpenOnRender]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpenOnRender]);
 
     useEffect(() => {
       if (matchHash) {
@@ -46,6 +53,7 @@ const modalWrapper = (ModalContent, ModalButton, { propsWrapper, matchHash, crea
 
   WrappedComponent.propTypes = {
     isOpenOnRender: PropTypes.bool,
+    onClose: PropTypes.func,
   };
 
   if (createHash) {

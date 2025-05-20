@@ -115,6 +115,11 @@ const selectorTransferState = createSelector(
   (reducer) => reducer.transferState,
 );
 
+const selectorPaymentSuccess = createSelector(
+  walletReducer,
+  (reducer) => reducer.paymentSuccess,
+);
+
 export {
   selectorWalletInfo,
   selectorGettingWalletInfo,
@@ -137,4 +142,5 @@ export {
   selectorAssetsDetails,
   selectorTransferState,
   selectorGettingWalletInfoUnobtrusive,
+  selectorPaymentSuccess,
 };

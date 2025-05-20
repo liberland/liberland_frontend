@@ -70,6 +70,7 @@ export default {
     bridge: '/home/wallet/bridge',
     nfts: '/home/wallet/nfts',
     payMe: '/home/wallet/pay-me',
+    gateway: '/home/wallet/gateway/:orderId',
   },
   registries: {
     overview: '/home/registries/overview',

@@ -43,6 +43,10 @@ function Wallet() {
           component={loader(() => import('./PayMe'))}
         />
         <Route
+          path={router.wallet.gateway}
+          component={loader(() => import('./Gateway'))}
+        />
+        <Route
           exact
           path={router.home.wallet}
           render={() => (

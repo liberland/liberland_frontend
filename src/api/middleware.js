@@ -105,3 +105,21 @@ export const getTaxPayers = async (timeInMonth, limit) => {
     throw new Error(err);
   }
 };
+
+export const checkPayment = async ({
+  orderId,
+  price,
+  toId,
+}) => {
+  const { data, status, statusText } = await getMiddlewareApi().get('/v1/verify-purchase', {
+    params: {
+      orderId,
+      price,
+      toId,
+    },
+  });
+  if (status >= 400) {
+    throw statusText;
+  }
+  return data.paid;
+};
