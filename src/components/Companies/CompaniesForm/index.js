@@ -29,6 +29,8 @@ import router from '../../../router';
 import { walletActions } from '../../../redux/actions';
 import AssetSelector from '../AssetSelector';
 import MarkdownEditor from '../../MarkdownEditor';
+import DeleteCompanyModal from '../../Modals/DeleteCompanyModal';
+import CancelCompanyRequestModal from '../../Modals/CancelCompanyRequestModal';
 
 const buildFieldName = (index, dynamicField, suffix) => (dynamicField.encryptable
   ? [index, dynamicField.key, suffix]
@@ -153,7 +155,9 @@ function getFieldComponent({
 }
 
 export const getDefaultValuesFromDataObject = (formObject, editMode = false) => {
-  const defaultValues = {};
+  const defaultValues = {
+    signedContract: Boolean(formObject.id),
+  };
   if (editMode) {
     formObject?.staticFields?.forEach((staticField) => {
       defaultValues[staticField.key] = fieldDateTypes[staticField.type]
@@ -191,6 +195,7 @@ export default function CompaniesForm({
 }) {
   const [form] = Form.useForm();
   const defaultValues = getDefaultValuesFromDataObject(formObject, !!companyId);
+  const isRequest = Boolean(formObject.registryAllowedToEdit);
   const companyType = Form.useWatch('companyType', form);
   const isLargerThanWideScreen = useMediaQuery('(min-width: 1500px)');
   const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
@@ -475,6 +480,11 @@ export default function CompaniesForm({
           <Button onClick={() => history.push(router.companies.allCompanies)}>
             Cancel
           </Button>
+          {companyId && (isRequest ? (
+            <CancelCompanyRequestModal companyId={companyId} />
+          ) : (
+            <DeleteCompanyModal companyId={companyId} />
+          ))}
           <Button
             primary
             type="submit"
@@ -491,6 +501,6 @@ CompaniesForm.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   formObject: PropTypes.any.isRequired,
   buttonMessage: PropTypes.string.isRequired,
-  companyId: PropTypes.string.isRequired,
+  companyId: PropTypes.string,
   callback: PropTypes.func.isRequired,
 };

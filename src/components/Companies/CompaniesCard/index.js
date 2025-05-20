@@ -35,7 +35,7 @@ function CompaniesCard({
     [registries],
   );
   const dataSource = useMemo(() => {
-    const filtered = simplify?.filter((registered) => registered && !registered.invalid);
+    const filtered = simplify?.filter((registered) => registered && !registered.invalid && !registered.unregister);
     return type === 'all'
       ? filtered.sort((aCompany, bCompany) => {
         const [aAssets] = getRelevantAssets(aCompany);
@@ -131,7 +131,7 @@ function CompaniesCard({
                 title={(
                   <Flex align="center" gap="15px">
                     {companyLogo}
-                    {truncate(registeredCompany.name || '', 20)}
+                    {truncate(registeredCompany.name, 20)}
                   </Flex>
                 )}
               />

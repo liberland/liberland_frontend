@@ -9,7 +9,7 @@ import { registriesActions } from '../../redux/actions';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
 
-function DeleteCompanyForm({
+function CancelCompanyRequestForm({
   onClose, companyId,
 }) {
   const dispatch = useDispatch();
@@ -21,7 +21,7 @@ function DeleteCompanyForm({
       layout="vertical"
       onFinish={() => {
         dispatch(
-          registriesActions.requestUnregisterCompanyRegistrationAction.call({
+          registriesActions.cancelCompanyRequest.call({
             companyId,
           }),
         );
@@ -29,7 +29,7 @@ function DeleteCompanyForm({
       }}
     >
       <Title level={4}>
-        Are you sure you want to request the deletion of company from the registrar?
+        Are you sure you want to cancel company request?
       </Title>
       <Flex wrap gap="15px">
         <Button red type="submit">
@@ -41,16 +41,16 @@ function DeleteCompanyForm({
   );
 }
 
-DeleteCompanyForm.propTypes = {
+CancelCompanyRequestForm.propTypes = {
   companyId: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
 function ButtonModal(props) {
   return (
-    <OpenModalButton text="Request Deletion" red {...props} />
+    <OpenModalButton text="Delete request" red {...props} />
   );
 }
-const DeleteCompanyModal = modalWrapper(DeleteCompanyForm, ButtonModal);
+const CancelCompanyRequestModal = modalWrapper(CancelCompanyRequestForm, ButtonModal);
 
-export default DeleteCompanyModal;
+export default CancelCompanyRequestModal;
