@@ -8,8 +8,6 @@ import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Link from 'antd/es/typography/Link';
-import subwalletBrowserHighlightImage from '../../../assets/images/subwallet-browser-highlight.png';
-import subwalletSearchHighlightImage from '../../../assets/images/subwallet-search-highlight.png';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
 import { authActions } from '../../../redux/actions';
@@ -67,35 +65,23 @@ function NoWalletsDetectedInBrowser() {
               children: (
                 <>
                   <Paragraph>
-                    You need to visit this site inside a dApp explorer
+                    You need to visit this site inside a dApp explorer like Subwallet
+                  </Paragraph>
+                  <Paragraph>
+                    <Button
+                      primary
+                      onClick={() => {
+                        window.location.href = process.env.REACT_APP_SUBWALLET_LINK;
+                      }}
+                    >
+                      Open in Subwallet
+                    </Button>
                   </Paragraph>
                   <Paragraph>
                     <Link href="https://docs.liberland.org/blockchain/for-citizens/onboarding">
                       Read the guide for details
                     </Link>
                   </Paragraph>
-                  <Paragraph>
-                    <img
-                      src={subwalletBrowserHighlightImage}
-                      className={styles.img}
-                      alt="subwalletBrowserHighlightImage"
-                    />
-                  </Paragraph>
-                  <Paragraph>
-                    <img
-                      src={subwalletSearchHighlightImage}
-                      className={styles.img}
-                      alt="subwalletSearchHighlightImage"
-                    />
-                  </Paragraph>
-                  <Button
-                    primary
-                    onClick={() => {
-                      window.location.href = process.env.REACT_APP_SUBWALLET_LINK;
-                    }}
-                  >
-                    Open in Subwallet
-                  </Button>
                 </>
               ),
             },
