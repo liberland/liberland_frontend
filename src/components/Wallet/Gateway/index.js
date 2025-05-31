@@ -31,12 +31,14 @@ export default function Gateway() {
     remark,
     callback,
     failure,
+    hook,
   } = useMemo(() => [
     'price',
     'toId',
     'callback',
     'remark',
     'failure',
+    'hook',
   ].reduce((keys, urlKey) => {
     const value = new URLSearchParams(search).get(urlKey);
     if (value) {
@@ -61,9 +63,9 @@ export default function Gateway() {
       orderId,
       price: parseDollars(price).toString(),
       toId,
-      callback: process.env.REACT_APP_PAYMENT_CALLBACK,
+      callback: hook,
     }));
-  }, [callback, dispatch, orderId, price, toId]);
+  }, [callback, dispatch, orderId, price, toId, hook]);
 
   React.useEffect(() => {
     if (isStartedCount && seconds === 0) {
@@ -90,7 +92,7 @@ export default function Gateway() {
     }
   }, [paymentSuccessful, callback]);
 
-  if (!callback || !price || !orderId || !toId) {
+  if (!callback || !price || !orderId || !toId || !hook) {
     return (
       <Result status="error" title="Malformed URL, contact admin" />
     );
