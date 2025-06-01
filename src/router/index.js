@@ -71,6 +71,7 @@ export default {
     nfts: '/home/wallet/nfts',
     payMe: '/home/wallet/pay-me',
     gateway: '/home/wallet/gateway/:orderId',
+    faucet: '/home/wallet/faucet',
   },
   registries: {
     overview: '/home/registries/overview',

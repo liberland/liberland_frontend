@@ -123,3 +123,27 @@ export const checkPayment = async ({
   }
   return data.paid;
 };
+
+export const claimFaucetLLD = async (address) => {
+  const middlewareApi = getMiddlewareApi();
+  try {
+    const response = await middlewareApi.post('/v1/faucet/lld', {
+      address,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to claim LLD');
+  }
+};
+
+export const claimFaucetLLM = async (address) => {
+  const middlewareApi = getMiddlewareApi();
+  try {
+    const response = await middlewareApi.post('/v1/faucet/llm', {
+      address,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to claim LLM');
+  }
+};

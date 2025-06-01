@@ -5,6 +5,7 @@ import {
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
 import { ApiPromise, WsProvider } from '@polkadot/api';
+import { ContractPromise } from '@polkadot/api-contract';
 import groupBy from 'lodash/groupBy';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
@@ -18,6 +19,7 @@ import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
 import { decodeAndFilter } from '../utils/identityParser';
 import { OfficeType } from '../utils/officeTypeEnum';
+import faucetContractAbi from '../utils/faucetContractAbi.json';
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 let __apiCache = null;
@@ -3139,6 +3141,43 @@ async function transferNFT(collectionId, itemId, newOwner, walletAddress) {
   return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
+const FAUCET_ADDRESS = '5FGMYA7aMc6rYpuZnoqMVavqgM3Sv5zQzKK13D5g8Ndg9YfN';
+const FAUCET_METADATA = faucetContractAbi;
+
+async function getFaucetTimeUntilNextFunding(address, tokenType) {
+  try {
+    const api = await getApi();
+
+    // Create contract instance using ContractPromise
+    const contract = new ContractPromise(api, FAUCET_METADATA, FAUCET_ADDRESS);
+
+    const formattedTokenType = { [tokenType]: null }; // e.g., { "LLD": null } or { "LLM": null }
+
+    const { result, output } = await contract.query.getTimeUntilNextFunding(
+      address, // caller address
+      {
+        gasLimit: -1, // use maximum gas available
+        storageDepositLimit: null, // unlimited storage deposit
+      },
+      address, // first parameter to the contract function
+      formattedTokenType, // second parameter to the contract function
+    );
+
+    // Check if the call was successful
+    if (result.isOk) {
+      // Return the actual result from the contract
+      return output.toHuman();
+    }
+    // eslint-disable-next-line no-console
+    console.error('Contract call failed:', result.asErr);
+    return null;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error querying faucet contract:', error);
+    return null;
+  }
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -3291,4 +3330,5 @@ export {
   getClerksMinistryFinance,
   updateValidate,
   getValidator,
+  getFaucetTimeUntilNextFunding,
 };
