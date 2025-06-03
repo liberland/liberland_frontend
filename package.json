@@ -11,7 +11,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.13.0",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/react-fontawesome": "^0.1.9",
-    "@polkadot/api": "^11.3.1",
+    "@polkadot/api": "^16.1.1",
     "@polkadot/api-contract": "^16.1.1",
     "@polkadot/api-derive": "^11.3.1",
     "@polkadot/extension-dapp": "^0.47.6",

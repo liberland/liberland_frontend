@@ -16,22 +16,22 @@ import { walletActions } from '../../../redux/actions';
 import { isTestnet, getNetworkName } from '../../../utils/networkHelpers';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import { claimFaucetLLD, claimFaucetLLM } from '../../../api/middleware';
-import { getFaucetTimeUntilNextFunding } from '../../../api/nodeRpcCall';
+import { getFaucetTimeUntilNextFunding, getFaucetLldAmount, getFaucetLlmAmount } from '../../../api/nodeRpcCall';
 import styles from './styles.module.scss';
 
 const { Title, Paragraph } = Typography;
 
-// Faucet configuration
+// Base faucet configuration (will be updated with contract amounts)
 const FAUCET_CONFIG = {
   LLD: {
-    amount: 1000, // 1000 LLD per claim
-    dailyLimit: 1000, // 1000 LLD per 24 hours
+    amount: 0, // Will be fetched from contract
+    dailyLimit: 0, // Will be fetched from contract
     symbol: 'LLD',
     name: 'Liberland Dollar',
   },
   LLM: {
-    amount: 10, // 10 LLM per claim
-    dailyLimit: 10, // 10 LLM per 24 hours
+    amount: 0, // Will be fetched from contract
+    dailyLimit: 0, // Will be fetched from contract
     symbol: 'LLM',
     name: 'Liberland Merit',
   },
@@ -48,8 +48,38 @@ function Faucet() {
   const [loading, setLoading] = useState({ LLD: false, LLM: false });
   const [timeUntilNext, setTimeUntilNext] = useState({ LLD: null, LLM: null });
   const [checkingCooldown, setCheckingCooldown] = useState(false);
+  const [faucetAmounts, setFaucetAmounts] = useState({ LLD: null, LLM: null });
+  const [loadingAmounts, setLoadingAmounts] = useState(true);
 
-  // Check cooldown times from blockchain
+  const fetchFaucetAmounts = useCallback(async () => {
+    setLoadingAmounts(true);
+    try {
+      const [lldAmount, llmAmount] = await Promise.all([
+        getFaucetLldAmount(),
+        getFaucetLlmAmount(),
+      ]);
+
+      const formattedLldAmount = lldAmount ? Math.floor(lldAmount / 1e12) : 0;
+      const formattedLlmAmount = llmAmount ? Math.floor(llmAmount / 1e12) : 0;
+
+      setFaucetAmounts({
+        LLD: formattedLldAmount,
+        LLM: formattedLlmAmount,
+      });
+
+      FAUCET_CONFIG.LLD.amount = formattedLldAmount;
+      FAUCET_CONFIG.LLD.dailyLimit = formattedLldAmount;
+      FAUCET_CONFIG.LLM.amount = formattedLlmAmount;
+      FAUCET_CONFIG.LLM.dailyLimit = formattedLlmAmount;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching faucet amounts:', error);
+      message.error('Failed to fetch faucet amounts from contract');
+    } finally {
+      setLoadingAmounts(false);
+    }
+  }, []);
+
   const checkCooldownTimes = useCallback(async () => {
     if (!userWalletAddress) return;
 
@@ -73,15 +103,16 @@ function Faucet() {
     }
   }, [userWalletAddress]);
 
-  // Check cooldown on component mount and when wallet address changes
+  useEffect(() => {
+    fetchFaucetAmounts();
+  }, [fetchFaucetAmounts]);
+
   useEffect(() => {
     checkCooldownTimes();
-    // Set up interval to refresh cooldown status every minute
     const interval = setInterval(checkCooldownTimes, 60000);
     return () => clearInterval(interval);
   }, [checkCooldownTimes]);
 
-  // Don't show faucet on mainnet
   if (!isTestnet()) {
     return (
       <Result
@@ -92,11 +123,10 @@ function Faucet() {
     );
   }
 
-  // Check if user can claim tokens
   const canClaim = (tokenType) => {
     const timeRemaining = timeUntilNext[tokenType];
 
-    if (timeRemaining === null) {
+    if (timeRemaining === null || timeRemaining === undefined) {
       return {
         canClaim: false,
         reason: 'Checking...',
@@ -119,7 +149,6 @@ function Faucet() {
     };
   };
 
-  // Format time remaining
   const formatTimeRemaining = (ms) => {
     const hours = Math.floor(ms / (1000 * 60 * 60));
     const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
@@ -130,7 +159,6 @@ function Faucet() {
     return `${minutes}m`;
   };
 
-  // Handle token claim
   const handleClaim = async (tokenType) => {
     if (!userWalletAddress) return;
 
@@ -140,17 +168,19 @@ function Faucet() {
     setLoading((prev) => ({ ...prev, [tokenType]: true }));
 
     try {
+      const claimAmount = faucetAmounts[tokenType] || FAUCET_CONFIG[tokenType].amount;
+
       if (tokenType === 'LLD') {
         await claimFaucetLLD(userWalletAddress);
       } else {
         await claimFaucetLLM(userWalletAddress);
       }
 
-      message.success(`Successfully claimed ${FAUCET_CONFIG[tokenType].amount} ${tokenType}!`);
+      message.success(`Successfully claimed ${claimAmount} ${tokenType}!`);
 
-      // Refresh wallet data and cooldown status
       dispatch(walletActions.getWallet.call(userWalletAddress));
       await checkCooldownTimes();
+      await fetchFaucetAmounts();
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(`Error claiming ${tokenType}:`, error);
@@ -160,11 +190,25 @@ function Faucet() {
     }
   };
 
-  // Render claim button
   const renderClaimButton = (tokenType) => {
     const claimStatus = canClaim(tokenType);
     const config = FAUCET_CONFIG[tokenType];
     const isLoading = loading[tokenType];
+    const amount = faucetAmounts[tokenType];
+
+    if (loadingAmounts) {
+      return (
+        <Button
+          className={`${styles.claimButton} ${styles.disabled}`}
+          size="large"
+          disabled
+        >
+          <Spin size="small" />
+          {' '}
+          Loading amounts...
+        </Button>
+      );
+    }
 
     if (isLoading) {
       return (
@@ -232,7 +276,7 @@ function Faucet() {
       >
         Claim
         {' '}
-        {config.amount}
+        {amount || config.amount}
         {' '}
         {config.symbol}
       </Button>
@@ -262,6 +306,7 @@ function Faucet() {
   const renderTokenCard = (tokenType) => {
     const config = FAUCET_CONFIG[tokenType];
     const claimStatus = canClaim(tokenType);
+    const contractAmount = faucetAmounts[tokenType];
 
     // Use real balance
     const balance = tokenType === 'LLD'
@@ -309,8 +354,10 @@ function Faucet() {
           {/* Info Alert */}
           <Alert
             className={styles.infoAlert}
-            message={`Claim ${config.amount} ${config.symbol} every ${COOLDOWN_HOURS} hours`}
-            description="Cooldown times are managed by the blockchain faucet contract"
+            message={loadingAmounts
+              ? `Loading ${config.symbol} amount from contract...`
+              : `Claim ${contractAmount || config.amount} ${config.symbol} every ${COOLDOWN_HOURS} hours`}
+            description="Cooldown times and amounts are managed by the blockchain faucet contract"
             type="info"
             showIcon
             icon={<CheckCircleOutlined />}
@@ -364,7 +411,17 @@ function Faucet() {
         <ul>
           <li>Cooldown times are managed by the faucet contract</li>
           <li>Claims are processed through secure middleware APIs</li>
-          <li>Each claim gives you exactly 1000 tokens of LLD and 10 tokens of LLM</li>
+          <li>
+            Each claim gives you exactly
+            {' '}
+            {FAUCET_CONFIG.LLD.amount}
+            {' '}
+            tokens of LLD and
+            {' '}
+            {FAUCET_CONFIG.LLM.amount}
+            {' '}
+            tokens of LLM
+          </li>
           <li>Only available on testnet environments</li>
         </ul>
       </div>

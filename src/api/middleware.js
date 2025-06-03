@@ -124,11 +124,11 @@ export const checkPayment = async ({
   return data.paid;
 };
 
-export const claimFaucetLLD = async (address) => {
+export const claimFaucetLLD = async (walletAddress) => {
   const middlewareApi = getMiddlewareApi();
   try {
     const response = await middlewareApi.post('/v1/faucet/lld', {
-      address,
+      walletAddress,
     });
     return response.data;
   } catch (error) {
@@ -136,11 +136,11 @@ export const claimFaucetLLD = async (address) => {
   }
 };
 
-export const claimFaucetLLM = async (address) => {
+export const claimFaucetLLM = async (walletAddress) => {
   const middlewareApi = getMiddlewareApi();
   try {
     const response = await middlewareApi.post('/v1/faucet/llm', {
-      address,
+      walletAddress,
     });
     return response.data;
   } catch (error) {

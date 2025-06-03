@@ -13,11 +13,13 @@ export const isTestnet = () => {
   // Common testnet indicators
   const testnetIndicators = [
     'testnet',
+    'testchain',
     'test',
     'dev',
     'localhost',
     '127.0.0.1',
-    '9944', // Default dev port
+    '9944',
+    '8060',
     'staging',
   ];
 
