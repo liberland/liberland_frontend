@@ -239,20 +239,23 @@ const crossReference = (api, blockchainData, allCentralizedData, motions, isRefe
 const submitExtrinsic = async (extrinsic, walletAddress, api) => {
   const { signer } = await web3FromAddress(walletAddress);
   return new Promise((resolve, reject) => {
-    extrinsic.signAndSend(walletAddress, { signer }, ({ status, events, dispatchError }) => {
-      const errorData = handleMyDispatchErrors(dispatchError, api);
-      if (status.isInBlock) {
-        const blockHash = status.asInBlock.toString();
-        // eslint-disable-next-line no-console
-        console.log(errorData, events);
-        if (errorData.isError) {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject({
-            blockHash, status, events, errorData,
-          });
-        } else resolve({ blockHash, status, events });
-      }
-    }).catch((err) => {
+    extrinsic.signAndSend(
+      walletAddress,
+      { signer, withSignedTransaction: true },
+      ({ status, events, dispatchError }) => {
+        const errorData = handleMyDispatchErrors(dispatchError, api);
+        if (status.isInBlock) {
+          const blockHash = status.asInBlock.toString();
+          // eslint-disable-next-line no-console
+          console.log(errorData, events);
+          if (errorData.isError) {
+            // eslint-disable-next-line prefer-promise-reject-errors
+            reject({
+              blockHash, status, events, errorData,
+            });
+          } else resolve({ blockHash, status, events });
+        }
+      }).catch((err) => {
       // eslint-disable-next-line no-console
       console.log(err);
       reject(err);
@@ -1514,7 +1517,7 @@ const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress
   // scaleEncoded is ready to be used for setting metadata
   // eslint-disable-next-line max-len
   // this data will be validated and will be rejected if encoded incorrectly or data is nonsensical (not on liberland island, self-intersecting plot lines, less then 3 points)
-  officeExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+  officeExtrinsic.signAndSend(walletAddress, { signer: injector.signer, withSignedTransaction: true }, ({ status }) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed REQUEST COMPANY REGISTRATION at block hash #${status.asInBlock.toString()}`);
