@@ -123,3 +123,20 @@ export const checkPayment = async ({
   }
   return data.paid;
 };
+
+export const createPayment = async ({
+  orderId,
+  price,
+  toId,
+  callback,
+}) => {
+  const { status, statusText } = await getMiddlewareApi().post('/v1/create-purchase', {
+    orderId,
+    price,
+    toId,
+    callback,
+  });
+  if (status >= 400) {
+    throw statusText;
+  }
+};

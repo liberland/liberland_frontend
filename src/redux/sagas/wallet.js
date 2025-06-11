@@ -17,7 +17,7 @@ import {
   mintAsset,
   createOrUpdateAsset,
 } from '../../api/nodeRpcCall';
-import { checkPayment } from '../../api/middleware';
+import { checkPayment, createPayment } from '../../api/middleware';
 import { getHistoryTransfers } from '../../api/explorer';
 
 import { walletActions } from '../actions';
@@ -31,6 +31,11 @@ function* checkPaymentWorker(action) {
   if (isPaid) {
     yield put(walletActions.checkPayment.success());
   }
+}
+
+function* createPaymentWorker(action) {
+  yield call(createPayment, action.payload);
+  yield put(walletActions.createPayment.success());
 }
 
 function* getWalletWorker() {
@@ -178,6 +183,10 @@ function* checkPaymentWatcher() {
   yield* blockchainWatcher(walletActions.checkPayment, checkPaymentWorker);
 }
 
+function* createPaymentWatcher() {
+  yield* blockchainWatcher(walletActions.createPayment, createPaymentWorker);
+}
+
 function* sendTransferWithRemarkWatcher() {
   yield* blockchainWatcher(walletActions.sendTransferRemark, sendTransferRemarkWorker);
 }
@@ -264,4 +273,5 @@ export {
   mintAssetWatcher,
   createOrUpdateAssetWatcher,
   checkPaymentWatcher,
+  createPaymentWatcher,
 };

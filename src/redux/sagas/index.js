@@ -50,6 +50,7 @@ export default function* rootSaga() {
     walletSagas.createOrUpdateAssetWatcher(),
     walletSagas.mintAssetWatcher(),
     walletSagas.checkPaymentWatcher(),
+    walletSagas.createPaymentWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),
