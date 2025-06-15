@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import Autocomplete from 'antd/es/auto-complete';
 import Spin from 'antd/es/spin';
 import Flex from 'antd/es/flex';
-import CheckCircleFilled from '@ant-design/icons/CheckCircleFilled';
-import CloseCircleFilled from '@ant-design/icons/CloseCircleFilled';
 import { getUsersIdentityData } from '../../api/explorer';
-import styles from './styles.module.scss';
+import IsConfirmed from './IsConfirmed';
 
 function InputSearch(props) {
   const [loading, setLoading] = useState();
@@ -20,9 +18,7 @@ function InputSearch(props) {
         value: id,
         label: (
           <Flex gap="15px">
-            {isConfirmed
-              ? <CheckCircleFilled className={styles.green} />
-              : <CloseCircleFilled className={styles.red} />}
+            <IsConfirmed isConfirmed={isConfirmed} />
             <strong>{name}</strong>
             <span>
               {id}

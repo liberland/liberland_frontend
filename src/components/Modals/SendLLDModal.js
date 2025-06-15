@@ -6,6 +6,8 @@ import Paragraph from 'antd/es/typography/Paragraph';
 import Flex from 'antd/es/flex';
 import Collapse from 'antd/es/collapse';
 import InputNumber from 'antd/es/input-number';
+import Input from 'antd/es/input';
+import Spin from 'antd/es/spin';
 import { useDispatch, useSelector } from 'react-redux';
 import { BN_ZERO, BN } from '@polkadot/util';
 import Button from '../Button/Button';
@@ -17,8 +19,16 @@ import modalWrapper from './components/ModalWrapper';
 import OpenModalButton from './components/OpenModalButton';
 import RemarkFormUser from '../Wallet/RemarkFormUser';
 import { IndexHelper } from '../../utils/council/councilEnum';
+import { useConfirmed } from '../InputComponents/hooks';
+import HookConsumer from '../../hooks/HookConsumer';
+import IsConfirmed from '../InputComponents/IsConfirmed';
 
-function SendLLDForm({ onClose, onSuccess, initialValues }) {
+function SendLLDForm({
+  onClose,
+  onSuccess,
+  initialValues,
+  readOnly,
+}) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
   const [isLoading, setIsLoading] = useState();
@@ -82,13 +92,42 @@ function SendLLDForm({ onClose, onSuccess, initialValues }) {
     >
       <Title level={3}>Send LLD</Title>
       <Paragraph>You are going to send tokens from your wallet</Paragraph>
-      <Form.Item
-        label="Send to address"
-        name="recipient"
-        rules={[{ required: true }]}
-      >
-        <InputSearch placeholder="Send to address" />
-      </Form.Item>
+      {readOnly ? (
+        <HookConsumer useHook={useConfirmed} params={{ value: initialValues.recipient }}>
+          {({
+            loading,
+            error,
+            isConfirmed,
+            name,
+          }) => {
+            if (loading) {
+              return <Spin />;
+            }
+            return (
+              <Form.Item
+                label="Send to address"
+                name="recipient"
+                rules={[{ required: true }]}
+                extra={name}
+                help={error ? 'Could not verify identity' : undefined}
+              >
+                <Input
+                  readOnly
+                  addonAfter={<IsConfirmed isConfirmed={isConfirmed} />}
+                />
+              </Form.Item>
+            );
+          }}
+        </HookConsumer>
+      ) : (
+        <Form.Item
+          label="Send to address"
+          name="recipient"
+          rules={[{ required: true }]}
+        >
+          <InputSearch placeholder="Send to address" />
+        </Form.Item>
+      )}
       <Form.Item
         name="amount"
         label="Amount LLD"
@@ -99,14 +138,19 @@ function SendLLDForm({ onClose, onSuccess, initialValues }) {
           },
         ]}
       >
-        <InputNumber stringMode controls={false} placeholder="Amount LLD" />
+        <InputNumber
+          stringMode
+          controls={false}
+          placeholder="Amount LLD"
+          readOnly={readOnly}
+        />
       </Form.Item>
       <Form.Item
         name="remark"
       >
         <Collapse
           activeKey={remark ? ['remark'] : []}
-          onChange={() => form.setFieldValue('remark', !remark)}
+          onChange={readOnly ? undefined : () => form.setFieldValue('remark', !remark)}
           destroyInactivePanel
           items={[{
             key: 'remark',
@@ -115,6 +159,7 @@ function SendLLDForm({ onClose, onSuccess, initialValues }) {
               <RemarkFormUser
                 form={form}
                 setIsLoading={setIsLoading}
+                readOnly={readOnly}
               />
             ),
           }]}
@@ -140,6 +185,7 @@ SendLLDForm.propTypes = {
     description: PropTypes.string,
   }),
   onSuccess: PropTypes.func,
+  readOnly: PropTypes.bool,
 };
 
 function ButtonModal(props) {
