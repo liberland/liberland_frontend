@@ -69,26 +69,11 @@ const fetchSpending = async (wallet, skip, take) => {
   }
 };
 
-const fetchSpendingCount = async (wallet) => {
-  const { data: { count } } = await getMiddlewareApi().get(
-    `/v1/government-spendings/${wallet}/count`,
-  );
-  return count;
-};
-
-export const fetchCongressSpendingCount = () => fetchSpendingCount(
-  '5EYCAe5g8CDuMsTief7QBxfvzDFEfws6ueXTUhsbx5V81nGH',
+export const fetchCongressSpending = () => (
+  fetchSpending('5EYCAe5g8CDuMsTief7QBxfvzDFEfws6ueXTUhsbx5V81nGH')
 );
-
-export const fetchMinistryOfFinanceSpendingCount = () => fetchSpendingCount(
-  '5EYCAe5iXF2YZpCZr7ALYUUYaNpMXde3NUXxYn1Sc1YRM4gV',
-);
-
-export const fetchCongressSpending = (skip, take) => (
-  fetchSpending('5EYCAe5g8CDuMsTief7QBxfvzDFEfws6ueXTUhsbx5V81nGH', skip, take)
-);
-export const fetchMinistryOfFinanceSpending = (skip, take) => (
-  fetchSpending('5EYCAe5iXF2YZpCZr7ALYUUYaNpMXde3NUXxYn1Sc1YRM4gV', skip, take)
+export const fetchMinistryOfFinanceSpending = () => (
+  fetchSpending('5EYCAe5iXF2YZpCZr7ALYUUYaNpMXde3NUXxYn1Sc1YRM4gV')
 );
 
 export const getTaxPayers = async (timeInMonth, limit) => {

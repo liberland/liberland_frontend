@@ -63,8 +63,3 @@ export const spendingSelector = createSelector(
   ministryFinanceReducer,
   (reducer) => reducer.ministryFinanceSpending,
 );
-
-export const spendingCountSelector = createSelector(
-  ministryFinanceReducer,
-  (reducer) => reducer.spendingCount,
-);

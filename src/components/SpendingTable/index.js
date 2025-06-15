@@ -22,9 +22,6 @@ import truncate from '../../utils/truncate';
 
 export default function SpendingTable({
   spending,
-  isLoading,
-  total,
-  onNext,
 }) {
   const names = useSelector(identitySelectors.selectorIdentityMotions);
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
@@ -165,10 +162,6 @@ export default function SpendingTable({
                 },
               ]}
               data={displayData}
-              total={total}
-              simple
-              onPageChange={onNext}
-              disablePagination={isLoading}
               pageSize={10}
             />
           ) : (
@@ -176,14 +169,7 @@ export default function SpendingTable({
               dataSource={displayData}
               itemLayout="horizontal"
               size="small"
-              pagination={{
-                pageSize: 10,
-                total,
-                onChange: onNext,
-                simple: { readOnly: true },
-                showSizeChanger: false,
-                disabled: isLoading,
-              }}
+              pagination={{ pageSize: 10 }}
               renderItem={({
                 timestamp,
                 recipient,
@@ -243,9 +229,6 @@ export default function SpendingTable({
 }
 
 SpendingTable.propTypes = {
-  onNext: PropTypes.func.isRequired,
-  total: PropTypes.number.isRequired,
-  isLoading: PropTypes.bool.isRequired,
   spending: PropTypes.arrayOf(PropTypes.shape({
     timestamp: PropTypes.instanceOf(Date).isRequired,
     recipient: PropTypes.string.isRequired,
