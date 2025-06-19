@@ -50,6 +50,7 @@ export default function* rootSaga() {
     walletSagas.createOrUpdateAssetWatcher(),
     walletSagas.mintAssetWatcher(),
     walletSagas.checkPaymentWatcher(),
+    walletSagas.createPaymentWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),
@@ -141,7 +142,6 @@ export default function* rootSaga() {
     congressSagas.getAllBalanceForCongressWatcher(),
     congressSagas.congressBudgetProposeWatcher(),
     congressSagas.congressSpendingWatcher(),
-    congressSagas.congressSpendingCountWatcher(),
 
     // ONBOARDING
     onboardingSagas.claimComplimentaryLLDWatcher(),
@@ -219,6 +219,5 @@ export default function* rootSaga() {
     ministryFinanceSagas.sendLlmToPolitipoolWatcher(),
     ministryFinanceSagas.sendLlmWatcher(),
     ministryFinanceSagas.ministryOfFinanceSpendingWatcher(),
-    ministryFinanceSagas.ministryOfFinanceSpendingCountWatcher(),
   ]);
 }

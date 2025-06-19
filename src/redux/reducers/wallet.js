@@ -41,6 +41,7 @@ const initialState = {
   assetsBalance: {},
   transferState: null,
   paymentSuccess: false,
+  paymentCreated: false,
 };
 
 const walletReducer = handleActions(
@@ -68,6 +69,7 @@ const walletReducer = handleActions(
       walletActions.createOrUpdateAsset.call,
       walletActions.mintAsset.call,
       walletActions.checkPayment.call,
+      walletActions.createPayment.call,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: true,
@@ -142,6 +144,10 @@ const walletReducer = handleActions(
       ...state,
       nominatorTargets: action.payload,
     }),
+    [walletActions.createPayment.success]: (state) => ({
+      ...state,
+      paymentCreated: true,
+    }),
     [combineActions(
       walletActions.getWallet.success,
       walletActions.getWallet.failure,
@@ -178,6 +184,8 @@ const walletReducer = handleActions(
       walletActions.mintAsset.failure,
       walletActions.checkPayment.success,
       walletActions.checkPayment.failure,
+      walletActions.createPayment.success,
+      walletActions.createPayment.failure,
     )]: (state) => ({
       ...state,
       gettingWalletInfo: initialState.gettingWalletInfo,

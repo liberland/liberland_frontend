@@ -20,6 +20,7 @@ export const {
   mintAsset,
   createOrUpdateAsset,
   checkPayment,
+  createPayment,
 } = createActions({
   GET_WALLET: {
     call: undefined,
@@ -127,6 +128,11 @@ export const {
     failure: undefined,
   },
   CHECK_PAYMENT: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  CREATE_PAYMENT: {
     call: undefined,
     success: undefined,
     failure: undefined,

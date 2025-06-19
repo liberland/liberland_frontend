@@ -1,7 +1,6 @@
 import { handleActions, combineActions } from 'redux-actions';
 import { BN_ZERO } from '@polkadot/util';
 import { congressActions } from '../actions';
-import { spendingTableMerge } from '../../utils/spendingTable';
 
 const initialState = {
   codeName: 'councilAccount',
@@ -42,7 +41,6 @@ const initialState = {
     period: BN_ZERO,
   },
   congressSpending: null,
-  spendingCount: 0,
 };
 
 const congressReducer = handleActions(
@@ -69,7 +67,6 @@ const congressReducer = handleActions(
       congressActions.getAllBalanceForCongress.call,
       congressActions.congressBudgetPropose.call,
       congressActions.congressSpending.call,
-      congressActions.congressSpendingCount.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -82,7 +79,6 @@ const congressReducer = handleActions(
       congressActions.getTreasuryInfo.call,
       congressActions.getAllBalanceForCongress.call,
       congressActions.congressSpending.call,
-      congressActions.congressSpendingCount.call,
     )]: (state) => ({
       ...state,
       unobtrusive: true,
@@ -119,8 +115,6 @@ const congressReducer = handleActions(
       congressActions.congressBudgetPropose.success,
       congressActions.congressSpending.success,
       congressActions.congressSpending.failure,
-      congressActions.congressSpendingCount.success,
-      congressActions.congressSpendingCount.failure,
     )]: (state) => ({
       ...state,
       loading: false,
@@ -160,11 +154,7 @@ const congressReducer = handleActions(
     }),
     [congressActions.congressSpending.success]: (state, action) => ({
       ...state,
-      congressSpending: spendingTableMerge(action.payload, state.congressSpending),
-    }),
-    [congressActions.congressSpendingCount.success]: (state, action) => ({
-      ...state,
-      spendingCount: action.payload.count,
+      congressSpending: action.payload,
     }),
   },
   initialState,

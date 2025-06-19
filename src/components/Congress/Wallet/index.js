@@ -15,21 +15,10 @@ export default function Wallet() {
   const userIsMember = useSelector(congressSelectors.userIsMember);
   const balances = useSelector(congressSelectors.balances);
   const spending = useSelector(congressSelectors.spendingSelector);
-  const spendingCount = useSelector(congressSelectors.spendingCountSelector);
-  const isLoading = useSelector(congressSelectors.isLoading);
   const dispatch = useDispatch();
 
-  const loadMore = (page, pageSize) => {
-    const from = spending ? spending.from : 0;
-    const skip = (page - 1) * pageSize;
-    if (from < (page * pageSize)) {
-      dispatch(congressActions.congressSpending.call({ skip, take: pageSize }));
-    }
-  };
-
   useEffect(() => {
-    dispatch(congressActions.congressSpendingCount.call());
-    loadMore(1, 10);
+    dispatch(congressActions.congressSpending.call());
     dispatch(congressActions.getMembers.call());
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only on mount
@@ -52,12 +41,9 @@ export default function Wallet() {
           }}
         />
       )}
-      {spending && spendingCount ? (
+      {spending ? (
         <SpendingTable
           spending={spending.data}
-          onNext={loadMore}
-          total={spendingCount}
-          isLoading={isLoading}
         />
       ) : null}
     </Flex>
