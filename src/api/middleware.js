@@ -147,3 +147,23 @@ export const claimFaucetLLM = async (walletAddress) => {
     throw new Error(error.response?.data?.message || 'Failed to claim LLM');
   }
 };
+
+export const getFaucetAmount = async (token) => {
+  const middlewareApi = getMiddlewareApi();
+  try {
+    const response = await middlewareApi.get(`/v1/faucet/amount/${token}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to get LLM amount');
+  }
+};
+
+export const getFaucetCooldown = async (walletAddress, token) => {
+  const middlewareApi = getMiddlewareApi();
+  try {
+    const response = await middlewareApi.get(`/v1/faucet/cooldown?walletAddress=${walletAddress}&token=${token}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to get LLM amount');
+  }
+};

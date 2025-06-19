@@ -5,7 +5,6 @@ import {
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { ContractPromise } from '@polkadot/api-contract';
 import groupBy from 'lodash/groupBy';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
@@ -19,7 +18,6 @@ import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
 import { decodeAndFilter } from '../utils/identityParser';
 import { OfficeType } from '../utils/officeTypeEnum';
-import { FAUCET_CONTRACT } from '../constants/contracts';
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 let __apiCache = null;
@@ -3141,135 +3139,6 @@ async function transferNFT(collectionId, itemId, newOwner, walletAddress) {
   return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
-async function getFaucetTimeUntilNextFunding(address, tokenType) {
-  try {
-    const api = await getApi();
-
-    const contract = new ContractPromise(api, FAUCET_CONTRACT.METADATA, FAUCET_CONTRACT.ADDRESS);
-
-    const gasLimit = api.registry.createType('WeightV2', {
-      refTime: 30_000_000_000_000,
-      proofSize: 5_000_000,
-    });
-    const storageDepositLimit = null;
-    const formattedTokenType = { [tokenType]: null };
-
-    const { result, output } = await contract.query.getTimeUntilNextFunding(
-      address,
-      {
-        gasLimit,
-        storageDepositLimit,
-      },
-      address,
-      formattedTokenType,
-    );
-
-    if (result.isOk) {
-      const timeUntilNextString = output.toHuman().Ok;
-      const timeUntilNext = parseInt(timeUntilNextString.replace(/,/g, ''));
-      return timeUntilNext;
-    }
-    const errorData = result.asErr;
-    if (errorData.isModule) {
-      const decoded = api.registry.findMetaError(errorData.asModule);
-      // eslint-disable-next-line no-console
-      console.error(`Contract error: ${decoded.section}.${decoded.name}: ${decoded.docs.join(' ')}`);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Contract call failed:', errorData.toString());
-    }
-    return null;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error querying faucet contract:', error);
-    return null;
-  }
-}
-
-async function getFaucetLldAmount() {
-  try {
-    const api = await getApi();
-
-    const contract = new ContractPromise(api, FAUCET_CONTRACT.METADATA, FAUCET_CONTRACT.ADDRESS);
-
-    const gasLimit = api.registry.createType('WeightV2', {
-      refTime: 30_000_000_000_000,
-      proofSize: 5_000_000,
-    });
-    const storageDepositLimit = null;
-
-    const { result, output } = await contract.query.getLldAmount(
-      FAUCET_CONTRACT.ADDRESS, // caller address
-      {
-        gasLimit,
-        storageDepositLimit,
-      },
-    );
-
-    if (result.isOk) {
-      const amountString = output.toHuman().Ok;
-      const amount = parseInt(amountString.replace(/,/g, ''));
-      return amount;
-    }
-    const errorData = result.asErr;
-    if (errorData.isModule) {
-      const decoded = api.registry.findMetaError(errorData.asModule);
-      // eslint-disable-next-line no-console
-      console.error(`Contract error: ${decoded.section}.${decoded.name}: ${decoded.docs.join(' ')}`);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Contract call failed:', errorData.toString());
-    }
-    return null;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error querying faucet LLD amount:', error);
-    return null;
-  }
-}
-
-async function getFaucetLlmAmount() {
-  try {
-    const api = await getApi();
-
-    const contract = new ContractPromise(api, FAUCET_CONTRACT.METADATA, FAUCET_CONTRACT.ADDRESS);
-
-    const gasLimit = api.registry.createType('WeightV2', {
-      refTime: 30_000_000_000_000,
-      proofSize: 5_000_000,
-    });
-    const storageDepositLimit = null;
-
-    const { result, output } = await contract.query.getLlmAmount(
-      FAUCET_CONTRACT.ADDRESS, // caller address
-      {
-        gasLimit,
-        storageDepositLimit,
-      },
-    );
-
-    if (result.isOk) {
-      const amountString = output.toHuman().Ok;
-      const amount = parseInt(amountString.replace(/,/g, ''));
-      return amount;
-    }
-    const errorData = result.asErr;
-    if (errorData.isModule) {
-      const decoded = api.registry.findMetaError(errorData.asModule);
-      // eslint-disable-next-line no-console
-      console.error(`Contract error: ${decoded.section}.${decoded.name}: ${decoded.docs.join(' ')}`);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Contract call failed:', errorData.toString());
-    }
-    return null;
-  } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error querying faucet LLM amount:', error);
-    return null;
-  }
-}
-
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -3422,7 +3291,4 @@ export {
   getClerksMinistryFinance,
   updateValidate,
   getValidator,
-  getFaucetTimeUntilNextFunding,
-  getFaucetLldAmount,
-  getFaucetLlmAmount,
 };
