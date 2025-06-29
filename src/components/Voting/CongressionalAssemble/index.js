@@ -296,7 +296,7 @@ function CongressionalAssemble() {
         >
           <Card.Meta
             // eslint-disable-next-line max-len
-            description="View the final results of Liberland’s most recent election. This explorer shows candidate scores, rankings, and detailed statistics such as voting stake versus performance — all secured and verified on-chain."
+            description="View the results of Liberland’s upcoming election. This explorer shows candidate scores, rankings, and detailed statistics such as voting stake versus performance — all secured and verified on-chain."
           />
         </Card>
       </Flex>
