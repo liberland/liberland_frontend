@@ -410,3 +410,24 @@ textarea.ant-input {
 .ant-layout-sider-children .ant-menu {
   background-color: var(--nav-bg);
 }
+
+.twoSplitter {
+  .ant-card {
+    width: 100%;
+  }
+  @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
+    .ant-card {
+      width: calc(50% - 7.5px);
+
+      .ant-card-body {
+        height: 150px;
+      }
+    }
+  }
+  .ant-card-head-title {
+    .ant-typography {
+      margin-bottom: 15px;
+      margin-top: 15px;
+    }
+  }
+}
