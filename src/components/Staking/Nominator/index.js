@@ -110,6 +110,9 @@ function Nominator() {
   }, [validators, dispatch]);
 
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1920px)');
+  const selectingValidatorsDisabled = (isSelected) => (
+    !isSelected && isMaxNumValidatorsSelected(selectedValidatorsAsTargets)
+  );
 
   return (
     <Flex vertical gap="20px">
@@ -140,7 +143,7 @@ function Nominator() {
         <ValidatorList
           validators={validators}
           selectedValidatorsAsTargets={selectedValidatorsAsTargets}
-          selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+          selectingValidatorsDisabled={selectingValidatorsDisabled}
           toggleSelectedValidator={toggleSelectedValidator}
           goToAdvancedPage={goToAdvancedPage}
           updateNominations={updateNominations}
@@ -149,7 +152,7 @@ function Nominator() {
         <ValidatorListMobile
           validators={validators}
           selectedValidatorsAsTargets={selectedValidatorsAsTargets}
-          selectingValidatorsDisabled={isMaxNumValidatorsSelected(selectedValidatorsAsTargets)}
+          selectingValidatorsDisabled={selectingValidatorsDisabled}
           toggleSelectedValidator={toggleSelectedValidator}
           goToAdvancedPage={goToAdvancedPage}
           updateNominations={updateNominations}
