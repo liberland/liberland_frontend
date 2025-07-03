@@ -6,7 +6,6 @@ import Select from 'antd/es/select';
 import Collapse from 'antd/es/collapse';
 import Result from 'antd/es/result';
 import Spin from 'antd/es/spin';
-import Title from 'antd/es/typography/Title';
 import { identityActions, officesActions } from '../../../redux/actions';
 import { officesSelectors } from '../../../redux/selectors';
 import TaxPayerCard from './TaxPayerCard';
