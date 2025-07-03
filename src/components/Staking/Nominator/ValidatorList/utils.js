@@ -55,7 +55,7 @@ export const getValidatorDisplay = ({
           address={address}
           toggleSelectedValidator={toggleSelectedValidator}
           nominatedByMe={nominatedByMe}
-          selectingValidatorsDisabled={selectingValidatorsDisabled}
+          selectingValidatorsDisabled={selectingValidatorsDisabled(nominatedByMe)}
         />
       ),
     };

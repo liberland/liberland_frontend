@@ -86,7 +86,7 @@ ValidatorList.propTypes = {
     blocked: PropTypes.bool,
   })).isRequired,
   selectedValidatorsAsTargets: PropTypes.arrayOf(PropTypes.string).isRequired,
-  selectingValidatorsDisabled: PropTypes.bool.isRequired,
+  selectingValidatorsDisabled: PropTypes.func.isRequired,
   toggleSelectedValidator: PropTypes.func.isRequired,
   updateNominations: PropTypes.func.isRequired,
   goToAdvancedPage: PropTypes.func.isRequired,
