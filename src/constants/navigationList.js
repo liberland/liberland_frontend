@@ -126,6 +126,13 @@ export const navigationList = [
     },
   },
   {
+    route: router.home.multisig,
+    title: 'Multisig',
+    icon: StakingIcon,
+    isDiscouraged: process.env.REACT_APP_IS_MULTISIG_DISCOURAGED === 'true',
+    subLinks: {},
+  },
+  {
     route: router.home.offices,
     title: 'Offices',
     icon: OfficesIcon,

@@ -38,6 +38,7 @@ function Home() {
         <Redirect to={router.home.feed} />
       )}
     />,
+    <Route key={router.home.multisig} path={router.home.multisig} component={loader(() => import('../Multisig'))} />,
   ];
 
   return (
