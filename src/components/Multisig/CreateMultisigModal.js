@@ -20,23 +20,25 @@ import { blockchainSelectors } from '../../redux/selectors';
 import CopyIconWithAddress from '../CopyIconWithAddress';
 import modalWrapper from '../Modals/components/ModalWrapper';
 import OpenModalButton from '../Modals/components/OpenModalButton';
+import { createMultisigData } from '../../utils/multisig';
 
 const { Text } = Typography;
 
 const MAX_SIGNATORIES = 100;
-const MIN_THRESHOLD = 2;
+const MIN_THRESHOLD = 1;
 
-// This would need to be implemented based on your app's multisig creation logic
-function createMultisig(signatories, threshold, options, onStatusChange) {
-  // Placeholder for actual multisig creation
-  console.log('Creating multisig with:', { signatories, threshold, options });
+function createMultisig(signatories, threshold, name, onStatusChange = () => {}) {
+  const multisigData = createMultisigData({
+    signatories,
+    threshold,
+    name,
+  });
 
-  // This should be replaced with actual multisig creation logic
   const status = {
     action: 'create',
     status: 'success',
     message: 'Multisig created successfully',
-    account: 'placeholder-address', // This would be the actual multisig address
+    account: multisigData.address,
   };
 
   if (onStatusChange) {
@@ -107,9 +109,8 @@ function MultisigForm({ onClose, onStatusChange }) {
 
   const handleCreateMultisig = useCallback((values) => {
     const { name } = values;
-    const options = { name: name?.trim() };
 
-    createMultisig(signatories, threshold, options, onStatusChange);
+    createMultisig(signatories, threshold, name.trim(), onStatusChange);
     onClose();
   }, [signatories, threshold, onStatusChange, onClose]);
 
@@ -297,10 +298,6 @@ function MultisigForm({ onClose, onStatusChange }) {
 MultisigForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   onStatusChange: PropTypes.func,
-};
-
-MultisigForm.defaultProps = {
-  onStatusChange: () => {},
 };
 
 function ButtonModal(props) {

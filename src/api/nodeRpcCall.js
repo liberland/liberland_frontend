@@ -255,7 +255,8 @@ const submitExtrinsic = async (extrinsic, walletAddress, api) => {
             });
           } else resolve({ blockHash, status, events });
         }
-      }).catch((err) => {
+      },
+    ).catch((err) => {
       // eslint-disable-next-line no-console
       console.log(err);
       reject(err);
@@ -3142,6 +3143,27 @@ async function transferNFT(collectionId, itemId, newOwner, walletAddress) {
   return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
+async function getMultisigAccountInfo(multisigAddress) {
+  const api = await getApi();
+  const accountInfo = await api.query.system.account(multisigAddress);
+
+  const multisigs = await api.query.multisig.multisigs.entries(multisigAddress);
+
+  return {
+    address: multisigAddress,
+    balance: {
+      total: accountInfo.data.free.toString(),
+      reserved: accountInfo.data.reserved.toString(),
+      transferable: accountInfo.data.free.sub(accountInfo.data.frozen).toString(),
+    },
+    nonce: accountInfo.nonce.toString(),
+    pendingMultisigs: multisigs.map(([key, value]) => ({
+      callHash: key.args[1].toHex(),
+      multisig: value.unwrap().toJSON(),
+    })),
+  };
+}
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -3294,4 +3316,5 @@ export {
   getClerksMinistryFinance,
   updateValidate,
   getValidator,
+  getMultisigAccountInfo,
 };
