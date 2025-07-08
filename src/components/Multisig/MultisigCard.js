@@ -8,6 +8,7 @@ import Typography from 'antd/es/typography';
 import Tooltip from 'antd/es/tooltip';
 import Dropdown from 'antd/es/dropdown';
 import {
+  DeleteOutlined,
   DownloadOutlined,
   FileTextOutlined,
   MoreOutlined,
@@ -17,6 +18,7 @@ import {
 import Button from '../Button/Button';
 import CopyIconWithAddress from '../CopyIconWithAddress';
 import { formatDollars } from '../../utils/walletHelpers';
+import { removeMultisigFromStorage } from '../../utils/multisig';
 
 const { Text } = Typography;
 
@@ -25,6 +27,7 @@ function MultisigCard({
   userAddress,
   onExportSignatories,
   onViewApprovals,
+  onMultisigRemoved,
 }) {
   const isSignatory = multisig.signatories.includes(userAddress);
 
@@ -41,6 +44,15 @@ function MultisigCard({
       icon: <FileTextOutlined />,
       disabled: multisig.pendingTxs === 0,
       onClick: () => onViewApprovals(multisig),
+    },
+    {
+      key: 'remove',
+      label: 'Remove',
+      icon: <DeleteOutlined />,
+      onClick: () => {
+        removeMultisigFromStorage(multisig.address);
+        onMultisigRemoved();
+      },
     },
   ];
 
@@ -138,6 +150,7 @@ MultisigCard.propTypes = {
   userAddress: PropTypes.string.isRequired,
   onExportSignatories: PropTypes.func.isRequired,
   onViewApprovals: PropTypes.func.isRequired,
+  onMultisigRemoved: PropTypes.func.isRequired,
 };
 
 export default MultisigCard;

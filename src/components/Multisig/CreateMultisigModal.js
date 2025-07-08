@@ -21,11 +21,12 @@ import CopyIconWithAddress from '../CopyIconWithAddress';
 import modalWrapper from '../Modals/components/ModalWrapper';
 import OpenModalButton from '../Modals/components/OpenModalButton';
 import { createMultisigData } from '../../utils/multisig';
+import { isValidSubstrateAddress } from '../../utils/walletHelpers';
 
 const { Text } = Typography;
 
 const MAX_SIGNATORIES = 100;
-const MIN_THRESHOLD = 1;
+const MIN_THRESHOLD = 2;
 
 function createMultisig(signatories, threshold, name, onStatusChange = () => {}) {
   const multisigData = createMultisigData({
@@ -48,7 +49,7 @@ function createMultisig(signatories, threshold, name, onStatusChange = () => {})
   return status;
 }
 
-function MultisigForm({ onClose, onStatusChange }) {
+function MultisigForm({ onClose, onStatusChange, onMultisigCreated }) {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
 
   const [form] = Form.useForm();
@@ -57,6 +58,7 @@ function MultisigForm({ onClose, onStatusChange }) {
   const [uploadError, setUploadError] = useState('');
   const [signatories, setSignatories] = useState([]);
   const [threshold, setThreshold] = useState(MIN_THRESHOLD);
+  const [inputValue, setInputValue] = useState('');
 
   const handleFileUpload = useCallback((file) => {
     const reader = new FileReader();
@@ -88,14 +90,15 @@ function MultisigForm({ onClose, onStatusChange }) {
   }, []);
 
   const handleAddSignatory = useCallback((address) => {
+    address = address.trim();
+    if (!isValidSubstrateAddress(address)) return;
     if (address && !signatories.includes(address)) {
       const newSignatories = [...signatories, address];
       setSignatories(newSignatories);
-      if (newSignatories.length >= threshold) {
-        // Threshold is still valid
-      } else if (threshold > newSignatories.length) {
+      if (threshold > newSignatories.length) {
         setThreshold(Math.min(threshold, newSignatories.length));
       }
+      setInputValue('');
     }
   }, [signatories, threshold]);
 
@@ -111,8 +114,9 @@ function MultisigForm({ onClose, onStatusChange }) {
     const { name } = values;
 
     createMultisig(signatories, threshold, name.trim(), onStatusChange);
+    onMultisigCreated();
     onClose();
-  }, [signatories, threshold, onStatusChange, onClose]);
+  }, [signatories, threshold, onStatusChange, onMultisigCreated, onClose]);
 
   const resetFileUpload = useCallback(() => {
     setUploadedSignatories([]);
@@ -213,11 +217,15 @@ function MultisigForm({ onClose, onStatusChange }) {
               <Flex vertical gap={8}>
                 <InputSearch
                   placeholder="Enter or search for signatory address"
-                  onSelect={handleAddSignatory}
-                  onPressEnter={(e) => {
-                    if (e.target.value) {
-                      handleAddSignatory(e.target.value);
-                      e.target.value = '';
+                  value={inputValue}
+                  onChange={setInputValue}
+                  onSelect={(address) => {
+                    handleAddSignatory(address);
+                    setInputValue('');
+                  }}
+                  onInputKeyDown={(e) => {
+                    if (e.key === 'Enter' && inputValue.trim()) {
+                      handleAddSignatory(inputValue);
                     }
                   }}
                 />
@@ -298,11 +306,16 @@ function MultisigForm({ onClose, onStatusChange }) {
 MultisigForm.propTypes = {
   onClose: PropTypes.func.isRequired,
   onStatusChange: PropTypes.func,
+  onMultisigCreated: PropTypes.func,
 };
 
 function ButtonModal(props) {
   return <OpenModalButton text="Create Multisig" primary {...props} />;
 }
+
+ButtonModal.propTypes = {
+  onMultisigCreated: PropTypes.func,
+};
 
 const CreateMultisigModal = modalWrapper(MultisigForm, ButtonModal);
 

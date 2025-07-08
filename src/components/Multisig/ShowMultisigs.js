@@ -21,31 +21,31 @@ function ShowMultisigs() {
   const [multisigs, setMultisigs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const loadUserMultisigs = async () => {
-      setLoading(true);
-      try {
-        const localMultiSigs = loadMultisigsFromStorage();
-        const multisigInfos = await Promise.all(localMultiSigs.map(async (multisig) => {
+  const loadMultisigs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const localMultiSigs = loadMultisigsFromStorage();
+      const multisigInfos = await Promise.all(localMultiSigs.map(
+        async (multisig) => {
           const info = await getMultisigAccountInfo(multisig.address);
           return {
             ...multisig,
             ...info,
           };
-        }));
-        setMultisigs(multisigInfos);
-      } catch (error) {
-        console.error('Failed to load multisigs:', error);
-        message.error('Failed to load multisig accounts');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (userWalletAddress) {
-      loadUserMultisigs();
+        },
+      ));
+      setMultisigs(multisigInfos);
+    } catch (error) {
+      console.error('Failed to load multisigs:', error);
+      message.error('Failed to load multisig accounts');
+    } finally {
+      setLoading(false);
     }
-  }, [userWalletAddress]);
+  }, []);
+
+  useEffect(() => {
+    loadMultisigs();
+  }, [loadMultisigs]);
 
   const handleExportSignatories = useCallback((multisig) => {
     try {
@@ -104,7 +104,7 @@ function ShowMultisigs() {
             Multisig accounts where you are a signatory
           </Text>
         </div>
-        <CreateMultisigModal />
+        <CreateMultisigModal onMultisigCreated={loadMultisigs} />
       </Flex>
 
       {loading && (
@@ -124,7 +124,7 @@ function ShowMultisigs() {
               <br />
               Create a new multisig or ask to be added to an existing one.
             </Text>
-            <CreateMultisigModal />
+            <CreateMultisigModal onMultisigCreated={loadMultisigs} />
           </Flex>
         </Card>
       ) : (
@@ -136,6 +136,7 @@ function ShowMultisigs() {
               userAddress={userWalletAddress}
               onExportSignatories={handleExportSignatories}
               onViewApprovals={handleViewApprovals}
+              onMultisigRemoved={loadMultisigs}
             />
           ))}
         </div>
