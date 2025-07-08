@@ -65,22 +65,28 @@ function MultisigCard({
             <Text strong>{multisig.name}</Text>
             {!isSignatory && <Tag color="orange">Observer</Tag>}
           </Flex>
+
+        </Flex>
+        )}
+      extra={(
+        <Flex gap={12}>
+          {multisig.pendingTxs.length > 0 && (
+            <Badge count={multisig.pendingTxs.length} color="orange">
+              <Button
+                size="small"
+                onClick={() => onViewApprovals(multisig)}
+              >
+                Pending
+              </Button>
+            </Badge>
+          )}
           <Dropdown menu={{ items: menuItems }} trigger={['click']}>
             <Button size="small" icon={<MoreOutlined />}>
               <MenuOutlined />
             </Button>
           </Dropdown>
         </Flex>
-        )}
-      extra={
-          multisig.pendingTxs > 0 && (
-            <Badge count={multisig.pendingTxs} color="orange">
-              <Button size="small" onClick={() => onViewApprovals(multisig)}>
-                Pending
-              </Button>
-            </Badge>
-          )
-        }
+      )}
       style={{ marginBottom: 16 }}
     >
       <Flex vertical gap={12}>

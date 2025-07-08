@@ -3157,7 +3157,7 @@ async function getMultisigAccountInfo(multisigAddress) {
       transferable: accountInfo.data.free.sub(accountInfo.data.frozen).toString(),
     },
     nonce: accountInfo.nonce.toString(),
-    pendingMultisigs: multisigs.map(([key, value]) => ({
+    pendingTxs: multisigs.map(([key, value]) => ({
       callHash: key.args[1].toHex(),
       multisig: value.unwrap().toJSON(),
     })),
