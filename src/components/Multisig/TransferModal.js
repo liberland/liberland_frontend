@@ -172,6 +172,7 @@ function TransferForm({
         amount: transactionPreview.amount,
         isProtected: transactionPreview.isProtected,
         walletAddress: userAddress,
+        call: transactionPreview.callData.call, // Reuse the call from preview
       });
 
       onClose();

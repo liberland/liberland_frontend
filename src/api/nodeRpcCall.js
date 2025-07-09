@@ -3170,7 +3170,6 @@ async function getMultisigAccountInfo(multisigAddress) {
 }
 
 const createMultisigTransaction = async ({
-  multisigAddress: _multisigAddress,
   threshold,
   otherSignatories,
   call,
@@ -3210,18 +3209,13 @@ const createMultisigTransferCallData = async ({
 }) => {
   const api = await getApi();
 
-  // Force refresh of runtime info to ensure we have current metadata
-  await api.rpc.state.getRuntimeVersion();
-
   const transferCall = isProtected
     ? api.tx.balances.transferKeepAlive(recipient, amount.toString())
     : api.tx.balances.transfer(recipient, amount.toString());
 
-  const callData = transferCall.toHex();
-
   return {
     call: transferCall,
-    callData,
+    callData: transferCall.method.toHex(),
     callHash: transferCall.method.hash.toHex(),
     method: transferCall.method.toJSON(),
     args: transferCall.args.map((arg) => arg.toString()),
@@ -3273,12 +3267,14 @@ const createMultisigTransfer = async ({
   amount,
   isProtected,
   walletAddress,
+  call, // Optional pre-created call
 }) => {
   const api = await getApi();
 
-  const transferCall = isProtected
+  // Use provided call or create new one if not provided
+  const transferCall = call || (isProtected
     ? api.tx.balances.transferKeepAlive(recipient, amount.toString())
-    : api.tx.balances.transfer(recipient, amount.toString());
+    : api.tx.balances.transfer(recipient, amount.toString()));
 
   return createMultisigTransaction({
     multisigAddress,
