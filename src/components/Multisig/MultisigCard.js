@@ -36,7 +36,6 @@ function MultisigCard({
   const { showModal, closeLastNModals } = useModal();
 
   const handleSendClick = () => {
-    // Get all multisig wallets where user is a signatory
     const userMultisigs = getUserMultisigs(userAddress);
     showModal(
       <TransferFormComponent

@@ -104,9 +104,6 @@ function MultisigApprove({
         onClose();
       }, 1000);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Transaction failed:', error);
-
       let errorMessage = 'Transaction failed. Please try again.';
 
       if (error.message?.includes('findMetaCall')) {
@@ -117,7 +114,6 @@ function MultisigApprove({
         errorMessage = 'Insufficient balance to complete this transaction.';
       }
 
-      // Show error notification
       api.error({
         message: 'Transaction Failed',
         description: errorMessage,
