@@ -18,8 +18,10 @@ import {
 import Button from '../Button/Button';
 import CopyIconWithAddress from '../CopyIconWithAddress';
 import MultisigApproveModal from './MultisigApprove';
+import { TransferFormComponent } from './TransferModal';
 import { formatDollars } from '../../utils/walletHelpers';
-import { removeMultisigFromStorage } from '../../utils/multisig';
+import { removeMultisigFromStorage, getUserMultisigs } from '../../utils/multisig';
+import { useModal } from '../../context/modalContext';
 
 const { Text } = Typography;
 
@@ -31,6 +33,28 @@ function MultisigCard({
   onMultisigRemoved,
   onActionCompleted,
 }) {
+  const { showModal, closeLastNModals } = useModal();
+
+  const handleSendClick = () => {
+    // Get all multisig wallets where user is a signatory
+    const userMultisigs = getUserMultisigs(userAddress);
+    showModal(
+      <TransferFormComponent
+        multisigAddress={multisig.address}
+        userAddress={userAddress}
+        multisigData={{
+          signatories: multisig.signatories,
+          threshold: multisig.threshold,
+        }}
+        userMultisigs={userMultisigs}
+        onClose={() => closeLastNModals(1)}
+        onSuccess={() => {
+          onActionCompleted();
+        }}
+      />,
+    );
+  };
+
   const isSignatory = multisig.signatories.includes(userAddress);
 
   const menuItems = [
@@ -71,6 +95,7 @@ function MultisigCard({
       )}
       extra={(
         <Flex gap={12}>
+          <Button onClick={handleSendClick}>Send</Button>
           {multisig.pendingTxs.length > 0 && (
             <Badge count={multisig.pendingTxs.length} color="orange">
               <MultisigApproveModal

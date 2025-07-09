@@ -19,6 +19,7 @@ import {
   FileTextOutlined,
   ClockCircleOutlined,
 } from '@ant-design/icons';
+import notification from 'antd/es/notification';
 import Button from '../Button/Button';
 import CopyIconWithAddress from '../CopyIconWithAddress';
 import modalWrapper from '../Modals/components/ModalWrapper';
@@ -38,6 +39,7 @@ function MultisigApprove({
   const [callData, setCallData] = useState('');
   const [showCallData, setShowCallData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [api, contextHolder] = notification.useNotification();
 
   // Set initial selected transaction
   useEffect(() => {
@@ -60,7 +62,10 @@ function MultisigApprove({
     if (actionType === 'reject' && !isUserDepositor) {
       setActionType('approve');
     }
-  }, [selectedTxHash, actionType, isUserDepositor]);
+    if (actionType === 'approve' && hasUserApproved && isUserDepositor) {
+      setActionType('reject');
+    }
+  }, [selectedTxHash, actionType, isUserDepositor, hasUserApproved]);
 
   const handleAction = async () => {
     if (!selectedTx || !isUserSignatory) return;
@@ -101,7 +106,23 @@ function MultisigApprove({
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Transaction failed:', error);
-      // TODO: Show error message to user
+
+      let errorMessage = 'Transaction failed. Please try again.';
+
+      if (error.message?.includes('findMetaCall')) {
+        errorMessage = 'Invalid call data provided. Please check the call data from the original transaction creator.';
+      } else if (error.message?.includes('ExistentialDeposit')) {
+        errorMessage = 'Transaction would drop account below existential deposit (1 LLD minimum).';
+      } else if (error.message?.includes('InsufficientBalance')) {
+        errorMessage = 'Insufficient balance to complete this transaction.';
+      }
+
+      // Show error notification
+      api.error({
+        message: 'Transaction Failed',
+        description: errorMessage,
+        duration: 6,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -125,6 +146,7 @@ function MultisigApprove({
       closable={!isSubmitting}
       maskClosable={!isSubmitting}
     >
+      {contextHolder}
       {multisig.pendingTxs.length === 0 ? (
         <Flex justify="center" align="center" style={{ padding: '40px 0' }}>
           <Text type="secondary">No pending transactions found</Text>
@@ -291,14 +313,24 @@ function MultisigApprove({
                   <Flex vertical gap={16}>
                     <Title level={5} style={{ margin: 0 }}>Your Action</Title>
 
-                    {hasUserApproved ? (
+                    <Flex vertical gap={12}>
+                      {hasUserApproved && !isUserDepositor && (
+                        <Alert
+                          message="You have already approved this transaction"
+                          type="success"
+                          showIcon
+                        />
+                      )}
+                      {hasUserApproved && isUserDepositor && (
                       <Alert
-                        message="You have already approved this transaction"
+                        message="You have approved this transaction"
+                        description="As the transaction creator, you can still reject it if needed."
                         type="success"
                         showIcon
                       />
-                    ) : (
-                      <Flex vertical gap={12}>
+                      )}
+
+                      {(!hasUserApproved || isUserDepositor) && (
                         <Flex gap={16} align="end">
                           <div>
                             <Text strong style={{ display: 'block', marginBottom: 8 }}>
@@ -310,8 +342,8 @@ function MultisigApprove({
                               onChange={setActionType}
                               disabled={isSubmitting}
                               options={[
-                                { value: 'approve', label: 'Approve Transaction' },
-                                isUserDepositor ? { value: 'reject', label: 'Cancel Transaction' } : null,
+                                !hasUserApproved ? { value: 'approve', label: 'Approve Transaction' } : null,
+                                isUserDepositor ? { value: 'reject', label: 'Reject Transaction' } : null,
                               ].filter(Boolean)}
                             />
                           </div>
@@ -327,19 +359,19 @@ function MultisigApprove({
                             </Flex>
                           )}
                         </Flex>
+                      )}
 
-                        {actionType === 'approve' && isFinalApproval && showCallData && (
-                          <Input
-                            placeholder="Enter call data in hex format (0x...)"
-                            value={callData}
-                            onChange={(e) => setCallData(e.target.value)}
-                            disabled={isSubmitting}
-                          />
-                        )}
-                      </Flex>
-                    )}
+                      {actionType === 'approve' && isFinalApproval && showCallData && (
+                        <Input
+                          placeholder="Enter call data in hex format (0x...)"
+                          value={callData}
+                          onChange={(e) => setCallData(e.target.value)}
+                          disabled={isSubmitting}
+                        />
+                      )}
+                    </Flex>
 
-                    {!hasUserApproved && (
+                    {(!hasUserApproved || isUserDepositor) && (
                       <Flex gap={12} justify="end">
                         <Button onClick={onClose} disabled={isSubmitting}>
                           Cancel
@@ -350,7 +382,7 @@ function MultisigApprove({
                           onClick={handleAction}
                           icon={actionType === 'approve' ? <CheckOutlined /> : <CloseOutlined />}
                         >
-                          {actionType === 'approve' ? 'Approve' : 'Cancel'}
+                          {actionType === 'approve' ? 'Approve' : 'Reject'}
                         </Button>
                       </Flex>
                     )}
