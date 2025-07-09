@@ -457,4 +457,5 @@ ButtonModal.propTypes = {
 
 const MultisigApproveModal = modalWrapper(MultisigApprove, ButtonModal);
 
+export { MultisigApprove };
 export default MultisigApproveModal;

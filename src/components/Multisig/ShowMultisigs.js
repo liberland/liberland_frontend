@@ -3,7 +3,9 @@ import { useSelector } from 'react-redux';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
 import Typography from 'antd/es/typography';
+import Collapse from 'antd/es/collapse';
 import message from 'antd/es/message';
+import Result from 'antd/es/result';
 import {
   TeamOutlined,
 } from '@ant-design/icons';
@@ -13,7 +15,7 @@ import { loadMultisigsFromStorage } from '../../utils/multisig';
 import { getMultisigAccountInfo } from '../../api/nodeRpcCall';
 import MultisigCard from './MultisigCard';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 function ShowMultisigs() {
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
@@ -84,55 +86,63 @@ function ShowMultisigs() {
     );
   }
 
-  return (
-    <div style={{ padding: '24px' }}>
-      <Flex justify="space-between" align="center" style={{ marginBottom: 24 }}>
-        <div>
-          <Title level={3} style={{ margin: 0 }}>
-            My Multisig Accounts
-          </Title>
-          <Text type="secondary">
-            Multisig accounts where you are a signatory
-          </Text>
-        </div>
-        <CreateMultisigModal onMultisigCreated={loadMultisigs} />
-      </Flex>
-
-      {loading && (
+  const collapseContent = () => {
+    if (loading) {
+      return (
         <Card>
           <Flex justify="center" align="center" style={{ padding: 40 }}>
             <Text>Loading multisig accounts...</Text>
           </Flex>
         </Card>
-      )}
-      {!loading && multisigs.length === 0 ? (
-        <Card>
-          <Flex vertical justify="center" align="center" style={{ padding: 40 }} gap={16}>
-            <TeamOutlined style={{ fontSize: 48, color: '#d9d9d9' }} />
-            <Text type="secondary">No multisig accounts found</Text>
-            <Text type="secondary" style={{ textAlign: 'center' }}>
-              You are not a signatory on any multisig accounts yet.
+      );
+    }
+
+    if (multisigs.length === 0) {
+      return (
+        <Result
+          icon={<TeamOutlined />}
+          title="No multisig accounts found"
+          subTitle={(
+            <div>
+              You are not tracking any multisig accounts yet.
               <br />
-              Create a new multisig or ask to be added to an existing one.
-            </Text>
-            <CreateMultisigModal onMultisigCreated={loadMultisigs} />
-          </Flex>
-        </Card>
-      ) : (
-        <div>
-          {multisigs.map((multisig) => (
-            <MultisigCard
-              key={multisig.address}
-              multisig={multisig}
-              userAddress={userWalletAddress}
-              onExportSignatories={handleExportSignatories}
-              onMultisigRemoved={loadMultisigs}
-              onActionCompleted={loadMultisigs}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+              Add a new multisig to start tracking.
+            </div>
+          )}
+          extra={<CreateMultisigModal onMultisigCreated={loadMultisigs} />}
+        />
+      );
+    }
+
+    return (
+      <div>
+        {multisigs.map((multisig) => (
+          <MultisigCard
+            key={multisig.address}
+            multisig={multisig}
+            userAddress={userWalletAddress}
+            onExportSignatories={handleExportSignatories}
+            onMultisigRemoved={loadMultisigs}
+            onActionCompleted={loadMultisigs}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <Collapse
+      collapsible="icon"
+      defaultActiveKey={['tracking-multisigs']}
+      items={[{
+        key: 'tracking-multisigs',
+        label: 'Tracking Multisigs',
+        children: collapseContent(),
+        extra: (
+          <CreateMultisigModal onMultisigCreated={loadMultisigs} />
+        ),
+      }]}
+    />
   );
 }
 

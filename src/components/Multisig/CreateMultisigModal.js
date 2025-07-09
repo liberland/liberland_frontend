@@ -28,8 +28,8 @@ const { Text } = Typography;
 const MAX_SIGNATORIES = 100;
 const MIN_THRESHOLD = 2;
 
-function createMultisig(signatories, threshold, name, onStatusChange = () => {}) {
-  const multisigData = createMultisigData({
+async function createMultisig(signatories, threshold, name, onStatusChange = () => {}) {
+  const multisigData = await createMultisigData({
     signatories,
     threshold,
     name,
@@ -110,10 +110,10 @@ function MultisigForm({ onClose, onStatusChange, onMultisigCreated }) {
     }
   }, [signatories, threshold]);
 
-  const handleCreateMultisig = useCallback((values) => {
+  const handleCreateMultisig = useCallback(async (values) => {
     const { name } = values;
 
-    createMultisig(signatories, threshold, name.trim(), onStatusChange);
+    await createMultisig(signatories, threshold, name.trim(), onStatusChange);
     onMultisigCreated();
     onClose();
   }, [signatories, threshold, onStatusChange, onMultisigCreated, onClose]);
@@ -310,7 +310,7 @@ MultisigForm.propTypes = {
 };
 
 function ButtonModal(props) {
-  return <OpenModalButton text="Create Multisig" primary {...props} />;
+  return <OpenModalButton text="Add Multisig" primary {...props} />;
 }
 
 ButtonModal.propTypes = {

@@ -5,13 +5,13 @@ import {
 } from '@polkadot/util-crypto';
 import { getSS58Prefix } from '../api/nodeRpcCall';
 
-const SS58Prefix = getSS58Prefix(); // Substrate's SS58 prefix
 const MULTISIG_STORAGE_KEY = 'liberland_multisigs';
 
-export const createMultisigAddress = ({
+export const createMultisigAddress = async ({
   signatories,
   threshold,
 }) => {
+  const SS58Prefix = await getSS58Prefix(); // Substrate's SS58 prefix
   const sortedSignatories = sortAddresses(signatories, SS58Prefix);
   const multiAddress = createKeyMulti(sortedSignatories, threshold);
   const multisigAddress = encodeAddress(multiAddress, SS58Prefix);
@@ -33,12 +33,12 @@ export const saveMultisigToStorage = (multisig) => {
 };
 
 // Create multisig data object
-export const createMultisigData = (multisigData) => {
+export const createMultisigData = async (multisigData) => {
   const {
     signatories, threshold, name,
   } = multisigData;
 
-  const address = createMultisigAddress({ signatories, threshold });
+  const address = await createMultisigAddress({ signatories, threshold });
 
   const multisig = {
     address,
@@ -98,21 +98,22 @@ export const validateMultisigParams = (signatories, threshold) => {
   };
 };
 
-export const importMultisigsFromJson = (jsonString) => {
+export const importMultisigsFromJson = async (jsonString) => {
   try {
     const importedData = JSON.parse(jsonString);
     if (!Array.isArray(importedData)) {
       throw new Error('Invalid format: expected array of multisigs');
     }
 
-    return importedData.map((item) => {
+    return Promise.all(importedData.map(async (item) => {
       const validation = validateMultisigParams(item.signatories, item.threshold);
       if (!validation.isValid) {
         throw new Error(`Invalid multisig: ${validation.errors.join(', ')}`);
       }
 
-      return createMultisigData(item, 'imported');
-    });
+      const multisig = await createMultisigData(item);
+      return multisig;
+    }));
   } catch (error) {
     throw new Error(`Import failed: ${error.message}`);
   }

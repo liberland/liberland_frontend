@@ -17,7 +17,7 @@ import {
 } from '@ant-design/icons';
 import Button from '../Button/Button';
 import CopyIconWithAddress from '../CopyIconWithAddress';
-import MultisigApproveModal from './MultisigApprove';
+import { MultisigApprove } from './MultisigApprove';
 import { TransferFormComponent } from './TransferModal';
 import { formatDollars } from '../../utils/walletHelpers';
 import { removeMultisigFromStorage, getUserMultisigs } from '../../utils/multisig';
@@ -55,10 +55,11 @@ function MultisigCard({
 
   const handleViewApprovals = () => {
     showModal(
-      <MultisigApproveModal
+      <MultisigApprove
         multisig={multisig}
         userAddress={userAddress}
         onActionCompleted={onActionCompleted}
+        onClose={() => closeLastNModals(1)}
       />,
     );
   };
