@@ -3143,6 +3143,11 @@ async function transferNFT(collectionId, itemId, newOwner, walletAddress) {
   return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
+const calculateMaxWeight = async (extrinsic, walletAddress) => {
+  const { weight } = await extrinsic.paymentInfo(walletAddress);
+  return weight;
+};
+
 async function getMultisigAccountInfo(multisigAddress) {
   const api = await getApi();
   const accountInfo = await api.query.system.account(multisigAddress);
@@ -3163,6 +3168,94 @@ async function getMultisigAccountInfo(multisigAddress) {
     })),
   };
 }
+
+const approveMultisigTransaction = async ({
+  threshold,
+  otherSignatories,
+  maybeTimepoint,
+  callHash,
+  walletAddress,
+  isFinalApproval,
+  callData,
+}) => {
+  const api = await getApi();
+  let tx;
+
+  if (isFinalApproval) {
+    let bytes = callData;
+    if (!bytes) {
+      const pre = await api.query.preimage.preimageFor(callHash);
+      if (pre.isSome) {
+        // Tuple <len, bytes>
+        bytes = pre.unwrap()[1].toHex();
+      } else {
+        throw new Error(
+          'Call data not available on-chain; one signer needs to supply it',
+        );
+      }
+    }
+
+    const call = api.registry.createType('Call', bytes);
+    const tempTx = api.tx.multisig.asMulti(
+      threshold,
+      otherSignatories,
+      maybeTimepoint,
+      call,
+      { refTime: 0, proofSize: 0 },
+    );
+    const weight = await calculateMaxWeight(tempTx, walletAddress);
+    tx = api.tx.multisig.asMulti(
+      threshold,
+      otherSignatories,
+      maybeTimepoint,
+      call,
+      weight,
+    );
+  } else {
+    const approve = api.tx.multisig.approveAsMulti(
+      threshold,
+      otherSignatories,
+      maybeTimepoint,
+      callHash,
+      { refTime: 0, proofSize: 0 }, // placeholder
+    );
+    const weight = await calculateMaxWeight(approve, walletAddress);
+    tx = api.tx.multisig.approveAsMulti(
+      threshold,
+      otherSignatories,
+      maybeTimepoint,
+      callHash,
+      weight,
+    );
+  }
+
+  return submitExtrinsic(tx, walletAddress, api);
+};
+
+const rejectMultisigTransaction = async ({
+  threshold,
+  otherSignatories,
+  timepoint,
+  callHash,
+  walletAddress,
+}) => {
+  const api = await getApi();
+
+  const extrinsic = api.tx.multisig.cancelAsMulti(
+    threshold,
+    otherSignatories,
+    timepoint,
+    callHash,
+  );
+
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getSS58Prefix = async () => {
+  const api = await getApi();
+  const ss58Prefix = api.registry.chainSS58;
+  return ss58Prefix;
+};
 
 export {
   getBalanceByAddress,
@@ -3317,4 +3410,8 @@ export {
   updateValidate,
   getValidator,
   getMultisigAccountInfo,
+  approveMultisigTransaction,
+  rejectMultisigTransaction,
+  calculateMaxWeight,
+  getSS58Prefix,
 };

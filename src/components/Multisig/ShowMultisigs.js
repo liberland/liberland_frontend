@@ -137,6 +137,7 @@ function ShowMultisigs() {
               onExportSignatories={handleExportSignatories}
               onViewApprovals={handleViewApprovals}
               onMultisigRemoved={loadMultisigs}
+              onActionCompleted={loadMultisigs}
             />
           ))}
         </div>

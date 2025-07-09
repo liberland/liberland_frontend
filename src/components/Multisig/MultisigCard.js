@@ -17,6 +17,7 @@ import {
 } from '@ant-design/icons';
 import Button from '../Button/Button';
 import CopyIconWithAddress from '../CopyIconWithAddress';
+import MultisigApproveModal from './MultisigApprove';
 import { formatDollars } from '../../utils/walletHelpers';
 import { removeMultisigFromStorage } from '../../utils/multisig';
 
@@ -28,6 +29,7 @@ function MultisigCard({
   onExportSignatories,
   onViewApprovals,
   onMultisigRemoved,
+  onActionCompleted,
 }) {
   const isSignatory = multisig.signatories.includes(userAddress);
 
@@ -42,7 +44,7 @@ function MultisigCard({
       key: 'approvals',
       label: 'View Approvals',
       icon: <FileTextOutlined />,
-      disabled: multisig.pendingTxs === 0,
+      disabled: multisig.pendingTxs.length === 0,
       onClick: () => onViewApprovals(multisig),
     },
     {
@@ -65,19 +67,17 @@ function MultisigCard({
             <Text strong>{multisig.name}</Text>
             {!isSignatory && <Tag color="orange">Observer</Tag>}
           </Flex>
-
         </Flex>
-        )}
+      )}
       extra={(
         <Flex gap={12}>
           {multisig.pendingTxs.length > 0 && (
             <Badge count={multisig.pendingTxs.length} color="orange">
-              <Button
-                size="small"
-                onClick={() => onViewApprovals(multisig)}
-              >
-                Pending
-              </Button>
+              <MultisigApproveModal
+                multisig={multisig}
+                userAddress={userAddress}
+                onActionCompleted={onActionCompleted}
+              />
             </Badge>
           )}
           <Dropdown menu={{ items: menuItems }} trigger={['click']}>
@@ -150,13 +150,24 @@ MultisigCard.propTypes = {
       total: PropTypes.string.isRequired,
       transferable: PropTypes.string.isRequired,
     }).isRequired,
-    pendingTxs: PropTypes.number.isRequired,
+    pendingTxs: PropTypes.arrayOf(PropTypes.shape({
+      callHash: PropTypes.string.isRequired,
+      multisig: PropTypes.shape({
+        when: PropTypes.shape({
+          height: PropTypes.number,
+          index: PropTypes.number,
+        }).isRequired,
+        depositor: PropTypes.string.isRequired,
+        approvals: PropTypes.arrayOf(PropTypes.string).isRequired,
+      }).isRequired,
+    })).isRequired,
     isActive: PropTypes.bool.isRequired,
   }).isRequired,
   userAddress: PropTypes.string.isRequired,
   onExportSignatories: PropTypes.func.isRequired,
   onViewApprovals: PropTypes.func.isRequired,
   onMultisigRemoved: PropTypes.func.isRequired,
+  onActionCompleted: PropTypes.func.isRequired,
 };
 
 export default MultisigCard;

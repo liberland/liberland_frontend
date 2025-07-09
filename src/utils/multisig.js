@@ -3,8 +3,9 @@ import {
   encodeAddress,
   sortAddresses,
 } from '@polkadot/util-crypto';
+import { getSS58Prefix } from '../api/nodeRpcCall';
 
-const SS58Prefix = 42; // Substrate's SS58 prefix
+const SS58Prefix = getSS58Prefix(); // Substrate's SS58 prefix
 const MULTISIG_STORAGE_KEY = 'liberland_multisigs';
 
 export const createMultisigAddress = ({
