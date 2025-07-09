@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Card from 'antd/es/card';
@@ -36,7 +35,6 @@ function ShowMultisigs() {
       ));
       setMultisigs(multisigInfos);
     } catch (error) {
-      console.error('Failed to load multisigs:', error);
       message.error('Failed to load multisig accounts');
     } finally {
       setLoading(false);
@@ -72,15 +70,8 @@ function ShowMultisigs() {
 
       message.success('Signatories exported successfully');
     } catch (error) {
-      console.error('Export failed:', error);
       message.error('Failed to export signatories');
     }
-  }, []);
-
-  const handleViewApprovals = useCallback((multisig) => {
-    // TODO: Implement modal or navigation to approvals view
-    console.log('View approvals for:', multisig.address);
-    message.info(`Viewing approvals for ${multisig.name} (${multisig.pendingTxs} pending)`);
   }, []);
 
   if (!userWalletAddress) {
@@ -135,7 +126,6 @@ function ShowMultisigs() {
               multisig={multisig}
               userAddress={userWalletAddress}
               onExportSignatories={handleExportSignatories}
-              onViewApprovals={handleViewApprovals}
               onMultisigRemoved={loadMultisigs}
               onActionCompleted={loadMultisigs}
             />

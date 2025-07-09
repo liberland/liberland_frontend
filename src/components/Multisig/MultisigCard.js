@@ -29,7 +29,6 @@ function MultisigCard({
   multisig,
   userAddress,
   onExportSignatories,
-  onViewApprovals,
   onMultisigRemoved,
   onActionCompleted,
 }) {
@@ -54,6 +53,16 @@ function MultisigCard({
     );
   };
 
+  const handleViewApprovals = () => {
+    showModal(
+      <MultisigApproveModal
+        multisig={multisig}
+        userAddress={userAddress}
+        onActionCompleted={onActionCompleted}
+      />,
+    );
+  };
+
   const isSignatory = multisig.signatories.includes(userAddress);
 
   const menuItems = [
@@ -68,7 +77,7 @@ function MultisigCard({
       label: 'View Approvals',
       icon: <FileTextOutlined />,
       disabled: multisig.pendingTxs.length === 0,
-      onClick: () => onViewApprovals(multisig),
+      onClick: handleViewApprovals,
     },
     {
       key: 'remove',
@@ -97,11 +106,7 @@ function MultisigCard({
           <Button onClick={handleSendClick}>Send</Button>
           {multisig.pendingTxs.length > 0 && (
             <Badge count={multisig.pendingTxs.length} color="orange">
-              <MultisigApproveModal
-                multisig={multisig}
-                userAddress={userAddress}
-                onActionCompleted={onActionCompleted}
-              />
+              <Button onClick={handleViewApprovals}>View Approvals</Button>
             </Badge>
           )}
           <Dropdown menu={{ items: menuItems }} trigger={['click']}>
@@ -185,11 +190,9 @@ MultisigCard.propTypes = {
         approvals: PropTypes.arrayOf(PropTypes.string).isRequired,
       }).isRequired,
     })).isRequired,
-    isActive: PropTypes.bool.isRequired,
   }).isRequired,
   userAddress: PropTypes.string.isRequired,
   onExportSignatories: PropTypes.func.isRequired,
-  onViewApprovals: PropTypes.func.isRequired,
   onMultisigRemoved: PropTypes.func.isRequired,
   onActionCompleted: PropTypes.func.isRequired,
 };
