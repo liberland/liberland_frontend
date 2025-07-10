@@ -155,7 +155,7 @@ function CongressionalAssemble() {
   const termDuration = democracy?.democracy?.electionsInfo?.termDuration;
 
   return (
-    <Flex vertical gap="20px">
+    <>
       <Modal
         open={isModalOpen}
         title="Are you certain you want to leave the page?"
@@ -167,7 +167,7 @@ function CongressionalAssemble() {
         Your voting preferences haven&#96;t been saved, would you like to save them?
       </Modal>
       <Collapse
-        defaultActiveKey={['current', 'preference', 'term']}
+        defaultActiveKey={['current', 'preference', 'term', 'info']}
         collapsible="icon"
         items={[
           {
@@ -182,6 +182,69 @@ function CongressionalAssemble() {
             key: 'term',
             children: (
               <CongressionalCountdown termDuration={termDuration.toNumber()} />
+            ),
+          },
+          {
+            label: 'Information',
+            key: 'info',
+            children: (
+              <Flex
+                wrap
+                gap="15px"
+                justify="center"
+                align="center"
+                vertical={!isBiggerThanSmallScreen}
+                className="twoSplitter"
+              >
+                <Card
+                  title={(
+                    <Title level={4}>
+                      Shape Liberland’s Future
+                    </Title>
+                  )}
+                  extra={<UserAddOutlined className={styles.userMark} />}
+                  actions={[
+                    <Button
+                      onClick={() => {
+                        window.location.href = 'https://docs.liberland.org/primers/congress';
+                      }}
+                    >
+                      Learn how
+                      <Space />
+                      <GlobalOutlined />
+                    </Button>,
+                  ]}
+                >
+                  <Card.Meta
+                    // eslint-disable-next-line max-len
+                    description="Unhappy with the way Liberland is run? Help lead the way by registering your candidacy for a seat in Liberland Congress."
+                  />
+                </Card>
+                <Card
+                  title={(
+                    <Title level={4}>
+                      Liberland Election Explorer
+                    </Title>
+                  )}
+                  extra={<BarChartOutlined className={styles.graphMark} />}
+                  actions={[
+                    <Button
+                      onClick={() => {
+                        window.location.href = 'https://election-details.liberland.org/council/elections/latest';
+                      }}
+                    >
+                      View Election Results
+                      <Space />
+                      <GlobalOutlined />
+                    </Button>,
+                  ]}
+                >
+                  <Card.Meta
+                    // eslint-disable-next-line max-len
+                    description="View the results of Liberland’s upcoming election. This explorer shows candidate scores, rankings, and detailed statistics such as voting stake versus performance — all secured and verified on-chain."
+                  />
+                </Card>
+              </Flex>
             ),
           },
           {
@@ -250,57 +313,7 @@ function CongressionalAssemble() {
           },
         ].filter(Boolean)}
       />
-      <Flex wrap gap="15px" justify="center" align="center" vertical={!isBiggerThanSmallScreen} className="twoSplitter">
-        <Card
-          title={(
-            <Title level={4}>
-              Shape Liberland’s Future
-            </Title>
-          )}
-          extra={<UserAddOutlined className={styles.userMark} />}
-          actions={[
-            <Button
-              onClick={() => {
-                window.location.href = 'https://docs.liberland.org/primers/congress';
-              }}
-            >
-              Learn how
-              <Space />
-              <GlobalOutlined />
-            </Button>,
-          ]}
-        >
-          <Card.Meta
-            // eslint-disable-next-line max-len
-            description="Unhappy with the way Liberland is run? Help lead the way by registering your candidacy for a seat in Liberland Congress."
-          />
-        </Card>
-        <Card
-          title={(
-            <Title level={4}>
-              Liberland Election Explorer
-            </Title>
-          )}
-          extra={<BarChartOutlined className={styles.graphMark} />}
-          actions={[
-            <Button
-              onClick={() => {
-                window.location.href = 'https://election-details.liberland.org/council/elections/latest';
-              }}
-            >
-              View Election Results
-              <Space />
-              <GlobalOutlined />
-            </Button>,
-          ]}
-        >
-          <Card.Meta
-            // eslint-disable-next-line max-len
-            description="View the results of Liberland’s upcoming election. This explorer shows candidate scores, rankings, and detailed statistics such as voting stake versus performance — all secured and verified on-chain."
-          />
-        </Card>
-      </Flex>
-    </Flex>
+    </>
   );
 }
 
