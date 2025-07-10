@@ -49,6 +49,8 @@ export default function* rootSaga() {
     walletSagas.sendTransferWithRemarkWatcher(),
     walletSagas.createOrUpdateAssetWatcher(),
     walletSagas.mintAssetWatcher(),
+    walletSagas.checkPaymentWatcher(),
+    walletSagas.createPaymentWatcher(),
 
     // DEMOCRACY
     democracySagas.getDemocracyWatcher(),
@@ -82,6 +84,7 @@ export default function* rootSaga() {
     officesSagas.unregisterCompanyWatcher(),
     officesSagas.setRegisteredCompanyDataWatcher(),
     officesSagas.getPendingAdditionalMeritsWatcher(),
+    officesSagas.getTaxPayersWatcher(),
 
     // REGISTRIES
     registriesSagas.getOfficialRegistryEntriesWatcher(),

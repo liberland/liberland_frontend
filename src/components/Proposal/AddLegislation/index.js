@@ -46,7 +46,7 @@ function AddLegislation({ proposal, isDetailsHidden }) {
                   <List.Item>
                     <Card className={styles.section}>
                       <div className={styles.legislationContent}>
-                        <Markdown>
+                        <Markdown options={{ disableParsingRawHTML: true }}>
                           {new TextDecoder('utf-8').decode(section)}
                         </Markdown>
                       </div>

@@ -12,6 +12,15 @@
   width: 15px!important;
   margin: 20px auto;
 }
+.userMark,
+.graphMark {
+  width: 32px;
+  height: 32px;
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+}
 .cardTitle {
   @media screen and (min-width: map-get($breakpoints, 'widescreen')) {
     max-width: 350px;
@@ -44,7 +53,7 @@
 .intro {
   h1,h2,h3,h4,h5 {
     font-size: 18px!important;
-    color: #ACBDC5;
+    color: var(--description-color);
     font-weight: 600!important;
     margin-bottom: 0!important;
     margin-top: 0!important;

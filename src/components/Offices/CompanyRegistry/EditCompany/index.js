@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
-import { BuildRegistryForm, blockchainDataToFormObject } from '../../../../utils/registryFormBuilder';
 import { officesActions } from '../../../../redux/actions';
 import { officesSelectors } from '../../../../redux/selectors';
+import { blockchainDataToFormObject } from '../../../../utils/nodeRpcCall';
+import CompaniesForm from '../../../Companies/CompaniesForm';
 
 export default function EditCompany() {
   const { companyId } = useParams();
@@ -28,7 +29,7 @@ export default function EditCompany() {
 
   const formObject = blockchainDataToFormObject(registration.registration.data);
   return (
-    <BuildRegistryForm
+    <CompaniesForm
       formObject={formObject}
       buttonMessage="Submit"
       companyId={companyId}

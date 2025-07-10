@@ -17,6 +17,7 @@ import {
   mintAsset,
   createOrUpdateAsset,
 } from '../../api/nodeRpcCall';
+import { checkPayment, createPayment } from '../../api/middleware';
 import { getHistoryTransfers } from '../../api/explorer';
 
 import { walletActions } from '../actions';
@@ -24,6 +25,18 @@ import { blockchainSelectors } from '../selectors';
 import { blockchainWatcher } from './base';
 
 // WORKERS
+
+function* checkPaymentWorker(action) {
+  const isPaid = yield call(checkPayment, action.payload);
+  if (isPaid) {
+    yield put(walletActions.checkPayment.success());
+  }
+}
+
+function* createPaymentWorker(action) {
+  yield call(createPayment, action.payload);
+  yield put(walletActions.createPayment.success());
+}
 
 function* getWalletWorker() {
   const walletAddress = yield select(blockchainSelectors.userWalletAddressSelector);
@@ -149,6 +162,7 @@ function* sendTransferRemarkWorker(action) {
   );
   yield call(transferWithRemark, remarkInfo, transferData, walletAddress);
   yield put(walletActions.sendTransferRemark.success());
+  yield put(walletActions.getWallet.call());
 }
 
 function* mintAssetWorker(action) {
@@ -164,6 +178,14 @@ function* createOrUpdateAssetWorker(action) {
 }
 
 // WATCHERS
+
+function* checkPaymentWatcher() {
+  yield* blockchainWatcher(walletActions.checkPayment, checkPaymentWorker);
+}
+
+function* createPaymentWatcher() {
+  yield* blockchainWatcher(walletActions.createPayment, createPaymentWorker);
+}
 
 function* sendTransferWithRemarkWatcher() {
   yield* blockchainWatcher(walletActions.sendTransferRemark, sendTransferRemarkWorker);
@@ -250,4 +272,6 @@ export {
   sendTransferWithRemarkWatcher,
   mintAssetWatcher,
   createOrUpdateAssetWatcher,
+  checkPaymentWatcher,
+  createPaymentWatcher,
 };

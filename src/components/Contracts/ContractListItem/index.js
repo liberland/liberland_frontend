@@ -74,7 +74,7 @@ function ContractListItem({
           }}
           className={cx('description', styles.preview)}
         >
-          <Markdown>
+          <Markdown options={{ disableParsingRawHTML: true }}>
             {data}
           </Markdown>
         </Paragraph>

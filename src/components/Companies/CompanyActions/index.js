@@ -10,10 +10,13 @@ import ManageInfo from '../ManageInfo';
 import ShowInfo from '../ShowInfo';
 import CopyInput from '../../CopyInput';
 import router from '../../../router';
+import TradeButton from '../TradeButton';
 
 export default function CompanyActions({
   registeredCompany,
   type,
+  getRelevantAssets,
+  getRelevantPools,
 }) {
   const dispatch = useDispatch();
   const website = useMemo(() => {
@@ -41,6 +44,47 @@ export default function CompanyActions({
 
   const companyLink = router.companies.view.replace(':companyId', registeredCompany.id);
 
+  const manageAndShowInfo = (
+    <>
+      <ManageInfo registeredCompany={registeredCompany} />
+      <ShowInfo registeredCompany={registeredCompany} />
+    </>
+  );
+
+  const websiteButton = website && (
+    <Button
+      href={website}
+    >
+      <GlobalOutlined />
+      <span className="hidden">
+        Website
+      </span>
+    </Button>
+  );
+
+  const tradeButton = useMemo(() => {
+    const [connected] = getRelevantAssets?.(registeredCompany) || [];
+    const { index } = connected?.[0] || {};
+    if (!index) {
+      return null;
+    }
+    const {
+      asset1,
+      asset2,
+      assetData1,
+      assetData2,
+    } = getRelevantPools?.(index)?.[0] || {};
+    if (!asset1 || !asset2) {
+      return null;
+    }
+    const isStock = assetData1.isStock || assetData2.isStock;
+    return (
+      <TradeButton asset1={asset1} asset2={asset2} isStock={isStock}>
+        Trade
+      </TradeButton>
+    );
+  }, [getRelevantAssets, getRelevantPools, registeredCompany]);
+
   switch (type) {
     case 'mine':
       return (
@@ -52,46 +96,24 @@ export default function CompanyActions({
             )}
             hideLink
           />
-          <ManageInfo registeredCompany={registeredCompany} />
-          <ShowInfo registeredCompany={registeredCompany} />
+          {manageAndShowInfo}
         </>
       );
     case 'requested':
-      return (
-        <>
-          <ManageInfo registeredCompany={registeredCompany} />
-          <ShowInfo registeredCompany={registeredCompany} />
-        </>
-      );
+      return manageAndShowInfo;
     case 'all':
       return (
         <>
+          {tradeButton}
           <ShowInfo registeredCompany={registeredCompany} />
-          {website && (
-            <Button
-              href={website}
-            >
-              <GlobalOutlined />
-              <span className="hidden">
-                Website
-              </span>
-            </Button>
-          )}
+          {websiteButton}
         </>
       );
     case 'detail':
       return (
         <>
-          {website && (
-            <Button
-              href={website}
-            >
-              <GlobalOutlined />
-              <span className="hidden">
-                Website
-              </span>
-            </Button>
-          )}
+          {tradeButton}
+          {websiteButton}
           <Button
             onClick={() => handleGenerateButton(registeredCompany.id)}
           >
@@ -102,16 +124,8 @@ export default function CompanyActions({
     case 'detail-request':
       return (
         <>
-          {website && (
-            <Button
-              href={website}
-            >
-              <GlobalOutlined />
-              <span className="hidden">
-                Website
-              </span>
-            </Button>
-          )}
+          {tradeButton}
+          {websiteButton}
           <Button
             red
             onClick={() => dispatch(
@@ -131,10 +145,12 @@ export default function CompanyActions({
 
 CompanyActions.propTypes = {
   registeredCompany: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    id: PropTypes.string,
     // eslint-disable-next-line react/forbid-prop-types
     onlineAddresses: PropTypes.arrayOf(PropTypes.object),
     charterURL: PropTypes.string,
   }).isRequired,
   type: PropTypes.oneOf(['requested', 'mine', 'all', 'detail', 'detail-request']),
+  getRelevantAssets: PropTypes.func,
+  getRelevantPools: PropTypes.func,
 };

@@ -65,6 +65,7 @@ export default function Overview() {
             {(userIsMember || userIsCandidate || userIsRunnersUp) && (
               <Button
                 onClick={() => dispatch(congressActions.renounceCandidacy.call(userStatus))}
+                red
               >
                 Renounce
                 {userIsMember ? ' Congress Membership' : null}

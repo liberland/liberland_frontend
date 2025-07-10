@@ -49,8 +49,8 @@ function CompanyRequest({ companyRequest }) {
     <Card
       title="Company data"
       cover={(
-        <Flex justify="center" align="center" className={styles.enforceFlex}>
-          <code className={styles.code}>
+        <Flex justify="center" align="center" className={styles.wrapper}>
+          <code className={styles.container}>
             <pre className={styles.code}>
               {JSON.stringify(
                 data.toJSON(),

@@ -32,19 +32,25 @@ export const getFinancialMetrics = async () => {
   const middlewareApi = getMiddlewareApi();
   try {
     const response = await middlewareApi.get('/v1/lld-stats');
-    return response.data;
+    const totalIssuance = await middlewareApi.get('/v1/total-issuance/lld');
+    return {
+      ...response.data,
+      totalLld: totalIssuance.data,
+    };
   } catch (error) {
     throw new Error(error);
   }
 };
 
-const fetchSpending = async (wallet) => {
+const fetchSpending = async (wallet, skip, take) => {
   try {
-    const { data: spendingText } = await getMiddlewareApi().get(
+    const { data: spendings } = await getMiddlewareApi().get(
       `/v1/government-spendings/${wallet}`,
+      {
+        params: { skip, take },
+      },
     );
-    const [, ...spendings] = JSON.parse(spendingText);
-    return spendings.map((spending) => ({
+    return spendings.slice(1).map((spending) => ({
       timestamp: new Date(spending[0]),
       recipient: spending[1],
       asset: spending[2],
@@ -63,5 +69,59 @@ const fetchSpending = async (wallet) => {
   }
 };
 
-export const fetchCongressSpending = () => fetchSpending('5EYCAe5g8CDuMsTief7QBxfvzDFEfws6ueXTUhsbx5V81nGH');
-export const fetchMinistryOfFinanceSpending = () => fetchSpending('5EYCAe5iXF2YZpCZr7ALYUUYaNpMXde3NUXxYn1Sc1YRM4gV');
+export const fetchCongressSpending = () => (
+  fetchSpending('5EYCAe5g8CDuMsTief7QBxfvzDFEfws6ueXTUhsbx5V81nGH')
+);
+export const fetchMinistryOfFinanceSpending = () => (
+  fetchSpending('5EYCAe5iXF2YZpCZr7ALYUUYaNpMXde3NUXxYn1Sc1YRM4gV')
+);
+
+export const getTaxPayers = async (timeInMonth, limit) => {
+  try {
+    const middlewareApi = getMiddlewareApi();
+    const response = await middlewareApi.get('/v1/tax-payers', {
+      params: {
+        limit: limit || 10,
+        months: timeInMonth || 12,
+      },
+    });
+    return response.data;
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+export const checkPayment = async ({
+  orderId,
+  price,
+  toId,
+}) => {
+  const { data, status, statusText } = await getMiddlewareApi().get('/v1/verify-purchase', {
+    params: {
+      orderId,
+      price,
+      toId,
+    },
+  });
+  if (status >= 400) {
+    throw statusText;
+  }
+  return data.paid;
+};
+
+export const createPayment = async ({
+  orderId,
+  price,
+  toId,
+  callback,
+}) => {
+  const { status, statusText } = await getMiddlewareApi().post('/v1/create-purchase', {
+    orderId,
+    price,
+    toId,
+    callback,
+  });
+  if (status >= 400) {
+    throw statusText;
+  }
+};

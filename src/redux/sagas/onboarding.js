@@ -11,9 +11,6 @@ import { blockchainWatcher } from './base';
 // WORKERS
 
 function* claimComplimentaryLLDWorker() {
-  let errorData = {
-    details: 'Error in claiming, send screenshot to devs please',
-  };
   try {
     const walletAddress = yield select(
       blockchainSelectors.userWalletAddressSelector,
@@ -23,24 +20,18 @@ function* claimComplimentaryLLDWorker() {
       walletAddress,
     );
     if (getComplimentaryLLDResponse.status === 200) {
-      // FIXME eventually we need a notification modal, not just error modal
-      errorData = {
-        details: 'Complimentary LLDs claimed.',
-      };
       yield call(getBalanceByAddress, walletAddress);
       yield put(onBoardingActions.getEligibleForComplimentaryLld.call());
-      throw new Error(errorData.details);
+      yield put(onBoardingActions.claimComplimentaryLld.success());
     } else {
-      errorData = {
-        details:
-          typeof getComplimentaryLLDResponse?.data === 'string'
-            ? getComplimentaryLLDResponse?.data
-            : 'Technical error without description, please let the devs know',
-      };
-      throw new Error(errorData.details);
+      throw new Error(typeof getComplimentaryLLDResponse?.data === 'string'
+        ? getComplimentaryLLDResponse?.data
+        : 'Technical error without description, please let the devs know');
     }
   } catch (e) {
-    throw new Error(errorData.details);
+    // eslint-disable-next-line no-console
+    console.error(e);
+    throw new Error('Error in claiming, send screenshot to devs please');
   }
 }
 

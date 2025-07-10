@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import Spin from 'antd/es/spin';
 import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
@@ -13,9 +14,12 @@ import Validator from '../Validator';
 import Nominator from '../Nominator';
 import styles from './styles.module.scss';
 import { CreateValidatorModal, StakeLLDModal } from '../../Modals';
+import router from '../../../router';
+import Button from '../../Button/Button';
 
 export default function StakingOverview() {
   const dispatch = useDispatch();
+  const history = useHistory();
   const info = useSelector(validatorSelectors.info);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const infoLink = 'https://docs.liberland.org/blockchain/for-validators-nominators-and-stakers/staking';
@@ -51,11 +55,28 @@ export default function StakingOverview() {
             <Link href={infoLink}>
               here
             </Link>
-            .
+            . If you hold LLD on other chains,
+            you can also stake your LLD in a liquidity pool to earn trading and farming rewards.
           </Paragraph>
           <Flex wrap gap="15px" justify="center">
-            <StakeLLDModal label="Start staking as nominator" />
+            <StakeLLDModal label="Start staking as nominator" primary />
             <CreateValidatorModal label="Create validator server" />
+          </Flex>
+          <Flex wrap gap="15px" justify="center">
+            <Button
+              href={router.staking.ethlpstaking}
+              primary
+              onClick={() => history.push(router.staking.ethlpstaking)}
+            >
+              Stake LLD on ETH
+            </Button>
+            <Button
+              href={router.staking.sollpstaking}
+              primary
+              onClick={() => history.push(router.staking.sollpstaking)}
+            >
+              Stake LLD on SOL
+            </Button>
           </Flex>
         </Flex>
       </Flex>

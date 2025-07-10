@@ -37,17 +37,22 @@ const defaultIcons = {
 export default function CurrencyIcon({
   symbol,
   size,
+  logo,
 }) {
+  if (logo) {
+    return <Avatar size={size} src={logo} alt={symbol} />;
+  }
   const icon = defaultIcons[symbol.toUpperCase()];
   if (icon) {
     return <Avatar size={size} src={icon} alt={symbol} />;
   }
   return (
-    <ColorAvatar name={symbol} fontSize={12} size={size} />
+    <ColorAvatar name={symbol} fontSize={Math.round(size / 2)} size={size} />
   );
 }
 
 CurrencyIcon.propTypes = {
   size: PropTypes.number.isRequired,
   symbol: PropTypes.string.isRequired,
+  logo: PropTypes.string,
 };

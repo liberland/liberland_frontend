@@ -32,8 +32,7 @@ export const userIsCandidate = createSelector(
   congressReducer,
   blockchainReducer,
   (congressState, blockchainState) => congressState.candidates
-    .map((m) => m.toString())
-    .includes(blockchainState.userWalletAddress),
+    .some(([address]) => blockchainState.userWalletAddress === address),
 );
 
 export const motions = createSelector(
@@ -50,8 +49,7 @@ export const userIsMember = createSelector(
   congressReducer,
   blockchainReducer,
   (congressState, blockchainState) => congressState.members
-    .map((m) => m.member.toString())
-    .includes(blockchainState.userWalletAddress),
+    .some((m) => m.member === blockchainState.userWalletAddress),
 );
 
 export const runnersUp = createSelector(
@@ -63,8 +61,7 @@ export const userIsRunnersUp = createSelector(
   congressReducer,
   blockchainReducer,
   (congressState, blockchainState) => congressState.runnersUp
-    .map((m) => m.toString())
-    .includes(blockchainState.userWalletAddress),
+    .some((m) => m.who === blockchainState.userWalletAddress),
 );
 
 export const treasury = createSelector(

@@ -4,21 +4,20 @@ import {
   BN_ZERO,
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import groupBy from 'lodash/groupBy';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
-import { blockchainDataToFormObject } from '../utils/registryFormBuilder';
 import * as centralizedBackend from './backend';
 // eslint-disable-next-line import/no-cycle
 import { convertAssetData } from '../utils/dexFormatter';
 import { parseDollars, parseMerits } from '../utils/walletHelpers';
-import { getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
+import { blockchainDataToFormObject, getMetadataCache, setMetadataCache } from '../utils/nodeRpcCall';
 import { addReturns, calcInflation, getBaseInfo } from '../utils/staking';
 import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
 import { decodeAndFilter } from '../utils/identityParser';
 import { OfficeType } from '../utils/officeTypeEnum';
-
-const { ApiPromise, WsProvider } = require('@polkadot/api');
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 let __apiCache = null;
@@ -240,20 +239,23 @@ const crossReference = (api, blockchainData, allCentralizedData, motions, isRefe
 const submitExtrinsic = async (extrinsic, walletAddress, api) => {
   const { signer } = await web3FromAddress(walletAddress);
   return new Promise((resolve, reject) => {
-    extrinsic.signAndSend(walletAddress, { signer }, ({ status, events, dispatchError }) => {
-      const errorData = handleMyDispatchErrors(dispatchError, api);
-      if (status.isInBlock) {
-        const blockHash = status.asInBlock.toString();
-        // eslint-disable-next-line no-console
-        console.log(errorData, events);
-        if (errorData.isError) {
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject({
-            blockHash, status, events, errorData,
-          });
-        } else resolve({ blockHash, status, events });
-      }
-    }).catch((err) => {
+    extrinsic.signAndSend(
+      walletAddress,
+      { signer, withSignedTransaction: true },
+      ({ status, events, dispatchError }) => {
+        const errorData = handleMyDispatchErrors(dispatchError, api);
+        if (status.isInBlock) {
+          const blockHash = status.asInBlock.toString();
+          // eslint-disable-next-line no-console
+          console.log(errorData, events);
+          if (errorData.isError) {
+            // eslint-disable-next-line prefer-promise-reject-errors
+            reject({
+              blockHash, status, events, errorData,
+            });
+          } else resolve({ blockHash, status, events });
+        }
+      }).catch((err) => {
       // eslint-disable-next-line no-console
       console.log(err);
       reject(err);
@@ -283,6 +285,7 @@ const createOrUpdateAsset = async ({
   issuer,
   freezer,
   owner,
+  companyId,
   isCreate,
   isStock,
   defaultValues,
@@ -293,6 +296,10 @@ const createOrUpdateAsset = async ({
       const create = await api.tx.assets.create(id, admin, minBalance);
       await submitExtrinsic(create, owner, api);
     }
+    if (isStock && isCreate) {
+      const params = await api.tx.assets.setParameters(id, { eresidencyRequired: true });
+      await submitExtrinsic(params, owner, api);
+    }
     if (defaultValues?.name !== name || defaultValues?.symbol !== symbol || defaultValues?.decimals !== decimals) {
       const setMetadata = await api.tx.assets.setMetadata(id, name, symbol, decimals);
       await submitExtrinsic(setMetadata, owner, api);
@@ -301,9 +308,9 @@ const createOrUpdateAsset = async ({
       const setTeam = await api.tx.assets.setTeam(id, issuer, admin, freezer);
       await submitExtrinsic(setTeam, owner, api);
     }
-    if (isStock && isCreate) {
-      const params = await api.tx.assets.setParameters(id, { eresidencyRequired: true });
-      await submitExtrinsic(params, owner, api);
+    if (defaultValues?.companyId !== companyId) {
+      const setCompanyId = await api.tx.assets.setRelatedCompany(id, companyId);
+      await submitExtrinsic(setCompanyId, owner, api);
     }
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -424,6 +431,49 @@ const getAssetDetails = async (ids) => {
   }
 };
 
+const convertCompanyValue = (api, id, companyValue) => {
+  let companyData;
+  try {
+    if (companyValue.isNone) companyData = { unregister: true };
+    else {
+      const compressed = companyValue?.isSome
+        ? companyValue.unwrap().data : companyValue.data;
+      companyData = api.createType('CompanyData', pako.inflate(compressed));
+    }
+
+    const formObject = blockchainDataToFormObject(companyData);
+
+    const dataObject = { ...formObject, id };
+    return dataObject;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log(err);
+    return null;
+  }
+};
+
+const getOfficialRegistryEntries = async () => {
+  const api = await getApi();
+  const allEntites = await api.query.companyRegistry.registries.entries(0);
+  const registeredCompanies = [];
+  allEntites.forEach((companyRegistry) => {
+    const [key, companyValue] = companyRegistry;
+    const entityId = key.toHuman();
+    const companyData = convertCompanyValue(api, entityId[1], companyValue);
+    if (companyData) {
+      registeredCompanies.push(companyData);
+    }
+  });
+  return registeredCompanies;
+};
+
+const getCompaniesByIds = async (ids) => {
+  const api = await getApi();
+  const queries = ids.map((id) => [api.query.companyRegistry.registries, [0, id]]);
+  const resolved = await api.queryMulti(queries);
+  return resolved.map((r, i) => convertCompanyValue(api, ids[i], r)).filter(Boolean);
+};
+
 const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = false) => {
   try {
     const api = await getApi();
@@ -436,15 +486,29 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
     const assets = [];
     const assetQueries = [];
     const parametersQueries = [];
+    const relatedCompanyQueries = [];
     processedMetadatas.forEach((asset) => {
       // Disregard LLM, asset of ID 1 because it has special treatment already
-      const isLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
-      if (isLLM) {
+      const isNotLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
+      if (isNotLLM) {
+        relatedCompanyQueries.push([api.query.assets.relatedCompany, [asset.index]]);
         assetQueries.push([api.query.assets.account, [asset.index, address]]);
         parametersQueries.push([api.query.assets.parameters, [asset.index]]);
         assets.push(asset);
       }
     });
+
+    if (relatedCompanyQueries.length !== 0) {
+      const relatedCompanyResults = await api.queryMulti(relatedCompanyQueries);
+      const companies = await getCompaniesByIds(relatedCompanyResults.map((r) => r.toJSON()));
+      const mapped = groupBy(companies, 'id');
+      relatedCompanyResults.forEach((relatedCompanyId, index) => {
+        const company = mapped[relatedCompanyId.toJSON()]?.[0];
+        if (company) {
+          assets[index].company = company;
+        }
+      });
+    }
 
     if (assetQueries.length !== 0) {
       const assetResults = await api.queryMulti(assetQueries);
@@ -893,9 +957,11 @@ const getDemocracyReferendums = async (address) => {
     const [
       apideriveReferendums,
       apideriveReferendumsActive,
+      nextExternal,
     ] = await Promise.all([ // api.queryMulti doesnt work with api.derive :(
       api.derive.democracy.referendums(),
       api.derive.democracy.referendumsActive(),
+      api.derive.democracy.nextExternal(),
     ]);
 
     const proposalData = proposals.map((proposalItem) => ({
@@ -939,6 +1005,7 @@ const getDemocracyReferendums = async (address) => {
       apideriveReferendumsActive,
       userVotes: userVotes.toHuman(),
       centralizedReferendumsData,
+      nextExternal,
     };
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -1124,15 +1191,29 @@ const getLegislation = async (tier) => {
     tier,
   );
   const legislationById = legislation.reduce(
-    (acc, [{ args: key }, content]) => {
+    (acc, part) => {
+      const [{ args: key }, content] = part;
       const { year, index } = key[1];
-      if (!acc[year]) acc[year] = {};
-      if (!acc[year][index]) { acc[year][index] = { id: { year, index }, vetos: [], sections: [] }; }
-      acc[year][index].sections.push({ vetos: [], content });
+      const sectionId = key[2].toNumber();
+      if (!acc[year]) {
+        acc[year] = {};
+      }
+      if (!acc[year][index]) {
+        acc[year][index] = { id: { year, index }, vetos: [], sections: [] };
+      }
+      acc[year][index].sections[sectionId] = { vetos: [], content };
       return acc;
     },
     {},
   );
+  Object.keys(legislationById).forEach((year) => {
+    Object.keys(legislationById[year] || {}).forEach((index) => {
+      const { sections } = legislationById[year][index] || {};
+      if (sections) {
+        legislationById[year][index].sections = sections.filter(Boolean); // Make sure no "undefined" sections exist
+      }
+    });
+  });
 
   const vetos = await api.query.liberlandLegislation.vetos.entries(tier);
   vetos
@@ -1225,34 +1306,6 @@ const getLegislation = async (tier) => {
   });
 
   return legislationById;
-};
-
-const getOfficialRegistryEntries = async () => {
-  const api = await getApi();
-  const allEntites = await api.query.companyRegistry.registries.entries(0);
-  const registeredCompanies = [];
-  allEntites.forEach((companyRegistry) => {
-    const [key, companyValue] = companyRegistry;
-    const entityId = key.toHuman();
-    let companyData;
-    try {
-      if (companyValue.isNone) companyData = { unregister: true };
-      else {
-        const compressed = companyValue?.isSome
-          ? companyValue.unwrap().data : companyValue.data;
-        companyData = api.createType('CompanyData', pako.inflate(compressed));
-      }
-
-      const formObject = blockchainDataToFormObject(companyData);
-
-      const dataObject = { ...formObject, id: entityId[1] };
-      registeredCompanies.push(dataObject);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.log(err);
-    }
-  });
-  return registeredCompanies;
 };
 
 const getOfficialUserRegistryEntries = async (walletAddress) => {
@@ -1464,7 +1517,7 @@ const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress
   // scaleEncoded is ready to be used for setting metadata
   // eslint-disable-next-line max-len
   // this data will be validated and will be rejected if encoded incorrectly or data is nonsensical (not on liberland island, self-intersecting plot lines, less then 3 points)
-  officeExtrinsic.signAndSend(walletAddress, { signer: injector.signer }, ({ status }) => {
+  officeExtrinsic.signAndSend(walletAddress, { signer: injector.signer, withSignedTransaction: true }, ({ status }) => {
     if (status.isInBlock) {
       // eslint-disable-next-line no-console
       console.log(`Completed REQUEST COMPANY REGISTRATION at block hash #${status.asInBlock.toString()}`);

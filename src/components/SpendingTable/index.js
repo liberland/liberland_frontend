@@ -20,7 +20,9 @@ import ColorAvatar from '../ColorAvatar';
 import styles from './styles.module.scss';
 import truncate from '../../utils/truncate';
 
-export default function SpendingTable({ spending }) {
+export default function SpendingTable({
+  spending,
+}) {
   const names = useSelector(identitySelectors.selectorIdentityMotions);
   const additionalAssets = useSelector(walletSelectors.selectorAdditionalAssets);
   const isBigScreen = useMediaQuery('(min-width: 1600px)');
@@ -77,7 +79,7 @@ export default function SpendingTable({ spending }) {
     const { identity } = names?.[recipient] || {};
     const name = identity?.legal || identity?.name;
     return {
-      timestamp: formatDate(timestamp, ' '),
+      timestamp: timestamp !== '-' ? formatDate(timestamp, ' ') : '-',
       recipient: recipient !== '-' && (
         <Flex wrap gap="10px" align="center">
           <ColorAvatar size={32} name={name || 'U'} />
@@ -160,12 +162,14 @@ export default function SpendingTable({ spending }) {
                 },
               ]}
               data={displayData}
+              pageSize={10}
             />
           ) : (
             <List
               dataSource={displayData}
               itemLayout="horizontal"
               size="small"
+              pagination={{ pageSize: 10 }}
               renderItem={({
                 timestamp,
                 recipient,
@@ -235,6 +239,6 @@ SpendingTable.propTypes = {
     supplier: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     finalDestination: PropTypes.string.isRequired,
-    amountInUsd: PropTypes.string.isRequired,
+    amountInUsd: PropTypes.number.isRequired,
   }).isRequired).isRequired,
 };

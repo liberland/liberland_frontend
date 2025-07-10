@@ -17,6 +17,7 @@ const ModeContext = createContext();
 export const useModeContext = () => useContext(ModeContext);
 
 export default function AntdProvider({ children }) {
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [isDarkMode, setIsDarkMode] = useState(prefersDarkMode);
   const context = useMemo(() => ({ isDarkMode, setIsDarkMode }), [isDarkMode]);
@@ -26,14 +27,18 @@ export default function AntdProvider({ children }) {
   }, [isDarkMode]);
 
   const colorText = isDarkMode ? 'white' : '#243F5F';
+  const itemSelected = isDarkMode ? '#2E3743' : '#EAEEF0';
   const activeBackground = isDarkMode ? '#1E202A' : 'white';
-  const mildShadow = isDarkMode ? '#7095A7' : '#F2F2F2';
+  const mildShadow = isDarkMode ? '#37383F' : '#F2F2F2';
   const shadow = isDarkMode ? '#7095A7' : '#EAEEF0';
   const mildBlue = isDarkMode ? '#7095A7' : '#ACBDC5';
-  const activeBorder = isDarkMode ? '#7095A7' : '#CCD6DB';
+  const activeBorder = isDarkMode ? '#37383F' : '#CCD6DB';
   const primaryColor = isDarkMode ? '#7095A7' : '#122C4B';
   const primaryBorder = isDarkMode ? '#7095A7' : '#F6CA31';
   const contentBg = isDarkMode ? '#1E202A' : 'white';
+  const colorLink = isDarkMode ? '#F3CB28' : '#1677ff';
+  const colorLinkActive = isDarkMode ? '#FBE9AC' : '#1677ff';
+  const colorWarningBg = isDarkMode ? '#F6CA31' : '#fffbe6';
 
   return (
     <ConfigProvider
@@ -51,8 +56,12 @@ export default function AntdProvider({ children }) {
           fontSizeHeading4: 29,
           fontSizeHeading3: 33,
           fontSizeHeading2: 37,
-          fontSizeHeading1: 41,
+          fontSizeHeading1: 45,
           fontFamily: 'Open Sans',
+          colorLink,
+          colorLinkHover: colorLinkActive,
+          colorLinkActive,
+          colorWarningBg,
         },
         components: {
           Layout: {
@@ -77,7 +86,7 @@ export default function AntdProvider({ children }) {
             itemActiveBg: mildShadow,
             itemActiveColor: colorText,
             subMenuItemSelectedColor: colorText,
-            itemSelectedBg: shadow,
+            itemSelectedBg: itemSelected,
             groupTitleColor: mildBlue,
             subMenuItemBorderRadius: '0',
             horizontalItemHoverColor: mildShadow,
@@ -106,12 +115,12 @@ export default function AntdProvider({ children }) {
             itemHoverColor: colorText,
           },
           Collapse: {
-            contentPadding: '20px',
+            contentPadding: isBiggerThanSmallScreen ? '20px' : '7px 10px',
             headerBg: activeBackground,
-            headerPadding: '20px',
+            headerPadding: isBiggerThanSmallScreen ? '20px' : '7px 10px',
             colorBorder: mildShadow,
             contentBg,
-            fontSize: 20,
+            fontSize: isBiggerThanSmallScreen ? 20 : 18,
             colorText,
           },
           Card: {
@@ -119,6 +128,11 @@ export default function AntdProvider({ children }) {
             actionsLiMargin: '12px 5px',
             actionsBg: contentBg,
             headerBg: contentBg,
+            ...(isBiggerThanSmallScreen ? {} : {
+              bodyPadding: '7px 10px',
+              headerFontSize: 18,
+              headerPadding: 10,
+            }),
           },
           InputNumber: {
             controlWidth: '100%',
@@ -146,6 +160,12 @@ export default function AntdProvider({ children }) {
             rowHoverBg: activeBackground,
             rowSelectedHoverBg: activeBackground,
             rowSelectedBg: activeBackground,
+          },
+          Divider: {
+            marginLG: isBiggerThanSmallScreen ? '24px' : '8px',
+          },
+          List: {
+            itemPaddingSM: isBiggerThanSmallScreen ? '8px 16px' : '8px 10px',
           },
         },
       }}

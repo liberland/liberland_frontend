@@ -94,7 +94,7 @@ export default function IdentityForm() {
           { required: true },
           {
             validator: (_, v) => (
-              isValidSubstrateAddress(v) ? Promise.resolve : Promise.reject('Invalid Address')
+              isValidSubstrateAddress(v) ? Promise.resolve() : Promise.reject('Invalid Address')
             ),
           },
         ]}

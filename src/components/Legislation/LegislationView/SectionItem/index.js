@@ -4,6 +4,7 @@ import { hexToString, isHex } from '@polkadot/util';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
+import Result from 'antd/es/result';
 import Markdown from 'markdown-to-jsx';
 import VetoStats from '../VetoStats';
 import ProposeButton from '../ProposeButton';
@@ -11,23 +12,36 @@ import AmendButton from '../AmendButton';
 import CastVeto from '../CastVeto';
 import styles from '../styles.module.scss';
 
-const checkTextToShow = (content) => {
+const tryParseToShow = (content) => {
   if (!content.isSome) {
-    return 'Repealed';
+    return [false];
   }
   const human = content.unwrap().toHuman();
-  if (isHex(human)) {
-    return hexToString(human) || '';
+  if (!human) {
+    return [false];
   }
-  return human || '';
+  if (isHex(human)) {
+    return [true, hexToString(human) || ''];
+  }
+  return [true, human || ''];
 };
 
 function SectionItem({
   section, content, tier, id,
 }) {
-  const text = useMemo(() => checkTextToShow(
+  const [hasContent, text] = useMemo(() => tryParseToShow(
     content,
   ), [content]);
+
+  if (!hasContent) {
+    return (
+      <Result
+        className="warning-result warning-result--borderless warning-result--flat"
+        title={`Section #${section} is repealed`}
+        status="warning"
+      />
+    );
+  }
 
   return (
     <Card
@@ -62,7 +76,7 @@ function SectionItem({
       <Paragraph
         className={styles.paragraph}
       >
-        <Markdown>
+        <Markdown options={{ disableParsingRawHTML: true }}>
           {text}
         </Markdown>
       </Paragraph>

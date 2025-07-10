@@ -102,6 +102,7 @@ function ExchangeList() {
             {
               key: 'lowliq',
               label: 'Low liquidity exchange pairs',
+              forceRender: true,
               extra: isBiggerThanDesktop && (
                 <ExchangeSort onSort={setLowLiquiditySort} sortBy={lowLiquiditySort} />
               ),
@@ -129,7 +130,7 @@ function ExchangeList() {
         />
       )}
       <Flex wrap gap="15px">
-        <AddAssetForm poolsData={poolsData} />
+        <AddAssetForm poolsData={poolsData} isStock={isStock} />
       </Flex>
     </Flex>
   );

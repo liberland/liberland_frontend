@@ -9,6 +9,7 @@ import SendAssetModal from '../../Modals/SendAssetModal';
 import styles from './styles.module.scss';
 import MoneyCard from '../../MoneyCard';
 import CurrencyIcon from '../../CurrencyIcon';
+import { isCompanyConnected } from '../../../utils/asset';
 
 function AssetOverview({
   additionalAssets,
@@ -22,38 +23,42 @@ function AssetOverview({
     [additionalAssets],
   );
   const isBiggerThanDesktop = useMediaQuery('(min-width: 1500px)');
-  const renderItem = (assetData) => (
-    <MoneyCard
-      actions={!isCongress || userIsMember ? [
-        <SendAssetModal
-          isRemarkNeeded={isRemarkNeeded}
-          assetData={assetData}
-          officeType={officeType}
-          key="send"
-        />,
-      ] : undefined}
-      amount={(
-        <>
-          {formatAssets(
-            assetData.balance?.balance || '0',
-            assetData.metadata.decimals,
-            true,
-          )}
-          {' '}
-          {assetData.metadata.symbol}
-        </>
-      )}
-      title={(
-        <span className={styles.name}>
-          {assetData.metadata.name}
-        </span>
-      )}
-      alt={assetData.metadata.symbol}
-      icon={(
-        <CurrencyIcon size={22} symbol={assetData.metadata.symbol} />
-      )}
-    />
-  );
+  const renderItem = (assetData) => {
+    const isConnected = isCompanyConnected(assetData);
+    const logo = isConnected ? assetData.company.logoURL : undefined;
+    return (
+      <MoneyCard
+        actions={!isCongress || userIsMember ? [
+          <SendAssetModal
+            isRemarkNeeded={isRemarkNeeded}
+            assetData={assetData}
+            officeType={officeType}
+            key="send"
+          />,
+        ] : undefined}
+        amount={(
+          <>
+            {formatAssets(
+              assetData.balance?.balance || '0',
+              assetData.metadata.decimals,
+              true,
+            )}
+            {' '}
+            {assetData.metadata.symbol}
+          </>
+        )}
+        title={(
+          <span className={styles.name}>
+            {assetData.metadata.name}
+          </span>
+        )}
+        alt={assetData.metadata.symbol}
+        icon={(
+          <CurrencyIcon size={22} symbol={assetData.metadata.symbol} logo={logo} />
+        )}
+      />
+    );
+  };
 
   if (!filteredAssets.length) {
     return (
@@ -95,7 +100,7 @@ AssetOverview.propTypes = {
       name: PropTypes.string,
       decimals: PropTypes.string,
     }),
-    balance: PropTypes.string,
+    balance: PropTypes.oneOf([PropTypes.string, PropTypes.string]),
   })),
 };
 

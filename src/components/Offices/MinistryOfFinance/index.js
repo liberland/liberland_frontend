@@ -23,7 +23,8 @@ export default function Wallet() {
   useEffect(() => {
     dispatch(ministryFinanceActions.ministryFinanceSpending.call());
     dispatch(officesActions.getPalletIds.call());
-  }, [dispatch]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Should only run on mount
 
   useEffect(() => {
     dispatch(ministryFinanceActions.ministryFinanceGetWallet.call());
@@ -53,9 +54,11 @@ export default function Wallet() {
           LLMPolitipool: (data) => ministryFinanceActions.ministryFinanceSendLlmToPolitipool.call(data),
         }}
       />
-      {spending && (
-        <SpendingTable spending={spending} />
-      )}
+      {spending ? (
+        <SpendingTable
+          spending={spending.data}
+        />
+      ) : null}
     </Flex>
   );
 }

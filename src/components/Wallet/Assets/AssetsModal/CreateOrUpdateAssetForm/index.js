@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Input from 'antd/es/input';
@@ -6,14 +9,21 @@ import Flex from 'antd/es/flex';
 import Spin from 'antd/es/spin';
 import Paragraph from 'antd/es/typography/Paragraph';
 import InputNumber from 'antd/es/input-number';
+import Title from 'antd/es/typography/Title';
 import PropTypes from 'prop-types';
 import {
   walletSelectors,
   blockchainSelectors,
+  registriesSelectors,
 } from '../../../../../redux/selectors';
-import { walletActions } from '../../../../../redux/actions';
+import { registriesActions, walletActions } from '../../../../../redux/actions';
 import Button from '../../../../Button/Button';
 import InputSearch from '../../../../InputComponents/InputSearchAddressName';
+import CompanyDisplay from '../../CompanyDisplay';
+import CompanyImage from '../../CompanyImage';
+import truncate from '../../../../../utils/truncate';
+import styles from './styles.module.scss';
+import AutoComplete from '../../../../AutoComplete';
 
 function CreateOrUpdateAssetForm({
   onClose,
@@ -33,6 +43,12 @@ function CreateOrUpdateAssetForm({
   const type = isStock ? 'stock' : 'asset';
   const typeCapitalized = isStock ? 'Stock' : 'Asset';
 
+  useEffect(() => {
+    dispatch(registriesActions.getOfficialRegistryEntries.call());
+  }, [dispatch]);
+
+  const allRegistries = useSelector(registriesSelectors.allRegistries)?.officialRegistryEntries;
+
   const onSubmit = async ({
     name,
     symbol,
@@ -41,6 +57,7 @@ function CreateOrUpdateAssetForm({
     admin,
     issuer,
     freezer,
+    companyId,
   }) => {
     setLoading(true);
     try {
@@ -62,6 +79,7 @@ function CreateOrUpdateAssetForm({
           issuer,
           freezer,
           owner: userWalletAddress,
+          companyId,
           isCreate,
           defaultValues,
           isStock,
@@ -90,6 +108,9 @@ function CreateOrUpdateAssetForm({
       initialValues={defaultValues}
       layout="vertical"
     >
+      <Title level={2}>
+        {isCreate ? `Create ${type}` : `Update ${type}`}
+      </Title>
       <Form.Item
         name="name"
         rules={[
@@ -153,9 +174,58 @@ function CreateOrUpdateAssetForm({
       >
         <InputSearch />
       </Form.Item>
-      <Paragraph>May ask you to sign up to 4 transactions</Paragraph>
+      <AutoComplete
+        empty="No companies found"
+        form={form}
+        label="Select related company"
+        name="companyId"
+        placeholder="Select related company"
+        renderSelected={(companyId, options) => {
+          if (companyId) {
+            const {
+              name: companyName,
+              logoURL: companyLogo,
+            } = options?.find(({ id }) => companyId.toString() === id) || {};
+
+            return (
+              <Flex wrap gap="15px" align="center" className={styles.extra}>
+                <div className="description">
+                  {truncate(companyName || 'Unknown', 15)}
+                </div>
+                <CompanyImage
+                  id={companyId}
+                  size={32}
+                  logo={companyLogo}
+                  name={companyName || 'Unknown'}
+                />
+              </Flex>
+            );
+          }
+          return <div className="description">None</div>;
+        }}
+        renderOption={({
+          id,
+          name,
+          logoURL,
+        }) => ({
+          value: id,
+          label: (
+            <CompanyDisplay
+              id={id}
+              size={40}
+              logo={logoURL}
+              name={name}
+              asset={defaultValues?.id || 0}
+            />
+          ),
+        })}
+        initialValue={defaultValues?.companyId}
+        options={allRegistries}
+        keys={['id', 'name']}
+      />
+      <Paragraph>May ask you to sign up to 5 transactions</Paragraph>
       <Flex wrap gap="15px">
-        <Button disabled={loading} medium onClick={onClose}>
+        <Button disabled={loading} onClick={onClose}>
           Close
         </Button>
         <Button primary medium type="submit" disabled={loading}>
@@ -175,6 +245,7 @@ const defaultValues = PropTypes.shape({
   admin: PropTypes.string,
   issuer: PropTypes.string,
   freezer: PropTypes.string,
+  companyId: PropTypes.number,
 });
 
 CreateOrUpdateAssetForm.propTypes = {

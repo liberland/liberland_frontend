@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import InputNumber from 'antd/es/input-number';
 import Input from 'antd/es/input';
-import { encodeRemark } from '../../../api/nodeRpcCall';
+import { encodeRemarkUser } from '../../../api/nodeRpcCall';
 
 export default function RemarkFormUser({
   form,
@@ -16,7 +16,7 @@ export default function RemarkFormUser({
     (async () => {
       setIsLoading(true);
       try {
-        const remark = await encodeRemark({
+        const remark = await encodeRemarkUser({
           id, description,
         });
         form.setFieldValue('combined', remark);

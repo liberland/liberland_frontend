@@ -20,11 +20,8 @@ export default function Wallet() {
   useEffect(() => {
     dispatch(congressActions.congressSpending.call());
     dispatch(congressActions.getMembers.call());
-  }, [dispatch]);
-
-  if (!congressAccountAddress || !balances) {
-    return null;
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount
 
   return (
     <Flex vertical gap="20px">
@@ -44,9 +41,11 @@ export default function Wallet() {
           }}
         />
       )}
-      {spending && (
-        <SpendingTable spending={spending} />
-      )}
+      {spending ? (
+        <SpendingTable
+          spending={spending.data}
+        />
+      ) : null}
     </Flex>
   );
 }

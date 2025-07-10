@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
-import { BuildRegistryForm } from '../../../../utils/registryFormBuilder';
+import Result from 'antd/es/result';
 import { registriesActions } from '../../../../redux/actions';
 import {
   blockchainSelectors,
 } from '../../../../redux/selectors';
 import { useCompanyDataFromUrl } from '../../hooks';
+import CompaniesForm from '../../CompaniesForm';
 
 export default function EditCompany() {
   const { companyId } = useParams();
@@ -24,9 +25,7 @@ export default function EditCompany() {
 
   if (!mainDataObject) {
     return (
-      <div>
-        There is no company with this id
-      </div>
+      <Result status={404} title="There is no company with this ID" />
     );
   }
 
@@ -43,7 +42,7 @@ export default function EditCompany() {
   };
 
   return (
-    <BuildRegistryForm
+    <CompaniesForm
       formObject={mainDataObject}
       buttonMessage="Submit Company Application"
       companyId={companyId}

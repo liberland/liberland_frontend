@@ -91,7 +91,7 @@ function* applyForCongressWorker() {
 
 function* spendingWorker() {
   const spending = yield call(fetchCongressSpending);
-  yield put(congressActions.congressSpending.success(spending));
+  yield put(congressActions.congressSpending.success({ data: spending }));
 }
 
 function* getCandidatesWorker() {

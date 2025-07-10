@@ -202,13 +202,13 @@ StakeEthForm.propTypes = {
 
 function ButtonModal(props) {
   return (
-    <OpenModalButton primary medium text="Stake ETH & LLD" {...props} />
+    <OpenModalButton primary text="Stake ETH & LLD" {...props} />
   );
 }
 
 ButtonModal.propTypes = {
   label: PropTypes.string.isRequired,
-  icon: PropTypes.node.isRequired,
+  icon: PropTypes.node,
 };
 
 const StakeEthFormModal = modalWrapper(StakeEthForm, ButtonModal);

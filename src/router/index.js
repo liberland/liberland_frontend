@@ -35,6 +35,7 @@ export default {
     finances: '/home/offices/finances',
     scheduledCongressSpending: '/home/offices/scheduled-congress-spending',
     ministryOfFinance: '/home/offices/ministry-of-finance',
+    taxPayers: '/home/offices/tax-payers',
   },
   documents: {
     myAccount: '/home/documents/my-account',
@@ -69,6 +70,7 @@ export default {
     bridge: '/home/wallet/bridge',
     nfts: '/home/wallet/nfts',
     payMe: '/home/wallet/pay-me',
+    gateway: '/home/wallet/gateway/:orderId',
   },
   registries: {
     overview: '/home/registries/overview',
@@ -107,5 +109,6 @@ export default {
     edit: '/home/companies/edit/:companyId',
     view: '/home/companies/view/:companyId',
     allCompanies: '/home/companies/allCompanies',
+    myCompanies: '/home/companies/my',
   },
 };
