@@ -27,7 +27,6 @@ function Home() {
       component={loader(() => import('../Registries'))}
     />,
     <Route key={router.home.companies} path={router.home.companies} component={loader(() => import('../Companies'))} />,
-    <Route key={router.home.documents} path={router.home.documents} component={loader(() => import('../Documents'))} />,
     <Route key={router.home.senate} path={router.home.senate} component={loader(() => import('../Senate'))} />,
     <Route key={router.home.nfts} path={router.home.nfts} component={loader(() => import('../Nfts'))} />,
     <Route
