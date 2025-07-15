@@ -47,6 +47,10 @@ function Wallet() {
           component={loader(() => import('./Gateway'))}
         />
         <Route
+          path={router.wallet.faucet}
+          component={loader(() => import('./Faucet'))}
+        />
+        <Route
           exact
           path={router.home.wallet}
           render={() => (
