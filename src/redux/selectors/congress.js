@@ -61,7 +61,7 @@ export const userIsRunnersUp = createSelector(
   congressReducer,
   blockchainReducer,
   (congressState, blockchainState) => congressState.runnersUp
-    .some((m) => m.who === blockchainState.userWalletAddress),
+    .some((m) => m.who.toString() === blockchainState.userWalletAddress),
 );
 
 export const treasury = createSelector(
