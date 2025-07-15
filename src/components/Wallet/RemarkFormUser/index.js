@@ -8,6 +8,7 @@ import { encodeRemarkUser } from '../../../api/nodeRpcCall';
 export default function RemarkFormUser({
   form,
   setIsLoading,
+  readOnly,
 }) {
   const id = Form.useWatch('id', form);
   const description = Form.useWatch('description', form);
@@ -37,14 +38,14 @@ export default function RemarkFormUser({
         label="ID"
         rules={[{ required: true }]}
       >
-        <InputNumber controls={false} />
+        <InputNumber readOnly={readOnly} controls={false} />
       </Form.Item>
       <Form.Item
         name="description"
         label="Description"
         rules={[{ required: true }]}
       >
-        <Input placeholder="Enter description" />
+        <Input readOnly={readOnly} placeholder="Enter description" />
       </Form.Item>
       <Form.Item
         hidden
@@ -63,4 +64,5 @@ RemarkFormUser.propTypes = {
     setFields: PropTypes.func.isRequired,
   }).isRequired,
   setIsLoading: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool,
 };

@@ -161,6 +161,7 @@ export default function Gateway() {
                 description: formRemark,
               }}
               isOpenOnRender
+              readOnly
               onSuccess={startCount}
               onClose={setClosed}
             />

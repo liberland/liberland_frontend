@@ -411,6 +411,12 @@ textarea.ant-input {
   background-color: var(--nav-bg);
 }
 
+.ant-input-number-readonly,
+.ant-input[readonly=""] {
+  background: transparent;
+  border: solid 1px var(--border-color);
+}
+
 .twoSplitter {
   .ant-card {
     width: 100%;
