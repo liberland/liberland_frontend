@@ -1,4 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+} from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import Result from 'antd/es/result';
 import Progress from 'antd/es/progress';
@@ -15,8 +20,9 @@ import CurrencyIcon from '../../CurrencyIcon';
 import SendLLDModal from '../../Modals/SendLLDModal';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import styles from './styles.module.scss';
-import { parseDollars } from '../../../utils/walletHelpers';
+import { parseAssets, parseDollars } from '../../../utils/walletHelpers';
 import Button from '../../Button/Button';
+import SendAssetModal from '../../Modals/SendAssetModal';
 
 const intervalInSeconds = 10;
 const percentagePerSecond = 100 / intervalInSeconds;
@@ -32,6 +38,7 @@ export default function Gateway() {
     callback,
     failure,
     hook,
+    assetId,
   } = useMemo(() => [
     'price',
     'toId',
@@ -39,6 +46,7 @@ export default function Gateway() {
     'remark',
     'failure',
     'hook',
+    'assetId',
   ].reduce((keys, urlKey) => {
     const value = new URLSearchParams(search).get(urlKey);
     if (value) {
@@ -48,6 +56,14 @@ export default function Gateway() {
   }, {}), [search]);
   const paymentCreated = useSelector(walletSelectors.selectorPaymentCreated);
   const paymentSuccessful = useSelector(walletSelectors.selectorPaymentSuccess);
+  const additionalAssets = useSelector(
+    walletSelectors.selectorAdditionalAssets,
+  );
+  const formRemark = remark || `Order ID: ${orderId}`;
+  const foundAsset = assetId ? additionalAssets?.find(({ index }) => assetId === index.toString()) : 'Native';
+  const parsedUnits = foundAsset === 'Native'
+    ? parseDollars(price).toString()
+    : foundAsset && parseAssets(price, foundAsset.metadata.decimals).toString();
   const [seconds, setSeconds] = useState(intervalInSeconds);
   const [isStartedCount, setIsStartCount] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
@@ -57,23 +73,29 @@ export default function Gateway() {
   useInterval(() => {
     setSeconds(seconds === 0 ? intervalInSeconds : seconds - 1);
   }, 1000);
+  useEffect(() => {
+    dispatch(walletActions.getAdditionalAssets.call());
+  }, [dispatch]);
+  useEffect(() => {
+    if (parsedUnits) {
+      dispatch(walletActions.createPayment.call({
+        orderId,
+        price: parsedUnits,
+        toId,
+        callback: hook,
+        assetId,
+      }));
+    }
+  }, [callback, dispatch, orderId, parsedUnits, toId, assetId, hook]);
 
-  React.useEffect(() => {
-    dispatch(walletActions.createPayment.call({
-      orderId,
-      price: parseDollars(price).toString(),
-      toId,
-      callback: hook,
-    }));
-  }, [callback, dispatch, orderId, price, toId, hook]);
-
-  React.useEffect(() => {
-    if (isStartedCount && seconds === 0) {
+  useEffect(() => {
+    if (isStartedCount && seconds === 0 && parsedUnits) {
       dispatch(
         walletActions.checkPayment.call({
           orderId,
-          price: parseDollars(price).toString(),
+          price: parsedUnits,
           toId,
+          assetId,
         }),
       );
     }
@@ -81,12 +103,13 @@ export default function Gateway() {
     seconds,
     dispatch,
     orderId,
-    price,
+    assetId,
+    parsedUnits,
     toId,
     isStartedCount,
   ]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (paymentSuccessful) {
       window.location.href = callback;
     }
@@ -98,9 +121,7 @@ export default function Gateway() {
     );
   }
 
-  const formRemark = remark || `Order ID: ${orderId}`;
-
-  if (!paymentCreated) {
+  if (!paymentCreated || !foundAsset) {
     return <Spin />;
   }
 
@@ -150,21 +171,41 @@ export default function Gateway() {
                 </Button>
               </div>
             )}
-            <SendLLDModal
-              text="Send payment"
-              primary
-              initialValues={{
-                recipient: toId,
-                amount: price,
-                remark: true,
-                id: orderId,
-                description: formRemark,
-              }}
-              isOpenOnRender
-              readOnly
-              onSuccess={startCount}
-              onClose={setClosed}
-            />
+            {assetId ? (
+              <SendAssetModal
+                text="Send payment"
+                primary
+                initialValues={{
+                  recipient: toId,
+                  amount: price,
+                  remark: true,
+                  id: orderId,
+                  description: formRemark,
+                }}
+                isOpenOnRender
+                readOnly
+                isRemarkNeeded
+                assetData={foundAsset}
+                onSuccess={startCount}
+                onClose={setClosed}
+              />
+            ) : (
+              <SendLLDModal
+                text="Send payment"
+                primary
+                initialValues={{
+                  recipient: toId,
+                  amount: price,
+                  remark: true,
+                  id: orderId,
+                  description: formRemark,
+                }}
+                isOpenOnRender
+                readOnly
+                onSuccess={startCount}
+                onClose={setClosed}
+              />
+            )}
           </Flex>
         </Flex>
       )}
