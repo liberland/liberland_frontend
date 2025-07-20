@@ -361,17 +361,17 @@ function Faucet() {
         title={(
           <Flex align="center" justify="center" gap={8}>
             <GiftOutlined />
-            <span>
+            <h3>
               {config.name}
               {' '}
               {config.symbol}
-            </span>
+            </h3>
           </Flex>
         )}
       >
         <Flex vertical gap={24}>
           <div className={styles.balanceSection}>
-            <div className={styles.balanceLabel}>Current Balance</div>
+            <div className={styles.balanceLabel}><strong>Current Balance</strong></div>
             <div className={styles.balanceValue}>
               {getBalanceDisplayText(tokenType, balance)}
               {' '}
@@ -380,7 +380,7 @@ function Faucet() {
           </div>
 
           <div className={styles.statusSection}>
-            <div className={styles.statusLabel}>Next Claim</div>
+            <div className={styles.statusLabel}><strong>Next Claim</strong></div>
             <div className={`${styles.statusValue} ${getStatusClass(claimStatus)}`}>
               {getStatusDisplayText(claimStatus)}
             </div>
