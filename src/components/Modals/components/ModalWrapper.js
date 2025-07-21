@@ -14,7 +14,7 @@ const modalWrapper = (ModalContent, ModalButton, { propsWrapper, matchHash, crea
           {...props}
           onClose={() => {
             closeLastNModals(1);
-            onClose();
+            onClose?.();
           }}
         />,
         { ...propsWrapper, onClose },

@@ -95,12 +95,14 @@ export const checkPayment = async ({
   orderId,
   price,
   toId,
+  assetId,
 }) => {
   const { data, status, statusText } = await getMiddlewareApi().get('/v1/verify-purchase', {
     params: {
       orderId,
       price,
       toId,
+      assetId,
     },
   });
   if (status >= 400) {
@@ -113,12 +115,14 @@ export const createPayment = async ({
   orderId,
   price,
   toId,
+  assetId,
   callback,
 }) => {
   const { status, statusText } = await getMiddlewareApi().post('/v1/create-purchase', {
     orderId,
     price,
     toId,
+    assetId,
     callback,
   });
   if (status >= 400) {

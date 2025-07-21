@@ -6,7 +6,9 @@ import InputNumber from 'antd/es/input-number';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useDispatch } from 'react-redux';
-import { BN } from '@polkadot/util';
+import { BN, isHex } from '@polkadot/util';
+import Input from 'antd/es/input';
+import Spin from 'antd/es/spin';
 import Button from '../Button/Button';
 import { parseAssets } from '../../utils/walletHelpers';
 import {
@@ -20,9 +22,19 @@ import { encodeRemark } from '../../api/nodeRpcCall';
 import { OfficeType } from '../../utils/officeTypeEnum';
 import modalWrapper from './components/ModalWrapper';
 import OpenModalButton from './components/OpenModalButton';
+import RemarkFormUser from '../Wallet/RemarkFormUser';
+import { useConfirmed } from '../InputComponents/hooks';
+import HookConsumer from '../../hooks/HookConsumer';
+import IsConfirmed from '../InputComponents/IsConfirmed';
 
 function SendAssetForm({
-  onClose, assetData, isRemarkNeeded, officeType,
+  onClose,
+  assetData,
+  isRemarkNeeded,
+  officeType,
+  readOnly,
+  initialValues,
+  onSuccess,
 }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -32,7 +44,7 @@ function SendAssetForm({
 
   const transfer = async (values) => {
     const {
-      recipient, project, description, category, supplier, amountInUsd, finalDestination,
+      recipient, project, description, category, supplier, amountInUsd, finalDestination, combined,
     } = values;
     const amount = parseAssets(values.amount, assetData.metadata.decimals);
     if (!isRemarkNeeded) {
@@ -41,7 +53,7 @@ function SendAssetForm({
         amount,
         assetData,
       }));
-    } else {
+    } else if (officeType) {
       const remarkInfo = {
         project,
         description,
@@ -66,8 +78,18 @@ function SendAssetForm({
       } else if (officeType === OfficeType.MINISTRY_FINANCE) {
         dispatch(ministryFinanceActions.ministryFinanceSendAssets.call({ ...data, officeType }));
       }
+    } else {
+      dispatch(walletActions.sendTransferRemark.call({
+        remarkInfo: combined,
+        transferData: {
+          index: assetData.index,
+          balance: amount,
+          recipient,
+        },
+      }));
     }
-    onClose();
+    onClose?.();
+    onSuccess();
   };
   const { balance } = assetData.balance;
   return (
@@ -76,6 +98,7 @@ function SendAssetForm({
       layout="vertical"
       initialValues={{
         votingDays: 7,
+        ...initialValues,
       }}
       onFinish={transfer}
     >
@@ -85,18 +108,46 @@ function SendAssetForm({
         {assetData.metadata.symbol}
       </Title>
       <Paragraph>
-        {!isRemarkNeeded
+        {!isRemarkNeeded && !officeType
           ? 'You are going to send tokens from your wallet'
           : 'You are going to create spend token proposal'}
       </Paragraph>
-
-      <Form.Item
-        label="Send to address"
-        name="recipient"
-        rules={[{ required: true }]}
-      >
-        <InputSearch />
-      </Form.Item>
+      {readOnly ? (
+        <HookConsumer useHook={useConfirmed} params={{ value: initialValues.recipient }}>
+          {({
+            loading,
+            error,
+            isConfirmed,
+            name,
+          }) => {
+            if (loading) {
+              return <Spin />;
+            }
+            return (
+              <Form.Item
+                label="Send to address"
+                name="recipient"
+                rules={[{ required: true }]}
+                extra={name}
+                help={error ? 'Could not verify identity' : undefined}
+              >
+                <Input
+                  readOnly
+                  addonAfter={<IsConfirmed isConfirmed={isConfirmed} />}
+                />
+              </Form.Item>
+            );
+          }}
+        </HookConsumer>
+      ) : (
+        <Form.Item
+          label="Send to address"
+          name="recipient"
+          rules={[{ required: true }]}
+        >
+          <InputSearch />
+        </Form.Item>
+      )}
       <Form.Item
         name="amount"
         label={`Amount ${assetData.metadata.symbol}`}
@@ -104,23 +155,31 @@ function SendAssetForm({
           { required: true },
           {
             validator: (_, textValue) => {
-              try {
-                return Validator.validateValue(
-                  typeof balance === 'string' ? new BN(balance.slice(2), 16) : new BN(balance),
-                  parseAssets(textValue, assetData.metadata.decimals),
-                ) ? Promise.resolve() : Promise.reject('Invalid number');
-              } catch {
-                return Promise.reject('Invalid value');
+              if (!officeType) {
+                try {
+                  const validated = Validator.validateValue(
+                    isHex(balance) ? new BN(balance.slice(2), 16) : new BN(balance),
+                    parseAssets(textValue, assetData.metadata.decimals),
+                  );
+                  return validated === true ? Promise.resolve() : Promise.reject(validated);
+                } catch {
+                  return Promise.reject('Invalid value');
+                }
               }
+              return Promise.resolve();
             },
           },
         ]}
       >
-        <InputNumber stringMode controls={false} />
+        <InputNumber stringMode controls={false} readOnly={readOnly} />
       </Form.Item>
       {isRemarkNeeded && (
         <>
-          <RemarkForm form={form} setIsLoading={setIsLoading} />
+          {!officeType ? (
+            <RemarkFormUser form={form} setIsLoading={setIsLoading} readOnly={readOnly} />
+          ) : (
+            <RemarkForm form={form} setIsLoading={setIsLoading} />
+          )}
           {officeType === 'congress' && (
             <>
               <Form.Item
@@ -170,6 +229,15 @@ SendAssetForm.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types, react/require-default-props
   assetData: PropTypes.any,
   onClose: PropTypes.func.isRequired,
+  onSuccess: PropTypes.func,
+  readOnly: PropTypes.bool,
+  initialValues: PropTypes.shape({
+    recipient: PropTypes.string,
+    amount: PropTypes.string,
+    remark: PropTypes.bool,
+    id: PropTypes.string,
+    description: PropTypes.string,
+  }),
 };
 
 function ButtonModal(props) {
