@@ -36,7 +36,7 @@ function ErrorModal() {
               Close modal
             </Button>
           ) : (
-            <Flex wrap gap="15px">
+            <Flex wrap justify="center" align="center" gap="15px">
               <Button
                 onClick={close}
               >

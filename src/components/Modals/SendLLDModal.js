@@ -14,7 +14,7 @@ import Button from '../Button/Button';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import { parseDollars, parseMerits } from '../../utils/walletHelpers';
 import { walletActions } from '../../redux/actions';
-import { walletSelectors } from '../../redux/selectors';
+import { blockchainSelectors, walletSelectors } from '../../redux/selectors';
 import modalWrapper from './components/ModalWrapper';
 import OpenModalButton from './components/OpenModalButton';
 import RemarkFormUser from '../Wallet/RemarkFormUser';
@@ -31,6 +31,7 @@ function SendLLDForm({
 }) {
   const dispatch = useDispatch();
   const balances = useSelector(walletSelectors.selectorBalances);
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const [isLoading, setIsLoading] = useState();
   const maxUnbond = balances?.liquidAmount?.amount !== '0x0'
     ? BN.max(
@@ -68,18 +69,21 @@ function SendLLDForm({
   };
 
   const validateUnbondValue = (_, textUnbondValue) => {
-    try {
-      const unbondValue = parseMerits(textUnbondValue);
-      if (unbondValue.gt(maxUnbond)) {
-        return Promise.reject('Minimum of 2 LLD must remain after transaction');
-      }
-      if (unbondValue.lte(BN_ZERO)) {
+    if (userWalletAddress) { // Let users submit without wallet and then direct them to login
+      try {
+        const unbondValue = parseMerits(textUnbondValue);
+        if (unbondValue.gt(maxUnbond)) {
+          return Promise.reject('Minimum of 2 LLD must remain after transaction');
+        }
+        if (unbondValue.lte(BN_ZERO)) {
+          return Promise.reject('Invalid amount');
+        }
+        return Promise.resolve();
+      } catch (e) {
         return Promise.reject('Invalid amount');
       }
-      return Promise.resolve();
-    } catch (e) {
-      return Promise.reject('Invalid amount');
     }
+    return Promise.resolve();
   };
   const remark = Form.useWatch('remark', form);
 

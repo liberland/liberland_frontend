@@ -5,7 +5,7 @@ import Flex from 'antd/es/flex';
 import InputNumber from 'antd/es/input-number';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { BN, isHex } from '@polkadot/util';
 import Input from 'antd/es/input';
 import Spin from 'antd/es/spin';
@@ -26,6 +26,7 @@ import RemarkFormUser from '../Wallet/RemarkFormUser';
 import { useConfirmed } from '../InputComponents/hooks';
 import HookConsumer from '../../hooks/HookConsumer';
 import IsConfirmed from '../InputComponents/IsConfirmed';
+import { blockchainSelectors } from '../../redux/selectors';
 
 function SendAssetForm({
   onClose,
@@ -40,6 +41,7 @@ function SendAssetForm({
   const [form] = Form.useForm();
   const votingDays = Form.useWatch('votingDays', form);
   const executionBlock = useCongressExecutionBlock(votingDays);
+  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const [isLoading, setIsLoading] = useState(false);
 
   const transfer = async (values) => {
@@ -92,6 +94,23 @@ function SendAssetForm({
     onSuccess();
   };
   const { balance } = assetData.balance;
+  const validateAssetAmount = (_, textValue) => {
+    // Only validate amounts if the user has selected wallet and it's not a govt office
+    // Govt offices can create spending without having the funds yet.
+    if (!officeType && userWalletAddress) {
+      try {
+        const validated = Validator.validateValue(
+          isHex(balance) ? new BN(balance.slice(2), 16) : new BN(balance),
+          parseAssets(textValue, assetData.metadata.decimals),
+        );
+        return validated === true ? Promise.resolve() : Promise.reject(validated);
+      } catch {
+        return Promise.reject('Invalid value');
+      }
+    }
+    return Promise.resolve();
+  };
+
   return (
     <Form
       form={form}
@@ -154,20 +173,7 @@ function SendAssetForm({
         rules={[
           { required: true },
           {
-            validator: (_, textValue) => {
-              if (!officeType) {
-                try {
-                  const validated = Validator.validateValue(
-                    isHex(balance) ? new BN(balance.slice(2), 16) : new BN(balance),
-                    parseAssets(textValue, assetData.metadata.decimals),
-                  );
-                  return validated === true ? Promise.resolve() : Promise.reject(validated);
-                } catch {
-                  return Promise.reject('Invalid value');
-                }
-              }
-              return Promise.resolve();
-            },
+            validator: validateAssetAmount,
           },
         ]}
       >
