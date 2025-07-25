@@ -1,0 +1,9 @@
+@import '/src/assets/main.scss';
+
+.gateway {
+    max-width: 600px;
+    margin-bottom: 30vh;
+    @media screen and (max-width: map-get($breakpoints, 'desktop')) {
+        margin-bottom: 0;
+    }
+}

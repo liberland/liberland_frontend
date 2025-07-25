@@ -17,6 +17,7 @@ export default {
     companies: '/home/companies',
     senate: '/home/senate',
     nfts: '/home/nfts',
+    multisig: '/home/multisig',
   },
   nfts: {
     overview: '/home/nfts/overview',
@@ -71,6 +72,7 @@ export default {
     nfts: '/home/wallet/nfts',
     payMe: '/home/wallet/pay-me',
     gateway: '/home/wallet/gateway/:orderId',
+    multisig: '/home/wallet/multisig',
   },
   registries: {
     overview: '/home/registries/overview',

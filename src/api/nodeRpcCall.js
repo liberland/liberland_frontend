@@ -255,7 +255,8 @@ const submitExtrinsic = async (extrinsic, walletAddress, api) => {
             });
           } else resolve({ blockHash, status, events });
         }
-      }).catch((err) => {
+      },
+    ).catch((err) => {
       // eslint-disable-next-line no-console
       console.log(err);
       reject(err);
@@ -3142,6 +3143,236 @@ async function transferNFT(collectionId, itemId, newOwner, walletAddress) {
   return submitExtrinsic(extrinsic, walletAddress, api);
 }
 
+const calculateMaxWeight = async (extrinsic, walletAddress) => {
+  const { weight } = await extrinsic.paymentInfo(walletAddress);
+  return weight;
+};
+
+async function getMultisigAccountInfo(multisigAddress) {
+  const api = await getApi();
+  const accountInfo = await api.query.system.account(multisigAddress);
+
+  const multisigs = await api.query.multisig.multisigs.entries(multisigAddress);
+
+  return {
+    address: multisigAddress,
+    balance: {
+      total: accountInfo.data.free.toString(),
+      reserved: accountInfo.data.reserved.toString(),
+      transferable: accountInfo.data.free.sub(accountInfo.data.frozen).toString(),
+    },
+    nonce: accountInfo.nonce.toString(),
+    pendingTxs: multisigs.map(([key, value]) => ({
+      callHash: key.args[1].toHex(),
+      multisig: value.unwrap().toJSON(),
+    })),
+  };
+}
+
+const createMultisigTransaction = async ({
+  threshold,
+  otherSignatories,
+  call,
+  walletAddress,
+}) => {
+  const api = await getApi();
+
+  if (threshold === 1) {
+    return submitExtrinsic(call, walletAddress, api);
+  }
+
+  // For threshold > 1, create multisig proposal
+  const tempTx = api.tx.multisig.asMulti(
+    threshold,
+    otherSignatories,
+    null,
+    call,
+    { refTime: 0, proofSize: 0 },
+  );
+
+  const weight = await calculateMaxWeight(tempTx, walletAddress);
+  const tx = api.tx.multisig.asMulti(
+    threshold,
+    otherSignatories,
+    null,
+    call,
+    weight,
+  );
+
+  return submitExtrinsic(tx, walletAddress, api);
+};
+
+const createMultisigTransferCallData = async ({
+  recipient,
+  amount,
+  isProtected,
+}) => {
+  const api = await getApi();
+
+  const transferCall = isProtected
+    ? api.tx.balances.transferKeepAlive(recipient, amount.toString())
+    : api.tx.balances.transfer(recipient, amount.toString());
+
+  return {
+    call: transferCall,
+    callData: transferCall.method.toHex(),
+    callHash: transferCall.method.hash.toHex(),
+    method: transferCall.method.toJSON(),
+    args: transferCall.args.map((arg) => arg.toString()),
+  };
+};
+
+const calculateMultisigTransactionFee = async ({
+  threshold,
+  otherSignatories,
+  call,
+  walletAddress,
+}) => {
+  const api = await getApi();
+
+  if (!call) {
+    throw new Error('Call parameter is required for fee calculation');
+  }
+
+  // Calculate fee for threshold=1 (direct execution)
+  if (threshold === 1) {
+    const paymentInfo = await call.paymentInfo(walletAddress);
+    return {
+      fee: paymentInfo.partialFee,
+      weight: paymentInfo.weight,
+    };
+  }
+
+  // Calculate fee for multisig proposal
+  const tempTx = api.tx.multisig.asMulti(
+    threshold,
+    otherSignatories,
+    null,
+    call,
+    { refTime: 0, proofSize: 0 },
+  );
+
+  const paymentInfo = await tempTx.paymentInfo(walletAddress);
+  return {
+    fee: paymentInfo.partialFee,
+    weight: paymentInfo.weight,
+  };
+};
+
+const createMultisigTransfer = async ({
+  multisigAddress,
+  threshold,
+  otherSignatories,
+  recipient,
+  amount,
+  isProtected,
+  walletAddress,
+  call, // Optional pre-created call
+}) => {
+  const api = await getApi();
+
+  // Use provided call or create new one if not provided
+  const transferCall = call || (isProtected
+    ? api.tx.balances.transferKeepAlive(recipient, amount.toString())
+    : api.tx.balances.transfer(recipient, amount.toString()));
+
+  return createMultisigTransaction({
+    multisigAddress,
+    threshold,
+    otherSignatories,
+    call: transferCall,
+    walletAddress,
+  });
+};
+
+const approveMultisigTransaction = async ({
+  threshold,
+  otherSignatories,
+  maybeTimepoint,
+  callHash,
+  walletAddress,
+  isFinalApproval,
+  callData,
+}) => {
+  const api = await getApi();
+  let tx;
+
+  if (isFinalApproval) {
+    let bytes = callData;
+    if (!bytes) {
+      const pre = await api.query.preimage.preimageFor(callHash);
+      if (pre.isSome) {
+        // Tuple <len, bytes>
+        bytes = pre.unwrap()[1].toHex();
+      } else {
+        throw new Error(
+          'Call data not available on-chain; one signer needs to supply it',
+        );
+      }
+    }
+
+    const call = api.registry.createType('Call', bytes);
+    const tempTx = api.tx.multisig.asMulti(
+      threshold,
+      otherSignatories,
+      maybeTimepoint,
+      call,
+      { refTime: 0, proofSize: 0 },
+    );
+    const weight = await calculateMaxWeight(tempTx, walletAddress);
+    tx = api.tx.multisig.asMulti(
+      threshold,
+      otherSignatories,
+      maybeTimepoint,
+      call,
+      weight,
+    );
+  } else {
+    const approve = api.tx.multisig.approveAsMulti(
+      threshold,
+      otherSignatories,
+      maybeTimepoint,
+      callHash,
+      { refTime: 0, proofSize: 0 }, // placeholder
+    );
+    const weight = await calculateMaxWeight(approve, walletAddress);
+    tx = api.tx.multisig.approveAsMulti(
+      threshold,
+      otherSignatories,
+      maybeTimepoint,
+      callHash,
+      weight,
+    );
+  }
+
+  return submitExtrinsic(tx, walletAddress, api);
+};
+
+const rejectMultisigTransaction = async ({
+  threshold,
+  otherSignatories,
+  timepoint,
+  callHash,
+  walletAddress,
+}) => {
+  const api = await getApi();
+
+  const extrinsic = api.tx.multisig.cancelAsMulti(
+    threshold,
+    otherSignatories,
+    timepoint,
+    callHash,
+  );
+
+  return submitExtrinsic(extrinsic, walletAddress, api);
+};
+
+const getSS58Prefix = async () => {
+  const api = await getApi();
+  const ss58Prefix = api.registry.chainSS58;
+  return ss58Prefix;
+};
+
 export {
   getBalanceByAddress,
   sendTransfer,
@@ -3294,4 +3525,13 @@ export {
   getClerksMinistryFinance,
   updateValidate,
   getValidator,
+  getMultisigAccountInfo,
+  createMultisigTransaction,
+  createMultisigTransferCallData,
+  calculateMultisigTransactionFee,
+  createMultisigTransfer,
+  approveMultisigTransaction,
+  rejectMultisigTransaction,
+  calculateMaxWeight,
+  getSS58Prefix,
 };
