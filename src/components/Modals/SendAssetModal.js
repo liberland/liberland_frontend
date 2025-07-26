@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { BN, isHex } from '@polkadot/util';
 import Input from 'antd/es/input';
 import Spin from 'antd/es/spin';
+import Checkbox from 'antd/es/checkbox';
 import Button from '../Button/Button';
 import { parseAssets } from '../../utils/walletHelpers';
 import {
@@ -27,6 +28,7 @@ import { useConfirmed } from '../InputComponents/hooks';
 import HookConsumer from '../../hooks/HookConsumer';
 import IsConfirmed from '../InputComponents/IsConfirmed';
 import { blockchainSelectors } from '../../redux/selectors';
+import { createGovtCrosschainPayment } from './utils';
 
 function SendAssetForm({
   onClose,
@@ -46,10 +48,50 @@ function SendAssetForm({
 
   const transfer = async (values) => {
     const {
-      recipient, project, description, category, supplier, amountInUsd, finalDestination, combined,
+      recipient,
+      project,
+      description,
+      category,
+      supplier,
+      amountInUsd,
+      finalDestination,
+      combined,
+      crosschain,
     } = values;
     const amount = parseAssets(values.amount, assetData.metadata.decimals);
-    if (!isRemarkNeeded) {
+    if (crosschain) {
+      const {
+        orderId,
+        transmitterHook,
+      } = createGovtCrosschainPayment({
+        finalDestination,
+        recipient,
+      });
+      const remarkInfo = {
+        project,
+        description,
+        category,
+        supplier,
+        currency: assetData.metadata.symbol,
+        date: Date.now(),
+        finalDestination: `${finalDestination}, ${orderId}`,
+        amountInUSDAtDateOfPayment: Number(amountInUsd),
+      };
+      const encodedRemark = await encodeRemark(remarkInfo);
+      const data = {
+        transferToAddress: values.recipient,
+        transferAmount: amount,
+        assetData,
+        remarkInfo: encodedRemark,
+      };
+      dispatch(walletActions.createPayment.call({
+        orderId,
+        price: amount.toString(),
+        toId: recipient,
+        callback: transmitterHook,
+      }));
+      dispatch(ministryFinanceActions.ministryFinanceSendAssets.call({ ...data, officeType }));
+    } else if (!isRemarkNeeded) {
       dispatch(walletActions.sendAssetsTransfer.call({
         recipient,
         amount,
@@ -186,7 +228,7 @@ function SendAssetForm({
           ) : (
             <RemarkForm form={form} setIsLoading={setIsLoading} />
           )}
-          {officeType === 'congress' && (
+          {officeType === OfficeType.CONGRESS && (
             <>
               <Form.Item
                 name="votingDays"
@@ -203,6 +245,15 @@ function SendAssetForm({
                 .
               </Paragraph>
             </>
+          )}
+          {officeType === OfficeType.MINISTRY_FINANCE && (
+            <Form.Item
+              name="crosschain"
+              label="Is cross-chain transaction?"
+              layout="horizontal"
+            >
+              <Checkbox />
+            </Form.Item>
           )}
         </>
       )}

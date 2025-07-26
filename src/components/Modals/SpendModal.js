@@ -5,6 +5,7 @@ import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import InputNumber from 'antd/es/input-number';
 import Flex from 'antd/es/flex';
+import Checkbox from 'antd/es/checkbox';
 import { useDispatch } from 'react-redux';
 import Button from '../Button/Button';
 import InputSearch from '../InputComponents/InputSearchAddressName';
@@ -16,6 +17,8 @@ import { encodeRemark } from '../../api/nodeRpcCall';
 import { OfficeType } from '../../utils/officeTypeEnum';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
+import { walletActions } from '../../redux/actions';
+import { createGovtCrosschainPayment } from './utils';
 
 function SpendForm({
   onClose, onSend, spendData, officeType, balance,
@@ -32,29 +35,69 @@ function SpendForm({
   const votingDays = Form.useWatch('votingDays', form);
   const executionBlock = useCongressExecutionBlock(votingDays);
   const [isLoading, setIsLoading] = useState();
-
   const transfer = async (values) => {
     const {
-      project, description: descriptionRemark, category, supplier, amount, recipient, amountInUsd, finalDestination,
-    } = values;
-    const remarkInfo = {
       project,
       description: descriptionRemark,
       category,
       supplier,
-      currency: name,
-      date: Date.now(),
+      amount,
+      recipient,
+      amountInUsd,
       finalDestination,
-      amountInUSDAtDateOfPayment: Number(amountInUsd),
-    };
-
-    const encodedRemark = await encodeRemark(remarkInfo);
-    dispatch(onSend({
-      transferToAddress: recipient,
-      transferAmount: parseMerits(amount),
-      remarkInfo: encodedRemark,
-      executionBlock,
-    }));
+      crosschain,
+    } = values;
+    const transferAmount = parseMerits(amount);
+    if (crosschain) {
+      const {
+        orderId,
+        transmitterHook,
+      } = createGovtCrosschainPayment({
+        finalDestination,
+        recipient,
+      });
+      const remarkInfo = {
+        project,
+        description: descriptionRemark,
+        category,
+        supplier,
+        currency: name,
+        date: Date.now(),
+        finalDestination: `${finalDestination}, ${orderId}`,
+        amountInUSDAtDateOfPayment: Number(amountInUsd),
+      };
+      const encodedRemark = await encodeRemark(remarkInfo);
+      dispatch(onSend({
+        transferToAddress: recipient,
+        transferAmount,
+        remarkInfo: encodedRemark,
+        executionBlock,
+      }));
+      dispatch(walletActions.createPayment.call({
+        orderId,
+        price: transferAmount.toString(),
+        toId: recipient,
+        callback: transmitterHook,
+      }));
+    } else {
+      const remarkInfo = {
+        project,
+        description: descriptionRemark,
+        category,
+        supplier,
+        currency: name,
+        date: Date.now(),
+        finalDestination,
+        amountInUSDAtDateOfPayment: Number(amountInUsd),
+      };
+      const encodedRemark = await encodeRemark(remarkInfo);
+      dispatch(onSend({
+        transferToAddress: recipient,
+        transferAmount,
+        remarkInfo: encodedRemark,
+        executionBlock,
+      }));
+    }
     onClose();
   };
 
@@ -116,6 +159,16 @@ function SpendForm({
             .
           </Paragraph>
         </>
+      )}
+
+      {officeType === OfficeType.MINISTRY_FINANCE && (
+        <Form.Item
+          name="crosschain"
+          label="Is cross-chain transaction?"
+          layout="horizontal"
+        >
+          <Checkbox />
+        </Form.Item>
       )}
 
       <Flex wrap gap="15px">
