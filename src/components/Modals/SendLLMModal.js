@@ -11,13 +11,12 @@ import Button from '../Button/Button';
 import InputSearch from '../InputComponents/InputSearchAddressName';
 import { walletActions } from '../../redux/actions';
 import { parseMerits, valueToBN } from '../../utils/walletHelpers';
-import { blockchainSelectors, walletSelectors } from '../../redux/selectors';
+import { walletSelectors } from '../../redux/selectors';
 import modalWrapper from './components/ModalWrapper';
 import OpenModalButton from './components/OpenModalButton';
 
 function SendLLMForm({ onClose }) {
   const dispatch = useDispatch();
-  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const balances = useSelector(walletSelectors.selectorBalances);
   const maxUnbond = valueToBN(balances?.liquidMerits?.amount ?? 0);
 
@@ -34,18 +33,15 @@ function SendLLMForm({ onClose }) {
   };
 
   const validateUnbondValue = (_, textUnbondValue) => {
-    if (userWalletAddress) { // Let users submit without wallet and then direct them to login
-      try {
-        const unbondValue = parseMerits(textUnbondValue);
-        if (unbondValue.gt(maxUnbond) || unbondValue.lte(BN_ZERO)) {
-          return Promise.reject('Invalid amount');
-        }
-        return Promise.resolve();
-      } catch (e) {
+    try {
+      const unbondValue = parseMerits(textUnbondValue);
+      if (unbondValue.gt(maxUnbond) || unbondValue.lte(BN_ZERO)) {
         return Promise.reject('Invalid amount');
       }
+      return Promise.resolve();
+    } catch (e) {
+      return Promise.reject('Invalid amount');
     }
-    return Promise.resolve();
   };
 
   return (
