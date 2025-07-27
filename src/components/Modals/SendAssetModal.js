@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Flex from 'antd/es/flex';
@@ -28,7 +28,7 @@ import { useConfirmed } from '../InputComponents/hooks';
 import HookConsumer from '../../hooks/HookConsumer';
 import IsConfirmed from '../InputComponents/IsConfirmed';
 import { blockchainSelectors } from '../../redux/selectors';
-import { createGovtCrosschainPayment } from './utils';
+import { createGovtCrosschainPayment, getTransmitterIndex, getTransmitterWallets } from './utils';
 
 function SendAssetForm({
   onClose,
@@ -79,7 +79,7 @@ function SendAssetForm({
       };
       const encodedRemark = await encodeRemark(remarkInfo);
       const data = {
-        transferToAddress: values.recipient,
+        transferToAddress: recipient,
         transferAmount: amount,
         assetData,
         remarkInfo: encodedRemark,
@@ -89,6 +89,7 @@ function SendAssetForm({
         price: amount.toString(),
         toId: recipient,
         callback: transmitterHook,
+        assetId: assetData.index,
       }));
       dispatch(ministryFinanceActions.ministryFinanceSendAssets.call({ ...data, officeType }));
     } else if (!isRemarkNeeded) {
@@ -153,6 +154,23 @@ function SendAssetForm({
     return Promise.resolve();
   };
 
+  const crosschain = Form.useWatch('crosschain', form);
+
+  useEffect(() => {
+    if (crosschain) {
+      const providers = getTransmitterWallets();
+      if (providers.length === 1) {
+        form.setFieldValue('recipient', providers[0]);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [crosschain]);
+
+  /**
+   * @type string[]
+   */
+  const crosschainCompatibles = JSON.parse(process.env.REACT_APP_TRANSMITTER_TOKENS);
+
   return (
     <Form
       form={form}
@@ -173,6 +191,16 @@ function SendAssetForm({
           ? 'You are going to send tokens from your wallet'
           : 'You are going to create spend token proposal'}
       </Paragraph>
+      {officeType === OfficeType.MINISTRY_FINANCE && crosschainCompatibles.includes(assetData.index.toString()) && (
+        <Form.Item
+          name="crosschain"
+          label="Is cross-chain transaction?"
+          layout="horizontal"
+          valuePropName="checked"
+        >
+          <Checkbox />
+        </Form.Item>
+      )}
       {readOnly ? (
         <HookConsumer useHook={useConfirmed} params={{ value: initialValues.recipient }}>
           {({
@@ -204,7 +232,16 @@ function SendAssetForm({
         <Form.Item
           label="Send to address"
           name="recipient"
-          rules={[{ required: true }]}
+          rules={[
+            { required: true },
+            {
+              validator: (_, value) => (
+                getTransmitterIndex(value) === -1
+                  ? Promise.reject('Invalid recipient for cross-chain transfer')
+                  : Promise.resolve()
+              ),
+            },
+          ]}
         >
           <InputSearch />
         </Form.Item>
@@ -226,7 +263,7 @@ function SendAssetForm({
           {!officeType ? (
             <RemarkFormUser form={form} setIsLoading={setIsLoading} readOnly={readOnly} />
           ) : (
-            <RemarkForm form={form} setIsLoading={setIsLoading} />
+            <RemarkForm form={form} setIsLoading={setIsLoading} isCrosschain={crosschain} />
           )}
           {officeType === OfficeType.CONGRESS && (
             <>
@@ -245,15 +282,6 @@ function SendAssetForm({
                 .
               </Paragraph>
             </>
-          )}
-          {officeType === OfficeType.MINISTRY_FINANCE && (
-            <Form.Item
-              name="crosschain"
-              label="Is cross-chain transaction?"
-              layout="horizontal"
-            >
-              <Checkbox />
-            </Form.Item>
           )}
         </>
       )}

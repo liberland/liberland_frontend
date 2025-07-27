@@ -5,6 +5,7 @@ import Input from 'antd/es/input';
 import InputNumber from 'antd/es/input-number';
 import Select from 'antd/es/select';
 import { encodeRemark } from '../../../api/nodeRpcCall';
+import { validateFinalDestination } from '../../Modals/utils';
 
 const remarkOptions = [
   {
@@ -49,6 +50,7 @@ export default function RemarkForm({
   index,
   form,
   setIsLoading,
+  isCrosschain,
 }) {
   const getName = useCallback((name, withPrefix) => {
     const baseName = typeof index === 'number' ? [index, name] : [name];
@@ -135,7 +137,17 @@ export default function RemarkForm({
       <Form.Item
         name={getName('finalDestination')}
         label="Final destination"
-        rules={[{ required: true }]}
+        rules={[
+          { required: true },
+          {
+            validator: (_, value) => {
+              if (isCrosschain && !validateFinalDestination(value)) {
+                return Promise.reject('Invalid destination format');
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
       >
         <Input />
       </Form.Item>
@@ -164,4 +176,5 @@ RemarkForm.propTypes = {
     setFields: PropTypes.func.isRequired,
   }).isRequired,
   setIsLoading: PropTypes.func.isRequired,
+  isCrosschain: PropTypes.bool,
 };

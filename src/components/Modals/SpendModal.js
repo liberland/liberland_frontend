@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -18,7 +18,7 @@ import { OfficeType } from '../../utils/officeTypeEnum';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
 import { walletActions } from '../../redux/actions';
-import { createGovtCrosschainPayment } from './utils';
+import { createGovtCrosschainPayment, getTransmitterIndex, getTransmitterWallets } from './utils';
 
 function SpendForm({
   onClose, onSend, spendData, officeType, balance,
@@ -101,6 +101,18 @@ function SpendForm({
     onClose();
   };
 
+  const crosschain = Form.useWatch('crosschain', form);
+
+  useEffect(() => {
+    if (crosschain) {
+      const providers = getTransmitterWallets();
+      if (providers.length === 1) {
+        form.setFieldValue('recipient', providers[0]);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [crosschain]);
+
   return (
     <Form
       initialValues={{
@@ -116,10 +128,29 @@ function SpendForm({
       <Paragraph>
         {description}
       </Paragraph>
+      {officeType === OfficeType.MINISTRY_FINANCE && (
+        <Form.Item
+          name="crosschain"
+          label="Is cross-chain transaction?"
+          layout="horizontal"
+          valuePropName="checked"
+        >
+          <Checkbox />
+        </Form.Item>
+      )}
       <Form.Item
         label={subtitle}
         name="recipient"
-        rules={[{ required: true }]}
+        rules={[
+          { required: true },
+          {
+            validator: (_, value) => (
+              getTransmitterIndex(value) === -1
+                ? Promise.reject('Invalid recipient for cross-chain transfer')
+                : Promise.resolve()
+            ),
+          },
+        ]}
       >
         <InputSearch />
       </Form.Item>
@@ -140,7 +171,7 @@ function SpendForm({
         <InputNumber placeholder={`Amount ${name}`} controls={false} stringMode />
       </Form.Item>
 
-      <RemarkForm form={form} setIsLoading={setIsLoading} />
+      <RemarkForm form={form} setIsLoading={setIsLoading} isCrosschain={crosschain} />
 
       {officeType === OfficeType.CONGRESS && (
         <>
@@ -159,16 +190,6 @@ function SpendForm({
             .
           </Paragraph>
         </>
-      )}
-
-      {officeType === OfficeType.MINISTRY_FINANCE && (
-        <Form.Item
-          name="crosschain"
-          label="Is cross-chain transaction?"
-          layout="horizontal"
-        >
-          <Checkbox />
-        </Form.Item>
       )}
 
       <Flex wrap gap="15px">

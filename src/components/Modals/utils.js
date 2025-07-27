@@ -10,6 +10,20 @@ const isValidSolanaAddress = (address) => {
   }
 };
 
+export const validateFinalDestination = (finalDestination) => (
+  isAddress(finalDestination) || isValidSolanaAddress(finalDestination)
+);
+
+export const getTransmitterWallets = () => {
+  /**
+   * @type string[]
+   */
+  const trasmitterWallets = JSON.parse(process.env.REACT_APP_TRANSMITTER_WALLETS);
+  return trasmitterWallets;
+};
+
+export const getTransmitterIndex = (recipient) => getTransmitterWallets().indexOf(recipient);
+
 export const createGovtCrosschainPayment = ({
   recipient,
   finalDestination,
@@ -17,12 +31,8 @@ export const createGovtCrosschainPayment = ({
   const buffer = randomBytes(4);
   const hexString = buffer.toString('hex');
   const orderId = window.BigInt(`0x${hexString}`).toString();
-  /**
-   * @type string[]
-   */
-  const trasmitterWallets = JSON.parse(process.env.REACT_APP_TRANSMITTER_WALLETS);
-  const transmitterIndex = trasmitterWallets.indexOf(recipient);
-  if (!isAddress(finalDestination) && !isValidSolanaAddress(finalDestination)) {
+  const transmitterIndex = getTransmitterIndex(recipient);
+  if (!validateFinalDestination(finalDestination)) {
     throw new Error(`${finalDestination} is not a valid ETH or SOL address`);
   }
   if (transmitterIndex === -1) {
