@@ -1,0 +1,55 @@
+@import '../../../assets/main.scss';
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.cardsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 32px;
+  text-align: center;
+
+  @media screen and (max-width: map-get($breakpoints, 'tablet')) {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media screen and (max-width: map-get($breakpoints, 'phone')) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.infoAlert {
+  text-align: left;
+
+  :global(.ant-alert-icon) {
+    color: $succes;
+  }
+}
+
+.info {
+  margin-top: 24px;
+  border-radius: 6px;
+  padding: 32px;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+
+  ul {
+    list-style: none;
+
+    li {
+      padding-left: 24px;
+      position: relative;
+
+      &::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: #059669;
+        font-weight: bold;
+      }
+    }
+  }
+}
