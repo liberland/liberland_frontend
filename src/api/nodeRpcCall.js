@@ -255,7 +255,8 @@ const submitExtrinsic = async (extrinsic, walletAddress, api) => {
             });
           } else resolve({ blockHash, status, events });
         }
-      }).catch((err) => {
+      },
+    ).catch((err) => {
       // eslint-disable-next-line no-console
       console.log(err);
       reject(err);

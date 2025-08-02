@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import InputNumber from 'antd/es/input-number';
 import Flex from 'antd/es/flex';
+import Checkbox from 'antd/es/checkbox';
 import { useDispatch } from 'react-redux';
 import Button from '../Button/Button';
 import InputSearch from '../InputComponents/InputSearchAddressName';
@@ -16,6 +17,8 @@ import { encodeRemark } from '../../api/nodeRpcCall';
 import { OfficeType } from '../../utils/officeTypeEnum';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
+import { walletActions } from '../../redux/actions';
+import { createGovtCrosschainPayment, getTransmitterIndex, getTransmitterWallets } from './utils';
 
 function SpendForm({
   onClose, onSend, spendData, officeType, balance,
@@ -32,31 +35,83 @@ function SpendForm({
   const votingDays = Form.useWatch('votingDays', form);
   const executionBlock = useCongressExecutionBlock(votingDays);
   const [isLoading, setIsLoading] = useState();
-
   const transfer = async (values) => {
     const {
-      project, description: descriptionRemark, category, supplier, amount, recipient, amountInUsd, finalDestination,
-    } = values;
-    const remarkInfo = {
       project,
       description: descriptionRemark,
       category,
       supplier,
-      currency: name,
-      date: Date.now(),
+      amount,
+      recipient,
+      amountInUsd,
       finalDestination,
-      amountInUSDAtDateOfPayment: Number(amountInUsd),
-    };
-
-    const encodedRemark = await encodeRemark(remarkInfo);
-    dispatch(onSend({
-      transferToAddress: recipient,
-      transferAmount: parseMerits(amount),
-      remarkInfo: encodedRemark,
-      executionBlock,
-    }));
+      crosschain,
+    } = values;
+    const transferAmount = parseMerits(amount);
+    if (crosschain) {
+      const {
+        orderId,
+        transmitterHook,
+      } = createGovtCrosschainPayment({
+        finalDestination,
+        recipient,
+      });
+      const remarkInfo = {
+        project,
+        description: descriptionRemark,
+        category,
+        supplier,
+        currency: name,
+        date: Date.now(),
+        finalDestination: `${finalDestination}, ${orderId}`,
+        amountInUSDAtDateOfPayment: Number(amountInUsd),
+      };
+      const encodedRemark = await encodeRemark(remarkInfo);
+      dispatch(onSend({
+        transferToAddress: recipient,
+        transferAmount,
+        remarkInfo: encodedRemark,
+        executionBlock,
+      }));
+      dispatch(walletActions.createPayment.call({
+        orderId,
+        price: transferAmount.toString(),
+        toId: recipient,
+        callback: transmitterHook,
+      }));
+    } else {
+      const remarkInfo = {
+        project,
+        description: descriptionRemark,
+        category,
+        supplier,
+        currency: name,
+        date: Date.now(),
+        finalDestination,
+        amountInUSDAtDateOfPayment: Number(amountInUsd),
+      };
+      const encodedRemark = await encodeRemark(remarkInfo);
+      dispatch(onSend({
+        transferToAddress: recipient,
+        transferAmount,
+        remarkInfo: encodedRemark,
+        executionBlock,
+      }));
+    }
     onClose();
   };
+
+  const crosschain = Form.useWatch('crosschain', form);
+
+  useEffect(() => {
+    if (crosschain) {
+      const providers = getTransmitterWallets();
+      if (providers.length === 1) {
+        form.setFieldValue('recipient', providers[0]);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [crosschain]);
 
   return (
     <Form
@@ -73,10 +128,29 @@ function SpendForm({
       <Paragraph>
         {description}
       </Paragraph>
+      {officeType === OfficeType.MINISTRY_FINANCE && (
+        <Form.Item
+          name="crosschain"
+          label="Is cross-chain transaction?"
+          layout="horizontal"
+          valuePropName="checked"
+        >
+          <Checkbox />
+        </Form.Item>
+      )}
       <Form.Item
         label={subtitle}
         name="recipient"
-        rules={[{ required: true }]}
+        rules={[
+          { required: true },
+          {
+            validator: (_, value) => (
+              getTransmitterIndex(value) === -1
+                ? Promise.reject('Invalid recipient for cross-chain transfer')
+                : Promise.resolve()
+            ),
+          },
+        ]}
       >
         <InputSearch />
       </Form.Item>
@@ -97,7 +171,7 @@ function SpendForm({
         <InputNumber placeholder={`Amount ${name}`} controls={false} stringMode />
       </Form.Item>
 
-      <RemarkForm form={form} setIsLoading={setIsLoading} />
+      <RemarkForm form={form} setIsLoading={setIsLoading} isCrosschain={crosschain} />
 
       {officeType === OfficeType.CONGRESS && (
         <>
