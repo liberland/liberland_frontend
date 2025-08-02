@@ -1,17 +1,9 @@
 import { randomBytes } from 'crypto';
 import { isAddress } from 'thirdweb';
-import { PublicKey } from '@solana/web3.js';
 
-const isValidSolanaAddress = (address) => {
-  try {
-    return PublicKey.isOnCurve(new PublicKey(address));
-  } catch {
-    return false;
-  }
-};
-
+// TODO add validate solana once we upgrade to node 20
 export const validateFinalDestination = (finalDestination) => (
-  isAddress(finalDestination) || isValidSolanaAddress(finalDestination)
+  isAddress(finalDestination)
 );
 
 export const getTransmitterWallets = () => {

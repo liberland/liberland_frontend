@@ -17,7 +17,6 @@
     "@polkadot/keyring": "^12.6.2",
     "@polkadot/util": "^12.6.2",
     "@polkadot/util-crypto": "12.6.2",
-    "@solana/web3.js": "^1.98.2",
     "@svgr/webpack": "^6.2.1",
     "@uiw/react-markdown-editor": "^6.1.2",
     "antd": "^5.24.0",
