@@ -16,6 +16,7 @@ import { ReactComponent as X } from '../assets/icons/x.svg';
 import { ReactComponent as YouTube } from '../assets/icons/youtube.svg';
 import { ReactComponent as Telegram } from '../assets/icons/telegram.svg';
 import router from '../router';
+import { isTestnet } from '../utils/networkHelpers';
 
 export const navigationList = [
   {
@@ -37,6 +38,7 @@ export const navigationList = [
       Assets: router.wallet.assets,
       Stocks: router.wallet.stocks,
       Bridge: router.wallet.bridge,
+      ...(isTestnet() && { Faucet: router.wallet.faucet }),
     },
   },
   {
