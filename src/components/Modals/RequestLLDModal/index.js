@@ -9,6 +9,7 @@ import List from 'antd/es/list';
 import InputNumber from 'antd/es/input-number';
 import Divider from 'antd/es/divider';
 import TextArea from 'antd/es/input/TextArea';
+import Checkbox from 'antd/es/checkbox';
 import PropTypes from 'prop-types';
 import Button from '../../Button/Button';
 import { blockchainSelectors, identitySelectors } from '../../../redux/selectors';
@@ -39,14 +40,18 @@ function RequestLLDForm({ onClose }) {
     }
   }, [dispatch, walletAddress]);
 
-  const onSubmit = async ({ amount, note }) => {
+  const onSubmit = async ({ amount, note, donation }) => {
     try {
-      const realAmount = parseDollars(amount).toString();
+      const fixedAmount = donation ? undefined : parseDollars(amount).toString();
       const data = window.btoa(
-        JSON.stringify({
-          amount: realAmount,
+        JSON.stringify(fixedAmount ? {
+          amount: fixedAmount,
           note,
           recipient: walletAddress,
+        } : {
+          note,
+          recipient: walletAddress,
+          donation,
         }),
       );
       const link = `${window.location.protocol}//${window.location.host}${router.wallet.payMe}?data=${data}`;
@@ -54,12 +59,18 @@ function RequestLLDForm({ onClose }) {
         link,
       )}`;
       const edgeLink = `https://deep.edge.app/pay/liberland/${walletAddress}?amount=${amount}`;
-      setLinkData({
-        amount: realAmount,
+      setLinkData(fixedAmount ? {
+        amount: fixedAmount,
         note,
         link,
         subwalletLink,
         edgeLink,
+      } : {
+        note,
+        link,
+        subwalletLink,
+        edgeLink,
+        donation,
       });
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -68,6 +79,14 @@ function RequestLLDForm({ onClose }) {
   };
 
   const isLargerThanHdScreen = useMediaQuery('(min-width: 768px)');
+  const isDonation = Form.useWatch('donation', form);
+
+  useEffect(() => {
+    if (isDonation) {
+      form.setFieldValue('amount', '');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDonation]);
 
   if (identityIsLoading) {
     return <Spin />;
@@ -184,7 +203,10 @@ function RequestLLDForm({ onClose }) {
                 name: 'Recipient',
                 value: displayName,
               },
-              {
+              linkData.donation ? {
+                name: 'Type of request',
+                value: 'Donation',
+              } : {
                 name: 'Amount',
                 value: `${formatDollars(linkData.amount, true)} LLD`,
               },
@@ -206,11 +228,26 @@ function RequestLLDForm({ onClose }) {
         label="Requested payment amount in LLD"
         name="amount"
         rules={[
-          { required: true },
           { pattern: /^\d*\.?\d+$/, message: 'Must be a number' },
+          {
+            validator: (_, value) => {
+              if (isDonation || value) {
+                return Promise.resolve();
+              }
+              return Promise.reject('Requested amount is required');
+            },
+          },
         ]}
       >
-        <InputNumber placeholder="LLD" stringMode controls={false} />
+        <InputNumber disabled={isDonation} placeholder="LLD" stringMode controls={false} />
+      </Form.Item>
+      <Form.Item
+        name="donation"
+        layout="horizontal"
+        valuePropName="checked"
+        label="Create donation request?"
+      >
+        <Checkbox />
       </Form.Item>
       <Form.Item label="Note" name="note" extra="Optional">
         <TextArea className={styles.textarea} />
