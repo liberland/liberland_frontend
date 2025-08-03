@@ -145,7 +145,7 @@ function SpendForm({
           { required: true },
           {
             validator: (_, value) => (
-              getTransmitterIndex(value) === -1
+              getTransmitterIndex(value) === -1 && crosschain
                 ? Promise.reject('Invalid recipient for cross-chain transfer')
                 : Promise.resolve()
             ),
