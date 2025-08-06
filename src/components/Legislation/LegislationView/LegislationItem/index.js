@@ -13,6 +13,8 @@ import Button from '../../../Button/Button';
 import ProposeAmendLegislationModalWrapper from '../../../Modals/ProposeAmendLegislationModal';
 import CongressAmendLegislationModalWrapper from '../../../Modals/CongressAmendLegislationModal';
 import CongressAmendLegislationViaReferendumModal from '../../../Modals/CongressAmendLegislationViaReferendumModal';
+import { useTitleFromMarkdown } from '../../../Voting/Referendum/Items/hooks';
+import truncate from '../../../../utils/truncate';
 import CastVeto from '../CastVeto';
 import ProposeButton from '../ProposeButton';
 import AmendButton from '../AmendButton';
@@ -21,10 +23,11 @@ import styles from '../styles.module.scss';
 function LegislationItem({
   year, index, tier, id, sections,
 }) {
+  const { title, setTitleFromRef } = useTitleFromMarkdown(false, `Legislation ${year}/${index}`);
   return (
     <Collapse
       items={[{
-        label: `Legislation ${year}/${index}`,
+        label: truncate(title, 50),
         key: 'legislation',
         extra: (
           <VetoStats
@@ -33,6 +36,7 @@ function LegislationItem({
             isH2
           />
         ),
+        forceRender: true,
         children: (
           <Card
             title="Sections"
@@ -100,6 +104,7 @@ function LegislationItem({
                     content={content}
                     id={id}
                     section={section}
+                    paragraphRef={section === 0 ? setTitleFromRef : undefined}
                   />
                 </List.Item>
               )}

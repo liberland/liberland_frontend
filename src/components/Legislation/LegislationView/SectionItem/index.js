@@ -27,7 +27,11 @@ const tryParseToShow = (content) => {
 };
 
 function SectionItem({
-  section, content, tier, id,
+  section,
+  content,
+  tier,
+  id,
+  paragraphRef,
 }) {
   const [hasContent, text] = useMemo(() => tryParseToShow(
     content,
@@ -75,6 +79,7 @@ function SectionItem({
     >
       <Paragraph
         className={styles.paragraph}
+        ref={paragraphRef}
       >
         <Markdown options={{ disableParsingRawHTML: true }}>
           {text}
@@ -99,6 +104,7 @@ SectionItem.propTypes = {
     // eslint-disable-next-line react/forbid-prop-types
     index: PropTypes.object.isRequired,
   }).isRequired,
+  paragraphRef: PropTypes.func,
 };
 
 export default SectionItem;
