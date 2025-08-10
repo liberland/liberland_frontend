@@ -1,25 +1,31 @@
 ## Local Installation instructions
 
+- Install polkadotjs browser extension [https://polkadot.js.org/extension/](https://polkadot.js.org/extension/) and add non citizen, citizen, and assemblyMember accounts from seeds
+- Install MetaMask (or similar) browser extension [https://metamask.io/download/](https://metamask.io/download/) for using Ethereum features, such as staking
+- For local development, run `yarn dev` and Open [http://localhost:8082](http://localhost:8082) to view it in the browser.
+- In order to use correct Node and NPM versions, install NVM [https://github.com/nvm-sh/nvm](https://github.com/nvm-sh/nvm) in order to easily switch between versions
+- Install yarn as a wrapper for NPM [https://classic.yarnpkg.com/lang/en/docs/install/](https://classic.yarnpkg.com/lang/en/docs/install/)
+- In order to simulate Solidity contracts locally, install [https://ethereum-blockchain-developer.com/2022-06-nft-truffle-hardhat-foundry/14-foundry-setup/](https://ethereum-blockchain-developer.com/2022-06-nft-truffle-hardhat-foundry/14-foundry-setup/) Foundry
+- When emulating Solidity contracts, don't forget to replace addresses in your .env with correct contract addresses
+
+### Local installation
+
 ```console
 git clone {repo}
 yarn install
 cp .env.dist .env
 ```
-In .env setup real values
-
-- Install polkadotjs browser extension [https://polkadot.js.org/extension/](https://polkadot.js.org/extension/) and add non citizen, citizen, and assemblyMember accounts from seeds
-- for local development, run `npm run dev` and Open [http://localhost:8080](http://localhost:8080) to view it in the browser.
 
 ### Linting
 
 To autolint, run
 ```console
-npm run eslint --fix
+yarn eslint --fix
 ```
 
 ## Build for production
 ```console
-npm run build
+yarn build
 ```
  
 ## Default wallets
@@ -30,21 +36,16 @@ Mnemonic phrase: `bargain album current caught tragic slab identify squirrel emb
 Address: `5HGZfBpqUUqGY7uRCYA6aRwnRHJVhrikn8to31GcfNcifkym`
 
 
-## Local development
+## Development
 
-Start api and auth servers.
+### Local development
 
-### API 
+Use this command to start DEV server and connect to staging
 ```console
-nvm use 16
-PORT=8020 npm run start
+yarn dev
 ```
 
-### SSO 
-```console
-nvm use 16
-npm run start
-```
+## Other important repos
 
 ### Middleware
 Needed for self onboarding process
@@ -54,16 +55,17 @@ Needed for self onboarding process
 [https://github.com/liberland/chain_explorer/](https://github.com/liberland/chain_explorer/)
 Setup the dev instance as described in README with graphql engine running on port 3000
 
+## Blockchain
+
+### Local Ethereum chain
+
+```console
+anvil --chain-id 1337
+```
+
 ### Blockchain 
 ```console
 cargo run --release -- --dev
-```
-
-### Liberland frontend
-
-Run the following command from their respective directories
-```console 
-npm run dev
 ```
 
 ### Polkadot explorer
