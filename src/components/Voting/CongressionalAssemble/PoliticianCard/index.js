@@ -19,13 +19,13 @@ function PoliticanCard({
   isElected,
 }) {
   const isBigScreen = useMediaQuery('(min-width: 1200px)');
-  return (
+  return isBigScreen ? (
     <Card
       size="small"
       className={styles.candidate}
     >
       <Flex wrap gap="15px" align="center">
-        {isBigScreen && preActions?.length ? (
+        {preActions?.length ? (
           <Flex wrap gap="15px">
             {preActions}
           </Flex>
@@ -42,14 +42,52 @@ function PoliticanCard({
           </div>
         </Flex>
         <Flex wrap gap="15px" align="center" justify="end">
-          {!isBigScreen && preActions?.length ? preActions : null}
+          {politician.website && (
+            <Button primary href={sanitizeUrlHelper(politician.website)}>
+              <Flex gap="15px" align="center">
+                <GlobalOutlined aria-label="Web" />
+                Learn more
+              </Flex>
+            </Button>
+          )}
           {actions}
-          <Button href={sanitizeUrlHelper(politician.website)}>
-            <GlobalOutlined aria-label="Web" />
-          </Button>
           {isElected && (
             <img src={libertarianTorch} alt="Libertarian torch" className={styles.torch} />
           )}
+        </Flex>
+      </Flex>
+    </Card>
+  ) : (
+    <Card
+      size="small"
+      className={styles.candidate}
+    >
+      <Flex vertical gap="15px">
+        <Flex wrap gap="15px" align="center">
+          <ColorAvatar size={50} name={politician.name} />
+          <Flex vertical flex={1} gap="5px">
+            <strong>
+              {truncate(politician.name, 15)}
+            </strong>
+            <div className="description">
+              <CopyIconWithAddress
+                address={politician.rawIdentity}
+              />
+            </div>
+          </Flex>
+          <img src={libertarianTorch} alt="Libertarian torch" className={styles.torch} />
+        </Flex>
+        <Flex wrap gap="15px" align="center">
+          {politician.website && (
+            <Button primary href={sanitizeUrlHelper(politician.website)}>
+              <Flex gap="15px" align="center">
+                <GlobalOutlined aria-label="Web" />
+                Learn more
+              </Flex>
+            </Button>
+          )}
+          {preActions?.length ? preActions : null}
+          {actions}
         </Flex>
       </Flex>
     </Card>
