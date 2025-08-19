@@ -151,7 +151,9 @@ function SendAssetForm({
   /**
    * @type string[]
    */
-  const crosschainCompatibles = JSON.parse(process.env.REACT_APP_TRANSMITTER_TOKENS);
+  const crosschainCompatibles = process.env.REACT_APP_TRANSMITTER_TOKENS
+    ? JSON.parse(process.env.REACT_APP_TRANSMITTER_TOKENS)
+    : [];
 
   return (
     <Form
