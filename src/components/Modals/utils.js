@@ -7,6 +7,10 @@ export const validateFinalDestination = (finalDestination) => (
 );
 
 export const getTransmitterWallets = () => {
+  if (!process.env.REACT_APP_TRANSMITTER_WALLETS) {
+    return [];
+  }
+
   /**
    * @type string[]
    */
@@ -29,6 +33,9 @@ export const createGovtCrosschainPayment = ({
   }
   if (transmitterIndex === -1) {
     throw new Error(`Recipient ${recipient} is not a valid transmitter`);
+  }
+  if (!process.env.REACT_APP_TRANSMITTER_HOOKS) {
+    throw new Error('No transmitter hooks registered in process.env.REACT_APP_TRANSMITTER_HOOKS');
   }
   /**
    * @type string[]
