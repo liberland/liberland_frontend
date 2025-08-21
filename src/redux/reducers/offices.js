@@ -45,6 +45,7 @@ const initialState = {
       electionLock: 0,
     },
   },
+  topHolders: null,
 };
 
 const officesReducer = handleActions({
@@ -60,6 +61,7 @@ const officesReducer = handleActions({
     officesActions.setRegisteredCompanyData.call,
     officesActions.getPendingAdditionalMerits.call,
     officesActions.getTaxPayers.call,
+    officesActions.getTopHolders.call,
   )]: (state) => ({
     ...state,
     loading: true,
@@ -92,6 +94,8 @@ const officesReducer = handleActions({
     officesActions.getPendingAdditionalMerits.success,
     officesActions.getTaxPayers.failure,
     officesActions.getTaxPayers.success,
+    officesActions.getTopHolders.failure,
+    officesActions.getTopHolders.success,
   )]: (state) => ({
     ...state,
     loading: false,
@@ -192,6 +196,10 @@ const officesReducer = handleActions({
   [officesActions.getTaxPayers.success]: (state, action) => ({
     ...state,
     taxPayers: action.payload,
+  }),
+  [officesActions.getTopHolders.success]: (state, action) => ({
+    ...state,
+    topHolders: action.payload,
   }),
 }, initialState);
 
