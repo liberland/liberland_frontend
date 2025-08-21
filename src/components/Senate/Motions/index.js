@@ -16,6 +16,7 @@ function Motions() {
   const { motionIds } = useMotionContext();
 
   useEffect(() => {
+    dispatch(senateActions.senateGetMembers.call());
     dispatch(senateActions.senateGetMotions.call());
   }, [dispatch]);
 
