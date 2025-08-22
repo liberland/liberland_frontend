@@ -107,37 +107,45 @@ export function calcInflation(totalIssuance, totalStaked) {
   };
 }
 
-const extractSingle = (derive, api) => {
-  const emptyExposure = api.createType('Exposure');
-  return derive.info.map((item) => {
+const extractSingle = async (api, derive, keys) => {
+  const activeEra = (await api.query.staking.activeEra()).unwrap().index;
+  const eraRewardPoints = await api.query.staking.erasRewardPoints(activeEra);
+  const validatorPointsMap = eraRewardPoints.individual.toJSON();
+  return Promise.all(derive.info.map(async (item, index) => {
     const {
-      accountId, exposure = emptyExposure, stakingLedger, validatorPrefs,
+      accountId, stakingLedger, validatorPrefs,
     } = item;
-    const [bondOwn, bondTotal] = exposure.total
-      ? [exposure.own.unwrap(), exposure.total.unwrap()]
-      : [BN_ZERO, BN_ZERO];
+    const exposure = await api.query.staking.erasStakers(activeEra, accountId);
+    const bondOwn = exposure.own.unwrap();
+    const bondTotal = exposure.total.unwrap();
     const skipRewards = bondTotal.isZero();
     const key = accountId.toString();
-    const dataSkipRewars = stakingLedger.total?.unwrap() || BN_ZERO;
+    const dataSkipRewards = stakingLedger.total?.unwrap() || BN_ZERO;
+    const validatorPoints = validatorPointsMap[keys[index].toHuman()[0]];
+    const totalPoints = eraRewardPoints.total;
+    const rewardRatio = validatorPoints
+      ? validatorPoints / totalPoints.toNumber()
+      : 0;
     return {
       key,
       accountId,
       bondOther: bondTotal.sub(bondOwn),
-      bondOwn: skipRewards ? dataSkipRewars : bondOwn,
-      bondTotal: skipRewards ? dataSkipRewars : bondTotal,
+      bondOwn: skipRewards ? dataSkipRewards : bondOwn,
+      bondTotal: skipRewards ? dataSkipRewards : bondTotal,
       isActive: !skipRewards,
       skipRewards,
+      rewardRatio,
       stakedReturn: 0,
       stakedReturnCmp: 0,
       commissionPer: validatorPrefs.commission.unwrap().toNumber() / 10_000_000,
       validatorPrefs,
     };
-  });
+  }));
 };
 
-export function getBaseInfo(api, elected, waitingInfo) {
-  const baseInfo = extractSingle(elected, api);
-  const waiting = extractSingle(waitingInfo, api);
+export async function getBaseInfo(api, elected, waitingInfo, keys) {
+  const baseInfo = await extractSingle(api, elected, keys);
+  const waiting = await extractSingle(api, waitingInfo, keys);
   const activeTotals = baseInfo
     .filter(({ isActive }) => isActive)
     .map(({ bondTotal }) => bondTotal)
@@ -160,13 +168,14 @@ export function addReturns(inflation, baseInfo) {
   }
 
   const list = validators.map((v) => {
-    if (!v.skipRewards) {
-      const adjusted = avgStaked.mul(BN_HUNDRED).imuln(inflation.stakedReturn).div(v.bondTotal);
-      const stakedReturn = Math.min(adjusted.toNumber(), BN_MAX_INTEGER.toNumber()) / BN_HUNDRED.toNumber();
-      const stakedReturnCmp = (stakedReturn * (100 - v.commissionPer)) / 100;
-      return { ...v, stakedReturn, stakedReturnCmp };
-    }
-    return v;
+    const adjusted = avgStaked
+      .mul(BN_HUNDRED)
+      .imuln(inflation.stakedReturn)
+      .div(v.bondTotal)
+      .imuln(v.rewardRatio);
+    const stakedReturn = adjusted.div(BN_HUNDRED).toNumber();
+    const stakedReturnCmp = (stakedReturn * (100 - v.commissionPer)) / 100;
+    return { ...v, stakedReturn, stakedReturnCmp };
   });
 
   return { ...baseInfo, validators: list };
