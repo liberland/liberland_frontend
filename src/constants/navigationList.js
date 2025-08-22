@@ -141,6 +141,7 @@ export const navigationList = [
       Finances: router.offices.finances,
       'Scheduled Congress Spending': router.offices.scheduledCongressSpending,
       'Tax Payers': router.offices.taxPayers,
+      'Top LLD Holders': router.offices.topHolders,
     },
   },
   {

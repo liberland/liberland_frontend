@@ -56,6 +56,11 @@ function Offices() {
         path={router.offices.taxPayers}
         component={loader(() => import('./TaxPayers'))}
       />
+      <Route
+        exact
+        path={router.offices.topHolders}
+        component={loader(() => import('./TopHolders'))}
+      />
     </Switch>
   );
 }

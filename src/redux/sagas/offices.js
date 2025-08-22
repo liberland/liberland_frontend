@@ -22,7 +22,7 @@ import { blockchainSelectors } from '../selectors';
 import router from '../../router';
 import * as backend from '../../api/backend';
 import { parseDollars, parseMerits } from '../../utils/walletHelpers';
-import { getTaxPayers } from '../../api/middleware';
+import { getTaxPayers, getTopHolders } from '../../api/middleware';
 // WORKERS
 
 function* getIdentityWorker(action) {
@@ -158,10 +158,25 @@ function* getTaxPayersWorker(action) {
   }
 }
 
+function* getTopHoldersWorker() {
+  try {
+    const topHolders = yield call(getTopHolders);
+    yield put(officesActions.getTopHolders.success(topHolders));
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    yield put(officesActions.getTaxPayers.failure(e));
+  }
+}
+
 // WATCHERS
 
 function* getTaxPayersWatcher() {
   yield* blockchainWatcher(officesActions.getTaxPayers, getTaxPayersWorker);
+}
+
+function* getTopHoldersWatcher() {
+  yield* blockchainWatcher(officesActions.getTopHolders, getTopHoldersWorker);
 }
 
 function* getPendingAdditionalMeritsWatcher() {
@@ -236,4 +251,5 @@ export {
   setRegisteredCompanyDataWatcher,
   getPendingAdditionalMeritsWatcher,
   getTaxPayersWatcher,
+  getTopHoldersWatcher,
 };

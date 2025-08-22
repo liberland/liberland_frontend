@@ -85,6 +85,7 @@ export default function* rootSaga() {
     officesSagas.setRegisteredCompanyDataWatcher(),
     officesSagas.getPendingAdditionalMeritsWatcher(),
     officesSagas.getTaxPayersWatcher(),
+    officesSagas.getTopHoldersWatcher(),
 
     // REGISTRIES
     registriesSagas.getOfficialRegistryEntriesWatcher(),

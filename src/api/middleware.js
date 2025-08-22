@@ -173,3 +173,13 @@ export const getFaucetCooldown = async (walletAddress, token) => {
     throw new Error(error.response?.data?.message || 'Failed to get LLM amount');
   }
 };
+
+export const getTopHolders = async () => {
+  const middlewareApi = getMiddlewareApi();
+  try {
+    const response = await middlewareApi.get('/v1/top-holders');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to get LLM amount');
+  }
+};

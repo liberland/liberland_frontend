@@ -52,6 +52,11 @@ const selectorTaxesPayers = createSelector(
   (reducer) => reducer.taxPayers,
 );
 
+const selectorTopHolders = createSelector(
+  officesReducer,
+  (reducer) => reducer.topHolders,
+);
+
 export {
   selectorIdentity,
   selectorCompanyRequest,
@@ -63,4 +68,5 @@ export {
   selectorPendingAdditionalMerits,
   selectorIsUnobtrusive,
   selectorTaxesPayers,
+  selectorTopHolders,
 };

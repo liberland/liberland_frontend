@@ -12,6 +12,7 @@ export const {
   setRegisteredCompanyData,
   getPendingAdditionalMerits,
   getTaxPayers,
+  getTopHolders,
 } = createActions({
   GET_PENDING_ADDITIONAL_MERITS: {
     call: undefined,
@@ -64,6 +65,11 @@ export const {
     failure: undefined,
   },
   GET_TAX_PAYERS: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  GET_TOP_HOLDERS: {
     call: undefined,
     success: undefined,
     failure: undefined,
