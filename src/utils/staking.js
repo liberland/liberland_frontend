@@ -75,10 +75,10 @@ export const stakingInfoToProgress = (stakingInfo, progress) => {
 };
 
 const DEFAULT_PARAMS = {
-  falloff: 0.1,
+  falloff: 0.05,
   maxInflation: 0.1,
-  minInflation: 0.005,
-  idealStake: 0.75,
+  minInflation: 0.025,
+  idealStake: 0.5,
 };
 
 export function calcInflation(totalIssuance, totalStaked) {
@@ -95,7 +95,6 @@ export function calcInflation(totalIssuance, totalStaked) {
       ? (stakedFraction * (idealInterest - (minInflation / idealStake)))
       : (((idealInterest * idealStake) - minInflation) * (2 ** ((idealStake - stakedFraction) / falloff)))
   ));
-
   return {
     idealInterest,
     idealStake,
@@ -109,24 +108,17 @@ export function calcInflation(totalIssuance, totalStaked) {
 
 const extractSingle = async (api, derive) => {
   const activeEra = (await api.query.staking.activeEra()).unwrap().index;
-  const eraRewardPoints = await api.query.staking.erasRewardPoints(activeEra);
-  const validatorPointsMap = eraRewardPoints.individual.toJSON();
   return Promise.all(derive.info.map(async (item) => {
     const {
-      accountId, stakingLedger, validatorPrefs, controllerId,
+      accountId, stakingLedger, validatorPrefs,
     } = item;
     const exposure = await api.query.staking.erasStakers(activeEra, accountId);
-    const stashId = await api.query.staking.bonded(controllerId);
     const bondOwn = exposure.own.unwrap();
     const bondTotal = exposure.total.unwrap();
     const skipRewards = bondTotal.isZero();
     const key = accountId.toString();
     const dataSkipRewards = stakingLedger.total?.unwrap() || BN_ZERO;
-    const validatorPoints = validatorPointsMap[stashId.unwrap().toHuman()];
-    const totalPoints = eraRewardPoints.total;
-    const rewardRatio = validatorPoints
-      ? validatorPoints / totalPoints.toNumber()
-      : 0;
+
     return {
       key,
       accountId,
@@ -135,7 +127,6 @@ const extractSingle = async (api, derive) => {
       bondTotal: skipRewards ? dataSkipRewards : bondTotal,
       isActive: !skipRewards,
       skipRewards,
-      rewardRatio,
       stakedReturn: 0,
       stakedReturnCmp: 0,
       commissionPer: validatorPrefs.commission.unwrap().toNumber() / 10_000_000,
@@ -169,14 +160,16 @@ export function addReturns(inflation, baseInfo) {
   }
 
   const list = validators.map((v) => {
-    const adjusted = avgStaked
-      .mul(BN_HUNDRED)
-      .imuln(inflation.stakedReturn)
-      .div(v.bondTotal)
-      .imuln(v.rewardRatio);
-    const stakedReturn = adjusted.toNumber() / 100;
-    const stakedReturnCmp = (stakedReturn * (100 - v.commissionPer)) / 100;
-    return { ...v, stakedReturn, stakedReturnCmp };
+    if (v.isActive) {
+      const stakedReturn = avgStaked
+        .mul(BN_HUNDRED)
+        .imuln(inflation.stakedReturn)
+        .div(v.bondTotal)
+        .toNumber() / 100;
+      const stakedReturnCmp = (stakedReturn * (100 - v.commissionPer)) / 100;
+      return { ...v, stakedReturn, stakedReturnCmp };
+    }
+    return v;
   });
 
   return { ...baseInfo, validators: list };
