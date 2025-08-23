@@ -873,7 +873,7 @@ const getValidators = async () => {
   ]);
 
   const totalIssuance = await api.query.balances?.totalIssuance();
-  const baseInfo = await getBaseInfo(api, elected, waiting, validatorsKeys);
+  const baseInfo = await getBaseInfo(api, elected, waiting);
   const inflation = calcInflation(totalIssuance, baseInfo?.totalStaked);
 
   baseInfo.validators.forEach(async ({ key }) => {

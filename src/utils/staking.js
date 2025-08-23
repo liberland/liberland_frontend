@@ -107,21 +107,22 @@ export function calcInflation(totalIssuance, totalStaked) {
   };
 }
 
-const extractSingle = async (api, derive, keys) => {
+const extractSingle = async (api, derive) => {
   const activeEra = (await api.query.staking.activeEra()).unwrap().index;
   const eraRewardPoints = await api.query.staking.erasRewardPoints(activeEra);
   const validatorPointsMap = eraRewardPoints.individual.toJSON();
-  return Promise.all(derive.info.map(async (item, index) => {
+  return Promise.all(derive.info.map(async (item) => {
     const {
-      accountId, stakingLedger, validatorPrefs,
+      accountId, stakingLedger, validatorPrefs, controllerId,
     } = item;
     const exposure = await api.query.staking.erasStakers(activeEra, accountId);
+    const stashId = await api.query.staking.bonded(controllerId);
     const bondOwn = exposure.own.unwrap();
     const bondTotal = exposure.total.unwrap();
     const skipRewards = bondTotal.isZero();
     const key = accountId.toString();
     const dataSkipRewards = stakingLedger.total?.unwrap() || BN_ZERO;
-    const validatorPoints = validatorPointsMap[keys[index].toHuman()[0]];
+    const validatorPoints = validatorPointsMap[stashId.unwrap().toHuman()];
     const totalPoints = eraRewardPoints.total;
     const rewardRatio = validatorPoints
       ? validatorPoints / totalPoints.toNumber()
@@ -143,9 +144,9 @@ const extractSingle = async (api, derive, keys) => {
   }));
 };
 
-export async function getBaseInfo(api, elected, waitingInfo, keys) {
-  const baseInfo = await extractSingle(api, elected, keys);
-  const waiting = await extractSingle(api, waitingInfo, keys);
+export async function getBaseInfo(api, elected, waitingInfo) {
+  const baseInfo = await extractSingle(api, elected);
+  const waiting = await extractSingle(api, waitingInfo);
   const activeTotals = baseInfo
     .filter(({ isActive }) => isActive)
     .map(({ bondTotal }) => bondTotal)
@@ -173,7 +174,7 @@ export function addReturns(inflation, baseInfo) {
       .imuln(inflation.stakedReturn)
       .div(v.bondTotal)
       .imuln(v.rewardRatio);
-    const stakedReturn = adjusted.div(BN_HUNDRED).toNumber();
+    const stakedReturn = adjusted.toNumber() / 100;
     const stakedReturnCmp = (stakedReturn * (100 - v.commissionPer)) / 100;
     return { ...v, stakedReturn, stakedReturnCmp };
   });
