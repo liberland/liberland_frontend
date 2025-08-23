@@ -866,14 +866,18 @@ const getValidators = async () => {
 
   const [elected, waiting, validatorsKeys] = await Promise.all([
     api.derive.staking.electedInfo({
-      withController: true, withExposure: true, withPrefs: true, withLedger: true,
+      withController: true,
+      withExposure: true,
+      withExposureMeta: true,
+      withPrefs: true,
+      withClaimedRewardsEras: true,
+      withLedger: true,
     }),
     api.derive.staking.waitingInfo({ withController: true, withPrefs: true, withLedger: true }),
     api.query.staking.validators.keys(),
   ]);
-
   const totalIssuance = await api.query.balances?.totalIssuance();
-  const baseInfo = getBaseInfo(api, elected, waiting);
+  const baseInfo = await getBaseInfo(api, elected, waiting);
   const inflation = calcInflation(totalIssuance, baseInfo?.totalStaked);
 
   baseInfo.validators.forEach(async ({ key }) => {
