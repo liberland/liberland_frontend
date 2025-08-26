@@ -17,12 +17,13 @@ function TaxPayerCard({
   index,
   address,
   totalValue,
+  label,
 }) {
   return (
     <Card hoverable>
       <Flex vertical gap="15px">
         <Card.Meta
-          description={`${index + 1}${getRankSuffix(index + 1)} Top Tax Payer`}
+          description={`${index + 1}${getRankSuffix(index + 1)} ${label}`}
         />
         <Card.Meta
           title={<HistoryCopyIconWithAddress address={address} />}
@@ -48,6 +49,7 @@ TaxPayerCard.propTypes = {
   index: PropTypes.number.isRequired,
   address: PropTypes.string.isRequired,
   totalValue: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
 };
 
 export default TaxPayerCard;
