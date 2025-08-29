@@ -32,11 +32,7 @@ export const getFinancialMetrics = async () => {
   const middlewareApi = getMiddlewareApi();
   try {
     const response = await middlewareApi.get('/v1/lld-stats');
-    const totalIssuance = await middlewareApi.get('/v1/total-issuance/lld');
-    return {
-      ...response.data,
-      totalLld: totalIssuance.data,
-    };
+    return response.data;
   } catch (error) {
     throw new Error(error);
   }
