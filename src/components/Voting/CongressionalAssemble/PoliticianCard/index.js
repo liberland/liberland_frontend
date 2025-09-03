@@ -43,7 +43,7 @@ function PoliticanCard({
         </Flex>
         <Flex wrap gap="15px" align="center" justify="end">
           {politician.website && (
-            <Button primary href={sanitizeUrlHelper(politician.website)}>
+            <Button primary href={sanitizeUrlHelper(politician.website)} newTab>
               <Flex gap="15px" align="center">
                 <GlobalOutlined aria-label="Web" />
                 Learn more
@@ -79,7 +79,7 @@ function PoliticanCard({
         </Flex>
         <Flex wrap gap="15px" align="center">
           {politician.website && (
-            <Button primary href={sanitizeUrlHelper(politician.website)}>
+            <Button primary href={sanitizeUrlHelper(politician.website)} newTab>
               <Flex gap="15px" align="center">
                 <GlobalOutlined aria-label="Web" />
                 Learn more
