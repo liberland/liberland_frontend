@@ -71,6 +71,7 @@ export default function TaxPayers() {
                       address={addressId}
                       index={index}
                       totalValue={totalValue}
+                      label="Top Tax Payer"
                     />
                   </Col>
                 ))
@@ -93,6 +94,7 @@ export default function TaxPayers() {
                       address={addressId}
                       index={index}
                       totalValue={totalValue}
+                      label="Top Tax Receiver"
                     />
                   </Col>
                 ))
@@ -114,6 +116,7 @@ export default function TaxPayers() {
                       address={addressId}
                       index={index}
                       totalValue={totalValue}
+                      label="Top Tax Payer"
                     />
                   </Col>
                 ))
