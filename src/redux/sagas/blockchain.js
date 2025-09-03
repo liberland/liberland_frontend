@@ -2,6 +2,7 @@ import {
   put, call, takeLatest, take, race, delay,
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
+import { isAddress } from '@polkadot/util-crypto';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
 import { blockchainActions } from '../actions';
 import {
@@ -87,7 +88,7 @@ export function* subscribeWalletsSaga() {
     if (data) {
       const { extensions, wallets } = data;
       yield put(blockchainActions.setExtensions.value(extensions));
-      yield put(blockchainActions.setWallets.value(wallets));
+      yield put(blockchainActions.setWallets.value(wallets.filter(({ address }) => isAddress(address))));
     }
   }
 }
