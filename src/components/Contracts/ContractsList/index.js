@@ -4,21 +4,34 @@ import List from 'antd/es/list';
 import { useMediaQuery } from 'usehooks-ts';
 import ContractListItem from '../ContractListItem';
 import { getDefaultPageSizes } from '../../../utils/pageSize';
+import Search from '../../Search';
+import { contractsActions } from '../../../redux/actions';
+import { contractsSelectors } from '../../../redux/selectors';
 
 function ContractsList({ contracts }) {
   const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
   return (
-    <List
-      dataSource={contracts}
-      size="small"
-      pagination={getDefaultPageSizes(10)}
-      itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
-      renderItem={(contract) => (
-        <ContractListItem
-          {...contract}
+    <Search
+      data={contracts}
+      action={contractsActions.searchContracts.call}
+      reset={contractsActions.searchContracts.reset}
+      selector={contractsSelectors.selectorSearch}
+      placeholder="Search contracts"
+    >
+      {(results) => (
+        <List
+          dataSource={results}
+          size="small"
+          pagination={getDefaultPageSizes(10)}
+          itemLayout={isLargerThanHdScreen ? 'horizontal' : 'vertical'}
+          renderItem={(contract) => (
+            <ContractListItem
+              {...contract}
+            />
+          )}
         />
       )}
-    />
+    </Search>
   );
 }
 

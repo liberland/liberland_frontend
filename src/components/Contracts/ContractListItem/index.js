@@ -75,7 +75,7 @@ function ContractListItem({
           className={cx('description', styles.preview)}
         >
           <Markdown options={{ disableParsingRawHTML: true }}>
-            {data}
+            {data.slice(0, 10000) /* Important in testdata only, but causes a nasty crash */}
           </Markdown>
         </Paragraph>
         {!isLargerThanHdScreen && (

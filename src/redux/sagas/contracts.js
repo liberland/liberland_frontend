@@ -1,6 +1,7 @@
 import {
   put, call, takeLatest, select, take,
 } from 'redux-saga/effects';
+import { spawn } from 'threads';
 import { contractsActions } from '../actions';
 import {
   getAllContracts,
@@ -15,6 +16,14 @@ import {
 } from '../../api/nodeRpcCall';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors, contractsSelectors } from '../selectors';
+import ReduxWorker from './redux.worker';
+
+let spawned;
+
+async function getSpawned() {
+  spawned ||= await spawn(ReduxWorker());
+  return spawned;
+}
 
 function addNameIdentityToAdress(contract) {
   const {
@@ -26,6 +35,19 @@ function addNameIdentityToAdress(contract) {
   ] : contract;
   return Array.from(
     new Set(arrays),
+  );
+}
+
+function* searchContractsWorker({ payload }) {
+  const worker = yield call(getSpawned);
+  const results = yield call(worker.searchContracts, payload);
+  yield put(contractsActions.searchContracts.success(results));
+}
+
+export function* searchContractsWatcher() {
+  yield* blockchainWatcher(
+    contractsActions.searchContracts,
+    searchContractsWorker,
   );
 }
 
