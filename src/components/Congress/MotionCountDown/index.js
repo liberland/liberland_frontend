@@ -1,6 +1,6 @@
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { format, intervalToDuration } from 'date-fns';
-import React from 'react';
 import PropTypes from 'prop-types';
 import { blockchainSelectors } from '../../../redux/selectors';
 
@@ -22,7 +22,13 @@ function CouncilMotionCountdown({ motionEndBlockNumber }) {
   }
 
   const {
-    days, hours, minutes, seconds,
+    years,
+    months,
+    weeks,
+    days,
+    hours,
+    minutes,
+    seconds,
   } = intervalToDuration({
     start: now,
     end: untilEnd,
@@ -30,6 +36,9 @@ function CouncilMotionCountdown({ motionEndBlockNumber }) {
 
   const getRemainingTimeString = () => {
     const parts = [];
+    if (years > 0) parts.push(`${years} year${years > 1 ? 's' : ''}`);
+    if (months > 0) parts.push(`${months} month${months > 1 ? 's' : ''}`);
+    if (weeks > 0) parts.push(`${weeks} week${weeks > 1 ? 's' : ''}`);
     if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
     if (hours > 0) parts.push(`${hours} hour${hours > 1 ? 's' : ''}`);
     if (minutes > 0) parts.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
