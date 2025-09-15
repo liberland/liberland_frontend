@@ -4,13 +4,15 @@ import { format, intervalToDuration } from 'date-fns';
 import PropTypes from 'prop-types';
 import { blockchainSelectors } from '../../../redux/selectors';
 
+const blockDurationMilis = 6000;
+const delayForClosingWithMinScheduler = 1000 * 60 * 60 * 24 * 5; // 4 days min scheduler, 1 day for closing delay
+
 function CouncilMotionCountdown({ motionEndBlockNumber }) {
   const currentBlockTimestamp = useSelector(blockchainSelectors.blockTimestamp);
   const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
   const remaining = motionEndBlockNumber - currentBlockNumber;
-  const blockDurationMilis = 6000;
   const now = new Date(currentBlockTimestamp);
-  const untilEnd = new Date(currentBlockTimestamp + (remaining * blockDurationMilis));
+  const untilEnd = new Date(currentBlockTimestamp + (remaining * blockDurationMilis) - delayForClosingWithMinScheduler);
 
   if (untilEnd.getTime() <= now.getTime()) {
     return (
