@@ -7,18 +7,20 @@ import { blockchainSelectors } from '../../../redux/selectors';
 function CouncilMotionCountdown({ motionEndBlockNumber }) {
   const currentBlockTimestamp = useSelector(blockchainSelectors.blockTimestamp);
   const currentBlockNumber = useSelector(blockchainSelectors.blockNumber);
-  const blocksInDay = (3600 * 24) / 6;
-  const delayForClosingWithMinScheduler = blocksInDay * 5; // 4 days min scheduler, 1 day for closing
+  const remaining = motionEndBlockNumber - currentBlockNumber;
   const blockDurationMilis = 6000;
-  const remaining = motionEndBlockNumber
-  - (currentBlockNumber % motionEndBlockNumber)
-  - delayForClosingWithMinScheduler;
-  const untilEndTimestamp = currentBlockTimestamp + (remaining * blockDurationMilis);
-  const untilEnd = new Date(untilEndTimestamp);
+  const now = new Date(currentBlockTimestamp);
+  const untilEnd = new Date(currentBlockTimestamp + (remaining * blockDurationMilis));
 
-  const now = new Date().getTime();
-  if (untilEndTimestamp <= now) {
-    return <div>The voting period has ended.</div>;
+  if (untilEnd.getTime() <= now.getTime()) {
+    return (
+      <div>
+        The voting period has ended on
+        {' '}
+        {format(untilEnd, 'dd. MM. yyyy HH:mm:ss')}
+        .
+      </div>
+    );
   }
 
   const {
@@ -29,10 +31,12 @@ function CouncilMotionCountdown({ motionEndBlockNumber }) {
     hours,
     minutes,
     seconds,
-  } = intervalToDuration({
-    start: now,
-    end: untilEnd,
-  });
+  } = intervalToDuration(
+    {
+      start: now,
+      end: untilEnd,
+    },
+  );
 
   const getRemainingTimeString = () => {
     const parts = [];

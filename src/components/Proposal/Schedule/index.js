@@ -11,7 +11,7 @@ function Schedule({ proposal, children }) {
       {' '}
       {when.toString()}
       :
-      <CouncilMotionCountdown motionEndBlockNumber={when} />
+      <CouncilMotionCountdown motionEndBlockNumber={when.toString()} />
       <br />
       {children(args[3])}
     </div>
