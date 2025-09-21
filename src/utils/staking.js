@@ -75,10 +75,10 @@ export const stakingInfoToProgress = (stakingInfo, progress) => {
 };
 
 const DEFAULT_PARAMS = {
-  falloff: 0.05,
+  falloff: 0.1,
   maxInflation: 0.1,
-  minInflation: 0.025,
-  idealStake: 0.5,
+  minInflation: 0.005,
+  idealStake: 0.75,
 };
 
 export function calcInflation(totalIssuance, totalStaked) {
