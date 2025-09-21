@@ -1,11 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { format, intervalToDuration } from 'date-fns';
+import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import { blockchainSelectors } from '../../../redux/selectors';
-
-const blockDurationMilis = 6000;
-const delayForClosingWithMinScheduler = 1000 * 60 * 60 * 24 * 5; // 4 days min scheduler, 1 day for closing delay
+import { blockDurationMilis, delayForClosingWithMinScheduler } from './constants';
+import { getRemainingTimeString } from './util';
 
 function CouncilMotionCountdown({ motionEndBlockNumber }) {
   const currentBlockTimestamp = useSelector(blockchainSelectors.blockTimestamp);
@@ -25,39 +24,12 @@ function CouncilMotionCountdown({ motionEndBlockNumber }) {
     );
   }
 
-  const {
-    years,
-    months,
-    weeks,
-    days,
-    hours,
-    minutes,
-    seconds,
-  } = intervalToDuration(
-    {
-      start: now,
-      end: untilEnd,
-    },
-  );
-
-  const getRemainingTimeString = () => {
-    const parts = [];
-    if (years > 0) parts.push(`${years} year${years > 1 ? 's' : ''}`);
-    if (months > 0) parts.push(`${months} month${months > 1 ? 's' : ''}`);
-    if (weeks > 0) parts.push(`${weeks} week${weeks > 1 ? 's' : ''}`);
-    if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}`);
-    if (hours > 0) parts.push(`${hours} hour${hours > 1 ? 's' : ''}`);
-    if (minutes > 0) parts.push(`${minutes} minute${minutes > 1 ? 's' : ''}`);
-    if (seconds > 0) parts.push(`${seconds} second${seconds > 1 ? 's' : ''}`);
-    return parts.length > 0 ? parts.join(' ') : 'less than 1 minute';
-  };
-
   return (
     <>
       <div>
         <b>Ends in:</b>
         {' '}
-        {getRemainingTimeString()}
+        {getRemainingTimeString({ now, untilEnd })}
       </div>
       <div>
         <b>End date:</b>
