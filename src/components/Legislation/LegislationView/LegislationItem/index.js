@@ -1,18 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Space from 'antd/es/space';
 import Collapse from 'antd/es/collapse';
-import DownOutlined from '@ant-design/icons/DownOutlined';
-import Dropdown from 'antd/es/dropdown';
 import Card from 'antd/es/card';
 import List from 'antd/es/list';
 import Flex from 'antd/es/flex';
 import VetoStats from '../VetoStats';
 import SectionItem from '../SectionItem';
-import Button from '../../../Button/Button';
-import ProposeAmendLegislationModalWrapper from '../../../Modals/ProposeAmendLegislationModal';
-import CongressAmendLegislationModalWrapper from '../../../Modals/CongressAmendLegislationModal';
-import CongressAmendLegislationViaReferendumModal from '../../../Modals/CongressAmendLegislationViaReferendumModal';
 import { useTitleFromMarkdown } from '../../../Voting/Referendum/Items/hooks';
 import truncate from '../../../../utils/truncate';
 import CastVeto from '../CastVeto';
@@ -53,43 +46,8 @@ function LegislationItem({
                 <AmendButton
                   id={id}
                   tier={tier}
+                  section={sections.length}
                 />
-                <Dropdown
-                  trigger={['click']}
-                  menu={{
-                    items: [
-                      <ProposeAmendLegislationModalWrapper
-                        add
-                        tier={tier}
-                        id={id}
-                        section={sections.length}
-                      />,
-                      tier === 'InternationalTreaty' && (
-                        <CongressAmendLegislationModalWrapper
-                          add
-                          tier={tier}
-                          id={id}
-                          section={sections.length}
-                        />
-                      ),
-                      <CongressAmendLegislationViaReferendumModal
-                        add
-                        tier={tier}
-                        id={id}
-                        section={sections.length}
-                      />,
-                    ].filter(Boolean).map((label, key) => ({
-                      label,
-                      key,
-                    })),
-                  }}
-                >
-                  <Button primary>
-                    Add
-                    <Space />
-                    <DownOutlined />
-                  </Button>
-                </Dropdown>
               </Flex>,
             ]}
           >

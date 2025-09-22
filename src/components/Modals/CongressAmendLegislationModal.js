@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -12,6 +12,7 @@ import { legislationSelectors } from '../../redux/selectors';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
 import LegislationHeading from '../Congress/LegislationHeading';
+import { tryParseMaybeHexFromHuman } from '../../utils/legislation';
 
 function CongressAmendLegislationForm({
   onClose, tier, id, section,
@@ -19,7 +20,10 @@ function CongressAmendLegislationForm({
   const dispatch = useDispatch();
   const allLegislation = useSelector(legislationSelectors.legislation);
   const legislation = allLegislation[tier][id.year][id.index];
-  const sectionContent = legislation.sections?.[section]?.content.toHuman() ?? '';
+  const sectionContent = useMemo(
+    () => tryParseMaybeHexFromHuman(legislation.sections?.[section]?.content),
+    [legislation, section],
+  );
   const [form] = Form.useForm();
 
   const onSubmit = ({
