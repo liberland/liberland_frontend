@@ -11,7 +11,6 @@ import CongressAmendLegislationViaReferendumModal from '../../../Modals/Congress
 function AmendButton({
   tier, id, section,
 }) {
-  console.log({ tier, id, section });
   return typeof section === 'number' ? (
     <Dropdown
       trigger={['click']}
