@@ -1,4 +1,5 @@
 import React from 'react';
+import Flex from 'antd/es/flex';
 import PropTypes from 'prop-types';
 import CouncilMotionCountdown from '../../Congress/MotionCountDown';
 
@@ -6,15 +7,10 @@ function Schedule({ proposal, children }) {
   const { args } = proposal;
   const when = args[0];
   return (
-    <div>
-      Schedule call to be made on:
-      {' '}
-      {when.toString()}
-      :
+    <Flex vertical gap="20px">
       <CouncilMotionCountdown motionEndBlockNumber={when.toString()} />
-      <br />
       {children(args[3])}
-    </div>
+    </Flex>
   );
 }
 

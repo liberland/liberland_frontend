@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import router from '../../../router';
 import styles from '../styles.module.scss';
+import { tryParseMaybeHexFromHuman } from '../../../utils/legislation';
 
 function AmendLegislation({ proposal }) {
   const { args: [tier, { year, index }, section, newContent] } = proposal;
@@ -26,7 +27,7 @@ function AmendLegislation({ proposal }) {
         .
       </p>
       <p>New content:</p>
-      <p className={styles.legislationContent}>{newContent.toHuman()}</p>
+      <p className={styles.legislationContent}>{tryParseMaybeHexFromHuman(newContent)}</p>
     </div>
   );
 }
