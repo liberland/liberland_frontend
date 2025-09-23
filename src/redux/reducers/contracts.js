@@ -10,6 +10,7 @@ const initialState = {
   myContracts: [],
   singleContract: null,
   signatures: [],
+  searched: null,
 };
 
 const contractReducer = handleActions(
@@ -22,6 +23,7 @@ const contractReducer = handleActions(
       contractsActions.createContract.call,
       contractsActions.getSignaturesForContracts.call,
       contractsActions.getSingleContract.call,
+      contractsActions.searchContracts.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -54,6 +56,8 @@ const contractReducer = handleActions(
       contractsActions.getSignaturesForContracts.success,
       contractsActions.getSingleContract.success,
       contractsActions.getSingleContract.failure,
+      contractsActions.searchContracts.success,
+      contractsActions.searchContracts.failure,
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
@@ -100,6 +104,16 @@ const contractReducer = handleActions(
       ...state,
       signatures: { ...state.signatures, [action.payload.signatures.contractId]: action.payload.signatures },
       names: action.payload.names,
+    }),
+
+    [contractsActions.searchContracts.success]: (state, action) => ({
+      ...state,
+      searched: action.payload,
+    }),
+
+    [contractsActions.searchContracts.reset]: (state) => ({
+      ...state,
+      searched: null,
     }),
   },
   initialState,

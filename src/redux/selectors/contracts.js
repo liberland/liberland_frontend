@@ -42,6 +42,11 @@ const selectorSignatures = createSelector(
   (reducer) => reducer.signatures,
 );
 
+const selectorSearch = createSelector(
+  contractsReducer,
+  (reducer) => reducer.searched,
+);
+
 export {
   selectorContracts,
   selectorIsContractsLoading,
@@ -51,4 +56,5 @@ export {
   selectorSingleContract,
   selectorSignatures,
   selectorIsContractsUnobtrusive,
+  selectorSearch,
 };

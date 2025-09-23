@@ -63,6 +63,10 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
+          test: /\.worker\.js$/,
+          use: ['worker-loader'],
+        },
+        {
           test: /\.m?js$/,
           resolve: {
             fullySpecified: false
