@@ -1,3 +1,5 @@
+import { hexToString, isHex } from '@polkadot/util';
+
 export const markdown2sections = (data) => {
   const lines = data.split('\n');
   const sections = lines.reduce((acc, line) => {
@@ -7,4 +9,18 @@ export const markdown2sections = (data) => {
     return acc;
   }, []);
   return sections.map((s) => s.trim());
+};
+
+export const tryParseMaybeHexFromHuman = (content) => {
+  try {
+    const human = content?.toHuman() || '';
+    if (isHex(human)) {
+      return hexToString(human);
+    }
+    return human;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    return '';
+  }
 };

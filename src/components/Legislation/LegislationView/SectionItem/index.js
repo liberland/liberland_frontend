@@ -73,6 +73,7 @@ function SectionItem({
           <AmendButton
             id={id}
             tier={tier}
+            section={section}
           />
         </Flex>,
       ]}
