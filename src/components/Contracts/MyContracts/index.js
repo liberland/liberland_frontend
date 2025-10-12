@@ -37,12 +37,12 @@ function MyContracts() {
         {
           key: 'all',
           label: 'My contracts',
-          extra: isBiggerThanSmallScreen ? <CreateContractModal isMyContracts /> : undefined,
+          extra: isBiggerThanSmallScreen ? <CreateContractModal /> : undefined,
           children: (
             <Flex vertical>
               {!isBiggerThanSmallScreen && (
                 <>
-                  <CreateContractModal isMyContracts />
+                  <CreateContractModal />
                   <Divider />
                 </>
               )}

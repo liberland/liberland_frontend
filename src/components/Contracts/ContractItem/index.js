@@ -29,7 +29,6 @@ function ContractItem({
   parties,
   judgesSignaturesList,
   partiesSignaturesList,
-  isMyContracts,
 }) {
   const dispatch = useDispatch();
   const history = useHistory();
@@ -95,7 +94,7 @@ function ContractItem({
       {!isMeSigned && (
         <Button
           primary
-          onClick={() => dispatch(contractsActions.signContract.call({ contractId, isMyContracts }))}
+          onClick={() => dispatch(contractsActions.signContract.call({ contractId }))}
         >
           Sign as a party
         </Button>
@@ -107,7 +106,6 @@ function ContractItem({
           onClick={() => dispatch(
             contractsActions.signContractJudge.call({
               contractId,
-              isMyContracts,
             }),
           )}
         >
@@ -118,7 +116,10 @@ function ContractItem({
       {!isContractSign && (
         <Button
           red
-          onClick={() => dispatch(contractsActions.removeContract.call({ contractId, isMyContracts }))}
+          onClick={() => {
+            dispatch(contractsActions.removeContract.call({ contractId }));
+            history.push(router.contracts.overview);
+          }}
         >
           Remove
         </Button>
@@ -210,12 +211,7 @@ function ContractItem({
   );
 }
 
-ContractItem.defaultProps = {
-  isMyContracts: false,
-};
-
 ContractItem.propTypes = {
-  isMyContracts: PropTypes.bool,
   contractId: PropTypes.string.isRequired,
   creator: PropTypes.string.isRequired,
   data: PropTypes.string.isRequired,
