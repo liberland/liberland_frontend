@@ -40,7 +40,7 @@ export const setCentralizedBackendBlockchainAddress = async (blockchainAddress, 
 
 export const maybeGetApprovedEresidency = async () => {
   try {
-    const approvedEresidency = await api.get('/e-residents/approved/me');
+    const approvedEresidency = await api.get('/e-residents/me');
     return approvedEresidency.data;
   } catch (e) {
     return { isError: true, errorResponse: e.response };

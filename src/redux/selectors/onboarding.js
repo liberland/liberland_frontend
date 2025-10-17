@@ -19,9 +19,9 @@ const selectorIneligibleForComplimentaryLLDIsLoading = createSelector(
   (reducer) => reducer.isLoading,
 );
 
-const selectorIsResident = createSelector(
+const selectorResident = createSelector(
   onboardingReducer,
-  (reducer) => reducer.isResident,
+  (reducer) => reducer.resident,
 );
 
 const selectorIsLoading = createSelector(
@@ -46,6 +46,6 @@ export {
   selectorIneligibleForComplimentaryLLDReason,
   selectorIsSkipOnBoarding,
   selectorIneligibleForComplimentaryLLDIsLoading,
-  selectorIsResident,
+  selectorResident,
   selectorIsClaimed,
 };

@@ -46,6 +46,7 @@ function Profile() {
   const liquidMerits = useSelector(walletSelectors.selectorLiquidMeritsBalance);
   const registeredAddress = useSelector(userSelectors.selectWalletAddress);
   const hasClaimed = useSelector(onboardingSelectors.selectorIsClaimed);
+  const resident = useSelector(onboardingSelectors.selectorResident);
   const liquidDollars = useSelector(
     walletSelectors.selectorLiquidDollarsBalance,
   );
@@ -233,6 +234,7 @@ function Profile() {
                   identity={identity}
                   lastName={lastName}
                   userName={userName}
+                  resident={resident}
                 />
                 <Button
                   primary={isUserEligibleForComplimentaryLLD && !isLoading}
