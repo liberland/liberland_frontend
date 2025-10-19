@@ -1,14 +1,18 @@
 import {
   put, call, takeLatest, take, race, delay,
+  select,
 } from 'redux-saga/effects';
+import uniq from 'lodash/uniq';
 import { eventChannel } from 'redux-saga';
-import { isAddress } from '@polkadot/util-crypto';
+import { isAddress as isAddressPolkadot } from '@polkadot/util-crypto';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
+import { isAddress as isAddressEth } from 'thirdweb';
 import { blockchainActions } from '../actions';
 import {
   subscribeActiveEra, subscribeBestBlockNumber, fetchPreimage,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcherEvery } from './base';
+import { ethSelectors } from '../selectors';
 
 // WORKERS
 function* clearErrorsWorker(action) {
@@ -81,14 +85,19 @@ export function* subscribeWalletsSaga() {
       data: take(channel),
       timeout: delay(20000),
     });
+    const { accounts } = yield select(ethSelectors.selectorConnected) || {};
     if (timeout && checkTimeout) {
       yield put(blockchainActions.setExtensions.value([]));
-      yield put(blockchainActions.setWallets.value([]));
+      yield put(blockchainActions.setWallets.value(accounts));
     }
     if (data) {
       const { extensions, wallets } = data;
       yield put(blockchainActions.setExtensions.value(extensions));
-      yield put(blockchainActions.setWallets.value(wallets.filter(({ address }) => isAddress(address))));
+      yield put(
+        blockchainActions.setWallets.value(
+          uniq([...accounts, ...wallets.filter(({ address }) => isAddressEth(address) || isAddressPolkadot(address))]),
+        ),
+      );
     }
   }
 }

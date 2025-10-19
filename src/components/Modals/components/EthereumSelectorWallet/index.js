@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Form from 'antd/es/form';
 import Select from 'antd/es/select';
-import { ethSelectors } from '../../../redux/selectors';
-import { ethActions } from '../../../redux/actions';
+import { ethSelectors } from '../../../../redux/selectors';
+import { ethActions } from '../../../../redux/actions';
 
 function EthereumSelectorWallet() {
   const dispatch = useDispatch();

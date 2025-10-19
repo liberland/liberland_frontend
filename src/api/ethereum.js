@@ -381,6 +381,10 @@ const getAvailableWallets = async () => {
   return walletOptions.filter(({ id }) => injectedProvider(id));
 };
 
+const convertSubstrateToEthereumAddress = (address) => {
+
+};
+
 export {
   getThirdWebContract,
   connectWallet,
@@ -395,4 +399,5 @@ export {
   withdrawTokens,
   getSwapExchangeRate,
   stakeLPWithEth,
+  convertSubstrateToEthereumAddress,
 };

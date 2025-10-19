@@ -1,26 +1,22 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import Title from 'antd/es/typography/Title';
 import Card from 'antd/es/card/Card';
 import Paragraph from 'antd/es/typography/Paragraph';
-import Form from 'antd/es/form';
 import Divider from 'antd/es/divider';
 import Link from 'antd/es/typography/Link';
 import Flex from 'antd/es/flex';
-import EthereumSelectorAddress from '../../Wallet/EthereumSelectorAddress';
-import EthereumSelectorWallet from '../../Wallet/EthereumSelectorWallet';
 import TokenStakeInfo from './TokenStakeInfo';
+import { ethSelectors } from '../../../redux/selectors';
 
 export default function ETHLPStaking() {
   // eslint-disable-next-line max-len
   const instructions = 'https://docs.liberland.org/blockchain/for-validators-nominators-and-stakers/eth-liquidity-staking';
   const lldOnEth = 'https://app.uniswap.org/explore/tokens/ethereum/0x054c9d4c6f4ea4e14391addd1812106c97d05690';
-
-  const [form] = Form.useForm();
-  const selectedWallet = Form.useWatch('selectedWallet', form);
-  const selectedAccount = Form.useWatch('selectedAccount', form);
+  const selectedAccount = useSelector(ethSelectors.selectorEthAccount);
 
   return (
-    <Form form={form} layout="vertical">
+    <div>
       <Title level={2}>
         ETH LP Staking
       </Title>
@@ -52,14 +48,7 @@ export default function ETHLPStaking() {
         </Flex>
       </Card>
       <Divider />
-      <EthereumSelectorWallet />
-      <EthereumSelectorAddress
-        selectedWallet={selectedWallet}
-        selectedAccount={selectedAccount}
-        form={form}
-      />
-      <Divider />
       <TokenStakeInfo selectedAccount={selectedAccount} />
-    </Form>
+    </div>
   );
 }

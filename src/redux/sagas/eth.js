@@ -1,6 +1,9 @@
 import {
-  put, call,
+  put,
+  call,
+  take,
 } from 'redux-saga/effects';
+import { eventChannel } from 'redux-saga';
 import {
   connectWallet,
   getTokenStakeContractInfo,
@@ -21,20 +24,15 @@ import { blockchainWatcher, blockchainWatcherEvery } from './base';
 // WORKERS
 
 function* stakeLpWithEthWorker(action) {
-  try {
-    const userEthAddress = yield call(() => action.payload.account.getAddress());
-    yield call(stakeLPWithEth, action.payload);
-    yield put(ethActions.getWethLpExchangeRate.call());
-    yield put(ethActions.getBalance.call({ provider: action.payload.provider, address: userEthAddress }));
-    yield put(ethActions.getErc20Balance.call({
-      erc20Address: process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
-      account: userEthAddress,
-    }));
-    yield put(ethActions.getTokenStakeAddressInfo.call({ userEthAddress }));
-  } catch (e) {
-    console.error(e);
-    throw e;
-  }
+  const userEthAddress = yield call(() => action.payload.account.getAddress());
+  yield call(stakeLPWithEth, action.payload);
+  yield put(ethActions.getWethLpExchangeRate.call());
+  yield put(ethActions.getBalance.call({ provider: action.payload.provider, address: userEthAddress }));
+  yield put(ethActions.getErc20Balance.call({
+    erc20Address: process.env.REACT_APP_THIRD_WEB_LLD_ADDRESS,
+    account: userEthAddress,
+  }));
+  yield put(ethActions.getTokenStakeAddressInfo.call({ userEthAddress }));
 }
 
 function* stakeTokensWorker(action) {
@@ -85,9 +83,40 @@ function* getWalletOptionsWorker(action) {
   }
 }
 
+function createAccountsChannel(provider) {
+  return eventChannel((emit) => {
+    const handler = (accounts) => emit(accounts);
+
+    provider.on('accountsChanged', handler);
+
+    return () => {
+      provider.removeListener('accountsChanged', handler);
+    };
+  });
+}
+
+function* watchAccounts(provider) {
+  const channel = yield call(createAccountsChannel, provider);
+  try {
+    while (true) {
+      const accounts = yield take(channel);
+      const [selected] = accounts || [];
+      if (selected) {
+        yield put(ethActions.setEthAccount.success(selected));
+      }
+    }
+  } finally {
+    channel.close();
+  }
+}
+
 function* connectWalletWorker(action) {
   try {
-    const connected = yield call(connectWallet, action.payload);
+    const connected = yield call(
+      connectWallet,
+      action.payload,
+    );
+    yield call(watchAccounts, connected.provider);
     yield put(ethActions.getConnectedEthWallet.success(connected));
   } catch (e) {
     yield put(ethActions.getConnectedEthWallet.failure(e));
