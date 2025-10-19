@@ -18,7 +18,7 @@ import {
   withdrawTokens,
   claimRewards,
 } from '../../api/ethereum';
-import { ethActions } from '../actions';
+import { blockchainActions, ethActions } from '../actions';
 import { blockchainWatcher, blockchainWatcherEvery } from './base';
 
 // WORKERS
@@ -103,6 +103,7 @@ function* watchAccounts(provider) {
       const [selected] = accounts || [];
       if (selected) {
         yield put(ethActions.setEthAccount.success(selected));
+        yield put(blockchainActions.setUserWallet.success(blockchainActions.setUserWallet.success));
       }
     }
   } finally {

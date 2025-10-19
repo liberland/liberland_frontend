@@ -83,7 +83,7 @@ const ethReducer = handleActions(
     }),
     [ethActions.setEthAccount.success]: (state, action) => ({
       ...state,
-      ethAccount: action.payload.ethAccount,
+      ethAccount: action.payload,
     }),
     [ethActions.getBalance.failure]: (state) => ({
       ...state,

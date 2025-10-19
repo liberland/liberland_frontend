@@ -23,7 +23,7 @@ function EthAddressModalForm({
     >
       <Title level={3}>Connect Your Wallet</Title>
       <Paragraph>
-        Choose your preferred Ethereum wallet and select the account you&apos;d like to use.
+        Choose your preferred Ethereum wallet
       </Paragraph>
       <Divider />
       <EthereumSelectorWallet />

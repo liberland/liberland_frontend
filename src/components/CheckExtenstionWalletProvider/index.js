@@ -5,7 +5,7 @@ import { blockchainSelectors, userSelectors } from '../../redux/selectors';
 import UnsupportedBrowserNoticeComponent from '../GuidedSetup/UnSupportedBrowserNoticeComponent';
 import LoadingComponent from '../GuidedSetup/LoadingComponent';
 import { GuidedSetupWrapper } from '../GuidedSetup/Wrapper';
-import { blockchainActions } from '../../redux/actions';
+import { setMultichainWallet } from '../../redux/store/utils';
 
 const useIsUnsupportedBrowser = () => {
   const [isBrave, setIsBrave] = useState(null);
@@ -42,11 +42,7 @@ export function CheckExtensionWalletProvider({ children }) {
 
   useEffect(() => {
     if (!walletAddress && (userBlockchainAdressStorage || (wallets?.length > 0 && wallets[0]?.address))) {
-      dispatch(
-        blockchainActions.setUserWallet.success(
-          userBlockchainAdressStorage || wallets[0].address,
-        ),
-      );
+      setMultichainWallet(dispatch, userBlockchainAdressStorage || wallets[0].address);
     }
   }, [walletAddress, userBlockchainAdressStorage, wallets, dispatch]);
 
