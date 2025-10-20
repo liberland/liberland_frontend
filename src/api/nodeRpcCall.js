@@ -4,8 +4,10 @@ import {
   BN_ZERO,
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
+import { isAddress as isEthAddress, waitForReceipt } from 'thirdweb';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import groupBy from 'lodash/groupBy';
+import { providers } from 'ethers';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import * as centralizedBackend from './backend';
@@ -18,6 +20,7 @@ import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
 import { decodeAndFilter } from '../utils/identityParser';
 import { OfficeType } from '../utils/officeTypeEnum';
+import { getEthApi } from './ethereum';
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 let __apiCache = null;
@@ -237,6 +240,37 @@ const crossReference = (api, blockchainData, allCentralizedData, motions, isRefe
 });
 
 const submitExtrinsic = async (extrinsic, walletAddress, api) => {
+  if (isEthAddress(walletAddress)) {
+    const scaleHex = `0x${extrinsic.toHex().slice(2)}`;
+    const tx = {
+      to: process.env.REACT_APP_DISPATCH_PRECOMPILE_ADDRESS,
+      data: scaleHex,
+      value: 0,
+    };
+    const ethApi = getEthApi();
+    if (!ethApi) {
+      throw new Error('No injected provider detected!');
+    }
+    const chain = {
+      id: process.env.REACT_APP_LL_ID,
+      rpc: process.env.REACT_APP_LL_RPC_URL,
+      nativeCurrency: JSON.parse(process.env.REACT_APP_THIRD_WEB_NATIVE_CURRENCY),
+    };
+    await ethApi.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: `0x${Number(chain.id).toString(16)}` }],
+    });
+    const web3Provider = new providers.Web3Provider(ethApi, {
+      chainId: process.env.REACT_APP_LL_ID,
+    });
+    await ethApi.send('eth_requestAccounts', []);
+    const signer = web3Provider.getSigner(walletAddress);
+    const sentTx = await signer.sendTransaction(tx);
+    return waitForReceipt({
+      transactionHash: sentTx.hash,
+      chain,
+    });
+  }
   const { signer } = await web3FromAddress(walletAddress);
   return new Promise((resolve, reject) => {
     extrinsic.signAndSend(
@@ -1494,7 +1528,6 @@ const getLandNFTMetadataJson = async (collection_id, nft_id) => {
 };
 
 const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress) => {
-  const injector = await web3FromAddress(walletAddress);
   const api = await getApi();
   /* let metadata = {
     type: "test",
@@ -1522,15 +1555,7 @@ const setLandNFTMetadata = async (collection_id, nft_id, metadata, walletAddress
   // scaleEncoded is ready to be used for setting metadata
   // eslint-disable-next-line max-len
   // this data will be validated and will be rejected if encoded incorrectly or data is nonsensical (not on liberland island, self-intersecting plot lines, less then 3 points)
-  officeExtrinsic.signAndSend(walletAddress, { signer: injector.signer, withSignedTransaction: true }, ({ status }) => {
-    if (status.isInBlock) {
-      // eslint-disable-next-line no-console
-      console.log(`Completed REQUEST COMPANY REGISTRATION at block hash #${status.asInBlock.toString()}`);
-    }
-  }).catch((error) => {
-    // eslint-disable-next-line no-console
-    console.error(':( transaction EDIT METADATA failed', error);
-  });
+  await submitExtrinsic(officeExtrinsic, walletAddress, api);
 };
 
 const getBlockEvents = async (blockHash) => {

@@ -341,9 +341,11 @@ const getTokenStakeContractInfo = async () => {
   return resolved;
 };
 
+let injected;
+
 const connectWallet = async ({ walletId }) => {
   try {
-    const injected = injectedProvider(walletId);
+    injected = injectedProvider(walletId);
 
     if (!injected) {
       throw new Error(`${walletId} provider not found`);
@@ -385,6 +387,8 @@ const convertSubstrateToEthereumAddress = (address) => {
 
 };
 
+const getEthApi = () => injected;
+
 export {
   getThirdWebContract,
   connectWallet,
@@ -400,4 +404,5 @@ export {
   getSwapExchangeRate,
   stakeLPWithEth,
   convertSubstrateToEthereumAddress,
+  getEthApi,
 };

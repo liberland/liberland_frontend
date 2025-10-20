@@ -17,6 +17,7 @@ import ChangeWallet from '../../Home/ChangeWallet';
 import truncate from '../../../utils/truncate';
 import ModeSwitch from '../../ModeSwitch';
 import GetLLDWrapper from '../../GetLLDWrapper';
+import EthAddressModal from '../../Modals/EthAddressModal';
 
 function UrlMenu({
   onClose,
@@ -119,6 +120,15 @@ function UrlMenu({
       ),
       key: 'wallets',
       className: styles.changeWallet,
+      onClick: ({ domEvent }) => domEvent.preventDefault(),
+      onTitleClick: ({ domEvent }) => domEvent.preventDefault(),
+    },
+    {
+      label: (
+        <EthAddressModal />
+      ),
+      key: 'ethmodal',
+      classNames: styles.changeWallet,
       onClick: ({ domEvent }) => domEvent.preventDefault(),
       onTitleClick: ({ domEvent }) => domEvent.preventDefault(),
     },

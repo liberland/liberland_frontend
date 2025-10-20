@@ -1,7 +1,6 @@
 import { createActions } from 'redux-actions';
 
 export const {
-  setEthAccount,
   getEthWalletOptions,
   getConnectedEthWallet,
   getTokenStakeContractInfo,
@@ -15,11 +14,6 @@ export const {
   withdrawTokens,
   claimReward,
 } = createActions({
-  SET_ETH_ACCOUNT: {
-    call: undefined,
-    success: undefined,
-    failure: undefined,
-  },
   GET_ETH_WALLET_OPTIONS: {
     call: undefined,
     success: undefined,

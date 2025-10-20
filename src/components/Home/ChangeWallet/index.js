@@ -16,6 +16,7 @@ import Polkadot from '../../../assets/icons/polkadot.svg';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
+import EthAddressModal from '../../Modals/EthAddressModal';
 
 function ChangeWallet({
   onSelect,
@@ -100,6 +101,9 @@ function ChangeWallet({
           </Flex>
         </Button>
       </Dropdown>
+      {isBiggerThanSmallScreen && (
+        <EthAddressModal />
+      )}
       {walletAdressSelector && (
         <CopyIconWithAddress
           address={walletAdressSelector}
