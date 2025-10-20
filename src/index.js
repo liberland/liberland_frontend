@@ -6,10 +6,8 @@ import './assets/main.scss';
 import { AuthProvider } from 'react-oauth2-code-pkce';
 import App from './App';
 import store from './redux/store';
-import { authActions, onBoardingActions } from './redux/actions';
+import { authActions, blockchainActions, onBoardingActions } from './redux/actions';
 import AntdProvider from './components/AntdProvider';
-import { setMultichainWallet } from './redux/store/utils';
-
 const defaultConfig = {
   tokenEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/token`,
   authorizationEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/authorize`,
@@ -26,7 +24,7 @@ const defaultConfig = {
     localStorage.removeItem('BlockchainAdress');
 
     const walletAddress = storeData.user.user.blockchainAddress;
-    setMultichainWallet(store.dispatch, walletAddress);
+    store.dispatch(blockchainActions.setUserWallet.success(walletAddress));
   },
 };
 

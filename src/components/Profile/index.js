@@ -19,7 +19,7 @@ import { formatDollars, formatMerits } from '../../utils/walletHelpers';
 import styles from './styles.module.scss';
 import liberlandEmblemImage from '../../assets/images/liberlandEmblem.svg';
 import UpdateProfile from './UpdateProfile';
-import { identityActions, onBoardingActions } from '../../redux/actions';
+import { blockchainActions, identityActions, onBoardingActions } from '../../redux/actions';
 import {
   parseDOB,
   parseAdditionalFlag,
@@ -29,7 +29,6 @@ import {
 import CopyIconWithAddress from '../CopyIconWithAddress';
 import truncate from '../../utils/truncate';
 import { setCentralizedBackendAddress } from '../../utils/setCentralizedBackendAddress';
-import { setMultichainWallet } from '../../redux/store/utils';
 
 function Profile() {
   const userName = useSelector(userSelectors.selectUserGivenName);
@@ -130,7 +129,7 @@ function Profile() {
       <Button
         primary
         onClick={() => {
-          setMultichainWallet(dispatch, walletAddress);
+          dispatch(blockchainActions.setUserWallet.success(walletAddress));
           setCentralizedBackendAddress(walletAddress, userId, { dispatch });
         }}
       >

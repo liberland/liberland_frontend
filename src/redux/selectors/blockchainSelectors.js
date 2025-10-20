@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { isAddress } from 'thirdweb';
 
 export const blockchainReducer = (state) => state.blockchain;
 
@@ -13,6 +14,12 @@ const allWalletsSelector = createSelector(
 const userWalletAddressSelector = createSelector(
   blockchainReducer,
   (reducer) => reducer.userWalletAddress,
+);
+const ethUserWalletAddressSelector = createSelector(
+  blockchainReducer,
+  (reducer) => (
+    reducer.userWalletAddress && isAddress(reducer.userWalletAddress) ? reducer.userWalletAddress : undefined
+  ),
 );
 const isUserWalletAddressSameAsUserAdress = createSelector(
   (state) => state,
@@ -57,4 +64,5 @@ export {
   preimages,
   blockTimestamp,
   isUserWalletAddressSameAsUserAdress,
+  ethUserWalletAddressSelector,
 };

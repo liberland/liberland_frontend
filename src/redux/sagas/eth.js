@@ -102,7 +102,6 @@ function* watchAccounts(provider) {
       const accounts = yield take(channel);
       const [selected] = accounts || [];
       if (selected) {
-        yield put(ethActions.setEthAccount.success(selected));
         yield put(blockchainActions.setUserWallet.success(blockchainActions.setUserWallet.success));
       }
     }

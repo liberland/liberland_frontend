@@ -59,11 +59,6 @@ const selectorERC20Balance = createSelector(
   }, {}),
 );
 
-const selectorEthAccount = createSelector(
-  ethReducer,
-  (reducer) => reducer.ethAccount,
-);
-
 export {
   selectorWalletOptions,
   selectorConnected,
@@ -75,5 +70,4 @@ export {
   selectorBalance,
   selectorEthLoading,
   selectorEthUnobtrusive,
-  selectorEthAccount,
 };

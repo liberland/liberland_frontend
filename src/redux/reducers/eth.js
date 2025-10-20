@@ -12,7 +12,6 @@ const initialState = {
   erc20Balance: {},
   wethLpExchangeRate: null,
   balance: null,
-  ethAccount: null,
 };
 
 const ethReducer = handleActions(
@@ -30,7 +29,6 @@ const ethReducer = handleActions(
       ethActions.stakeTokens.call,
       ethActions.withdrawTokens.call,
       ethActions.getWethLpExchangeRate.call,
-      ethActions.setEthAccount.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -44,13 +42,11 @@ const ethReducer = handleActions(
       ethActions.getConnectedEthWallet.call,
       ethActions.getWethLpExchangeRate.call,
       ethActions.getEthWalletOptions.call,
-      ethActions.setEthAccount.call,
     )]: (state) => ({
       ...state,
       unobtrusive: true,
     }),
     [combineActions(
-      ethActions.setEthAccount.success,
       ethActions.getErc20Balance.success,
       ethActions.getErc20Info.success,
       ethActions.getTokenStakeAddressInfo.success,
@@ -63,7 +59,6 @@ const ethReducer = handleActions(
       ethActions.stakeTokens.success,
       ethActions.withdrawTokens.success,
       ethActions.getWethLpExchangeRate.success,
-      ethActions.setEthAccount.failure,
       ethActions.getErc20Balance.failure,
       ethActions.getErc20Info.failure,
       ethActions.getTokenStakeAddressInfo.failure,
@@ -80,10 +75,6 @@ const ethReducer = handleActions(
       ...state,
       loading: false,
       unobtrusive: false,
-    }),
-    [ethActions.setEthAccount.success]: (state, action) => ({
-      ...state,
-      ethAccount: action.payload,
     }),
     [ethActions.getBalance.failure]: (state) => ({
       ...state,

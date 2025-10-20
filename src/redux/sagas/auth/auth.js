@@ -3,10 +3,8 @@ import {
   put,
   call,
 } from 'redux-saga/effects';
-import { isAddress as isEthAddress } from 'thirdweb';
 import {
   authActions, blockchainActions,
-  ethActions,
 } from '../../actions';
 import { getMe } from '../../../api/backend';
 import { getUserRoleRpc } from '../../../api/nodeRpcCall';
@@ -23,9 +21,6 @@ function* verifySessionWorker() {
       const userBlockchainAdressStorage = yield localStorage.getItem('BlockchainAdress');
       const userAddress = userBlockchainAdressStorage || user.blockchainAddress;
       yield put(blockchainActions.setUserWallet.success(userAddress));
-      if (isEthAddress) {
-        yield put(ethActions.setEthAccount.success(userAddress));
-      }
       yield put(authActions.verifySession.success(user));
       return;
     } catch (e) {

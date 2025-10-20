@@ -11,13 +11,12 @@ import styles from '../styles.module.scss';
 import { useNavigationList } from '../hooks';
 import { navigationList } from '../../../constants/navigationList';
 import { blockchainSelectors, userSelectors } from '../../../redux/selectors';
-import { validatorActions } from '../../../redux/actions';
+import { blockchainActions, validatorActions } from '../../../redux/actions';
 import Button from '../../Button/Button';
 import ChangeWallet from '../../Home/ChangeWallet';
 import truncate from '../../../utils/truncate';
 import ModeSwitch from '../../ModeSwitch';
 import GetLLDWrapper from '../../GetLLDWrapper';
-import { setMultichainWallet } from '../../../redux/store/utils';
 
 function UrlMenu({
   onClose,
@@ -33,7 +32,7 @@ function UrlMenu({
   const walletAddress = useSelector(userSelectors.selectWalletAddress);
   const hasSwitchWallet = user && !isWalletAdressSame;
   const switchToRegisteredWallet = () => {
-    setMultichainWallet(dispatch, walletAddress);
+    dispatch(blockchainActions.setUserWallet.success(walletAddress));
     dispatch(validatorActions.getInfo.call());
     localStorage.removeItem('BlockchainAdress');
     if (!isBiggerThanSmallScreen) {

@@ -3,11 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
-import { senateActions, validatorActions } from '../../../redux/actions';
+import { blockchainActions, senateActions, validatorActions } from '../../../redux/actions';
 import { senateSelectors } from '../../../redux/selectors';
 import Button from '../../Button/Button';
 import Table from '../../Table';
-import { setMultichainWallet } from '../../../redux/store/utils';
 
 function Overview() {
   const dispatch = useDispatch();
@@ -20,7 +19,7 @@ function Overview() {
   }, [dispatch]);
 
   const switchWallet = (walletAddress) => {
-    setMultichainWallet(dispatch, walletAddress);
+    dispatch(blockchainActions.setUserWallet.success(walletAddress));
     dispatch(validatorActions.getInfo.call());
     localStorage.removeItem('BlockchainAdress');
   };

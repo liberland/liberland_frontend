@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import Button from '../../Button/Button';
-import { congressActions, validatorActions } from '../../../redux/actions';
+import { blockchainActions, congressActions, validatorActions } from '../../../redux/actions';
 import {
   congressSelectors,
 } from '../../../redux/selectors';
@@ -12,7 +12,6 @@ import ProposeLegislationViaReferendumButton from '../ProposeLegislationViaRefer
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import ProposeBudgetModalWrapper from '../../Modals/ProposeBudgetModal';
 import Table from '../../Table';
-import { setMultichainWallet } from '../../../redux/store/utils';
 
 export default function Overview() {
   const dispatch = useDispatch();
@@ -42,7 +41,7 @@ export default function Overview() {
   }, [userIsMember, userIsCandidate, userIsRunnersUp]);
 
   const switchWallet = (walletAddress) => {
-    setMultichainWallet(dispatch, walletAddress);
+    dispatch(blockchainActions.setUserWallet.success(walletAddress));
     dispatch(validatorActions.getInfo.call());
     localStorage.removeItem('BlockchainAdress');
   };

@@ -7,6 +7,7 @@ import Dropdown from 'antd/es/dropdown/dropdown';
 import Avatar from 'antd/es/avatar';
 import DownOutlined from '@ant-design/icons/DownOutlined';
 import {
+  blockchainActions,
   democracyActions, validatorActions, walletActions,
 } from '../../../redux/actions';
 import { blockchainSelectors } from '../../../redux/selectors';
@@ -15,7 +16,6 @@ import Polkadot from '../../../assets/icons/polkadot.svg';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
-import { setMultichainWallet } from '../../../redux/store/utils';
 
 function ChangeWallet({
   onSelect,
@@ -29,7 +29,7 @@ function ChangeWallet({
   const dispatch = useDispatch();
   const onWalletAdresssChange = useCallback((address) => {
     if (address) {
-      setMultichainWallet(dispatch, address);
+      dispatch(blockchainActions.setUserWallet.success(address));
       dispatch(validatorActions.getInfo.call());
       dispatch(walletActions.getWallet.call());
       dispatch(democracyActions.getDemocracy.call());

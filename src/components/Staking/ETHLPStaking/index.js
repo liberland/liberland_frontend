@@ -7,13 +7,13 @@ import Divider from 'antd/es/divider';
 import Link from 'antd/es/typography/Link';
 import Flex from 'antd/es/flex';
 import TokenStakeInfo from './TokenStakeInfo';
-import { ethSelectors } from '../../../redux/selectors';
+import { blockchainSelectors } from '../../../redux/selectors';
 
 export default function ETHLPStaking() {
   // eslint-disable-next-line max-len
   const instructions = 'https://docs.liberland.org/blockchain/for-validators-nominators-and-stakers/eth-liquidity-staking';
   const lldOnEth = 'https://app.uniswap.org/explore/tokens/ethereum/0x054c9d4c6f4ea4e14391addd1812106c97d05690';
-  const selectedAccount = useSelector(ethSelectors.selectorEthAccount);
+  const selectedAccount = useSelector(blockchainSelectors.ethUserWalletAddressSelector);
 
   return (
     <div>

@@ -8,7 +8,7 @@ import Button from '../../Button/Button';
 import styles from '../styles.module.scss';
 import { blockchainSelectors, userSelectors } from '../../../redux/selectors';
 import ColorAvatar from '../../ColorAvatar';
-import { setMultichainWallet } from '../../../redux/store/utils';
+import { blockchainActions } from '../../../redux/actions';
 
 function WalletListComponent() {
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ function WalletListComponent() {
               primary
               className={styles.connectWalletAddressButton}
               onClick={() => {
-                setMultichainWallet(dispatch, address);
+                dispatch(blockchainActions.setUserWallet.success(address));
                 setCentralizedBackendAddress(address, userId, { dispatch });
               }}
             >
