@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { tryConvertAddress } from './utils';
 
 const getMiddlewareApi = () => axios.create({
   baseURL: process.env.REACT_APP_MIDDLEWARE_API,
@@ -117,7 +118,7 @@ export const createPayment = async ({
   const { status, statusText } = await getMiddlewareApi().post('/v1/create-purchase', {
     orderId,
     price,
-    toId,
+    toId: tryConvertAddress(toId),
     assetId,
     callback,
   });
@@ -130,7 +131,7 @@ export const claimFaucetLLD = async (walletAddress) => {
   const middlewareApi = getMiddlewareApi();
   try {
     const response = await middlewareApi.post('/v1/faucet/lld', {
-      walletAddress,
+      walletAddress: tryConvertAddress(walletAddress),
     });
     return response.data;
   } catch (error) {
@@ -142,7 +143,7 @@ export const claimFaucetLLM = async (walletAddress) => {
   const middlewareApi = getMiddlewareApi();
   try {
     const response = await middlewareApi.post('/v1/faucet/llm', {
-      walletAddress,
+      walletAddress: tryConvertAddress(walletAddress),
     });
     return response.data;
   } catch (error) {
@@ -163,7 +164,9 @@ export const getFaucetAmount = async (token) => {
 export const getFaucetCooldown = async (walletAddress, token) => {
   const middlewareApi = getMiddlewareApi();
   try {
-    const response = await middlewareApi.get(`/v1/faucet/cooldown?walletAddress=${walletAddress}&token=${token}`);
+    const response = await middlewareApi.get(
+      `/v1/faucet/cooldown?walletAddress=${tryConvertAddress(walletAddress)}&token=${token}`,
+    );
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || 'Failed to get LLM amount');

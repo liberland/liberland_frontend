@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import axios from 'axios';
+import { tryConvertAddress } from './utils';
 
 const api = axios.create({
   baseURL: process.env.REACT_APP_API,
@@ -22,7 +23,7 @@ export const getMe = async () => api.get('/users/me');
 export const getUsersByAddress = async (blockchainAddress) => {
   const { data } = await api.get('/users', {
     params: {
-      blockchainAddress,
+      blockchainAddress: tryConvertAddress(blockchainAddress),
     },
   });
 
@@ -35,7 +36,7 @@ export const getUsersByAddress = async (blockchainAddress) => {
 
 // eslint-disable-next-line max-len
 export const setCentralizedBackendBlockchainAddress = async (blockchainAddress, userId) => api.patch(`users/${userId}`, {
-  blockchainAddress,
+  blockchainAddress: tryConvertAddress(blockchainAddress),
 });
 
 export const maybeGetApprovedEresidency = async () => {
@@ -73,7 +74,13 @@ export const getReferenda = async () => {
 export const addReferendum = async ({
   link, name, description, hash, additionalMetadata, proposerAddress,
 }) => api.post('/referenda', { // TODO fix API not to use chainIndex
-  link, chainIndex: 0, name, description, hash, additionalMetadata, proposerAddress,
+  link,
+  chainIndex: 0,
+  name,
+  description,
+  hash,
+  additionalMetadata,
+  proposerAddress: tryConvertAddress(proposerAddress),
 });
 
 export const fetchPendingAdditionalMerits = async () => {

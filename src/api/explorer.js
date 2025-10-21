@@ -2,6 +2,7 @@ import axios from 'axios';
 import { BN } from '@polkadot/util';
 import { getAdditionalAssets } from './nodeRpcCall';
 import { isCompanyConnected } from '../utils/asset';
+import { tryConvertAddress } from './utils';
 
 const historyTransferQuery = `
   query CombinedQuery(
@@ -253,12 +254,13 @@ const parseSoraTransfer = (soraMinted, soraBurned, assetsData) => {
 };
 
 export const getHistoryTransfers = async (substrateAddress) => {
+  const converted = tryConvertAddress(substrateAddress);
   const [
     transferData,
     assetsData,
   ] = await Promise.all([
-    getWalletTransfers(substrateAddress),
-    getAdditionalAssets(substrateAddress, true, true),
+    getWalletTransfers(converted),
+    getAdditionalAssets(converted, true, true),
   ]);
 
   const soraMinted = transferData.data?.soraMinteds?.nodes ?? [];

@@ -4,11 +4,10 @@ import {
   BN_ZERO,
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
-import { hexToBytes, isAddress as isEthAddress, waitForReceipt } from 'thirdweb';
-import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
+import { isAddress as isEthAddress, waitForReceipt } from 'thirdweb';
+import { ApiPromise, WsProvider } from '@polkadot/api';
 import groupBy from 'lodash/groupBy';
 import { providers } from 'ethers';
-import { blake2AsU8a } from '@polkadot/util-crypto';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import * as centralizedBackend from './backend';
@@ -22,6 +21,7 @@ import { IndexHelper } from '../utils/council/councilEnum';
 import { decodeAndFilter } from '../utils/identityParser';
 import { OfficeType } from '../utils/officeTypeEnum';
 import { getEthApi } from './ethereum';
+import { tryConvertAddress } from './utils';
 
 const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
 let __apiCache = null;
@@ -219,22 +219,6 @@ const getApi = async () => {
     );
   }
   return __apiCache;
-};
-
-const tryConvertAddress = (walletAddress) => {
-  if (!isEthAddress(walletAddress)) {
-    return walletAddress;
-  }
-  const addressBytes = hexToBytes(walletAddress);
-  const result = new Uint8Array(24);
-  const prefix = new TextEncoder().encode('evm:');
-  result.set(prefix);
-  result.set(addressBytes, 4);
-  const blakeHash = blake2AsU8a(result, 256);
-  const keyring = new Keyring();
-  const address = keyring.encodeAddress(blakeHash, 42);
-
-  return address;
 };
 
 // eslint-disable-next-line max-len
@@ -1113,7 +1097,7 @@ const submitProposal = async (
     description: discussionDescription,
     hash,
     additionalMetadata: {},
-    proposerAddress: tryConvertAddress(walletAddress),
+    proposerAddress: walletAddress,
   });
   const minDeposit = api.consts.democracy.minimumDeposit;
   const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
@@ -2167,7 +2151,7 @@ const congressProposeReferendum = async (
     description: discussionDescription,
     hash: referendumProposal.hash,
     additionalMetadata: {},
-    proposerAddress: tryConvertAddress(walletAddress),
+    proposerAddress: walletAddress,
   });
 
   const lookup = {
@@ -2281,7 +2265,7 @@ const citizenProposeRepealLegislation = async (
     description: discussionDescription,
     hash: repealLegislation.hash,
     additionalMetadata: {},
-    proposerAddress: tryConvertAddress(walletAddress),
+    proposerAddress: walletAddress,
   });
 
   const minDeposit = api.consts.democracy.minimumDeposit;
@@ -2353,7 +2337,7 @@ const proposeAmendLegislation = async (
     description: discussionDescription,
     hash: proposal.hash,
     additionalMetadata: {},
-    proposerAddress: tryConvertAddress(walletAddress),
+    proposerAddress: walletAddress,
   });
   const notePreimageTx = api.tx.preimage.notePreimage(proposal.toHex());
   const minDeposit = api.consts.democracy.minimumDeposit;
