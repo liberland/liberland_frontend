@@ -383,10 +383,6 @@ const getAvailableWallets = async () => {
   return walletOptions.filter(({ id }) => injectedProvider(id));
 };
 
-const convertSubstrateToEthereumAddress = (address) => {
-
-};
-
 const getEthApi = () => injected;
 
 export {
@@ -403,6 +399,5 @@ export {
   withdrawTokens,
   getSwapExchangeRate,
   stakeLPWithEth,
-  convertSubstrateToEthereumAddress,
   getEthApi,
 };

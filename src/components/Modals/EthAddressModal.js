@@ -5,7 +5,9 @@ import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Flex from 'antd/es/flex';
 import Divider from 'antd/es/divider';
+import { useDispatch } from 'react-redux';
 import Button from '../Button/Button';
+import { ethActions } from '../../redux/actions';
 import OpenModalButton from './components/OpenModalButton';
 import modalWrapper from './components/ModalWrapper';
 import EthereumSelectorWallet from './components/EthereumSelectorWallet';
@@ -13,13 +15,18 @@ import EthereumSelectorWallet from './components/EthereumSelectorWallet';
 function EthAddressModalForm({
   onClose,
 }) {
+  const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const onSubmit = ({ selectedWallet }) => {
+    dispatch(ethActions.getConnectedEthWallet.call({ walletId: selectedWallet }));
+    onClose();
+  };
 
   return (
     <Form
       form={form}
       layout="vertical"
-      onFinish={onClose}
+      onFinish={onSubmit}
     >
       <Title level={3}>Connect Your Wallet</Title>
       <Paragraph>
@@ -30,10 +37,15 @@ function EthAddressModalForm({
       <Divider />
       <Flex wrap gap="15px">
         <Button
+          onClick={onClose}
+        >
+          Cancel
+        </Button>
+        <Button
           primary
           type="submit"
         >
-          Done
+          Select
         </Button>
       </Flex>
     </Form>

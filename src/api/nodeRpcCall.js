@@ -4,10 +4,11 @@ import {
   BN_ZERO,
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
-import { isAddress as isEthAddress, waitForReceipt } from 'thirdweb';
-import { ApiPromise, WsProvider } from '@polkadot/api';
+import { hexToBytes, isAddress as isEthAddress, waitForReceipt } from 'thirdweb';
+import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 import groupBy from 'lodash/groupBy';
 import { providers } from 'ethers';
+import { blake2AsU8a } from '@polkadot/util-crypto';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import * as centralizedBackend from './backend';
@@ -220,6 +221,22 @@ const getApi = async () => {
   return __apiCache;
 };
 
+const tryConvertAddress = (walletAddress) => {
+  if (!isEthAddress(walletAddress)) {
+    return walletAddress;
+  }
+  const addressBytes = hexToBytes(walletAddress);
+  const result = new Uint8Array(24);
+  const prefix = new TextEncoder().encode('evm:');
+  result.set(prefix);
+  result.set(addressBytes, 4);
+  const blakeHash = blake2AsU8a(result, 256);
+  const keyring = new Keyring();
+  const address = keyring.encodeAddress(blakeHash, 42);
+
+  return address;
+};
+
 // eslint-disable-next-line max-len
 const crossReference = (api, blockchainData, allCentralizedData, motions, isReferendum) => blockchainData.map((item) => {
   const proposalHash = isReferendum ? item.imageHash : (
@@ -301,7 +318,7 @@ const submitExtrinsic = async (extrinsic, walletAddress, api) => {
 const getIdentity = async (address) => {
   try {
     const api = await getApi();
-    const identity = await api.query.identity.identityOf(address);
+    const identity = await api.query.identity.identityOf(tryConvertAddress(address));
     return identity;
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -374,7 +391,7 @@ const mintAsset = async ({
 const getLlmBalances = async (addresses) => {
   try {
     const api = await getApi();
-    const balances = await api.query.assets.account.multi(addresses.map((a) => [1, a]));
+    const balances = await api.query.assets.account.multi(addresses.map((a) => [1, tryConvertAddress(a)]));
     return addresses.reduce((acc, addr, idx) => {
       if (balances[idx].isSome) return Object.assign(acc, { [addr]: balances[idx].unwrap().balance });
       return Object.assign(acc, { [addr]: 0 });
@@ -389,7 +406,7 @@ const getLlmBalances = async (addresses) => {
 const getLldBalances = async (addresses) => {
   try {
     const api = await getApi();
-    const balances = await api.query.system.account.multi(addresses);
+    const balances = await api.query.system.account.multi(addresses.map(tryConvertAddress));
     return addresses.reduce((acc, addr, idx) => Object.assign(acc, { [addr]: balances[idx].data.free }), {});
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -401,7 +418,7 @@ const getLldBalances = async (addresses) => {
 const getAssetData = async (asset, address) => {
   try {
     const api = await getApi();
-    const maybeData = await api.query.assets.account(asset, address);
+    const maybeData = await api.query.assets.account(asset, tryConvertAddress(address));
     if (maybeData.isSome) {
       const data = maybeData.unwrapOrDefault();
       return data.balance;
@@ -527,7 +544,7 @@ const getAdditionalAssets = async (address, isIndexNeed = false, isLlmNeeded = f
       const isNotLLM = isLlmNeeded || !(asset.index === 1 || asset.index === '1');
       if (isNotLLM) {
         relatedCompanyQueries.push([api.query.assets.relatedCompany, [asset.index]]);
-        assetQueries.push([api.query.assets.account, [asset.index, address]]);
+        assetQueries.push([api.query.assets.account, [asset.index, tryConvertAddress(address)]]);
         parametersQueries.push([api.query.assets.parameters, [asset.index]]);
         assets.push(asset);
       }
@@ -579,11 +596,11 @@ const makeTransferExtrinsic = (api, trasferData) => {
   const { index, balance, recipient } = trasferData;
   let transferExtrinsic;
   if (index === IndexHelper.LLD) {
-    transferExtrinsic = api.tx.balances.transfer(recipient, balance);
+    transferExtrinsic = api.tx.balances.transfer(tryConvertAddress(recipient), balance);
   } else if (index === IndexHelper.POLITIPOOL_LLM) {
-    transferExtrinsic = api.tx.llm.sendLlmToPolitipool(recipient, balance);
+    transferExtrinsic = api.tx.llm.sendLlmToPolitipool(tryConvertAddress(recipient), balance);
   } else {
-    transferExtrinsic = api.tx.assets.transfer(parseInt(index), recipient, balance);
+    transferExtrinsic = api.tx.assets.transfer(parseInt(index), tryConvertAddress(recipient), balance);
   }
   return transferExtrinsic;
 };
@@ -603,23 +620,24 @@ const transferWithRemark = async (remarkInfo, transfer, walletAddress) => {
 const provideJudgementAndAssets = async ({
   address, hash, walletAddress, merits, dollars, judgementType = identityJudgementEnums.KNOWNGOOD,
 }) => {
+  const converted = tryConvertAddress(address);
   const parsedMerits = parseMerits(merits);
   const parsedDollars = parseDollars(dollars);
   const api = await getApi();
   const calls = [];
 
   const judgement = api.createType('IdentityJudgement', judgementType);
-  const judgementCall = api.tx.identity.provideJudgement(0, address, judgement, hash);
+  const judgementCall = api.tx.identity.provideJudgement(0, converted, judgement, hash);
   const officeJudgementCall = api.tx.identityOffice.execute(judgementCall);
   calls.push(officeJudgementCall);
 
   if (parsedDollars?.gt(BN_ZERO)) {
-    const lldCall = api.tx.balances.transfer(address, parsedDollars.toString());
+    const lldCall = api.tx.balances.transfer(converted, parsedDollars.toString());
     const officeLldCall = api.tx.identityOffice.execute(lldCall);
     calls.push(officeLldCall);
   }
   if (parsedMerits?.gt(BN_ZERO)) {
-    const llmCall = api.tx.llm.sendLlmToPolitipool(address, parsedMerits.toString());
+    const llmCall = api.tx.llm.sendLlmToPolitipool(converted, parsedMerits.toString());
     const officeLlmCall = api.tx.identityOffice.execute(llmCall);
     calls.push(officeLlmCall);
   }
@@ -770,6 +788,7 @@ const registerCompany = async ({ entity_id, hash, walletAddress }) => {
 
 // TODO: Need refactor when blockchain node update
 const getBalanceByAddress = async (address) => {
+  const converted = tryConvertAddress(address);
   try {
     const api = await getApi();
     const [
@@ -778,12 +797,12 @@ const getBalanceByAddress = async (address) => {
       LLMPolitiPool,
       electionLock,
     ] = await api.queryMulti([
-      [api.query.system.account, address],
-      [api.query.assets.account, [1, address]],
-      [api.query.llm.llmPolitics, address],
-      [api.query.llm.electionlock, address],
+      [api.query.system.account, converted],
+      [api.query.assets.account, [1, converted]],
+      [api.query.llm.llmPolitics, converted],
+      [api.query.llm.electionlock, converted],
     ]);
-    const derivedLLDBalances = await api.derive.balances.all(address);
+    const derivedLLDBalances = await api.derive.balances.all(converted);
     const LLMPolitiPoolData = LLMPolitiPool.toJSON();
     const LLDWalletData = LLDData.toJSON();
     const LLMWalletData = LLMData.toJSON();
@@ -858,7 +877,7 @@ const politiPool = async (amount, walletAddress) => {
 const getUserRoleRpc = async (walletAddress) => {
   try {
     const api = await getApi();
-    const identityResult = await api.query.identity.identityOf(walletAddress);
+    const identityResult = await api.query.identity.identityOf(tryConvertAddress(walletAddress));
     const userRoleObject = identityResult?.toHuman()?.info.additional[0];
     if (userRoleObject && (USER_ROLES.includes(userRoleObject[0]?.Raw) && userRoleObject[1]?.Raw === '1')) {
       return userRolesHelper.assignJsIdentity(userRoleObject[0].Raw);
@@ -889,7 +908,7 @@ function accountsToString(accounts) {
 
 const getValidator = async (address) => {
   const api = await getApi();
-  return api.query.staking.validators(address);
+  return api.query.staking.validators(tryConvertAddress(address));
 };
 
 const getValidators = async () => {
@@ -970,7 +989,7 @@ const setNominatorTargets = async (payload) => {
 
 const delegateDemocracy = async (delegateeAddress, walletAddress) => {
   const api = await getApi();
-  const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
+  const LLMPolitiPool = await api.query.llm.llmPolitics(tryConvertAddress(walletAddress));
   const LLMPolitiPoolData = LLMPolitiPool.toJSON();
   const delegateExtrinsic = api.tx.democracy.delegate(delegateeAddress, 'None', LLMPolitiPoolData);
   return submitExtrinsic(delegateExtrinsic, walletAddress, api);
@@ -990,7 +1009,7 @@ const getDemocracyReferendums = async (address) => {
       userVotes,
     ] = await api.queryMulti([
       api.query.democracy.publicProps,
-      [api.query.democracy.votingOf, address],
+      [api.query.democracy.votingOf, tryConvertAddress(address)],
     ]);
 
     const [
@@ -1055,7 +1074,7 @@ const getDemocracyReferendums = async (address) => {
 
 const voteOnReferendum = async (walletAddress, referendumIndex, voteType) => {
   const api = await getApi();
-  const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
+  const LLMPolitiPool = await api.query.llm.llmPolitics(tryConvertAddress(walletAddress));
   const LLMPolitiPoolData = LLMPolitiPool.toJSON();
   const voteExtrinsic = api.tx.democracy.vote(referendumIndex, {
     Standard: {
@@ -1094,7 +1113,7 @@ const submitProposal = async (
     description: discussionDescription,
     hash,
     additionalMetadata: {},
-    proposerAddress: walletAddress,
+    proposerAddress: tryConvertAddress(walletAddress),
   });
   const minDeposit = api.consts.democracy.minimumDeposit;
   const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
@@ -1119,7 +1138,9 @@ const submitProposal = async (
 async function getIdentityDataProper(addressesIdentityData) {
   const api = await getApi();
   if (addressesIdentityData.length === 0) return [];
-  const identityQueries = addressesIdentityData.map((address) => [api.query.identity.identityOf, address]);
+  const identityQueries = addressesIdentityData.map(
+    (address) => [api.query.identity.identityOf, tryConvertAddress(address)],
+  );
   const identities = await api.queryMulti(identityQueries);
   return addressesIdentityData.map((address, index) => {
     const identity = identities[index];
@@ -1158,7 +1179,7 @@ const getCongressMembersWithIdentity = async (walletAddress) => {
   ] = await api.queryMulti([
     api.query.council.members,
     api.query.elections.candidates,
-    [api.query.elections.voting, walletAddress],
+    [api.query.elections.voting, tryConvertAddress(walletAddress)],
     api.query.elections.runnersUp,
   ]);
 
@@ -1204,7 +1225,7 @@ const voteForCongress = async (listofVotes, walletAddress) => {
   }
   const votes = listofVotes.map((vote) => vote.rawIdentity);
 
-  const LLMPolitiPool = await api.query.llm.llmPolitics(walletAddress);
+  const LLMPolitiPool = await api.query.llm.llmPolitics(tryConvertAddress(walletAddress));
   const LLMPolitiPoolData = LLMPolitiPool.toJSON();
 
   const voteExtrinsic = api.tx.elections.vote(votes, LLMPolitiPoolData);
@@ -1349,7 +1370,7 @@ const getLegislation = async (tier) => {
 
 const getOfficialUserRegistryEntries = async (walletAddress) => {
   const api = await getApi();
-  const ownerEntites = await api.query.companyRegistry.ownerEntities.entries(walletAddress);
+  const ownerEntites = await api.query.companyRegistry.ownerEntities.entries(tryConvertAddress(walletAddress));
 
   const ownerEntitesHuman = ownerEntites.map((x) => ({
     key: x[0].toHuman(), value: x[1].toHuman(),
@@ -1964,7 +1985,7 @@ const setStakingPayee = async (destination, walletAddress) => {
 
 const getIdentities = async (addresses) => {
   const api = await getApi();
-  const raw = await api.query.identity.identityOf.multi(addresses);
+  const raw = await api.query.identity.identityOf.multi(addresses.map(tryConvertAddress));
   return raw.map((identity, idx) => ({
     address: addresses[idx],
     identity: identity.isSome ? identity.unwrap().info : null,
@@ -1973,7 +1994,7 @@ const getIdentities = async (addresses) => {
 
 const getIdentitiesNames = async (addresses) => {
   const api = await getApi();
-  const raw = await api.query.identity.identityOf.multi(addresses);
+  const raw = await api.query.identity.identityOf.multi(addresses.map(tryConvertAddress));
   const identities = {};
   raw.map((identity, idx) => {
     identities[addresses[idx]] = {};
@@ -2044,7 +2065,7 @@ const stakingUnbond = async (value, walletAddress) => {
 
 const stakingWithdrawUnbonded = async (walletAddress) => {
   const api = await getApi();
-  const ledger = await api.query.staking.ledger(walletAddress);
+  const ledger = await api.query.staking.ledger(tryConvertAddress(walletAddress));
   if (ledger.isNone) throw new Error("Account isn't a stash controller!");
 
   const spans = await api.query.staking.slashingSpans(ledger.unwrap().stash);
@@ -2123,7 +2144,7 @@ const congressUnapproveTreasurySpend = async (proposalId, walletAddress) => {
 const closeCongressMotion = async (proposalHash, index, walletAddress) => {
   const api = await getApi();
   const proposal = await api.query.council.proposalOf(proposalHash);
-  const { weight: weightBound } = await api.tx(proposal.unwrap()).paymentInfo(walletAddress);
+  const { weight: weightBound } = await api.tx(proposal.unwrap()).paymentInfo(tryConvertAddress(walletAddress));
   const lengthBound = proposal.unwrap().toU8a().length;
   return submitExtrinsic(api.tx.council.close(proposalHash, index, weightBound, lengthBound), walletAddress, api);
 };
@@ -2146,7 +2167,7 @@ const congressProposeReferendum = async (
     description: discussionDescription,
     hash: referendumProposal.hash,
     additionalMetadata: {},
-    proposerAddress: walletAddress,
+    proposerAddress: tryConvertAddress(walletAddress),
   });
 
   const lookup = {
@@ -2260,7 +2281,7 @@ const citizenProposeRepealLegislation = async (
     description: discussionDescription,
     hash: repealLegislation.hash,
     additionalMetadata: {},
-    proposerAddress: walletAddress,
+    proposerAddress: tryConvertAddress(walletAddress),
   });
 
   const minDeposit = api.consts.democracy.minimumDeposit;
@@ -2332,7 +2353,7 @@ const proposeAmendLegislation = async (
     description: discussionDescription,
     hash: proposal.hash,
     additionalMetadata: {},
-    proposerAddress: walletAddress,
+    proposerAddress: tryConvertAddress(walletAddress),
   });
   const notePreimageTx = api.tx.preimage.notePreimage(proposal.toHex());
   const minDeposit = api.consts.democracy.minimumDeposit;
@@ -2579,7 +2600,7 @@ const getAssetsDataFromPool = async () => {
 
 const getLpTokensOwnedByAddress = async (lpTokenId, address) => {
   const api = await getApi();
-  const maybeTokens = await api.query.poolAssets.account(lpTokenId, address);
+  const maybeTokens = await api.query.poolAssets.account(lpTokenId, tryConvertAddress(address));
 
   if (maybeTokens.isNone) {
     return null;
@@ -2629,7 +2650,7 @@ const getDexPools = async (walletAddress) => {
 
 const getDexPoolsExtendData = async (walletAddress) => {
   try {
-    const dexData = await getDexPools(walletAddress);
+    const dexData = await getDexPools(tryConvertAddress(walletAddress));
     return dexData;
   } catch (error) {
     // eslint-disable-next-line no-console
@@ -2830,7 +2851,7 @@ const getAllJudges = async () => {
 
 const getIsUserJudges = async (walletAddress) => {
   const api = await getApi();
-  const rawIsJudge = await api.query.contractsRegistry.judges(walletAddress);
+  const rawIsJudge = await api.query.contractsRegistry.judges(tryConvertAddress(walletAddress));
   return rawIsJudge.isTrue;
 };
 
@@ -2847,7 +2868,7 @@ const createContract = async (data, parties, walletAddress) => {
 const getStakingData = async (walletAddress) => {
   const api = await getApi();
   const [stakingInfo, sessionProgress] = await Promise.all([
-    api.derive.staking?.account(walletAddress),
+    api.derive.staking?.account(tryConvertAddress(walletAddress)),
     api.derive.session.progress(),
   ]);
 
@@ -2998,7 +3019,7 @@ async function processUrlData(ipfsUrl, json = true) {
 
 async function checkUserCollection(userAddress) {
   const api = await getApi();
-  const collectionKeys = await api.query.nfts.account.entries(userAddress);
+  const collectionKeys = await api.query.nfts.account.entries(tryConvertAddress(userAddress));
   const collectionIds = [];
   const nftIds = [];
 
@@ -3112,7 +3133,7 @@ const getUserNfts = async (walletAddress) => {
 async function getUserCollection(walletAddress) {
   const api = await getApi();
 
-  const collectionKeys = await api.query.nfts.collectionAccount.keys(walletAddress);
+  const collectionKeys = await api.query.nfts.collectionAccount.keys(tryConvertAddress(walletAddress));
 
   const collections = collectionKeys.map(({ args: [address, collectionId] }) => ({
     address: address.toString(),
