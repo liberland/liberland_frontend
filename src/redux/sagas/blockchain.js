@@ -85,7 +85,10 @@ export function* subscribeWalletsSaga() {
       data: take(channel),
       timeout: delay(20000),
     });
-    const { accounts } = yield select(ethSelectors.selectorConnected) || {};
+    const connected = yield select(ethSelectors.selectorConnected);
+    const accounts = (
+      connected?.accounts || []
+    ).map((address) => ({ address }));
     if (timeout && checkTimeout) {
       yield put(blockchainActions.setExtensions.value([]));
       yield put(blockchainActions.setWallets.value(accounts));
@@ -95,7 +98,11 @@ export function* subscribeWalletsSaga() {
       yield put(blockchainActions.setExtensions.value(extensions));
       yield put(
         blockchainActions.setWallets.value(
-          uniq([...accounts, ...wallets.filter(({ address }) => isAddressEth(address) || isAddressPolkadot(address))]),
+          uniq([
+            ...accounts,
+            ...wallets
+              .filter(({ address }) => isAddressEth(address) || isAddressPolkadot(address)),
+          ]),
         ),
       );
     }

@@ -2,6 +2,7 @@ import {
   put,
   call,
   take,
+  fork,
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import {
@@ -116,7 +117,7 @@ function* connectWalletWorker(action) {
       connectWallet,
       action.payload,
     );
-    yield call(watchAccounts, connected.provider);
+    yield fork(watchAccounts, connected.provider);
     yield put(ethActions.getConnectedEthWallet.success(connected));
   } catch (e) {
     yield put(ethActions.getConnectedEthWallet.failure(e));

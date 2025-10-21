@@ -14,9 +14,11 @@ import { blockchainSelectors } from '../../../redux/selectors';
 import truncate from '../../../utils/truncate';
 import Polkadot from '../../../assets/icons/polkadot.svg';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
+import EthAddressModal from '../../Modals/EthAddressModal';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
-import EthAddressModal from '../../Modals/EthAddressModal';
+
+const chooseWalletKey = 'choose';
 
 function ChangeWallet({
   onSelect,
@@ -28,14 +30,14 @@ function ChangeWallet({
   );
 
   const dispatch = useDispatch();
-  const onWalletAdresssChange = useCallback((address) => {
-    if (address) {
-      dispatch(blockchainActions.setUserWallet.success(address));
+  const onWalletAdresssChange = useCallback((keyOrAddress) => {
+    if (keyOrAddress && keyOrAddress !== chooseWalletKey) {
+      dispatch(blockchainActions.setUserWallet.success(keyOrAddress));
       dispatch(validatorActions.getInfo.call());
       dispatch(walletActions.getWallet.call());
       dispatch(democracyActions.getDemocracy.call());
-      localStorage.setItem('BlockchainAdress', address);
-      onSelect?.(address);
+      localStorage.setItem('BlockchainAdress', keyOrAddress);
+      onSelect?.(keyOrAddress);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -71,16 +73,21 @@ function ChangeWallet({
     }
     return 'No address selected';
   }, [walletAdressSelector, wallets, isBiggerThanSmallScreen]);
-
   return (
     <Flex gap={isBiggerThanSmallScreen ? undefined : '3px'} vertical={!isBiggerThanSmallScreen}>
       <Dropdown
         trigger={['click']}
         menu={{
-          items: wallets.map(({ meta, address }) => ({
-            key: address,
-            label: meta?.name ? `${meta?.name} (${truncate(address, 10)})` : truncate(address, 24),
-          })),
+          items: [
+            ...wallets.map(({ meta, address }) => ({
+              key: address,
+              label: meta?.name ? `${meta?.name} (${truncate(address, 10)})` : truncate(address, 24),
+            })),
+            {
+              key: chooseWalletKey,
+              label: <EthAddressModal asText />,
+            },
+          ],
           selectedKeys: [walletAdressSelector],
           onClick: ({ key }) => onWalletAdresssChange(key),
         }}
@@ -101,9 +108,6 @@ function ChangeWallet({
           </Flex>
         </Button>
       </Dropdown>
-      {isBiggerThanSmallScreen && (
-        <EthAddressModal />
-      )}
       {walletAdressSelector && (
         <CopyIconWithAddress
           address={walletAdressSelector}

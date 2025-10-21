@@ -58,7 +58,7 @@ EthAddressModalForm.propTypes = {
 
 function ButtonModal(props) {
   return (
-    <OpenModalButton text="Ethereum account" {...props} />
+    <OpenModalButton text="Ethereum wallets" {...props} />
   );
 }
 const EthAddressModal = modalWrapper(EthAddressModalForm, ButtonModal);
