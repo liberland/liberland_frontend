@@ -2,7 +2,8 @@ import {
   put, call, takeLatest, take, race, delay,
   select,
 } from 'redux-saga/effects';
-import uniq from 'lodash/uniq';
+import { providers } from 'ethers';
+import orderBy from 'lodash/orderBy';
 import { eventChannel } from 'redux-saga';
 import { isAddress as isAddressPolkadot } from '@polkadot/util-crypto';
 import { web3Accounts, web3Enable } from '@polkadot/extension-dapp';
@@ -12,7 +13,8 @@ import {
   subscribeActiveEra, subscribeBestBlockNumber, fetchPreimage,
 } from '../../api/nodeRpcCall';
 import { blockchainWatcherEvery } from './base';
-import { ethSelectors } from '../selectors';
+import { getEthApi } from '../../api/ethereum';
+import { blockchainSelectors } from '../selectors';
 
 // WORKERS
 function* clearErrorsWorker(action) {
@@ -80,30 +82,56 @@ export function* subscribeWalletsSaga() {
     }, 120000);
     return () => clearInterval(interval);
   });
+  const ethChannel = eventChannel((emitter) => {
+    let injected;
+    let web3Provider;
+    const interval = setInterval(async () => {
+      const api = getEthApi();
+      if (injected !== api) {
+        injected = api;
+        web3Provider?.removeAllListeners();
+        web3Provider = new providers.Web3Provider(injected);
+        web3Provider.on('accountsChanged', (accounts) => {
+          emitter({ accounts });
+        });
+        const accounts = await web3Provider.send('eth_requestAccounts', []);
+        emitter({ accounts });
+      }
+    }, 500);
+    return () => clearInterval(interval);
+  });
   while (true) {
-    const { data, timeout } = yield race({
+    const { data, timeout, eth } = yield race({
       data: take(channel),
+      eth: take(ethChannel),
       timeout: delay(20000),
     });
-    const connected = yield select(ethSelectors.selectorConnected);
-    const accounts = (
-      connected?.accounts || []
-    ).map((address) => ({ address }));
     if (timeout && checkTimeout) {
       yield put(blockchainActions.setExtensions.value([]));
-      yield put(blockchainActions.setWallets.value(accounts));
+      yield put(blockchainActions.setWallets.value([]));
     }
+    const previous = yield select(blockchainSelectors.allWalletsSelector);
     if (data) {
-      const { extensions, wallets } = data;
+      const { extensions, wallets } = data || { extensions: [], wallets: [] };
+      const previousEth = previous?.filter((params) => params.eth) || [];
       yield put(blockchainActions.setExtensions.value(extensions));
+      yield put(blockchainActions.setWallets.value(orderBy([
+        ...previousEth,
+        ...wallets
+          .filter(({ address }) => isAddressEth(address) || isAddressPolkadot(address))
+          .map((address) => ({ ...address, polkadot: true })),
+      ], ({ address }) => address)));
+    }
+    if (eth) {
+      const previousPolka = previous?.filter((params) => params.polkadot) || [];
+      const accounts = (
+        eth?.accounts || []
+      ).map((address) => ({ address, eth: true }));
       yield put(
-        blockchainActions.setWallets.value(
-          uniq([
-            ...accounts,
-            ...wallets
-              .filter(({ address }) => isAddressEth(address) || isAddressPolkadot(address)),
-          ]),
-        ),
+        blockchainActions.setWallets.value(orderBy([
+          ...previousPolka,
+          ...accounts,
+        ], ({ address }) => address)),
       );
     }
   }

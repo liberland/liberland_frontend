@@ -242,7 +242,7 @@ const crossReference = (api, blockchainData, allCentralizedData, motions, isRefe
 
 const submitExtrinsic = async (extrinsic, walletAddress, api) => {
   if (isEthAddress(walletAddress)) {
-    const scaleHex = `0x${extrinsic.toHex().slice(2)}`;
+    const scaleHex = extrinsic.toHex();
     const tx = {
       to: process.env.REACT_APP_DISPATCH_PRECOMPILE_ADDRESS,
       data: scaleHex,
@@ -257,14 +257,23 @@ const submitExtrinsic = async (extrinsic, walletAddress, api) => {
       rpc: process.env.REACT_APP_LL_RPC_URL,
       nativeCurrency: JSON.parse(process.env.REACT_APP_THIRD_WEB_NATIVE_CURRENCY),
     };
+    const chainIdHex = `0x${Number(chain.id).toString(16)}`;
+    await ethApi.request({
+      method: 'wallet_addEthereumChain',
+      params: [{
+        chainId: chainIdHex,
+        chainName: 'Liberland',
+        rpcUrls: [chain.rpc],
+        nativeCurrency: chain.nativeCurrency,
+      }],
+    });
     await ethApi.request({
       method: 'wallet_switchEthereumChain',
-      params: [{ chainId: `0x${Number(chain.id).toString(16)}` }],
+      params: [{ chainId: chainIdHex }],
     });
     const web3Provider = new providers.Web3Provider(ethApi, {
-      chainId: process.env.REACT_APP_LL_ID,
+      chainId: parseInt(process.env.REACT_APP_LL_ID),
     });
-    await ethApi.send('eth_requestAccounts', []);
     const signer = web3Provider.getSigner(walletAddress);
     const sentTx = await signer.sendTransaction(tx);
     return waitForReceipt({
@@ -1931,7 +1940,7 @@ const getNominators = async () => {
 
 const getStakingLedger = async (controller) => {
   const api = await getApi();
-  return api.query.staking.ledger(controller);
+  return api.query.staking.ledger(tryConvertAddress(controller));
 };
 
 const getAppliedSlashes = async () => {
