@@ -1,6 +1,15 @@
 @import "../../assets/base/variables";
 @import "../../assets/main.scss";
 
+.paragraph {
+  max-width: 700px;
+}
+.ribbon {
+  width: 100%;
+  @media screen and (min-width: map-get($breakpoints, 'hd-screen')) {
+    width: initial;
+  }
+}
 .nav {
   margin-top: 25px;
 }

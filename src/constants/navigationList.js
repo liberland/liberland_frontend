@@ -59,7 +59,9 @@ export const navigationList = [
     icon: PoliticsIcon,
     isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED === 'true',
     subLinks: {
-      'Congressional Assemble': router.voting.congressionalAssemble,
+      'Congressional Assembly': router.voting.congressionalAssembly,
+      Candidates: router.voting.candidates,
+      Information: router.voting.information,
       Referendum: router.voting.referendum,
       'Propose legislation': router.voting.addLegislation,
     },

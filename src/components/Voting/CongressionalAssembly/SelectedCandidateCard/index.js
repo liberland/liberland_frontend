@@ -17,12 +17,12 @@ function SelectedCandidateCard({
       politician={politician}
       preActions={[
         candidateIndex !== 0 && candidatesLength !== 1 && (
-          <Button link onClick={() => moveSelectedCandidate(politician, 'up')}>
+          <Button primary link onClick={() => moveSelectedCandidate(politician, 'up')}>
             <ArrowUpOutlined aria-label="Move up" />
           </Button>
         ),
         candidateIndex !== candidatesLength - 1 && candidatesLength !== 1 && (
-          <Button link onClick={() => moveSelectedCandidate(politician, 'down')}>
+          <Button red link onClick={() => moveSelectedCandidate(politician, 'down')}>
             <ArrowDownOutlined aria-label="Move down" />
           </Button>
         ),

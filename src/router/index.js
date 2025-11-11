@@ -45,7 +45,9 @@ export default {
     courtCases: '/home/documents/court-cases',
   },
   voting: {
-    congressionalAssemble: '/home/voting/congressional-assemble',
+    congressionalAssembly: '/home/voting/congressional-assembly',
+    candidates: '/home/voting/candidates',
+    information: '/home/voting/info',
     referendum: '/home/voting/referendum',
     proposalItem: '/home/voting/proposal/:id',
     referendumItem: '/home/voting/referendum/:referendumHash',
