@@ -15,6 +15,7 @@ function SelectedCandidateCard({
   return (
     <PoliticanCard
       politician={politician}
+      isSelected
       preActions={[
         candidateIndex !== 0 && candidatesLength !== 1 && (
           <Button primary link onClick={() => moveSelectedCandidate(politician, 'up')}>

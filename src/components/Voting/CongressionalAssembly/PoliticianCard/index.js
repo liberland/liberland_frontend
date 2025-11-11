@@ -20,6 +20,7 @@ function PoliticanCard({
   actions,
   preActions,
   isElected,
+  isSelected,
 }) {
   const isBiggerThanMobile = useMediaQuery('(min-width: 576px)');
   const isBigScreen = useMediaQuery('(min-width: 1600px)');
@@ -33,12 +34,13 @@ function PoliticanCard({
             alt="Libertarian torch"
             className={styles.torch}
           />
-          {isElected ? 'Elected' : 'Candidate'}
+          {isElected && 'Elected'}
+          {isSelected ? 'Selected' : 'Candidate'}
         </Flex>
       )}
       color="#1677ff"
     >
-      {isBigScreen ? (
+      {isBigScreen && !isSelected ? (
         <Card
           cover={<ColorCover name={politician.name} width={200} height={300} />}
         >
@@ -126,6 +128,7 @@ PoliticanCard.propTypes = {
   preActions: PropTypes.arrayOf(PropTypes.node),
   actions: PropTypes.arrayOf(PropTypes.node).isRequired,
   isElected: PropTypes.bool,
+  isSelected: PropTypes.bool,
 };
 
 export default PoliticanCard;

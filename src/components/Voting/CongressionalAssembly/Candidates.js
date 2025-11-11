@@ -6,6 +6,7 @@ import Modal from 'antd/es/modal';
 import Divider from 'antd/es/divider';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
+import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
 import { blockchainSelectors, democracySelectors } from '../../../redux/selectors';
 import { democracyActions } from '../../../redux/actions';
@@ -26,6 +27,7 @@ function CongressionalAssemble() {
   const [isSideBlocked, setIsSideBlocked] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [navigationToLeave, setNavigationToLeave] = useState(null);
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 1600px)');
 
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call());
@@ -143,10 +145,64 @@ function CongressionalAssemble() {
 
   return (
     <Flex vertical gap="16px">
-      <Flex justify="space-between" align="center" wrap gap="20px">
-        <Title level={2}>
-          Candidates
-        </Title>
+      <Title level={2}>
+        Candidates
+      </Title>
+      <Modal
+        open={isModalOpen}
+        title="Are you certain you want to leave the page?"
+        onOk={() => handleUpdate()}
+        onCancel={handleDiscardChanges}
+        okText="Update vote"
+        cancelText="Cancel and leave the page"
+      >
+        Your voting preferences haven&#96;t been saved, would you like to save them?
+      </Modal>
+      <Flex vertical gap="8px">
+        {selectedCandidates?.length > 0 && (
+          <>
+            <List
+              dataSource={selectedCandidates}
+              header="Selected candidates"
+              split={false}
+              bordered={false}
+              grid={isBiggerThanSmallScreen ? { column: 1 } : undefined}
+              renderItem={(currentCandidateVoteByUser, index) => (
+                <List.Item>
+                  <SelectedCandidateCard
+                    politician={currentCandidateVoteByUser}
+                    unselectCandidate={unselectCandidate}
+                    moveSelectedCandidate={moveSelectedCandidate}
+                    candidateIndex={index}
+                    candidatesLength={selectedCandidates.length}
+                  />
+                </List.Item>
+              )}
+            />
+            <Divider />
+          </>
+        )}
+        {(selectedCandidates?.length === 0 || eligibleUnselectedCandidates?.length > 0) && (
+          <>
+            <List
+              dataSource={eligibleUnselectedCandidates}
+              header="Eligible candidates"
+              locale={{ emptyText: 'No eligible candidates' }}
+              split={false}
+              bordered={false}
+              grid={isBiggerThanSmallScreen ? { column: 4 } : undefined}
+              renderItem={(unSelectedCandidate) => (
+                <List.Item>
+                  <CandidateCard
+                    politician={unSelectedCandidate}
+                    selectCandidate={selectCandidate}
+                  />
+                </List.Item>
+              )}
+            />
+            <Divider />
+          </>
+        )}
         <Flex wrap gap="15px" justify="end">
           <Button
             primary
@@ -168,48 +224,6 @@ function CongressionalAssemble() {
             Clear my votes
           </Button>
         </Flex>
-      </Flex>
-      <Modal
-        open={isModalOpen}
-        title="Are you certain you want to leave the page?"
-        onOk={() => handleUpdate()}
-        onCancel={handleDiscardChanges}
-        okText="Update vote"
-        cancelText="Cancel and leave the page"
-      >
-        Your voting preferences haven&#96;t been saved, would you like to save them?
-      </Modal>
-      <Divider />
-      <Flex vertical gap="5px">
-        <List
-          dataSource={selectedCandidates}
-          header="Selected candidates"
-          locale={{ emptyText: 'No selected candidates' }}
-          renderItem={(currentCandidateVoteByUser, index) => (
-            <List.Item>
-              <SelectedCandidateCard
-                politician={currentCandidateVoteByUser}
-                unselectCandidate={unselectCandidate}
-                moveSelectedCandidate={moveSelectedCandidate}
-                candidateIndex={index}
-                candidatesLength={selectedCandidates.length}
-              />
-            </List.Item>
-          )}
-        />
-        <List
-          dataSource={eligibleUnselectedCandidates}
-          header="Eligible candidates"
-          locale={{ emptyText: 'No eligible candidates' }}
-          renderItem={(unSelectedCandidate) => (
-            <List.Item>
-              <CandidateCard
-                politician={unSelectedCandidate}
-                selectCandidate={selectCandidate}
-              />
-            </List.Item>
-          )}
-        />
       </Flex>
     </Flex>
   );
