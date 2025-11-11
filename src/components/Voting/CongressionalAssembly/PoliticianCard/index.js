@@ -35,10 +35,18 @@ function PoliticanCard({
             className={styles.torch}
           />
           {isElected && 'Elected'}
-          {isSelected ? 'Selected' : 'Candidate'}
+          {!isElected && (isSelected ? 'Selected' : 'Candidate')}
         </Flex>
       )}
-      color="#1677ff"
+      color={(() => {
+        if (isElected) {
+          return '#1677ff';
+        }
+        if (isSelected) {
+          return '#243F5F';
+        }
+        return '#122C4B';
+      })()}
     >
       {isBigScreen && !isSelected ? (
         <Card
