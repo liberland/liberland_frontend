@@ -64,14 +64,14 @@ function PoliticanCard({
             <Divider />
             <Flex wrap gap="16px" align="center">
               {preActions}
-              {politician.website ? (
+              {politician.website && (
                 <Button primary href={sanitizeUrlHelper(politician.website)} newTab>
                   <Flex gap="15px" align="center">
                     <GlobalOutlined aria-label="Web" />
                     Learn more
                   </Flex>
                 </Button>
-              ) : <div />}
+              )}
               {actions}
             </Flex>
           </Flex>
@@ -134,7 +134,7 @@ PoliticanCard.propTypes = {
     }).isRequired,
   }).isRequired,
   preActions: PropTypes.arrayOf(PropTypes.node),
-  actions: PropTypes.arrayOf(PropTypes.node).isRequired,
+  actions: PropTypes.arrayOf(PropTypes.node),
   isElected: PropTypes.bool,
   isSelected: PropTypes.bool,
 };

@@ -18,7 +18,7 @@ function CongressionalAssembly() {
   }, [dispatch]);
 
   return (
-    <Flex vertical gap="32px">
+    <Flex vertical gap="24px">
       <Title level={2}>
         Acting congressional assembly
       </Title>

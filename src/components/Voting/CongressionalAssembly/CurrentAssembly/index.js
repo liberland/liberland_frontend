@@ -13,28 +13,28 @@ function CurrentAssembly({
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const delegatingTo = democracy.democracy?.userVotes?.Delegating?.target;
-  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 1600px)');
+  const isLargeScreen = useMediaQuery('(min-width: 1600px)');
+  const isVeryLargeScreen = useMediaQuery('(min-width: 1920px)');
 
   return (
     <List
       dataSource={currentCongressMembers}
       locale={{ emptyText: 'No current assemble' }}
-      grid={isBiggerThanSmallScreen ? { column: 4 } : undefined}
+      className="compactList"
+      grid={isLargeScreen ? { column: isVeryLargeScreen ? 4 : 2 } : undefined}
       bordered={false}
       renderItem={(politician) => (
         <List.Item>
           <PoliticanCard
             politician={politician}
             actions={[
-              politician.rawIdentity === userWalletAddress || delegatingTo === politician.rawIdentity ? (
-                <div />
-              ) : (
+              politician.rawIdentity !== userWalletAddress && delegatingTo !== politician.rawIdentity && (
                 <DelegateModalWrapper
                   delegateAddress={politician.rawIdentity}
                   currentlyDelegatingTo={delegatingTo}
                 />
               ),
-            ]}
+            ].filter(Boolean)}
             isElected
           />
         </List.Item>

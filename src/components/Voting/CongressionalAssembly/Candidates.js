@@ -5,6 +5,7 @@ import List from 'antd/es/list';
 import Modal from 'antd/es/modal';
 import Divider from 'antd/es/divider';
 import Flex from 'antd/es/flex';
+import Paragraph from 'antd/es/typography/Paragraph';
 import Title from 'antd/es/typography/Title';
 import { useMediaQuery } from 'usehooks-ts';
 import { useHistory } from 'react-router-dom';
@@ -13,6 +14,7 @@ import { democracyActions } from '../../../redux/actions';
 import CandidateCard from './CandidateCard';
 import Button from '../../Button/Button';
 import SelectedCandidateCard from './SelectedCandidateCard';
+import styles from '../styles.module.scss';
 
 function CongressionalAssemble() {
   const history = useHistory();
@@ -27,7 +29,8 @@ function CongressionalAssemble() {
   const [isSideBlocked, setIsSideBlocked] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [navigationToLeave, setNavigationToLeave] = useState(null);
-  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 1600px)');
+  const isLargeScreen = useMediaQuery('(min-width: 1600px)');
+  const isVeryLargeScreen = useMediaQuery('(min-width: 1920px)');
 
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call());
@@ -143,11 +146,48 @@ function CongressionalAssemble() {
     dispatch(democracyActions.getDemocracy.call());
   }, [dispatch]);
 
+  const buttons = (
+    <Flex wrap gap="15px" justify="end">
+      <Button
+        primary
+        disabled={!didChangeSelectedCandidates}
+        onClick={() => handleUpdate()}
+      >
+        Update vote
+      </Button>
+      <Button
+        red
+        onClick={() => {
+          setSelectedCandidates([]);
+          setEligibleUnselectedCandidates([
+            ...selectedCandidates,
+            ...eligibleUnselectedCandidates,
+          ]);
+        }}
+      >
+        Clear my votes
+      </Button>
+    </Flex>
+  );
+
   return (
-    <Flex vertical gap="16px">
-      <Title level={2}>
-        Candidates
-      </Title>
+    <Flex vertical gap="24px">
+      <Flex justify="space-between" gap="24px" align="center">
+        <Title level={2}>
+          Candidates
+        </Title>
+        {buttons}
+      </Flex>
+      <Paragraph className={styles.paragraph}>
+        This page allows citizens to
+        {' '}
+        <strong>cast their vote for representatives of the Liberland Congressional Assembly</strong>
+        {' '}
+        and
+        {' '}
+        <strong>arrange candidates by order of preference</strong>
+        , ensuring that every vote reflects the voter’s prioritized choice within the nation’s representative framework.
+      </Paragraph>
       <Modal
         open={isModalOpen}
         title="Are you certain you want to leave the page?"
@@ -166,7 +206,7 @@ function CongressionalAssemble() {
               header="Selected candidates"
               split={false}
               bordered={false}
-              grid={isBiggerThanSmallScreen ? { column: 1 } : undefined}
+              grid={{ column: 1 }}
               renderItem={(currentCandidateVoteByUser, index) => (
                 <List.Item>
                   <SelectedCandidateCard
@@ -188,9 +228,10 @@ function CongressionalAssemble() {
               dataSource={eligibleUnselectedCandidates}
               header="Eligible candidates"
               locale={{ emptyText: 'No eligible candidates' }}
+              className="compactList"
               split={false}
               bordered={false}
-              grid={isBiggerThanSmallScreen ? { column: 4 } : undefined}
+              grid={isLargeScreen ? { column: isVeryLargeScreen ? 4 : 2 } : undefined}
               renderItem={(unSelectedCandidate) => (
                 <List.Item>
                   <CandidateCard
@@ -203,27 +244,7 @@ function CongressionalAssemble() {
             <Divider />
           </>
         )}
-        <Flex wrap gap="15px" justify="end">
-          <Button
-            primary
-            disabled={!didChangeSelectedCandidates}
-            onClick={() => handleUpdate()}
-          >
-            Update vote
-          </Button>
-          <Button
-            red
-            onClick={() => {
-              setSelectedCandidates([]);
-              setEligibleUnselectedCandidates([
-                ...selectedCandidates,
-                ...eligibleUnselectedCandidates,
-              ]);
-            }}
-          >
-            Clear my votes
-          </Button>
-        </Flex>
+        {buttons}
       </Flex>
     </Flex>
   );

@@ -238,6 +238,19 @@ th.ant-table-cell {
   gap: 15px;
 }
 
+.compactList.ant-list .ant-row {
+  gap: 0;
+  margin-left: -10px;
+
+  >* {
+    padding: 0 10px;
+  }
+
+  .ant-card {
+    max-width: 100%;
+  }
+}
+
 .threeColumnList {
   .ant-row > div {
     width: 100%!important;
