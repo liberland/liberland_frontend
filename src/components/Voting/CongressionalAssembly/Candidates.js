@@ -29,6 +29,7 @@ function CongressionalAssemble() {
   const [isSideBlocked, setIsSideBlocked] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [navigationToLeave, setNavigationToLeave] = useState(null);
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   const isLargeScreen = useMediaQuery('(min-width: 1600px)');
   const isVeryLargeScreen = useMediaQuery('(min-width: 1920px)');
 
@@ -147,7 +148,7 @@ function CongressionalAssemble() {
   }, [dispatch]);
 
   const buttons = (
-    <Flex wrap gap="15px" justify="end">
+    <Flex wrap gap="15px" justify={isBiggerThanSmallScreen ? 'end' : undefined}>
       <Button
         primary
         disabled={!didChangeSelectedCandidates}
@@ -176,8 +177,9 @@ function CongressionalAssemble() {
         <Title level={2}>
           Candidates
         </Title>
-        {buttons}
+        {isBiggerThanSmallScreen && buttons}
       </Flex>
+      {!isBiggerThanSmallScreen && buttons}
       <Paragraph className={styles.paragraph}>
         This page allows citizens to
         {' '}
