@@ -35,7 +35,6 @@ function CurrentAssembly({
                 />
               ),
             ].filter(Boolean)}
-            isElected
           />
         </List.Item>
       )}

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
 import Divider from 'antd/es/divider';
-import Badge from 'antd/es/badge';
 import { useMediaQuery } from 'usehooks-ts';
 import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
 import CopyIconWithAddress from '../../../CopyIconWithAddress';
@@ -19,102 +18,68 @@ function PoliticanCard({
   politician,
   actions,
   preActions,
-  isElected,
   isSelected,
 }) {
   const isBiggerThanMobile = useMediaQuery('(min-width: 576px)');
   const isBigScreen = useMediaQuery('(min-width: 1600px)');
-  return (
-    <Badge.Ribbon
-      rootClassName={styles.ribbon}
-      text={(
-        <Flex gap="8px" align="center">
-          <img
-            src={libertarianTorch}
-            alt="Libertarian torch"
-            className={styles.torch}
-          />
-          {isElected && 'Elected'}
-          {!isElected && (isSelected ? 'Selected' : 'Candidate')}
-        </Flex>
-      )}
-      color={(() => {
-        if (isElected) {
-          return '#1677ff';
-        }
-        if (isSelected) {
-          return '#243F5F';
-        }
-        return '#122C4B';
-      })()}
+  return isBigScreen && !isSelected ? (
+    <Card
+      cover={<ColorCover name={politician.name} width={200} height={300} />}
     >
-      {isBigScreen && !isSelected ? (
-        <Card
-          cover={<ColorCover name={politician.name} width={200} height={300} />}
-        >
-          <Flex align="stretch" vertical gap="16px">
-            <Card.Meta
-              title={truncate(politician.name, 30)}
-              description={(
-                <CopyIconWithAddress
-                  address={politician.rawIdentity}
-                />
-              )}
-            />
-            <Divider />
-            <Flex wrap gap="16px" align="center">
-              {preActions}
-              {politician.website && (
-                <Button primary href={sanitizeUrlHelper(politician.website)} newTab>
-                  <Flex gap="15px" align="center">
-                    <GlobalOutlined aria-label="Web" />
-                    Learn more
-                  </Flex>
-                </Button>
-              )}
-              {actions}
-            </Flex>
-          </Flex>
-        </Card>
-      ) : (
-        <Card
-          size="small"
-          className={styles.candidate}
-          cover={<ColorCover name={politician.name} width="100%" height={5} />}
-        >
-          <Flex vertical gap="15px">
-            <Flex wrap gap="15px" align="center">
-              {isBiggerThanMobile && (
-                <ColorAvatar size={50} name={politician.name} />
-              )}
-              <Flex vertical flex={1} gap="5px">
-                <strong>
-                  {truncate(politician.name, 15)}
-                </strong>
-                <div className="description">
-                  <CopyIconWithAddress
-                    address={politician.rawIdentity}
-                  />
-                </div>
+      <Flex align="stretch" vertical gap="16px">
+        <Card.Meta
+          title={truncate(politician.name, 30)}
+        />
+        <Divider />
+        <Flex wrap gap="16px" align="center">
+          {preActions}
+          {politician.website && (
+            <Button primary href={sanitizeUrlHelper(politician.website)} newTab>
+              <Flex gap="15px" align="center">
+                <GlobalOutlined aria-label="Web" />
+                Learn more
               </Flex>
-              <img src={libertarianTorch} alt="Libertarian torch" className={styles.torch} />
-            </Flex>
-            <Flex wrap gap="15px" align="center">
-              {politician.website && (
-                <Button primary href={sanitizeUrlHelper(politician.website)} newTab>
-                  <Flex gap="15px" align="center">
-                    <GlobalOutlined aria-label="Web" />
-                    Learn more
-                  </Flex>
-                </Button>
-              )}
-              {preActions?.length ? preActions : null}
-              {actions}
-            </Flex>
+            </Button>
+          )}
+          {actions}
+        </Flex>
+      </Flex>
+    </Card>
+  ) : (
+    <Card
+      size="small"
+      className={styles.candidate}
+      cover={<ColorCover name={politician.name} width="100%" height={5} />}
+    >
+      <Flex vertical gap="15px">
+        <Flex wrap gap="15px" align="center">
+          <ColorAvatar size={isBiggerThanMobile ? 56 : 24} name={politician.name} />
+          <Flex vertical flex={1} gap="5px">
+            <strong>
+              {truncate(politician.name, 15)}
+            </strong>
+            <div className="description">
+              <CopyIconWithAddress
+                address={politician.rawIdentity}
+              />
+            </div>
           </Flex>
-        </Card>
-      )}
-    </Badge.Ribbon>
+          <img src={libertarianTorch} alt="Libertarian torch" className={styles.torch} />
+        </Flex>
+        <Flex wrap gap="15px" align="center">
+          {politician.website && (
+            <Button primary href={sanitizeUrlHelper(politician.website)} newTab>
+              <Flex gap="15px" align="center">
+                <GlobalOutlined aria-label="Web" />
+                Learn more
+              </Flex>
+            </Button>
+          )}
+          {preActions?.length ? preActions : null}
+          {actions}
+        </Flex>
+      </Flex>
+    </Card>
   );
 }
 
@@ -135,7 +100,6 @@ PoliticanCard.propTypes = {
   }).isRequired,
   preActions: PropTypes.arrayOf(PropTypes.node),
   actions: PropTypes.arrayOf(PropTypes.node),
-  isElected: PropTypes.bool,
   isSelected: PropTypes.bool,
 };
 
