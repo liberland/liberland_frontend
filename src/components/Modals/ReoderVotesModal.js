@@ -44,7 +44,7 @@ function ReoderVotesForm({
                   candidateIndex={index}
                   candidatesLength={fields.length}
                   moveSelectedCandidate={(direction) => move(index, index + direction)}
-                  politician={form.getFieldValue(field.name)}
+                  politician={form.getFieldValue(['candidates', field.name])}
                   unselectCandidate={() => remove(index)}
                 />
                 <Divider />

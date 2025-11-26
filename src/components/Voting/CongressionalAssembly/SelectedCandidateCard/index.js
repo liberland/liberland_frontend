@@ -18,12 +18,12 @@ function SelectedCandidateCard({
       isSelected
       preActions={[
         candidateIndex !== 0 && candidatesLength !== 1 && moveSelectedCandidate && (
-          <Button primary link onClick={() => moveSelectedCandidate(1)}>
+          <Button primary link onClick={() => moveSelectedCandidate(-1)}>
             <ArrowUpOutlined aria-label="Move up" />
           </Button>
         ),
         candidateIndex !== candidatesLength - 1 && moveSelectedCandidate && candidatesLength !== 1 && (
-          <Button red link onClick={() => moveSelectedCandidate(-1)}>
+          <Button red link onClick={() => moveSelectedCandidate(1)}>
             <ArrowDownOutlined aria-label="Move down" />
           </Button>
         ),

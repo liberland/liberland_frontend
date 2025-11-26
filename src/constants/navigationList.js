@@ -61,6 +61,7 @@ export const navigationList = [
     subLinks: {
       'Congressional Assembly': router.voting.congressionalAssembly,
       Candidates: router.voting.candidates,
+      'My votes': router.voting.votes,
       Information: router.voting.information,
       Referendum: router.voting.referendum,
       'Propose legislation': router.voting.addLegislation,

@@ -1,11 +1,10 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import List from 'antd/es/list';
 import Flex from 'antd/es/flex';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Title from 'antd/es/typography/Title';
-import Divider from 'antd/es/divider';
 import { useMediaQuery } from 'usehooks-ts';
 import { blockchainSelectors, democracySelectors } from '../../../redux/selectors';
 import { democracyActions } from '../../../redux/actions';
@@ -13,24 +12,23 @@ import SelectedCandidateCard from './SelectedCandidateCard';
 import styles from '../styles.module.scss';
 import ReoderVotesModal from '../../Modals/ReoderVotesModal';
 
-function CongressionalAssemble() {
+function Votes() {
   const dispatch = useDispatch();
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
-  const [selectedCandidates, setSelectedCandidates] = useState([]);
 
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call());
   }, [dispatch, userWalletAddress]);
 
-  useEffect(() => {
+  const selectedCandidates = useMemo(() => {
     const {
       currentCandidateVotesByUser,
     } = democracy?.democracy || {};
-    setSelectedCandidates(currentCandidateVotesByUser);
+    return currentCandidateVotesByUser;
   }, [democracy]);
 
   useEffect(() => {
@@ -43,9 +41,13 @@ function CongressionalAssemble() {
         <Title level={2}>
           Candidates
         </Title>
-        {isBiggerThanSmallScreen && <ReoderVotesModal candidates={selectedCandidates} />}
+        {isBiggerThanSmallScreen
+          && selectedCandidates?.length > 0
+          && <ReoderVotesModal candidates={selectedCandidates} />}
       </Flex>
-      {!isBiggerThanSmallScreen && <ReoderVotesModal candidates={selectedCandidates} />}
+      {!isBiggerThanSmallScreen
+        && selectedCandidates?.length > 0
+        && <ReoderVotesModal candidates={selectedCandidates} />}
       <Paragraph className={styles.paragraph}>
         This page allows citizens to
         {' '}
@@ -54,10 +56,9 @@ function CongressionalAssemble() {
       <Flex vertical gap="8px">
         <List
           dataSource={selectedCandidates}
-          header="Selected candidates"
           split={false}
           bordered={false}
-          locale={{ emptyText: 'No candidates were selected' }}
+          locale={{ emptyText: <div className={styles.none}>No candidates were selected</div> }}
           grid={{ column: 1 }}
           renderItem={(currentCandidateVoteByUser, index) => (
             <List.Item>
@@ -69,11 +70,9 @@ function CongressionalAssemble() {
             </List.Item>
           )}
         />
-        <Divider />
-        <ReoderVotesModal candidates={selectedCandidates} />
       </Flex>
     </Flex>
   );
 }
 
-export default CongressionalAssemble;
+export default Votes;

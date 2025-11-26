@@ -5,8 +5,6 @@ import Flex from 'antd/es/flex';
 import Divider from 'antd/es/divider';
 import { useMediaQuery } from 'usehooks-ts';
 import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
-import CopyIconWithAddress from '../../../CopyIconWithAddress';
-import libertarianTorch from '../../../../assets/images/libertariantorch.png';
 import truncate from '../../../../utils/truncate';
 import Button from '../../../Button/Button';
 import ColorAvatar from '../../../ColorAvatar';
@@ -58,16 +56,10 @@ function PoliticanCard({
             <strong>
               {truncate(politician.name, 15)}
             </strong>
-            <div className="description">
-              <CopyIconWithAddress
-                address={politician.rawIdentity}
-              />
-            </div>
           </Flex>
-          <img src={libertarianTorch} alt="Libertarian torch" className={styles.torch} />
         </Flex>
         <Flex wrap gap="15px" align="center">
-          {politician.website && (
+          {politician.website && !preActions?.length && (
             <Button primary href={sanitizeUrlHelper(politician.website)} newTab>
               <Flex gap="15px" align="center">
                 <GlobalOutlined aria-label="Web" />

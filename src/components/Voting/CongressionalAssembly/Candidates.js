@@ -1,8 +1,7 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import List from 'antd/es/list';
-import Divider from 'antd/es/divider';
 import Flex from 'antd/es/flex';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Title from 'antd/es/typography/Title';
@@ -13,14 +12,12 @@ import CandidateCard from './CandidateCard';
 import Button from '../../Button/Button';
 import styles from '../styles.module.scss';
 
-function CongressionalAssemble() {
+function Candidates() {
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
-  const [selectedCandidates, setSelectedCandidates] = useState([]);
-  const [eligibleUnselectedCandidates, setEligibleUnselectedCandidates] = useState([]);
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   const isLargeScreen = useMediaQuery('(min-width: 1600px)');
   const isVeryLargeScreen = useMediaQuery('(min-width: 1920px)');
@@ -33,20 +30,10 @@ function CongressionalAssemble() {
     dispatch(democracyActions.voteForCongress.call({ selectedCandidates: selected, userWalletAddress }));
   };
 
-  const selectCandidate = (politician) => {
-    const newList = [...selectedCandidates, politician];
-    setSelectedCandidates(newList);
-    setEligibleUnselectedCandidates(eligibleUnselectedCandidates.filter((candidate) => (
-      candidate.rawIdentity !== politician.rawIdentity
-    )));
-    handleUpdate(newList);
-  };
-
-  useEffect(() => {
+  const { selectedCandidates, eligibleUnselectedCandidates } = useMemo(() => {
     const {
       currentCongressMembers, candidates, runnersUp, currentCandidateVotesByUser,
     } = democracy?.democracy || {};
-    setSelectedCandidates(currentCandidateVotesByUser);
 
     const allMembers = [
       ...(currentCongressMembers || []),
@@ -60,28 +47,35 @@ function CongressionalAssemble() {
     const filteredEligibleUnselectedCandidates = allMembers.filter(
       (member) => !votedForRawIdentities.has(member.rawIdentity),
     );
-    setEligibleUnselectedCandidates(filteredEligibleUnselectedCandidates);
+    return {
+      selectedCandidates: currentCandidateVotesByUser,
+      eligibleUnselectedCandidates: filteredEligibleUnselectedCandidates,
+    };
+  }, [democracy]);
+
+  const selectCandidate = (politician) => {
+    const newList = [...selectedCandidates, politician];
+    handleUpdate(newList);
+  };
+
+  useEffect(() => {
+
   }, [democracy]);
 
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call());
   }, [dispatch]);
 
-  const clearButton = (
+  const clearButton = eligibleUnselectedCandidates?.length > 0 ? (
     <Button
       red
       onClick={() => {
-        setSelectedCandidates([]);
-        setEligibleUnselectedCandidates([
-          ...selectedCandidates,
-          ...eligibleUnselectedCandidates,
-        ]);
         handleUpdate([]);
       }}
     >
       Clear my votes
     </Button>
-  );
+  ) : null;
 
   return (
     <Flex vertical gap="24px">
@@ -100,32 +94,28 @@ function CongressionalAssemble() {
         , ensuring that every vote reflects the voter’s prioritized choice within the nation’s representative framework.
       </Paragraph>
       <Flex vertical gap="8px">
-        {eligibleUnselectedCandidates?.length > 0 && (
-          <>
-            <List
-              dataSource={eligibleUnselectedCandidates}
-              header="Eligible candidates"
-              locale={{ emptyText: 'No eligible candidates' }}
-              className="compactList"
-              split={false}
-              bordered={false}
-              grid={isLargeScreen ? { column: isVeryLargeScreen ? 4 : 2 } : undefined}
-              renderItem={(unSelectedCandidate) => (
-                <List.Item>
-                  <CandidateCard
-                    politician={unSelectedCandidate}
-                    selectCandidate={selectCandidate}
-                  />
-                </List.Item>
-              )}
-            />
-            <Divider />
-          </>
-        )}
-        {clearButton}
+        <List
+          dataSource={eligibleUnselectedCandidates}
+          locale={{ emptyText: <div className={styles.none}>No eligible candidates found</div> }}
+          className="compactList"
+          split={false}
+          bordered={false}
+          grid={isLargeScreen ? { column: isVeryLargeScreen ? 4 : 2 } : undefined}
+          renderItem={(unSelectedCandidate) => (
+            <List.Item>
+              <CandidateCard
+                politician={unSelectedCandidate}
+                selectCandidate={selectCandidate}
+              />
+            </List.Item>
+          )}
+        />
+        <div>
+          {clearButton}
+        </div>
       </Flex>
     </Flex>
   );
 }
 
-export default CongressionalAssemble;
+export default Candidates;

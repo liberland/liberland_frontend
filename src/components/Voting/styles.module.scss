@@ -1,6 +1,9 @@
 @import "../../assets/base/variables";
 @import "../../assets/main.scss";
 
+.none {
+  color: var(--main-color)
+}
 .paragraph {
   max-width: 700px;
 }
