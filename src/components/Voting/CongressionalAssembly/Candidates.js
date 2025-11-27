@@ -3,6 +3,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import List from 'antd/es/list';
 import Flex from 'antd/es/flex';
+import message from 'antd/es/message';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Title from 'antd/es/typography/Title';
 import { useMediaQuery } from 'usehooks-ts';
@@ -11,6 +12,7 @@ import { democracyActions } from '../../../redux/actions';
 import CandidateCard from './CandidateCard';
 import Button from '../../Button/Button';
 import styles from '../styles.module.scss';
+import truncate from '../../../utils/truncate';
 
 function Candidates() {
   const dispatch = useDispatch();
@@ -21,13 +23,20 @@ function Candidates() {
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   const isLargeScreen = useMediaQuery('(min-width: 1600px)');
   const isVeryLargeScreen = useMediaQuery('(min-width: 1920px)');
+  const [api, context] = message.useMessage({
+    duration: 3,
+    maxCount: 2,
+  });
 
   useEffect(() => {
     dispatch(democracyActions.getDemocracy.call());
   }, [dispatch, userWalletAddress]);
 
   const handleUpdate = (selected) => {
+    const names = selected.map(({ name }) => truncate(name, 20)).join(', ');
+    const text = names.length > 0 ? `You current votes are: ${names}` : 'You haven\'t voted for anyone';
     dispatch(democracyActions.voteForCongress.call({ selectedCandidates: selected, userWalletAddress }));
+    api.success(text);
   };
 
   const { selectedCandidates, eligibleUnselectedCandidates } = useMemo(() => {
@@ -79,6 +88,7 @@ function Candidates() {
 
   return (
     <Flex vertical gap="24px">
+      {context}
       <Flex justify="space-between" gap="24px" align="center">
         <Title level={2}>
           Candidates
