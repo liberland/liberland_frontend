@@ -43,6 +43,7 @@ function UpdateProfile({
       email: values.email,
       onChainIdentity: values.onChainIdentity,
       eligible_on,
+      description: values.description || '',
     };
 
     dispatch(

@@ -650,7 +650,7 @@ const buildAdditionals = (values, blockNumber) => {
     );
   }
 
-  const additionalItems = ['legal', 'web', 'display', 'email'];
+  const additionalItems = ['legal', 'web', 'display', 'email', 'description'];
 
   additionalItems.map((item) => {
     const itemData = values[item];
@@ -1096,18 +1096,21 @@ async function getIdentityDataProper(addressesIdentityData) {
     let nameData;
     let legalData;
     let websiteData;
+    let descriptionData;
     if (isIdentity) {
       const identityData = identity.unwrap();
       const { info } = identityData;
-      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal']);
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'description']);
       nameData = decodedData?.display;
       legalData = decodedData?.legal;
       websiteData = decodedData?.web;
+      descriptionData = decodedData?.description;
     }
     return {
       name: nameData,
       legal: legalData,
       website: websiteData,
+      description: descriptionData,
       identityData: identity.isSome ? identity.unwrap().toJSON() : null,
       rawIdentity: addressString,
     };

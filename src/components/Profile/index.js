@@ -6,6 +6,7 @@ import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
 import Modal from 'antd/es/modal';
 import Result from 'antd/es/result';
+import Markdown from 'markdown-to-jsx';
 import { useMediaQuery } from 'usehooks-ts';
 import Button from '../Button/Button';
 import {
@@ -71,7 +72,7 @@ function Profile() {
 
   const displayName = userName && lastName ? `${userName} ${lastName}` : '';
   const emptyElement = <em>&lt;empty&gt;</em>;
-  const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email']);
+  const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description']);
   const onChainIdenityList = [
     {
       dataFunction: () => decodedData?.display,
@@ -112,6 +113,12 @@ function Profile() {
       dataFunction: () => parseAdditionalFlag(info?.additional, 'company'),
       title: 'Company',
       isDataToShow: false,
+    },
+    {
+      dataFunction: () => decodedData?.description,
+      title: 'Description',
+      isDataToShow: true,
+      isMarkdown: true,
     },
     {
       dataFunction: () => parseCitizenshipJudgement(judgements),
@@ -207,7 +214,12 @@ function Profile() {
             <Flex vertical gap="20px">
               <List
                 dataSource={onChainIdenityList}
-                renderItem={({ isDataToShow, title, dataFunction }) => {
+                renderItem={({
+                  isDataToShow,
+                  isMarkdown,
+                  title,
+                  dataFunction,
+                }) => {
                   const dataFromFunction = dataFunction();
                   const yesOrNo = dataFromFunction ? 'Yes' : 'No';
                   const htmlElement = isDataToShow
@@ -218,7 +230,13 @@ function Profile() {
                       <List.Item.Meta
                         title={title}
                         description={htmlElement ? (
-                          <strong>{htmlElement}</strong>
+                          <strong className={styles.formValue}>
+                            {isMarkdown ? (
+                              <Markdown options={{ disableParsingRawHTML: true }}>
+                                {htmlElement}
+                              </Markdown>
+                            ) : htmlElement}
+                          </strong>
                         ) : (
                           emptyElement
                         )}

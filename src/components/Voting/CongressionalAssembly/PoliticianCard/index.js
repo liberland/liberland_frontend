@@ -11,6 +11,7 @@ import ColorAvatar from '../../../ColorAvatar';
 import ColorCover from '../../../ColorCover';
 import sanitizeUrlHelper from '../../../../utils/sanitizeUrlHelper';
 import styles from '../../styles.module.scss';
+import EllipsisModal from '../../../Modals/EllipsisModal';
 
 function PoliticanCard({
   politician,
@@ -27,6 +28,12 @@ function PoliticanCard({
       <Flex align="stretch" vertical gap="16px">
         <Card.Meta
           title={truncate(politician.name, 30)}
+          description={(
+            <EllipsisModal
+              title={politician.name}
+              paragraph={politician.description}
+            />
+          )}
         />
         <Divider />
         <Flex wrap gap="16px" align="center">
@@ -58,6 +65,14 @@ function PoliticanCard({
             </strong>
           </Flex>
         </Flex>
+        <Card.Meta
+          description={(
+            <EllipsisModal
+              title={politician.name}
+              paragraph={politician.description}
+            />
+          )}
+        />
         <Flex wrap gap="15px" align="center">
           {politician.website && !preActions?.length && (
             <Button primary href={sanitizeUrlHelper(politician.website)} newTab>
@@ -80,6 +95,7 @@ PoliticanCard.propTypes = {
     name: PropTypes.string,
     legal: PropTypes.string,
     website: PropTypes.string,
+    description: PropTypes.string,
     rawIdentity: PropTypes.string.isRequired,
     identityData: PropTypes.shape({
       info: PropTypes.shape({

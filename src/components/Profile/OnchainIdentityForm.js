@@ -18,6 +18,7 @@ import {
   parseCitizenshipJudgement,
   decodeAndFilter,
 } from '../../utils/identityParser';
+import MarkdownEditor from '../MarkdownEditor';
 
 function OnchainIdentityForm({
   onSubmit,
@@ -40,7 +41,7 @@ function OnchainIdentityForm({
       ].find(Boolean);
 
       const identityDOB = parseDOB(info.additional, blockNumber);
-      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email']);
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description']);
 
       return {
         display: decodedData?.display ?? name,
@@ -51,6 +52,7 @@ function OnchainIdentityForm({
         older_than_15: !identityDOB,
         onChainIdentity,
         hasUserWarn: parseCitizenshipJudgement(judgements),
+        description: decodedData.description ?? '',
       };
     }
     return {
@@ -102,7 +104,14 @@ function OnchainIdentityForm({
           ]}
         />
       </Form.Item>
-
+      {(onChainIdentity === 'citizen' || onChainIdentity === 'eresident') && (
+        <MarkdownEditor
+          label="Description"
+          name="description"
+          required
+          description="This information will be used if you decide to run for Congress"
+        />
+      )}
       {onChainIdentity === 'citizen' && (
         <>
           <Form.Item
