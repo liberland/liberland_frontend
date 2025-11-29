@@ -179,3 +179,15 @@ export const getTopHolders = async () => {
     throw new Error(error.response?.data?.message || 'Failed to get LLM amount');
   }
 };
+
+export const getX = async ({ handle }) => {
+  const middlewareApi = getMiddlewareApi();
+  try {
+    const response = await middlewareApi.get(`/v1/x/${handle}`);
+    return response.data;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    return {};
+  }
+};

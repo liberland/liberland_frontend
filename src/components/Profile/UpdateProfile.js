@@ -44,6 +44,7 @@ function UpdateProfile({
       onChainIdentity: values.onChainIdentity,
       eligible_on,
       description: values.description || '',
+      twitter: values.x || '',
     };
 
     dispatch(

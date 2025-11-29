@@ -72,7 +72,7 @@ function Profile() {
 
   const displayName = userName && lastName ? `${userName} ${lastName}` : '';
   const emptyElement = <em>&lt;empty&gt;</em>;
-  const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description']);
+  const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description', 'twitter']);
   const onChainIdenityList = [
     {
       dataFunction: () => decodedData?.display,
@@ -92,6 +92,11 @@ function Profile() {
     {
       dataFunction: () => decodedData?.email,
       title: 'Email',
+      isDataToShow: true,
+    },
+    {
+      dataFunction: () => decodedData?.twitter,
+      title: 'X username',
       isDataToShow: true,
     },
     {

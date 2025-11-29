@@ -6,6 +6,7 @@ import {
 import { getIdentitiesNames, getIdentity, setIdentity } from '../../api/nodeRpcCall';
 import { identityActions } from '../actions';
 import { blockchainWatcher } from './base';
+import { getX } from '../../api/middleware';
 
 function* setIdentityWorker(action) {
   yield call(
@@ -17,6 +18,15 @@ function* setIdentityWorker(action) {
   yield put(identityActions.getIdentity.call(action.payload.userWalletAddress));
   if (action.payload?.isGuidedUpdate) {
     sessionStorage.setItem('SkippedOnBoardingGetLLD', true);
+  }
+}
+
+function* getXWorker(action) {
+  try {
+    const x = yield call(getX, action.payload);
+    yield put(identityActions.getX.success({ handle: action.payload.handle, profile: x }));
+  } catch (e) {
+    yield put(identityActions.getX.failure(e));
   }
 }
 
@@ -39,6 +49,10 @@ function* getIdentityMotionsWorker(action) {
 }
 
 // WATCHERS
+
+function* getXWatcher() {
+  yield* blockchainWatcher(identityActions.getX, getXWorker);
+}
 
 function* getIdentityMotionsWatcher() {
   try {
@@ -64,4 +78,5 @@ export {
   setIdentityWatcher,
   getIdentityWatcher,
   getIdentityMotionsWatcher,
+  getXWatcher,
 };

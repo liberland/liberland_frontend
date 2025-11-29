@@ -5,6 +5,7 @@ const initialState = {
   loading: false,
   unobtrusive: false,
   identity: null,
+  x: {},
 };
 
 const identityReducer = handleActions(
@@ -13,6 +14,7 @@ const identityReducer = handleActions(
       identityActions.getIdentity.call,
       identityActions.setIdentity.call,
       identityActions.getIdentityMotions.call,
+      identityActions.getX.call,
     )]: (state) => ({
       ...state,
       loading: true,
@@ -21,6 +23,7 @@ const identityReducer = handleActions(
     [combineActions(
       identityActions.getIdentity.call,
       identityActions.getIdentityMotions.call,
+      identityActions.getX.call,
     )]: (state) => ({
       ...state,
       unobtrusive: true,
@@ -33,6 +36,8 @@ const identityReducer = handleActions(
       identityActions.setIdentity.failure,
       identityActions.getIdentityMotions.success,
       identityActions.getIdentityMotions.failure,
+      identityActions.getX.success,
+      identityActions.getX.failure,
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
@@ -57,6 +62,13 @@ const identityReducer = handleActions(
     [identityActions.getIdentityMotions.success]: (state, action) => ({
       ...state,
       identityMotions: action.payload,
+    }),
+    [identityActions.getX.success]: (state, action) => ({
+      ...state,
+      x: {
+        ...state.x,
+        [action.payload.handle]: action.payload.profile,
+      },
     }),
   },
   initialState,
