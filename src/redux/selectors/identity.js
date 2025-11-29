@@ -22,15 +22,9 @@ const selectorIdentityMotions = createSelector(
   (reducer) => reducer.identityMotions,
 );
 
-const selectorX = createSelector(
-  identityReducer,
-  (reducer) => reducer.x,
-);
-
 export {
   selectorIdentity,
   selectorIsLoading,
   selectorIdentityMotions,
   selectorIsUnobtrusive,
-  selectorX,
 };

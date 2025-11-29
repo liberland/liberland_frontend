@@ -676,9 +676,9 @@ const setIdentity = async (values, walletAddress) => {
     legal: asData(truncate(values.legal)),
     web: asData(truncate(values.web)),
     email: asData(truncate(values.email)),
-    twitter: asData(truncate(values.twitter)),
     riot: asData(null),
     image: asData(null),
+    twitter: asData(null),
   };
 
   const setCall = api.tx.identity.setIdentity(info);
@@ -1097,23 +1097,20 @@ async function getIdentityDataProper(addressesIdentityData) {
     let legalData;
     let websiteData;
     let descriptionData;
-    let xData;
     if (isIdentity) {
       const identityData = identity.unwrap();
       const { info } = identityData;
-      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'description', 'twitter']);
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'description']);
       nameData = decodedData?.display;
       legalData = decodedData?.legal;
       websiteData = decodedData?.web;
       descriptionData = decodedData?.description;
-      xData = decodedData?.twitter;
     }
     return {
       name: nameData,
       legal: legalData,
       website: websiteData,
       description: descriptionData,
-      x: xData,
       identityData: identity.isSome ? identity.unwrap().toJSON() : null,
       rawIdentity: addressString,
     };

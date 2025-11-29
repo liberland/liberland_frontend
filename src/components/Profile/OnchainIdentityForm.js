@@ -7,7 +7,6 @@ import Input from 'antd/es/input';
 import Result from 'antd/es/result';
 import Checkbox from 'antd/es/checkbox';
 import DatePicker from 'antd/es/date-picker';
-import XOutlined from '@ant-design/icons/XOutlined';
 import Flex from 'antd/es/flex';
 import Select from 'antd/es/select';
 import dayjs from 'dayjs';
@@ -42,7 +41,7 @@ function OnchainIdentityForm({
       ].find(Boolean);
 
       const identityDOB = parseDOB(info.additional, blockNumber);
-      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description', 'twitter']);
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description']);
 
       return {
         display: decodedData?.display ?? name,
@@ -54,7 +53,6 @@ function OnchainIdentityForm({
         onChainIdentity,
         hasUserWarn: parseCitizenshipJudgement(judgements),
         description: decodedData.description ?? '',
-        x: decodedData.twitter ?? '',
       };
     }
     return {
@@ -88,9 +86,6 @@ function OnchainIdentityForm({
       </Form.Item>
       <Form.Item name="web" label="Web address" extra="Optional">
         <Input placeholder="Web address" />
-      </Form.Item>
-      <Form.Item name="x" label="X handle" extra="Recommended, Optional">
-        <Input prefix={<XOutlined />} placeholder="Your X username" />
       </Form.Item>
       <Form.Item name="email" label="E-mail" extra="Recommended, Optional">
         <Input inputMode="email" placeholder="Web address" />
