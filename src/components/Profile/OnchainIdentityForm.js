@@ -19,6 +19,8 @@ import {
   decodeAndFilter,
 } from '../../utils/identityParser';
 import MarkdownEditor from '../MarkdownEditor';
+import { useUploader } from '../../hooks/useUploader';
+import Uploader from '../Uploader';
 
 function OnchainIdentityForm({
   onSubmit,
@@ -41,7 +43,7 @@ function OnchainIdentityForm({
       ].find(Boolean);
 
       const identityDOB = parseDOB(info.additional, blockNumber);
-      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description']);
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description', 'image']);
 
       return {
         display: decodedData?.display ?? name,
@@ -53,6 +55,7 @@ function OnchainIdentityForm({
         onChainIdentity,
         hasUserWarn: parseCitizenshipJudgement(judgements),
         description: decodedData.description ?? '',
+        image: decodedData?.image ? [decodedData.image] : [],
       };
     }
     return {
@@ -65,6 +68,12 @@ function OnchainIdentityForm({
   const isOlderThan15 = Form.useWatch('older_than_15', form);
   const onChainIdentity = Form.useWatch('onChainIdentity', form);
   const isUserWarnAccepted = Form.useWatch('isUserWarnAccepted', form);
+  const {
+    uploadImageWithLink,
+    uploading,
+    setPreviewImage,
+    previewImage,
+  } = useUploader();
 
   return (
     <Form
@@ -90,6 +99,14 @@ function OnchainIdentityForm({
       <Form.Item name="email" label="E-mail" extra="Recommended, Optional">
         <Input inputMode="email" placeholder="Web address" />
       </Form.Item>
+      <Uploader
+        name="image"
+        label="Avatar"
+        setPreviewImage={setPreviewImage}
+        uploadImageWithLink={uploadImageWithLink}
+        previewImage={previewImage}
+        uploading={uploading}
+      />
       <Form.Item
         name="onChainIdentity"
         label="I am a"

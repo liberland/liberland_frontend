@@ -6,7 +6,6 @@ import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
 import Modal from 'antd/es/modal';
 import Result from 'antd/es/result';
-import Markdown from 'markdown-to-jsx';
 import { useMediaQuery } from 'usehooks-ts';
 import Button from '../Button/Button';
 import {
@@ -30,6 +29,7 @@ import {
 import CopyIconWithAddress from '../CopyIconWithAddress';
 import truncate from '../../utils/truncate';
 import { setCentralizedBackendAddress } from '../../utils/setCentralizedBackendAddress';
+import ProfileItem from './ProfileItem';
 
 function Profile() {
   const userName = useSelector(userSelectors.selectUserGivenName);
@@ -71,8 +71,7 @@ function Profile() {
   const date_of_birth = parseDOB(info?.additional, blockNumber);
 
   const displayName = userName && lastName ? `${userName} ${lastName}` : '';
-  const emptyElement = <em>&lt;empty&gt;</em>;
-  const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description']);
+  const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description', 'image']);
   const onChainIdenityList = [
     {
       dataFunction: () => decodedData?.display,
@@ -93,6 +92,12 @@ function Profile() {
       dataFunction: () => decodedData?.email,
       title: 'Email',
       isDataToShow: true,
+    },
+    {
+      dataFunction: () => decodedData?.image,
+      title: 'Avatar',
+      isDataToShow: true,
+      isImage: true,
     },
     {
       dataFunction: () => (date_of_birth === false ? 'old enough to vote' : date_of_birth),
@@ -214,36 +219,7 @@ function Profile() {
             <Flex vertical gap="20px">
               <List
                 dataSource={onChainIdenityList}
-                renderItem={({
-                  isDataToShow,
-                  isMarkdown,
-                  title,
-                  dataFunction,
-                }) => {
-                  const dataFromFunction = dataFunction();
-                  const yesOrNo = dataFromFunction ? 'Yes' : 'No';
-                  const htmlElement = isDataToShow
-                    ? dataFromFunction
-                    : yesOrNo;
-                  return (
-                    <List.Item>
-                      <List.Item.Meta
-                        title={title}
-                        description={htmlElement ? (
-                          <strong className={styles.formValue}>
-                            {isMarkdown ? (
-                              <Markdown options={{ disableParsingRawHTML: true }}>
-                                {htmlElement}
-                              </Markdown>
-                            ) : htmlElement}
-                          </strong>
-                        ) : (
-                          emptyElement
-                        )}
-                      />
-                    </List.Item>
-                  );
-                }}
+                renderItem={ProfileItem}
               />
               <Flex wrap gap="15px">
                 <UpdateProfile

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
 import Divider from 'antd/es/divider';
+import Avatar from 'antd/es/avatar';
 import { useMediaQuery } from 'usehooks-ts';
 import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
 import truncate from '../../../../utils/truncate';
@@ -19,7 +20,6 @@ function PoliticanCard({
   preActions,
   isSelected,
 }) {
-  const isBiggerThanMobile = useMediaQuery('(min-width: 576px)');
   const isBigScreen = useMediaQuery('(min-width: 1600px)');
   return isBigScreen && !isSelected ? (
     <Card
@@ -27,7 +27,16 @@ function PoliticanCard({
     >
       <Flex align="stretch" vertical gap="16px">
         <Card.Meta
-          title={truncate(politician.name, 30)}
+          title={(
+            <Flex gap="12px" align="center">
+              {politician.image ? (
+                <Avatar size={64} src={politician.image} />
+              ) : (
+                <ColorAvatar size={64} name={politician.name} />
+              )}
+              {truncate(politician.name, 20)}
+            </Flex>
+          )}
           description={(
             <EllipsisModal
               title={politician.name}
@@ -58,10 +67,14 @@ function PoliticanCard({
     >
       <Flex vertical gap="15px">
         <Flex wrap gap="15px" align="center">
-          <ColorAvatar size={isBiggerThanMobile ? 56 : 24} name={politician.name} />
+          {politician.image ? (
+            <Avatar size={56} src={politician.image} />
+          ) : (
+            <ColorAvatar size={56} name={politician.name} />
+          )}
           <Flex vertical flex={1} gap="5px">
             <strong>
-              {truncate(politician.name, 15)}
+              {truncate(politician.name, 25)}
             </strong>
           </Flex>
         </Flex>
@@ -96,6 +109,7 @@ PoliticanCard.propTypes = {
     legal: PropTypes.string,
     website: PropTypes.string,
     description: PropTypes.string,
+    image: PropTypes.string,
     rawIdentity: PropTypes.string.isRequired,
     identityData: PropTypes.shape({
       info: PropTypes.shape({

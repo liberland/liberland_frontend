@@ -650,7 +650,7 @@ const buildAdditionals = (values, blockNumber) => {
     );
   }
 
-  const additionalItems = ['legal', 'web', 'display', 'email', 'description'];
+  const additionalItems = ['legal', 'web', 'display', 'email', 'description', 'image'];
 
   additionalItems.map((item) => {
     const itemData = values[item];
@@ -677,7 +677,7 @@ const setIdentity = async (values, walletAddress) => {
     web: asData(truncate(values.web)),
     email: asData(truncate(values.email)),
     riot: asData(null),
-    image: asData(null),
+    image: asData(truncate(values.image)),
     twitter: asData(null),
   };
 
@@ -1097,19 +1097,22 @@ async function getIdentityDataProper(addressesIdentityData) {
     let legalData;
     let websiteData;
     let descriptionData;
+    let imageData;
     if (isIdentity) {
       const identityData = identity.unwrap();
       const { info } = identityData;
-      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'description']);
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'description', 'image']);
       nameData = decodedData?.display;
       legalData = decodedData?.legal;
       websiteData = decodedData?.web;
       descriptionData = decodedData?.description;
+      imageData = decodedData?.image;
     }
     return {
       name: nameData,
       legal: legalData,
       website: websiteData,
+      image: imageData,
       description: descriptionData,
       identityData: identity.isSome ? identity.unwrap().toJSON() : null,
       rawIdentity: addressString,
