@@ -9,7 +9,6 @@ import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
 import truncate from '../../../../utils/truncate';
 import Button from '../../../Button/Button';
 import ColorAvatar from '../../../ColorAvatar';
-import ColorCover from '../../../ColorCover';
 import sanitizeUrlHelper from '../../../../utils/sanitizeUrlHelper';
 import styles from '../../styles.module.scss';
 import EllipsisModal from '../../../Modals/EllipsisModal';
@@ -22,9 +21,7 @@ function PoliticanCard({
 }) {
   const isBigScreen = useMediaQuery('(min-width: 1600px)');
   return isBigScreen && !isSelected ? (
-    <Card
-      cover={<ColorCover name={politician.name} width={200} height={300} />}
-    >
+    <Card>
       <Flex align="stretch" vertical gap="16px">
         <Card.Meta
           title={(
@@ -63,7 +60,6 @@ function PoliticanCard({
     <Card
       size="small"
       className={styles.candidate}
-      cover={<ColorCover name={politician.name} width="100%" height={5} />}
     >
       <Flex vertical gap="15px">
         <Flex wrap gap="15px" align="center">
