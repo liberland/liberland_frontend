@@ -40,7 +40,10 @@ function CongressionalCountdown({ termDuration }) {
             {format(untilEnd, 'd. M. yyyy')}
             {' '}
             (
-            {formatDuration(duration)}
+            {formatDuration(duration, {
+              format: ['years', 'months', 'days', 'hours', 'minutes'],
+              zero: false,
+            })}
             )
           </time>
         )}
