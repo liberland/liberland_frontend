@@ -33,32 +33,31 @@ function CongressionalCountdown({ termDuration }) {
     <Flex vertical gap="20px">
       <Card
         size="small"
-        title={`Election ends in ${formatDuration(duration)}`}
+        title={(
+          <time dateTime={untilEnd.toString()}>
+            Election ends at
+            {' '}
+            {format(untilEnd, 'd. M. yyyy')}
+            {' '}
+            (
+            {formatDuration(duration)}
+            )
+          </time>
+        )}
         className={styles.countdown}
       >
-        <Card.Meta
-          description={(
-            <>
-              Congress elections are ongoing and citizens votes will be tallied on
-              {' '}
-              <time dateTime={untilEnd.toString()}>
-                Election end date:
-                {' '}
-                {format(untilEnd, 'd. M. yyyy')}
-              </time>
-            </>
-          )}
-        />
         <Progress type="line" trailColor="#ECEBF0" strokeColor="#EDC007" percent={ratio} />
       </Card>
       <Result
         status="warning"
         className="warning-result"
         title="Phragmen algorithm"
+        icon={null}
         subTitle={(
           <>
             Liberland uses the Phragmen algorithm to tally votes.
-            Your votes will be distributed among your preferred candidates in the order set below.
+            You can vote for multiple candidates and your votes are distributed
+            to ensure that as many of your selected candidates get elected.
           </>
         )}
       />

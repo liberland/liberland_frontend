@@ -46,9 +46,8 @@ export default {
   },
   voting: {
     congressionalAssembly: '/home/voting/congressional-assembly',
-    candidates: '/home/voting/candidates',
+    candidates: '/home/voting/election',
     votes: '/home/voting/my-votes',
-    information: '/home/voting/info',
     referendum: '/home/voting/referendum',
     proposalItem: '/home/voting/proposal/:id',
     referendumItem: '/home/voting/referendum/:referendumHash',

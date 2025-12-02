@@ -35,11 +35,6 @@ function Voting() {
         component={loader(() => import('./CongressionalAssembly/Votes'))}
       />
       <Route
-        exact
-        path={router.voting.information}
-        component={loader(() => import('./CongressionalAssembly/Information'))}
-      />
-      <Route
         path={router.voting.proposalItem}
         component={loader(() => import('./Referendum/Items/ProposalPage'))}
       />

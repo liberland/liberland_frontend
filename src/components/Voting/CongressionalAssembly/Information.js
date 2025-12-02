@@ -27,7 +27,7 @@ function CongressionalAssemble() {
   return (
     <Flex vertical gap="16px">
       <Title level={2}>
-        Information
+        Election details
       </Title>
       {termDuration && (
         <CongressionalCountdown termDuration={termDuration.toNumber()} />
@@ -53,7 +53,7 @@ function CongressionalAssemble() {
                 window.location.href = 'https://docs.liberland.org/primers/congress';
               }}
             >
-              Learn how
+              Apply to congress
               <Space />
               <GlobalOutlined />
             </Button>,

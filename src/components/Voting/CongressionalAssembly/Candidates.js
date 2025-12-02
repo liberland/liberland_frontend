@@ -39,7 +39,7 @@ function Candidates() {
     api.success(text);
   };
 
-  const { selectedCandidates, eligibleUnselectedCandidates } = useMemo(() => {
+  const { selectedCandidates, markedCandidates } = useMemo(() => {
     const {
       currentCongressMembers, candidates, runnersUp, currentCandidateVotesByUser,
     } = democracy?.democracy || {};
@@ -53,17 +53,23 @@ function Candidates() {
       (currentCandidateVotesByUser || []).map((votedForCandidate) => votedForCandidate.rawIdentity),
     );
 
-    const filteredEligibleUnselectedCandidates = allMembers.filter(
-      (member) => !votedForRawIdentities.has(member.rawIdentity),
+    const marked = allMembers.map(
+      (member) => ({ ...member, votedFor: votedForRawIdentities.has(member.rawIdentity) }),
     );
     return {
       selectedCandidates: currentCandidateVotesByUser,
-      eligibleUnselectedCandidates: filteredEligibleUnselectedCandidates,
+      markedCandidates: marked,
     };
   }, [democracy]);
 
   const selectCandidate = (politician) => {
     const newList = [...selectedCandidates, politician];
+    handleUpdate(newList);
+  };
+
+  const removeCandidate = (politician) => {
+    const newList = selectedCandidates
+      .filter(({ rawIdentity }) => rawIdentity !== politician.rawIdentity);
     handleUpdate(newList);
   };
 
@@ -75,7 +81,7 @@ function Candidates() {
     dispatch(democracyActions.getDemocracy.call());
   }, [dispatch]);
 
-  const clearButton = eligibleUnselectedCandidates?.length > 0 ? (
+  const clearButton = markedCandidates?.length > 0 ? (
     <Button
       red
       onClick={() => {
@@ -91,7 +97,7 @@ function Candidates() {
       {context}
       <Flex justify="space-between" gap="24px" align="center">
         <Title level={2}>
-          Candidates
+          Election
         </Title>
         {isBiggerThanSmallScreen && clearButton}
       </Flex>
@@ -99,23 +105,24 @@ function Candidates() {
       <Paragraph className={styles.paragraph}>
         This page allows citizens to
         {' '}
-        <strong>cast their vote for representatives of the Liberland Congressional Assembly</strong>
+        <strong>cast their vote for representatives of the Liberland Congress</strong>
         {' '}
         , ensuring that every vote reflects the voter’s prioritized choice within the nation’s representative framework.
       </Paragraph>
       <Flex vertical gap="8px">
         <List
-          dataSource={eligibleUnselectedCandidates}
+          dataSource={markedCandidates}
           locale={{ emptyText: <div className={styles.none}>No eligible candidates found</div> }}
           className="compactList"
           split={false}
           bordered={false}
           grid={isLargeScreen ? { column: isVeryLargeScreen ? 4 : 2 } : undefined}
-          renderItem={(unSelectedCandidate) => (
+          renderItem={(marked) => (
             <List.Item>
               <CandidateCard
-                politician={unSelectedCandidate}
+                politician={marked}
                 selectCandidate={selectCandidate}
+                removeCandidate={removeCandidate}
               />
             </List.Item>
           )}

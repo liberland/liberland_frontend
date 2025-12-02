@@ -39,7 +39,7 @@ function Votes() {
     <Flex vertical gap="24px">
       <Flex justify="space-between" gap="24px" align="center">
         <Title level={2}>
-          Candidates
+          My Votes
         </Title>
         {isBiggerThanSmallScreen
           && selectedCandidates?.length > 0
@@ -51,7 +51,7 @@ function Votes() {
       <Paragraph className={styles.paragraph}>
         This page allows citizens to
         {' '}
-        <strong>rank-order their votes for representatives of the Liberland Congressional Assembly</strong>
+        <strong>rank-order their votes for representatives of the Liberland Congress</strong>
       </Paragraph>
       <Flex vertical gap="8px">
         <List

@@ -4,9 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import Flex from 'antd/es/flex';
 import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
+import Link from 'antd/es/typography/Link';
 import { democracySelectors } from '../../../redux/selectors';
 import CurrentAssembly from './CurrentAssembly';
 import { democracyActions } from '../../../redux/actions';
+import Information from './Information';
 import styles from '../styles.module.scss';
 
 function CongressionalAssembly() {
@@ -20,16 +22,24 @@ function CongressionalAssembly() {
   return (
     <Flex vertical gap="24px">
       <Title level={2}>
-        Acting congressional assembly
+        Congress
       </Title>
       <Paragraph className={styles.paragraph}>
-        This menu allows you to delegate your citizen authority to the Liberland Congressional Assembly.
-        By selecting this option, you empower the Assembly to act on your behalf in legislative
-        matters while retaining the right to rescind delegation at any time.
+        Current congress members.
+        Congress sets the budgets and passes legislation,
+        which needs to be confirmed via public referendum.
+        You can delegate your referendum votes to a congress member.
+        Learn more
+        {' '}
+        <Link href="https://docs.liberland.org/blockchain/for-citizens/become-congressmen">
+          here
+        </Link>
+        .
       </Paragraph>
       <CurrentAssembly
         currentCongressMembers={democracy?.democracy?.currentCongressMembers || []}
       />
+      <Information />
     </Flex>
   );
 }

@@ -4,8 +4,14 @@
 .none {
   color: var(--main-color)
 }
+.votedFor {
+  box-shadow: 0px 0px 3px $primary2,0px 0px 3px $primary2,0px 0px 3px $primary2;
+}
 .paragraph {
   max-width: 700px;
+}
+.paragaphContainer {
+  height: 200px;
 }
 .ribbon {
   width: 100%;
