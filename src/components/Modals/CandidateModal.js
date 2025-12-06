@@ -4,12 +4,15 @@ import Title from 'antd/es/typography/Title';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Flex from 'antd/es/flex';
 import Result from 'antd/es/result';
+import Avatar from 'antd/es/avatar';
+import GlobalOutlined from '@ant-design/icons/GlobalOutlined';
 import { useSelector } from 'react-redux';
 import Markdown from 'markdown-to-jsx';
 import Button from '../Button/Button';
 import modalWrapper from './components/ModalWrapper';
 import styles from './styles.module.scss';
 import { democracySelectors } from '../../redux/selectors';
+import sanitizeUrlHelper from '../../utils/sanitizeUrlHelper';
 
 function CandidateDisplay({
   onClose,
@@ -36,7 +39,14 @@ function CandidateDisplay({
 
   return (
     <Flex vertical gap="16px">
-      <Title level={3}>{politician.name}</Title>
+      <Title level={3} className={styles.politicianTitle}>
+        {politician.name}
+      </Title>
+      <Flex justify="center">
+        {politician.image && (
+          <Avatar size={64} src={politician.image} />
+        )}
+      </Flex>
       {politician.description && (
         <Paragraph>
           <Markdown
@@ -50,6 +60,14 @@ function CandidateDisplay({
       )}
       <Flex wrap gap="15px">
         {actions}
+        {politician.website && (
+          <Button primary href={sanitizeUrlHelper(politician.website)} newTab>
+            <Flex gap="15px" align="center">
+              <GlobalOutlined />
+              Learn more
+            </Flex>
+          </Button>
+        )}
         <Button
           onClick={onClose}
         >

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -55,7 +55,7 @@ function OnchainIdentityForm({
         onChainIdentity,
         hasUserWarn: parseCitizenshipJudgement(judgements),
         description: decodedData.description ?? '',
-        image: decodedData?.image ? [decodedData.image] : [],
+        image: decodedData?.image ? [{ response: decodedData.image }] : [],
       };
     }
     return {
@@ -74,6 +74,12 @@ function OnchainIdentityForm({
     setPreviewImage,
     previewImage,
   } = useUploader();
+
+  useEffect(() => {
+    if (defaultValues.image?.[0]?.response) {
+      setPreviewImage(defaultValues.image[0].response);
+    }
+  }, [defaultValues.image, setPreviewImage]);
 
   return (
     <Form
