@@ -94,6 +94,7 @@ function CreatEditNFTForm({
         uploadImageWithLink={uploadImageWithLink}
         previewImage={previewImage}
         uploading={uploading}
+        required
       />
       <Paragraph>
         Will ask you to sign 2 transactions

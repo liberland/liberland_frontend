@@ -21,13 +21,14 @@ function Uploader({
   setPreviewImage,
   uploadImageWithLink,
   label,
+  required,
 }) {
   return (
     <Form.Item
       name={name}
       valuePropName="fileList"
       label={label || 'Upload image'}
-      rules={[{ required: true }]}
+      rules={required ? [{ required: true }] : undefined}
       getValueFromEvent={getFileFromEvent}
     >
       <Upload.Dragger
@@ -64,6 +65,7 @@ Uploader.propTypes = {
   setPreviewImage: PropTypes.func.isRequired,
   uploadImageWithLink: PropTypes.func.isRequired,
   label: PropTypes.string,
+  required: PropTypes.bool,
 };
 
 export default Uploader;
