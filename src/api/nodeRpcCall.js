@@ -596,10 +596,11 @@ const provideJudgementAndAssets = async ({
 
 const getAdditionals = (itemData, key) => {
   const chunks = [];
-  for (let i = 0; i < itemData.length; i += 32) {
+  const buffer = Buffer.from(itemData, 'utf-8');
+  for (let i = 0; i < buffer.length; i += 32) {
     chunks.push([
       { Raw: key },
-      { Raw: itemData.substr(i, 32) },
+      { Raw: buffer.slice(i, i + 32).toString('utf-8') },
     ]);
   }
   return chunks;
@@ -654,7 +655,7 @@ const buildAdditionals = (values, blockNumber) => {
 
   additionalItems.map((item) => {
     const itemData = values[item];
-    if (itemData && itemData.length > 32) {
+    if (itemData && Buffer.from(itemData, 'utf-8').length > 32) {
       additionals.push(
         ...getAdditionals(itemData, item),
       );
@@ -667,7 +668,13 @@ const buildAdditionals = (values, blockNumber) => {
 
 const setIdentity = async (values, walletAddress) => {
   const asData = (v) => (v ? { Raw: v } : null);
-  const truncate = (v) => (v?.length > 32 ? v.substring(0, 32) : v);
+  const truncate = (v) => {
+    if (!v) {
+      return undefined;
+    }
+    const buffer = Buffer.from(v, 'utf-8');
+    return buffer.slice(0, 32).toString('utf-8');
+  };
   const api = await getApi();
   const blockNumber = await api.derive.chain.bestNumber();
   const info = {
