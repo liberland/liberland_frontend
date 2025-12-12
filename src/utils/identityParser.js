@@ -111,3 +111,84 @@ export function decodeAndFilter(info, params) {
   const parsedInfo = parseInfo(info, decoded, params);
   return parsedInfo;
 }
+
+export function getProfileIdentityData({
+  identity,
+  blockNumber,
+}) {
+  const { judgements, info } = identity?.isSome ? identity.unwrap() : {};
+  const date_of_birth = parseDOB(info?.additional, blockNumber);
+  const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description', 'image']);
+  return [
+    {
+      dataFunction: () => decodedData?.display,
+      title: 'Display',
+      isDataToShow: true,
+    },
+    {
+      dataFunction: () => decodedData?.legal,
+      title: 'Legal',
+      isDataToShow: true,
+    },
+    {
+      dataFunction: () => decodedData?.web,
+      title: 'Web',
+      isDataToShow: true,
+    },
+    {
+      dataFunction: () => decodedData?.email,
+      title: 'Email',
+      isDataToShow: true,
+    },
+    {
+      dataFunction: () => decodedData?.image,
+      title: 'Avatar',
+      isDataToShow: true,
+      isImage: true,
+    },
+    {
+      dataFunction: () => (date_of_birth === false ? 'old enough to vote' : date_of_birth),
+      title: 'Date of birth',
+      isDataToShow: true,
+    },
+    {
+      dataFunction: () => parseAdditionalFlag(info?.additional, 'citizen'),
+      title: 'Citizen',
+      isDataToShow: false,
+    },
+    {
+      dataFunction: () => parseAdditionalFlag(info?.additional, 'eresident'),
+      title: 'E-resident',
+      isDataToShow: false,
+    },
+    {
+      dataFunction: () => parseAdditionalFlag(info?.additional, 'company'),
+      title: 'Company',
+      isDataToShow: false,
+    },
+    {
+      dataFunction: () => decodedData?.description,
+      title: 'Description',
+      isDataToShow: true,
+      isMarkdown: true,
+    },
+    {
+      dataFunction: () => parseCitizenshipJudgement(judgements),
+      title: 'Identity confirmed',
+      isDataToShow: false,
+    },
+  ];
+}
+
+export function getIdentityRank({
+  identity,
+  blockNumber,
+}) {
+  const dataFunctions = getProfileIdentityData({
+    identity,
+    blockNumber,
+  });
+  return dataFunctions
+    .map(({ dataFunction }) => dataFunction())
+    .reduce((rank, current) => (current ? 1 : 0) + rank, 0);
+}

@@ -13,12 +13,14 @@ import CandidateCard from './CandidateCard';
 import Button from '../../Button/Button';
 import styles from '../styles.module.scss';
 import truncate from '../../../utils/truncate';
+import { getIdentityRank } from '../../../utils/identityParser';
 
 function Candidates() {
   const dispatch = useDispatch();
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
+  const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   const isLargeScreen = useMediaQuery('(min-width: 1600px)');
@@ -48,7 +50,19 @@ function Candidates() {
       ...(currentCongressMembers || []),
       ...(candidates || []),
       ...(runnersUp || []),
-    ];
+    ].sort((aMember, bMember) => {
+      const aFilled = getIdentityRank({
+        identity: aMember,
+        blockNumber,
+      });
+      const bFilled = getIdentityRank({
+        identity: bMember,
+        blockNumber,
+      });
+      return bFilled === aFilled
+        ? bMember.rawIdentity.localeCompare(aMember.rawIdentity)
+        : bFilled - aFilled;
+    });
     const votedForRawIdentities = new Set(
       (currentCandidateVotesByUser || []).map((votedForCandidate) => votedForCandidate.rawIdentity),
     );
@@ -60,7 +74,7 @@ function Candidates() {
       selectedCandidates: currentCandidateVotesByUser,
       markedCandidates: marked,
     };
-  }, [democracy]);
+  }, [democracy, blockNumber]);
 
   const selectCandidate = (politician) => {
     const newList = [...selectedCandidates, politician];

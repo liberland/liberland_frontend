@@ -21,10 +21,7 @@ import liberlandEmblemImage from '../../assets/images/liberlandEmblem.svg';
 import UpdateProfile from './UpdateProfile';
 import { blockchainActions, identityActions, onBoardingActions } from '../../redux/actions';
 import {
-  parseDOB,
-  parseAdditionalFlag,
-  parseCitizenshipJudgement,
-  decodeAndFilter,
+  getProfileIdentityData,
 } from '../../utils/identityParser';
 import CopyIconWithAddress from '../CopyIconWithAddress';
 import truncate from '../../utils/truncate';
@@ -61,76 +58,16 @@ function Profile() {
   // eslint-disable-next-line no-unsafe-optional-chaining
   const lockBlocks = walletInfo?.balances?.electionLock - blockNumber;
   const lockDays = lockBlocks > 0 ? (lockBlocks * 6) / 3600 / 24 : 0;
+  const displayName = userName && lastName ? `${userName} ${lastName}` : '';
+  const onChainIdenityList = React.useMemo(() => getProfileIdentityData({
+    blockNumber,
+    identity,
+  }), [blockNumber, identity]);
 
   useEffect(() => {
     dispatch(identityActions.getIdentity.call(walletAddress));
     dispatch(onBoardingActions.getEligibleForComplimentaryLld.call());
   }, [liquidDollars, dispatch, walletAddress]);
-
-  const { judgements, info } = identity?.isSome ? identity.unwrap() : {};
-  const date_of_birth = parseDOB(info?.additional, blockNumber);
-
-  const displayName = userName && lastName ? `${userName} ${lastName}` : '';
-  const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description', 'image']);
-  const onChainIdenityList = [
-    {
-      dataFunction: () => decodedData?.display,
-      title: 'Display',
-      isDataToShow: true,
-    },
-    {
-      dataFunction: () => decodedData?.legal,
-      title: 'Legal',
-      isDataToShow: true,
-    },
-    {
-      dataFunction: () => decodedData?.web,
-      title: 'Web',
-      isDataToShow: true,
-    },
-    {
-      dataFunction: () => decodedData?.email,
-      title: 'Email',
-      isDataToShow: true,
-    },
-    {
-      dataFunction: () => decodedData?.image,
-      title: 'Avatar',
-      isDataToShow: true,
-      isImage: true,
-    },
-    {
-      dataFunction: () => (date_of_birth === false ? 'old enough to vote' : date_of_birth),
-      title: 'Date of birth',
-      isDataToShow: true,
-    },
-    {
-      dataFunction: () => parseAdditionalFlag(info?.additional, 'citizen'),
-      title: 'Citizen',
-      isDataToShow: false,
-    },
-    {
-      dataFunction: () => parseAdditionalFlag(info?.additional, 'eresident'),
-      title: 'E-resident',
-      isDataToShow: false,
-    },
-    {
-      dataFunction: () => parseAdditionalFlag(info?.additional, 'company'),
-      title: 'Company',
-      isDataToShow: false,
-    },
-    {
-      dataFunction: () => decodedData?.description,
-      title: 'Description',
-      isDataToShow: true,
-      isMarkdown: true,
-    },
-    {
-      dataFunction: () => parseCitizenshipJudgement(judgements),
-      title: 'Identity confirmed',
-      isDataToShow: false,
-    },
-  ];
 
   const handleGetFreeLLD = () => {
     dispatch(onBoardingActions.claimComplimentaryLld.call());
@@ -162,16 +99,11 @@ function Profile() {
           key: 'account',
           label: displayName || 'Account',
           extra: (
-            <Flex wrap gap="15px">
-              <Button disabled>
-                Edit
-              </Button>
-              <img
-                className={styles.liberlandLogo}
-                src={liberlandEmblemImage}
-                alt="liberlandEmblem"
-              />
-            </Flex>
+            <img
+              className={styles.liberlandLogo}
+              src={liberlandEmblemImage}
+              alt="liberlandEmblem"
+            />
           ),
           children: (
             <Flex vertical gap="20px">
