@@ -20,7 +20,6 @@ function Candidates() {
   const userWalletAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
-  const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   const isLargeScreen = useMediaQuery('(min-width: 1600px)');
@@ -53,11 +52,9 @@ function Candidates() {
     ].sort((aMember, bMember) => {
       const aFilled = getIdentityRank({
         identity: aMember,
-        blockNumber,
       });
       const bFilled = getIdentityRank({
         identity: bMember,
-        blockNumber,
       });
       return bFilled === aFilled
         ? bMember.rawIdentity.localeCompare(aMember.rawIdentity)
@@ -74,7 +71,7 @@ function Candidates() {
       selectedCandidates: currentCandidateVotesByUser,
       markedCandidates: marked,
     };
-  }, [democracy, blockNumber]);
+  }, [democracy]);
 
   const selectCandidate = (politician) => {
     const newList = [...selectedCandidates, politician];

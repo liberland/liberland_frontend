@@ -1,17 +1,22 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import Title from 'antd/es/typography/Title';
+import Flex from 'antd/es/flex';
 import { officesSelectors } from '../../../redux/selectors';
 import CompanyRequest from './CompanyRequest';
 import CompanyForm from './CompanyForm';
 import CompanyRegistration from './CompanyRegistration';
+import CompanyRequestList from './CompanyRequestList';
 
 function CompanyRegistry() {
   const request = useSelector(officesSelectors.selectorCompanyRequest);
   const registration = useSelector(officesSelectors.selectorCompanyRegistration);
   return (
     <>
-      <CompanyForm />
+      <Flex vertical gap="32px">
+        <CompanyForm />
+        <CompanyRequestList />
+      </Flex>
       {registration && (
         <>
           <Title level={4}>Currently registered data:</Title>

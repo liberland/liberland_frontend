@@ -94,6 +94,7 @@ export default function* rootSaga() {
     registriesSagas.requestEditCompanyRegistrationWatcher(),
     registriesSagas.cancelCompanyRequestWatcher(),
     registriesSagas.requestUnregisterCompanyRegistrationWatcher(),
+    registriesSagas.fetchCompanyRequestsWatcher(),
 
     // VALIDATOR
     validatorSagas.payoutWatcher(),

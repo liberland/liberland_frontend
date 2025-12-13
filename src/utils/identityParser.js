@@ -182,13 +182,15 @@ export function getProfileIdentityData({
 
 export function getIdentityRank({
   identity,
-  blockNumber,
 }) {
-  const dataFunctions = getProfileIdentityData({
-    identity,
-    blockNumber,
-  });
-  return dataFunctions
-    .map(({ dataFunction }) => dataFunction())
+  const idParts = [
+    identity?.display,
+    identity?.legal,
+    identity?.web,
+    identity?.email,
+    identity?.image,
+    identity?.description,
+  ];
+  return idParts
     .reduce((rank, current) => (current ? 1 : 0) + rank, 0);
 }
