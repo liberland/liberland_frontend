@@ -6,6 +6,7 @@ const initialState = {
   isGetRegistries: false,
   unobtrusive: false,
   officialRegistryEntries: [],
+  companyRequests: [],
 };
 
 const registriesReducer = handleActions({
@@ -25,6 +26,7 @@ const registriesReducer = handleActions({
     registriesActions.requestAssetDeleteAction.call,
     registriesActions.registerAssetAction.call,
     registriesActions.cancelCompanyRequest.call,
+    registriesActions.fetchCompanyRequests.call,
   )]: (state) => ({
     ...state,
     isGetRegistries: true,
@@ -32,6 +34,7 @@ const registriesReducer = handleActions({
   [combineActions(
     registriesActions.getOfficialUserRegistryEntries.call,
     registriesActions.getOfficialRegistryEntries.call,
+    registriesActions.fetchCompanyRequests.call,
   )]: (state) => ({
     ...state,
     unobtrusive: true,
@@ -54,6 +57,8 @@ const registriesReducer = handleActions({
     registriesActions.cancelCompanyRequest.failure,
     registriesActions.getOfficialRegistryEntries.success,
     registriesActions.getOfficialRegistryEntries.failure,
+    registriesActions.fetchCompanyRequests.success,
+    registriesActions.fetchCompanyRequests.failure,
   )]: (state) => ({
     ...state,
     isGetRegistries: false,
@@ -63,9 +68,17 @@ const registriesReducer = handleActions({
     ...state,
     officialUserRegistryEntries: [],
   }),
+  [registriesActions.fetchCompanyRequests.call]: (state) => ({
+    ...state,
+    companyRequests: [],
+  }),
   [registriesActions.getOfficialUserRegistryEntries.success]: (state, action) => ({
     ...state,
     officialUserRegistryEntries: action.payload,
+  }),
+  [registriesActions.fetchCompanyRequests.success]: (state, action) => ({
+    ...state,
+    companyRequests: action.payload,
   }),
   [registriesActions.getOfficialRegistryEntries.call]: (state) => ({
     ...state,

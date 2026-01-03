@@ -43,8 +43,10 @@ function UpdateProfile({
       legal: values.legal,
       web: values.web,
       email: values.email,
+      image: values.image?.[0]?.response,
       onChainIdentity: values.onChainIdentity,
       eligible_on,
+      description: values.description || '',
     };
 
     dispatch(

@@ -3,6 +3,7 @@ import { createActions } from 'redux-actions';
 export const {
   getOfficialRegistryEntries,
   getOfficialUserRegistryEntries,
+  fetchCompanyRequests,
   requestCompanyRegistrationAction,
   requestCompanyEditAction,
   requestCompanyDeleteAction,
@@ -24,6 +25,11 @@ export const {
     failure: undefined,
   },
   GET_OFFICIAL_USER_REGISTRY_ENTRIES: {
+    call: undefined,
+    success: undefined,
+    failure: undefined,
+  },
+  FETCH_COMPANY_REQUESTS: {
     call: undefined,
     success: undefined,
     failure: undefined,

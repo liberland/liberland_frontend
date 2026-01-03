@@ -16,7 +16,7 @@ import {
   setRegisteredCompanyData,
 } from '../../api/nodeRpcCall';
 
-import { blockchainActions, officesActions } from '../actions';
+import { blockchainActions, officesActions, registriesActions } from '../actions';
 import { blockchainWatcher } from './base';
 import { blockchainSelectors } from '../selectors';
 import router from '../../router';
@@ -93,6 +93,7 @@ function* getCompanyRegistrationWorker(action) {
 function* registerCompanyWorker(action) {
   yield call(registerCompany, action.payload);
   yield put(officesActions.registerCompany.success());
+  yield put(registriesActions.fetchCompanyRequests.call());
   yield put(officesActions.getCompanyRequest.call(action.payload.entity_id));
   yield put(officesActions.getCompanyRegistration.call(action.payload.entity_id));
 }
@@ -128,6 +129,7 @@ function* unregisterCompanyWorker(action) {
     action.payload.soft,
     walletAddress,
   );
+  yield put(registriesActions.fetchCompanyRequests.call());
   yield put(officesActions.getCompanyRequest.call(action.payload.entityId));
   yield put(officesActions.unregisterCompany.success());
 }

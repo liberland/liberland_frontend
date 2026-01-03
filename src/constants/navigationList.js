@@ -59,7 +59,9 @@ export const navigationList = [
     icon: PoliticsIcon,
     isDiscouraged: process.env.REACT_APP_IS_VOTING_DISCOURAGED === 'true',
     subLinks: {
-      'Congressional Assemble': router.voting.congressionalAssemble,
+      Congress: router.voting.congressionalAssembly,
+      Election: router.voting.candidates,
+      'My votes': router.voting.votes,
       Referendum: router.voting.referendum,
       'Propose legislation': router.voting.addLegislation,
     },
@@ -140,7 +142,7 @@ export const navigationList = [
       'Land registry': router.offices.landRegistry,
       Finances: router.offices.finances,
       'Scheduled Congress Spending': router.offices.scheduledCongressSpending,
-      'Tax Payers': router.offices.taxPayers,
+      // 'Tax Payers': router.offices.taxPayers, TODO: Maybe fix in the future, currently just hide quietly from users
       'Top LLD Holders': router.offices.topHolders,
     },
   },
