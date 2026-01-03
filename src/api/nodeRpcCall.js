@@ -2700,12 +2700,41 @@ const removeLiquidity = async (
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+const getCompanyOwnershipMap = async (api) => {
+  const ownership = await api.query.companyRegistry.ownerEntities.entries();
+  const ownedList = ownership.map(([key]) => key.toHuman());
+  return ownedList.reduce((acc, [walletAddress, companyId]) => {
+    acc[companyId] = walletAddress;
+    return acc;
+  }, {});
+};
+
 const fetchCompanyRequests = async () => {
   const api = await getApi();
+  const ownership = await getCompanyOwnershipMap(api);
   const raw = await api.query.companyRegistry.requests.entries();
-  return raw.map((rawEntry) => ({
-    indexes: rawEntry[0].toHuman(),
-  }));
+  return raw.map((rawEntry) => {
+    const [requestIndex, companyId] = rawEntry[0].toHuman();
+    const owner = ownership[companyId];
+    return {
+      indexes: [requestIndex, companyId],
+      owner,
+      data: (() => {
+        const unpacked = rawEntry[1].unwrapOrDefault(null)?.unwrapOrDefault(null)?.data;
+        if (!unpacked) {
+          return undefined;
+        }
+        try {
+          return api.createType(
+            'CompanyData',
+            pako.inflate(unpacked),
+          );
+        } catch {
+          return undefined;
+        }
+      })(),
+    };
+  });
 };
 
 const handleContractData = (data) => {

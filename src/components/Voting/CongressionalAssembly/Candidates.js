@@ -13,6 +13,7 @@ import CandidateCard from './CandidateCard';
 import Button from '../../Button/Button';
 import styles from '../styles.module.scss';
 import truncate from '../../../utils/truncate';
+import { getIdentityRank } from '../../../utils/identityParser';
 
 function Candidates() {
   const dispatch = useDispatch();
@@ -48,7 +49,17 @@ function Candidates() {
       ...(currentCongressMembers || []),
       ...(candidates || []),
       ...(runnersUp || []),
-    ];
+    ].sort((aMember, bMember) => {
+      const aFilled = getIdentityRank({
+        identity: aMember,
+      });
+      const bFilled = getIdentityRank({
+        identity: bMember,
+      });
+      return bFilled === aFilled
+        ? bMember.rawIdentity.localeCompare(aMember.rawIdentity)
+        : bFilled - aFilled;
+    });
     const votedForRawIdentities = new Set(
       (currentCandidateVotesByUser || []).map((votedForCandidate) => votedForCandidate.rawIdentity),
     );
