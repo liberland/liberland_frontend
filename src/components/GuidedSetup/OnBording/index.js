@@ -41,6 +41,7 @@ function OnBoarding({ setIsSkippedOnBoardingGetLLD }) {
   const lastName = useSelector(userSelectors.selectUserFamilyName);
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
   const identity = useSelector(identitySelectors.selectorIdentity);
+  const resident = useSelector(onboardingSelectors.selectorResident);
   const ineligibleForComplimentaryLLDReason = useSelector(
     onboardingSelectors.selectorIneligibleForComplimentaryLLDReason,
   );
@@ -101,6 +102,7 @@ function OnBoarding({ setIsSkippedOnBoardingGetLLD }) {
           identity={identity}
           lastName={lastName}
           userName={userName}
+          resident={resident}
         />
         <Button
           onClick={() => {

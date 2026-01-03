@@ -18,6 +18,7 @@ import {
   parseCitizenshipJudgement,
   decodeAndFilter,
 } from '../../utils/identityParser';
+import { residentType } from './utils';
 import MarkdownEditor from '../MarkdownEditor';
 import { useUploader } from '../../hooks/useUploader';
 import Uploader from '../Uploader';
@@ -27,9 +28,22 @@ function OnchainIdentityForm({
   onClose,
   identity,
   blockNumber,
+  resident,
   name,
 }) {
   const defaultValues = useMemo(() => {
+    const resName = resident && (resident.givenName || resident.familyName)
+      ? `${resident.givenName} ${resident.familyName}`
+      : undefined;
+    const residentModel = {
+      display: resName,
+      legal: resName,
+      web: resident?.companyUrl,
+      email: resident?.user?.email,
+      date_of_birth: resident?.birthdate ? dayjs(resident?.birthdate) : undefined,
+      onChainIdentity: resident?.isCitizen ? 'citizen' : 'neither',
+      older_than_15: resident?.birthdate ? dayjs().diff(dayjs(resident?.birthdate), 'year') >= 15 : undefined,
+    };
     if (identity.isSome) {
       const { judgements, info } = identity.unwrap();
       const identityCitizen = parseAdditionalFlag(info.additional, 'citizen');
@@ -46,13 +60,13 @@ function OnchainIdentityForm({
       const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description', 'image']);
 
       return {
-        display: decodedData?.display ?? name,
-        legal: decodedData?.legal ?? name,
-        web: decodedData?.web,
-        email: decodedData?.email,
-        date_of_birth: dayjs(identityDOB) ?? undefined,
-        older_than_15: !identityDOB,
-        onChainIdentity,
+        display: decodedData?.display ?? name ?? residentModel.display,
+        legal: decodedData?.legal ?? name ?? residentModel.legal,
+        web: decodedData?.web ?? residentModel.web,
+        email: decodedData?.email ?? residentModel.email,
+        date_of_birth: dayjs(identityDOB) ?? residentModel.date_of_birth,
+        older_than_15: !identityDOB || residentModel.older_than_15,
+        onChainIdentity: onChainIdentity === 'neither' ? residentModel.onChainIdentity : onChainIdentity,
         hasUserWarn: parseCitizenshipJudgement(judgements),
         description: decodedData.description ?? '',
         image: decodedData?.image ? [{ response: decodedData.image }] : [],
@@ -60,8 +74,9 @@ function OnchainIdentityForm({
     }
     return {
       hasUserWarn: false,
+      ...residentModel,
     };
-  }, [identity, blockNumber, name]);
+  }, [identity, blockNumber, name, resident]);
 
   const [form] = Form.useForm();
 
@@ -207,6 +222,7 @@ OnchainIdentityForm.propTypes = {
     unwrap: PropTypes.func.isRequired,
   }).isRequired,
   blockNumber: PropTypes.number.isRequired,
+  resident: residentType,
   name: PropTypes.string.isRequired,
 };
 

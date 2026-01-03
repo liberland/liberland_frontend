@@ -39,7 +39,13 @@ function GuidedSetup({ children }) {
   );
 
   const isLoadingUser = useSelector(userSelectors.selectIsLoading);
-  const isResident = useSelector(onboardingSelectors.selectorIsResident);
+  const resident = useSelector(onboardingSelectors.selectorResident);
+  const isNotVerified = !resident
+    || resident.isBanned
+    || !resident.eResidencyApplication
+    || !resident.eResidencyApplication.status
+    || !resident.eResidencyApplication.status.seq
+    || resident.eResidencyApplication.status.seq < 3;
 
   const isLoading = !isSessionReady || isLoadingUser || extensions === null || wallets === null;
 
@@ -105,7 +111,7 @@ function GuidedSetup({ children }) {
     );
   }
 
-  if (!notResidentAcceptedByUser && !isResident && userHasIdentity !== 'true') {
+  if (!notResidentAcceptedByUser && isNotVerified && userHasIdentity !== 'true') {
     return (
       <GuidedSetupWrapper>
         <InstructionOnBoard setIsClicked={setNotResidentAcceptedByUser} />

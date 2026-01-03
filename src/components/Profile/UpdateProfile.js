@@ -6,6 +6,7 @@ import { identityActions } from '../../redux/actions';
 import OnchainIdentityForm from './OnchainIdentityForm';
 import OpenModalButton from '../Modals/components/OpenModalButton';
 import modalWrapper from '../Modals/components/ModalWrapper';
+import { residentType } from './utils';
 
 function UpdateProfile({
   onClose,
@@ -13,6 +14,7 @@ function UpdateProfile({
   lastName,
   identity,
   blockNumber,
+  resident,
   isGuidedUpdate,
 }) {
   const dispatch = useDispatch();
@@ -62,6 +64,7 @@ function UpdateProfile({
       onClose={onClose}
       onSubmit={handleSubmitOnchainIdentity}
       identity={identity}
+      resident={resident}
       blockNumber={blockNumber}
       name={displayName}
     />
@@ -83,6 +86,7 @@ UpdateProfile.propTypes = {
     isSome: PropTypes.bool.isRequired,
     unwrap: PropTypes.func.isRequired,
   }).isRequired,
+  resident: residentType,
   blockNumber: PropTypes.number.isRequired,
 };
 

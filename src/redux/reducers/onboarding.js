@@ -8,7 +8,7 @@ const initialState = {
   unobtrusive: false,
   isLoading: false,
   claimed: false,
-  isResident: false,
+  resident: null,
 };
 
 const onboardingReducer = handleActions({
@@ -34,7 +34,7 @@ const onboardingReducer = handleActions({
     isEligibleForComplimentaryLLD: action.payload.isEligibleForComplimentaryLLD,
     ineligibleForComplimentaryLLDReason: action.payload.ineligibleForComplimentaryLLDReason,
     isSkipOnBoarding: action.payload.isSkipOnBoarding,
-    isResident: action.payload.isResident,
+    resident: action.payload.resident,
   }),
 
   [combineActions(
