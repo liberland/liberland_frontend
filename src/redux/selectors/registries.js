@@ -21,3 +21,8 @@ export const isGetRegistriesUnobtrusive = createSelector(
   registriesReducer,
   (reducer) => reducer.unobtrusive,
 );
+
+export const allCompanyRequests = createSelector(
+  registriesReducer,
+  (reducer) => reducer.companyRequests,
+);

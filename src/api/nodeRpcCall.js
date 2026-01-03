@@ -596,10 +596,11 @@ const provideJudgementAndAssets = async ({
 
 const getAdditionals = (itemData, key) => {
   const chunks = [];
-  for (let i = 0; i < itemData.length; i += 32) {
+  const buffer = Buffer.from(itemData, 'utf-8');
+  for (let i = 0; i < buffer.length; i += 32) {
     chunks.push([
       { Raw: key },
-      { Raw: itemData.substr(i, 32) },
+      { Raw: buffer.slice(i, i + 32).toString('utf-8') },
     ]);
   }
   return chunks;
@@ -650,11 +651,11 @@ const buildAdditionals = (values, blockNumber) => {
     );
   }
 
-  const additionalItems = ['legal', 'web', 'display', 'email'];
+  const additionalItems = ['legal', 'web', 'display', 'email', 'description', 'image'];
 
   additionalItems.map((item) => {
     const itemData = values[item];
-    if (itemData && itemData.length > 32) {
+    if (itemData && Buffer.from(itemData, 'utf-8').length > 32) {
       additionals.push(
         ...getAdditionals(itemData, item),
       );
@@ -667,7 +668,13 @@ const buildAdditionals = (values, blockNumber) => {
 
 const setIdentity = async (values, walletAddress) => {
   const asData = (v) => (v ? { Raw: v } : null);
-  const truncate = (v) => (v?.length > 32 ? v.substring(0, 32) : v);
+  const truncate = (v) => {
+    if (!v) {
+      return undefined;
+    }
+    const buffer = Buffer.from(v, 'utf-8');
+    return buffer.slice(0, 32).toString('utf-8');
+  };
   const api = await getApi();
   const blockNumber = await api.derive.chain.bestNumber();
   const info = {
@@ -677,7 +684,7 @@ const setIdentity = async (values, walletAddress) => {
     web: asData(truncate(values.web)),
     email: asData(truncate(values.email)),
     riot: asData(null),
-    image: asData(null),
+    image: asData(truncate(values.image)),
     twitter: asData(null),
   };
 
@@ -1096,18 +1103,24 @@ async function getIdentityDataProper(addressesIdentityData) {
     let nameData;
     let legalData;
     let websiteData;
+    let descriptionData;
+    let imageData;
     if (isIdentity) {
       const identityData = identity.unwrap();
       const { info } = identityData;
-      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal']);
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'description', 'image']);
       nameData = decodedData?.display;
       legalData = decodedData?.legal;
       websiteData = decodedData?.web;
+      descriptionData = decodedData?.description;
+      imageData = decodedData?.image;
     }
     return {
       name: nameData,
       legal: legalData,
       website: websiteData,
+      image: imageData,
+      description: descriptionData,
       identityData: identity.isSome ? identity.unwrap().toJSON() : null,
       rawIdentity: addressString,
     };
@@ -2687,12 +2700,41 @@ const removeLiquidity = async (
   return submitExtrinsic(extrinsic, walletAddress, api);
 };
 
+const getCompanyOwnershipMap = async (api) => {
+  const ownership = await api.query.companyRegistry.ownerEntities.entries();
+  const ownedList = ownership.map(([key]) => key.toHuman());
+  return ownedList.reduce((acc, [walletAddress, companyId]) => {
+    acc[companyId] = walletAddress;
+    return acc;
+  }, {});
+};
+
 const fetchCompanyRequests = async () => {
   const api = await getApi();
+  const ownership = await getCompanyOwnershipMap(api);
   const raw = await api.query.companyRegistry.requests.entries();
-  return raw.map((rawEntry) => ({
-    indexes: rawEntry[0].toHuman(),
-  }));
+  return raw.map((rawEntry) => {
+    const [requestIndex, companyId] = rawEntry[0].toHuman();
+    const owner = ownership[companyId];
+    return {
+      indexes: [requestIndex, companyId],
+      owner,
+      data: (() => {
+        const unpacked = rawEntry[1].unwrapOrDefault(null)?.unwrapOrDefault(null)?.data;
+        if (!unpacked) {
+          return undefined;
+        }
+        try {
+          return api.createType(
+            'CompanyData',
+            pako.inflate(unpacked),
+          );
+        } catch {
+          return undefined;
+        }
+      })(),
+    };
+  });
 };
 
 const handleContractData = (data) => {

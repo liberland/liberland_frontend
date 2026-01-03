@@ -15,23 +15,24 @@ function SelectedCandidateCard({
   return (
     <PoliticanCard
       politician={politician}
+      isSelected
       preActions={[
-        candidateIndex !== 0 && candidatesLength !== 1 && (
-          <Button link onClick={() => moveSelectedCandidate(politician, 'up')}>
+        candidateIndex !== 0 && candidatesLength !== 1 && moveSelectedCandidate && (
+          <Button primary link onClick={() => moveSelectedCandidate(-1)}>
             <ArrowUpOutlined aria-label="Move up" />
           </Button>
         ),
-        candidateIndex !== candidatesLength - 1 && candidatesLength !== 1 && (
-          <Button link onClick={() => moveSelectedCandidate(politician, 'down')}>
+        candidateIndex !== candidatesLength - 1 && moveSelectedCandidate && candidatesLength !== 1 && (
+          <Button red link onClick={() => moveSelectedCandidate(1)}>
             <ArrowDownOutlined aria-label="Move down" />
           </Button>
         ),
       ].filter(Boolean)}
-      actions={[
+      actions={unselectCandidate ? [
         <Button red onClick={() => unselectCandidate(politician)}>
           Remove
         </Button>,
-      ]}
+      ] : undefined}
     />
   );
 }
@@ -51,8 +52,8 @@ SelectedCandidateCard.propTypes = {
       }),
     }).isRequired,
   }).isRequired,
-  unselectCandidate: PropTypes.func.isRequired,
-  moveSelectedCandidate: PropTypes.func.isRequired,
+  unselectCandidate: PropTypes.func,
+  moveSelectedCandidate: PropTypes.func,
   candidateIndex: PropTypes.number.isRequired,
   candidatesLength: PropTypes.number.isRequired,
 };

@@ -1,0 +1,149 @@
+/* eslint-disable react/prop-types */
+import React, { useEffect, useMemo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import List from 'antd/es/list';
+import Flex from 'antd/es/flex';
+import message from 'antd/es/message';
+import Paragraph from 'antd/es/typography/Paragraph';
+import Title from 'antd/es/typography/Title';
+import { useMediaQuery } from 'usehooks-ts';
+import { blockchainSelectors, democracySelectors } from '../../../redux/selectors';
+import { democracyActions } from '../../../redux/actions';
+import CandidateCard from './CandidateCard';
+import Button from '../../Button/Button';
+import styles from '../styles.module.scss';
+import truncate from '../../../utils/truncate';
+import { getIdentityRank } from '../../../utils/identityParser';
+
+function Candidates() {
+  const dispatch = useDispatch();
+  const userWalletAddress = useSelector(
+    blockchainSelectors.userWalletAddressSelector,
+  );
+  const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
+  const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
+  const isLargeScreen = useMediaQuery('(min-width: 1600px)');
+  const isVeryLargeScreen = useMediaQuery('(min-width: 1920px)');
+  const [api, context] = message.useMessage({
+    duration: 3,
+    maxCount: 2,
+  });
+
+  useEffect(() => {
+    dispatch(democracyActions.getDemocracy.call());
+  }, [dispatch, userWalletAddress]);
+
+  const handleUpdate = (selected) => {
+    const names = selected.map(({ name }) => truncate(name, 20)).join(', ');
+    const text = names.length > 0 ? `You current votes are: ${names}` : 'You haven\'t voted for anyone';
+    dispatch(democracyActions.voteForCongress.call({ selectedCandidates: selected, userWalletAddress }));
+    api.success(text);
+  };
+
+  const { selectedCandidates, markedCandidates } = useMemo(() => {
+    const {
+      currentCongressMembers, candidates, runnersUp, currentCandidateVotesByUser,
+    } = democracy?.democracy || {};
+
+    const allMembers = [
+      ...(currentCongressMembers || []),
+      ...(candidates || []),
+      ...(runnersUp || []),
+    ].sort((aMember, bMember) => {
+      const aFilled = getIdentityRank({
+        identity: aMember,
+      });
+      const bFilled = getIdentityRank({
+        identity: bMember,
+      });
+      return bFilled === aFilled
+        ? bMember.rawIdentity.localeCompare(aMember.rawIdentity)
+        : bFilled - aFilled;
+    });
+    const votedForRawIdentities = new Set(
+      (currentCandidateVotesByUser || []).map((votedForCandidate) => votedForCandidate.rawIdentity),
+    );
+
+    const marked = allMembers.map(
+      (member) => ({ ...member, votedFor: votedForRawIdentities.has(member.rawIdentity) }),
+    );
+    return {
+      selectedCandidates: currentCandidateVotesByUser,
+      markedCandidates: marked,
+    };
+  }, [democracy]);
+
+  const selectCandidate = (politician) => {
+    const newList = [...selectedCandidates, politician];
+    handleUpdate(newList);
+  };
+
+  const removeCandidate = (politician) => {
+    const newList = selectedCandidates
+      .filter(({ rawIdentity }) => rawIdentity !== politician.rawIdentity);
+    handleUpdate(newList);
+  };
+
+  useEffect(() => {
+
+  }, [democracy]);
+
+  useEffect(() => {
+    dispatch(democracyActions.getDemocracy.call());
+  }, [dispatch]);
+
+  const clearButton = markedCandidates?.length > 0 ? (
+    <Button
+      red
+      onClick={() => {
+        handleUpdate([]);
+      }}
+    >
+      Clear my votes
+    </Button>
+  ) : null;
+
+  return (
+    <Flex vertical gap="24px">
+      {context}
+      <Flex justify="space-between" gap="24px" align="center">
+        <Title level={2}>
+          Election
+        </Title>
+        {isBiggerThanSmallScreen && clearButton}
+      </Flex>
+      {!isBiggerThanSmallScreen && clearButton}
+      <Paragraph className={styles.paragraph}>
+        This page allows citizens to
+        {' '}
+        <strong>cast their vote for representatives of the Liberland Congress</strong>
+        {' '}
+        , ensuring that every vote reflects the voter’s prioritized choice within the nation’s representative framework.
+      </Paragraph>
+      <Flex vertical gap="8px">
+        <List
+          dataSource={markedCandidates}
+          locale={{ emptyText: <div className={styles.none}>No eligible candidates found</div> }}
+          className="compactList"
+          split={false}
+          bordered={false}
+          grid={isLargeScreen ? { column: isVeryLargeScreen ? 4 : 2 } : undefined}
+          renderItem={(marked) => (
+            <List.Item>
+              <CandidateCard
+                politician={marked}
+                selectCandidate={selectCandidate}
+                removeCandidate={removeCandidate}
+              />
+            </List.Item>
+          )}
+        />
+        <div>
+          {clearButton}
+        </div>
+      </Flex>
+    </Flex>
+  );
+}
+
+export default Candidates;

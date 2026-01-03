@@ -9,6 +9,7 @@ import {
   requestEditCompanyRegistration,
   requestUnregisterCompanyRegistration,
   getOfficialRegistryEntries,
+  fetchCompanyRequests,
 } from '../../api/nodeRpcCall';
 
 import { registriesActions } from '../actions';
@@ -28,6 +29,17 @@ function* getOfficialRegistryEntriesWorker() {
     // eslint-disable-next-line no-console
     console.error(e);
     yield put(registriesActions.getOfficialRegistryEntries.failure(e));
+  }
+}
+
+function* fetchCompanyRequestsWorker() {
+  try {
+    const requests = yield call(fetchCompanyRequests);
+    yield put(registriesActions.fetchCompanyRequests.success(requests));
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+    yield put(registriesActions.fetchCompanyRequests.failure(e));
   }
 }
 
@@ -137,5 +149,12 @@ export function* requestUnregisterCompanyRegistrationWatcher() {
   yield* blockchainWatcher(
     registriesActions.requestUnregisterCompanyRegistrationAction,
     requestUnregisterCompanyRegistrationWorker,
+  );
+}
+
+export function* fetchCompanyRequestsWatcher() {
+  yield* blockchainWatcher(
+    registriesActions.fetchCompanyRequests,
+    fetchCompanyRequestsWorker,
   );
 }

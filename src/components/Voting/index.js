@@ -21,8 +21,18 @@ function Voting() {
     <Switch>
       <Route
         exact
-        path={router.voting.congressionalAssemble}
-        component={loader(() => import('./CongressionalAssemble'))}
+        path={router.voting.congressionalAssembly}
+        component={loader(() => import('./CongressionalAssembly'))}
+      />
+      <Route
+        exact
+        path={router.voting.candidates}
+        component={loader(() => import('./CongressionalAssembly/Candidates'))}
+      />
+      <Route
+        exact
+        path={router.voting.votes}
+        component={loader(() => import('./CongressionalAssembly/Votes'))}
       />
       <Route
         path={router.voting.proposalItem}
@@ -49,7 +59,7 @@ function Voting() {
         exact
         path={router.home.voting}
         render={() => (
-          <Redirect to={router.voting.congressionalAssemble} />
+          <Redirect to={router.voting.congressionalAssembly} />
         )}
       />
     </Switch>

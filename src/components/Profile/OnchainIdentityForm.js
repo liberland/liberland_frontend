@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Title from 'antd/es/typography/Title';
@@ -18,6 +18,9 @@ import {
   parseCitizenshipJudgement,
   decodeAndFilter,
 } from '../../utils/identityParser';
+import MarkdownEditor from '../MarkdownEditor';
+import { useUploader } from '../../hooks/useUploader';
+import Uploader from '../Uploader';
 
 function OnchainIdentityForm({
   onSubmit,
@@ -40,7 +43,7 @@ function OnchainIdentityForm({
       ].find(Boolean);
 
       const identityDOB = parseDOB(info.additional, blockNumber);
-      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email']);
+      const decodedData = decodeAndFilter(info, ['display', 'web', 'legal', 'email', 'description', 'image']);
 
       return {
         display: decodedData?.display ?? name,
@@ -51,6 +54,8 @@ function OnchainIdentityForm({
         older_than_15: !identityDOB,
         onChainIdentity,
         hasUserWarn: parseCitizenshipJudgement(judgements),
+        description: decodedData.description ?? '',
+        image: decodedData?.image ? [{ response: decodedData.image }] : [],
       };
     }
     return {
@@ -63,6 +68,18 @@ function OnchainIdentityForm({
   const isOlderThan15 = Form.useWatch('older_than_15', form);
   const onChainIdentity = Form.useWatch('onChainIdentity', form);
   const isUserWarnAccepted = Form.useWatch('isUserWarnAccepted', form);
+  const {
+    uploadImageWithLink,
+    uploading,
+    setPreviewImage,
+    previewImage,
+  } = useUploader();
+
+  useEffect(() => {
+    if (defaultValues.image?.[0]?.response) {
+      setPreviewImage(defaultValues.image[0].response);
+    }
+  }, [defaultValues.image, setPreviewImage]);
 
   return (
     <Form
@@ -88,6 +105,14 @@ function OnchainIdentityForm({
       <Form.Item name="email" label="E-mail" extra="Recommended, Optional">
         <Input inputMode="email" placeholder="Web address" />
       </Form.Item>
+      <Uploader
+        name="image"
+        label="Avatar"
+        setPreviewImage={setPreviewImage}
+        uploadImageWithLink={uploadImageWithLink}
+        previewImage={previewImage}
+        uploading={uploading}
+      />
       <Form.Item
         name="onChainIdentity"
         label="I am a"
@@ -102,7 +127,14 @@ function OnchainIdentityForm({
           ]}
         />
       </Form.Item>
-
+      {(onChainIdentity === 'citizen' || onChainIdentity === 'eresident') && (
+        <MarkdownEditor
+          label="Description"
+          name="description"
+          required
+          description="This information will be used if you decide to run for Congress"
+        />
+      )}
       {onChainIdentity === 'citizen' && (
         <>
           <Form.Item
