@@ -2758,9 +2758,7 @@ const getAllContracts = async () => {
     const data = handleContractData(contract?.data);
 
     const { judgesSignaturesList, partiesSignaturesList } = await getSignaturesForContracts(contractId);
-    const parties = (contract?.parties && contract?.parties.length > 0)
-      ? contract?.parties.map((party) => party.toString())
-      : [];
+    const parties = contract?.parties?.toJSON?.() || [];
     const keysArrayJudges = judgesSignaturesList.map((obj) => obj.key);
     const keysArrayParties = partiesSignaturesList.map((obj) => obj.key);
     return {

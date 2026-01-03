@@ -13,7 +13,7 @@ import { contractsActions } from '../../../../redux/actions';
 import Button from '../../../Button/Button';
 import InputSearch from '../../../InputComponents/InputSearchAddressName';
 
-export default function CreateContract({ isMyContracts, onClose }) {
+export default function CreateContract({ onClose }) {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
@@ -22,7 +22,6 @@ export default function CreateContract({ isMyContracts, onClose }) {
       contractsActions.createContract.call({
         data: data.contractData,
         parties: data.parties,
-        isMyContracts,
       }),
     );
     onClose();
@@ -80,6 +79,5 @@ export default function CreateContract({ isMyContracts, onClose }) {
 }
 
 CreateContract.propTypes = {
-  isMyContracts: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
 };

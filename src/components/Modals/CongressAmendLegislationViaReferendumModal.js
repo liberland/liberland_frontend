@@ -17,7 +17,7 @@ import LegislationHeading from '../Congress/LegislationHeading';
 import { tryParseMaybeHexFromHuman } from '../../utils/legislation';
 
 function CongressAmendLegislationViaReferendumForm({
-  closeModal,
+  onClose,
   tier,
   id,
   section,
@@ -63,7 +63,7 @@ function CongressAmendLegislationViaReferendumForm({
         fastTrackEnactmentPeriod,
       }),
     );
-    closeModal();
+    onClose();
   };
 
   return (
@@ -99,7 +99,7 @@ function CongressAmendLegislationViaReferendumForm({
       <ProposalDiscussionFields />
       <FastTrackForm form={form} />
       <Flex wrap gap="15px">
-        <Button medium onClick={closeModal}>
+        <Button medium onClick={onClose}>
           Cancel
         </Button>
         <Button primary medium type="submit">
@@ -111,7 +111,7 @@ function CongressAmendLegislationViaReferendumForm({
 }
 
 CongressAmendLegislationViaReferendumForm.propTypes = {
-  closeModal: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
   tier: PropTypes.string.isRequired,
   id: PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
