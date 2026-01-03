@@ -41,7 +41,7 @@ function OnchainIdentityForm({
       web: resident?.companyUrl,
       email: resident?.user?.email,
       date_of_birth: resident?.birthdate ? dayjs(resident?.birthdate) : undefined,
-      onChainIdentity: resident.isCitizen ? 'citizen' : 'neither',
+      onChainIdentity: resident?.isCitizen ? 'citizen' : 'neither',
       older_than_15: resident?.birthdate ? dayjs().diff(dayjs(resident?.birthdate), 'year') >= 15 : undefined,
     };
     if (identity.isSome) {
