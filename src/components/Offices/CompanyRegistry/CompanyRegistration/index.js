@@ -9,6 +9,7 @@ import Button from '../../../Button/Button';
 import { officesActions } from '../../../../redux/actions';
 import router from '../../../../router';
 import styles from './styles.module.scss';
+import CompanyEditable from '../CompanyEditable';
 
 function CompanyRegistration({ registration }) {
   const dispatch = useDispatch();
@@ -44,7 +45,10 @@ function CompanyRegistration({ registration }) {
           <code>
             <pre className={styles.code}>
               {JSON.stringify(
-                registration.registration.data.toJSON(),
+                {
+                  owner: registration.registration.owner,
+                  ...registration.registration.data.toJSON(),
+                },
                 null,
                 2,
               )}
@@ -66,11 +70,8 @@ function CompanyRegistration({ registration }) {
           Unregister company
         </Button>,
       ]}
-    >
-      Data editable by registrar:
-      {' '}
-      {registration.registration.editableByRegistrar.toString()}
-    </Card>
+      extra={<CompanyEditable editableByRegistrar={registration.registration.editableByRegistrar} />}
+    />
   );
 }
 
@@ -79,9 +80,12 @@ CompanyRegistration.propTypes = {
     invalid: PropTypes.bool,
     entity_id: PropTypes.string.isRequired,
     registration: PropTypes.shape({
-      editableByRegistrar: PropTypes.bool.isRequired,
+      editableByRegistrar: PropTypes.shape({
+        isTrue: PropTypes.bool,
+      }).isRequired,
       hash: PropTypes.arrayOf(PropTypes.number).isRequired,
       data: PropTypes.instanceOf(Map).isRequired,
+      owner: PropTypes.shape({}),
     }),
   }).isRequired,
 };
