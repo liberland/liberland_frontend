@@ -3,13 +3,12 @@ import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
-import CheckCircleFilled from '@ant-design/icons/CheckCircleFilled';
-import CloseCircleOutlined from '@ant-design/icons/CloseCircleOutlined';
 import { blockchainSelectors } from '../../../../redux/selectors';
 import UnregisterCompany from '../UnregisterCompany';
 import { officesActions } from '../../../../redux/actions';
 import Button from '../../../Button/Button';
 import styles from './styles.module.scss';
+import CompanyEditable from '../CompanyEditable';
 
 function CompanyRequest({ companyRequest }) {
   const dispatch = useDispatch();
@@ -35,7 +34,12 @@ function CompanyRequest({ companyRequest }) {
       </>
     );
   }
-  const { hash, data, editableByRegistrar } = request;
+  const {
+    hash,
+    data,
+    owner,
+    editableByRegistrar,
+  } = request;
 
   const onClick = () => {
     dispatch(officesActions.registerCompany.call({
@@ -53,7 +57,10 @@ function CompanyRequest({ companyRequest }) {
           <code className={styles.container}>
             <pre className={styles.code}>
               {JSON.stringify(
-                data.toJSON(),
+                {
+                  owner,
+                  ...data.toJSON(),
+                },
                 null,
                 2,
               )}
@@ -69,16 +76,8 @@ function CompanyRequest({ companyRequest }) {
           Register company
         </Button>,
       ]}
-      extra={editableByRegistrar.isTrue ? (
-        <CheckCircleFilled className={styles.green} />
-      ) : (
-        <CloseCircleOutlined className={styles.red} />
-      )}
-    >
-      Data editable by registrar:
-      {' '}
-      {editableByRegistrar.toString()}
-    </Card>
+      extra={<CompanyEditable editableByRegistrar={editableByRegistrar} />}
+    />
   );
 }
 
@@ -89,10 +88,13 @@ CompanyRequest.propTypes = {
     entity_id: PropTypes.string.isRequired,
     invalid: PropTypes.bool,
     request: PropTypes.shape({
-      editableByRegistrar: PropTypes.bool.isRequired,
+      editableByRegistrar: PropTypes.shape({
+        isTrue: PropTypes.bool,
+      }).isRequired,
       hash: PropTypes.arrayOf(PropTypes.number).isRequired,
       data: PropTypes.instanceOf(Map).isRequired,
       unregister: PropTypes.bool,
+      owner: PropTypes.shape({}),
     }),
   }).isRequired,
 };

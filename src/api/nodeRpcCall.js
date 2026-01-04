@@ -692,6 +692,19 @@ const setIdentity = async (values, walletAddress) => {
   return submitExtrinsic(setCall, walletAddress, api);
 };
 
+const getCompanyOwnerIdentity = async (api, entity_id) => {
+  const owner = await api.query.companyRegistry.entityOwner(entity_id);
+  const identity = await getIdentity(owner.toString());
+  const { info } = identity?.isSome ? identity.unwrap() : {};
+  const { display, legal, email } = info ? decodeAndFilter(info, ['display', 'legal', 'email']) : {};
+  return {
+    address: owner,
+    display,
+    legal,
+    email,
+  };
+};
+
 const getCompanyRequest = async (entity_id) => {
   try {
     const api = await getApi();
@@ -704,9 +717,11 @@ const getCompanyRequest = async (entity_id) => {
       };
     }
     const request = optRequest.unwrap();
+    const owner = await getCompanyOwnerIdentity(api, entity_id);
     return {
       hash: request.data.hash,
       editableByRegistrar: request.editableByRegistrar,
+      owner,
       data: api.createType('CompanyData', pako.inflate(request.data)),
     };
   } catch (e) {
@@ -722,10 +737,12 @@ const getCompanyRegistration = async (entity_id) => {
     const maybeRegistration = await api.query.companyRegistry.registries(0, entity_id);
     if (maybeRegistration.isNone) return null;
     const registration = maybeRegistration.unwrap();
+    const owner = await getCompanyOwnerIdentity(api, entity_id);
     return {
       hash: registration.data.hash,
       editableByRegistrar: registration.editableByRegistrar,
       data: api.createType('CompanyData', pako.inflate(registration.data)),
+      owner,
     };
   } catch (e) {
     // eslint-disable-next-line no-console
