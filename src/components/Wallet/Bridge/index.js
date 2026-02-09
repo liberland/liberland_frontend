@@ -3,8 +3,8 @@ import Card from 'antd/es/card';
 import Button from '../../Button/Button';
 
 function Bridge() {
-  const goToHashiBridge = () => {
-    const stakingLink = 'https://polkaswap.io/#/bridge/';
+  const goToBridge = () => {
+    const stakingLink = 'https://exchange.liberstake.ll.land/';
     window.open(stakingLink);
   };
 
@@ -12,7 +12,7 @@ function Bridge() {
     <Card
       title="Bridge"
       actions={[
-        <Button primary onClick={() => goToHashiBridge()}>
+        <Button primary onClick={() => goToBridge()}>
           Go to bridge
         </Button>,
       ]}
@@ -25,7 +25,7 @@ function Bridge() {
       )}
     >
       <Card.Meta
-        description="Liberland chain is connected to other chains via SORA HASHI bridge."
+        description="Liberland chain is connected to other chains via Liberstake bridge."
       />
     </Card>
   );
