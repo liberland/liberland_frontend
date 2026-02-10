@@ -81,7 +81,10 @@ export default function IdentityForm() {
                 </Button>,
               ]}
             >
-              <List.Item.Meta title={pedingAdditionalMerit.blockchainAddress} />
+              <List.Item.Meta
+                title={pedingAdditionalMerit.identity?.name || pedingAdditionalMerit.blockchainAddress}
+                description={pedingAdditionalMerit.identity?.name ? pedingAdditionalMerit.blockchainAddress : undefined}
+              />
             </List.Item>
           )}
         />

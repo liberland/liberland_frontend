@@ -14,6 +14,7 @@ import {
   getPalletIds,
   unregisterCompany,
   setRegisteredCompanyData,
+  getIdentitiesNames,
 } from '../../api/nodeRpcCall';
 
 import { blockchainActions, officesActions, registriesActions } from '../actions';
@@ -146,7 +147,15 @@ function* setRegisteredCompanyDataWorker(action) {
 
 function* getPendingAdditionalMeritsWorker() {
   const pendingAdditionalMertis = yield call(backend.fetchPendingAdditionalMerits);
-  yield put(officesActions.getPendingAdditionalMerits.success(pendingAdditionalMertis));
+  const addresses = pendingAdditionalMertis
+    .map((item) => item.blockchainAddress)
+    .filter(Boolean);
+  const identities = addresses.length > 0 ? yield call(getIdentitiesNames, addresses) : {};
+  const meritsWithIdentities = pendingAdditionalMertis.map((item) => ({
+    ...item,
+    identity: identities[item.blockchainAddress]?.identity,
+  }));
+  yield put(officesActions.getPendingAdditionalMerits.success(meritsWithIdentities));
 }
 
 function* getTaxPayersWorker(action) {
