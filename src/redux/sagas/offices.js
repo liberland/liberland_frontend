@@ -153,7 +153,7 @@ function* getPendingAdditionalMeritsWorker() {
   const identities = addresses.length > 0 ? yield call(getIdentitiesNames, addresses) : {};
   const meritsWithIdentities = pendingAdditionalMertis.map((item) => ({
     ...item,
-    identity: identities[item.blockchainAddress]?.identity || null,
+    identity: identities[item.blockchainAddress]?.identity,
   }));
   yield put(officesActions.getPendingAdditionalMerits.success(meritsWithIdentities));
 }
