@@ -43,6 +43,7 @@ const getStyleLoaders = (cssOptions) => {
 
 module.exports = (env, argv) => {
   return {
+    bail: false,
     context: __dirname,
     entry: ['babel-polyfill', './src/index.js'],
     output: {
