@@ -1,0 +1,160 @@
+@keyframes blip {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.sider {
+  width: 264px;
+  flex: none;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--line);
+  background: var(--surface);
+  overflow: hidden;
+  z-index: 100;
+}
+
+.topAccent {
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold-bright), var(--gold));
+  flex: none;
+}
+
+.brand {
+  padding: 20px 20px 14px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex: none;
+}
+
+.brandText {
+  line-height: 1.05;
+}
+
+.brandName {
+  font-family: 'Spectral', Georgia, serif;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+.brandSub {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--line-strong);
+    border-radius: 6px;
+  }
+  &::-webkit-scrollbar-track { background: transparent; }
+}
+
+.navSection {
+  margin-bottom: 2px;
+}
+
+.sectionLabel {
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 700;
+  padding: 12px 12px 6px;
+}
+
+.navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 9px 12px 9px 9px;
+  border-radius: 10px;
+  border: none;
+  border-left: 3px solid transparent;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 500;
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  cursor: pointer;
+  transition: background 0.16s, color 0.16s, border-color 0.16s;
+  text-align: left;
+
+  &:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+}
+
+.navItemActive {
+  background: var(--gold-tint) !important;
+  color: var(--ink) !important;
+  font-weight: 600 !important;
+  border-left-color: var(--gold) !important;
+}
+
+.navIcon {
+  display: flex;
+  align-items: center;
+  flex: none;
+  color: currentColor;
+}
+
+.navLabel {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.footer {
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  color: var(--ink-soft);
+  flex: none;
+}
+
+.networkDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 3px var(--green-tint);
+  animation: blip 2.4s ease-in-out infinite;
+  flex: none;
+}
+
+.networkLabel {
+  flex: 1;
+}
+
+.blockHeight {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: var(--ink-faint);
+  font-size: 11px;
+}
