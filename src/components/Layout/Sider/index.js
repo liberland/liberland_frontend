@@ -29,6 +29,7 @@ const NAV_SECTIONS = [
       { key: 'documents', route: router.home.documents, label: 'Identity & Docs', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><circle cx="8" cy="11" r="2.3"/><path d="M4.8 16.2c.5-1.7 1.8-2.6 3.2-2.6s2.7.9 3.2 2.6"/><path d="M14.5 9.5h4M14.5 12.5h4M14.5 15.5h2.5"/></svg> },
       { key: 'contracts', route: router.contracts.overview, label: 'Contracts', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2.5H6.5a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V8Z"/><path d="M14 2.5V8h5.5M8 13h8M8 16.5h5"/></svg> },
       { key: 'nfts', route: router.nfts.overview, label: 'NFTs', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> },
+      { key: 'profile', route: router.home.profile, label: 'Profile', icon: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> },
     ],
   },
   {

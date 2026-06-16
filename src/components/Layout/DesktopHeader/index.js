@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import Dropdown from 'antd/es/dropdown';
+import { AuthContext } from 'react-oauth2-code-pkce';
 import { userSelectors } from '../../../redux/selectors';
+import { authActions } from '../../../redux/actions';
 import { useModeContext } from '../../AntdProvider';
 import ChangeWallet from '../../Home/ChangeWallet';
 import UserMenu from '../../UserMenu';
@@ -58,6 +61,8 @@ function ThemeToggle() {
 function DesktopHeader() {
   const { pathname } = useLocation();
   const history = useHistory();
+  const dispatch = useDispatch();
+  const { logOut } = useContext(AuthContext);
   const user = useSelector(userSelectors.selectUser);
   const givenName = useSelector(userSelectors.selectUserGivenName);
   const familyName = useSelector(userSelectors.selectUserFamilyName);
@@ -71,6 +76,17 @@ function DesktopHeader() {
   const displayName = givenName
     ? `${givenName}${familyName ? ` ${familyName}` : ''}`
     : null;
+
+  const handleLogout = () => {
+    logOut();
+    dispatch(authActions.signOut.call(history));
+    window.location.href = `${process.env.REACT_APP_SSO_API}/logout?redirect=${process.env.REACT_APP_FRONTEND_REDIRECT}`;
+  };
+
+  const userDropdownItems = [
+    { key: 'profile', label: 'View Profile' },
+    { key: 'logout', label: 'Logout', danger: true },
+  ];
 
   return (
     <header className={styles.header}>
@@ -86,22 +102,29 @@ function DesktopHeader() {
         </div>
         <ChangeWallet />
         {user && displayName ? (
-          <button
-            type="button"
-            className={styles.userBtn}
-            onClick={() => history.push(router.home.profile)}
+          <Dropdown
+            menu={{
+              items: userDropdownItems,
+              onClick: ({ key }) => {
+                if (key === 'profile') history.push(router.home.profile);
+                if (key === 'logout') handleLogout();
+              },
+            }}
+            trigger={['click']}
           >
-            <span className={styles.avatar}>{initials}</span>
-            <span className={styles.userInfo}>
-              <span className={styles.userName}>{displayName}</span>
-              <span className={styles.citizenBadge}>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 1.5 14.6 7l6 .6-4.5 4 1.3 5.9L12 14.6 6.6 17.5 7.9 11.6l-4.5-4 6-.6z" />
-                </svg>
-                CITIZEN
+            <button type="button" className={styles.userBtn}>
+              <span className={styles.avatar}>{initials}</span>
+              <span className={styles.userInfo}>
+                <span className={styles.userName}>{displayName}</span>
+                <span className={styles.citizenBadge}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 1.5 14.6 7l6 .6-4.5 4 1.3 5.9L12 14.6 6.6 17.5 7.9 11.6l-4.5-4 6-.6z" />
+                  </svg>
+                  CITIZEN
+                </span>
               </span>
-            </span>
-          </button>
+            </button>
+          </Dropdown>
         ) : (
           <UserMenu />
         )}

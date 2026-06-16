@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { walletActions } from '../../redux/actions';
+import { HideTitleProvider } from './HideTitle';
+import ScrollContainer from './ScrollContainer';
 import styles from './styles.module.scss';
 import Header from './Header';
 import Sider from './Sider';
@@ -21,10 +23,14 @@ function Layout({ children }) {
       <Sider />
       <div className={styles.main}>
         <Header />
-        <div className={styles.content}>
-          <Tabs />
-          {children}
-        </div>
+        <ScrollContainer>
+          <div className={styles.content}>
+            <Tabs />
+            <HideTitleProvider>
+              {children}
+            </HideTitleProvider>
+          </div>
+        </ScrollContainer>
         <footer className={styles.footer}>
           <div className={styles.footerItem}>
             <Socials />
