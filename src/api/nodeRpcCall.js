@@ -18,8 +18,9 @@ import identityJudgementEnums from '../constants/identityJudgementEnums';
 import { IndexHelper } from '../utils/council/councilEnum';
 import { decodeAndFilter } from '../utils/identityParser';
 import { OfficeType } from '../utils/officeTypeEnum';
+import { getNetworkRpc } from '../utils/networkHelpers';
 
-const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
+const provider = new WsProvider(getNetworkRpc());
 let __apiCache = null;
 const getApi = async () => {
   if (__apiCache === null) {
@@ -255,7 +256,8 @@ const submitExtrinsic = async (extrinsic, walletAddress, api) => {
             });
           } else resolve({ blockHash, status, events });
         }
-      }).catch((err) => {
+      },
+    ).catch((err) => {
       // eslint-disable-next-line no-console
       console.log(err);
       reject(err);

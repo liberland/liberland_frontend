@@ -75,12 +75,27 @@
   white-space: nowrap;
 }
 
+.networkBadgeBtn {
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.18s, color 0.18s;
+
+  &:hover {
+    border-color: var(--gold);
+    color: var(--ink);
+  }
+}
+
 .networkDot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: var(--green);
   flex: none;
+}
+
+.networkDotTestnet {
+  background: #d97706;
 }
 
 .userBtn {

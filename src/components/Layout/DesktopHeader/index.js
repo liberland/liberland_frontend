@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import React, { useContext } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -9,6 +10,7 @@ import { useModeContext } from '../../AntdProvider';
 import ChangeWallet from '../../Home/ChangeWallet';
 import UserMenu from '../../UserMenu';
 import router from '../../../router';
+import { NETWORKS, getSelectedNetwork, setSelectedNetwork } from '../../../utils/networkHelpers';
 import styles from './styles.module.scss';
 
 const PAGE_TITLES = [
@@ -32,6 +34,35 @@ const PAGE_TITLES = [
 function getPageTitle(pathname) {
   const match = PAGE_TITLES.find((entry) => entry.test(pathname));
   return match ? [match.title, match.sub] : ['Liberland', 'Republic Ledger'];
+}
+
+function NetworkSwitcher() {
+  const current = getSelectedNetwork();
+  const dotClass = current === 'testnet'
+    ? `${styles.networkDot} ${styles.networkDotTestnet}`
+    : styles.networkDot;
+  const items = Object.values(NETWORKS).map((n) => ({
+    key: n.key,
+    label: n.label,
+  }));
+  return (
+    <Dropdown
+      menu={{
+        items,
+        selectedKeys: [current],
+        onClick: ({ key }) => { if (key !== current) setSelectedNetwork(key); },
+      }}
+      trigger={['click']}
+    >
+      <button type="button" className={`${styles.networkBadge} ${styles.networkBadgeBtn}`}>
+        <span className={dotClass} />
+        {NETWORKS[current].label}
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+    </Dropdown>
+  );
 }
 
 function ThemeToggle() {
@@ -69,6 +100,7 @@ function DesktopHeader() {
 
   const [title, sub] = getPageTitle(pathname);
 
+  // eslint-disable-next-line no-nested-ternary
   const initials = givenName && familyName
     ? `${givenName[0]}${familyName[0]}`.toUpperCase()
     : (givenName ? givenName.slice(0, 2).toUpperCase() : null);
@@ -96,10 +128,7 @@ function DesktopHeader() {
       </div>
       <div className={styles.actions}>
         <ThemeToggle />
-        <div className={styles.networkBadge}>
-          <span className={styles.networkDot} />
-          Mainnet
-        </div>
+        <NetworkSwitcher />
         <ChangeWallet />
         {user && displayName ? (
           <Dropdown
