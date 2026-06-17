@@ -1,8 +1,9 @@
 import { ethers } from 'ethers';
 import axios from 'axios';
+import { getNetworkConfig } from '../utils/networkHelpers';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API,
+  baseURL: getNetworkConfig().api,
   withCredentials: true,
 });
 

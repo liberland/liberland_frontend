@@ -8,10 +8,13 @@ import App from './App';
 import store from './redux/store';
 import { authActions, blockchainActions, onBoardingActions } from './redux/actions';
 import AntdProvider from './components/AntdProvider';
+import { getNetworkConfig } from './utils/networkHelpers';
+
+const { ssoApi } = getNetworkConfig();
 
 const defaultConfig = {
-  tokenEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/token`,
-  authorizationEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/authorize`,
+  tokenEndpoint: `${ssoApi}/oauth/token`,
+  authorizationEndpoint: `${ssoApi}/oauth/authorize`,
   decodeToken: false,
   autoLogin: false,
   postLogin: () => {

@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { getNetworkConfig } from '../utils/networkHelpers';
 
 const getMiddlewareApi = () => axios.create({
-  baseURL: process.env.REACT_APP_MIDDLEWARE_API,
+  baseURL: getNetworkConfig().middlewareApi,
 });
 
 export const getComplimentaryLLD = async (usingWalletAddress) => {

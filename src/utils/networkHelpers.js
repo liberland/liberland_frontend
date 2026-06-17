@@ -1,9 +1,22 @@
-const MAINNET_RPC = 'wss://liberland-rpc.dwellir.com';
-const TESTNET_RPC = process.env.REACT_APP_NODE_ADDRESS;
-
 export const NETWORKS = {
-  mainnet: { key: 'mainnet', label: 'Mainnet', rpc: MAINNET_RPC },
-  testnet: { key: 'testnet', label: 'Testnet', rpc: TESTNET_RPC },
+  mainnet: {
+    key: 'mainnet',
+    label: 'Mainnet',
+    rpc: 'wss://liberland-rpc.dwellir.com',
+    api: 'https://api.liberland.org',
+    middlewareApi: 'https://api.blockchain.liberland.org',
+    explorer: 'https://archive.mainnet.liberland.org/graphql',
+    ssoApi: 'https://sso.liberland.org',
+  },
+  testnet: {
+    key: 'testnet',
+    label: 'Testnet',
+    rpc: process.env.REACT_APP_NODE_ADDRESS,
+    api: process.env.REACT_APP_API,
+    middlewareApi: process.env.REACT_APP_MIDDLEWARE_API,
+    explorer: process.env.REACT_APP_EXPLORER,
+    ssoApi: process.env.REACT_APP_SSO_API,
+  },
 };
 
 const detectDefaultNetwork = () => {
@@ -25,9 +38,11 @@ export const setSelectedNetwork = (network) => {
   window.location.reload();
 };
 
-export const getNetworkRpc = () => NETWORKS[getSelectedNetwork()].rpc;
+export const getNetworkConfig = () => NETWORKS[getSelectedNetwork()];
 
-export const getNetworkName = () => NETWORKS[getSelectedNetwork()].label;
+export const getNetworkRpc = () => getNetworkConfig().rpc;
 
-// Legacy helpers kept for compatibility
+export const getNetworkName = () => getNetworkConfig().label;
+
+// Legacy helper kept for compatibility
 export const isTestnet = () => getSelectedNetwork() === 'testnet';
