@@ -7,6 +7,11 @@ export const NETWORKS = {
     middlewareApi: 'https://api.blockchain.liberland.org',
     explorer: 'https://archive.mainnet.liberland.org/graphql',
     ssoApi: 'https://sso.liberland.org',
+    ssoClientId: '137685',
+    ssoAdminClientId: '162334',
+    ssoAdminLink: 'https://blockchain.liberland.org/?admin=true',
+    frontendRedirect: 'https://blockchain.liberland.org/',
+    faucetAddress: '5CMHBiso4hX5cDFViz7bqxd5FZPLwvRa1ZzQ52vBZCeTYLru',
   },
   testnet: {
     key: 'testnet',
@@ -16,6 +21,11 @@ export const NETWORKS = {
     middlewareApi: process.env.REACT_APP_MIDDLEWARE_API,
     explorer: process.env.REACT_APP_EXPLORER,
     ssoApi: process.env.REACT_APP_SSO_API,
+    ssoClientId: process.env.REACT_APP_SSO_API_CLIENT_ID,
+    ssoAdminClientId: process.env.REACT_APP_SSO_API_ADMIN_CLIENT_ID,
+    ssoAdminLink: process.env.REACT_APP_SSO_API_ADMIN_LINK,
+    frontendRedirect: process.env.REACT_APP_FRONTEND_REDIRECT,
+    faucetAddress: process.env.REACT_APP_ONBOARDER_LLD_FAUCET_ADDRESS,
   },
 };
 

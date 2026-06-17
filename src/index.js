@@ -10,7 +10,9 @@ import { authActions, blockchainActions, onBoardingActions } from './redux/actio
 import AntdProvider from './components/AntdProvider';
 import { getNetworkConfig } from './utils/networkHelpers';
 
-const { ssoApi } = getNetworkConfig();
+const {
+  ssoApi, ssoClientId, ssoAdminClientId, ssoAdminLink, frontendRedirect,
+} = getNetworkConfig();
 
 const defaultConfig = {
   tokenEndpoint: `${ssoApi}/oauth/token`,
@@ -32,15 +34,15 @@ const defaultConfig = {
 };
 
 const adminAuthConfig = {
-  clientId: `${process.env.REACT_APP_SSO_API_ADMIN_CLIENT_ID}`,
-  redirectUri: `${process.env.REACT_APP_SSO_API_ADMIN_LINK}`,
+  clientId: `${ssoAdminClientId}`,
+  redirectUri: `${ssoAdminLink}`,
   scope: 'others:read_write',
   ...defaultConfig,
 };
 
 const authConfig = {
-  clientId: `${process.env.REACT_APP_SSO_API_CLIENT_ID}`,
-  redirectUri: process.env.REACT_APP_FRONTEND_REDIRECT,
+  clientId: `${ssoClientId}`,
+  redirectUri: frontendRedirect,
   ...defaultConfig,
 };
 
