@@ -8,17 +8,7 @@ import { blockchainSelectors } from '../../../redux/selectors';
 import { getSelectedNetwork, NETWORKS } from '../../../utils/networkHelpers';
 import router from '../../../router';
 import styles from './styles.module.scss';
-
-function StateSeal() {
-  return (
-    <svg width="36" height="36" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <circle cx="20" cy="20" r="19" fill="var(--gold-tint)" stroke="var(--gold)" strokeWidth="1.4" />
-      <circle cx="20" cy="22.5" r="6.2" fill="none" stroke="var(--gold)" strokeWidth="1.6" />
-      <path d="M20 16.3V11M20 16.3l3.4-3.1M20 16.3l-3.4-3.1M26 22.5h4.6M14 22.5H9.4M24.2 18.3l3-2.6M15.8 18.3l-3-2.6" stroke="var(--gold)" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M11 28.5q9 -5 18 0" stroke="var(--gold)" strokeWidth="1.6" strokeLinecap="round" fill="none" />
-    </svg>
-  );
-}
+import liberlandLogo from '../../../assets/images/liberland-blockchain-logo.png';
 
 const NAV_SECTIONS = [
   {
@@ -180,7 +170,7 @@ function Sider() {
     <aside className={styles.sider}>
       <div className={styles.topAccent} />
       <div className={styles.brand}>
-        <StateSeal />
+        <img src={liberlandLogo} alt="Liberland" className={styles.brandLogo} />
         <div className={styles.brandText}>
           <div className={styles.brandName}>Liberland</div>
           <div className={styles.brandSub}>Republic Ledger</div>

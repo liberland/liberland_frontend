@@ -24,11 +24,20 @@
 }
 
 .brand {
-  padding: 20px 20px 14px;
+  padding: 22px 20px 16px;
   display: flex;
-  align-items: center;
-  gap: 11px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
   flex: none;
+}
+
+.brandLogo {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
 }
 
 .brandText {
