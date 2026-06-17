@@ -7,9 +7,6 @@ import ScrollContainer from './ScrollContainer';
 import styles from './styles.module.scss';
 import Header from './Header';
 import Sider from './Sider';
-import Socials from './Socials';
-import FooterLinks from './FooterLinks';
-import Copyright from './Copyright';
 import Tabs from './Tabs';
 
 function Layout({ children }) {
@@ -31,13 +28,6 @@ function Layout({ children }) {
             </HideTitleProvider>
           </div>
         </ScrollContainer>
-        <footer className={styles.footer}>
-          <div className={styles.footerItem}>
-            <Socials />
-          </div>
-          <FooterLinks />
-          <Copyright />
-        </footer>
       </div>
     </div>
   );
