@@ -56,6 +56,7 @@ module.exports = (env, argv) => {
     },
     optimization: {
       moduleIds: 'deterministic',
+      emitOnErrors: true,
       splitChunks: {
         maxSize: 51200,
         maxAsyncSize: 51200,
