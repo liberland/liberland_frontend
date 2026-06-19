@@ -7,19 +7,17 @@ on:
       - claud-V2
   workflow_dispatch:
 
-# Allow the workflow to publish to GitHub Pages.
+# Pushing the built site to the gh-pages branch needs write access to contents.
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# Only one Pages deployment at a time; newer runs supersede in-progress ones.
+# Only one deployment at a time; newer runs supersede in-progress ones.
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,13 +31,6 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-
-      - name: Configure Pages
-        # enablement: true turns on GitHub Pages for the repo on first run, so
-        # no manual repo-settings step is required.
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Prepare environment
         # Mainnet config is hard-coded in src/utils/networkHelpers.js, so the
@@ -56,21 +47,15 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
         run: node_modules/.bin/webpack --mode=production
 
-      - name: SPA fallback
-        run: cp dist/index.html dist/404.html
+      - name: SPA fallback + disable Jekyll
+        run: |
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          force_orphan: true
