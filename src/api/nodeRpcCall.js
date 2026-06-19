@@ -1051,7 +1051,7 @@ const submitProposal = async (
     sections,
   ).method;
   const { hash } = proposal;
-  await centralizedBackend.addReferendum({
+  await centralizedBackend.tryAddReferendum({
     link: discussionLink,
     name: discussionName,
     description: discussionDescription,
@@ -1063,7 +1063,7 @@ const submitProposal = async (
   const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
   const proposeTx = proposeCall({
     Lookup: {
-      hash,
+      hash_: hash,
       len: proposal.encodedLength,
     },
   }, minDeposit);
@@ -2112,7 +2112,7 @@ const congressProposeReferendum = async (
 ) => {
   const api = await getApi();
 
-  await centralizedBackend.addReferendum({
+  await centralizedBackend.tryAddReferendum({
     link: discussionLink,
     name: discussionName,
     description: discussionDescription,
@@ -2226,7 +2226,7 @@ const citizenProposeRepealLegislation = async (
     ? api.tx.liberlandLegislation.repealLegislationSection(tier, id, section, witness).method
     : api.tx.liberlandLegislation.repealLegislation(tier, id, witness).method;
 
-  await centralizedBackend.addReferendum({
+  await centralizedBackend.tryAddReferendum({
     link: discussionLink,
     name: discussionName,
     description: discussionDescription,
@@ -2298,7 +2298,7 @@ const proposeAmendLegislation = async (
     content,
     witness,
   ).method;
-  await centralizedBackend.addReferendum({
+  await centralizedBackend.tryAddReferendum({
     link: discussionLink,
     name: discussionName,
     description: discussionDescription,
@@ -2311,7 +2311,7 @@ const proposeAmendLegislation = async (
   const proposeCall = tier === 'Constitution' ? api.tx.democracy.proposeRichOrigin : api.tx.democracy.propose;
   const proposeTx = proposeCall({
     Lookup: {
-      hash: proposal.hash,
+      hash_: proposal.hash,
       len: proposal.encodedLength,
     },
   }, minDeposit);
