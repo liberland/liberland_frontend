@@ -10,6 +10,9 @@ module.exports = {
       plugins: [
         '@babel/plugin-proposal-class-properties',
         '@babel/plugin-proposal-optional-chaining',
+        // Needed to transform @polkadot/types-codec, which uses static class
+        // blocks, when it is pulled into a test bundle.
+        '@babel/plugin-transform-class-static-block',
       ],
     }],
   },
