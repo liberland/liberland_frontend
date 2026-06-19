@@ -303,34 +303,13 @@ const getOfficialUserRegistryEntries = async (walletAddress) => {
     }
   });
 
-  // const METAVERSTE_NFTs_ID = 1;
-  // const LAND_NFTs_ID = 0;
-
   const metaverseLandForOwner = [];
   const landForOwner = [];
-
-  // const ownerLand = await Promise.all([
-  //   api.query.nfts.account.entries(walletAddress, LAND_NFTs_ID),
-  //   api.query.nfts.account.entries(walletAddress, METAVERSTE_NFTs_ID),
-  // ]);
 
   const landForOwnerIds = [];
   const landMetadataQueries = [];
   const metaverseLandForOwnerIds = [];
   const metaverseLandMetadataQueries = [];
-  // const ownerLandHuman = ownerLand[0].map((x) => {
-  //   const landObject = { ...x[0].toHuman() };
-  //   landForOwnerIds.push(landObject[2]);
-  //   landMetadataQueries.push([api.query.nfts.itemMetadataOf, [LAND_NFTs_ID, parseInt(landObject[2])]]);
-  //   return landObject;
-  // });
-  // const ownerMetaverseLandHuman = ownerLand[1].map((x) => {
-  //   const metaverseLandObject = { ...x[0].toHuman() };
-  //   metaverseLandForOwnerIds.push(metaverseLandObject[2]);
-  // eslint-disable-next-line max-len
-  //   metaverseLandMetadataQueries.push([api.query.nfts.itemMetadataOf, [METAVERSTE_NFTs_ID, parseInt(metaverseLandObject[2])]]);
-  //   return metaverseLandObject;
-  // });
 
   let landAttributes = [];
   // only query if something to query, otherwise never resolves
