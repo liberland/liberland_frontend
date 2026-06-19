@@ -49,7 +49,10 @@ module.exports = (env, argv) => {
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].[contenthash].js',
-      publicPath: '/',
+      // Configurable for hosting under a sub-path (e.g. GitHub Pages project
+      // site at /liberland_frontend/). Defaults to root for the canonical
+      // production deployment at blockchain.liberland.org.
+      publicPath: process.env.PUBLIC_PATH || '/',
     },
     devServer: {
       historyApiFallback: true,
@@ -165,7 +168,10 @@ module.exports = (env, argv) => {
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),
-      new Dotenv(),
+      // systemvars lets CI / shell-provided REACT_APP_* (and PUBLIC_PATH)
+      // override or supplement values from the .env file, which is what the
+      // GitHub Pages build relies on.
+      new Dotenv({ systemvars: true }),
       // new InterpolateHtmlPlugin({PUBLIC_URL: 'static' }),
     ].filter(Boolean),
     resolve: {
