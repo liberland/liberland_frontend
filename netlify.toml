@@ -1,0 +1,28 @@
+# Netlify build configuration.
+#
+# This repo's primary shareable build is published to GitHub Pages via
+# .github/workflows/deploy-pages.yml. Netlify preview deploys were failing
+# because the repo defines no build command in package.json (only `prod`) and
+# carried no netlify.toml, so Netlify had no valid command to run. This file
+# gives Netlify a known-good build.
+#
+# Unlike the GitHub Pages build, Netlify serves from the domain root, so we do
+# NOT set PUBLIC_PATH (webpack defaults publicPath to '/') and we use the
+# default BrowserRouter with an SPA fallback rather than the hash router.
+
+[build]
+  command = "yarn prod"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # The polkadot.js dependency graph makes this a heavy webpack build; raise the
+  # heap so the production build does not OOM on Netlify's default builder.
+  NODE_OPTIONS = "--max-old-space-size=4096"
+
+# Single-page-app fallback: serve index.html for client-side routes so deep
+# links resolve under BrowserRouter.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
