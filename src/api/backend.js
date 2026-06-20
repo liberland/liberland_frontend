@@ -98,6 +98,8 @@ export const fetchPendingAdditionalMerits = async () => {
     );
     return approvedEresidency.data;
   } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to fetch pending additional merits:', e);
     return [];
   }
 };

@@ -62,6 +62,8 @@ async function processUrlData(ipfsUrl, json = true) {
     }
     return json ? await response.json() : response;
   } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to load NFT metadata from IPFS:', error);
     return null;
   }
 }

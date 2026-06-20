@@ -2,21 +2,28 @@ import { IndexHelper } from '../../utils/council/councilEnum';
 import { OfficeType } from '../../utils/officeTypeEnum';
 import { getApi, submitExtrinsic } from './core';
 
-const congressMajorityThreshold = async () => {
+// Council ("congress") and Senate share identical proposal/threshold logic and
+// differ only in which pallet they target, so both are derived from a single
+// pallet-parameterised factory rather than copy-pasted per chamber.
+const majorityThresholdFor = (pallet) => async () => {
   const api = await getApi();
-  const congressmen = await api.query.council.members();
-  return Math.trunc(congressmen.length / 2) + 1;
+  const members = await api.query[pallet].members();
+  return Math.trunc(members.length / 2) + 1;
 };
 
-const createProposalAndVote = async (threshold, proposalContent, vote) => {
+const createProposalAndVoteFor = (pallet) => async (threshold, proposalContent, vote) => {
   const api = await getApi();
-  const proposal = api.tx.council.propose(threshold, proposalContent, proposalContent.length);
+  const proposal = api.tx[pallet].propose(threshold, proposalContent, proposalContent.length);
 
-  const nextProposalIndex = await api.query.council.proposalCount();
-  const voteAye = api.tx.council.vote(proposalContent.method.hash, nextProposalIndex, vote);
+  const nextProposalIndex = await api.query[pallet].proposalCount();
+  const voteAye = api.tx[pallet].vote(proposalContent.method.hash, nextProposalIndex, vote);
 
   return [proposal, voteAye];
 };
+
+const congressMajorityThreshold = majorityThresholdFor('council');
+
+const createProposalAndVote = createProposalAndVoteFor('council');
 
 const handleCreateProposalAndVote = async (threshold, proposalData, walletAddress) => {
   const api = await getApi();
@@ -45,20 +52,9 @@ const congressProposeSpend = async ({
   return handleCreateProposalAndVote(threshold, proposal, walletAddress);
 };
 
-const createSenateProposalAndVote = async (threshold, proposalContent, vote) => {
-  const api = await getApi();
-  const proposal = api.tx.senate.propose(threshold, proposalContent, proposalContent.length);
-  const nextProposalIndex = await api.query.senate.proposalCount();
-  const voteAye = api.tx.senate.vote(proposalContent.method.hash, nextProposalIndex, vote);
+const createSenateProposalAndVote = createProposalAndVoteFor('senate');
 
-  return [proposal, voteAye];
-};
-
-const senateMajorityThreshold = async () => {
-  const api = await getApi();
-  const senateMember = await api.query.senate.members();
-  return Math.trunc(senateMember.length / 2) + 1;
-};
+const senateMajorityThreshold = majorityThresholdFor('senate');
 
 const senateProposeSpend = async ({
   walletAddress, spendProposal, remarkInfo,
@@ -111,11 +107,13 @@ const getProperProposal = async (officeType) => {
   return null;
 };
 
-const congressSenateSendLlm = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
+// The "send" variants are identical except for the extrinsic that builds the
+// spend proposal, so each is created from one factory that takes a builder.
+const congressSenateSend = (buildSpendProposal) => async ({
+  walletAddress, transferToAddress, transferAmount, assetData, remarkInfo, executionBlock, officeType,
 }) => {
   const api = await getApi();
-  const spendProposal = api.tx.llm.sendLlm(transferToAddress, transferAmount);
+  const spendProposal = buildSpendProposal(api, { transferToAddress, transferAmount, assetData });
   const proposeSend = await getProperProposal(officeType);
 
   return proposeSend({
@@ -123,47 +121,24 @@ const congressSenateSendLlm = async ({
   });
 };
 
-const congressSenateSendLld = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
-}) => {
-  const api = await getApi();
-  const spendProposal = api.tx.balances.transfer(transferToAddress, transferAmount);
-  const proposeSend = await getProperProposal(officeType);
+const congressSenateSendLlm = congressSenateSend(
+  (api, { transferToAddress, transferAmount }) => api.tx.llm.sendLlm(transferToAddress, transferAmount),
+);
 
-  return proposeSend({
-    walletAddress, spendProposal, remarkInfo, executionBlock,
-  });
-};
+const congressSenateSendLld = congressSenateSend(
+  (api, { transferToAddress, transferAmount }) => api.tx.balances.transfer(transferToAddress, transferAmount),
+);
 
-const congressSenateSendLlmToPolitipool = async ({
-  walletAddress, transferToAddress, transferAmount, remarkInfo, executionBlock, officeType,
-}) => {
-  const api = await getApi();
-  const spendProposal = api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount);
-  const proposeSend = await getProperProposal(officeType);
+const congressSenateSendLlmToPolitipool = congressSenateSend(
+  (api, { transferToAddress, transferAmount }) => api.tx.llm.sendLlmToPolitipool(transferToAddress, transferAmount),
+);
 
-  return proposeSend({
-    walletAddress, spendProposal, remarkInfo, executionBlock,
-  });
-};
-
-const congressSenateSendAssets = async ({
-  walletAddress,
-  transferToAddress,
-  transferAmount,
-  assetData,
-  remarkInfo,
-  executionBlock,
-  officeType,
-}) => {
-  const api = await getApi();
-  const spendProposal = api.tx.assets.transfer(parseInt(assetData.index), transferToAddress, transferAmount);
-  const proposeSend = await getProperProposal(officeType);
-
-  return proposeSend({
-    walletAddress, spendProposal, remarkInfo, executionBlock,
-  });
-};
+const congressSenateSendAssets = congressSenateSend(
+  (api, { transferToAddress, transferAmount, assetData }) => {
+    const assetIndex = parseInt(assetData.index);
+    return api.tx.assets.transfer(assetIndex, transferToAddress, transferAmount);
+  },
+);
 
 const congressProposeBudget = async ({
   walletAddress, itemsCouncilPropose, executionBlock,
