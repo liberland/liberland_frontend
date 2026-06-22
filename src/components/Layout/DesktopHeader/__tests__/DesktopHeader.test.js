@@ -175,6 +175,51 @@ describe('DesktopHeader', () => {
     });
   });
 
+  describe('logout resolves SSO from the selected network (not build-time env)', () => {
+    let originalLocation;
+
+    beforeEach(() => {
+      // Named citizen so the Logout dropdown action renders.
+      let callCount = 0;
+      useSelector.mockImplementation(() => {
+        callCount += 1;
+        if (callCount === 1) return { blockchainAddress: '5Abc' };
+        if (callCount === 2) return 'Ada';
+        if (callCount === 3) return 'Lovelace';
+        callCount = 0;
+        return null;
+      });
+      // Force the runtime selection to mainnet.
+      localStorage.setItem('liberland_network', 'mainnet');
+      originalLocation = window.location;
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        writable: true,
+        value: { href: '' },
+      });
+    });
+
+    afterEach(() => {
+      localStorage.removeItem('liberland_network');
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        writable: true,
+        value: originalLocation,
+      });
+    });
+
+    it('points logout at the selected network SSO + redirect', async () => {
+      const user = userEvent.setup();
+      render(<DesktopHeader />);
+      await user.click(screen.getByRole('button', { name: 'Logout' }));
+      // Mainnet config from networkHelpers — not process.env (undefined in tests).
+      expect(window.location.href).toBe(
+        'https://sso.liberland.org/logout?redirect=https://blockchain.liberland.org/',
+      );
+      expect(window.location.href).not.toContain('undefined');
+    });
+  });
+
   describe('common elements', () => {
     beforeEach(() => {
       useSelector.mockReturnValue(null);
