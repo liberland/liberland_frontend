@@ -1,29 +1,45 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans|Playfair+Display&display=swap');
 @import '../node_modules/rc-tooltip/assets/bootstrap';
 @import './assets/main.scss';
 
-$openSans: 'Open Sans', sans-serif;
-$playfairDisplay: 'Playfair Display', serif;
+$hankenGrotesk: 'Hanken Grotesk', system-ui, sans-serif;
+$spectral: 'Spectral', Georgia, serif;
+$jetbrainsMono: 'JetBrains Mono', ui-monospace, monospace;
 
-h1.ant-typography {
-  font-family: $playfairDisplay;
+// Keep legacy vars for any remaining Open Sans references
+$openSans: 'Hanken Grotesk', system-ui, sans-serif;
+$playfairDisplay: 'Spectral', Georgia, serif;
+
+// ── Typography roles ──────────────────────────────────────
+// Civic headings & display text → Spectral
+h1.ant-typography,
+h2.ant-typography,
+h3.ant-typography {
+  font-family: $spectral;
+  font-weight: 600;
 }
 
+// Address / hash display → JetBrains Mono
+.ll-mono {
+  font-family: $jetbrainsMono;
+  font-size: 0.9em;
+}
+
+// ── Global base ───────────────────────────────────────────
 body {
   margin: 0;
-  font-family: $openSans;
+  font-family: $hankenGrotesk;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var(--main-color);
-  background-color: var(--body-background);
+  color: var(--ink);
+  background-color: var(--paper);
   font-weight: 500;
 
   [class*=ant-] {
     font-weight: 500;
   }
 
-  h1,h2,h3,h4,h5,strong {
-    font-weight: 600!important;
+  h1, h2, h3, h4, h5, strong {
+    font-weight: 600 !important;
   }
 }
 

@@ -8,10 +8,15 @@ import App from './App';
 import store from './redux/store';
 import { authActions, blockchainActions, onBoardingActions } from './redux/actions';
 import AntdProvider from './components/AntdProvider';
+import { getNetworkConfig } from './utils/networkHelpers';
+
+const {
+  ssoApi, ssoClientId, ssoAdminClientId, ssoAdminLink, frontendRedirect,
+} = getNetworkConfig();
 
 const defaultConfig = {
-  tokenEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/token`,
-  authorizationEndpoint: `${process.env.REACT_APP_SSO_API}/oauth/authorize`,
+  tokenEndpoint: `${ssoApi}/oauth/token`,
+  authorizationEndpoint: `${ssoApi}/oauth/authorize`,
   decodeToken: false,
   autoLogin: false,
   postLogin: () => {
@@ -29,15 +34,15 @@ const defaultConfig = {
 };
 
 const adminAuthConfig = {
-  clientId: `${process.env.REACT_APP_SSO_API_ADMIN_CLIENT_ID}`,
-  redirectUri: `${process.env.REACT_APP_SSO_API_ADMIN_LINK}`,
+  clientId: `${ssoAdminClientId}`,
+  redirectUri: `${ssoAdminLink}`,
   scope: 'others:read_write',
   ...defaultConfig,
 };
 
 const authConfig = {
-  clientId: `${process.env.REACT_APP_SSO_API_CLIENT_ID}`,
-  redirectUri: process.env.REACT_APP_FRONTEND_REDIRECT,
+  clientId: `${ssoClientId}`,
+  redirectUri: frontendRedirect,
   ...defaultConfig,
 };
 
