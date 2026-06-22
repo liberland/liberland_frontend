@@ -9,6 +9,7 @@ import { AuthContext } from 'react-oauth2-code-pkce';
 import UserIcon from '../../assets/icons/user.svg';
 import { userSelectors } from '../../redux/selectors';
 import { authActions } from '../../redux/actions';
+import { getNetworkConfig } from '../../utils/networkHelpers';
 import Button from '../Button/Button';
 import styles from './styles.module.scss';
 
@@ -48,12 +49,14 @@ function UserMenu() {
         onClick: ({ key, domEvent }) => {
           domEvent.stopPropagation();
           switch (key) {
-            case logoutAction.key:
+            case logoutAction.key: {
               logOut();
               dispatch(authActions.signOut.call(history));
-              window.location.href = `${
-                process.env.REACT_APP_SSO_API}/logout?redirect=${process.env.REACT_APP_FRONTEND_REDIRECT}`;
+              // Use the live network selection so logout matches login's SSO.
+              const { ssoApi, frontendRedirect } = getNetworkConfig();
+              window.location.href = `${ssoApi}/logout?redirect=${frontendRedirect}`;
               break;
+            }
             default:
               break;
           }

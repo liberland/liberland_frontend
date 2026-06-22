@@ -1,0 +1,64 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - Claud-V2-REFACTOR
+      - claud-V2
+  workflow_dispatch:
+
+# Pushing the built site to the gh-pages branch needs write access to contents.
+permissions:
+  contents: write
+
+# Only one deployment at a time; newer runs supersede in-progress ones.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Prepare environment
+        # Mainnet config is hard-coded in src/utils/networkHelpers.js, so the
+        # in-app network switcher works out of the box. .env.dist supplies the
+        # testnet endpoints; HashRouter keeps deep links working on Pages.
+        run: |
+          cp .env.dist .env
+          echo "REACT_APP_USE_HASH_ROUTER=true" >> .env
+
+      - name: Build
+        env:
+          PUBLIC_PATH: /liberland_frontend/
+          REACT_APP_USE_HASH_ROUTER: 'true'
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: node_modules/.bin/webpack --mode=production
+
+      - name: SPA fallback + disable Jekyll
+        run: |
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
+
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          force_orphan: true
+          # Keep repo dotfiles out of the served site (they carry no secrets
+          # but shouldn't be published).
+          exclude_assets: '.github,.babelrc,.eslintrc,.env.dist,.gitignore'

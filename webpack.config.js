@@ -49,7 +49,10 @@ module.exports = (env, argv) => {
     output: {
       path: path.resolve(__dirname, 'dist'),
       filename: '[name].[contenthash].js',
-      publicPath: '/',
+      // Configurable for hosting under a sub-path (e.g. GitHub Pages project
+      // site at /liberland_frontend/). Defaults to root for the canonical
+      // production deployment at blockchain.liberland.org.
+      publicPath: process.env.PUBLIC_PATH || '/',
     },
     devServer: {
       historyApiFallback: true,
@@ -57,9 +60,16 @@ module.exports = (env, argv) => {
     optimization: {
       moduleIds: 'deterministic',
       emitOnErrors: true,
+      // Pull the webpack runtime into its own chunk and split both initial and
+      // async chunks (chunks: 'all'). Without this, the synchronously-imported
+      // redux store/sagas dragged all of polkadot/ethers/thirdweb into a single
+      // ~3.2 MiB `main` entry chunk. Now vendor code is split into cacheable
+      // chunks shared across the app, shrinking the entry and improving caching.
+      runtimeChunk: 'single',
       splitChunks: {
-        maxSize: 51200,
-        maxAsyncSize: 51200,
+        chunks: 'all',
+        minSize: 20000,
+        maxSize: 244000,
       },
     },
     module: {
@@ -165,7 +175,10 @@ module.exports = (env, argv) => {
       new webpack.ProvidePlugin({
         process: 'process/browser',
       }),
-      new Dotenv(),
+      // systemvars lets CI / shell-provided REACT_APP_* (and PUBLIC_PATH)
+      // override or supplement values from the .env file, which is what the
+      // GitHub Pages build relies on.
+      new Dotenv({ systemvars: true }),
       // new InterpolateHtmlPlugin({PUBLIC_URL: 'static' }),
     ].filter(Boolean),
     resolve: {

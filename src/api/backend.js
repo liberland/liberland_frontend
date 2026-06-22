@@ -77,6 +77,19 @@ export const addReferendum = async ({
   link, chainIndex: 0, name, description, hash, additionalMetadata, proposerAddress,
 });
 
+// Best-effort recording of off-chain discussion metadata for a referendum.
+// The on-chain proposal is the source of truth, so a failure here (backend
+// down, auth/CORS, network) must NEVER block the on-chain submission that
+// follows. We log and continue instead of throwing.
+export const tryAddReferendum = async (params) => {
+  try {
+    await addReferendum(params);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to record referendum discussion metadata (continuing with on-chain submission):', e);
+  }
+};
+
 export const fetchPendingAdditionalMerits = async () => {
   try {
     const approvedEresidency = await api.get(
@@ -85,6 +98,8 @@ export const fetchPendingAdditionalMerits = async () => {
     );
     return approvedEresidency.data;
   } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to fetch pending additional merits:', e);
     return [];
   }
 };

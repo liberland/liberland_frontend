@@ -10,7 +10,9 @@ import { useModeContext } from '../../AntdProvider';
 import ChangeWallet from '../../Home/ChangeWallet';
 import UserMenu from '../../UserMenu';
 import router from '../../../router';
-import { NETWORKS, getSelectedNetwork, setSelectedNetwork } from '../../../utils/networkHelpers';
+import {
+  NETWORKS, getSelectedNetwork, setSelectedNetwork, getNetworkConfig,
+} from '../../../utils/networkHelpers';
 import styles from './styles.module.scss';
 
 const PAGE_TITLES = [
@@ -112,7 +114,10 @@ function DesktopHeader() {
   const handleLogout = () => {
     logOut();
     dispatch(authActions.signOut.call(history));
-    window.location.href = `${process.env.REACT_APP_SSO_API}/logout?redirect=${process.env.REACT_APP_FRONTEND_REDIRECT}`;
+    // Resolve SSO from the live network selection (not build-time env), so
+    // logout hits the same SSO that login used after a network switch.
+    const { ssoApi, frontendRedirect } = getNetworkConfig();
+    window.location.href = `${ssoApi}/logout?redirect=${frontendRedirect}`;
   };
 
   const userDropdownItems = [
