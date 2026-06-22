@@ -2,8 +2,26 @@
 @import '../../assets/base/fonts';
 @import '../../assets/main';
 
+// ── New layout shell ──────────────────────────────────────
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .contentWrapper {
-  background-color: var(--content-bg);
+  background-color: var(--paper);
 }
 .header {
   display: flex;
@@ -81,17 +99,19 @@
   width: 100%;
 }
 .content {
-  max-width: 2048px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 32px 64px;
+  background: var(--paper);
   min-height: 280px;
-  margin: 0;
-  padding: 5px 12px;
 
-  @media screen and (min-width: map-get($breakpoints, 'tablet')) {
-    padding: 10px 25px;
+  // inner max-width for readability on very wide screens
+  & > * {
+    max-width: 1200px;
   }
 
-  @media screen and (min-width: map-get($breakpoints, 'desktop')) {
-    padding: 10px 50px;
+  @media screen and (max-width: map-get($breakpoints, 'tablet')) {
+    padding: 16px 16px 48px;
   }
 }
 .version {

@@ -1,85 +1,132 @@
-// colors
-
-$primary: #F7D034;
-$primary2: #38CB89;
-$primary4: #FF5630;
-$bg3: #FAFBFC;
-$bg2: #d4d4d4;
+// Liberland Design System — color tokens
+// Legacy SCSS vars kept for backward compat with existing components
+$primary: #C99A3A;
+$primary2: #2C7A57;
+$primary4: #BB4632;
+$bg3: #FBF8F1;
+$bg2: #E7E0D0;
 $bg4: #FFFFFF;
-$secondary3: #F6E290;
-$secondary2: #E5F7EF;
-$secondary4: #FFEFEB;
-$transparent1: #F4F8FF;
-$transparent2: #F5FCF9;
-$transparent3: #FFFBF1;
-$transparent4: #FFF6F4;
-$secondary: #E5F6EF;
-$bg1: #C1C7D0;
-$lightGrey: #F6F6F6;
-$black: #231F20;
+$secondary3: #F3E9D0;
+$secondary2: #E2F0E8;
+$secondary4: #F6E4DF;
+$transparent1: #F4F0E6;
+$transparent2: #E2F0E8;
+$transparent3: #F3E9D0;
+$transparent4: #F6E4DF;
+$secondary: #E2F0E8;
+$bg1: #948E80;
+$lightGrey: #FBF8F1;
+$black: #1C1813;
 $clearBlack: #000000;
-$succes: #7DC035;
-$blueLogo: #00336A;
-$red: #FF0000;
-$grey: #D9D9D9;
-$lightBlue: #3C75C3;
-
+$succes: #2C7A57;
+$blueLogo: #2C56C6;
+$red: #BB4632;
+$grey: #E7E0D0;
+$lightBlue: #2C56C6;
 
 // text
-$text1: #323B4B;
-$text2: #4E5D78;
-$text3: #8A94A6;
-$text4: #B0B7C3;
-$text5: #BFBFBF;
-$text6: #BCBCBC;
+$text1: #1C1813;
+$text2: #5C564B;
+$text3: #948E80;
+$text4: #ABA391;
+$text5: #948E80;
+$text6: #766F5F;
 $errorText: $primary4;
 
 html {
-    --main-color: #243F5F;
-    --border-color: #ECEBF0;
-    --main-border: #ECEBF0;
-    --body-background: white;
-    --table-bg: white;
-    --footer-bg: white;
-    --table-border: #F2F2F2;
-    --dangerous-color: black;
-    --dangerous-bg: white;
-    --description-color: #ACBDC5;
-    --card-border: #ECEBF0;
-    --card-background: white;
-    --nav-bg: white;
-    --content-bg: #FAFAFA;
-    --mobile-menu-open: white;
-    --button-gray-bg: rgba(0,0,0,0.04);
-    --button-gray-color: rgba(0,0,0,0.25);
-    --alert-warning-color: #243F5F;
-    --serious-bg: rgba(255, 0, 0, .02);
-    --serious-border: rgba(255, 0, 0, .25);
-    --markd-bg: white;
-    --markd-border: #424242;
+    // ── Design tokens (light mode) ──
+    --paper:      #F4F0E6;
+    --surface:    #FFFFFF;
+    --surface-2:  #FBF8F1;
+    --surface-3:  #F1ECDF;
+    --ink:        #1C1813;
+    --ink-soft:   #5C564B;
+    --ink-faint:  #948E80;
+    --line:       #E7E0D0;
+    --line-strong:#D8CFBA;
+    --gold:       #9A7320;
+    --gold-bright:#C99A3A;
+    --gold-tint:  #F3E9D0;
+    --gold-tint-2:#FAF4E4;
+    --blue:       #2C56C6;
+    --green:      #2C7A57;
+    --green-tint: #E2F0E8;
+    --red:        #BB4632;
+    --red-tint:   #F6E4DF;
+    --on-gold:    #211904;
+    --shadow:     0 1px 2px rgba(28,24,19,.05),0 10px 28px -12px rgba(28,24,19,.14);
+    --shadow-sm:  0 1px 2px rgba(28,24,19,.06);
+
+    // Legacy compat
+    --main-color:        #1C1813;
+    --border-color:      #E7E0D0;
+    --main-border:       #E7E0D0;
+    --body-background:   #F4F0E6;
+    --table-bg:          #FFFFFF;
+    --footer-bg:         #FFFFFF;
+    --table-border:      #E7E0D0;
+    --dangerous-color:   #1C1813;
+    --dangerous-bg:      #FFFFFF;
+    --description-color: #948E80;
+    --card-border:       #E7E0D0;
+    --card-background:   #FFFFFF;
+    --nav-bg:            #FFFFFF;
+    --content-bg:        #F4F0E6;
+    --mobile-menu-open:  #FFFFFF;
+    --button-gray-bg:    rgba(28,24,19,0.04);
+    --button-gray-color: rgba(28,24,19,0.35);
+    --alert-warning-color: #1C1813;
+    --serious-bg:        rgba(187, 70, 50, .04);
+    --serious-border:    rgba(187, 70, 50, .25);
+    --markd-bg:          #FFFFFF;
+    --markd-border:      #D8CFBA;
 
     &[dark-mode='yes'] {
-        --border-color: #37383F;
-        --main-color: white;
-        --main-border: #37383F;
-        --body-background: #1E202A;
-        --table-bg: #1E202A;
-        --footer-bg: #10131b;
-        --table-border: #37383F;
-        --dangerous-color: white;
-        --dangerous-bg: #702122;
-        --description-color: #7095A7;
-        --card-border: #37383F;
-        --card-background: #1E202A;
-        --nav-bg: #1E202A;
-        --content-bg: #10131b;
-        --mobile-menu-open: #141414;
-        --markd-bg: #141414;
-        --markd-border: #424242;
-        --button-gray-bg: rgba(255,255,255,0.20);
-        --button-gray-color: rgba(255,255,255,0.75);
-        --alert-warning-color: #122C4B;
-        --serious-bg: rgba(255, 0, 0, .25);
-        --serious-border: rgba(255, 0, 0, .75);
+        // ── Design tokens (dark mode) ──
+        --paper:      #121009;
+        --surface:    #1C1913;
+        --surface-2:  #232017;
+        --surface-3:  #2A2619;
+        --ink:        #F3EEE1;
+        --ink-soft:   #ABA391;
+        --ink-faint:  #766F5F;
+        --line:       #2E2A1E;
+        --line-strong:#3B3525;
+        --gold:       #E6BA56;
+        --gold-bright:#F4CE73;
+        --gold-tint:  #2C2614;
+        --gold-tint-2:#241F11;
+        --blue:       #7B9BF2;
+        --green:      #5CB98A;
+        --green-tint: #16271E;
+        --red:        #E07F66;
+        --red-tint:   #2A1A14;
+        --on-gold:    #1A1305;
+        --shadow:     0 1px 2px rgba(0,0,0,.4),0 16px 40px -16px rgba(0,0,0,.6);
+        --shadow-sm:  0 1px 2px rgba(0,0,0,.4);
+
+        // Legacy compat
+        --border-color:      #2E2A1E;
+        --main-color:        #F3EEE1;
+        --main-border:       #2E2A1E;
+        --body-background:   #121009;
+        --table-bg:          #1C1913;
+        --footer-bg:         #121009;
+        --table-border:      #2E2A1E;
+        --dangerous-color:   #F3EEE1;
+        --dangerous-bg:      #2A1A14;
+        --description-color: #766F5F;
+        --card-border:       #2E2A1E;
+        --card-background:   #1C1913;
+        --nav-bg:            #1C1913;
+        --content-bg:        #121009;
+        --mobile-menu-open:  #1C1913;
+        --markd-bg:          #1C1913;
+        --markd-border:      #3B3525;
+        --button-gray-bg:    rgba(243,238,225,0.10);
+        --button-gray-color: rgba(243,238,225,0.60);
+        --alert-warning-color: #F3EEE1;
+        --serious-bg:        rgba(224, 127, 102, .12);
+        --serious-border:    rgba(224, 127, 102, .40);
     }
 }

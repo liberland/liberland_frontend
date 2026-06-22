@@ -11,6 +11,7 @@ import Link from 'antd/es/typography/Link';
 import Button from '../../Button/Button';
 import styles from './styles.module.scss';
 import { authActions } from '../../../redux/actions';
+import { getNetworkConfig } from '../../../utils/networkHelpers';
 
 function NoWalletsDetectedInBrowser() {
   const { logOut } = useContext(AuthContext);
@@ -21,8 +22,9 @@ function NoWalletsDetectedInBrowser() {
   const handleLogout = () => {
     logOut();
     dispatch(authActions.signOut.call(history));
-    window.location.href = `
-    ${process.env.REACT_APP_SSO_API}/logout?redirect=${process.env.REACT_APP_FRONTEND_REDIRECT}`;
+    // Use the live network selection so logout matches login's SSO.
+    const { ssoApi, frontendRedirect } = getNetworkConfig();
+    window.location.href = `${ssoApi}/logout?redirect=${frontendRedirect}`;
   };
 
   return (
