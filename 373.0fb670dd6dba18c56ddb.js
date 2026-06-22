@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkliberland_front_end=self.webpackChunkliberland_front_end||[]).push([[373],{20373(e,n,t){t.r(n),t.d(n,{default:()=>r});var l=t(96540);t(59191);const r=function(){return l.createElement("div",null,"Assets")}}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkliberland_front_end=self.webpackChunkliberland_front_end||[]).push([[5433],{65433(e,t,a){a.r(t),a.d(t,{eth_estimateGas:()=>s});var n=a(63809);async function s(e,t){const a=await e({method:"eth_estimateGas",params:[t]});return(0,n.uU)(a)}}}]);

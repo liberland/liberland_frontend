@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkliberland_front_end=self.webpackChunkliberland_front_end||[]).push([[3996],{3996(e,n,l){l.r(n),l.d(n,{default:()=>t});var r=l(96540);const t=function(){return r.createElement("div",null,"sign up")}}}]);

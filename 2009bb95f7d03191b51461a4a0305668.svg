@@ -1,0 +1,9 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect width="16" height="16" rx="8" fill="url(#pattern0_513_8773)"/>
+<defs>
+<pattern id="pattern0_513_8773" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_513_8773" transform="scale(0.00166389)"/>
+</pattern>
+<image id="image0_513_8773" width="601" height="601" xlink:href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath fill='%23FFFFFF' d='M40,20c0,11-9,20-20,20S0,31,0,20S9,0,20,0S40,9,40,20z'/%3E%3Cpolygon fill='%2362678F' points='20,5 29.1,20.1 20,16.2 '/%3E%3Cpolygon fill='%238C92B2' points='10.9,20.1 20,5 20,16.2 '/%3E%3Cpolygon fill='%2362678F' points='20,25.7 10.9,20.1 20,16.2 '/%3E%3Cpolygon fill='%23444971' points='29.1,20.1 20,16.2 20,25.7 '/%3E%3Cpolygon fill='%2362678F' points='20,27.6 29.1,22.2 20,35 '/%3E%3Cpolygon fill='%238C92B2' points='20,27.6 10.9,22.2 20,35 '/%3E%3C/svg%3E"/>
+</defs>
+</svg>

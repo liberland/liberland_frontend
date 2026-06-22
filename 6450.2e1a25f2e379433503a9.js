@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkliberland_front_end=self.webpackChunkliberland_front_end||[]).push([[6450],{86450(e,n,r){r.r(n),r.d(n,{default:()=>l});var t=r(96540);r(59191);const l=function(){return t.createElement("div",null,"Other")}}}]);

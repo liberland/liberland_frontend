@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkliberland_front_end=self.webpackChunkliberland_front_end||[]).push([[1446],{71446(n,e,l){l.r(e),l.d(e,{default:()=>r});var t=l(96540),u=l(82613);const r=function(){var n=(0,t.useContext)(u.cy).login;return(0,t.useEffect)(function(){null==n||n()},[n]),null}}}]);
