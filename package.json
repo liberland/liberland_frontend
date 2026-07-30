@@ -75,7 +75,8 @@
     "eslint": "node_modules/.bin/eslint src/",
     "webpack-dev-server": "webpack-dev-server",
     "dev": "webpack-dev-server --mode=development",
-    "prod": "rm -rf dist/* && webpack --mode=production"
+    "prod": "rm -rf dist/* && webpack --mode=production",
+    "test": "SKIP_PREFLIGHT_CHECK=true react-scripts test --watchAll=false --runInBand"
   },
   "eslintConfig": {
     "extends": "react-app"
