@@ -2,6 +2,7 @@ import axios from 'axios';
 import { BN } from '@polkadot/util';
 import { getAdditionalAssets } from './nodeRpcCall';
 import { isCompanyConnected } from '../utils/asset';
+import { getNetworkConfig } from '../utils/networkHelpers';
 
 const historyTransferQuery = `
   query CombinedQuery(
@@ -139,7 +140,7 @@ query GetIdentities($name: String!) {
 }`;
 
 const getApi = () => axios.create({
-  baseURL: process.env.REACT_APP_EXPLORER,
+  baseURL: getNetworkConfig().explorer,
 });
 
 function getStakingActionText(method) {

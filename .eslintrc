@@ -45,5 +45,19 @@
       "typescript": {}
     }
   },
-  "parser": "@babel/eslint-parser"
+  "parser": "@babel/eslint-parser",
+  "overrides": [
+    {
+      "files": ["**/__tests__/**/*.js", "**/*.test.js"],
+      "rules": {
+        "import/first": "off",
+        "react/prop-types": "off",
+        "react/function-component-definition": "off",
+        "global-require": "off",
+        "no-unused-vars": "warn",
+        "no-multi-spaces": "off",
+        "react-hooks/rules-of-hooks": "off"
+      }
+    }
+  ]
 }
