@@ -16,16 +16,19 @@ export const NETWORKS = {
   testnet: {
     key: 'testnet',
     label: 'Testnet',
-    rpc: process.env.REACT_APP_NODE_ADDRESS,
-    api: process.env.REACT_APP_API,
-    middlewareApi: process.env.REACT_APP_MIDDLEWARE_API,
-    explorer: process.env.REACT_APP_EXPLORER,
-    ssoApi: process.env.REACT_APP_SSO_API,
-    ssoClientId: process.env.REACT_APP_SSO_API_CLIENT_ID,
-    ssoAdminClientId: process.env.REACT_APP_SSO_API_ADMIN_CLIENT_ID,
-    ssoAdminLink: process.env.REACT_APP_SSO_API_ADMIN_LINK,
-    frontendRedirect: process.env.REACT_APP_FRONTEND_REDIRECT,
-    faucetAddress: process.env.REACT_APP_ONBOARDER_LLD_FAUCET_ADDRESS,
+    // Hard-coded from .env.dist so the switcher works regardless of which
+    // server built the bundle (the mainnet box's .env holds mainnet values).
+    // explorer has no /graphql suffix — explorer.js appends it via .post().
+    rpc: 'wss://testchain.liberland.org',
+    api: 'https://staging.api.liberland.org',
+    middlewareApi: 'https://staging.api.blockchain.liberland.org',
+    explorer: 'https://archive.testchain.liberland.org',
+    ssoApi: 'https://staging.sso.liberland.org',
+    ssoClientId: '1103',
+    ssoAdminClientId: '1103',
+    ssoAdminLink: 'https://testnet.liberland.org/?admin=true',
+    frontendRedirect: 'https://testnet.liberland.org',
+    faucetAddress: '5CSxW2nn4mQckisBziai4wGqQLEdKTUA4Xnt8iy8jtj5q52Q',
   },
 };
 
