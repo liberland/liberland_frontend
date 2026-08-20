@@ -5,7 +5,7 @@ export const NETWORKS = {
     rpc: 'wss://liberland-rpc.n.dwellir.com',
     api: 'https://api.liberland.org',
     middlewareApi: 'https://api.blockchain.liberland.org',
-    explorer: 'https://archive.mainnet.liberland.org/graphql',
+    explorer: 'https://archive.mainnet.liberland.org',
     ssoApi: 'https://sso.liberland.org',
     ssoClientId: '137685',
     ssoAdminClientId: '162334',
