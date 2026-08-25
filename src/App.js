@@ -2,7 +2,8 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
-  BrowserRouter as Router,
+  BrowserRouter,
+  HashRouter,
   Switch,
   Route,
   Redirect,
@@ -21,6 +22,13 @@ import GuidedSetup from './components/GuidedSetup';
 import { CheckExtensionWalletProvider } from './components/CheckExtenstionWalletProvider';
 import { loader } from './utils/loader';
 import { ModalProvider } from './context/modalContext';
+
+// On static hosts without server-side rewrites (e.g. GitHub Pages project
+// sites) deep links must be served from a single index.html. HashRouter keeps
+// the route in the URL fragment so every path resolves to index.html.
+const Router = process.env.REACT_APP_USE_HASH_ROUTER === 'true'
+  ? HashRouter
+  : BrowserRouter;
 
 function App() {
   const dispatch = useDispatch();

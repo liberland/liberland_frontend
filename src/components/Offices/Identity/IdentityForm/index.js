@@ -11,6 +11,7 @@ import { fetchPendingIdentities } from '../../../../api/nodeRpcCall';
 import { officesActions } from '../../../../redux/actions';
 import Button from '../../../Button/Button';
 import { isValidSubstrateAddress } from '../../../../utils/walletHelpers';
+import { getNetworkConfig } from '../../../../utils/networkHelpers';
 
 export default function IdentityForm() {
   const pendingAdditionalMerits = useSelector(officesSelectors.selectorPendingAdditionalMerits);
@@ -105,7 +106,7 @@ export default function IdentityForm() {
         <Input placeholder="Candidate's wallet address" />
       </Form.Item>
       <Flex wrap gap="15px">
-        <Button link href={`${process.env.REACT_APP_SSO_API_ADMIN_LINK}`}>admin login</Button>
+        <Button link href={getNetworkConfig().ssoAdminLink}>admin login</Button>
         <Button primary type="submit">
           Fetch Identity data
         </Button>

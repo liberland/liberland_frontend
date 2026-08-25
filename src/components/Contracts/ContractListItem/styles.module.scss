@@ -6,7 +6,7 @@
     }
 }
 .action {
-    margin-bottom: 15px;
+    width: 100%;
 }
 .title {
     margin-bottom: 0!important;
@@ -15,9 +15,15 @@
 .preview {
     margin-bottom: 0!important;
 }
+.card {
+    width: 100%;
+}
 .listItem {
-    border: solid 1px var(--border-color);
-    border-block-end: solid 1px var(--border-color)!important;
-    border-radius: 6px;
-    margin-bottom: 10px;
+    // Let the Card own the border/radius/shadow (the design-language section
+    // wrapper used across the app); strip the default List.Item divider and
+    // padding so it doesn't double up around the Card.
+    display: block;
+    padding: 0!important;
+    border-block-end: none!important;
+    margin-bottom: 16px;
 }

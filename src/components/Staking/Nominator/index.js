@@ -10,6 +10,7 @@ import ValidatorList from './ValidatorList';
 import ValidatorListMobile from './ValidatorListMobile';
 import { identityActions, walletActions } from '../../../redux/actions';
 import { areArraysSame } from '../../../utils/staking';
+import { getNetworkRpc } from '../../../utils/networkHelpers';
 
 function Nominator() {
   const dispatch = useDispatch();
@@ -45,7 +46,7 @@ function Nominator() {
 
   const goToAdvancedPage = () => {
     // eslint-disable-next-line max-len
-    const stakingLink = `https://polkadotjs.blockchain.liberland.org/?rpc=${process.env.REACT_APP_NODE_ADDRESS}#/staking`;
+    const stakingLink = `https://polkadotjs.blockchain.liberland.org/?rpc=${getNetworkRpc()}#/staking`;
     window.open(stakingLink);
   };
 

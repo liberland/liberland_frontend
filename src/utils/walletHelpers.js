@@ -9,13 +9,44 @@ import { IndexHelper } from './council/councilEnum';
 const meritDecimals = 12;
 const dollarDecimals = 12;
 
+// Expand a decimal / scientific-notation string (e.g. "2.1e+25" or "123.45")
+// into a plain integer string, truncating any fractional part. bn.js cannot
+// parse these forms and toFixed() still emits exponents for values >= 1e21.
+const decimalStringToIntString = (s) => {
+  const match = /^(-?)(\d*)(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/.exec(s);
+  if (!match) return null;
+  const [, sign, intPart = '', fracPart = '', expPart] = match;
+  const exp = expPart ? parseInt(expPart, 10) : 0;
+  const digits = (intPart || '0') + fracPart;
+  // Position of the decimal point within `digits`, then shifted by the exponent.
+  const pointPos = (intPart || '0').length + exp;
+  let result;
+  if (pointPos <= 0) {
+    result = '0';
+  } else if (pointPos >= digits.length) {
+    result = digits + '0'.repeat(pointPos - digits.length);
+  } else {
+    result = digits.slice(0, pointPos); // drop the fractional remainder
+  }
+  result = result.replace(/^0+(?=\d)/, '');
+  return (sign && result !== '0' ? sign : '') + result;
+};
+
 // take string or number and parse to BN using correct base
 export const valueToBN = (i) => {
-  const s = i.toString();
-  if (s.startsWith && s.startsWith('0x')) {
+  const s = i.toString().trim();
+  if (s.startsWith('0x')) {
     return new BN(s.slice(2), 16);
   }
-  return new BN(s);
+  // Plain integer (incl. negative) — pass straight through, full precision.
+  if (/^-?\d+$/.test(s)) {
+    return new BN(s);
+  }
+  // Tolerate decimals and scientific notation (e.g. a large total issuance
+  // serialized by the API as "2.1e+25") which bn.js would otherwise reject
+  // with "Invalid character".
+  const expanded = decimalStringToIntString(s);
+  return new BN(expanded ?? 0);
 };
 
 const _format = (value, decimals, withAll = false, precision = undefined) => {

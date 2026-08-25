@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import List from 'antd/es/list';
+import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
 import cx from 'classnames';
 import Paragraph from 'antd/es/typography/Paragraph';
 import { useHistory } from 'react-router-dom';
 import Markdown from 'markdown-to-jsx';
-import { useMediaQuery } from 'usehooks-ts';
 import { deriveAndHideContractTitle } from '../utils';
 import { useContractItem } from '../hooks';
 import Button from '../../Button/Button';
@@ -32,25 +32,11 @@ function ContractListItem({
     parties,
     partiesSignaturesList,
   });
-  const isLargerThanHdScreen = useMediaQuery('(min-width: 1600px)');
-  const buttons = [
-    <Button
-      href={routerLink}
-      onClick={() => {
-        history.push(routerLink);
-      }}
-      key="more"
-    >
-      Show more
-    </Button>,
-  ];
 
   return (
-    <List.Item
-      actions={isLargerThanHdScreen ? buttons : undefined}
-      className={styles.listItem}
-    >
-      <List.Item.Meta
+    <List.Item className={styles.listItem}>
+      <Card
+        className={styles.card}
         title={(
           <Flex vertical gap="5px">
             <div className="description">
@@ -65,25 +51,32 @@ function ContractListItem({
             )}
           </Flex>
         )}
-      />
-      <Flex vertical gap="20px" className={styles.noHeading}>
+        actions={[
+          <Flex justify="end" wrap gap="15px" className={styles.action}>
+            <Button
+              href={routerLink}
+              onClick={() => {
+                history.push(routerLink);
+              }}
+              key="more"
+            >
+              Show more
+            </Button>
+          </Flex>,
+        ]}
+      >
         <Paragraph
           ref={(p) => deriveAndHideContractTitle(p, title, setTitle)}
           ellipsis={{
             rows: 2,
           }}
-          className={cx('description', styles.preview)}
+          className={cx('description', styles.preview, styles.noHeading)}
         >
           <Markdown options={{ disableParsingRawHTML: true }}>
             {data.slice(0, 10000) /* Important in testdata only, but causes a nasty crash */}
           </Markdown>
         </Paragraph>
-        {!isLargerThanHdScreen && (
-          <Flex wrap gap="15px" className={styles.action}>
-            {buttons}
-          </Flex>
-        )}
-      </Flex>
+      </Card>
     </List.Item>
   );
 }

@@ -5,6 +5,7 @@ import {
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
 import { ApiPromise, WsProvider } from '@polkadot/api';
+import { getNetworkRpc } from '../utils/networkHelpers';
 import groupBy from 'lodash/groupBy';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
@@ -19,7 +20,7 @@ import { IndexHelper } from '../utils/council/councilEnum';
 import { decodeAndFilter } from '../utils/identityParser';
 import { OfficeType } from '../utils/officeTypeEnum';
 
-const provider = new WsProvider(process.env.REACT_APP_NODE_ADDRESS);
+const provider = new WsProvider(getNetworkRpc());
 let __apiCache = null;
 const getApi = async () => {
   if (__apiCache === null) {

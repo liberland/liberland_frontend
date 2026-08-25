@@ -26,19 +26,25 @@ export default function AntdProvider({ children }) {
     document.getElementsByTagName('html')[0].setAttribute('dark-mode', isDarkMode ? 'yes' : 'no');
   }, [isDarkMode]);
 
-  const colorText = isDarkMode ? 'white' : '#243F5F';
-  const itemSelected = isDarkMode ? '#2E3743' : '#EAEEF0';
-  const activeBackground = isDarkMode ? '#1E202A' : 'white';
-  const mildShadow = isDarkMode ? '#37383F' : '#F2F2F2';
-  const shadow = isDarkMode ? '#7095A7' : '#EAEEF0';
-  const mildBlue = isDarkMode ? '#7095A7' : '#ACBDC5';
-  const activeBorder = isDarkMode ? '#37383F' : '#CCD6DB';
-  const primaryColor = isDarkMode ? '#7095A7' : '#122C4B';
-  const primaryBorder = isDarkMode ? '#7095A7' : '#F6CA31';
-  const contentBg = isDarkMode ? '#1E202A' : 'white';
-  const colorLink = isDarkMode ? '#F3CB28' : '#1677ff';
-  const colorLinkActive = isDarkMode ? '#FBE9AC' : '#1677ff';
-  const colorWarningBg = isDarkMode ? '#F6CA31' : '#fffbe6';
+  // Design system color tokens
+  const colorText         = isDarkMode ? '#F3EEE1' : '#1C1813';
+  const colorTextSecond   = isDarkMode ? '#ABA391' : '#5C564B';
+  const colorBg           = isDarkMode ? '#1C1913' : '#FFFFFF';
+  const colorBgContainer  = isDarkMode ? '#1C1913' : '#FFFFFF';
+  const colorBgLayout     = isDarkMode ? '#121009' : '#F4F0E6';
+  const colorBorder       = isDarkMode ? '#2E2A1E' : '#E7E0D0';
+  const colorGold         = isDarkMode ? '#E6BA56' : '#9A7320';
+  const colorGoldBright   = isDarkMode ? '#F4CE73' : '#C99A3A';
+  const colorGoldTint     = isDarkMode ? '#2C2614' : '#F3E9D0';
+  const colorGreen        = isDarkMode ? '#5CB98A' : '#2C7A57';
+  const colorRed          = isDarkMode ? '#E07F66' : '#BB4632';
+  const colorLink         = isDarkMode ? '#E6BA56' : '#9A7320';
+  const colorLinkActive   = isDarkMode ? '#F4CE73' : '#C99A3A';
+  const colorWarningBg    = isDarkMode ? '#2C2614' : '#FAF4E4';
+  const contentBg         = isDarkMode ? '#121009' : '#F4F0E6';
+  const shadow            = isDarkMode ? '#2E2A1E' : '#E7E0D0';
+  const mildBlue          = isDarkMode ? '#766F5F' : '#948E80';
+  const activeBorder      = colorGold;
 
   return (
     <ConfigProvider
@@ -51,121 +57,160 @@ export default function AntdProvider({ children }) {
         algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
         token: {
           colorText,
-          fontSize: 18,
-          fontSizeHeading5: 25,
-          fontSizeHeading4: 29,
-          fontSizeHeading3: 33,
-          fontSizeHeading2: 37,
-          fontSizeHeading1: 45,
-          fontFamily: 'Open Sans',
+          colorTextBase: colorText,
+          colorBgBase: colorBg,
+          colorBgContainer,
+          colorBgLayout,
+          colorBorder,
+          colorPrimary: colorGold,
+          colorPrimaryHover: colorGoldBright,
+          colorSuccess: colorGreen,
+          colorError: colorRed,
+          colorWarning: colorGold,
           colorLink,
           colorLinkHover: colorLinkActive,
           colorLinkActive,
           colorWarningBg,
+          fontSize: 15,
+          fontSizeHeading5: 17,
+          fontSizeHeading4: 20,
+          fontSizeHeading3: 24,
+          fontSizeHeading2: 29,
+          fontSizeHeading1: 36,
+          fontFamily: "'Hanken Grotesk', system-ui, sans-serif",
+          borderRadius: 10,
+          borderRadiusLG: 14,
+          borderRadiusSM: 8,
+          wireframe: false,
         },
         components: {
           Layout: {
-            bodyBg: activeBackground,
-            footerBg: activeBackground,
-            headerBg: activeBackground,
+            bodyBg: colorBgLayout,
+            footerBg: colorBgContainer,
+            headerBg: colorBgContainer,
             headerColor: colorText,
-            headerHeight: '47px',
-            headerPadding: '12.73px 10',
+            headerHeight: 64,
+            headerPadding: '0 32px',
             lightTriggerColor: colorText,
-            siderBg: activeBackground,
-            triggerBg: activeBackground,
+            siderBg: colorBgContainer,
+            triggerBg: colorBgContainer,
             triggerColor: colorText,
           },
           Menu: {
-            subMenuItemBg: activeBackground,
-            itemPaddingInline: '20px',
+            subMenuItemBg: colorBgContainer,
+            itemPaddingInline: '12px',
             itemMarginInline: '0',
             itemSelectedColor: colorText,
-            itemColor: colorText,
-            itemBorderRadius: '0',
-            itemActiveBg: mildShadow,
+            itemColor: colorTextSecond,
+            itemBorderRadius: 10,
+            itemActiveBg: colorGoldTint,
             itemActiveColor: colorText,
             subMenuItemSelectedColor: colorText,
-            itemSelectedBg: itemSelected,
+            itemSelectedBg: colorGoldTint,
             groupTitleColor: mildBlue,
-            subMenuItemBorderRadius: '0',
-            horizontalItemHoverColor: mildShadow,
-            horizontalItemSelectedColor: 'transparent',
+            subMenuItemBorderRadius: 10,
+            horizontalItemHoverColor: colorText,
+            horizontalItemSelectedColor: colorText,
           },
           Button: {
             defaultActiveBorderColor: activeBorder,
-            defaultBg: activeBackground,
-            defaultBorderColor: activeBorder,
-            defaultHoverBorderColor: activeBorder,
+            defaultBg: colorBgContainer,
+            defaultBorderColor: colorBorder,
+            defaultHoverBorderColor: colorGold,
             defaultHoverColor: colorText,
-            defaultHoverBg: shadow,
+            defaultHoverBg: colorGoldTint,
             defaultShadow: '0',
-            primaryColor,
+            primaryColor: isDarkMode ? '#1A1305' : '#211904',
             primaryShadow: '0',
-            colorPrimaryBorder: primaryBorder,
+            colorPrimaryBorder: colorGold,
+            colorPrimary: colorGold,
+            colorPrimaryHover: colorGoldBright,
           },
           Typography: {
             colorText,
-            titleMarginBottom: '20px',
+            titleMarginBottom: '16px',
+            fontFamilyCode: "'JetBrains Mono', ui-monospace, monospace",
           },
           Tabs: {
-            inkBarColor: colorText,
+            inkBarColor: colorGold,
             itemActiveColor: colorText,
             itemColor: mildBlue,
             itemHoverColor: colorText,
+            itemSelectedColor: colorText,
+            cardBg: colorBgContainer,
           },
           Collapse: {
-            contentPadding: isBiggerThanSmallScreen ? '20px' : '7px 10px',
-            headerBg: activeBackground,
-            headerPadding: isBiggerThanSmallScreen ? '20px' : '7px 10px',
-            colorBorder: mildShadow,
+            contentPadding: isBiggerThanSmallScreen ? '20px' : '12px',
+            headerBg: colorBgContainer,
+            headerPadding: isBiggerThanSmallScreen ? '16px 20px' : '12px',
+            colorBorder: colorBorder,
             contentBg,
-            fontSize: isBiggerThanSmallScreen ? 20 : 18,
+            fontSize: 15,
             colorText,
           },
           Card: {
             extraColor: colorText,
             actionsLiMargin: '12px 5px',
             actionsBg: contentBg,
-            headerBg: contentBg,
+            headerBg: colorBgContainer,
+            colorBorderSecondary: colorBorder,
             ...(isBiggerThanSmallScreen ? {} : {
-              bodyPadding: '7px 10px',
-              headerFontSize: 18,
-              headerPadding: 10,
+              bodyPadding: '12px 16px',
+              headerFontSize: 16,
+              headerPadding: 14,
             }),
           },
           InputNumber: {
             controlWidth: '100%',
-            activeBorderColor: colorText,
-            hoverBorderColor: colorText,
+            activeBorderColor: colorGold,
+            hoverBorderColor: colorGold,
             colorText,
           },
           Input: {
-            activeBorderColor: colorText,
-            hoverBorderColor: colorText,
+            activeBorderColor: colorGold,
+            hoverBorderColor: colorGold,
             colorText,
+            colorBgContainer,
+          },
+          Select: {
+            colorBgContainer,
+            optionSelectedBg: colorGoldTint,
+            optionActiveBg: colorGoldTint,
           },
           Message: {
             margin: 'auto 0',
           },
           Progress: {
-            defaultColor: colorText,
+            defaultColor: colorGold,
+            colorSuccess: colorGreen,
           },
           Table: {
-            headerBg: activeBackground,
-            borderColor: mildShadow,
+            headerBg: colorBgContainer,
+            borderColor: colorBorder,
             headerColor: mildBlue,
-            footerBg: activeBackground,
-            rowExpandedBg: contentBg,
-            rowHoverBg: activeBackground,
-            rowSelectedHoverBg: activeBackground,
-            rowSelectedBg: activeBackground,
+            footerBg: colorBgContainer,
+            rowExpandedBg: colorBgContainer,
+            rowHoverBg: colorGoldTint,
+            rowSelectedHoverBg: colorGoldTint,
+            rowSelectedBg: colorGoldTint,
+            colorBgContainer,
           },
           Divider: {
+            colorSplit: colorBorder,
             marginLG: isBiggerThanSmallScreen ? '24px' : '8px',
           },
           List: {
-            itemPaddingSM: isBiggerThanSmallScreen ? '8px 16px' : '8px 10px',
+            itemPaddingSM: isBiggerThanSmallScreen ? '10px 16px' : '8px 12px',
+          },
+          Tag: {
+            defaultBg: colorGoldTint,
+            defaultColor: colorText,
+          },
+          Badge: {
+            colorPrimary: colorGold,
+          },
+          Alert: {
+            defaultPadding: '12px 16px',
           },
         },
       }}
