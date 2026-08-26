@@ -238,3 +238,21 @@
 .discouraged {
   color: $text3;
 }
+// Keyboard/assistive shortcut past the sidebar nav. Visually hidden until
+// focused, then pinned to the top-left so it is clearly visible.
+.skipLink {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 1000;
+  padding: 10px 16px;
+  background: var(--paper, #fff);
+  color: var(--ink, #111);
+  border: 1px solid var(--line, #ddd);
+  border-radius: 0 0 8px 0;
+  font-weight: 600;
+
+  &:focus {
+    left: 0;
+  }
+}

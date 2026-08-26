@@ -54,7 +54,7 @@ function LegislationView() {
   }
 
   if (!items.length) {
-    return <Result status={404} title="No legislation found" />;
+    return <Result status="info" title="No legislation found" />;
   }
 
   const repealList = Object.keys(repealed);

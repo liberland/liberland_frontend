@@ -47,7 +47,7 @@ function MyContracts() {
                 </>
               )}
               {myContracts.length < 1 ? (
-                <Result status={404} title="No contracts found" />
+                <Result status="info" title="No contracts found" />
               ) : (
                 <ContractsList contracts={myContracts} />
               )}

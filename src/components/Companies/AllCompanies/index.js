@@ -26,7 +26,7 @@ function AllCompanies() {
 
   if (!allRegistries.officialRegistryEntries?.length) {
     return (
-      <Result status={404} title="No registries found" />
+      <Result status="info" title="No registries found" />
     );
   }
 

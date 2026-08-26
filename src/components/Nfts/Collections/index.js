@@ -43,7 +43,7 @@ function Collections() {
               </List.Item>
             )}
           />
-        ) : <Result status={404} title={<>You don&apos;t have any collection</>} />,
+        ) : <Result status="info" title={<>You don&apos;t have any collection</>} />,
       }]}
     />
   );

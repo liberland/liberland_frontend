@@ -135,6 +135,7 @@ function NavItem({ item, isActive, onClick }) {
       className={`${styles.navItem} ${isActive ? styles.navItemActive : ''}`}
       onClick={onClick}
       aria-current={isActive ? 'page' : undefined}
+      data-testid={`nav-${item.key}`}
     >
       <span className={styles.navIcon}>{item.icon}</span>
       <span className={styles.navLabel}>{item.label}</span>
@@ -146,6 +147,7 @@ NavItem.propTypes = {
   item: PropTypes.shape({
     icon: PropTypes.node,
     label: PropTypes.string,
+    key: PropTypes.string,
   }).isRequired,
   isActive: PropTypes.bool.isRequired,
   onClick: PropTypes.func.isRequired,
@@ -176,7 +178,7 @@ function Sider() {
           <div className={styles.brandSub}>Republic Ledger</div>
         </div>
       </div>
-      <nav className={styles.nav}>
+      <nav className={styles.nav} aria-label="Main navigation">
         {NAV_SECTIONS.map((section) => (
           <div key={section.label} className={styles.navSection}>
             <div className={styles.sectionLabel}>{section.label}</div>

@@ -55,7 +55,7 @@ function OnSale() {
               />
             )}
           />
-        ) : <Result status={404} title="There are no NFTs on sale" />,
+        ) : <Result status="info" title="There are no NFTs on sale" />,
       }]}
     />
   );

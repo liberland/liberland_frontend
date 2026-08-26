@@ -21,7 +21,7 @@ function HomeContract() {
   }
 
   if (!contracts.length) {
-    return <Result status={404} title="No contracts found" />;
+    return <Result status="info" title="No contracts found" />;
   }
 
   return (

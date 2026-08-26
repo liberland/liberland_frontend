@@ -170,6 +170,7 @@ module.exports = (env, argv) => {
             "./public/logo512.png",
             "./public/manifest.json",
             "./public/robots.txt",
+            "./public/llms.txt",
           ],
         })
       ),
