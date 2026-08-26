@@ -63,7 +63,7 @@ function AssetOverview({
   if (!filteredAssets.length) {
     return (
       <Result
-        status={404}
+        status="info"
         title="No additional assets found"
       />
     );

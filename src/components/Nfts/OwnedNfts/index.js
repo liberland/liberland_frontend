@@ -97,7 +97,7 @@ function OwnedNfts() {
               />
             )}
           />
-        ) : <Result title="You have no NFTs" status={404} />,
+        ) : <Result title="You have no NFTs" status="info" />,
       }]}
     />
   );

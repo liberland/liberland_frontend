@@ -101,7 +101,7 @@ function Referendum() {
             />
           ) : (
             <Result
-              status={404}
+              status="info"
               title="There are no active Referendums"
               extra={!isBiggerThanMediumScreen ? controls : undefined}
             />
@@ -122,14 +122,14 @@ function Referendum() {
                 </List.Item>
               )}
             />
-          ) : <Result status={404} title="There are no active Proposals" />,
+          ) : <Result status="info" title="There are no active Proposals" />,
         },
         {
           key: 'external',
           label: 'External proposals',
           children: democracy.democracy?.nextExternal?.image?.proposal ? (
             <Proposal proposal={democracy.democracy.nextExternal?.image?.proposal} isDetailsHidden />
-          ) : <Result status={404} title="There are no active External proposals" />,
+          ) : <Result status="info" title="There are no active External proposals" />,
         },
         {
           key: 'dispatches',
@@ -145,7 +145,7 @@ function Referendum() {
                 </List.Item>
               )}
             />
-          ) : <Result status={404} title="There are no active Dispatches" />,
+          ) : <Result status="info" title="There are no active Dispatches" />,
         },
       ]}
     />

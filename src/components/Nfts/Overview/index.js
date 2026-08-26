@@ -54,7 +54,7 @@ function NftsComponent() {
               />
             )}
           />
-        ) : <Result status={404} title="No NFTs found" />,
+        ) : <Result status="info" title="No NFTs found" />,
         extra: (
           <CreateEditNFTModalWrapper />
         ),

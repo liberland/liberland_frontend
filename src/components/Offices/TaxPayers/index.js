@@ -76,7 +76,7 @@ export default function TaxPayers() {
                   </Col>
                 ))
               ) : (
-                <Result status="404" title="No Pool Totals Available" />
+                <Result status="info" title="No Pool Totals Available" />
               )}
             </Row>
           ) : <Spin />,
@@ -99,7 +99,7 @@ export default function TaxPayers() {
                   </Col>
                 ))
               ) : (
-                <Result status="404" title="No Unpool Totals Available" />
+                <Result status="info" title="No Unpool Totals Available" />
               )}
             </Row>
           ) : <Spin />,
@@ -121,7 +121,7 @@ export default function TaxPayers() {
                   </Col>
                 ))
               ) : (
-                <Result status="404" title="No Best Ever Totals Available" />
+                <Result status="info" title="No Best Ever Totals Available" />
               )}
             </Row>
           ) : <Spin />,

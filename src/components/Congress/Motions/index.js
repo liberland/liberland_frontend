@@ -28,7 +28,7 @@ function Motions() {
   }, [motions, motionIds, dispatch]);
 
   if (!motions || motions.length < 1) {
-    return <Result status={404} title="There are no open motions" />;
+    return <Result status="info" title="There are no open motions" />;
   }
 
   return (

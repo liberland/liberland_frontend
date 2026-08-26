@@ -80,7 +80,7 @@ function CompaniesCard({
         </Button>
       ) : undefined}
       locale={{
-        emptyText: <Result status={404} title="No companies found" />,
+        emptyText: <Result status="info" title="No companies found" />,
       }}
       renderItem={(registeredCompany) => {
         const owner = !hideOwner && registeredCompany.principals?.[0]?.name;

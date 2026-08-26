@@ -28,7 +28,7 @@ function ScheduledCongressSpending({ isVetoButton }) {
   }, [motionIds, dispatch, scheduledCalls]);
 
   if (!scheduledCalls || scheduledCalls.length < 1) {
-    return <Result status={404} title="There are no open items" />;
+    return <Result status="info" title="There are no open items" />;
   }
 
   return (

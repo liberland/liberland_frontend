@@ -25,6 +25,9 @@ function Button({
   href,
   link,
   newTab,
+  // Forward anything else (aria-*, data-*, title...) to the underlying button.
+  // Without this, accessibility and automation attributes are silently dropped.
+  ...rest
 }) {
   const getSize = () => {
     if (large) {
@@ -58,6 +61,7 @@ function Button({
 
   return (
     <ButtonInternal
+      {...rest}
       disabled={disabled}
       onClick={getOnClick()}
       htmlType={type}

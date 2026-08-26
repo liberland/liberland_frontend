@@ -18,7 +18,7 @@ export default function Stats() {
   }, [dispatch]);
 
   if (!stakerRewards?.length) {
-    return <Result status={404} title="No rewards found" />;
+    return <Result status="info" title="No rewards found" />;
   }
   const data = stakerRewards.map(({ era, validators }) => ({
     era: `Era ${era.toNumber()}`,

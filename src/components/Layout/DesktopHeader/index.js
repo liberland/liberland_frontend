@@ -13,30 +13,8 @@ import router from '../../../router';
 import {
   NETWORKS, getSelectedNetwork, setSelectedNetwork, getNetworkConfig,
 } from '../../../utils/networkHelpers';
+import { getPageTitle } from '../../../utils/pageTitle';
 import styles from './styles.module.scss';
-
-const PAGE_TITLES = [
-  { test: (p) => p === router.home.feed || p === router.home.index, title: 'Dashboard', sub: 'Welcome back to the Republic' },
-  { test: (p) => p.startsWith(router.home.wallet), title: 'Wallet', sub: 'Your assets, staking & transfers' },
-  { test: (p) => p.startsWith(router.home.documents), title: 'Identity & Documents', sub: 'Your citizenship, records & court standing' },
-  { test: (p) => p.startsWith(router.voting.referendum), title: 'Voting', sub: 'Referenda, proposals & the assembly' },
-  { test: (p) => p.startsWith(router.voting.congressionalAssemble), title: 'Congress Assembly', sub: 'Congressional votes & governance' },
-  { test: (p) => p.startsWith(router.home.legislation), title: 'Legislation', sub: 'The Constitution and the law of the land' },
-  { test: (p) => p.startsWith(router.home.congress), title: 'Congress', sub: 'Motions, members & the congressional treasury' },
-  { test: (p) => p.startsWith(router.home.senate), title: 'Senate', sub: 'Veto motions & scheduled spending' },
-  { test: (p) => p.startsWith(router.home.staking), title: 'Staking', sub: 'Secure the chain, earn rewards' },
-  { test: (p) => p.startsWith(router.home.registries), title: 'Registries', sub: 'Companies, land & on-chain assets' },
-  { test: (p) => p.startsWith(router.contracts.overview) || p.startsWith(router.home.contracts), title: 'Contracts', sub: 'Agreements signed on-chain' },
-  { test: (p) => p.startsWith(router.home.offices), title: 'Offices', sub: 'Government offices & state services' },
-  { test: (p) => p.startsWith(router.home.companies), title: 'Companies', sub: 'Business registry of Liberland' },
-  { test: (p) => p.startsWith(router.nfts.overview) || p.startsWith(router.home.nfts), title: 'NFTs', sub: 'Digital assets & collectibles' },
-  { test: (p) => p.startsWith(router.home.profile), title: 'Profile', sub: 'Your account & settings' },
-];
-
-function getPageTitle(pathname) {
-  const match = PAGE_TITLES.find((entry) => entry.test(pathname));
-  return match ? [match.title, match.sub] : ['Liberland', 'Republic Ledger'];
-}
 
 function NetworkSwitcher() {
   const current = getSelectedNetwork();
@@ -56,7 +34,14 @@ function NetworkSwitcher() {
       }}
       trigger={['click']}
     >
-      <button type="button" className={`${styles.networkBadge} ${styles.networkBadgeBtn}`}>
+      <button
+        type="button"
+        className={`${styles.networkBadge} ${styles.networkBadgeBtn}`}
+        aria-haspopup="menu"
+        aria-label={`Network: ${NETWORKS[current].label}. Change network`}
+        data-testid="network-switcher"
+        data-network={current}
+      >
         <span className={dotClass} />
         {NETWORKS[current].label}
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -74,6 +59,7 @@ function ThemeToggle() {
       type="button"
       className={styles.iconBtn}
       onClick={() => setIsDarkMode(!isDarkMode)}
+      data-testid="theme-toggle"
       aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
       title={isDarkMode ? 'Light mode' : 'Dark mode'}
     >
@@ -146,7 +132,13 @@ function DesktopHeader() {
             }}
             trigger={['click']}
           >
-            <button type="button" className={styles.userBtn}>
+            <button
+              type="button"
+              className={styles.userBtn}
+              aria-haspopup="menu"
+              aria-label={`Account menu for ${displayName}`}
+              data-testid="user-menu"
+            >
               <span className={styles.avatar}>{initials}</span>
               <span className={styles.userInfo}>
                 <span className={styles.userName}>{displayName}</span>
