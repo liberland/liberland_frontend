@@ -171,6 +171,9 @@ module.exports = (env, argv) => {
             "./public/manifest.json",
             "./public/robots.txt",
             "./public/llms.txt",
+            // pdf.js worker for the experimental legislation importer.
+            // Referenced at runtime as /pdf.worker.min.js.
+            { from: "node_modules/pdfjs-dist/legacy/build/pdf.worker.min.js", to: "pdf.worker.min.js" },
           ],
         })
       ),
