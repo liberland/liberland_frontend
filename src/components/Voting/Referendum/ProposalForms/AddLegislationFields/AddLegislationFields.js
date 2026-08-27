@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Form from 'antd/es/form';
 import Divider from 'antd/es/divider';
@@ -7,11 +7,13 @@ import Title from 'antd/es/typography/Title';
 import Flex from 'antd/es/flex';
 import Button from '../../../../Button/Button';
 import { markdown2sections } from '../../../../../utils/legislation';
+import { ExperimentalImport } from './ExperimentalImport';
 
 export function AddLegislationFields({
   form,
 }) {
   const sections = Form.useWatch('sections', form) || [];
+  const [showImport, setShowImport] = useState(false);
 
   const handlePaste = (e) => {
     const data = e.clipboardData.getData('text');
@@ -67,6 +69,21 @@ export function AddLegislationFields({
               </Button>
             </Flex>
           </Flex>
+          <Flex vertical gap="10px">
+            <Flex justify="start">
+              <Button
+                link
+                onClick={() => setShowImport((v) => !v)}
+                aria-expanded={showImport}
+                aria-label="Toggle the experimental document import method"
+                data-testid="legislation-toggle-experimental"
+              >
+                {showImport ? 'Hide alternative method' : 'Alternative method (experimental)'}
+              </Button>
+            </Flex>
+            {showImport && <ExperimentalImport form={form} />}
+          </Flex>
+          <Divider />
           {fields.map((field, index) => (
             <div key={field.key} data-testid={`legislation-section-${index + 1}`}>
               <Form.Item
