@@ -17,8 +17,15 @@ export default function TaxPayers() {
   const isLoading = useSelector(officesSelectors.selectorIsLoading);
   const { sortedPoolTotals, sortedUnpoolTotals, sortedTotalsByAddressPoolTotal } = taxPayers;
 
-  const topPoolTotals = sortedPoolTotals?.slice(0, 10);
   const topUnpoolTotals = sortedUnpoolTotals?.slice(0, 10);
+
+  // Being on the Wall of shame disqualifies you from the Wall of fame: a net
+  // welfare recipient cannot also be celebrated as a top contributor. Excluded
+  // before taking the top 10 so the fame list still fills to ten entries.
+  const shamedAddresses = new Set((topUnpoolTotals || []).map(({ addressId }) => addressId));
+  const topPoolTotals = sortedPoolTotals
+    ? sortedPoolTotals.filter(({ addressId }) => !shamedAddresses.has(addressId)).slice(0, 10)
+    : undefined;
 
   useEffect(() => {
     dispatch(officesActions.getTaxPayers.call(timePeriodInMonth));
