@@ -19,12 +19,17 @@ export default function TaxPayers() {
 
   const topUnpoolTotals = sortedUnpoolTotals?.slice(0, 10);
 
-  // Being on the Wall of shame disqualifies you from the Wall of fame: a net
-  // welfare recipient cannot also be celebrated as a top contributor. Excluded
-  // before taking the top 10 so the fame list still fills to ten entries.
+  // Being on the Wall of shame disqualifies you from every contributor
+  // ranking: a net welfare recipient is not celebrated as a top contributor,
+  // in the current window or all-time. Exclusion is applied before the top-10
+  // slice so the fame list still fills to ten entries.
   const shamedAddresses = new Set((topUnpoolTotals || []).map(({ addressId }) => addressId));
+  const notShamed = ({ addressId }) => !shamedAddresses.has(addressId);
   const topPoolTotals = sortedPoolTotals
-    ? sortedPoolTotals.filter(({ addressId }) => !shamedAddresses.has(addressId)).slice(0, 10)
+    ? sortedPoolTotals.filter(notShamed).slice(0, 10)
+    : undefined;
+  const bestEverTotals = sortedTotalsByAddressPoolTotal
+    ? sortedTotalsByAddressPoolTotal.filter(notShamed)
     : undefined;
 
   useEffect(() => {
@@ -108,7 +113,7 @@ export default function TaxPayers() {
           key: 'best',
           label: 'Best ever taxpayers',
           children: renderRanking(
-            sortedTotalsByAddressPoolTotal,
+            bestEverTotals,
             'Top Tax Payer',
             'No all-time tax payer data available',
           ),
