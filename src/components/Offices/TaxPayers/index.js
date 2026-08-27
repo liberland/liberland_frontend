@@ -14,6 +14,7 @@ export default function TaxPayers() {
   const [timePeriodInMonth, setTimePeriodInMonth] = useState(3);
   const dispatch = useDispatch();
   const taxPayers = useSelector(officesSelectors.selectorTaxesPayers);
+  const isLoading = useSelector(officesSelectors.selectorIsLoading);
   const { sortedPoolTotals, sortedUnpoolTotals, sortedTotalsByAddressPoolTotal } = taxPayers;
 
   const topPoolTotals = sortedPoolTotals?.slice(0, 10);
@@ -44,6 +45,32 @@ export default function TaxPayers() {
     setTimePeriodInMonth(value);
   };
 
+  // The request failing leaves these lists undefined, so rendering a spinner
+  // whenever they are missing span forever with no explanation. Only spin while
+  // a request is genuinely in flight; once it has settled, say there is no data.
+  const renderRanking = (items, label, emptyTitle) => {
+    if (!items) {
+      return isLoading ? <Spin /> : <Result status="info" title={emptyTitle} />;
+    }
+    if (!items.length) {
+      return <Result status="info" title={emptyTitle} />;
+    }
+    return (
+      <Row gutter={[16, 16]}>
+        {items.map(({ addressId, totalValue }, index) => (
+          <Col xs={24} sm={12} xl={8} key={addressId}>
+            <TaxPayerCard
+              address={addressId}
+              index={index}
+              totalValue={totalValue}
+              label={label}
+            />
+          </Col>
+        ))}
+      </Row>
+    );
+  };
+
   return (
     <Collapse
       activeKey={['bestRecent', 'worstRecent', 'best']}
@@ -62,69 +89,22 @@ export default function TaxPayers() {
               <Select.Option value={12}>12 Months</Select.Option>
             </Select>
           ),
-          children: topPoolTotals ? (
-            <Row gutter={[16, 16]}>
-              {topPoolTotals.length ? (
-                topPoolTotals.map(({ addressId, totalValue }, index) => (
-                  <Col xs={24} sm={12} xl={8} key={addressId}>
-                    <TaxPayerCard
-                      address={addressId}
-                      index={index}
-                      totalValue={totalValue}
-                      label="Top Tax Payer"
-                    />
-                  </Col>
-                ))
-              ) : (
-                <Result status="info" title="No Pool Totals Available" />
-              )}
-            </Row>
-          ) : <Spin />,
+          children: renderRanking(topPoolTotals, 'Top Tax Payer', 'No tax payer data available'),
         },
         {
           key: 'worstRecent',
           label: 'Wall of shame',
           extra: `Last ${timePeriodInMonth} months`,
-          children: topUnpoolTotals ? (
-            <Row gutter={[16, 16]}>
-              {topUnpoolTotals.length ? (
-                topUnpoolTotals.map(({ addressId, totalValue }, index) => (
-                  <Col xs={24} sm={12} xl={8} key={addressId}>
-                    <TaxPayerCard
-                      address={addressId}
-                      index={index}
-                      totalValue={totalValue}
-                      label="Top Tax Receiver"
-                    />
-                  </Col>
-                ))
-              ) : (
-                <Result status="info" title="No Unpool Totals Available" />
-              )}
-            </Row>
-          ) : <Spin />,
+          children: renderRanking(topUnpoolTotals, 'Top Tax Receiver', 'No welfare recipient data available'),
         },
         {
           key: 'best',
           label: 'Best ever taxpayers',
-          children: sortedTotalsByAddressPoolTotal ? (
-            <Row gutter={[16, 16]}>
-              {sortedTotalsByAddressPoolTotal.length ? (
-                sortedTotalsByAddressPoolTotal.map(({ addressId, totalValue }, index) => (
-                  <Col xs={24} sm={12} xl={8} key={addressId}>
-                    <TaxPayerCard
-                      address={addressId}
-                      index={index}
-                      totalValue={totalValue}
-                      label="Top Tax Payer"
-                    />
-                  </Col>
-                ))
-              ) : (
-                <Result status="info" title="No Best Ever Totals Available" />
-              )}
-            </Row>
-          ) : <Spin />,
+          children: renderRanking(
+            sortedTotalsByAddressPoolTotal,
+            'Top Tax Payer',
+            'No all-time tax payer data available',
+          ),
         },
       ]}
     />

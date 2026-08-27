@@ -176,7 +176,7 @@ function* getTopHoldersWorker() {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
-    yield put(officesActions.getTaxPayers.failure(e));
+    yield put(officesActions.getTopHolders.failure(e));
   }
 }
 
