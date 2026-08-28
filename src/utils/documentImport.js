@@ -123,6 +123,38 @@ const htmlToMarkdown = (html) => {
   return { markdown: blocks.join('\n\n').trim(), droppedImages };
 };
 
+// ── Section splitting ───────────────────────────────────────────────────────
+// The importer's own splitter, kept separate from utils/legislation's
+// markdown2sections so the established paste flow is not affected.
+//
+// Two deliberate differences:
+//  - `maxLevel` lets the drafter choose which heading depth starts a new
+//    section. A statute nested as "# Law / ## Chapter / ### Article" should
+//    usually break at ###, not at every heading.
+//  - Blank lines are preserved inside a section. markdown2sections drops them,
+//    which welds consecutive paragraphs of a law together.
+
+export const splitMarkdownSections = (markdown, maxLevel = 6) => {
+  const lines = String(markdown || '').split(/\r?\n/);
+  const chunks = [];
+  lines.forEach((line) => {
+    const heading = /^(#{1,6})\s/.exec(line);
+    const startsSection = heading && heading[1].length <= maxLevel;
+    if (startsSection || chunks.length === 0) chunks.push([]);
+    chunks[chunks.length - 1].push(line);
+  });
+  return chunks
+    .map((chunk) => chunk.join('\n').replace(/\n{3,}/g, '\n\n').trim())
+    .filter(Boolean);
+};
+
+export const HEADING_LEVEL_OPTIONS = [
+  { value: 6, label: 'Every heading' },
+  { value: 1, label: 'Only #' },
+  { value: 2, label: '# and ##' },
+  { value: 3, label: '#, ## and ###' },
+];
+
 // ── Heading recovery for unstructured text ──────────────────────────────────
 // PDF and plain-text extraction carry no heading markup, so a statute would
 // arrive as one undifferentiated block. Promote conventional legal openers to
