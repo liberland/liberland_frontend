@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import List from 'antd/es/list';
-import Result from 'antd/es/result';
 import { congressActions, identityActions } from '../../../redux/actions';
 import { congressSelectors } from '../../../redux/selectors';
 import Motion from '../../WalletCongresSenate/Motion';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
 import ProposalContainer from '../../Proposal/ProposalContainer';
+import EmptyState from '../../EmptyState';
 
 function Motions() {
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ function Motions() {
   }, [motions, motionIds, dispatch]);
 
   if (!motions || motions.length < 1) {
-    return <Result status="info" title="There are no open motions" />;
+    return <EmptyState title="There are no open motions" />;
   }
 
   return (

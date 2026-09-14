@@ -4,11 +4,11 @@ import Row from 'antd/es/row';
 import Col from 'antd/es/col';
 import Select from 'antd/es/select';
 import Collapse from 'antd/es/collapse';
-import Result from 'antd/es/result';
 import Spin from 'antd/es/spin';
 import { identityActions, officesActions } from '../../../redux/actions';
 import { officesSelectors } from '../../../redux/selectors';
 import TaxPayerCard from './TaxPayerCard';
+import EmptyState from '../../EmptyState';
 
 export default function TaxPayers() {
   const [timePeriodInMonth, setTimePeriodInMonth] = useState(3);
@@ -62,10 +62,10 @@ export default function TaxPayers() {
   // a request is genuinely in flight; once it has settled, say there is no data.
   const renderRanking = (items, label, emptyTitle) => {
     if (!items) {
-      return isLoading ? <Spin /> : <Result status="info" title={emptyTitle} />;
+      return isLoading ? <Spin /> : <EmptyState title={emptyTitle} />;
     }
     if (!items.length) {
-      return <Result status="info" title={emptyTitle} />;
+      return <EmptyState title={emptyTitle} />;
     }
     return (
       <Row gutter={[16, 16]}>

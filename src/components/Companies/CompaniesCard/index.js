@@ -7,7 +7,6 @@ import List from 'antd/es/list';
 import { isAddress } from '@polkadot/util-crypto';
 import { useHistory } from 'react-router-dom';
 import cx from 'classnames';
-import Result from 'antd/es/result';
 import Markdown from 'markdown-to-jsx';
 import { useMediaQuery } from 'usehooks-ts';
 import CopyIconWithAddress from '../../CopyIconWithAddress';
@@ -19,6 +18,7 @@ import { simplifyCompanyObject } from '../utils';
 import Button from '../../Button/Button';
 import router from '../../../router';
 import ColorAvatar from '../../ColorAvatar';
+import EmptyState from '../../EmptyState';
 import { getDefaultPageSizes } from '../../../utils/pageSize';
 
 function CompaniesCard({
@@ -80,7 +80,22 @@ function CompaniesCard({
         </Button>
       ) : undefined}
       locale={{
-        emptyText: <Result status="info" title="No companies found" />,
+        emptyText: (
+          <EmptyState
+            title="No companies found"
+            description={type === 'mine'
+              ? 'You have not registered a company yet.'
+              : undefined}
+            action={type === 'mine' ? (
+              <Button
+                primary
+                onClick={() => history.push(router.companies.create)}
+              >
+                Register a new company
+              </Button>
+            ) : undefined}
+          />
+        ),
       }}
       renderItem={(registeredCompany) => {
         const owner = !hideOwner && registeredCompany.principals?.[0]?.name;

@@ -1,0 +1,27 @@
+// Deliberately compact: an empty list should not claim a whole screen.
+.empty {
+  margin: 0;
+  padding: 22px 16px;
+
+  :global(.ant-empty-image) {
+    height: 40px;
+    margin-bottom: 10px;
+    opacity: 0.55;
+  }
+
+  :global(.ant-empty-description) {
+    margin: 0;
+  }
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-soft, #5C564B);
+}
+
+.description {
+  font-size: 12.5px;
+  color: var(--ink-faint, #948E80);
+  margin: 4px 0 12px;
+}

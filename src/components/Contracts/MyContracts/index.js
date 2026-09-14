@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import Result from 'antd/es/result';
 import Collapse from 'antd/es/collapse';
 import Spin from 'antd/es/spin';
 import Divider from 'antd/es/divider';
@@ -13,6 +12,7 @@ import {
 import { contractsActions } from '../../../redux/actions';
 import ContractsList from '../ContractsList';
 import CreateContractModal from '../Modals/CreateContractModal';
+import EmptyState from '../../EmptyState';
 
 function MyContracts() {
   const dispatch = useDispatch();
@@ -47,7 +47,7 @@ function MyContracts() {
                 </>
               )}
               {myContracts.length < 1 ? (
-                <Result status="info" title="No contracts found" />
+                <EmptyState title="No contracts found" />
               ) : (
                 <ContractsList contracts={myContracts} />
               )}

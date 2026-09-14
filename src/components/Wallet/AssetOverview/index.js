@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
-import Result from 'antd/es/result';
 import { useMediaQuery } from 'usehooks-ts';
 import { formatAssets } from '../../../utils/walletHelpers';
 import SendAssetModal from '../../Modals/SendAssetModal';
@@ -10,6 +9,7 @@ import styles from './styles.module.scss';
 import MoneyCard from '../../MoneyCard';
 import CurrencyIcon from '../../CurrencyIcon';
 import { isCompanyConnected } from '../../../utils/asset';
+import EmptyState from '../../EmptyState';
 
 function AssetOverview({
   additionalAssets,
@@ -62,10 +62,7 @@ function AssetOverview({
 
   if (!filteredAssets.length) {
     return (
-      <Result
-        status="info"
-        title="No additional assets found"
-      />
+      <EmptyState title="No additional assets found" />
     );
   }
 

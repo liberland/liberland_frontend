@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
-import Result from 'antd/es/result';
 import Spin from 'antd/es/spin';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
@@ -10,6 +9,7 @@ import {
   legislationSelectors,
 } from '../../../redux/selectors';
 import LegislationItem from './LegislationItem';
+import EmptyState from '../../EmptyState';
 
 function LegislationView() {
   const { tier } = useParams();
@@ -54,7 +54,7 @@ function LegislationView() {
   }
 
   if (!items.length) {
-    return <Result status="info" title="No legislation found" />;
+    return <EmptyState title="No legislation found" />;
   }
 
   const repealList = Object.keys(repealed);

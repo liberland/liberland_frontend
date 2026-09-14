@@ -1,12 +1,12 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Result from 'antd/es/result';
 import Collapse from 'antd/es/collapse';
 import Spin from 'antd/es/spin';
 import { registriesSelectors } from '../../../redux/selectors';
 import { registriesActions } from '../../../redux/actions';
 import CompaniesCard from '../CompaniesCard';
 import { useCompanyAssets, useTradePools } from '../hooks';
+import EmptyState from '../../EmptyState';
 
 function AllCompanies() {
   const dispatch = useDispatch();
@@ -26,7 +26,7 @@ function AllCompanies() {
 
   if (!allRegistries.officialRegistryEntries?.length) {
     return (
-      <Result status="info" title="No registries found" />
+      <EmptyState title="No registries found" />
     );
   }
 

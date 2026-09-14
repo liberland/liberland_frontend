@@ -3,7 +3,6 @@ import React, {
   useEffect,
 } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Result from 'antd/es/result';
 import Collapse from 'antd/es/collapse';
 import Flex from 'antd/es/flex';
 import List from 'antd/es/list';
@@ -23,6 +22,7 @@ import Button from '../../Button/Button';
 import router from '../../../router';
 import ReferendumItem from './Items/ReferendumItem';
 import { Proposal } from '../../Proposal';
+import EmptyState from '../../EmptyState';
 
 function Referendum() {
   const history = useHistory();
@@ -100,10 +100,9 @@ function Referendum() {
               )}
             />
           ) : (
-            <Result
-              status="info"
+            <EmptyState
               title="There are no active Referendums"
-              extra={!isBiggerThanMediumScreen ? controls : undefined}
+              action={!isBiggerThanMediumScreen ? controls : undefined}
             />
           ),
         },
@@ -122,14 +121,14 @@ function Referendum() {
                 </List.Item>
               )}
             />
-          ) : <Result status="info" title="There are no active Proposals" />,
+          ) : <EmptyState title="There are no active Proposals" />,
         },
         {
           key: 'external',
           label: 'External proposals',
           children: democracy.democracy?.nextExternal?.image?.proposal ? (
             <Proposal proposal={democracy.democracy.nextExternal?.image?.proposal} isDetailsHidden />
-          ) : <Result status="info" title="There are no active External proposals" />,
+          ) : <EmptyState title="There are no active External proposals" />,
         },
         {
           key: 'dispatches',
@@ -145,7 +144,7 @@ function Referendum() {
                 </List.Item>
               )}
             />
-          ) : <Result status="info" title="There are no active Dispatches" />,
+          ) : <EmptyState title="There are no active Dispatches" />,
         },
       ]}
     />

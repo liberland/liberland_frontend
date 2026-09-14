@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Spin from 'antd/es/spin';
-import Result from 'antd/es/result';
 import List from 'antd/es/list';
 import Collapse from 'antd/es/collapse';
 import { useMediaQuery } from 'usehooks-ts';
 import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import CreateEditCollectionModalWrapper from '../../Modals/Nfts/CreateEditCollection';
+import EmptyState from '../../EmptyState';
 
 function Collections() {
   const dispatch = useDispatch();
@@ -43,7 +43,7 @@ function Collections() {
               </List.Item>
             )}
           />
-        ) : <Result status="info" title={<>You don&apos;t have any collection</>} />,
+        ) : <EmptyState title={<>You don&apos;t have any collection</>} />,
       }]}
     />
   );

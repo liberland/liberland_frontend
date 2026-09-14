@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Result from 'antd/es/result';
 import List from 'antd/es/list';
 import Spin from 'antd/es/spin';
 import Collapse from 'antd/es/collapse';
@@ -8,6 +7,7 @@ import { useMediaQuery } from 'usehooks-ts';
 import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import ItemNft from '../ItemNft';
+import EmptyState from '../../EmptyState';
 
 function OnSale() {
   const dispatch = useDispatch();
@@ -55,7 +55,7 @@ function OnSale() {
               />
             )}
           />
-        ) : <Result status="info" title="There are no NFTs on sale" />,
+        ) : <EmptyState title="There are no NFTs on sale" />,
       }]}
     />
   );

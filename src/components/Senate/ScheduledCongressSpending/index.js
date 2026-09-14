@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import Result from 'antd/es/result';
 import List from 'antd/es/list';
 import Card from 'antd/es/card';
 import { identityActions, senateActions } from '../../../redux/actions';
@@ -10,6 +9,7 @@ import { Proposal } from '../../Proposal';
 import Button from '../../Button/Button';
 import ProposalContainer from '../../Proposal/ProposalContainer';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
+import EmptyState from '../../EmptyState';
 
 function ScheduledCongressSpending({ isVetoButton }) {
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ function ScheduledCongressSpending({ isVetoButton }) {
   }, [motionIds, dispatch, scheduledCalls]);
 
   if (!scheduledCalls || scheduledCalls.length < 1) {
-    return <Result status="info" title="There are no open items" />;
+    return <EmptyState title="There are no open items" />;
   }
 
   return (
