@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Spin from 'antd/es/spin';
-import Result from 'antd/es/result';
 import Collapse from 'antd/es/collapse';
 import ContractsList from '../ContractsList';
 import { blockchainSelectors, contractsSelectors } from '../../../redux/selectors';
 import { contractsActions } from '../../../redux/actions';
+import EmptyState from '../../EmptyState';
 
 function HomeContract() {
   const dispatch = useDispatch();
@@ -21,7 +21,7 @@ function HomeContract() {
   }
 
   if (!contracts.length) {
-    return <Result status="info" title="No contracts found" />;
+    return <EmptyState title="No contracts found" />;
   }
 
   return (

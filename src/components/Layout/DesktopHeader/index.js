@@ -14,6 +14,8 @@ import {
   NETWORKS, getSelectedNetwork, setSelectedNetwork, getNetworkConfig,
 } from '../../../utils/networkHelpers';
 import { getPageTitle } from '../../../utils/pageTitle';
+import { useNavigationList } from '../hooks';
+import Button from '../../Button/Button';
 import styles from './styles.module.scss';
 
 function NetworkSwitcher() {
@@ -88,6 +90,14 @@ function DesktopHeader() {
 
   const [title, sub] = getPageTitle(pathname);
 
+  // Per-route primary action declared in navigationList (`extra`). The old
+  // Layout rendered these through PageTitle, which the redesign dropped —
+  // taking "Register a new company" with it and leaving no route to company
+  // registration anywhere in the UI.
+  const { matchedRoute, matchedSubLink } = useNavigationList();
+  const pageAction = Object.entries((matchedSubLink || matchedRoute)?.extra || {})
+    .find(([path]) => path === pathname)?.[1];
+
   // eslint-disable-next-line no-nested-ternary
   const initials = givenName && familyName
     ? `${givenName[0]}${familyName[0]}`.toUpperCase()
@@ -118,6 +128,15 @@ function DesktopHeader() {
         <p className={styles.pageSub}>{sub}</p>
       </div>
       <div className={styles.actions}>
+        {pageAction && (
+          <Button
+            primary
+            onClick={() => history.push(pageAction.link)}
+            data-testid="page-action"
+          >
+            {pageAction.title}
+          </Button>
+        )}
         <ThemeToggle />
         <NetworkSwitcher />
         <ChangeWallet />

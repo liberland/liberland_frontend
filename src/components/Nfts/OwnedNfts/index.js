@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Result from 'antd/es/result';
 import List from 'antd/es/list';
 import Spin from 'antd/es/spin';
 import Flex from 'antd/es/flex';
@@ -13,6 +12,7 @@ import { nftsActions } from '../../../redux/actions';
 import { blockchainSelectors, nftsSelectors } from '../../../redux/selectors';
 import ItemNft from '../ItemNft';
 import FillNumberModal from '../../Modals/FillNumber';
+import EmptyState from '../../EmptyState';
 
 function OwnedNfts() {
   const dispatch = useDispatch();
@@ -97,7 +97,7 @@ function OwnedNfts() {
               />
             )}
           />
-        ) : <Result title="You have no NFTs" status="info" />,
+        ) : <EmptyState title="You have no NFTs" />,
       }]}
     />
   );
