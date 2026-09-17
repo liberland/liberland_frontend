@@ -22,6 +22,9 @@ import CopyLink from './CopyLink';
 import modalWrapper from '../components/ModalWrapper';
 import OpenModalButton from '../components/OpenModalButton';
 import ScrollTo from '../../ScrollTo';
+import ReceiveAddress from '../../ReceiveAddress';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
+import { readIdentityDisplay } from '../../../utils/identityDisplay';
 
 function RequestLLDForm({ onClose }) {
   const [form] = Form.useForm();
@@ -92,12 +95,15 @@ function RequestLLDForm({ onClose }) {
     return <Spin />;
   }
 
-  const { info } = identity?.isSome ? identity.unwrap() : {};
-  const displayName = info?.display?.toHuman()?.Raw || walletAddress || 'No name';
+  // display is a Data enum; reading .Raw directly printed a hex blob for any
+  // non-ASCII name, which readers mistook for the wallet address.
+  const { name: identityName, isHashed } = readIdentityDisplay(identity);
+  const showName = Boolean(form.getFieldValue('showName')) && Boolean(identityName);
   const submitText = linkData ? 'Update payment link' : 'Create payment link';
 
   return (
     <Form form={form} onFinish={onSubmit} layout="vertical">
+      <ReceiveAddress address={walletAddress} title="Receive LLD" />
       {linkData && (
         <ScrollTo deps={[linkData]}>
           {isLargerThanHdScreen ? (
@@ -200,9 +206,12 @@ function RequestLLDForm({ onClose }) {
             noPagination
             data={[
               {
-                name: 'Recipient',
-                value: displayName,
+                name: 'Recipient address',
+                value: <CopyIconWithAddress address={walletAddress} />,
               },
+            ].concat(
+              showName ? [{ name: 'Recipient name', value: identityName }] : [],
+            ).concat([
               linkData.donation ? {
                 name: 'Type of request',
                 value: 'Donation',
@@ -210,7 +219,7 @@ function RequestLLDForm({ onClose }) {
                 name: 'Amount',
                 value: `${formatDollars(linkData.amount, true)} LLD`,
               },
-            ].concat(
+            ]).concat(
               linkData.note
                 ? [
                   {
@@ -249,6 +258,27 @@ function RequestLLDForm({ onClose }) {
       >
         <Checkbox />
       </Form.Item>
+      {identityName && (
+        <Form.Item
+          name="showName"
+          layout="horizontal"
+          valuePropName="checked"
+          label={`Show my name (${identityName}) in this request?`}
+          extra={'Off by default. Note this hides the name from the request only — an '
+            + 'on-chain identity is public, so the payer\'s wallet can still look it up '
+            + 'from your address.'}
+        >
+          <Checkbox data-testid="request-show-name" />
+        </Form.Item>
+      )}
+      {isHashed && (
+        <Form.Item label="Your identity">
+          <span>
+            Your on-chain identity stores only a hash of your name, so no readable
+            name can be shown. Your address is used instead.
+          </span>
+        </Form.Item>
+      )}
       <Form.Item label="Note" name="note" extra="Optional">
         <TextArea className={styles.textarea} />
       </Form.Item>
