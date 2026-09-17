@@ -5,8 +5,8 @@ import {
   hexToU8a, u8aToHex,
 } from '@polkadot/util';
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { getNetworkRpc } from '../utils/networkHelpers';
 import groupBy from 'lodash/groupBy';
+import { getNetworkRpc } from '../utils/networkHelpers';
 import { USER_ROLES, userRolesHelper } from '../utils/userRolesHelper';
 import { handleMyDispatchErrors } from '../utils/therapist';
 import * as centralizedBackend from './backend';
