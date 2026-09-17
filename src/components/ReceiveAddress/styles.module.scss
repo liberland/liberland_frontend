@@ -1,0 +1,76 @@
+.wrapper {
+  border: 1px solid var(--line, #E7E0D0);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft, #5C564B);
+}
+
+.network {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong, #d8cfb8);
+  color: var(--ink-soft, #5C564B);
+}
+
+.body {
+  margin-top: 12px;
+}
+
+// The QR keeps a light plate of its own so the dark theme cannot invert it
+// into something scanners struggle with.
+.qrBox {
+  background: #FFFFFF;
+  padding: 10px;
+  border-radius: 8px;
+  flex: none;
+  line-height: 0;
+}
+
+.details {
+  flex: 1;
+  min-width: 260px;
+}
+
+.label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint, #948E80);
+  margin-bottom: 4px;
+}
+
+.address {
+  display: block;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-all;
+  color: var(--ink, #1C1813);
+  background: var(--surface-2, rgba(0, 0, 0, 0.04));
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+// First and last characters, which the sender is asked to verify.
+.verify {
+  font-weight: 700;
+  color: var(--gold, #9A7320);
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--ink-faint, #948E80);
+  line-height: 1.45;
+}

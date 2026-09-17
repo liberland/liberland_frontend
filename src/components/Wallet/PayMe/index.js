@@ -14,6 +14,8 @@ import { ReactComponent as UploadIcon } from '../../../assets/icons/upload.svg';
 import styles from './styles.module.scss';
 import Button from '../../Button/Button';
 import modalWrapper from '../../Modals/components/ModalWrapper';
+import { readIdentityDisplay } from '../../../utils/identityDisplay';
+import CopyIconWithAddress from '../../CopyIconWithAddress';
 
 function SuccessModal({ onClose }) {
   const history = useHistory();
@@ -62,8 +64,8 @@ function PayMe() {
     }
   }, [dispatch, linkData]);
 
-  const { info } = (identity && identity.isSome) ? identity.unwrap() : {};
-  const displayName = info?.display?.toHuman()?.Raw || linkData?.recipient || 'No name';
+  // Same Data-enum decoding as the request side: .Raw alone renders hex.
+  const { name: recipientName } = readIdentityDisplay(identity);
 
   const payRecipient = ({ amount }) => {
     dispatch(
@@ -95,9 +97,13 @@ function PayMe() {
         ]}
         data={[
           {
-            name: 'Recipient',
-            value: displayName,
+            name: 'Recipient address',
+            value: <CopyIconWithAddress address={linkData?.recipient} />,
           },
+        ].concat(recipientName ? [{
+          name: 'Recipient name',
+          value: recipientName,
+        }] : []).concat([
           linkData?.amount ? {
             name: 'Amount',
             value: `${formatDollars(linkData.amount)} LLD`,
@@ -119,7 +125,7 @@ function PayMe() {
         ].concat(linkData?.note ? [{
           name: 'Note',
           value: linkData.note,
-        }] : [])}
+        }] : []))}
         footer={(
           <Button primary type="submit">
             <div className={styles.icon}>
