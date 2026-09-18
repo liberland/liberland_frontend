@@ -1,8 +1,11 @@
 /* eslint-disable max-len */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import Markdown from 'markdown-to-jsx';
+import { useModeContext } from '../AntdProvider';
+import StateDashboard from './StateDashboard';
 import { userSelectors } from '../../redux/selectors';
 import router from '../../router';
 import styles from './styles.module.scss';
@@ -45,21 +48,33 @@ The easiest ways currently: [MEXC](https://www.mexc.com/exchange/LLD_USDT), [Coi
     title: 'Liberland Merits — LLM',
     date: 'Apr 05, 2023',
     author: 'Liberland',
-    text: `Liberland Merit (LLM) is the official politics and citizenship token of the Liberland blockchain. It represents political power and can be used to gain citizenship, interact with government services, or delegated (PolitiPooled) to representatives. [Learn more →](https://liberland.org/blockchain)`,
+    text: 'Liberland Merit (LLM) is the official politics and citizenship token of the Liberland blockchain. It represents political power and can be used to gain citizenship, interact with government services, or delegated (PolitiPooled) to representatives. [Learn more →](https://liberland.org/blockchain)',
     tag: 'LLM',
   },
 ];
 
-function StatCard({ label, value, unit, trend, trendColor, onClick }) {
+const TREND_CLASS = {
+  green: styles.trendGreen,
+  gold: styles.trendGold,
+};
+
+function StatCard({
+  label, value, unit, trend, trendColor, onClick,
+}) {
   return (
     <button type="button" className={styles.statCard} onClick={onClick}>
       <div className={styles.statLabel}>{label}</div>
       <div className={styles.statValue}>
         {value}
-        {unit && <span className={styles.statUnit}> {unit}</span>}
+        {unit && (
+        <span className={styles.statUnit}>
+          {' '}
+          {unit}
+        </span>
+        )}
       </div>
       {trend && (
-        <div className={`${styles.statTrend} ${trendColor === 'green' ? styles.trendGreen : trendColor === 'gold' ? styles.trendGold : styles.trendRed}`}>
+        <div className={`${styles.statTrend} ${TREND_CLASS[trendColor] || styles.trendRed}`}>
           {trend}
         </div>
       )}
@@ -67,7 +82,18 @@ function StatCard({ label, value, unit, trend, trendColor, onClick }) {
   );
 }
 
-function IdentityBanner({ name, initials, isCitizen, onViewPassport }) {
+StatCard.propTypes = {
+  label: PropTypes.string,
+  value: PropTypes.node,
+  unit: PropTypes.string,
+  trend: PropTypes.node,
+  trendColor: PropTypes.string,
+  onClick: PropTypes.func,
+};
+
+function IdentityBanner({
+  name, initials, isCitizen, onViewPassport,
+}) {
   return (
     <section className={styles.banner}>
       <svg
@@ -114,12 +140,25 @@ function IdentityBanner({ name, initials, isCitizen, onViewPassport }) {
   );
 }
 
+IdentityBanner.propTypes = {
+  name: PropTypes.string,
+  initials: PropTypes.string,
+  isCitizen: PropTypes.bool,
+  onViewPassport: PropTypes.func,
+};
+
 function NewsCard({ item }) {
   return (
     <article className={styles.newsCard}>
       <div className={styles.newsTag}>{item.tag}</div>
       <h3 className={styles.newsTitle}>{item.title}</h3>
-      <div className={styles.newsMeta}>{item.date} · {item.author}</div>
+      <div className={styles.newsMeta}>
+        {item.date}
+        {' '}
+        ·
+        {' '}
+        {item.author}
+      </div>
       <div className={styles.newsBody}>
         <Markdown>{item.text}</Markdown>
       </div>
@@ -127,8 +166,19 @@ function NewsCard({ item }) {
   );
 }
 
+NewsCard.propTypes = {
+  item: PropTypes.shape({
+    tag: PropTypes.string,
+    title: PropTypes.string,
+    date: PropTypes.string,
+    author: PropTypes.string,
+    text: PropTypes.node,
+  }).isRequired,
+};
+
 function Feed() {
   const history = useHistory();
+  const { isStateDesign } = useModeContext();
   const user = useSelector(userSelectors.selectUser);
   const givenName = useSelector(userSelectors.selectUserGivenName);
   const familyName = useSelector(userSelectors.selectUserFamilyName);
@@ -136,9 +186,17 @@ function Feed() {
   const displayName = givenName
     ? `${givenName}${familyName ? ` ${familyName}` : ''}`
     : null;
-  const initials = givenName && familyName
-    ? `${givenName[0]}${familyName[0]}`.toUpperCase()
-    : (givenName ? givenName.slice(0, 2).toUpperCase() : null);
+  const initialsOf = () => {
+    if (givenName && familyName) return `${givenName[0]}${familyName[0]}`.toUpperCase();
+    if (givenName) return givenName.slice(0, 2).toUpperCase();
+    return null;
+  };
+  const initials = initialsOf();
+
+  // The State language specifies its own landing screen.
+  if (isStateDesign) {
+    return <StateDashboard news={NEWS} />;
+  }
 
   return (
     <div className={styles.page}>
