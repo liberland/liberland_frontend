@@ -55,7 +55,7 @@
   font-size: 18px;
   letter-spacing: 0.02em;
   flex: none;
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-serif);
 }
 
 .bannerInfo {
@@ -73,7 +73,7 @@
 }
 
 .bannerName {
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: 22px;
   font-weight: 600;
   color: #F4EDD4;
@@ -157,7 +157,7 @@
 }
 
 .statValue {
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: 28px;
   font-weight: 600;
   color: var(--ink);
@@ -169,7 +169,7 @@
   font-size: 14px;
   font-weight: 400;
   color: var(--ink-soft);
-  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-family: var(--font-sans);
 }
 
 .statTrend {
@@ -204,7 +204,7 @@
 
 .newsSectionTitle {
   margin: 0;
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: 18px;
   font-weight: 600;
   color: var(--ink);
@@ -247,7 +247,7 @@
 
 .newsTitle {
   margin: 0 0 6px;
-  font-family: 'Spectral', Georgia, serif;
+  font-family: var(--font-serif);
   font-size: 16px;
   font-weight: 600;
   color: var(--ink);
