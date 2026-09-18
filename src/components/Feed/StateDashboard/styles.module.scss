@@ -1,0 +1,215 @@
+// "State of the chain" — measured from the design-language mockup.
+
+.page { max-width: 1240px; }
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 8px;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: 46px;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1;
+  margin: 0;
+  color: var(--ink);
+}
+
+.headMeta {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-align: right;
+  line-height: 1.7;
+}
+
+// ── statement strip ──
+.strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--gold);
+  margin-bottom: 34px;
+
+  @media (max-width: 1100px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 560px)  { grid-template-columns: 1fr; }
+}
+
+.stat {
+  padding: 16px 18px 18px;
+  border-right: 1px solid var(--line);
+
+  &:last-child { border-right: none; }
+}
+
+.statLabel {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+}
+
+.statValue {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  line-height: 1.1;
+  color: var(--ink);
+  word-break: break-all;
+}
+
+.statUnit {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--ink-faint);
+  margin-left: 7px;
+}
+
+.statNote {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--ink-faint);
+  margin-top: 8px;
+}
+
+// ── two columns ──
+.columns {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 34px;
+
+  @media (max-width: 1000px) { grid-template-columns: 1fr; }
+}
+
+.sectionTitle {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 400;
+  margin: 0 0 14px;
+  color: var(--ink);
+}
+
+.panel {
+  border: 1px solid var(--line);
+  padding: 16px 18px;
+}
+
+.panelBody {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin: 0 0 14px;
+}
+
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.primaryBtn,
+.ghostBtn {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+}
+
+.primaryBtn {
+  background: var(--gold-bright);
+  color: var(--on-gold);
+  border-color: var(--gold-bright);
+}
+
+.ghostBtn {
+  background: transparent;
+  color: var(--ink-faint);
+
+  &:hover { color: var(--ink); border-color: var(--line-strong); }
+}
+
+// ── dispatch ──
+.dispatch { display: flex; flex-direction: column; }
+
+.dispatchItem {
+  padding: 0 0 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+
+  &:last-child { border-bottom: none; margin-bottom: 0; }
+}
+
+.dispatchMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 2px 6px;
+}
+
+.dispatchDate,
+.dispatchAuthor {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+}
+
+.dispatchAuthor { margin-left: auto; }
+
+.dispatchTitle {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+
+.dispatchBody {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+
+  // markdown-to-jsx emits bare anchors, which would otherwise fall back to the
+  // browser's blue and break the language.
+  a {
+    color: var(--gold);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line-strong);
+
+    &:hover { color: var(--gold-bright); }
+  }
+
+  ul { padding-left: 18px; margin: 8px 0; }
+  p { margin: 0 0 8px; }
+}
