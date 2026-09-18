@@ -33,8 +33,12 @@
   height: 56px;
   flex: none;
   padding: 0 20px;
-  background: var(--surface-3);
-  border-bottom: 2px solid var(--gold);
+  // The status bar is chrome, not canvas: the design language keeps it
+  // near-black with the bright gold rule in day mode as well as night, so it
+  // must not follow --surface-3.
+  background: var(--statusbar-bg);
+  color: var(--statusbar-ink);
+  border-bottom: 2px solid var(--gold-fill);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -64,7 +68,7 @@
   font-size: 16px;
   font-weight: 400;
   letter-spacing: 0.01em;
-  color: var(--ink);
+  color: var(--statusbar-ink);
 }
 
 .brandSub {
@@ -74,7 +78,7 @@
   font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--statusbar-faint);
 }
 
 // The hairline separating the wordmark from the chain status.
@@ -82,7 +86,7 @@
   width: 1px;
   height: 26px;
   flex: none;
-  background: rgba(255, 200, 0, 0.24);
+  background: var(--statusbar-line);
 }
 
 .chain {
@@ -108,8 +112,8 @@
   text-transform: uppercase;
 }
 
-.chainLabel { color: var(--ink-faint); }
-.chainNumber { color: var(--ink); }
+.chainLabel { color: var(--statusbar-faint); }
+.chainNumber { color: var(--statusbar-ink); }
 
 .statusActions {
   display: flex;
@@ -124,9 +128,9 @@
   align-items: center;
   gap: 8px;
   padding: 4px 10px 4px 4px;
-  background: var(--gold-tint);
-  border: 1px solid var(--line);
-  color: var(--ink);
+  background: rgba(255, 200, 0, 0.1);
+  border: 1px solid var(--statusbar-line);
+  color: var(--statusbar-ink);
   cursor: pointer;
   font: inherit;
 }
@@ -137,7 +141,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--gold-bright);
+  background: var(--gold-fill);
   color: var(--on-gold);
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -188,12 +192,19 @@
   color: var(--ink-faint);
 }
 
+// Each domain carries its own colour on its dash — never gold, which the
+// design language reserves for the active item and the primary action.
 .groupRule {
   width: 14px;
-  height: 1px;
-  background: var(--gold);
+  height: 2px;
+  background: var(--domain-account);
   flex: none;
 }
+
+.groupRuleTreasury { background: var(--domain-treasury); }
+.groupRuleAssembly { background: var(--domain-assembly); }
+.groupRuleRegistry { background: var(--domain-registry); }
+.groupRuleAccount  { background: var(--domain-account); }
 
 .navItem {
   display: block;
@@ -203,12 +214,13 @@
   border: none;
   border-left: 2px solid transparent;
   background: transparent;
-  color: var(--ink-soft);
+  color: var(--ink-faint);
   font-family: var(--font-sans);
   font-size: 14.5px;
+  font-weight: 400;
   cursor: pointer;
 
-  &:hover { color: var(--ink); }
+  &:hover { color: var(--ink-soft); }
 }
 
 .navItemActive {
@@ -230,6 +242,8 @@
 .content {
   flex: 1;
   min-width: 0;
-  padding: 26px 30px 60px;
+  padding: 34px 40px 90px;
   overflow-x: hidden;
+
+  @media (max-width: 767px) { padding: 24px 16px 60px; }
 }

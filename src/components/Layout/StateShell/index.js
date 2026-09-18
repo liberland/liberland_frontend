@@ -245,7 +245,10 @@ function StateShell({ children }) {
             {NAV_GROUPS.map((group) => (
               <div key={group.label} className={styles.group}>
                 <div className={styles.groupLabel}>
-                  <span className={styles.groupRule} aria-hidden="true" />
+                  <span
+                    className={`${styles.groupRule} ${styles[`groupRule${group.label}`] || ''}`}
+                    aria-hidden="true"
+                  />
                   {group.label}
                 </div>
                 {group.items.map((item) => (

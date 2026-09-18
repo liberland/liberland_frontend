@@ -476,3 +476,106 @@ textarea.ant-input {
     }
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// Liberland State — controls
+//
+// Scoped entirely under the design-language attribute, so nothing here can
+// reach the Ledger. These are the rules Ant Design's theme tokens cannot
+// express — a typeface role, uppercase, tracking, a square box — plus the
+// overrides needed to beat the hard-coded Ledger button rules above, which
+// pin every primary button to #F6CA31 on #122C4B with !important.
+//
+// Values are measured from the design language, not chosen: Archivo
+// 11px / 600 / .18em, uppercase, radius 0, 10px padding. The primary action
+// is a solid state-yellow block with near-black text; every other action is
+// a hairline on the page.
+// ═══════════════════════════════════════════════════════════════════════
+html[data-design='state'] {
+  .ant-btn:not(.ant-btn-link):not(.ant-btn-icon-only) {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border-radius: 0;
+    height: auto;
+    min-height: 0;
+    line-height: 1.1;
+    padding: 10px 14px !important;
+
+    &.ant-btn-sm {
+      font-size: 10px;
+      padding: 7px 11px !important;
+    }
+
+    &.ant-btn-lg {
+      font-size: 12px;
+      padding: 13px 18px !important;
+    }
+  }
+
+  .ant-btn-primary {
+    background: var(--gold-fill);
+    border-color: var(--gold-fill);
+    color: var(--on-gold) !important;
+
+    &:focus, &:active, &:hover {
+      background: var(--gold-fill) !important;
+      filter: brightness(108%);
+    }
+  }
+
+  // The quiet action: a hairline rather than a filled block.
+  .ant-btn-default:not(.ant-btn-dangerous) {
+    background: transparent;
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+
+  // A destructive action is a hairline too — the design language reserves
+  // solid fills for the single primary action on a screen.
+  .ant-btn-dangerous {
+    background: transparent !important;
+    border-color: var(--red) !important;
+    color: var(--red) !important;
+
+    &:focus, &:active, &:hover {
+      background: var(--red-tint) !important;
+      color: var(--red) !important;
+      filter: none;
+    }
+  }
+
+  // Links keep sentence case — they sit inside running text, where the
+  // design language sets prose, not labels.
+  .ant-btn-link {
+    border-radius: 0;
+  }
+
+  // Squared surfaces, to match.
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-input-number,
+  .ant-select .ant-select-selector,
+  .ant-picker,
+  .ant-card,
+  .ant-collapse,
+  .ant-collapse > .ant-collapse-item,
+  .ant-alert,
+  .ant-tag,
+  .ant-table-wrapper,
+  .ant-table-footer,
+  .ant-modal .ant-modal-content {
+    border-radius: 0 !important;
+  }
+
+  // Display headings are set light in the design language, not bold. The
+  // global rule above forces 600 with !important, so this has to as well.
+  h1, h2,
+  h1.ant-typography,
+  h2.ant-typography {
+    font-weight: 400 !important;
+    letter-spacing: -0.015em;
+  }
+}
