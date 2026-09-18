@@ -9,6 +9,9 @@ import PropTypes from 'prop-types';
 import theme from 'antd/es/theme';
 import ConfigProvider from 'antd/es/config-provider';
 import { useMediaQuery } from 'usehooks-ts';
+import {
+  DESIGNS, getSelectedDesign, persistDesign, applyDesignAttribute,
+} from '../../utils/designLanguage';
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
@@ -20,31 +23,58 @@ export default function AntdProvider({ children }) {
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [isDarkMode, setIsDarkMode] = useState(prefersDarkMode);
-  const context = useMemo(() => ({ isDarkMode, setIsDarkMode }), [isDarkMode]);
+  const [design, setDesignState] = useState(getSelectedDesign);
+
+  // Persisted so a chosen design language survives reloads and sessions until
+  // the citizen changes it again.
+  const setDesign = (next) => {
+    persistDesign(next);
+    setDesignState(next);
+  };
+  const isState = design === DESIGNS.state.key;
+
+  const context = useMemo(
+    () => ({
+      isDarkMode, setIsDarkMode, design, setDesign, isStateDesign: isState,
+    }),
+    [isDarkMode, design, isState],
+  );
 
   useLayoutEffect(() => {
     document.getElementsByTagName('html')[0].setAttribute('dark-mode', isDarkMode ? 'yes' : 'no');
   }, [isDarkMode]);
 
+  // The stylesheet keys every token off this attribute, so switching it
+  // repaints the whole app without touching a single component.
+  useLayoutEffect(() => {
+    applyDesignAttribute(design);
+  }, [design]);
+
   // Design system color tokens
-  const colorText         = isDarkMode ? '#F3EEE1' : '#1C1813';
-  const colorTextSecond   = isDarkMode ? '#ABA391' : '#5C564B';
-  const colorBg           = isDarkMode ? '#1C1913' : '#FFFFFF';
-  const colorBgContainer  = isDarkMode ? '#1C1913' : '#FFFFFF';
-  const colorBgLayout     = isDarkMode ? '#121009' : '#F4F0E6';
-  const colorBorder       = isDarkMode ? '#2E2A1E' : '#E7E0D0';
-  const colorGold         = isDarkMode ? '#E6BA56' : '#9A7320';
-  const colorGoldBright   = isDarkMode ? '#F4CE73' : '#C99A3A';
-  const colorGoldTint     = isDarkMode ? '#2C2614' : '#F3E9D0';
-  const colorGreen        = isDarkMode ? '#5CB98A' : '#2C7A57';
-  const colorRed          = isDarkMode ? '#E07F66' : '#BB4632';
-  const colorLink         = isDarkMode ? '#E6BA56' : '#9A7320';
-  const colorLinkActive   = isDarkMode ? '#F4CE73' : '#C99A3A';
-  const colorWarningBg    = isDarkMode ? '#2C2614' : '#FAF4E4';
-  const contentBg         = isDarkMode ? '#121009' : '#F4F0E6';
-  const shadow            = isDarkMode ? '#2E2A1E' : '#E7E0D0';
-  const mildBlue          = isDarkMode ? '#766F5F' : '#948E80';
-  const activeBorder      = colorGold;
+  // Palette per design language. Ledger = warm parchment; State = near-black
+  // with the #FFC800 state yellow. Four-way pick keeps each token on one line
+  // without nesting ternaries.
+  const pick = (stateDark, stateLight, ledgerDark, ledgerLight) => {
+    if (isState) return isDarkMode ? stateDark : stateLight;
+    return isDarkMode ? ledgerDark : ledgerLight;
+  };
+  const colorText = pick('#F6F5F2', '#0A0A0B', '#F3EEE1', '#1C1813');
+  const colorTextSecond = pick('#B8B6AE', '#57554F', '#ABA391', '#5C564B');
+  const colorBg = pick('#16171A', '#FFFFFF', '#1C1913', '#FFFFFF');
+  const colorBgContainer = pick('#16171A', '#FFFFFF', '#1C1913', '#FFFFFF');
+  const colorBgLayout = pick('#0A0A0B', '#F6F5F2', '#121009', '#F4F0E6');
+  const colorBorder = pick('rgba(255,200,0,.20)', 'rgba(10,10,11,.13)', '#2E2A1E', '#E7E0D0');
+  const colorGold = pick('#FFC800', '#8A6A00', '#E6BA56', '#9A7320');
+  const colorGoldBright = pick('#FFD84D', '#E6B400', '#F4CE73', '#C99A3A');
+  const colorGoldTint = pick('rgba(255,200,0,.10)', 'rgba(255,200,0,.24)', '#2C2614', '#F3E9D0');
+  const colorGreen = pick('#6ECB4F', '#2F6B33', '#5CB98A', '#2C7A57');
+  const colorRed = pick('#C9705A', '#6B2F1F', '#E07F66', '#BB4632');
+  const colorLink = pick('#FFC800', '#8A6A00', '#E6BA56', '#9A7320');
+  const colorLinkActive = pick('#FFD84D', '#6E5500', '#F4CE73', '#C99A3A');
+  const colorWarningBg = isDarkMode ? '#2C2614' : '#FAF4E4';
+  const contentBg = pick('#0A0A0B', '#F6F5F2', '#121009', '#F4F0E6');
+  const mildBlue = isDarkMode ? '#766F5F' : '#948E80';
+  const activeBorder = colorGold;
 
   return (
     <ConfigProvider
@@ -77,10 +107,13 @@ export default function AntdProvider({ children }) {
           fontSizeHeading3: 24,
           fontSizeHeading2: 29,
           fontSizeHeading1: 36,
-          fontFamily: "'Hanken Grotesk', system-ui, sans-serif",
-          borderRadius: 10,
-          borderRadiusLG: 14,
-          borderRadiusSM: 8,
+          fontFamily: isState
+            ? "'Archivo', system-ui, sans-serif"
+            : "'Hanken Grotesk', system-ui, sans-serif",
+          // The State language is squared; the Ledger language is soft.
+          borderRadius: isState ? 0 : 10,
+          borderRadiusLG: isState ? 0 : 14,
+          borderRadiusSM: isState ? 0 : 8,
           wireframe: false,
         },
         components: {
@@ -102,7 +135,7 @@ export default function AntdProvider({ children }) {
             itemMarginInline: '0',
             itemSelectedColor: colorText,
             itemColor: colorTextSecond,
-            itemBorderRadius: 10,
+            itemBorderRadius: isState ? 0 : 10,
             itemActiveBg: colorGoldTint,
             itemActiveColor: colorText,
             subMenuItemSelectedColor: colorText,
@@ -143,7 +176,7 @@ export default function AntdProvider({ children }) {
             contentPadding: isBiggerThanSmallScreen ? '20px' : '12px',
             headerBg: colorBgContainer,
             headerPadding: isBiggerThanSmallScreen ? '16px 20px' : '12px',
-            colorBorder: colorBorder,
+            colorBorder,
             contentBg,
             fontSize: 15,
             colorText,

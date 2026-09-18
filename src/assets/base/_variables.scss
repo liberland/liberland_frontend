@@ -130,3 +130,129 @@ html {
         --serious-border:    rgba(224, 127, 102, .40);
     }
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// Design languages
+//
+// Two skins share one token vocabulary. Every component already reads these
+// custom properties (or antd tokens, which AntdProvider switches in step), so
+// a skin is a palette swap — no markup, no layout, no behaviour changes.
+//
+//   (default)            Liberland Limited Ledger — warm parchment, Spectral
+//   [data-design=state]  Liberland State          — near-black, #FFC800, Playfair
+//
+// These rules follow the base blocks, so at equal specificity they win; the
+// state+dark rule carries two attributes and so outranks state-light.
+// ═══════════════════════════════════════════════════════════════════════
+
+// Typeface roles — the Ledger defaults, referenced by name everywhere.
+html {
+  --font-serif: 'Spectral', Georgia, serif;
+  --font-sans:  'Hanken Grotesk', system-ui, sans-serif;
+  --font-mono:  'JetBrains Mono', ui-monospace, monospace;
+  --radius-lg:  12px;
+  --radius-md:  10px;
+  --radius-sm:  8px;
+}
+
+// ── Liberland State — light ──
+html[data-design='state'] {
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans:  'Archivo', system-ui, sans-serif;
+  --font-mono:  'IBM Plex Mono', ui-monospace, monospace;
+  // The State language is squared: hairlines and right angles, no soft cards.
+  --radius-lg: 0px;
+  --radius-md: 0px;
+  --radius-sm: 0px;
+
+  --paper:      #F6F5F2;
+  --surface:    #FFFFFF;
+  --surface-2:  #E6E4DE;
+  --surface-3:  #EFEDE8;
+  --ink:        #0A0A0B;
+  --ink-soft:   #57554F;
+  --ink-faint:  #6E6C66;
+  --line:       rgba(10, 10, 11, .13);
+  --line-strong:rgba(10, 10, 11, .28);
+  --gold:       #8A6A00;
+  --gold-bright:#E6B400;
+  --gold-tint:  rgba(255, 200, 0, .24);
+  --gold-tint-2:rgba(255, 200, 0, .12);
+  --blue:       #0F5E96;
+  --green:      #2F6B33;
+  --green-tint: rgba(47, 107, 51, .12);
+  --red:        #6B2F1F;
+  --red-tint:   rgba(107, 47, 31, .10);
+  --on-gold:    #0A0A0B;
+  --shadow:     none;
+  --shadow-sm:  none;
+
+  --main-color:        #0A0A0B;
+  --border-color:      rgba(10, 10, 11, .13);
+  --main-border:       rgba(10, 10, 11, .13);
+  --body-background:   #F6F5F2;
+  --table-bg:          #FFFFFF;
+  --footer-bg:         #EFEDE8;
+  --table-border:      rgba(10, 10, 11, .13);
+  --dangerous-color:   #6B2F1F;
+  --dangerous-bg:      #FFFFFF;
+  --description-color: #6E6C66;
+  --card-border:       rgba(10, 10, 11, .13);
+  --card-background:   #FFFFFF;
+  --nav-bg:            #EFEDE8;
+  --content-bg:        #F6F5F2;
+  --mobile-menu-open:  #FFFFFF;
+  --markd-bg:          #FFFFFF;
+  --markd-border:      rgba(10, 10, 11, .28);
+  --button-gray-bg:    rgba(10, 10, 11, .05);
+  --button-gray-color: rgba(10, 10, 11, .45);
+  --alert-warning-color: #0A0A0B;
+  --serious-bg:        rgba(107, 47, 31, .06);
+}
+
+// ── Liberland State — dark (the language's native mode) ──
+html[data-design='state'][dark-mode='yes'] {
+  --paper:      #0A0A0B;
+  --surface:    #16171A;
+  --surface-2:  #1E1F23;
+  --surface-3:  #101114;
+  --ink:        #F6F5F2;
+  --ink-soft:   #B8B6AE;
+  --ink-faint:  #8A8880;
+  --line:       rgba(255, 200, 0, .20);
+  --line-strong:rgba(255, 200, 0, .34);
+  --gold:       #FFC800;
+  --gold-bright:#FFD84D;
+  --gold-tint:  rgba(255, 200, 0, .10);
+  --gold-tint-2:rgba(255, 200, 0, .06);
+  --blue:       #5AAEE8;
+  --green:      #6ECB4F;
+  --green-tint: rgba(110, 203, 79, .12);
+  --red:        #C9705A;
+  --red-tint:   rgba(201, 112, 90, .12);
+  --on-gold:    #0A0A0B;
+  --shadow:     none;
+  --shadow-sm:  none;
+
+  --main-color:        #F6F5F2;
+  --border-color:      rgba(255, 200, 0, .20);
+  --main-border:       rgba(255, 200, 0, .20);
+  --body-background:   #0A0A0B;
+  --table-bg:          #101114;
+  --footer-bg:         #0E0F12;
+  --table-border:      rgba(255, 200, 0, .20);
+  --dangerous-color:   #C9705A;
+  --dangerous-bg:      #16171A;
+  --description-color: #8A8880;
+  --card-border:       rgba(255, 200, 0, .20);
+  --card-background:   #16171A;
+  --nav-bg:            #0E0F12;
+  --content-bg:        #0A0A0B;
+  --mobile-menu-open:  #16171A;
+  --markd-bg:          #16171A;
+  --markd-border:      rgba(255, 200, 0, .34);
+  --button-gray-bg:    rgba(246, 245, 242, .08);
+  --button-gray-color: rgba(246, 245, 242, .60);
+  --alert-warning-color: #F6F5F2;
+  --serious-bg:        rgba(201, 112, 90, .12);
+}

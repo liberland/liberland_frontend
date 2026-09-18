@@ -27,6 +27,7 @@ import CopyIconWithAddress from '../CopyIconWithAddress';
 import truncate from '../../utils/truncate';
 import { setCentralizedBackendAddress } from '../../utils/setCentralizedBackendAddress';
 import ProfileItem from './ProfileItem';
+import DesignLanguageSetting from '../DesignLanguageSetting';
 
 function Profile() {
   const userName = useSelector(userSelectors.selectUserGivenName);
@@ -93,9 +94,14 @@ function Profile() {
 
   return (
     <Collapse
-      defaultActiveKey={['profile', 'account', 'onchain']}
+      defaultActiveKey={['profile', 'account', 'onchain', 'appearance']}
       collapsible="icon"
       items={[
+        {
+          key: 'appearance',
+          label: 'Appearance',
+          children: <DesignLanguageSetting />,
+        },
         {
           key: 'account',
           label: displayName || 'Account',

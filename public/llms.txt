@@ -40,6 +40,14 @@ This application is non-custodial. Read these rules before taking any action.
   error and NOT an HTTP 404 — it means the collection is genuinely empty. All
   in-app routes are served with HTTP 200 by the SPA fallback.
 
+## Design languages
+
+The app renders in one of two visual languages, chosen per browser under
+Profile → Appearance: "Liberland Limited Ledger" (default) and "Liberland
+State". They differ only in colour, typeface and shape — same routes, same
+data, same behaviour, and the same `data-testid` hooks and accessible names in
+both. Never rely on colour alone to identify a control.
+
 ## Networks
 
 The network switcher in the header toggles between Mainnet and Testnet. Switching
