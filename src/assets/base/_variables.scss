@@ -164,18 +164,11 @@ html {
 // toggle, element by element, rather than derived. Two rules the design
 // keeps in BOTH modes and which are easy to get wrong:
 //
-//   * the status bar stays near-black with the gold rule in day mode — it is
-//     chrome, not canvas, so --statusbar-* below are mode-independent;
-//   * each nav group's dash carries its own domain colour, never gold.
+//   * each nav group's dash carries its own domain colour, never gold;
+//   * the design's own day mode keeps the status bar near-black, but we
+//     deliberately depart from it there — the bar follows the canvas, which
+//     is what --statusbar-* express. Everything else is as measured.
 // ═══════════════════════════════════════════════════════════════════════
-
-// Chrome that does not follow the canvas.
-html[data-design='state'] {
-  --statusbar-bg:   #101114;
-  --statusbar-ink:  #F6F5F2;
-  --statusbar-faint:#8A8880;
-  --statusbar-line: rgba(255, 200, 0, .24);
-}
 
 // ── Liberland State — day ──
 html[data-design='state'] {
@@ -188,6 +181,12 @@ html[data-design='state'] {
   --radius-lg: 0px;
   --radius-md: 0px;
   --radius-sm: 0px;
+
+  // The status bar follows the canvas in day mode, by request.
+  --statusbar-bg:   #EFEDE8;
+  --statusbar-ink:  #0A0A0B;
+  --statusbar-faint:#6E6C66;
+  --statusbar-line: rgba(10, 10, 11, .18);
 
   --paper:      #F6F5F2;
   --surface:    #FFFFFF;
@@ -247,6 +246,11 @@ html[data-design='state'] {
 
 // ── Liberland State — night (the language's native mode) ──
 html[data-design='state'][dark-mode='yes'] {
+  --statusbar-bg:   #101114;
+  --statusbar-ink:  #F6F5F2;
+  --statusbar-faint:#8A8880;
+  --statusbar-line: rgba(255, 200, 0, .24);
+
   --paper:      #0A0A0B;
   --surface:    #16171A;
   --surface-2:  #1E1F23;

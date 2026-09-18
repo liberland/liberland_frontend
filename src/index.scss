@@ -659,3 +659,43 @@ html[data-design='state'] {
     }
   }
 }
+
+// ── Liberland State — sub-navigation ───────────────────────
+//
+// The application puts a route's sub-pages in a tab row; the design language
+// has no tabs, but it does have the chip row above the legislation list —
+// squared mono labels with the current one filled in state yellow. Translating
+// the tab row into that chip row keeps one navigation on the screen instead of
+// two, and reads the same on every route that has sub-pages.
+html[data-design='state'] {
+  .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab,
+  .ant-tabs > .ant-tabs-nav .ant-tabs-tab {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 7px 11px !important;
+    margin: 0 8px 0 0 !important;
+    // antd styles card tabs from its own component tokens; these have to beat
+    // them rather than merely outrank them.
+    border: 1px solid var(--line-strong) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: var(--ink-faint);
+
+    &:hover { border-color: var(--gold) !important; }
+  }
+
+  .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active,
+  .ant-tabs > .ant-tabs-nav .ant-tabs-tab-active {
+    background: var(--gold-fill) !important;
+    border-color: var(--gold-fill) !important;
+
+    .ant-tabs-tab-btn { color: var(--on-gold) !important; }
+  }
+
+  // The design separates the chip row from the list with nothing but space.
+  .ant-tabs > .ant-tabs-nav::before,
+  .ant-tabs-card > .ant-tabs-nav::before { border-bottom: none; }
+  .ant-tabs-ink-bar { display: none; }
+}

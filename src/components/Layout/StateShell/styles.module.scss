@@ -33,9 +33,9 @@
   height: 56px;
   flex: none;
   padding: 0 20px;
-  // The status bar is chrome, not canvas: the design language keeps it
-  // near-black with the bright gold rule in day mode as well as night, so it
-  // must not follow --surface-3.
+  // The bar's own tokens: near-black at night, and following the canvas by
+  // day. The design's day mode keeps the bar dark; this is a deliberate
+  // departure from it.
   background: var(--statusbar-bg);
   color: var(--statusbar-ink);
   border-bottom: 2px solid var(--gold-fill);
@@ -128,7 +128,7 @@
   align-items: center;
   gap: 8px;
   padding: 4px 10px 4px 4px;
-  background: rgba(255, 200, 0, 0.1);
+  background: var(--gold-tint);
   border: 1px solid var(--statusbar-line);
   color: var(--statusbar-ink);
   cursor: pointer;
