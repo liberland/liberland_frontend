@@ -1,0 +1,43 @@
+.networkBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--line, #E7E0D0);
+  background: transparent;
+  color: var(--ink, #1C1813);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover { border-color: var(--line-strong, #D8CFBA); }
+}
+
+.networkDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green, #2C7A57);
+  flex: none;
+}
+
+.networkDotTestnet {
+  background: #d97706;
+}
+
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--line, #E7E0D0);
+  background: transparent;
+  color: var(--ink, #1C1813);
+  cursor: pointer;
+
+  &:hover { border-color: var(--line-strong, #D8CFBA); }
+}
