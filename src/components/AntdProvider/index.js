@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useLayoutEffect,
   useMemo,
@@ -11,6 +12,7 @@ import ConfigProvider from 'antd/es/config-provider';
 import { useMediaQuery } from 'usehooks-ts';
 import {
   DESIGNS, getSelectedDesign, persistDesign, applyDesignAttribute,
+  getStoredTheme, persistTheme, nativeThemeIsDark,
 } from '../../utils/designLanguage';
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
@@ -22,22 +24,35 @@ export const useModeContext = () => useContext(ModeContext);
 export default function AntdProvider({ children }) {
   const isBiggerThanSmallScreen = useMediaQuery('(min-width: 992px)');
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const [isDarkMode, setIsDarkMode] = useState(prefersDarkMode);
+  // A stored choice wins; otherwise follow the operating system.
+  const storedTheme = getStoredTheme();
+  const [isDarkMode, setIsDarkModeState] = useState(
+    storedTheme ? storedTheme === 'dark' : prefersDarkMode,
+  );
   const [design, setDesignState] = useState(getSelectedDesign);
+
+  const setIsDarkMode = useCallback((next) => {
+    persistTheme(next);
+    setIsDarkModeState(next);
+  }, []);
 
   // Persisted so a chosen design language survives reloads and sessions until
   // the citizen changes it again.
-  const setDesign = (next) => {
+  const setDesign = useCallback((next) => {
     persistDesign(next);
     setDesignState(next);
-  };
+    // Each language has a native canvas — State is a dark language, Ledger a
+    // light one. Choosing one lands you in it, persisted, so it survives
+    // navigation; the moon toggle still overrides afterwards.
+    setIsDarkMode(nativeThemeIsDark(next));
+  }, [setIsDarkMode]);
   const isState = design === DESIGNS.state.key;
 
   const context = useMemo(
     () => ({
       isDarkMode, setIsDarkMode, design, setDesign, isStateDesign: isState,
     }),
-    [isDarkMode, design, isState],
+    [isDarkMode, setIsDarkMode, design, setDesign, isState],
   );
 
   useLayoutEffect(() => {

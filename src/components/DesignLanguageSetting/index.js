@@ -37,7 +37,9 @@ function DesignLanguageSetting() {
         showIcon
         message="This changes appearance only"
         description={'Both languages run the same application — same pages, same data, same '
-          + 'actions. Your choice is remembered on this device until you change it.'}
+          + 'actions. Each opens on its native canvas (State is dark, Ledger is light); the '
+          + 'moon button still switches light and dark afterwards. Your choice is remembered '
+          + 'on this device until you change it.'}
       />
     </Flex>
   );
