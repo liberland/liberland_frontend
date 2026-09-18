@@ -55,3 +55,28 @@ export const applyDesignAttribute = (design) => {
 };
 
 export const getDesignLabel = (design) => (DESIGNS[design] || DESIGNS[DEFAULT_DESIGN]).label;
+
+/*
+ * Light/dark is persisted too. It used to be re-derived from
+ * prefers-color-scheme on every load, so a chosen canvas — including the dark
+ * one a design language opens on — was lost at the next navigation. An unset
+ * value still falls back to the system preference.
+ */
+const THEME_KEY = 'liberland_theme';
+
+export const getStoredTheme = () => {
+  try {
+    const saved = window.localStorage.getItem(THEME_KEY);
+    if (saved === 'dark' || saved === 'light') return saved;
+  } catch (_) { /* unavailable */ }
+  return null;
+};
+
+export const persistTheme = (isDark) => {
+  try {
+    window.localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+  } catch (_) { /* a failed write must never break the toggle */ }
+};
+
+/** The canvas each language opens on when it is selected. */
+export const nativeThemeIsDark = (design) => design === DESIGNS.state.key;
