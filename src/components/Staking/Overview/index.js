@@ -16,12 +16,16 @@ import styles from './styles.module.scss';
 import { CreateValidatorModal, StakeLLDModal } from '../../Modals';
 import router from '../../../router';
 import Button from '../../Button/Button';
+import StateStakeManagement from '../StateStakeManagement';
+import Section from '../../StateUI/Section';
+import { useModeContext } from '../../AntdProvider';
 
 export default function StakingOverview() {
   const dispatch = useDispatch();
   const history = useHistory();
   const info = useSelector(validatorSelectors.info);
   const walletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const { isStateDesign } = useModeContext();
   const infoLink = 'https://docs.liberland.org/blockchain/for-validators-nominators-and-stakers/staking';
 
   useEffect(() => {
@@ -79,6 +83,27 @@ export default function StakingOverview() {
             </Button>
           </Flex>
         </Flex>
+      </Flex>
+    );
+  }
+
+  // The State language opens the screen with a statement strip and lays the
+  // rest out as flat sections. The children below are the same components the
+  // Ledger renders — nomination, bonding and payouts are untouched.
+  if (isStateDesign) {
+    return (
+      <Flex vertical gap="46px">
+        <StateStakeManagement />
+        {info.isStakingValidator && (
+          <Section title="My validator status">
+            <Validator />
+          </Section>
+        )}
+        {!info.isStakingValidator && info.stash && (
+          <Section title="Validators">
+            <Nominator />
+          </Section>
+        )}
       </Flex>
     );
   }
