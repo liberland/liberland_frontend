@@ -503,6 +503,9 @@ html[data-design='state'] {
     min-height: 0;
     line-height: 1.1;
     padding: 10px 14px !important;
+    // Some actions render as anchors (Button href=...); the design draws every
+    // action as a block, never as underlined text.
+    text-decoration: none;
 
     &.ant-btn-sm {
       font-size: 10px;
