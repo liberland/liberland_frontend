@@ -9,11 +9,14 @@ import styles from './styles.module.scss';
 import Header from './Header';
 import Sider from './Sider';
 import Tabs from './Tabs';
+import StateShell from './StateShell';
+import { useModeContext } from '../AntdProvider';
 import { getDocumentTitle } from '../../utils/pageTitle';
 
 function Layout({ children }) {
   const dispatch = useDispatch();
   const { pathname } = useLocation();
+  const { isStateDesign } = useModeContext();
 
   useEffect(() => {
     dispatch(walletActions.getWallet.call());
@@ -25,6 +28,19 @@ function Layout({ children }) {
   useEffect(() => {
     document.title = getDocumentTitle(pathname);
   }, [pathname]);
+
+  // The State language replaces the whole chrome — status bar and domain-grouped
+  // sidebar — not just the palette. The page content is identical either way.
+  if (isStateDesign) {
+    return (
+      <StateShell>
+        <Tabs />
+        <HideTitleProvider>
+          {children}
+        </HideTitleProvider>
+      </StateShell>
+    );
+  }
 
   return (
     <div className={styles.shell}>

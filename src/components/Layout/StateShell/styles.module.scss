@@ -1,0 +1,219 @@
+// Liberland State shell — measured from the design-language mockup.
+// Status bar 56px on #101114 under a 2px state-yellow rule; sidebar grouped by
+// domain with a 2px active left rule; everything squared.
+
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.skipLink {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 1000;
+  padding: 10px 16px;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+
+  &:focus { left: 0; }
+}
+
+// ── status bar ──
+.statusBar {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  height: 56px;
+  flex: none;
+  padding: 0 20px;
+  background: var(--surface-3);
+  border-bottom: 2px solid var(--gold);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+}
+
+.emblem {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.brandText { line-height: 1.05; }
+
+.brandName {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 17px;
+  color: var(--ink);
+}
+
+.brandSub {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.chain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+.chainDot {
+  width: 7px;
+  height: 7px;
+  background: var(--green);
+  flex: none;
+}
+
+.chainLabel,
+.chainNumber {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.chainLabel { color: var(--ink-faint); }
+.chainNumber { color: var(--ink); }
+
+.statusActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.userChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  background: var(--gold-tint);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gold-bright);
+  color: var(--on-gold);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.userName {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+// ── body ──
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.sider {
+  width: 236px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--nav-bg);
+  border-right: 1px solid var(--line);
+
+  @media (max-width: 767px) { display: none; }
+}
+
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 0;
+}
+
+.group { margin-bottom: 18px; }
+
+.groupLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 20px 8px;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.groupRule {
+  width: 14px;
+  height: 1px;
+  background: var(--gold);
+  flex: none;
+}
+
+.navItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 20px;
+  border: none;
+  border-left: 2px solid transparent;
+  background: transparent;
+  color: var(--ink-soft);
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  cursor: pointer;
+
+  &:hover { color: var(--ink); }
+}
+
+.navItemActive {
+  background: var(--gold-tint);
+  border-left-color: var(--gold);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.motto {
+  padding: 18px 20px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--ink-faint);
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+  padding: 26px 30px 60px;
+  overflow-x: hidden;
+}
