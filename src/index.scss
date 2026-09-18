@@ -10,32 +10,38 @@ $openSans: 'Hanken Grotesk', system-ui, sans-serif;
 $playfairDisplay: 'Spectral', Georgia, serif;
 
 // ── Typography roles ──────────────────────────────────────
-// Civic headings & display text → Spectral
+// Each role resolves through a custom property so the active design language
+// sets the typeface for the whole application in one place: the Ledger's
+// Spectral/Hanken Grotesk/JetBrains Mono, or the State language's Playfair
+// Display/Archivo/IBM Plex Mono. The SCSS variables remain as the fallback, so
+// a browser that drops the custom properties renders exactly as before.
+
+// Civic headings & display text → serif
 h1.ant-typography,
 h2.ant-typography,
 h3.ant-typography {
-  font-family: $spectral;
+  font-family: var(--font-serif, #{$spectral});
   font-weight: 600;
 }
 
-// Address / hash display → JetBrains Mono
+// Address / hash display → monospace
 .ll-mono {
-  font-family: $jetbrainsMono;
+  font-family: var(--font-mono, #{$jetbrainsMono});
   font-size: 0.9em;
 }
 
 // ── Global base ───────────────────────────────────────────
 body {
   margin: 0;
-  font-family: $hankenGrotesk;
+  font-family: var(--font-sans, #{$hankenGrotesk});
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--ink);
   background-color: var(--paper);
-  font-weight: 500;
+  font-weight: var(--body-weight, 500);
 
   [class*=ant-] {
-    font-weight: 500;
+    font-weight: var(--body-weight, 500);
   }
 
   h1, h2, h3, h4, h5, strong {

@@ -153,6 +153,8 @@ html {
   --radius-lg:  12px;
   --radius-md:  10px;
   --radius-sm:  8px;
+  // Hanken Grotesk is set a notch heavy in the Ledger language.
+  --body-weight: 500;
 }
 
 // ── Liberland State — light ──
@@ -160,6 +162,8 @@ html[data-design='state'] {
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-sans:  'Archivo', system-ui, sans-serif;
   --font-mono:  'IBM Plex Mono', ui-monospace, monospace;
+  // Archivo is set at its regular weight in the design language.
+  --body-weight: 400;
   // The State language is squared: hairlines and right angles, no soft cards.
   --radius-lg: 0px;
   --radius-md: 0px;

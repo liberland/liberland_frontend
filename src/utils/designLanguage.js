@@ -1,10 +1,12 @@
 /*
  * Design language selection.
  *
- * Two skins over one unchanged application. Choosing a language only swaps
- * design tokens — the CSS custom properties in _variables.scss and the antd
- * theme in AntdProvider. No route, component, layout or behaviour differs
- * between them, which is what makes the switch safe to ship.
+ * Two skins over one unchanged application. Choosing a language swaps the
+ * design tokens (the CSS custom properties in _variables.scss and the antd
+ * theme in AntdProvider), the chrome around the page (Layout renders the State
+ * shell in place of the Ledger sider and header), the coat of arms and the tab
+ * icon. No route, no data and no behaviour differs between them, which is what
+ * makes the switch safe to ship.
  *
  * The choice is stored per browser and survives reloads and sessions until the
  * citizen changes it.
@@ -40,10 +42,36 @@ export const persistDesign = (design) => {
   } catch (_) { /* a failed write must never break the switch */ }
 };
 
+/*
+ * Tab icons. The Ledger's is the blue roundel the app has always shipped; the
+ * State language uses its own escutcheon. Both live at fixed paths under the
+ * site root — a relative href resolves against the current route, so it 404s
+ * on every screen below the first level.
+ */
+export const FAVICONS = {
+  ledger: { href: '/favicon.ico', type: 'image/x-icon' },
+  state: { href: '/state-escutcheon.png', type: 'image/png' },
+};
+
+const applyFavicon = (design) => {
+  const icon = FAVICONS[design] || FAVICONS[DEFAULT_DESIGN];
+  let link = document.querySelector('link[rel="icon"]');
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    document.head.appendChild(link);
+  }
+  if (link.getAttribute('href') !== icon.href) {
+    link.setAttribute('type', icon.type);
+    link.setAttribute('href', icon.href);
+  }
+};
+
 /**
  * The stylesheet keys every token off this attribute. Ledger is the default
  * and carries no attribute, so an unset or unknown value renders exactly as
- * the app did before this feature existed.
+ * the app did before this feature existed. The tab icon follows the same
+ * choice, so the arms in the browser tab match the arms on the page.
  */
 export const applyDesignAttribute = (design) => {
   const html = document.documentElement;
@@ -52,6 +80,7 @@ export const applyDesignAttribute = (design) => {
   } else {
     html.removeAttribute('data-design');
   }
+  applyFavicon(design);
 };
 
 export const getDesignLabel = (design) => (DESIGNS[design] || DESIGNS[DEFAULT_DESIGN]).label;

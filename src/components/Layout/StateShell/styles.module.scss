@@ -27,7 +27,9 @@
 .statusBar {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 20px;
+  // 56px measured from the design language, gold rule included.
+  box-sizing: border-box;
   height: 56px;
   flex: none;
   padding: 0 20px;
@@ -41,14 +43,17 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
   flex: none;
 }
 
+// The design language draws the escutcheon in a 26x30 box; the Emblem
+// component supplies the height and keeps the shield's own proportions, so the
+// extra width here is only the reserved gutter the design leaves beside it.
 .emblem {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+  display: block;
+  flex: none;
+  min-width: 26px;
 }
 
 .brandText { line-height: 1.05; }
@@ -56,18 +61,28 @@
 .brandName {
   display: block;
   font-family: var(--font-serif);
-  font-size: 17px;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   color: var(--ink);
 }
 
 .brandSub {
   display: block;
-  font-family: var(--font-sans);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink-faint);
+}
+
+// The hairline separating the wordmark from the chain status.
+.brandRule {
+  width: 1px;
+  height: 26px;
+  flex: none;
+  background: rgba(255, 200, 0, 0.24);
 }
 
 .chain {
@@ -78,8 +93,8 @@
 }
 
 .chainDot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   background: var(--green);
   flex: none;
 }
@@ -88,6 +103,7 @@
 .chainNumber {
   font-family: var(--font-mono);
   font-size: 10.5px;
+  font-weight: 400;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }

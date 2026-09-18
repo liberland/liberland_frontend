@@ -44,9 +44,18 @@ This application is non-custodial. Read these rules before taking any action.
 
 The app renders in one of two visual languages, chosen per browser under
 Profile → Appearance: "Liberland Limited Ledger" (default) and "Liberland
-State". They differ only in colour, typeface and shape — same routes, same
-data, same behaviour, and the same `data-testid` hooks and accessible names in
-both. Never rely on colour alone to identify a control.
+State". They differ in colour, typeface, shape, coat of arms, tab icon and the
+shape of the chrome — the Ledger has a flat icon sidebar with the page title in
+a top bar, the State has a status bar carrying the finalized block height and a
+sidebar grouped by domain (Treasury, Assembly, Registry, Account), with no icons
+on the nav entries.
+
+What does not differ: the routes, the data, the behaviour, and the automation
+hooks. `main#main-content`, the "Skip to main content" link, `nav[aria-label]`,
+`data-testid="nav-*"`, `network-switcher`, `theme-toggle`, `page-action` and
+`user-menu` exist with the same names in both. Exactly one nav entry carries
+`aria-current="page"`. Never rely on colour, position or icon to identify a
+control — use the testid or the accessible name.
 
 ## Networks
 
