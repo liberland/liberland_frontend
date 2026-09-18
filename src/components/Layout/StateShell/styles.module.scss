@@ -42,6 +42,12 @@
   position: sticky;
   top: 0;
   z-index: 100;
+
+  // The bar has to survive a phone, where it also carries the menu button.
+  @media (max-width: 767px) {
+    gap: 12px;
+    padding: 0 12px;
+  }
 }
 
 .brand {
@@ -60,7 +66,11 @@
   min-width: 26px;
 }
 
-.brandText { line-height: 1.05; }
+.brandText {
+  line-height: 1.05;
+
+  @media (max-width: 480px) { display: none; }
+}
 
 .brandName {
   display: block;
@@ -87,6 +97,8 @@
   height: 26px;
   flex: none;
   background: var(--statusbar-line);
+
+  @media (max-width: 767px) { display: none; }
 }
 
 .chain {
@@ -94,6 +106,8 @@
   align-items: center;
   gap: 8px;
   flex: none;
+
+  @media (max-width: 767px) { display: none; }
 }
 
 .chainDot {
@@ -167,8 +181,27 @@
   flex-direction: column;
   background: var(--nav-bg);
   border-right: 1px solid var(--line);
+}
 
-  @media (max-width: 767px) { display: none; }
+// Below the sidebar's breakpoint the same navigation opens from the status
+// bar instead. Without this the State language had no menu at all on a phone.
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  padding: 6px;
+  margin-left: -6px;
+  border: 1px solid var(--statusbar-line);
+  background: transparent;
+  color: var(--statusbar-ink);
+  cursor: pointer;
+}
+
+.drawerBody {
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
 }
 
 .nav {

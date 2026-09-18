@@ -172,8 +172,11 @@ module.exports = (env, argv) => {
             "./public/robots.txt",
             "./public/llms.txt",
             // Tab icon for the Liberland State design language. Served from a
-            // stable path because the favicon link is swapped at runtime.
-            "./public/state-escutcheon.png",
+            // stable path because the favicon link is swapped at runtime. It is
+            // a square canvas with the shield centred: the arms are taller than
+            // they are wide, and a browser squashes a non-square icon into the
+            // tab's square slot.
+            "./public/state-escutcheon-icon.png",
             // pdf.js worker for the experimental legislation importer.
             // Referenced at runtime as /pdf.worker.min.js.
             { from: "node_modules/pdfjs-dist/legacy/build/pdf.worker.min.js", to: "pdf.worker.min.js" },

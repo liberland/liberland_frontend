@@ -50,7 +50,7 @@ export const persistDesign = (design) => {
  */
 export const FAVICONS = {
   ledger: { href: '/favicon.ico', type: 'image/x-icon' },
-  state: { href: '/state-escutcheon.png', type: 'image/png' },
+  state: { href: '/state-escutcheon-icon.png', type: 'image/png' },
 };
 
 const applyFavicon = (design) => {

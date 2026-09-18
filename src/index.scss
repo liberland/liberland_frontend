@@ -699,3 +699,16 @@ html[data-design='state'] {
   .ant-tabs-card > .ant-tabs-nav::before { border-bottom: none; }
   .ant-tabs-ink-bar { display: none; }
 }
+
+// The State navigation drawer on small screens takes the sidebar's own
+// surface, not antd's default panel, so the menu looks like the sidebar it
+// replaces.
+html[data-design='state'] {
+  .ant-drawer-content,
+  .ant-drawer-header {
+    background: var(--nav-bg) !important;
+    border-color: var(--line) !important;
+  }
+
+  .ant-drawer-title { font-family: var(--font-serif); font-weight: 400 !important; }
+}

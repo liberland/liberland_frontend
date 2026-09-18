@@ -1,9 +1,11 @@
 /* eslint-disable max-len */
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Dropdown from 'antd/es/dropdown';
+import Drawer from 'antd/es/drawer';
+import { useMediaQuery } from 'usehooks-ts';
 import { AuthContext } from 'react-oauth2-code-pkce';
 import { blockchainSelectors, userSelectors } from '../../../redux/selectors';
 import { authActions } from '../../../redux/actions';
@@ -145,6 +147,13 @@ function StateShell({ children }) {
   const givenName = useSelector(userSelectors.selectUserGivenName);
   const familyName = useSelector(userSelectors.selectUserFamilyName);
   const blockNumber = useSelector(blockchainSelectors.blockNumber);
+  // Below the sidebar's breakpoint the same navigation moves into a drawer;
+  // without this the State language had no menu at all on a phone.
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Any navigation closes the drawer, including the browser's back button.
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   const { matchedRoute, matchedSubLink } = useNavigationList();
   const pageAction = Object.entries((matchedSubLink || matchedRoute)?.extra || {})
@@ -178,11 +187,59 @@ function StateShell({ children }) {
 
   const isActive = (item) => current?.key === item.key;
 
+  const goTo = (route) => {
+    setMenuOpen(false);
+    history.push(route);
+  };
+
+  const nav = (
+    <nav className={styles.nav} aria-label="Main navigation">
+      {NAV_GROUPS.map((group) => (
+        <div key={group.label} className={styles.group}>
+          <div className={styles.groupLabel}>
+            <span
+              className={`${styles.groupRule} ${styles[`groupRule${group.label}`] || ''}`}
+              aria-hidden="true"
+            />
+            {group.label}
+          </div>
+          {group.items.map((item) => (
+            <button
+              key={item.key}
+              type="button"
+              className={`${styles.navItem} ${isActive(item) ? styles.navItemActive : ''}`}
+              onClick={() => goTo(item.route)}
+              aria-current={isActive(item) ? 'page' : undefined}
+              data-testid={`nav-${item.key}`}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      ))}
+    </nav>
+  );
+
   return (
     <div className={styles.shell}>
       <a href="#main-content" className={styles.skipLink}>Skip to main content</a>
 
       <header className={styles.statusBar}>
+        {!isDesktop && (
+          <button
+            type="button"
+            className={styles.menuButton}
+            onClick={() => setMenuOpen(true)}
+            aria-label="Open main navigation"
+            aria-expanded={menuOpen}
+            data-testid="mobile-menu"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
+              <path d="M3 6h18M3 12h18M3 18h18" />
+            </svg>
+          </button>
+        )}
+
         <div className={styles.brand}>
           <Emblem height={30} className={styles.emblem} alt="" />
           <span className={styles.brandText}>
@@ -240,34 +297,25 @@ function StateShell({ children }) {
       </header>
 
       <div className={styles.body}>
-        <aside className={styles.sider}>
-          <nav className={styles.nav} aria-label="Main navigation">
-            {NAV_GROUPS.map((group) => (
-              <div key={group.label} className={styles.group}>
-                <div className={styles.groupLabel}>
-                  <span
-                    className={`${styles.groupRule} ${styles[`groupRule${group.label}`] || ''}`}
-                    aria-hidden="true"
-                  />
-                  {group.label}
-                </div>
-                {group.items.map((item) => (
-                  <button
-                    key={item.key}
-                    type="button"
-                    className={`${styles.navItem} ${isActive(item) ? styles.navItemActive : ''}`}
-                    onClick={() => history.push(item.route)}
-                    aria-current={isActive(item) ? 'page' : undefined}
-                    data-testid={`nav-${item.key}`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            ))}
-          </nav>
+        {isDesktop && (
+          <aside className={styles.sider}>
+            {nav}
+            <div className={styles.motto}>To live and let live</div>
+          </aside>
+        )}
+
+        <Drawer
+          open={!isDesktop && menuOpen}
+          onClose={() => setMenuOpen(false)}
+          placement="left"
+          width={280}
+          closable
+          title="Navigation"
+          classNames={{ body: styles.drawerBody }}
+        >
+          {nav}
           <div className={styles.motto}>To live and let live</div>
-        </aside>
+        </Drawer>
 
         <main id="main-content" className={styles.content}>
           {!isDashboard && (
