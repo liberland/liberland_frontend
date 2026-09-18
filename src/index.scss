@@ -579,3 +579,80 @@ html[data-design='state'] {
     letter-spacing: -0.015em;
   }
 }
+
+// ── Liberland State — tables and section headings ──────────
+//
+// The design language draws a table as a bare grid on the page: no frame, no
+// fill, uppercase Archivo column labels over a single state-yellow rule, and
+// hairline separators between rows. Numbers are set in the mono face.
+// Measured from the design's Assets and Recent-transfers tables.
+//
+// This reaches every table in the application at once, which is the point —
+// the design never drew most of these screens, but they all use this surface.
+html[data-design='state'] {
+  .ant-table-wrapper {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  .ant-table,
+  .ant-table-container,
+  .ant-table-content,
+  .ant-table-tbody,
+  .ant-table-title,
+  .ant-table-footer,
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    background: transparent !important;
+  }
+
+  .ant-table-thead > tr > th {
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 0 14px 10px 0;
+    border-bottom: 1px solid var(--line-strong) !important;
+
+    // antd draws a vertical divider between header cells; the design does not.
+    &::before { display: none !important; }
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 14px 14px 14px 0;
+    border-bottom: 1px solid var(--line) !important;
+  }
+
+  .ant-table-tbody > tr:hover > td {
+    background: var(--gold-tint-2) !important;
+  }
+
+  // Section headings. The design sets every one in Playfair at a single size;
+  // in this application those headings are the collapse and card headers.
+  .ant-collapse-header-text,
+  .ant-card-head-title {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 400 !important;
+    letter-spacing: -0.01em;
+  }
+
+  .ant-collapse,
+  .ant-collapse > .ant-collapse-item {
+    border-color: var(--line);
+  }
+
+  // The design puts a card's actions on the card, not on a darker strip below
+  // it — the balance banner is one panel with the buttons inside it.
+  .ant-card-actions {
+    background: transparent;
+    border-top: 1px solid var(--line) !important;
+
+    > li {
+      border-inline-end-color: var(--line);
+    }
+  }
+}
