@@ -196,7 +196,7 @@ function StateWalletOverview({
           <thead>
             <tr>
               <th>Asset</th>
-              <th>Class</th>
+              <th className={styles.klassHead}>Class</th>
               <th className={styles.numeric}>Balance</th>
               <th aria-label="Actions" />
             </tr>
@@ -209,6 +209,7 @@ function StateWalletOverview({
                     <CurrencyIcon size={20} symbol={row.symbol} logo={row.logo} />
                     {row.name}
                   </span>
+                  <span className={styles.klassInline}>{row.klass}</span>
                 </td>
                 <td className={styles.klass}>{row.klass}</td>
                 <td className={`${styles.numeric} ${styles.mono}`}>{row.balance}</td>

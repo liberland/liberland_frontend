@@ -45,8 +45,9 @@
 
   // The bar has to survive a phone, where it also carries the menu button.
   @media (max-width: 767px) {
-    gap: 12px;
+    gap: 10px;
     padding: 0 12px;
+    overflow: hidden;
   }
 }
 
@@ -129,17 +130,21 @@
 .chainLabel { color: var(--statusbar-faint); }
 .chainNumber { color: var(--statusbar-ink); }
 
+// The bar is a fixed 56px; anything that wraps here spills over the page
+// beneath it, so nothing in it is allowed to wrap.
 .statusActions {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-left: auto;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
 }
 
 .userChip {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
   gap: 8px;
   padding: 4px 10px 4px 4px;
   background: rgba(255, 200, 0, 0.1);
@@ -165,6 +170,10 @@
 .userName {
   font-size: 13px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (max-width: 560px) { display: none; }
 }
 
 // ── body ──
@@ -202,6 +211,29 @@
   padding: 0 !important;
   display: flex;
   flex-direction: column;
+}
+
+// The controls that do not fit the phone's status bar live here instead.
+.drawerSession {
+  padding: 16px 20px 18px;
+  border-top: 1px solid var(--line);
+}
+
+.drawerSessionLabel {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 12px;
+}
+
+.drawerSessionControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
 }
 
 .nav {
@@ -254,6 +286,12 @@
   cursor: pointer;
 
   &:hover { color: var(--ink-soft); }
+
+  // A finger needs a bigger target than a cursor.
+  @media (pointer: coarse) {
+    padding: 13px 20px;
+    font-size: 16px;
+  }
 }
 
 .navItemActive {

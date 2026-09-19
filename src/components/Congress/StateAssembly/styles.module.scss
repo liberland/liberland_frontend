@@ -26,6 +26,13 @@
   display: flex;
   align-items: center;
   gap: 12px;
+
+  // On a phone the heading wraps, which left the dash floating beside its
+  // middle and pushed the action off the row.
+  @media (max-width: 575px) {
+    flex-wrap: wrap;
+    align-items: baseline;
+  }
 }
 
 .dash {
@@ -44,9 +51,18 @@
   letter-spacing: -0.01em;
   color: var(--ink);
   margin: 0;
+
+  @media (max-width: 575px) { font-size: 22px; }
 }
 
-.columnAction { margin-left: auto; }
+.columnAction {
+  margin-left: auto;
+
+  @media (max-width: 575px) {
+    margin-left: 0;
+    flex-basis: 100%;
+  }
+}
 
 .motions {
   display: flex;

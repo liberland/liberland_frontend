@@ -139,17 +139,37 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
   font-family: var(--font-sans);
   font-size: 15px;
   color: var(--ink);
 }
 
+// On a phone the three columns crush each other, so the class moves under the
+// asset's name rather than fighting it for width.
 .klass {
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-faint);
+
+  @media (max-width: 575px) { display: none; }
+}
+
+.klassInline {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+
+  @media (max-width: 575px) { display: block; margin-top: 4px; }
+}
+
+.klassHead {
+  @media (max-width: 575px) { display: none; }
 }
 
 .rowAction { text-align: right; padding-right: 0 !important; }

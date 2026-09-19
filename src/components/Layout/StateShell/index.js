@@ -192,6 +192,44 @@ function StateShell({ children }) {
     history.push(route);
   };
 
+  // On a phone the status bar has room for the menu, the arms and one account
+  // control — no more. The session controls move into the drawer rather than
+  // wrapping onto a second row, which used to overlap the page beneath.
+  const session = (
+    <>
+      <ThemeToggle />
+      <NetworkSwitcher />
+      <ChangeWallet />
+    </>
+  );
+
+  const account = user && displayName ? (
+    <Dropdown
+      menu={{
+        items: [
+          { key: 'profile', label: 'View Profile' },
+          { key: 'logout', label: 'Logout', danger: true },
+        ],
+        onClick: ({ key }) => {
+          if (key === 'profile') history.push(router.home.profile);
+          if (key === 'logout') handleLogout();
+        },
+      }}
+      trigger={['click']}
+    >
+      <button
+        type="button"
+        className={styles.userChip}
+        aria-haspopup="menu"
+        aria-label={`Account menu for ${displayName}`}
+        data-testid="user-menu"
+      >
+        <span className={styles.avatar}>{initials}</span>
+        <span className={styles.userName}>{displayName}</span>
+      </button>
+    </Dropdown>
+  ) : <UserMenu />;
+
   const nav = (
     <nav className={styles.nav} aria-label="Main navigation">
       {NAV_GROUPS.map((group) => (
@@ -259,40 +297,13 @@ function StateShell({ children }) {
         </div>
 
         <div className={styles.statusActions}>
-          {pageAction && (
+          {pageAction && isDesktop && (
             <Button primary onClick={() => history.push(pageAction.link)} data-testid="page-action">
               {pageAction.title}
             </Button>
           )}
-          <ThemeToggle />
-          <NetworkSwitcher />
-          <ChangeWallet />
-          {user && displayName ? (
-            <Dropdown
-              menu={{
-                items: [
-                  { key: 'profile', label: 'View Profile' },
-                  { key: 'logout', label: 'Logout', danger: true },
-                ],
-                onClick: ({ key }) => {
-                  if (key === 'profile') history.push(router.home.profile);
-                  if (key === 'logout') handleLogout();
-                },
-              }}
-              trigger={['click']}
-            >
-              <button
-                type="button"
-                className={styles.userChip}
-                aria-haspopup="menu"
-                aria-label={`Account menu for ${displayName}`}
-                data-testid="user-menu"
-              >
-                <span className={styles.avatar}>{initials}</span>
-                <span className={styles.userName}>{displayName}</span>
-              </button>
-            </Dropdown>
-          ) : <UserMenu />}
+          {isDesktop && session}
+          {account}
         </div>
       </header>
 
@@ -314,6 +325,17 @@ function StateShell({ children }) {
           classNames={{ body: styles.drawerBody }}
         >
           {nav}
+          <div className={styles.drawerSession}>
+            <div className={styles.drawerSessionLabel}>Session</div>
+            <div className={styles.drawerSessionControls}>
+              {session}
+              {pageAction && (
+                <Button primary onClick={() => history.push(pageAction.link)} data-testid="page-action">
+                  {pageAction.title}
+                </Button>
+              )}
+            </div>
+          </div>
           <div className={styles.motto}>To live and let live</div>
         </Drawer>
 

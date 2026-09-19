@@ -24,6 +24,8 @@
 .title {
   font-family: var(--font-serif);
   font-size: 46px;
+
+  @media (max-width: 575px) { font-size: 34px; }
   font-weight: 400;
   letter-spacing: -0.015em;
   line-height: 1;
@@ -39,6 +41,9 @@
   color: var(--ink-faint);
   text-align: right;
   line-height: 1.7;
+
+  // Ragged-right under a wrapped headline reads as a mistake on a phone.
+  @media (max-width: 767px) { text-align: left; }
 }
 
 
