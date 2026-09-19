@@ -17,7 +17,7 @@ import {
 } from '../../redux/selectors';
 import { formatDollars, formatMerits } from '../../utils/walletHelpers';
 import styles from './styles.module.scss';
-import liberlandEmblemImage from '../../assets/images/liberlandEmblem.svg';
+import Emblem from '../Emblem';
 import UpdateProfile from './UpdateProfile';
 import { blockchainActions, identityActions, onBoardingActions } from '../../redux/actions';
 import {
@@ -106,11 +106,7 @@ function Profile() {
           key: 'account',
           label: displayName || 'Account',
           extra: (
-            <img
-              className={styles.liberlandLogo}
-              src={liberlandEmblemImage}
-              alt="liberlandEmblem"
-            />
+            <Emblem className={styles.liberlandLogo} height={33} />
           ),
           children: (
             <Flex vertical gap="20px">

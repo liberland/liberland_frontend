@@ -10,32 +10,38 @@ $openSans: 'Hanken Grotesk', system-ui, sans-serif;
 $playfairDisplay: 'Spectral', Georgia, serif;
 
 // ── Typography roles ──────────────────────────────────────
-// Civic headings & display text → Spectral
+// Each role resolves through a custom property so the active design language
+// sets the typeface for the whole application in one place: the Ledger's
+// Spectral/Hanken Grotesk/JetBrains Mono, or the State language's Playfair
+// Display/Archivo/IBM Plex Mono. The SCSS variables remain as the fallback, so
+// a browser that drops the custom properties renders exactly as before.
+
+// Civic headings & display text → serif
 h1.ant-typography,
 h2.ant-typography,
 h3.ant-typography {
-  font-family: $spectral;
+  font-family: var(--font-serif, #{$spectral});
   font-weight: 600;
 }
 
-// Address / hash display → JetBrains Mono
+// Address / hash display → monospace
 .ll-mono {
-  font-family: $jetbrainsMono;
+  font-family: var(--font-mono, #{$jetbrainsMono});
   font-size: 0.9em;
 }
 
 // ── Global base ───────────────────────────────────────────
 body {
   margin: 0;
-  font-family: $hankenGrotesk;
+  font-family: var(--font-sans, #{$hankenGrotesk});
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--ink);
   background-color: var(--paper);
-  font-weight: 500;
+  font-weight: var(--body-weight, 500);
 
   [class*=ant-] {
-    font-weight: 500;
+    font-weight: var(--body-weight, 500);
   }
 
   h1, h2, h3, h4, h5, strong {
@@ -467,6 +473,291 @@ textarea.ant-input {
     .ant-typography {
       margin-bottom: 15px;
       margin-top: 15px;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// Liberland State — controls
+//
+// Scoped entirely under the design-language attribute, so nothing here can
+// reach the Ledger. These are the rules Ant Design's theme tokens cannot
+// express — a typeface role, uppercase, tracking, a square box — plus the
+// overrides needed to beat the hard-coded Ledger button rules above, which
+// pin every primary button to #F6CA31 on #122C4B with !important.
+//
+// Values are measured from the design language, not chosen: Archivo
+// 11px / 600 / .18em, uppercase, radius 0, 10px padding. The primary action
+// is a solid state-yellow block with near-black text; every other action is
+// a hairline on the page.
+// ═══════════════════════════════════════════════════════════════════════
+html[data-design='state'] {
+  .ant-btn:not(.ant-btn-link):not(.ant-btn-icon-only) {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border-radius: 0;
+    height: auto;
+    min-height: 0;
+    line-height: 1.1;
+    padding: 10px 14px !important;
+    // Some actions render as anchors (Button href=...); the design draws every
+    // action as a block, never as underlined text.
+    text-decoration: none;
+
+    &.ant-btn-sm {
+      font-size: 10px;
+      padding: 7px 11px !important;
+    }
+
+    &.ant-btn-lg {
+      font-size: 12px;
+      padding: 13px 18px !important;
+    }
+  }
+
+  .ant-btn-primary {
+    background: var(--gold-fill);
+    border-color: var(--gold-fill);
+    color: var(--on-gold) !important;
+
+    &:focus, &:active, &:hover {
+      background: var(--gold-fill) !important;
+      filter: brightness(108%);
+    }
+  }
+
+  // The quiet action: a hairline rather than a filled block.
+  .ant-btn-default:not(.ant-btn-dangerous) {
+    background: transparent;
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+
+  // A destructive action is a hairline too — the design language reserves
+  // solid fills for the single primary action on a screen.
+  .ant-btn-dangerous {
+    background: transparent !important;
+    border-color: var(--red) !important;
+    color: var(--red) !important;
+
+    &:focus, &:active, &:hover {
+      background: var(--red-tint) !important;
+      color: var(--red) !important;
+      filter: none;
+    }
+  }
+
+  // Links keep sentence case — they sit inside running text, where the
+  // design language sets prose, not labels.
+  .ant-btn-link {
+    border-radius: 0;
+  }
+
+  // Squared surfaces, to match.
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-input-number,
+  .ant-select .ant-select-selector,
+  .ant-picker,
+  .ant-card,
+  .ant-collapse,
+  .ant-collapse > .ant-collapse-item,
+  .ant-alert,
+  .ant-tag,
+  .ant-table-wrapper,
+  .ant-table-footer,
+  .ant-modal .ant-modal-content {
+    border-radius: 0 !important;
+  }
+
+  // Display headings are set light in the design language, not bold. The
+  // global rule above forces 600 with !important, so this has to as well.
+  h1, h2,
+  h1.ant-typography,
+  h2.ant-typography {
+    font-weight: 400 !important;
+    letter-spacing: -0.015em;
+  }
+}
+
+// ── Liberland State — tables and section headings ──────────
+//
+// The design language draws a table as a bare grid on the page: no frame, no
+// fill, uppercase Archivo column labels over a single state-yellow rule, and
+// hairline separators between rows. Numbers are set in the mono face.
+// Measured from the design's Assets and Recent-transfers tables.
+//
+// This reaches every table in the application at once, which is the point —
+// the design never drew most of these screens, but they all use this surface.
+html[data-design='state'] {
+  .ant-table-wrapper {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  .ant-table,
+  .ant-table-container,
+  .ant-table-content,
+  .ant-table-tbody,
+  .ant-table-title,
+  .ant-table-footer,
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    background: transparent !important;
+  }
+
+  .ant-table-thead > tr > th {
+    font-family: var(--font-sans);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 0 14px 10px 0;
+    border-bottom: 1px solid var(--line-strong) !important;
+
+    // antd draws a vertical divider between header cells; the design does not.
+    &::before { display: none !important; }
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 14px 14px 14px 0;
+    border-bottom: 1px solid var(--line) !important;
+  }
+
+  .ant-table-tbody > tr:hover > td {
+    background: var(--gold-tint-2) !important;
+  }
+
+  // Section headings. The design sets every one in Playfair at a single size;
+  // in this application those headings are the collapse and card headers.
+  .ant-collapse-header-text,
+  .ant-card-head-title {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 400 !important;
+    letter-spacing: -0.01em;
+  }
+
+  .ant-collapse,
+  .ant-collapse > .ant-collapse-item {
+    border-color: var(--line);
+  }
+
+  // The design puts a card's actions on the card, not on a darker strip below
+  // it — the balance banner is one panel with the buttons inside it.
+  .ant-card-actions {
+    background: transparent;
+    border-top: 1px solid var(--line) !important;
+
+    > li {
+      border-inline-end-color: var(--line);
+    }
+  }
+}
+
+// ── Liberland State — sub-navigation ───────────────────────
+//
+// The application puts a route's sub-pages in a tab row; the design language
+// has no tabs, but it does have the chip row above the legislation list —
+// squared mono labels with the current one filled in state yellow. Translating
+// the tab row into that chip row keeps one navigation on the screen instead of
+// two, and reads the same on every route that has sub-pages.
+html[data-design='state'] {
+  .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab,
+  .ant-tabs > .ant-tabs-nav .ant-tabs-tab {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 7px 11px !important;
+    margin: 0 8px 0 0 !important;
+    // antd styles card tabs from its own component tokens; these have to beat
+    // them rather than merely outrank them.
+    border: 1px solid var(--line-strong) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: var(--ink-faint);
+
+    &:hover { border-color: var(--gold) !important; }
+  }
+
+  .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active,
+  .ant-tabs > .ant-tabs-nav .ant-tabs-tab-active {
+    background: var(--gold-fill) !important;
+    border-color: var(--gold-fill) !important;
+
+    .ant-tabs-tab-btn { color: var(--on-gold) !important; }
+  }
+
+  // The design separates the chip row from the list with nothing but space.
+  .ant-tabs > .ant-tabs-nav::before,
+  .ant-tabs-card > .ant-tabs-nav::before { border-bottom: none; }
+  .ant-tabs-ink-bar { display: none; }
+}
+
+// The State navigation drawer on small screens takes the sidebar's own
+// surface, not antd's default panel, so the menu looks like the sidebar it
+// replaces.
+html[data-design='state'] {
+  .ant-drawer-content,
+  .ant-drawer-header {
+    background: var(--nav-bg) !important;
+    border-color: var(--line) !important;
+  }
+
+  .ant-drawer-title { font-family: var(--font-serif); font-weight: 400 !important; }
+}
+
+// ── Liberland State — on a phone ───────────────────────────
+//
+// The chip row is sub-navigation: on a narrow screen it scrolls sideways the
+// way a native segmented control does, instead of wrapping into a block of
+// rows that pushes the page down. Actions grow to a finger-sized target.
+html[data-design='state'] {
+  @media (max-width: 767px) {
+    .ant-tabs > .ant-tabs-nav .ant-tabs-nav-wrap,
+    .ant-tabs-card > .ant-tabs-nav .ant-tabs-nav-wrap {
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+
+      &::-webkit-scrollbar { display: none; }
+    }
+
+    .ant-tabs > .ant-tabs-nav .ant-tabs-nav-list,
+    .ant-tabs-card > .ant-tabs-nav .ant-tabs-nav-list {
+      flex-wrap: nowrap;
+    }
+
+    .ant-tabs > .ant-tabs-nav .ant-tabs-tab,
+    .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab {
+      flex: none;
+      white-space: nowrap;
+      padding: 10px 13px !important;
+    }
+
+    // Every chip is rendered and the row scrolls, so antd's overflow menu is
+    // just a stray "..." next to it.
+    .ant-tabs-nav-operations { display: none !important; }
+  }
+
+  // A finger is not a cursor: every action gets a 44px target, the size
+  // both Apple and Google ask for.
+  @media (pointer: coarse) {
+    .ant-btn:not(.ant-btn-link) {
+      min-height: 44px;
+      padding: 12px 16px !important;
+    }
+
+    .ant-btn.ant-btn-sm {
+      min-height: 40px;
+      padding: 10px 13px !important;
     }
   }
 }

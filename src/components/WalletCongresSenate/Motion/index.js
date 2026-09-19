@@ -12,6 +12,8 @@ import { Proposal } from '../../Proposal';
 import { walletAddress } from '../../../redux/selectors/congress';
 import Voters from '../Voters';
 import ProposalTable from '../../Proposal/ProposalTable';
+import StateMotion from './StateMotion';
+import { useModeContext } from '../../AntdProvider';
 import styles from './styles.module.scss';
 
 export default function Motion({
@@ -28,6 +30,7 @@ export default function Motion({
   const userAddress = useSelector(
     blockchainSelectors.userWalletAddressSelector,
   );
+  const { isStateDesign } = useModeContext();
 
   const threshold = voting.threshold.toNumber();
 
@@ -43,6 +46,28 @@ export default function Motion({
     };
     dispatch(voteMotion(voteMotionData));
   };
+
+  // The State language draws a motion as a hairline card with the tally as a
+  // row of seats. Every decision above is shared, so only the markup differs.
+  if (isStateDesign) {
+    return (
+      <StateMotion
+        proposal={proposal}
+        proposalOf={proposalOf}
+        voting={voting}
+        threshold={threshold}
+        membersCount={membersCount}
+        isClosable={isClosable}
+        isClosableNaye={isClosableNaye}
+        userIsMember={userIsMember}
+        userHasVotedAye={voting.ayes.map((v) => v.toString()).includes(userAddress)}
+        userHasVotedNay={voting.nays.map((v) => v.toString()).includes(userAddress)}
+        onVote={voteMotionCall}
+        onCloseExecute={() => dispatch(closeMotion({ proposal, index: voting.index }))}
+        onCloseRejected={() => dispatch(closeMotion({ proposal, index: voting.index, walletAddress }))}
+      />
+    );
+  }
 
   return (
     <Card

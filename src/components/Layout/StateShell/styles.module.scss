@@ -27,47 +27,79 @@
 .statusBar {
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 20px;
+  // 56px measured from the design language, gold rule included.
+  box-sizing: border-box;
   height: 56px;
   flex: none;
   padding: 0 20px;
-  background: var(--surface-3);
-  border-bottom: 2px solid var(--gold);
+  // The status bar is chrome, not canvas: the design keeps it near-black
+  // under the state-yellow rule in day mode as well as night, so it must not
+  // follow --surface-3.
+  background: var(--statusbar-bg);
+  color: var(--statusbar-ink);
+  border-bottom: 2px solid var(--gold-fill);
   position: sticky;
   top: 0;
   z-index: 100;
+
+  // The bar has to survive a phone, where it also carries the menu button.
+  @media (max-width: 767px) {
+    gap: 10px;
+    padding: 0 12px;
+    overflow: hidden;
+  }
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
   flex: none;
 }
 
+// The design language draws the escutcheon in a 26x30 box; the Emblem
+// component supplies the height and keeps the shield's own proportions, so the
+// extra width here is only the reserved gutter the design leaves beside it.
 .emblem {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+  display: block;
+  flex: none;
+  min-width: 26px;
 }
 
-.brandText { line-height: 1.05; }
+.brandText {
+  line-height: 1.05;
+
+  @media (max-width: 480px) { display: none; }
+}
 
 .brandName {
   display: block;
   font-family: var(--font-serif);
-  font-size: 17px;
-  color: var(--ink);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--statusbar-ink);
 }
 
 .brandSub {
   display: block;
-  font-family: var(--font-sans);
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--statusbar-faint);
+}
+
+// The hairline separating the wordmark from the chain status.
+.brandRule {
+  width: 1px;
+  height: 26px;
+  flex: none;
+  background: var(--statusbar-line);
+
+  @media (max-width: 767px) { display: none; }
 }
 
 .chain {
@@ -75,11 +107,13 @@
   align-items: center;
   gap: 8px;
   flex: none;
+
+  @media (max-width: 767px) { display: none; }
 }
 
 .chainDot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   background: var(--green);
   flex: none;
 }
@@ -88,29 +122,34 @@
 .chainNumber {
   font-family: var(--font-mono);
   font-size: 10.5px;
+  font-weight: 400;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
-.chainLabel { color: var(--ink-faint); }
-.chainNumber { color: var(--ink); }
+.chainLabel { color: var(--statusbar-faint); }
+.chainNumber { color: var(--statusbar-ink); }
 
+// The bar is a fixed 56px; anything that wraps here spills over the page
+// beneath it, so nothing in it is allowed to wrap.
 .statusActions {
   display: flex;
   align-items: center;
   gap: 10px;
   margin-left: auto;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  min-width: 0;
 }
 
 .userChip {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
   gap: 8px;
   padding: 4px 10px 4px 4px;
-  background: var(--gold-tint);
-  border: 1px solid var(--line);
-  color: var(--ink);
+  background: rgba(255, 200, 0, 0.1);
+  border: 1px solid var(--statusbar-line);
+  color: var(--statusbar-ink);
   cursor: pointer;
   font: inherit;
 }
@@ -121,7 +160,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--gold-bright);
+  background: var(--gold-fill);
   color: var(--on-gold);
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -131,6 +170,10 @@
 .userName {
   font-size: 13px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (max-width: 560px) { display: none; }
 }
 
 // ── body ──
@@ -147,8 +190,50 @@
   flex-direction: column;
   background: var(--nav-bg);
   border-right: 1px solid var(--line);
+}
 
-  @media (max-width: 767px) { display: none; }
+// Below the sidebar's breakpoint the same navigation opens from the status
+// bar instead. Without this the State language had no menu at all on a phone.
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  padding: 6px;
+  margin-left: -6px;
+  border: 1px solid var(--statusbar-line);
+  background: transparent;
+  color: var(--statusbar-ink);
+  cursor: pointer;
+}
+
+.drawerBody {
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
+
+// The controls that do not fit the phone's status bar live here instead.
+.drawerSession {
+  padding: 16px 20px 18px;
+  border-top: 1px solid var(--line);
+}
+
+.drawerSessionLabel {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 12px;
+}
+
+.drawerSessionControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
 }
 
 .nav {
@@ -172,12 +257,19 @@
   color: var(--ink-faint);
 }
 
+// Each domain carries its own colour on its dash — never gold, which the
+// design language reserves for the active item and the primary action.
 .groupRule {
   width: 14px;
-  height: 1px;
-  background: var(--gold);
+  height: 2px;
+  background: var(--domain-account);
   flex: none;
 }
+
+.groupRuleTreasury { background: var(--domain-treasury); }
+.groupRuleAssembly { background: var(--domain-assembly); }
+.groupRuleRegistry { background: var(--domain-registry); }
+.groupRuleAccount  { background: var(--domain-account); }
 
 .navItem {
   display: block;
@@ -187,12 +279,19 @@
   border: none;
   border-left: 2px solid transparent;
   background: transparent;
-  color: var(--ink-soft);
+  color: var(--ink-faint);
   font-family: var(--font-sans);
   font-size: 14.5px;
+  font-weight: 400;
   cursor: pointer;
 
-  &:hover { color: var(--ink); }
+  &:hover { color: var(--ink-soft); }
+
+  // A finger needs a bigger target than a cursor.
+  @media (pointer: coarse) {
+    padding: 13px 20px;
+    font-size: 16px;
+  }
 }
 
 .navItemActive {
@@ -214,6 +313,8 @@
 .content {
   flex: 1;
   min-width: 0;
-  padding: 26px 30px 60px;
+  padding: 34px 40px 90px;
   overflow-x: hidden;
+
+  @media (max-width: 767px) { padding: 24px 16px 60px; }
 }

@@ -1,0 +1,81 @@
+// A motion card in the Liberland State design language.
+
+.motion {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.reference {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.status {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statusVoting { color: var(--gold); }
+.statusReady { color: var(--green); }
+.statusRejected { color: var(--red); }
+
+.body {
+  font-family: var(--font-sans);
+  font-size: 15.5px;
+  color: var(--ink);
+}
+
+// ── tally ──
+// One cell per seat: filled for a vote cast, an outline for a seat still to
+// be heard from.
+.tally {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.cells {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.cell {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+}
+
+.cellAye { background: var(--green); }
+.cellNay { background: var(--red); }
+.cellEmpty { border: 1px solid var(--line-strong); }
+
+.counts {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--ink-faint);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
