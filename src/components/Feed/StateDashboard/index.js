@@ -9,6 +9,7 @@ import {
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import { getSelectedNetwork, NETWORKS } from '../../../utils/networkHelpers';
 import router from '../../../router';
+import StatStrip, { DASH } from '../../StateUI/StatStrip';
 import styles from './styles.module.scss';
 
 /*
@@ -20,28 +21,6 @@ import styles from './styles.module.scss';
  * so nothing here is decorative data: a figure that has not loaded shows an em
  * dash rather than an invented number.
  */
-
-function Stat({
-  label, value, unit, note,
-}) {
-  return (
-    <div className={styles.stat}>
-      <div className={styles.statLabel}>{label}</div>
-      <div className={styles.statValue}>
-        {value}
-        {unit ? <span className={styles.statUnit}>{unit}</span> : null}
-      </div>
-      {note ? <div className={styles.statNote}>{note}</div> : null}
-    </div>
-  );
-}
-
-Stat.propTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.node.isRequired,
-  unit: PropTypes.string,
-  note: PropTypes.node,
-};
 
 function StateDashboard({ news }) {
   const history = useHistory();
@@ -68,31 +47,36 @@ function StateDashboard({ news }) {
         </div>
       </header>
 
-      <section className={styles.strip} aria-label="Account summary">
-        <Stat
-          label="Spendable"
-          value={spendable != null ? formatDollars(spendable) : '—'}
-          unit="LLD"
-          note="Liquid balance"
-        />
-        <Stat
-          label="Political power"
-          value={liquidMerits != null ? formatMerits(liquidMerits) : '—'}
-          unit="LLM"
-          note={pooled != null ? `${formatMerits(pooled)} politipooled` : 'Politipooled merits'}
-        />
-        <Stat
-          label="Staking yield"
-          value="—"
-          unit="APY"
-          note="Bonded LLD"
-        />
-        <Stat
-          label="Citizenship"
-          value={user ? 'Active' : '—'}
-          note={user ? 'Citizen of Liberland' : 'Sign in to verify'}
-        />
-      </section>
+      <StatStrip
+        stats={[
+          {
+            key: 'spendable',
+            label: 'Spendable',
+            value: spendable != null ? formatDollars(spendable) : DASH,
+            unit: 'LLD',
+            note: 'Liquid balance',
+          },
+          {
+            key: 'power',
+            label: 'Political power',
+            value: liquidMerits != null ? formatMerits(liquidMerits) : DASH,
+            unit: 'LLM',
+            note: pooled != null ? `${formatMerits(pooled)} politipooled` : 'Politipooled merits',
+          },
+          {
+            key: 'yield',
+            label: 'Staking yield',
+            unit: 'APY',
+            note: 'Bonded LLD',
+          },
+          {
+            key: 'citizenship',
+            label: 'Citizenship',
+            value: user ? 'Active' : undefined,
+            note: user ? 'Citizen of Liberland' : 'Sign in to verify',
+          },
+        ]}
+      />
 
       <div className={styles.columns}>
         <section className={styles.col}>

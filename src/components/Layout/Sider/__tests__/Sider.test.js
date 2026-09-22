@@ -44,9 +44,9 @@ describe('Sider', () => {
     expect(screen.getByText('Liberland')).toBeInTheDocument();
   });
 
-  it('shows "Republic Ledger" subtitle', () => {
+  it('shows "State Blockchain" subtitle', () => {
     render(<Sider />);
-    expect(screen.getByText('Republic Ledger')).toBeInTheDocument();
+    expect(screen.getByText('State Blockchain')).toBeInTheDocument();
   });
 
   it('renders all section headers', () => {

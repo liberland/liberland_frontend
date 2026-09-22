@@ -106,7 +106,7 @@ describe('DesktopHeader', () => {
       useSelector.mockReturnValue(null);
       render(<DesktopHeader />);
       expect(screen.getByText('Liberland')).toBeInTheDocument();
-      expect(screen.getByText('Republic Ledger')).toBeInTheDocument();
+      expect(screen.getByText('State Blockchain')).toBeInTheDocument();
     });
   });
 
