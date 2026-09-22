@@ -1,3 +1,9 @@
+// The sidebar's width, shared so the status bar's hairline can land exactly on
+// its edge: the bar and the body then sit on one vertical line instead of the
+// rule stopping a few dozen pixels short of it.
+$sider-width: 236px;
+$bar-pad: 20px;
+
 // Liberland State shell — measured from the design-language mockup.
 // Status bar 56px on #101114 under a 2px state-yellow rule; sidebar grouped by
 // domain with a 2px active left rule; everything squared.
@@ -56,6 +62,11 @@
   align-items: center;
   gap: 11px;
   flex: none;
+  // Left padding + this width + the bar's gap puts the rule on $sider-width.
+  width: $sider-width - ($bar-pad * 2);
+  min-width: 0;
+
+  @media (max-width: 767px) { width: auto; }
 }
 
 // The design language draws the escutcheon in a 26x30 box; the Emblem
@@ -190,7 +201,7 @@
 }
 
 .sider {
-  width: 236px;
+  width: $sider-width;
   flex: none;
   display: flex;
   flex-direction: column;

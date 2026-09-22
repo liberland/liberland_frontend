@@ -25,10 +25,10 @@ export const PAGE_TITLES = [
 
 export function getPageTitle(pathname) {
   const match = PAGE_TITLES.find((entry) => entry.test(pathname));
-  return match ? [match.title, match.sub] : ['Liberland', 'Republic Ledger'];
+  return match ? [match.title, match.sub] : ['Liberland', 'State Blockchain'];
 }
 
 export function getDocumentTitle(pathname) {
   const [title] = getPageTitle(pathname);
-  return title === 'Liberland' ? 'Liberland Republic Ledger' : `${title} · Liberland`;
+  return title === 'Liberland' ? 'Liberland State Blockchain' : `${title} · Liberland`;
 }

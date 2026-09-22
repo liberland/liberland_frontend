@@ -1,4 +1,4 @@
-# Liberland Republic Ledger
+# Liberland State Blockchain
 
 > The official dApp of the Free Republic of Liberland. A React single-page app on
 > top of a Substrate/Polkadot blockchain, used for citizen identity, wallets and
