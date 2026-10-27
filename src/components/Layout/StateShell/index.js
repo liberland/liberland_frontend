@@ -57,16 +57,19 @@ const NAV_GROUPS = [
         key: 'staking', label: 'Staking', route: router.staking.overview, owns: [router.home.staking],
       },
       { key: 'bridge', label: 'Bridge', route: router.wallet.bridge },
+      {
+        key: 'nfts', label: 'NFTs', route: router.nfts.overview, owns: [router.home.nfts],
+      },
     ],
   },
   {
     label: 'Assembly',
     items: [
       {
-        key: 'congress',
-        label: 'Congress & Senate',
-        route: router.congress.overview,
-        owns: [router.home.congress, router.home.senate, router.home.offices],
+        key: 'congress', label: 'Congress', route: router.congress.overview, owns: [router.home.congress],
+      },
+      {
+        key: 'senate', label: 'Senate', route: router.senate.overview, owns: [router.home.senate],
       },
       {
         key: 'voting', label: 'Voting', route: router.voting.referendum, owns: [router.home.voting],
@@ -92,6 +95,9 @@ const NAV_GROUPS = [
         key: 'land', label: 'Land', route: router.registries.land, owns: [router.home.registries],
       },
       { key: 'assets', label: 'Assets', route: router.registries.assets },
+      {
+        key: 'offices', label: 'Offices', route: router.home.offices, owns: [router.home.offices],
+      },
       {
         key: 'identity', label: 'Identity', route: router.home.profile, owns: [router.home.profile],
       },
