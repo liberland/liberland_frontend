@@ -32,6 +32,8 @@ function StateMotion({
         <MotionStatusTag status={motion.status} />
       </header>
 
+      <h3 className={styles.title}>{motion.title}</h3>
+
       <div className={styles.body}>
         <ProposalErrorBoundary hash={motion.hash}>
           <Proposal proposal={motion.call} isDetailsHidden />

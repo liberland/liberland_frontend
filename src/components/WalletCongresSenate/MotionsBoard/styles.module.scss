@@ -113,3 +113,15 @@
   font-size: 14px;
   color: var(--ink-faint);
 }
+
+// What the motion is about. It used to be reachable only by expanding the
+// body, which made a list of motions read as a list of identical cards.
+.rowTitle {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}

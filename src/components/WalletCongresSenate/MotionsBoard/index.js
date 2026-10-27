@@ -96,6 +96,8 @@ function MotionsBoard({ motions, detailPath, emptyText }) {
                 <MotionStatusTag status={motion.status} />
               </div>
 
+              <h3 className={styles.rowTitle}>{motion.title}</h3>
+
               <div className={styles.rowBody}>
                 <ProposalErrorBoundary hash={motion.hash}>
                   <Proposal proposal={motion.call} isTableRow isDetailsHidden />

@@ -37,3 +37,14 @@
   flex-wrap: wrap;
   gap: 10px;
 }
+
+// The subject of the vote, directly under the motion's number.
+.title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}

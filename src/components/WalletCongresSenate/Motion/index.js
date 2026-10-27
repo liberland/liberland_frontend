@@ -60,9 +60,12 @@ export default function Motion({
   return (
     <Card
       title={(
-        <Flex wrap align="center" gap="10px">
-          <span>{`Motion #${motion.index}`}</span>
-          <MotionStatusTag status={motion.status} />
+        <Flex vertical gap="6px" className={styles.cardTitle}>
+          <Flex wrap align="center" gap="10px">
+            <span className={styles.cardIndex}>{`Motion #${motion.index}`}</span>
+            <MotionStatusTag status={motion.status} />
+          </Flex>
+          <span className={styles.cardSubject}>{motion.title}</span>
         </Flex>
       )}
       className={styles.fullWidth}

@@ -15,6 +15,8 @@ import {
   isTransferLLM,
 } from '../components/Proposal/predicates';
 import { blockDurationMilis } from '../components/Congress/MotionCountDown/constants';
+import { formatDollars, formatMerits } from './walletHelpers';
+import { tryParseMaybeHexFromHuman } from './legislation';
 
 /*
  * One reading of a council or senate motion, shared by both design languages.
@@ -143,6 +145,104 @@ export function describeFate(call) {
   };
 }
 
+/** The first markdown heading of a legislation section, if it has one. */
+function headingOf(section) {
+  const text = tryParseMaybeHexFromHuman(section);
+  if (!text) return null;
+  const line = text.split('\n').map((l) => l.trim()).find((l) => l.startsWith('#'));
+  if (!line) return null;
+  const heading = line.replace(/^#+\s*/, '').trim();
+  return heading || null;
+}
+
+const legislationRef = (call) => {
+  const tier = call.args[0].toString();
+  const { year, index } = call.args[1];
+  return `${tier} ${year.toNumber()}/${index.toNumber()}`;
+};
+
+const shortHash = (h) => {
+  const s = h?.toString?.() ?? String(h ?? '');
+  return s.length > 14 ? `${s.slice(0, 10)}…${s.slice(-4)}` : s;
+};
+
+/**
+ * What the motion is about, in one line.
+ *
+ * The subject of a vote used to be buried inside the expanded body, so a list
+ * of motions read as a list of identical cards. Every branch is guarded: an
+ * argument shape this was not written for falls back to naming the call rather
+ * than throwing, because a wrong title is recoverable and a blank screen is
+ * not.
+ */
+export function motionTitle(call) {
+  if (!call) return 'Unreadable proposal';
+  const at = (fn, fallback) => {
+    try {
+      const out = fn();
+      return out || fallback;
+    } catch (_) {
+      return fallback;
+    }
+  };
+  const named = `${call.section ?? '?'}.${call.method ?? '?'}`;
+
+  switch (call.method) {
+    case 'addLegislation':
+      return at(() => {
+        const heading = headingOf(call.args[2]?.[0]);
+        return heading ? `${heading} — new ${legislationRef(call)}` : `New legislation ${legislationRef(call)}`;
+      }, 'New legislation');
+    case 'amendLegislation':
+      return at(() => {
+        const heading = headingOf(call.args[3]);
+        const ref = `${legislationRef(call)} § ${call.args[2].toNumber()}`;
+        return heading ? `${heading} — amends ${ref}` : `Amend ${ref}`;
+      }, 'Amend legislation');
+    case 'repealLegislation':
+      return at(() => `Repeal ${legislationRef(call)}`, 'Repeal legislation');
+    case 'repealLegislationSection':
+      return at(() => `Repeal ${legislationRef(call)} § ${call.args[2].toNumber()}`, 'Repeal a legislation section');
+    case 'transfer':
+      if (call.section === 'balances') {
+        return at(() => `Transfer ${formatDollars(call.args[1])} LLD`, 'Transfer LLD');
+      }
+      if (call.section === 'assets') {
+        return at(() => `Transfer asset #${call.args[0].toString()}`, 'Transfer an asset');
+      }
+      return named;
+    case 'sendLlmToPolitipool':
+      return at(() => `Politipool ${formatMerits(call.args[1])} LLM`, 'Politipool LLM');
+    case 'sendLlm':
+      return at(() => `Send ${formatMerits(call.args[1])} LLM`, 'Send LLM');
+    case 'remark':
+      return 'Treasury remark';
+    case 'blacklist':
+      return at(() => `Blacklist proposal ${shortHash(call.args[0])}`, 'Blacklist a proposal');
+    case 'externalProposeMajority':
+      return at(() => `Put ${shortHash(call.args[0].asLookup.hash_)} to referendum`, 'Put a question to referendum');
+    case 'schedule':
+      return at(() => `Scheduled: ${motionTitle(call.args[3])}`, 'Scheduled call');
+    case 'execute':
+      if (call.section === 'councilAccount' || call.section === 'senateAccount') {
+        const chamber = call.section === 'councilAccount' ? 'Congress' : 'Senate';
+        return at(() => `${chamber} executes: ${motionTitle(call.args[0])}`, `${chamber} executes a call`);
+      }
+      return named;
+    case 'batchAll':
+    case 'batch':
+      return at(() => {
+        const calls = call.args[0];
+        if (calls?.length === 1) return motionTitle(calls[0]);
+        return `Batch of ${calls.length} calls`;
+      }, 'Batch of calls');
+    case 'setMembers':
+      return 'Set the chamber’s members';
+    default:
+      return named;
+  }
+}
+
 /** Human time for a span of blocks, at the chain's six-second block. */
 export function blocksToText(blocks) {
   if (blocks == null || Number.isNaN(blocks)) return null;
@@ -203,6 +303,7 @@ export function readMotion(motion, currentBlock) {
     isClosable,
     isClosableNaye,
     status,
+    title: motionTitle(unwrappedCall),
     fate: describeFate(unwrappedCall),
   };
 }

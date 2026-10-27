@@ -761,3 +761,14 @@ html[data-design='state'] {
     }
   }
 }
+
+// Plain anchors — React Router links inside proposal bodies, mostly — fall
+// back to the user agent's blue, which is the only blue on a State screen.
+// antd's own links already follow colorLink; these do not.
+html[data-design='state'] {
+  a:not([class*='ant-']):not([class*='Button']) {
+    color: var(--gold);
+
+    &:hover { color: var(--gold-bright); }
+  }
+}
