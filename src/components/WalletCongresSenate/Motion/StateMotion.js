@@ -4,6 +4,7 @@ import Button from '../../Button/Button';
 import { Proposal } from '../../Proposal';
 import MotionSummary, { MotionHash, MotionStatusTag } from '../MotionSummary';
 import ProposalErrorBoundary from '../MotionSummary/ProposalErrorBoundary';
+import useMotionTitle from '../MotionSummary/useMotionTitle';
 import styles from './state.module.scss';
 
 /*
@@ -25,6 +26,7 @@ function StateMotion({
   onCloseExecute,
   onCloseRejected,
 }) {
+  const title = useMotionTitle(motion);
   return (
     <article className={styles.motion}>
       <header className={styles.head}>
@@ -32,7 +34,7 @@ function StateMotion({
         <MotionStatusTag status={motion.status} />
       </header>
 
-      <h3 className={styles.title}>{motion.title}</h3>
+      <h3 className={styles.title}>{title}</h3>
 
       <div className={styles.body}>
         <ProposalErrorBoundary hash={motion.hash}>

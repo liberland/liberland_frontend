@@ -10,6 +10,7 @@ import Voters from '../Voters';
 import ProposalTable from '../../Proposal/ProposalTable';
 import MotionSummary, { MotionHash, MotionStatusTag } from '../MotionSummary';
 import ProposalErrorBoundary from '../MotionSummary/ProposalErrorBoundary';
+import useMotionTitle from '../MotionSummary/useMotionTitle';
 import { readMotion } from '../../../utils/motions';
 import StateMotion from './StateMotion';
 import useMotionActions from './useMotionActions';
@@ -40,6 +41,7 @@ export default function Motion({
   const motion = readMotion({
     proposal, proposalOf, voting, membersCount,
   }, currentBlock);
+  const title = useMotionTitle(motion);
 
   // The State language draws a motion as a hairline card. Every decision
   // above is shared, so only the markup differs.
@@ -65,7 +67,7 @@ export default function Motion({
             <span className={styles.cardIndex}>{`Motion #${motion.index}`}</span>
             <MotionStatusTag status={motion.status} />
           </Flex>
-          <span className={styles.cardSubject}>{motion.title}</span>
+          <span className={styles.cardSubject}>{title}</span>
         </Flex>
       )}
       className={styles.fullWidth}

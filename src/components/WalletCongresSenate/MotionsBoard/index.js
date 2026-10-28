@@ -7,8 +7,56 @@ import { MOTION_FILTERS, countByStatus, sortMotionsNewestFirst } from '../../../
 import { Proposal } from '../../Proposal';
 import MotionSummary, { MotionHash, MotionStatusTag } from '../MotionSummary';
 import ProposalErrorBoundary from '../MotionSummary/ProposalErrorBoundary';
+import useMotionTitle from '../MotionSummary/useMotionTitle';
 import EmptyState from '../../EmptyState';
 import styles from './styles.module.scss';
+
+/*
+ * One row. Its own component because the title may have to be resolved
+ * through a preimage, and a hook cannot be called inside a map.
+ */
+function MotionRow({ motion, onOpen }) {
+  const title = useMotionTitle(motion);
+  return (
+    <div
+      className={styles.row}
+      role="link"
+      tabIndex={0}
+      aria-label={`Open motion ${motion.index}`}
+      data-testid={`motion-row-${motion.index}`}
+      onClick={() => onOpen(motion.hash)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onOpen(motion.hash);
+        }
+      }}
+    >
+      <div className={styles.rowHead}>
+        <span className={styles.rowIndex}>{`Motion #${motion.index}`}</span>
+        <MotionStatusTag status={motion.status} />
+      </div>
+
+      <h3 className={styles.rowTitle}>{title}</h3>
+
+      <div className={styles.rowBody}>
+        <ProposalErrorBoundary hash={motion.hash}>
+          <Proposal proposal={motion.call} isTableRow isDetailsHidden />
+        </ProposalErrorBoundary>
+      </div>
+
+      <MotionHash hash={motion.hash} />
+
+      <MotionSummary motion={motion} />
+    </div>
+  );
+}
+
+MotionRow.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  motion: PropTypes.object.isRequired,
+  onOpen: PropTypes.func.isRequired,
+};
 
 /*
  * The motions of a chamber, as a board you can actually read.
@@ -77,37 +125,7 @@ function MotionsBoard({ motions, detailPath, emptyText }) {
       <ul className={styles.rows}>
         {shown.map((motion) => (
           <li key={motion.hash}>
-            <div
-              className={styles.row}
-              role="link"
-              tabIndex={0}
-              aria-label={`Open motion ${motion.index}`}
-              data-testid={`motion-row-${motion.index}`}
-              onClick={() => open(motion.hash)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault();
-                  open(motion.hash);
-                }
-              }}
-            >
-              <div className={styles.rowHead}>
-                <span className={styles.rowIndex}>{`Motion #${motion.index}`}</span>
-                <MotionStatusTag status={motion.status} />
-              </div>
-
-              <h3 className={styles.rowTitle}>{motion.title}</h3>
-
-              <div className={styles.rowBody}>
-                <ProposalErrorBoundary hash={motion.hash}>
-                  <Proposal proposal={motion.call} isTableRow isDetailsHidden />
-                </ProposalErrorBoundary>
-              </div>
-
-              <MotionHash hash={motion.hash} />
-
-              <MotionSummary motion={motion} />
-            </div>
+            <MotionRow motion={motion} onOpen={open} />
           </li>
         ))}
       </ul>

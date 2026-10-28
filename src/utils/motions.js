@@ -219,6 +219,37 @@ const shortHash = (h) => {
   return s.length > 14 ? `${s.slice(0, 10)}…${s.slice(-4)}` : s;
 };
 
+/** The ways a call can hand a question to the citizens, all of them by hash. */
+const REFERENDUM_METHODS = new Set(['externalProposeMajority', 'externalPropose', 'externalProposeDefault']);
+
+/**
+ * The preimage a referendum proposal points at, if this call is one.
+ *
+ * `externalProposeMajority` carries only a hash: the thing being put to the
+ * citizens lives in a preimage fetched separately. Without it the only honest
+ * title is the hash, which is why these motions all read alike.
+ */
+export function referendumLookup(outerCall) {
+  // The proposal may still be wrapped — a motion that schedules, or executes
+  // from the chamber's account, a referendum proposal carries the lookup one
+  // or two levels down. The same unwrapping the title uses is applied first
+  // so those are not missed.
+  const { call } = unwrapCall(outerCall);
+  try {
+    if (call?.section === 'democracy' && REFERENDUM_METHODS.has(call.method)) {
+      const { hash_: hash, len } = call.args[0].asLookup;
+      return { hash, len };
+    }
+    if (isFastTrackProposal(call)) {
+      const { hash_: hash, len } = call.args[0][0].args[0].asLookup;
+      return { hash, len };
+    }
+  } catch (_) {
+    // Not a lookup we recognise.
+  }
+  return null;
+}
+
 /**
  * What the motion is about, in one line.
  *
@@ -278,6 +309,8 @@ export function motionTitle(outerCall) {
       return 'Treasury remark';
     case 'blacklist':
       return at(() => `Blacklist proposal ${shortHash(call.args[0])}`, 'Blacklist a proposal');
+    case 'externalPropose':
+    case 'externalProposeDefault':
     case 'externalProposeMajority':
       return at(() => `Put ${shortHash(call.args[0].asLookup.hash_)} to referendum`, 'Put a question to referendum');
     // Reached only when unwrapCall could not see inside — an empty or
