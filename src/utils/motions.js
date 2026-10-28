@@ -62,6 +62,40 @@ export const MOTION_FILTERS = [
 ];
 
 /**
+ * Peel the procedural wrappers off a call to reach what is actually proposed.
+ *
+ * A motion is often a wrapper around its real subject: the chamber executing
+ * from its own account, a scheduled call, a batch of one. Those say how a
+ * decision is carried out, not what is being decided — and naming a motion
+ * after its wrapper gives every such motion the same title. The wrappers are
+ * still reported, in the motion's fate; the subject comes from in here.
+ *
+ * Returns the innermost call and the wrappers removed, outermost first.
+ */
+export function unwrapCall(call, depth = 0) {
+  if (!call || depth > 6) return { call, wrappers: [] };
+  const descend = (inner, label) => {
+    if (!inner) return { call, wrappers: [] };
+    const next = unwrapCall(inner, depth + 1);
+    return { call: next.call, wrappers: [label, ...next.wrappers] };
+  };
+  try {
+    if (call.method === 'execute' && (call.section === 'councilAccount' || call.section === 'senateAccount')) {
+      return descend(call.args?.[0], call.section === 'councilAccount' ? 'Congress account' : 'Senate account');
+    }
+    if (call.method === 'schedule' && call.section === 'scheduler') {
+      return descend(call.args?.[3], 'scheduler');
+    }
+    if ((call.method === 'batchAll' || call.method === 'batch') && call.args?.[0]?.length === 1) {
+      return descend(call.args[0][0], 'batch');
+    }
+  } catch (_) {
+    // An unfamiliar wrapper shape is simply left alone.
+  }
+  return { call, wrappers: [] };
+}
+
+/**
  * What happens to this motion if it passes.
  *
  * Several council motions do not take effect themselves — they start a public
@@ -69,7 +103,7 @@ export const MOTION_FILTERS = [
  * deciding whether to put the question to the citizens, which is a different
  * question from whether they agree with it, so the screen says which it is.
  */
-export function describeFate(call) {
+function describeEffect(call) {
   if (!call) return { label: 'Unknown', detail: 'The proposal could not be read.' };
 
   // Each predicate is asked separately: an unfamiliar call shape must not stop
@@ -145,6 +179,25 @@ export function describeFate(call) {
   };
 }
 
+/**
+ * What happens if the motion passes, read from what it actually does.
+ *
+ * The effect is the innermost call's; the wrappers only say through which
+ * account, or when, so they become a clause rather than the whole answer. A
+ * motion that reads "Congress executes" says nothing about whether it enacts a
+ * law or pays an invoice.
+ */
+export function describeFate(outerCall) {
+  if (!outerCall) return { label: 'Unknown', detail: 'The proposal could not be read.' };
+  const { call, wrappers } = unwrapCall(outerCall);
+  const effect = describeEffect(call);
+  if (!wrappers.length) return effect;
+  return {
+    ...effect,
+    detail: `${effect.detail} Carried out through the ${wrappers.join(', then the ')}.`,
+  };
+}
+
 /** The first markdown heading of a legislation section, if it has one. */
 function headingOf(section) {
   const text = tryParseMaybeHexFromHuman(section);
@@ -175,8 +228,12 @@ const shortHash = (h) => {
  * than throwing, because a wrong title is recoverable and a blank screen is
  * not.
  */
-export function motionTitle(call) {
-  if (!call) return 'Unreadable proposal';
+export function motionTitle(outerCall) {
+  if (!outerCall) return 'Unreadable proposal';
+  // The subject is the innermost call. "Congress executes…" and "Scheduled…"
+  // describe the procedure, and would otherwise be the title of every motion
+  // that uses one, hiding the act being voted on behind the machinery.
+  const { call } = unwrapCall(outerCall);
   const at = (fn, fallback) => {
     try {
       const out = fn();
@@ -185,7 +242,9 @@ export function motionTitle(call) {
       return fallback;
     }
   };
-  const named = `${call.section ?? '?'}.${call.method ?? '?'}`;
+  // A call we cannot name is still named something a person can read; "?.?"
+  // is worse than saying plainly that it has no name we know.
+  const named = call.section && call.method ? `${call.section}.${call.method}` : 'Unnamed call';
 
   switch (call.method) {
     case 'addLegislation':
@@ -221,20 +280,22 @@ export function motionTitle(call) {
       return at(() => `Blacklist proposal ${shortHash(call.args[0])}`, 'Blacklist a proposal');
     case 'externalProposeMajority':
       return at(() => `Put ${shortHash(call.args[0].asLookup.hash_)} to referendum`, 'Put a question to referendum');
+    // Reached only when unwrapCall could not see inside — an empty or
+    // unfamiliar wrapper. Naming the machinery is then all there is.
     case 'schedule':
-      return at(() => `Scheduled: ${motionTitle(call.args[3])}`, 'Scheduled call');
+      return 'Scheduled call';
     case 'execute':
-      if (call.section === 'councilAccount' || call.section === 'senateAccount') {
-        const chamber = call.section === 'councilAccount' ? 'Congress' : 'Senate';
-        return at(() => `${chamber} executes: ${motionTitle(call.args[0])}`, `${chamber} executes a call`);
-      }
+      if (call.section === 'councilAccount') return 'Call from the Congress account';
+      if (call.section === 'senateAccount') return 'Call from the Senate account';
       return named;
     case 'batchAll':
     case 'batch':
+      // A batch of one is already unwrapped. For several, lead with the first
+      // subject and say how many follow, rather than only counting them.
       return at(() => {
         const calls = call.args[0];
-        if (calls?.length === 1) return motionTitle(calls[0]);
-        return `Batch of ${calls.length} calls`;
+        const rest = calls.length - 1;
+        return `${motionTitle(calls[0])} + ${rest} more`;
       }, 'Batch of calls');
     case 'setMembers':
       return 'Set the chamber’s members';
