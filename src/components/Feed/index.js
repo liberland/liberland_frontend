@@ -6,6 +6,8 @@ import { useHistory } from 'react-router-dom';
 import Markdown from 'markdown-to-jsx';
 import { useModeContext } from '../AntdProvider';
 import StateDashboard from './StateDashboard';
+import PendingTasks from '../PendingTasks';
+import usePendingTasks from '../../hooks/usePendingTasks';
 import { userSelectors } from '../../redux/selectors';
 import router from '../../router';
 import styles from './styles.module.scss';
@@ -180,6 +182,7 @@ function Feed() {
   const history = useHistory();
   const { isStateDesign } = useModeContext();
   const user = useSelector(userSelectors.selectUser);
+  const pending = usePendingTasks();
   const givenName = useSelector(userSelectors.selectUserGivenName);
   const familyName = useSelector(userSelectors.selectUserFamilyName);
 
@@ -195,7 +198,7 @@ function Feed() {
 
   // The State language specifies its own landing screen.
   if (isStateDesign) {
-    return <StateDashboard news={NEWS} />;
+    return <StateDashboard news={NEWS} pending={pending} />;
   }
 
   return (
@@ -206,6 +209,21 @@ function Feed() {
         isCitizen={!!user}
         onViewPassport={() => history.push(router.home.documents)}
       />
+
+      <section className={styles.newsSection}>
+        <div className={styles.tasksHeader}>
+          <h2 className={styles.newsSectionTitle}>Needs your attention</h2>
+          {pending.tasks.length > 0 && (
+            <span className={styles.taskCount}>{pending.tasks.length}</span>
+          )}
+        </div>
+        <PendingTasks
+          tasks={pending.tasks}
+          isLoading={pending.isLoading}
+          isSignedIn={pending.isSignedIn}
+          limit={6}
+        />
+      </section>
 
       <div className={styles.statsGrid}>
         <StatCard

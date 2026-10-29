@@ -5,6 +5,9 @@ import userEvent from '@testing-library/user-event';
 // Mock react-redux
 jest.mock('react-redux', () => ({
   useSelector: jest.fn(),
+  // The dashboard now asks the chain what is waiting for the citizen, so it
+  // dispatches. Nothing in these tests asserts on the dispatches themselves.
+  useDispatch: () => jest.fn(),
 }));
 
 // Mock react-router-dom

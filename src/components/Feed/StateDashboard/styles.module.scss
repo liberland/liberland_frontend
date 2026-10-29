@@ -59,6 +59,26 @@
   @media (max-width: 1000px) { grid-template-columns: 1fr; }
 }
 
+// The heading row, so a count can sit beside the title without pushing the
+// serif headline off its baseline.
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.sectionCount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--on-gold);
+  background: var(--gold-bright);
+  padding: 2px 8px;
+}
+
+.sectionHead .sectionTitle { margin-bottom: 0; }
+
 .sectionTitle {
   font-family: var(--font-serif);
   font-size: 26px;
@@ -70,6 +90,9 @@
 .panel {
   border: 1px solid var(--line);
   padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .panelBody {

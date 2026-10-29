@@ -10,6 +10,7 @@ import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import { getSelectedNetwork, NETWORKS } from '../../../utils/networkHelpers';
 import router from '../../../router';
 import StatStrip, { DASH } from '../../StateUI/StatStrip';
+import PendingTasks from '../../PendingTasks';
 import styles from './styles.module.scss';
 
 /*
@@ -22,7 +23,7 @@ import styles from './styles.module.scss';
  * dash rather than an invented number.
  */
 
-function StateDashboard({ news }) {
+function StateDashboard({ news, pending }) {
   const history = useHistory();
   const user = useSelector(userSelectors.selectUser);
   const balances = useSelector(walletSelectors.selectorBalances);
@@ -80,12 +81,19 @@ function StateDashboard({ news }) {
 
       <div className={styles.columns}>
         <section className={styles.col}>
-          <h2 className={styles.sectionTitle}>Awaiting your vote</h2>
+          <div className={styles.sectionHead}>
+            <h2 className={styles.sectionTitle}>Awaiting you</h2>
+            {pending?.tasks?.length > 0 && (
+              <span className={styles.sectionCount}>{pending.tasks.length}</span>
+            )}
+          </div>
           <div className={styles.panel}>
-            <p className={styles.panelBody}>
-              Referenda and congressional motions open for your vote are listed in
-              the assembly.
-            </p>
+            <PendingTasks
+              tasks={pending?.tasks}
+              isLoading={pending?.isLoading}
+              isSignedIn={pending?.isSignedIn}
+              limit={6}
+            />
             <div className={styles.actions}>
               <button
                 type="button"
@@ -138,6 +146,12 @@ StateDashboard.propTypes = {
     author: PropTypes.string,
     text: PropTypes.string,
   })).isRequired,
+  pending: PropTypes.shape({
+    // eslint-disable-next-line react/forbid-prop-types
+    tasks: PropTypes.array,
+    isLoading: PropTypes.bool,
+    isSignedIn: PropTypes.bool,
+  }),
 };
 
 export default StateDashboard;
