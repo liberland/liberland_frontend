@@ -1,19 +1,25 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import List from 'antd/es/list';
-import Divider from 'antd/es/divider';
+import { useRouteMatch } from 'react-router-dom';
 import { identityActions, senateActions } from '../../../redux/actions';
 import { senateSelectors } from '../../../redux/selectors';
-import Motion from '../../WalletCongresSenate/Motion';
 import { useMotionContext } from '../../WalletCongresSenate/ContextMotions';
-import ProposalContainer from '../../Proposal/ProposalContainer';
-import EmptyState from '../../EmptyState';
+import MotionsBoard from '../../WalletCongresSenate/MotionsBoard';
+import MotionDetail from '../../WalletCongresSenate/MotionDetail';
+import router from '../../../router';
+
+const voteMotion = (data) => senateActions.senateVoteAtMotions.call(data);
+const closeMotion = (data) => senateActions.senateCloseMotion.call(data);
+const detailPath = (hash) => `${router.senate.motions}/${hash}`;
 
 function Motions() {
   const dispatch = useDispatch();
   const motions = useSelector(senateSelectors.motions);
   const userIsMember = useSelector(senateSelectors.userIsMember);
+  const isLoading = useSelector(senateSelectors.isLoading);
   const { motionIds } = useMotionContext();
+
+  const detail = useRouteMatch({ path: router.senate.motion, exact: true });
 
   useEffect(() => {
     dispatch(senateActions.senateGetMembers.call());
@@ -25,33 +31,25 @@ function Motions() {
     dispatch(identityActions.getIdentityMotions.call(Array.from(new Set(motionIds.concat(votes.flat())))));
   }, [motions, motionIds, dispatch]);
 
-  if (!motions?.length) {
-    return <EmptyState title="There are no open motions" />;
+  if (detail) {
+    return (
+      <MotionDetail
+        motions={motions}
+        loading={isLoading}
+        userIsMember={userIsMember}
+        voteMotion={voteMotion}
+        closeMotion={closeMotion}
+        backPath={router.senate.motions}
+        backLabel="All Senate motions"
+      />
+    );
   }
 
   return (
-    <List
-      dataSource={motions}
-      renderItem={({
-        proposal,
-        proposalOf,
-        voting,
-        membersCount,
-      }) => (
-        <ProposalContainer noTable>
-          <Motion
-            userIsMember={userIsMember}
-            membersCount={membersCount}
-            proposal={proposal.toString()}
-            proposalOf={proposalOf}
-            voting={voting.unwrap()}
-            voteMotion={(data) => senateActions.senateVoteAtMotions.call(data)}
-            closeMotion={(data) => senateActions.senateCloseMotion.call(data)}
-            isTableRow
-          />
-          <Divider />
-        </ProposalContainer>
-      )}
+    <MotionsBoard
+      motions={motions}
+      detailPath={detailPath}
+      emptyText="There are no open motions before the Senate"
     />
   );
 }

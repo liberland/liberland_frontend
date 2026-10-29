@@ -1,0 +1,162 @@
+// The tally of a motion. Every colour is a design token, so this block takes
+// on whichever design language is active without a second implementation.
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// ── the bar ──
+.bar {
+  position: relative;
+  padding-bottom: 7px;
+}
+
+.cells {
+  display: flex;
+  gap: 3px;
+}
+
+.cell {
+  flex: 1 1 0;
+  min-width: 6px;
+  height: 14px;
+  border-radius: var(--radius-sm, 3px);
+}
+
+.cellAye { background: var(--green); }
+.cellNay { background: var(--red); }
+
+.cellEmpty {
+  border: 1px solid var(--line-strong);
+  background: transparent;
+}
+
+// Where the motion carries. Marked on the bar so "4 of 7" is visible, not
+// arithmetic.
+.thresholdMark {
+  position: absolute;
+  top: -3px;
+  bottom: 4px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--gold);
+}
+
+// ── the figures ──
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+  margin: 0;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  dt {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--ink);
+  }
+}
+
+.aye { color: var(--green) !important; }
+.nay { color: var(--red) !important; }
+
+// ── what happens next ──
+.fate {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.fateLabel {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.fateValue {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.fateDetail {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 70ch;
+}
+
+// ── identifier ──
+// Shown in full: the first and last few characters are not an identifier, and
+// two motions can share them.
+.hash {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: left;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ink-faint);
+
+  &:hover { color: var(--gold); }
+}
+
+// ── status ──
+.status {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm, 3px);
+  white-space: nowrap;
+}
+
+.status_voting { color: var(--gold); }
+.status_passing { color: var(--green); }
+.status_rejecting { color: var(--red); }
+.status_expired { color: var(--ink-faint); }
+
+// Shown in place of a proposal body the renderers cannot handle. The vote
+// itself is still readable above it.
+.unreadable {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-sm, 6px);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-faint);
+}

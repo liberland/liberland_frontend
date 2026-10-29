@@ -41,3 +41,37 @@
 
   &:hover { border-color: var(--line-strong, #D8CFBA); }
 }
+
+/*
+ * Inside the State language these controls sit in the near-black status bar,
+ * which does not follow the canvas — so they take the status-bar colours
+ * rather than the page's, in day mode as well as night. The design language
+ * draws them as small squared mono labels.
+ */
+:global(html[data-design='state']) {
+  .networkBadge,
+  .iconBtn {
+    border-radius: 0;
+    border-color: var(--statusbar-line);
+    color: var(--statusbar-faint);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+
+    &:hover {
+      border-color: var(--gold-bright);
+      color: var(--statusbar-ink);
+    }
+  }
+
+  .networkBadge { padding: 7px 11px; }
+
+  .iconBtn {
+    width: auto;
+    height: auto;
+    padding: 6px 8px;
+  }
+
+  .networkDot { border-radius: 0; }
+}

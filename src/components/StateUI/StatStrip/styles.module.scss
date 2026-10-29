@@ -1,0 +1,82 @@
+// Measured from the design language's own statement strip: surface fill,
+// hairline frame under a 2px state-yellow rule, cells at 22/20/20.
+
+.strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--gold-fill);
+
+  @media (max-width: 1100px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 560px)  { grid-template-columns: 1fr; }
+}
+
+.cell {
+  padding: 22px 20px 20px;
+  border-right: 1px solid var(--line);
+  min-width: 0;
+
+  &:last-child { border-right: none; }
+
+  @media (max-width: 1100px) {
+    &:nth-child(2n) { border-right: none; }
+    &:nth-child(-n + 2) { border-bottom: 1px solid var(--line); }
+  }
+
+  @media (max-width: 560px) {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+
+    &:last-child { border-bottom: none; }
+  }
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 12px;
+  min-width: 0;
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: 27px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.unit {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+.note {
+  margin-top: 8px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--ink-faint);
+}
+
+.action {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}

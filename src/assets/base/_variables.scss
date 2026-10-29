@@ -153,13 +153,38 @@ html {
   --radius-lg:  12px;
   --radius-md:  10px;
   --radius-sm:  8px;
+  // Hanken Grotesk is set a notch heavy in the Ledger language.
+  --body-weight: 500;
 }
 
-// ── Liberland State — light ──
+// ═══════════════════════════════════════════════════════════════════════
+// Liberland State
+//
+// Both palettes are measured from the design language's own Day/Night
+// toggle, element by element, rather than derived. Two rules the design
+// keeps in BOTH modes and which are easy to get wrong:
+//
+//   * the status bar stays near-black with the gold rule in day mode — it is
+//     chrome, not canvas, so --statusbar-* below are mode-independent;
+//   * each nav group's dash carries its own domain colour, never gold.
+// ═══════════════════════════════════════════════════════════════════════
+
+// Chrome that does not follow the canvas. The design keeps the status bar
+// near-black under the state-yellow rule in day mode as well as night.
+html[data-design='state'] {
+  --statusbar-bg:   #101114;
+  --statusbar-ink:  #F6F5F2;
+  --statusbar-faint:#8A8880;
+  --statusbar-line: rgba(255, 200, 0, .24);
+}
+
+// ── Liberland State — day ──
 html[data-design='state'] {
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-sans:  'Archivo', system-ui, sans-serif;
   --font-mono:  'IBM Plex Mono', ui-monospace, monospace;
+  // Archivo is set at its regular weight in the design language.
+  --body-weight: 400;
   // The State language is squared: hairlines and right angles, no soft cards.
   --radius-lg: 0px;
   --radius-md: 0px;
@@ -172,13 +197,16 @@ html[data-design='state'] {
   --ink:        #0A0A0B;
   --ink-soft:   #57554F;
   --ink-faint:  #6E6C66;
-  --line:       rgba(10, 10, 11, .18);
-  --line-strong:rgba(10, 10, 11, .34);
+  --line:       rgba(10, 10, 11, .13);
+  --line-strong:rgba(10, 10, 11, .28);
   // #FFC800 is unreadable as text on white, so the bright state yellow is the
-  // fill/accent and the darker tone carries text and links.
+  // fill/accent and the darker tone carries text, links and rules.
   --gold:       #8A6A00;
   --gold-bright:#FFC800;
-  --gold-tint:  rgba(255, 200, 0, .28);
+  // The solid fill of a primary action is the same bright state yellow in
+  // both modes; --gold shifts because it also has to carry readable text.
+  --gold-fill:  #FFC800;
+  --gold-tint:  rgba(255, 200, 0, .24);
   --gold-tint-2:rgba(255, 200, 0, .14);
   --blue:       #0F5E96;
   --green:      #2F6B33;
@@ -188,6 +216,12 @@ html[data-design='state'] {
   --on-gold:    #0A0A0B;
   --shadow:     none;
   --shadow-sm:  none;
+
+  // Domain colours for the nav group dashes.
+  --domain-treasury: #0B6F79;
+  --domain-assembly: #0F5E96;
+  --domain-registry: #6B2F1F;
+  --domain-account:  #6E6C66;
 
   --main-color:        #0A0A0B;
   --border-color:      rgba(10, 10, 11, .13);
@@ -212,7 +246,7 @@ html[data-design='state'] {
   --serious-bg:        rgba(107, 47, 31, .06);
 }
 
-// ── Liberland State — dark (the language's native mode) ──
+// ── Liberland State — night (the language's native mode) ──
 html[data-design='state'][dark-mode='yes'] {
   --paper:      #0A0A0B;
   --surface:    #16171A;
@@ -225,6 +259,7 @@ html[data-design='state'][dark-mode='yes'] {
   --line-strong:rgba(255, 200, 0, .34);
   --gold:       #FFC800;
   --gold-bright:#FFD84D;
+  --gold-fill:  #FFC800;
   --gold-tint:  rgba(255, 200, 0, .10);
   --gold-tint-2:rgba(255, 200, 0, .06);
   --blue:       #5AAEE8;
@@ -235,6 +270,11 @@ html[data-design='state'][dark-mode='yes'] {
   --on-gold:    #0A0A0B;
   --shadow:     none;
   --shadow-sm:  none;
+
+  --domain-treasury: #2BC4D2;
+  --domain-assembly: #5AAEE8;
+  --domain-registry: #C9705A;
+  --domain-account:  #8A8880;
 
   --main-color:        #F6F5F2;
   --border-color:      rgba(255, 200, 0, .20);

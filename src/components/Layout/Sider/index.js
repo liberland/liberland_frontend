@@ -175,7 +175,7 @@ function Sider() {
         <img src={liberlandLogo} alt="Liberland" className={styles.brandLogo} />
         <div className={styles.brandText}>
           <div className={styles.brandName}>Liberland</div>
-          <div className={styles.brandSub}>Republic Ledger</div>
+          <div className={styles.brandSub}>State Blockchain</div>
         </div>
       </div>
       <nav className={styles.nav} aria-label="Main navigation">

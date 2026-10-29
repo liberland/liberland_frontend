@@ -18,6 +18,8 @@ import Button from '../../Button/Button';
 import { transactionHistoryProcessorFactory } from '../WalletTransactionHistory/utils';
 import styles from './styles.module.scss';
 import WalletTransactionHistoryMobile from '../WalletTransactionHistoryMobile';
+import StateWalletOverview from '../StateWalletOverview';
+import { useModeContext } from '../../AntdProvider';
 
 function WalletOverview() {
   const [filterTransactionsBy, setFilterTransactionsBy] = useState();
@@ -31,6 +33,7 @@ function WalletOverview() {
   const userIsMember = useSelector(congressSelectors.userIsMember);
   const isDesktop = useMediaQuery('(min-width: 1200px)');
   const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const { isStateDesign } = useModeContext();
 
   const dispatch = useDispatch();
 
@@ -84,6 +87,22 @@ function WalletOverview() {
       ));
     }
   }, [dispatch, transactionHistoryTranslated]);
+
+  // The State design language lays this screen out as three flat sections
+  // rather than collapsible cards. Same selectors, same modals, same effects
+  // above — only the arrangement below differs.
+  if (isStateDesign) {
+    return (
+      <StateWalletOverview
+        balances={balances}
+        liquidMerits={liquidMerits}
+        additionalAssets={additionalAssets}
+        transactionHistory={transactionHistoryTranslated}
+        historyFetchFailed={historyFetchFailed}
+        userIsMember={userIsMember}
+      />
+    );
+  }
 
   return (
     <Collapse

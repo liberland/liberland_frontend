@@ -11,16 +11,31 @@ import truncate from '../../../../utils/truncate';
 import CastVeto from '../CastVeto';
 import ProposeButton from '../ProposeButton';
 import AmendButton from '../AmendButton';
+import { useModeContext } from '../../../AntdProvider';
 import styles from '../styles.module.scss';
+import stateStyles from './state.module.scss';
 
 function LegislationItem({
   year, index, tier, id, sections,
 }) {
   const { title, setTitleFromRef } = useTitleFromMarkdown(false, `Legislation ${year}/${index}`);
+  const { isStateDesign } = useModeContext();
+
+  // The design language names a piece of legislation and prints its on-chain
+  // address beneath — the tier, year and index it is actually addressed by.
+  const label = isStateDesign ? (
+    <span className={stateStyles.label}>
+      <span className={stateStyles.title}>{truncate(title, 70)}</span>
+      <span className={stateStyles.reference}>{`${tier} · ${year}/${index}`}</span>
+    </span>
+  ) : truncate(title, 50);
+
   return (
     <Collapse
+      bordered={!isStateDesign}
+      className={isStateDesign ? stateStyles.row : undefined}
       items={[{
-        label: truncate(title, 50),
+        label,
         key: 'legislation',
         extra: (
           <VetoStats

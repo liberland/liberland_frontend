@@ -91,6 +91,7 @@ export default {
   congress: {
     overview: '/home/congress/overview',
     motions: '/home/congress/motions',
+    motion: '/home/congress/motions/:proposalHash',
     addLegislation: '/home/congress/add-legislation',
     addLegislationViaReferendum:
       '/home/congress/add-legislation-via-referendum',
@@ -98,6 +99,7 @@ export default {
   },
   senate: {
     motions: '/home/senate/motions',
+    motion: '/home/senate/motions/:proposalHash',
     scheduledCongressSpending: '/home/senate/scheduled-congress-spending',
     wallet: '/home/senate/wallet',
     overview: '/home/senate/overview',

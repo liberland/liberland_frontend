@@ -1,0 +1,18 @@
+// A single motion's page.
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.back { align-self: flex-start; }
+
+.endNote {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-faint);
+}

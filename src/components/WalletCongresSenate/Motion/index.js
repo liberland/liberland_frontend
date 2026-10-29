@@ -1,17 +1,20 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import Card from 'antd/es/card';
 import Flex from 'antd/es/flex';
 import Button from '../../Button/Button';
-import truncate from '../../../utils/truncate';
-import {
-  blockchainSelectors,
-} from '../../../redux/selectors';
 import { Proposal } from '../../Proposal';
-import { walletAddress } from '../../../redux/selectors/congress';
+import { blockchainSelectors } from '../../../redux/selectors';
 import Voters from '../Voters';
 import ProposalTable from '../../Proposal/ProposalTable';
+import MotionSummary, { MotionHash, MotionStatusTag } from '../MotionSummary';
+import ProposalErrorBoundary from '../MotionSummary/ProposalErrorBoundary';
+import useMotionTitle from '../MotionSummary/useMotionTitle';
+import { readMotion } from '../../../utils/motions';
+import StateMotion from './StateMotion';
+import useMotionActions from './useMotionActions';
+import { useModeContext } from '../../AntdProvider';
 import styles from './styles.module.scss';
 
 export default function Motion({
@@ -24,104 +27,81 @@ export default function Motion({
   userIsMember,
   isTableRow,
 }) {
-  const dispatch = useDispatch();
-  const userAddress = useSelector(
-    blockchainSelectors.userWalletAddressSelector,
-  );
+  const { isStateDesign } = useModeContext();
+  const currentBlock = useSelector(blockchainSelectors.blockNumber);
+  const actions = useMotionActions({
+    proposal, voting, voteMotion, closeMotion, membersCount,
+  });
+  const {
+    isClosable, isClosableNaye, canVoteAye, canVoteNay,
+  } = actions;
 
-  const threshold = voting.threshold.toNumber();
+  // The same reading both languages and the motion's own page use, so a
+  // motion cannot read "passing" on one screen and "voting" on another.
+  const motion = readMotion({
+    proposal, proposalOf, voting, membersCount,
+  }, currentBlock);
+  const title = useMotionTitle(motion);
 
-  const isClosable = voting.ayes.length >= threshold;
-
-  const isClosableNaye = voting.nays.length > membersCount - threshold;
-
-  const voteMotionCall = (vote) => {
-    const voteMotionData = {
-      proposal,
-      index: voting.index,
-      vote,
-    };
-    dispatch(voteMotion(voteMotionData));
-  };
+  // The State language draws a motion as a hairline card. Every decision
+  // above is shared, so only the markup differs.
+  if (isStateDesign) {
+    return (
+      <StateMotion
+        motion={motion}
+        userIsMember={userIsMember}
+        canVoteAye={canVoteAye}
+        canVoteNay={canVoteNay}
+        onVote={actions.vote}
+        onCloseExecute={actions.closeExecute}
+        onCloseRejected={actions.closeRejected}
+      />
+    );
+  }
 
   return (
     <Card
       title={(
-        <>
-          Proposal id:
-          <b>{truncate(proposal, 13)}</b>
-        </>
+        <Flex vertical gap="6px" className={styles.cardTitle}>
+          <Flex wrap align="center" gap="10px">
+            <span className={styles.cardIndex}>{`Motion #${motion.index}`}</span>
+            <MotionStatusTag status={motion.status} />
+          </Flex>
+          <span className={styles.cardSubject}>{title}</span>
+        </Flex>
       )}
       className={styles.fullWidth}
       actions={userIsMember ? [
         <Flex wrap gap="15px" justify="start" className={styles.actions}>
           {isClosable && (
-            <Button
-              primary
-              onClick={() => dispatch(
-                closeMotion({ proposal, index: voting.index }),
-              )}
-            >
-              Close & Execute
+            <Button primary onClick={actions.closeExecute}>
+              Close &amp; Execute
             </Button>
           )}
-          {!voting.nays.map((v) => v.toString()).includes(userAddress)
-            && !isClosable && (
-              <Button
-                onClick={() => voteMotionCall(false)}
-                red
-              >
-                Vote nay
-              </Button>
+          {canVoteNay && (
+            <Button onClick={() => actions.vote(false)} red>
+              Vote nay
+            </Button>
           )}
-          {!voting.ayes.map((v) => v.toString()).includes(userAddress)
-            && !isClosable && (
-              <Button
-                onClick={() => voteMotionCall(true)}
-                green
-              >
-                Vote aye
-              </Button>
+          {canVoteAye && (
+            <Button onClick={() => actions.vote(true)} green>
+              Vote aye
+            </Button>
           )}
           {isClosableNaye && (
-            <Button
-              onClick={() => dispatch(
-                closeMotion({ proposal, index: voting.index, walletAddress }),
-              )}
-              primary
-            >
+            <Button onClick={actions.closeRejected} primary>
               Close Motion
             </Button>
           )}
         </Flex>,
       ] : []}
     >
-      <Card.Meta
-        description={(
-          <Flex wrap gap="15px">
-            <p>
-              Aye
-              {' '}
-              <b>
-                {voting.ayes.length}
-                /
-                {threshold}
-              </b>
-            </p>
-            <p>
-              Nay
-              {' '}
-              <b>
-                {voting.nays.length}
-                /
-                {threshold}
-              </b>
-            </p>
-          </Flex>
-        )}
-      />
       <Flex vertical gap="15px">
-        <Proposal proposal={proposalOf} isTableRow={isTableRow} isDetailsHidden />
+        <MotionSummary motion={motion} showFateDetail />
+        <MotionHash hash={motion.hash} />
+        <ProposalErrorBoundary hash={motion.hash}>
+          <Proposal proposal={proposalOf} isTableRow={isTableRow} isDetailsHidden />
+        </ProposalErrorBoundary>
         <Flex wrap gap="15px">
           <Card size="small" title="Voted aye">
             <Voters voting={voting.ayes} />

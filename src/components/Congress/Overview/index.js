@@ -12,6 +12,8 @@ import ProposeLegislationViaReferendumButton from '../ProposeLegislationViaRefer
 import CopyIconWithAddress from '../../CopyIconWithAddress';
 import ProposeBudgetModalWrapper from '../../Modals/ProposeBudgetModal';
 import Table from '../../Table';
+import StateAssembly from '../StateAssembly';
+import { useModeContext } from '../../AntdProvider';
 
 export default function Overview() {
   const dispatch = useDispatch();
@@ -21,6 +23,7 @@ export default function Overview() {
   const userIsCandidate = useSelector(congressSelectors.userIsCandidate);
   const userHasWalletCongressMember = useSelector(congressSelectors.userHasWalletCongressMember);
   const members = useSelector(congressSelectors.members);
+  const { isStateDesign } = useModeContext();
   useEffect(() => {
     dispatch(congressActions.getCandidates.call());
     dispatch(congressActions.getMembers.call());
@@ -46,7 +49,7 @@ export default function Overview() {
     localStorage.removeItem('BlockchainAdress');
   };
 
-  return (
+  const membersTable = (
     <Table
       title={(
         <Flex wrap gap="15px" justify="space-between">
@@ -124,4 +127,19 @@ export default function Overview() {
       }) || []}
     />
   );
+
+  // The design language puts the two chambers on one screen. The members
+  // table is kept below it rather than dropped — the design never drew this
+  // screen's contents, and the roll of Congress belongs on the overview. It
+  // carries its own heading, so it needs no section wrapper.
+  if (isStateDesign) {
+    return (
+      <Flex vertical gap="46px">
+        <StateAssembly />
+        {membersTable}
+      </Flex>
+    );
+  }
+
+  return membersTable;
 }

@@ -1,0 +1,28 @@
+// A legislation row in the Liberland State design language: the name of the
+// act, with the address it is held at on chain beneath it.
+
+.row {
+  border-bottom: 1px solid var(--line) !important;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.reference {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}

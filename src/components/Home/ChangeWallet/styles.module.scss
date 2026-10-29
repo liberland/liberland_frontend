@@ -10,6 +10,17 @@
 .dropdown, .dropdownLink {
   color: var(--main-color);
 }
+
+/*
+ * In the State language this control only ever appears in the near-black
+ * status bar, which keeps its own colours in day mode as well as night — the
+ * page ink would be near-invisible on it.
+ */
+:global(html[data-design='state']) {
+  .dropdown, .dropdownLink {
+    color: var(--statusbar-ink);
+  }
+}
 .button {
   margin-top: 5px;
   height: 25px;
