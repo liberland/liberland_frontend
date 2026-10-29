@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import Markdown from 'markdown-to-jsx';
 import {
   blockchainSelectors, userSelectors, walletSelectors,
 } from '../../../redux/selectors';
@@ -11,6 +10,8 @@ import { getSelectedNetwork, NETWORKS } from '../../../utils/networkHelpers';
 import router from '../../../router';
 import StatStrip, { DASH } from '../../StateUI/StatStrip';
 import PendingTasks from '../../PendingTasks';
+import RepublicLive from '../../RepublicLive';
+import Guides from '../../Guides';
 import styles from './styles.module.scss';
 
 /*
@@ -23,7 +24,7 @@ import styles from './styles.module.scss';
  * dash rather than an invented number.
  */
 
-function StateDashboard({ news, pending }) {
+function StateDashboard({ pending, live }) {
   const history = useHistory();
   const user = useSelector(userSelectors.selectUser);
   const balances = useSelector(walletSelectors.selectorBalances);
@@ -67,8 +68,8 @@ function StateDashboard({ news, pending }) {
           {
             key: 'yield',
             label: 'Staking yield',
-            unit: 'APY',
-            note: 'Bonded LLD',
+            value: live?.stakerApy ?? undefined,
+            note: 'From last week’s payouts',
           },
           {
             key: 'citizenship',
@@ -116,22 +117,9 @@ function StateDashboard({ news, pending }) {
         </section>
 
         <section className={styles.col}>
-          <h2 className={styles.sectionTitle}>Dispatch</h2>
-          <div className={styles.dispatch}>
-            {news.map((item) => (
-              <article key={item.title} className={styles.dispatchItem}>
-                <div className={styles.dispatchMeta}>
-                  <span className={styles.tag}>{`#${item.tag}`}</span>
-                  <span className={styles.dispatchDate}>{item.date}</span>
-                  <span className={styles.dispatchAuthor}>{item.author}</span>
-                </div>
-                <h3 className={styles.dispatchTitle}>{item.title}</h3>
-                <div className={styles.dispatchBody}>
-                  <Markdown>{item.text}</Markdown>
-                </div>
-              </article>
-            ))}
-          </div>
+          <h2 className={styles.sectionTitle}>The republic, live</h2>
+          <RepublicLive {...live} />
+          <Guides />
         </section>
       </div>
     </div>
@@ -139,19 +127,14 @@ function StateDashboard({ news, pending }) {
 }
 
 StateDashboard.propTypes = {
-  news: PropTypes.arrayOf(PropTypes.shape({
-    tag: PropTypes.string,
-    title: PropTypes.string,
-    date: PropTypes.string,
-    author: PropTypes.string,
-    text: PropTypes.string,
-  })).isRequired,
   pending: PropTypes.shape({
     // eslint-disable-next-line react/forbid-prop-types
     tasks: PropTypes.array,
     isLoading: PropTypes.bool,
     isSignedIn: PropTypes.bool,
   }),
+  // eslint-disable-next-line react/forbid-prop-types
+  live: PropTypes.object,
 };
 
 export default StateDashboard;

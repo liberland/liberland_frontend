@@ -16,9 +16,6 @@ jest.mock('react-router-dom', () => ({
   useHistory: () => ({ push: mockPush }),
 }));
 
-// Mock markdown-to-jsx
-jest.mock('markdown-to-jsx', () => ({ children }) => <div>{children}</div>);
-
 import { useSelector } from 'react-redux';
 import Feed from '../index';
 
@@ -55,9 +52,9 @@ describe('Feed (Dashboard)', () => {
       render(<Feed />);
       expect(screen.getByText('Wallet')).toBeInTheDocument();
       expect(screen.getByText('Open referenda')).toBeInTheDocument();
-      // "Staking" appears in both a stat card label and a news tag
+      // "Staking" and "Congress" are also guide links below the fold
       expect(screen.getAllByText('Staking').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText('Congress')).toBeInTheDocument();
+      expect(screen.getAllByText('Congress').length).toBeGreaterThanOrEqual(1);
     });
 
     it('renders stat card trend labels', () => {
@@ -68,26 +65,27 @@ describe('Feed (Dashboard)', () => {
       expect(screen.getByText('Active motions →')).toBeInTheDocument();
     });
 
-    it('renders the Republic updates heading', () => {
+    it('renders the live section heading', () => {
       render(<Feed />);
-      expect(screen.getByText('Republic updates')).toBeInTheDocument();
+      expect(screen.getByText('The republic, live')).toBeInTheDocument();
     });
 
-    it('renders all 4 news card titles', () => {
+    it('renders the three live blocks', () => {
       render(<Feed />);
-      expect(screen.getByText('Welcome to Liberland blockchain')).toBeInTheDocument();
-      expect(screen.getByText('How to get LLD?')).toBeInTheDocument();
-      expect(screen.getByText('LLD Staking guide')).toBeInTheDocument();
-      expect(screen.getByText('Liberland Merits — LLM')).toBeInTheDocument();
+      expect(screen.getByText('Coming into force')).toBeInTheDocument();
+      expect(screen.getByText('Where the money went')).toBeInTheDocument();
+      expect(screen.getByText('The republic in figures')).toBeInTheDocument();
     });
 
-    it('renders news card tags', () => {
+    it('says it is still reading rather than claiming the chain is empty', () => {
       render(<Feed />);
-      expect(screen.getByText('General')).toBeInTheDocument();
-      expect(screen.getByText('Blockchain')).toBeInTheDocument();
-      // "Staking" tag shares text with the Staking stat card label
-      expect(screen.getAllByText('Staking').length).toBeGreaterThanOrEqual(2);
-      expect(screen.getByText('LLM')).toBeInTheDocument();
+      expect(screen.getByText('Reading the agenda…')).toBeInTheDocument();
+    });
+
+    it('keeps the guides one click away', () => {
+      render(<Feed />);
+      expect(screen.getByText('Guides')).toBeInTheDocument();
+      expect(screen.getByText('Documentation')).toBeInTheDocument();
     });
   });
 
