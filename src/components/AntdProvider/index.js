@@ -65,10 +65,9 @@ export default function AntdProvider({ children }) {
     applyDesignAttribute(design);
   }, [design]);
 
-  // Design system color tokens
-  // Palette per design language. Ledger = warm parchment; State = near-black
-  // with the #FFC800 state yellow. Four-way pick keeps each token on one line
-  // without nesting ternaries.
+  // Design system color tokens. Four-way pick keeps each token on one line
+  // without nesting ternaries. The State values are measured from the design
+  // language's own Day/Night toggle, not derived from the Ledger's.
   const pick = (stateDark, stateLight, ledgerDark, ledgerLight) => {
     if (isState) return isDarkMode ? stateDark : stateLight;
     return isDarkMode ? ledgerDark : ledgerLight;
@@ -88,7 +87,7 @@ export default function AntdProvider({ children }) {
   const colorLinkActive = pick('#FFD84D', '#6E5500', '#F4CE73', '#C99A3A');
   const colorWarningBg = isDarkMode ? '#2C2614' : '#FAF4E4';
   const contentBg = pick('#0A0A0B', '#F6F5F2', '#121009', '#F4F0E6');
-  const mildBlue = isDarkMode ? '#766F5F' : '#948E80';
+  const mildBlue = pick('#8A8880', '#6E6C66', '#766F5F', '#948E80');
   const activeBorder = colorGold;
 
   return (
@@ -168,7 +167,7 @@ export default function AntdProvider({ children }) {
             defaultHoverColor: colorText,
             defaultHoverBg: colorGoldTint,
             defaultShadow: '0',
-            primaryColor: isDarkMode ? '#1A1305' : '#211904',
+            primaryColor: pick('#0A0A0B', '#0A0A0B', '#1A1305', '#211904'),
             primaryShadow: '0',
             colorPrimaryBorder: colorGold,
             colorPrimary: colorGold,

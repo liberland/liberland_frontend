@@ -1,0 +1,101 @@
+// The bridge instructions in the Liberland State design language.
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 900px;
+}
+
+.lede {
+  border-top: 2px solid var(--gold-fill);
+  border-bottom: 1px solid var(--line);
+  padding: 22px 0 24px;
+}
+
+.intro {
+  margin: 0 0 12px;
+  font-family: var(--font-sans);
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+
+  li + li { margin-top: 6px; }
+}
+
+// ── the route ──
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.step {
+  display: flex;
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+
+  &:last-child { border-bottom: 1px solid var(--line); }
+}
+
+.stepNumber {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  padding-top: 3px;
+}
+
+.stepBody { min-width: 0; }
+
+.stepTitle {
+  margin: 0 0 10px;
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 400 !important;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.note {
+  margin: 10px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--ink-faint);
+}
+
+// ── warnings ──
+.warning {
+  border: 1px solid var(--red);
+  background: var(--red-tint);
+  padding: 18px 20px 20px;
+}
+
+.warningLabel {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 12px;
+}

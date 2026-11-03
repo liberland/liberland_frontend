@@ -8,9 +8,14 @@ const initialState = {
 
 const financesReducer = handleActions(
   {
+    // These two were separate handlers for the same action. An object has
+    // one value per key, so the later one simply replaced the earlier and
+    // `loading` was never set to true at all — nothing could tell a request
+    // in flight from one that came back empty.
     [financesActions.getFinances.call]: (state) => ({
       ...state,
       loading: true,
+      finances: null,
     }),
 
     [combineActions(
@@ -19,11 +24,6 @@ const financesReducer = handleActions(
     )]: (state) => ({
       ...state,
       loading: initialState.loading,
-    }),
-
-    [financesActions.getFinances.call]: (state) => ({
-      ...state,
-      finances: null,
     }),
 
     [financesActions.getFinances.success]: (state, action) => ({

@@ -4,3 +4,16 @@
 .actions {
     padding-left: 15px;
 }
+.cardTitle { white-space: normal; }
+
+.cardIndex {
+  font-size: 13px;
+  color: var(--description-color);
+}
+
+.cardSubject {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}

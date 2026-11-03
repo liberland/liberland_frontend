@@ -7,9 +7,10 @@
   word-wrap: break-word;
 }
 
+// Size comes from the Emblem component, which keeps the arms' own proportions;
+// this rule only decides whether they are shown at all. The previous fixed
+// 43x33 box stretched a shield that is taller than it is wide.
 .liberlandLogo {
-  height: 33px;
-  width: 43px;
   display: none;
 
   @media screen and (min-width: map-get($breakpoints, 'tablet')){

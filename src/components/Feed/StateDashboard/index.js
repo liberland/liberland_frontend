@@ -2,13 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import Markdown from 'markdown-to-jsx';
 import {
   blockchainSelectors, userSelectors, walletSelectors,
 } from '../../../redux/selectors';
 import { formatDollars, formatMerits } from '../../../utils/walletHelpers';
 import { getSelectedNetwork, NETWORKS } from '../../../utils/networkHelpers';
 import router from '../../../router';
+import StatStrip, { DASH } from '../../StateUI/StatStrip';
+import PendingTasks from '../../PendingTasks';
+import RepublicLive from '../../RepublicLive';
+import Guides from '../../Guides';
 import styles from './styles.module.scss';
 
 /*
@@ -21,29 +24,7 @@ import styles from './styles.module.scss';
  * dash rather than an invented number.
  */
 
-function Stat({
-  label, value, unit, note,
-}) {
-  return (
-    <div className={styles.stat}>
-      <div className={styles.statLabel}>{label}</div>
-      <div className={styles.statValue}>
-        {value}
-        {unit ? <span className={styles.statUnit}>{unit}</span> : null}
-      </div>
-      {note ? <div className={styles.statNote}>{note}</div> : null}
-    </div>
-  );
-}
-
-Stat.propTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.node.isRequired,
-  unit: PropTypes.string,
-  note: PropTypes.node,
-};
-
-function StateDashboard({ news }) {
+function StateDashboard({ pending, live }) {
   const history = useHistory();
   const user = useSelector(userSelectors.selectUser);
   const balances = useSelector(walletSelectors.selectorBalances);
@@ -68,40 +49,52 @@ function StateDashboard({ news }) {
         </div>
       </header>
 
-      <section className={styles.strip} aria-label="Account summary">
-        <Stat
-          label="Spendable"
-          value={spendable != null ? formatDollars(spendable) : '—'}
-          unit="LLD"
-          note="Liquid balance"
-        />
-        <Stat
-          label="Political power"
-          value={liquidMerits != null ? formatMerits(liquidMerits) : '—'}
-          unit="LLM"
-          note={pooled != null ? `${formatMerits(pooled)} politipooled` : 'Politipooled merits'}
-        />
-        <Stat
-          label="Staking yield"
-          value="—"
-          unit="APY"
-          note="Bonded LLD"
-        />
-        <Stat
-          label="Citizenship"
-          value={user ? 'Active' : '—'}
-          note={user ? 'Citizen of Liberland' : 'Sign in to verify'}
-        />
-      </section>
+      <StatStrip
+        stats={[
+          {
+            key: 'spendable',
+            label: 'Spendable',
+            value: spendable != null ? formatDollars(spendable) : DASH,
+            unit: 'LLD',
+            note: 'Liquid balance',
+          },
+          {
+            key: 'power',
+            label: 'Political power',
+            value: liquidMerits != null ? formatMerits(liquidMerits) : DASH,
+            unit: 'LLM',
+            note: pooled != null ? `${formatMerits(pooled)} politipooled` : 'Politipooled merits',
+          },
+          {
+            key: 'yield',
+            label: 'Staking yield',
+            value: live?.stakerApy ?? undefined,
+            note: 'From last week’s payouts',
+          },
+          {
+            key: 'citizenship',
+            label: 'Citizenship',
+            value: user ? 'Active' : undefined,
+            note: user ? 'Citizen of Liberland' : 'Sign in to verify',
+          },
+        ]}
+      />
 
       <div className={styles.columns}>
         <section className={styles.col}>
-          <h2 className={styles.sectionTitle}>Awaiting your vote</h2>
+          <div className={styles.sectionHead}>
+            <h2 className={styles.sectionTitle}>Awaiting you</h2>
+            {pending?.tasks?.length > 0 && (
+              <span className={styles.sectionCount}>{pending.tasks.length}</span>
+            )}
+          </div>
           <div className={styles.panel}>
-            <p className={styles.panelBody}>
-              Referenda and congressional motions open for your vote are listed in
-              the assembly.
-            </p>
+            <PendingTasks
+              tasks={pending?.tasks}
+              isLoading={pending?.isLoading}
+              isSignedIn={pending?.isSignedIn}
+              limit={6}
+            />
             <div className={styles.actions}>
               <button
                 type="button"
@@ -124,22 +117,9 @@ function StateDashboard({ news }) {
         </section>
 
         <section className={styles.col}>
-          <h2 className={styles.sectionTitle}>Dispatch</h2>
-          <div className={styles.dispatch}>
-            {news.map((item) => (
-              <article key={item.title} className={styles.dispatchItem}>
-                <div className={styles.dispatchMeta}>
-                  <span className={styles.tag}>{`#${item.tag}`}</span>
-                  <span className={styles.dispatchDate}>{item.date}</span>
-                  <span className={styles.dispatchAuthor}>{item.author}</span>
-                </div>
-                <h3 className={styles.dispatchTitle}>{item.title}</h3>
-                <div className={styles.dispatchBody}>
-                  <Markdown>{item.text}</Markdown>
-                </div>
-              </article>
-            ))}
-          </div>
+          <h2 className={styles.sectionTitle}>The republic, live</h2>
+          <RepublicLive {...live} />
+          <Guides />
         </section>
       </div>
     </div>
@@ -147,13 +127,14 @@ function StateDashboard({ news }) {
 }
 
 StateDashboard.propTypes = {
-  news: PropTypes.arrayOf(PropTypes.shape({
-    tag: PropTypes.string,
-    title: PropTypes.string,
-    date: PropTypes.string,
-    author: PropTypes.string,
-    text: PropTypes.string,
-  })).isRequired,
+  pending: PropTypes.shape({
+    // eslint-disable-next-line react/forbid-prop-types
+    tasks: PropTypes.array,
+    isLoading: PropTypes.bool,
+    isSignedIn: PropTypes.bool,
+  }),
+  // eslint-disable-next-line react/forbid-prop-types
+  live: PropTypes.object,
 };
 
 export default StateDashboard;

@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo } from 'react';
 import Collapse from 'antd/es/collapse';
+import Spin from 'antd/es/spin';
 import Flex from 'antd/es/flex';
 import uniq from 'lodash/uniq';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useHistory, useParams } from 'react-router-dom';
 import Title from 'antd/es/typography/Title';
 import Space from 'antd/es/space';
@@ -14,8 +15,9 @@ import Details from '../Details';
 import CopyIconWithAddress from '../../../../CopyIconWithAddress';
 import router from '../../../../../router';
 import BlacklistButton from '../BlacklistButton';
-import { blockchainSelectors, democracySelectors } from '../../../../../redux/selectors';
-import { democracyActions, identityActions } from '../../../../../redux/actions';
+import { identityActions } from '../../../../../redux/actions';
+import useDemocracyInfo from '../useDemocracyInfo';
+import MissingItem from '../MissingItem';
 import { getHashAndLength } from './utils';
 import { useHideTitle } from '../../../../Layout/HideTitle';
 import CopyInput from '../../../../CopyInput';
@@ -25,25 +27,26 @@ function ProposalPage() {
   const history = useHistory();
   const { id } = useParams();
   const dispatch = useDispatch();
-  const democracy = useSelector(democracySelectors.selectorDemocracyInfo);
-  const userWalletAddress = useSelector(blockchainSelectors.userWalletAddressSelector);
+  const { info, hasLoaded } = useDemocracyInfo();
 
   useHideTitle();
 
-  useEffect(() => {
-    dispatch(democracyActions.getDemocracy.call(userWalletAddress));
-  }, [dispatch, userWalletAddress]);
+  const proposal = useMemo(() => info?.crossReferencedProposalsData?.find(({
+    index,
+  }) => index === parseInt(id)), [info, id]);
 
   const {
     centralizedDatas,
     boundedCall,
     blacklistMotion,
     userIsMember,
-  } = useMemo(() => democracy?.democracy?.crossReferencedProposalsData?.find(({
-    index,
-  }) => index === parseInt(id)) || {}, [democracy, id]);
+  } = proposal || {};
 
+  // On a cold load — this page reached by its own link rather than from the
+  // list — there is no proposal yet, and this used to read `.map` straight
+  // off nothing and take the screen down with it.
   useEffect(() => {
+    if (!centralizedDatas?.length) return;
     dispatch(identityActions.getIdentityMotions.call(
       uniq(centralizedDatas.map(({ proposerAddress }) => proposerAddress)),
     ));
@@ -53,6 +56,14 @@ function ProposalPage() {
 
   const fullLink = `${window.location.protocol}//${window.location.host}${
     router.voting.proposalItem.replace(':id', id)}`;
+
+  if (!hasLoaded) {
+    return <Spin />;
+  }
+
+  if (!proposal) {
+    return <MissingItem kind="proposal" id={`#${id}`} />;
+  }
 
   return (
     <Flex vertical gap="20px">

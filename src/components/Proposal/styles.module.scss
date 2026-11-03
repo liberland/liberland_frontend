@@ -27,3 +27,11 @@
   max-width: 100%!important;
   width: 100%;
 }
+/*
+ * The design languages carry their own link colour. A hardcoded light blue
+ * reads as a stray element in the State language, whose palette is near-black
+ * and state yellow, and it is the only blue on the screen.
+ */
+:global(html[data-design='state']) {
+  .blue { color: var(--gold); }
+}

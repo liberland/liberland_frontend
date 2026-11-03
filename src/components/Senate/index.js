@@ -30,6 +30,11 @@ function Senate() {
         path={router.senate.motions}
         component={MotionsWrapper}
       />
+      <Route
+        exact
+        path={router.senate.motion}
+        component={MotionsWrapper}
+      />
       <Route exact path={router.senate.wallet} component={loader(() => import('./Wallet'))} />
       <Route
         exact
