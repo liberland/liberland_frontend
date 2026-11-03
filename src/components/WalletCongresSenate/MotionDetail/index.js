@@ -21,6 +21,7 @@ import styles from './styles.module.scss';
  */
 function MotionDetail({
   motions, loading, userIsMember, voteMotion, closeMotion, backPath, backLabel,
+  members, chamber,
 }) {
   // `motions` starts as an empty array, so "not found" and "not fetched yet"
   // look identical. Claiming a motion is gone while its chamber is still
@@ -62,6 +63,8 @@ function MotionDetail({
       {back}
       <Motion
         userIsMember={userIsMember}
+        members={members}
+        chamber={chamber}
         membersCount={found.membersCount}
         proposal={found.proposal.toString()}
         proposalOf={found.proposalOf.unwrap()}
@@ -88,6 +91,9 @@ MotionDetail.propTypes = {
   closeMotion: PropTypes.func.isRequired,
   backPath: PropTypes.string.isRequired,
   backLabel: PropTypes.string,
+  // eslint-disable-next-line react/forbid-prop-types
+  members: PropTypes.array,
+  chamber: PropTypes.oneOf(['congress', 'senate']),
 };
 
 MotionDetail.defaultProps = {

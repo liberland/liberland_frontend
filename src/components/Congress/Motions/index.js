@@ -15,6 +15,7 @@ const detailPath = (hash) => `${router.congress.motions}/${hash}`;
 function Motions() {
   const dispatch = useDispatch();
   const motions = useSelector(congressSelectors.motions);
+  const members = useSelector(congressSelectors.members);
   const userIsMember = useSelector(congressSelectors.userIsMember);
   const isLoading = useSelector(congressSelectors.isLoading);
   const { motionIds } = useMotionContext();
@@ -41,6 +42,8 @@ function Motions() {
         userIsMember={userIsMember}
         voteMotion={voteMotion}
         closeMotion={closeMotion}
+        members={members}
+        chamber="congress"
         backPath={router.congress.motions}
         backLabel="All Congress motions"
       />

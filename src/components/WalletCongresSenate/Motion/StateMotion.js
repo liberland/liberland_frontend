@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Button from '../../Button/Button';
 import { Proposal } from '../../Proposal';
 import MotionSummary, { MotionHash, MotionStatusTag } from '../MotionSummary';
+import RollCall from '../RollCall';
 import ProposalErrorBoundary from '../MotionSummary/ProposalErrorBoundary';
 import useMotionTitle from '../MotionSummary/useMotionTitle';
 import styles from './state.module.scss';
@@ -19,6 +20,8 @@ import styles from './state.module.scss';
  */
 function StateMotion({
   motion,
+  members,
+  chamber,
   userIsMember,
   canVoteAye,
   canVoteNay,
@@ -46,6 +49,8 @@ function StateMotion({
 
       <MotionSummary motion={motion} showFateDetail />
 
+      <RollCall motion={motion} members={members} chamber={chamber} />
+
       {userIsMember && (
         <div className={styles.actions}>
           {motion.isClosable && (
@@ -69,6 +74,9 @@ function StateMotion({
 StateMotion.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   motion: PropTypes.object.isRequired,
+  // eslint-disable-next-line react/forbid-prop-types
+  members: PropTypes.array,
+  chamber: PropTypes.oneOf(['congress', 'senate']),
   userIsMember: PropTypes.bool.isRequired,
   canVoteAye: PropTypes.bool.isRequired,
   canVoteNay: PropTypes.bool.isRequired,

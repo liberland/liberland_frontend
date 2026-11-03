@@ -337,6 +337,69 @@ export function motionTitle(outerCall) {
   }
 }
 
+/** How a seat was cast, in the order a roll call reads. */
+export const VOTE_ORDER = ['aye', 'nay', 'none'];
+
+/**
+ * Who voted how, and who has not voted at all.
+ *
+ * A chamber's votes are public — that is most of the point of a chamber —
+ * but the motion screen only ever showed the two lists of people who had
+ * voted. The interesting name is often the one in neither list: a member who
+ * has said nothing while the clock runs down.
+ *
+ * Built against the chamber's current membership, with one exception: an
+ * address that voted and has since left the chamber is still listed, because
+ * the chain records the vote and not the seat. Dropping it would make the
+ * count here disagree with the tally directly above it on the same screen.
+ */
+export function rollCall(motion, members) {
+  const asSet = (list) => new Set((list || []).map((entry) => entry?.toString?.() ?? String(entry)));
+  const ayes = asSet(motion?.ayes);
+  const nays = asSet(motion?.nays);
+
+  const voteOf = (address) => {
+    if (ayes.has(address)) return 'aye';
+    if (nays.has(address)) return 'nay';
+    return 'none';
+  };
+
+  const seated = (members || []).map(({ member, identity }) => ({
+    address: member,
+    name: identity?.identity?.legal || identity?.identity?.name || null,
+    vote: voteOf(member),
+    isMember: true,
+  }));
+
+  const seats = new Set(seated.map((row) => row.address));
+  const departed = [...ayes, ...nays]
+    .filter((address) => !seats.has(address))
+    .map((address) => ({
+      address,
+      name: null,
+      vote: voteOf(address),
+      isMember: false,
+    }));
+
+  const rows = [...seated, ...departed].sort((a, b) => {
+    const byVote = VOTE_ORDER.indexOf(a.vote) - VOTE_ORDER.indexOf(b.vote);
+    if (byVote) return byVote;
+    // A named member before an unnamed one, then alphabetically; the address
+    // is the last resort so the order never depends on storage order.
+    if (Boolean(a.name) !== Boolean(b.name)) return a.name ? -1 : 1;
+    return (a.name || a.address).localeCompare(b.name || b.address);
+  });
+
+  return {
+    rows,
+    counts: {
+      aye: rows.filter((row) => row.vote === 'aye').length,
+      nay: rows.filter((row) => row.vote === 'nay').length,
+      none: rows.filter((row) => row.vote === 'none').length,
+    },
+  };
+}
+
 /** Human time for a span of blocks, at the chain's six-second block. */
 export function blocksToText(blocks) {
   if (blocks == null || Number.isNaN(blocks)) return null;

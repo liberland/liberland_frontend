@@ -6,7 +6,7 @@ import Flex from 'antd/es/flex';
 import Button from '../../Button/Button';
 import { Proposal } from '../../Proposal';
 import { blockchainSelectors } from '../../../redux/selectors';
-import Voters from '../Voters';
+import RollCall from '../RollCall';
 import ProposalTable from '../../Proposal/ProposalTable';
 import MotionSummary, { MotionHash, MotionStatusTag } from '../MotionSummary';
 import ProposalErrorBoundary from '../MotionSummary/ProposalErrorBoundary';
@@ -24,6 +24,8 @@ export default function Motion({
   voteMotion,
   closeMotion,
   membersCount,
+  members,
+  chamber,
   userIsMember,
   isTableRow,
 }) {
@@ -49,6 +51,8 @@ export default function Motion({
     return (
       <StateMotion
         motion={motion}
+        members={members}
+        chamber={chamber}
         userIsMember={userIsMember}
         canVoteAye={canVoteAye}
         canVoteNay={canVoteNay}
@@ -102,14 +106,7 @@ export default function Motion({
         <ProposalErrorBoundary hash={motion.hash}>
           <Proposal proposal={proposalOf} isTableRow={isTableRow} isDetailsHidden />
         </ProposalErrorBoundary>
-        <Flex wrap gap="15px">
-          <Card size="small" title="Voted aye">
-            <Voters voting={voting.ayes} />
-          </Card>
-          <Card size="small" title="Voted nay">
-            <Voters voting={voting.nays} />
-          </Card>
-        </Flex>
+        <RollCall motion={motion} members={members} chamber={chamber} />
         <ProposalTable />
       </Flex>
     </Card>
@@ -135,6 +132,8 @@ Motion.propTypes = {
   closeMotion: PropTypes.func.isRequired,
   voteMotion: PropTypes.func.isRequired,
   membersCount: PropTypes.number.isRequired,
+  members: PropTypes.array,
+  chamber: PropTypes.oneOf(['congress', 'senate']),
   isTableRow: PropTypes.bool,
   userIsMember: PropTypes.bool.isRequired,
 };

@@ -26,7 +26,7 @@ import styles from './styles.module.scss';
  */
 
 function Column({
-  label, tone, motions, userIsMember, onVote, onClose, emptyText, action,
+  label, tone, motions, members, chamber, userIsMember, onVote, onClose, emptyText, action,
 }) {
   return (
     <section className={styles.column}>
@@ -47,6 +47,8 @@ function Column({
             <Motion
               key={proposal.toString()}
               userIsMember={userIsMember}
+              members={members}
+              chamber={chamber}
               membersCount={membersCount}
               proposal={proposal.toString()}
               proposalOf={proposalOf.unwrap()}
@@ -66,6 +68,8 @@ Column.propTypes = {
   label: PropTypes.string.isRequired,
   tone: PropTypes.string.isRequired,
   motions: PropTypes.array,
+  members: PropTypes.array,
+  chamber: PropTypes.oneOf(['congress', 'senate']),
   userIsMember: PropTypes.bool,
   onVote: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
@@ -78,8 +82,10 @@ export default function StateAssembly() {
   const history = useHistory();
 
   const congressMotions = useSelector(congressSelectors.motions);
+  const congressMembers = useSelector(congressSelectors.members);
   const congressIsMember = useSelector(congressSelectors.userIsMember);
   const senateMotions = useSelector(senateSelectors.motions);
+  const senateMembers = useSelector(senateSelectors.members);
   const senateIsMember = useSelector(senateSelectors.userIsMember);
   const balances = useSelector(walletSelectors.selectorBalances);
   const pooled = balances?.liberstake?.amount;
@@ -106,6 +112,8 @@ export default function StateAssembly() {
           label="Congress motions"
           tone={styles.dashAssembly}
           motions={congressMotions}
+          members={congressMembers}
+          chamber="congress"
           userIsMember={congressIsMember}
           onVote={(data) => congressActions.voteAtMotions.call(data)}
           onClose={(data) => congressActions.closeMotion.call(data)}
@@ -126,6 +134,8 @@ export default function StateAssembly() {
             label="Senate review"
             tone={styles.dashRegistry}
             motions={senateMotions}
+            members={senateMembers}
+            chamber="senate"
             userIsMember={senateIsMember}
             onVote={(data) => senateActions.senateVoteAtMotions.call(data)}
             onClose={(data) => senateActions.senateCloseMotion.call(data)}
